@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+
+# cocoapods-generate
+gen/
+
+# Xcode
+xcuserdata/
+
+# Cocoapods
+
+Pods/
+*.xcworkspace
