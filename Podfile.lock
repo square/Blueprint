@@ -5,22 +5,12 @@ PODS:
     - BlueprintUI
   - BlueprintUICommonControls/SnapshotTests (0.2.0):
     - BlueprintUI
-    - iOSSnapshotTestCase
-  - iOSSnapshotTestCase (6.0.2):
-    - iOSSnapshotTestCase/SwiftSupport (= 6.0.2)
-  - iOSSnapshotTestCase/Core (6.0.2)
-  - iOSSnapshotTestCase/SwiftSupport (6.0.2):
-    - iOSSnapshotTestCase/Core
 
 DEPENDENCIES:
   - BlueprintUI (from `./BlueprintUI.podspec`)
   - BlueprintUI/Tests (from `./BlueprintUI.podspec`)
   - BlueprintUICommonControls (from `./BlueprintUICommonControls.podspec`)
   - BlueprintUICommonControls/SnapshotTests (from `./BlueprintUICommonControls.podspec`)
-
-SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - iOSSnapshotTestCase
 
 EXTERNAL SOURCES:
   BlueprintUI:
@@ -30,8 +20,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BlueprintUI: fdbf126886b4a570d4a2f4861d548638df931c17
-  BlueprintUICommonControls: a207abbd53718b7c032a79e2c67946cf293b9697
-  iOSSnapshotTestCase: 20083a7be9b8ef742610e16c79f15ad829441f29
+  BlueprintUICommonControls: a5abc38613d7c50236ab477b0cf9992b00e07553
 
 PODFILE CHECKSUM: 9015a7dc774b3dcc6b0acb1655c4572fdf37841d
 
