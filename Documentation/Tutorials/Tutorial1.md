@@ -176,7 +176,7 @@ final class ViewController: UIViewController {
 }
 ```
 
-The app now displays "Hello, world" in bold white text, centered over a dark gray background.
+The app now displays "Hello, world" in bold dark gray text, centered over a white background.
 
 Try rotating the simulator. Notice that the text is properly centered in both orientations, and it animates properly between orientations.
 
