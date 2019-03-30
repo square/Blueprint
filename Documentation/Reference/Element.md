@@ -11,9 +11,9 @@ public protocol Element {
 
 ## Example Elements
 
-#### A view-backed element that displays a `UISwitch`
+#### A view-backed element that displays a blue square
 ```swift
-struct RedSquare: Element {
+struct BlueSquare: Element {
 
     var content: ElementContent {
         return ElementContent(intrinsicSize: CGSize(width: 90.0, height: 90.0))
