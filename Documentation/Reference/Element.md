@@ -13,7 +13,7 @@ public protocol Element {
 
 #### A view-backed element that displays a blue square
 ```swift
-struct RedSquare: Element {
+struct BlueSquare: Element {
 
     var content: ElementContent {
         return ElementContent(intrinsicSize: CGSize(width: 90.0, height: 90.0))
