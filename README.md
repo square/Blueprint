@@ -67,7 +67,7 @@ Blueprint is not a replacement for UIKit! From the beginning, Blueprint has been
 ## Adding Blueprint to an existing project
 
 Two modules are provided:
-- **`Blueprint`** contains the core architecture and layout types.
+- **`BlueprintUI`** contains the core architecture and layout types.
 - **`BlueprintUICommonControls`** includes elements representing some common `UIKit` views and controls.
 
 Blueprint is available via CocoaPods. Add it to your `Podfile` to integrate:
