@@ -5,8 +5,12 @@ PODS:
     - BlueprintUI
   - BlueprintUICommonControls/SnapshotTests (0.1.0):
     - BlueprintUI
-    - SnapshotTesting (~> 1.3)
-  - SnapshotTesting (1.3.0)
+    - iOSSnapshotTestCase
+  - iOSSnapshotTestCase (6.0.2):
+    - iOSSnapshotTestCase/SwiftSupport (= 6.0.2)
+  - iOSSnapshotTestCase/Core (6.0.2)
+  - iOSSnapshotTestCase/SwiftSupport (6.0.2):
+    - iOSSnapshotTestCase/Core
 
 DEPENDENCIES:
   - BlueprintUI (from `./BlueprintUI.podspec`)
@@ -16,7 +20,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
-    - SnapshotTesting
+    - iOSSnapshotTestCase
 
 EXTERNAL SOURCES:
   BlueprintUI:
@@ -26,9 +30,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BlueprintUI: f4bfb888ae3da230b7499fc615e0f9cf5077354f
-  BlueprintUICommonControls: 0469ba2b1f1aa51656170637a85026acb235f825
-  SnapshotTesting: d4bd40afcf104af96bce7b84f98084fdd817396a
+  BlueprintUICommonControls: 5547bd052a97bcde174ea8916d4bd5eff4a4768e
+  iOSSnapshotTestCase: 20083a7be9b8ef742610e16c79f15ad829441f29
 
-PODFILE CHECKSUM: ac9879b66f47ce48b091deb12779b38eee8d3618
+PODFILE CHECKSUM: 9015a7dc774b3dcc6b0acb1655c4572fdf37841d
 
 COCOAPODS: 1.7.0.beta.2

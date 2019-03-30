@@ -51,4 +51,3 @@ class ImageTests: XCTestCase {
     }
 
 }
-

@@ -16,13 +16,10 @@ Pod::Spec.new do |s|
   s.dependency 'BlueprintUI'
 
   s.test_spec 'SnapshotTests' do |test_spec|
-    
-    test_spec.ios.deployment_target = '10.0'
-
     test_spec.source_files = 'BlueprintUICommonControls/Tests/Sources/*.swift'
     test_spec.resources = 'BlueprintUICommonControls/Tests/Resources/**/*'
     test_spec.framework = 'XCTest'
 
-    test_spec.dependency 'SnapshotTesting', '~> 1.3'
+    test_spec.dependency 'iOSSnapshotTestCase'
   end
 end

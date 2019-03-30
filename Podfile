@@ -1,5 +1,6 @@
 platform :ios, '12.0'
 inhibit_all_warnings!
+use_frameworks!
 
 project 'SampleApp/SampleApp.xcodeproj'
 
