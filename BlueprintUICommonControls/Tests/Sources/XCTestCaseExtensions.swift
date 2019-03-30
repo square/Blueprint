@@ -36,8 +36,14 @@ extension XCTestCase {
             if referenceImage.pixelData == image.pixelData {
                 // Success!
                 return
+            } else {
+                XCTFail("Snapshot did not match reference image", file: file, line: line)
             }
+        } else {
+            XCTFail("Failed to load reference image: \(imageURL.path)", file: file, line: line)
         }
+
+
 
         guard let pngData = image.pngData() else {
             XCTFail("Failed to get PNG data for snapshot image", file: file, line: line)
@@ -51,7 +57,6 @@ extension XCTestCase {
             return
         }
 
-        XCTFail("Snapshot did not match reference image", file: file, line: line)
     }
 
     func compareSnapshot(of view: UIView, identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line) {
