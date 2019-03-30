@@ -11,7 +11,7 @@ public protocol Element {
 
 ## Example Elements
 
-#### A view-backed element that displays a `UISwitch`
+#### A view-backed element that displays a blue square
 ```swift
 struct RedSquare: Element {
 
