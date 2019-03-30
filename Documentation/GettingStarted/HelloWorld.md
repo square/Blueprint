@@ -5,7 +5,7 @@
 ```swift
 import UIKit
 import BlueprintUI
-
+import BlueprintUICommonControls
 
 private func makeHelloWorldElement() -> Element {
     var label = Label(text: "Hello, world")
