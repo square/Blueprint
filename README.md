@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/square/Blueprint.svg?branch=master)](https://travis-ci.com/square/Blueprint)
+
 # Blueprint
 
 ### Declarative UI construction for iOS, written in Swift
