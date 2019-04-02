@@ -159,9 +159,8 @@ struct HelloWorldElement: ProxyElement {
 The element hierarchy that we have just defined is:
 
 ```
-- Box
-  - Centered
-    - Label
+- Centered
+  - Label
 ```
 
 Now update `ViewController` to use the new element:
