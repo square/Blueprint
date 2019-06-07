@@ -12,7 +12,7 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "simple")
+                identifier: "text_simple")
         }
 
         do {
@@ -30,7 +30,7 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "disabled")
+                identifier: "text_disabled")
         }
 
     }

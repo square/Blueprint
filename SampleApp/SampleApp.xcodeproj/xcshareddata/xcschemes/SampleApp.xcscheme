@@ -28,6 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F0DBD15A7E34A7177B40DF27414BFF9"
+               BuildableName = "BlueprintUI-Unit-Tests.xctest"
+               BlueprintName = "BlueprintUI-Unit-Tests"
+               ReferencedContainer = "container:../Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F925C76EB0C419FFF50E75FE722C55A2"
+               BuildableName = "BlueprintUICommonControls-Unit-SnapshotTests.xctest"
+               BlueprintName = "BlueprintUICommonControls-Unit-SnapshotTests"
+               ReferencedContainer = "container:../Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

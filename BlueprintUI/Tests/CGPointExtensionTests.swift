@@ -13,7 +13,12 @@ class CGPointExtensionTests: XCTestCase {
         
         let rotateTransform = CATransform3DMakeRotation(.pi, 0.0, 0.0, 1.0)
         let rotatedPoint = point.applying(rotateTransform)
-        XCTAssertEqual(rotatedPoint, CGPoint(x: -100.0, y: -100.0))
+        if MemoryLayout<CGFloat>.size == 4 {
+            let roundedPoint = CGPoint(x: rotatedPoint.x.rounded(), y: rotatedPoint.y.rounded())
+            XCTAssertEqual(roundedPoint, CGPoint(x: -100.0, y: -100.0))
+        } else {
+            XCTAssertEqual(rotatedPoint, CGPoint(x: -100.0, y: -100.0))
+        }
         
         let translateTransform = CATransform3DMakeTranslation(33.0, 22.0, 0.0)
         let translatedPoint = point.applying(translateTransform)

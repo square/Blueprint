@@ -11,3 +11,5 @@ xcuserdata/
 
 Pods/
 *.xcworkspace
+
+.*swp

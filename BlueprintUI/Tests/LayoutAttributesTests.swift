@@ -109,9 +109,14 @@ final class LayoutAttributesTests: XCTestCase {
             b.center = .zero
             
             let combined = b.within(a)
-            
-            XCTAssertEqual(combined.center.x, 100)
-            XCTAssertEqual(combined.center.y, 100)
+
+            if MemoryLayout<CGFloat>.size == 4 {
+                XCTAssertEqual(combined.center.x.rounded(), 100)
+                XCTAssertEqual(combined.center.y.rounded(), 100)
+            } else {
+                XCTAssertEqual(combined.center.x, 100)
+                XCTAssertEqual(combined.center.y, 100)
+            }
         }
 
     }
