@@ -10,6 +10,8 @@ public struct TextField: Element {
     public var onChange: ((String) -> Void)? = nil
     public var secure: Bool = false
     public var isEnabled: Bool = true
+    
+    public var font: UIFont? = nil
 
     public var clearButtonMode: UITextField.ViewMode = .never
 
@@ -28,8 +30,9 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
-    public init(text: String) {
+    public init(text: String, configure: (inout TextField) -> Void = { _ in }) {
         self.text = text
+        configure(&self)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -41,6 +44,8 @@ public struct TextField: Element {
             configuration[\.onChange] = onChange
             configuration[\.isSecureTextEntry] = secure
             configuration[\.isEnabled] = isEnabled
+            
+            configuration[\.font] = font
 
             configuration[\.clearButtonMode] = clearButtonMode
 
