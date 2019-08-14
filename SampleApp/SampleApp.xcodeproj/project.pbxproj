@@ -3,12 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		5C40B326942B3D4913788CB6 /* Pods_Tutorial_1__Completed_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12F17E90CFF5B03DC755C199 /* Pods_Tutorial_1__Completed_.framework */; };
-		68E4B3FC6122A5CDB8793F63 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		6D764555401AA55AC666B8E9 /* Pods_Tutorial_2__Completed_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 999BE36CC630B1FB1221C6A4 /* Pods_Tutorial_2__Completed_.framework */; };
 		97545519223C12E9003E353F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* ViewController.swift */; };
 		9754551A223C12E9003E353F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545511223C12E9003E353F /* AppDelegate.swift */; };
@@ -358,6 +357,19 @@
 				TargetAttributes = {
 					975454F9223C1289003E353F = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
+					};
+					9796EC3B224D1D2000E729F3 = {
+						LastSwiftMigration = 1020;
+					};
+					9796EC52224DB3BF00E729F3 = {
+						LastSwiftMigration = 1020;
+					};
+					9796EC61224DB3C500E729F3 = {
+						LastSwiftMigration = 1020;
+					};
+					979F49E5224D1BD300A3C5D4 = {
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -821,7 +833,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.SampleApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -839,7 +851,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.SampleApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -857,7 +869,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial1Completed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -875,7 +887,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial1Completed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -893,7 +905,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -911,7 +923,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -929,7 +941,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial2Completed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -947,7 +959,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial2Completed";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -965,7 +977,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -983,7 +995,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.Tutorial1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
