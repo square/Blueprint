@@ -137,6 +137,9 @@ extension StackLayout {
 
     /// Determines the on-axis layout when there is extra free space available.
     public enum UnderflowDistribution {
+        
+        /// Additional space will appear after all items are laid out (bottom for vertical stacks, left for horizontal stacks).
+        case none
 
         /// Additional space will be evenly devided into the spacing between items.
         case spaceEvenly
@@ -285,6 +288,8 @@ extension StackLayout {
         let space: CGFloat
 
         switch underflow {
+        case .none:
+            space = 0.0
         case .growProportionally:
             space = minimumSpacing
         case .growUniformly:
@@ -304,6 +309,8 @@ extension StackLayout {
             let traits = traits[index]
             var priority: CGFloat
             switch underflow {
+            case .none:
+                priority = 0.0
             case .growProportionally:
                 priority = basis.axis / totalBasisSize
             case .growUniformly:
