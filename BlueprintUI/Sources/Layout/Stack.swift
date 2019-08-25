@@ -289,7 +289,7 @@ extension StackLayout {
 
         switch underflow {
         case .none:
-            space = 0.0
+            space = minimumSpacing
         case .growProportionally:
             space = minimumSpacing
         case .growUniformly:
