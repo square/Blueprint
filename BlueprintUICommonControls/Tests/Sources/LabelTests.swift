@@ -71,6 +71,7 @@ class LabelTests: XCTestCase {
 
     fileprivate func compareSnapshot(identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line, configuration: (inout Label) -> Void) {
         var label = Label(text: "Hello, world. This is a long run of text that should wrap at some point. Someone should improve this test by adding a joke or something. Alright, it's been fun!")
+        label.roundingScale = 1
         configuration(&label)
         compareSnapshot(of: label, size: CGSize(width: 300, height: 300), identifier: identifier, file: file, testName: testName, line: line)
     }

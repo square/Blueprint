@@ -9,6 +9,7 @@ public struct SegmentedControl: Element, Measurable {
     public var selection: Selection = .none
 
     public var font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)
+    public var roundingScale: CGFloat = UIScreen.main.scale
 
     public init(items: [Item] = []) {
         self.items = items
@@ -24,7 +25,7 @@ public struct SegmentedControl: Element, Measurable {
 
     public func measure(in constraint: SizeConstraint) -> CGSize {
         return items.reduce(CGSize.zero, { (current, item) -> CGSize in
-            let itemSize = item.measure(font: font, in: constraint)
+            let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
             return CGSize(
                 width: itemSize.width + current.width,
                 height: max(itemSize.height, current.height))
@@ -67,9 +68,9 @@ extension SegmentedControl {
 
         public var onSelect: () -> Void
 
-        internal func measure(font: UIFont, in constraint: SizeConstraint) -> CGSize {
+        internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: CGFloat) -> CGSize {
             return CGSize(
-                width: width.requiredWidth(for: title, font: font, in: constraint),
+                width: width.requiredWidth(for: title, font: font, in: constraint, roundingScale: roundingScale),
                 height: 36.0)
         }
 
@@ -92,7 +93,12 @@ extension SegmentedControl.Item {
             }
         }
 
-        fileprivate func requiredWidth(for title: String, font: UIFont, in constraint: SizeConstraint) -> CGFloat {
+        fileprivate func requiredWidth(
+            for title: String,
+            font: UIFont,
+            in constraint: SizeConstraint,
+            roundingScale: CGFloat
+        ) -> CGFloat {
             switch self {
             case .automatic:
                 let width = (title as NSString)
@@ -103,8 +109,9 @@ extension SegmentedControl.Item {
                         context: nil)
                     .size
                     .width
+                    .rounded(.up, by: roundingScale)
 
-                return ceil(width) + 8 // 4pt padding on each side
+                return width + 8 // 4pt padding on each side
             case let .specific(width):
                 return width
             }
