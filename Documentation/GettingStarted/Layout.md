@@ -39,7 +39,18 @@ A `Centered` element always wraps a single child. During a layout pass, the layo
 After `Centered` has been assigned a size during a layout pass, it always sizes the wrapped element to its measured size, then centers it within the layout area.
 
 ```swift
-let centered = Centered(wrapping: Label(text: "Hello, world"))
+let centered = Centered(Label(text: "Hello, world"))
+```
+
+### `Aligned`
+
+Aligns a single child horizontally and vertically to the left (leading edge), right (trailing edge), top, bottom, or center of the available space. Like `Centered`, it delegates measuring to the child.
+
+```swift
+let aligned = Aligned(
+    vertically: .bottom,
+    horizontally: .trailing,
+    wrapping: Label(text: "Hello from the corner"))
 ```
 
 ### `Spacer`
