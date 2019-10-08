@@ -5,7 +5,7 @@ class InsetTests: XCTestCase {
 
     func test_measuring() {
         let element = TestElement()
-        let inset = Inset(wrapping: element, uniformInset: 20.0)
+        let inset = Inset(uniformInset: 20.0, wrapping: element)
 
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
@@ -15,7 +15,7 @@ class InsetTests: XCTestCase {
 
     func test_layout() {
         let element = TestElement()
-        let inset = Inset(wrapping: element, uniformInset: 20.0)
+        let inset = Inset(uniformInset: 20.0, wrapping: element)
 
         let children = inset.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children.map { $0.node }
 

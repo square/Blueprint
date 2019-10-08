@@ -97,8 +97,8 @@ fileprivate struct FeedItem: ProxyElement {
         let box = Box(
             backgroundColor: .white,
             wrapping: Inset(
-                wrapping: element,
-                uniformInset: 16.0))
+                uniformInset: 16.0,
+                wrapping: element))
 
 
         return box

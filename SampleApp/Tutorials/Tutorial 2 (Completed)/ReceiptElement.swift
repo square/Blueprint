@@ -44,8 +44,8 @@ struct ReceiptElement: ProxyElement {
         }
 
         let inset = Inset(
-            wrapping: column,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: column)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight
