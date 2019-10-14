@@ -11,7 +11,7 @@ public struct Button: Element {
     public var onTap: () -> Void
     public var minumumTappableSize: CGSize = CGSize(width: 44, height: 44)
 
-    public init(wrapping element: Element, isEnabled: Bool = true, onTap: @escaping () -> Void = {}) {
+    public init(isEnabled: Bool = true, onTap: @escaping () -> Void = {}, wrapping element: Element) {
         self.wrappedElement = element
         self.isEnabled = isEnabled
         self.onTap = onTap

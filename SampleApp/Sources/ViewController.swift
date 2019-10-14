@@ -76,12 +76,12 @@ fileprivate struct FeedItem: ProxyElement {
             row.horizontalUnderflow = .growUniformly
 
             let avatar = ConstrainedSize(
+                width: .absolute(64),
+                height: .absolute(64),
                 wrapping: Box(
                     backgroundColor: .lightGray,
                     cornerStyle: .rounded(radius: 32.0),
-                    wrapping: nil),
-                width: .absolute(64),
-                height: .absolute(64))
+                    wrapping: nil))
 
             row.add(
                 growPriority: 0.0,
@@ -97,8 +97,8 @@ fileprivate struct FeedItem: ProxyElement {
         let box = Box(
             backgroundColor: .white,
             wrapping: Inset(
-                wrapping: element,
-                uniformInset: 16.0))
+                uniformInset: 16.0,
+                wrapping: element))
 
 
         return box

@@ -6,7 +6,7 @@ public struct ConstrainedSize: Element {
     public var width: Constraint
     public var height: Constraint
 
-    public init(wrapping element: Element, width: Constraint = .unconstrained, height: Constraint = .unconstrained) {
+    public init(width: Constraint = .unconstrained, height: Constraint = .unconstrained, wrapping element: Element) {
         self.wrappedElement = element
         self.width = width
         self.height = height

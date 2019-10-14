@@ -13,7 +13,7 @@ public struct Inset: Element {
     public var left: CGFloat
     public var right: CGFloat
     
-    public init(wrapping element: Element, top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0) {
+    public init(top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0, wrapping element: Element) {
         self.wrappedElement = element
         self.top = top
         self.bottom = bottom
@@ -21,7 +21,7 @@ public struct Inset: Element {
         self.right = right
     }
     
-    public init(wrapping element: Element, uniformInset: CGFloat) {
+    public init(uniformInset: CGFloat, wrapping element: Element) {
         self.wrappedElement = element
         self.top = uniformInset
         self.bottom = uniformInset
@@ -29,7 +29,7 @@ public struct Inset: Element {
         self.right = uniformInset
     }
     
-    public init(wrapping element: Element, insets: UIEdgeInsets) {
+    public init(insets: UIEdgeInsets, wrapping element: Element) {
         self.wrappedElement = element
         self.top = insets.top
         self.bottom = insets.bottom
@@ -37,21 +37,21 @@ public struct Inset: Element {
         self.right = insets.right
     }
     
-    public init(wrapping element: Element, sideInsets: CGFloat) {
+    public init(sideInsets: CGFloat, wrapping element: Element) {
         self.init(
-            wrapping: element,
             insets: UIEdgeInsets(
                 top: 0.0,
                 left: sideInsets,
                 bottom: 0.0,
-                right: sideInsets))
+                right: sideInsets),
+            wrapping: element)
     }
     
-    public init(wrapping element: Element, vertical: CGFloat) {
+    public init(vertical: CGFloat, wrapping element: Element) {
         self.init(
-            wrapping: element,
             top: vertical,
-            bottom: vertical)
+            bottom: vertical,
+            wrapping: element)
     }
 
     public var content: ElementContent {
