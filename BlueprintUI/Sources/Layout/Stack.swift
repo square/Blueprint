@@ -146,6 +146,15 @@ extension StackLayout {
 
         /// Additional space will be distributed uniformly between children.
         case growUniformly
+
+        /// Additional space will appear after all children.
+        case justifyToStart
+
+        /// Additional space will be distributed on either side of all children.
+        case justifyToCenter
+
+        /// Additional space will be appear before all children.
+        case justifyToEnd
     }
 
     /// Determines the on-axis layout when there is not enough space to fit all children as measured.
@@ -291,11 +300,32 @@ extension StackLayout {
             space = minimumSpacing
         case .spaceEvenly:
             space = (layoutSize.axis - totalBasisSize) / CGFloat(basisSizes.count-1)
+        case .justifyToStart:
+            space = minimumSpacing
+        case .justifyToCenter:
+            space = minimumSpacing
+        case .justifyToEnd:
+            space = minimumSpacing
         }
 
         var frames = _calculateCross(basisSizes: basisSizes, layoutSize: layoutSize)
 
-        var axisOrigin: CGFloat = 0.0
+        var axisOrigin: CGFloat
+
+        switch underflow {
+        case .growProportionally:
+            axisOrigin = 0.0
+        case .growUniformly:
+            axisOrigin = 0.0
+        case .spaceEvenly:
+            axisOrigin = 0.0
+        case .justifyToStart:
+            axisOrigin = 0.0
+        case .justifyToCenter:
+            axisOrigin = (extraSize / 2.0).rounded() // TODO: @narenh - Add screen scale rounding
+        case .justifyToEnd:
+            axisOrigin = extraSize
+        }
 
         var growPriorities: [CGFloat] = []
 
@@ -309,6 +339,12 @@ extension StackLayout {
             case .growUniformly:
                 priority = 1.0
             case .spaceEvenly:
+                priority = 0.0
+            case .justifyToStart:
+                priority = 0.0
+            case .justifyToCenter:
+                priority = 0.0
+            case .justifyToEnd:
                 priority = 0.0
             }
 
