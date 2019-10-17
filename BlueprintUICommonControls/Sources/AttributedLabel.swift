@@ -5,6 +5,8 @@ public struct AttributedLabel: Element {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
+    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
+    public var roundingScale: CGFloat = UIScreen.main.scale
 
     public init(attributedText: NSAttributedString) {
         self.attributedText = attributedText
@@ -14,6 +16,7 @@ public struct AttributedLabel: Element {
         struct Measurer: Measurable {
 
             var attributedText: NSAttributedString
+            var roundingScale: CGFloat
 
             func measure(in constraint: SizeConstraint) -> CGSize {
                 var size = attributedText.boundingRect(
@@ -21,14 +24,14 @@ public struct AttributedLabel: Element {
                     options: [.usesLineFragmentOrigin],
                     context: nil)
                     .size
-                size.width = ceil(size.width)
-                size.height = ceil(size.height)
+                size.width = size.width.rounded(.up, by: roundingScale)
+                size.height = size.height.rounded(.up, by: roundingScale)
 
                 return size
             }
         }
 
-        return ElementContent(measurable: Measurer(attributedText: attributedText))
+        return ElementContent(measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale))
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

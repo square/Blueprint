@@ -12,7 +12,8 @@ class AttributedLabelTests: XCTestCase {
             .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
             .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-        let element = AttributedLabel(attributedText: string)
+        var element = AttributedLabel(attributedText: string)
+        element.roundingScale = 1
 
         compareSnapshot(of: element)
         
@@ -22,6 +23,7 @@ class AttributedLabelTests: XCTestCase {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         var element = AttributedLabel(attributedText: string)
+        element.roundingScale = 1
 
         element.numberOfLines = 0
         compareSnapshot(
@@ -52,11 +54,12 @@ class AttributedLabelTests: XCTestCase {
                 .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
                 .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-            let element = AttributedLabel(attributedText: string)
+            var element = AttributedLabel(attributedText: string)
+            element.roundingScale = 1
 
             var measuredSize = string.boundingRect(with: size, options: .usesLineFragmentOrigin, context: nil).size
-            measuredSize.width = ceil(measuredSize.width)
-            measuredSize.height = ceil(measuredSize.height)
+            measuredSize.width = measuredSize.width.rounded(.up)
+            measuredSize.height = measuredSize.height.rounded(.up)
 
             let elementSize = element.content.measure(in: SizeConstraint(size))
 
@@ -70,7 +73,20 @@ class AttributedLabelTests: XCTestCase {
 
     }
 
+    func test_rounding() {
+        let string = NSAttributedString(
+            string: "iiiii",
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 23)
+            ])
 
+        var element = AttributedLabel(attributedText: string)
+        element.roundingScale = 2.0
+
+        let size = element.content.measure(in: SizeConstraint(CGSize(width: 100, height: 100)))
+
+        XCTAssertEqual(size, CGSize(width: 25.5, height: 27.5))
+    }
 }
 
 
