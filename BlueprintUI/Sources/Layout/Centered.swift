@@ -4,7 +4,7 @@
 /// the content element – even if that size is larger than the wrapping `Centered`
 /// element.
 ///
-public struct Centered: Element {
+public struct Centered: ProxyElement {
 
     /// The content element to be centered.
     public var wrappedElement: Element
@@ -14,29 +14,7 @@ public struct Centered: Element {
         self.wrappedElement = wrappedElement
     }
 
-    public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout())
-    }
-
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return nil
-    }
-}
-
-extension Centered {
-    fileprivate struct Layout: SingleChildLayout {
-
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            var childAttributes = LayoutAttributes()
-            childAttributes.bounds.size = child.measure(in: SizeConstraint(size))
-            childAttributes.center.x = size.width/2.0
-            childAttributes.center.y = size.height/2.0
-            return childAttributes
-        }
-
+    public var elementRepresentation: Element {
+        return Aligned(vertically: .center, horizontally: .center, wrapping: wrappedElement)
     }
 }
