@@ -2,8 +2,6 @@
 /// the specified `direction` and spacing them according to the specified `spacing`.
 ///
 /// - Note: A stack is measured to accommodate its largest child in each axis.
-/// - Note: Children are laid out according to `roundingScale`. Any leftover space
-///         will be assigned to the last child.
 public struct EqualStack: Element {
 
     /// The direction in which this element will stack its children.
@@ -14,9 +12,6 @@ public struct EqualStack: Element {
 
     /// The child elements to be laid out. Defaults to an empty array.
     public var children: [Element] = []
-
-    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
 
     /// - Parameters:
     ///     - direction: The direction in which this element will stack its children.
@@ -30,7 +25,7 @@ public struct EqualStack: Element {
     }
 
     public var content: ElementContent {
-        let layout = EqualLayout(direction: direction, spacing: spacing, roundingScale: roundingScale)
+        let layout = EqualLayout(direction: direction, spacing: spacing)
         return ElementContent(layout: layout) {
             for child in children {
                 $0.add(element: child)
@@ -63,7 +58,6 @@ extension EqualStack {
 
         var direction: Direction
         var spacing: CGFloat
-        var roundingScale: CGFloat
 
         func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
             let itemSizes = items.map { $1.measure(in: constraint) }
@@ -89,56 +83,31 @@ extension EqualStack {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             guard items.count > 0 else { return [] }
 
-            var result: [LayoutAttributes] = []
-
             let itemSize: CGSize
             switch direction {
             case .horizontal:
-                let itemWidth = (size.width - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count)
                 itemSize = CGSize(
-                    width: itemWidth.rounded(.toNearestOrAwayFromZero, by: roundingScale),
+                    width: (size.width - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count),
                     height: size.height)
             case .vertical:
-                let itemHeight = (size.height - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count)
                 itemSize = CGSize(
                     width: size.width,
-                    height: itemHeight.rounded(.toNearestOrAwayFromZero, by: roundingScale))
+                    height: (size.height - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count))
             }
 
-            var cumulativeSize: CGFloat = 0
+            var result: [LayoutAttributes] = []
 
-            // Assign the fixed itemSize to the first n-1 items
-            for index in 0..<items.count - 1 {
+            for index in 0..<items.count {
                 var attributes = LayoutAttributes(size: itemSize)
 
                 switch direction {
                 case .horizontal:
-                    attributes.frame.origin.x = cumulativeSize
-                    cumulativeSize += itemSize.width + spacing
+                    attributes.frame.origin.x = (itemSize.width + spacing) * CGFloat(index)
                 case .vertical:
-                    attributes.frame.origin.y = cumulativeSize
-                    cumulativeSize += itemSize.height + spacing
+                    attributes.frame.origin.y = (itemSize.height + spacing) * CGFloat(index)
                 }
 
                 result.append(attributes)
-            }
-
-            // Assign the remaining space to the nth item
-            switch direction {
-            case .horizontal:
-                result.append(
-                    LayoutAttributes(frame: CGRect(
-                        x: cumulativeSize,
-                        y: 0,
-                        width: size.width - cumulativeSize,
-                        height: itemSize.height)))
-            case .vertical:
-                result.append(
-                    LayoutAttributes(frame: CGRect(
-                        x: 0,
-                        y: cumulativeSize,
-                        width: itemSize.width,
-                        height: size.height - cumulativeSize)))
             }
 
             return result

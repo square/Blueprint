@@ -7,7 +7,6 @@ class EqualStackTests: XCTestCase {
         let stack = EqualStack(direction: .horizontal)
         XCTAssertEqual(stack.spacing, 0)
         XCTAssertTrue(stack.children.isEmpty)
-        XCTAssertEqual(stack.roundingScale, UIScreen.main.scale)
     }
 
     func test_measuring() {
@@ -143,56 +142,6 @@ class EqualStackTests: XCTestCase {
                 CGRect(x: 0, y: 0, width: 200, height: 50),
                 CGRect(x: 0, y: 75, width: 200, height: 50),
                 CGRect(x: 0, y: 150, width: 200, height: 50)
-            ])
-        }
-
-    }
-
-    func test_layout_withRounding() {
-
-        let children = [
-            TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 100, height: 100))
-        ]
-
-        // direction = .horizontal, spacing = 0, roundingScale = 1
-        do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 0
-                stack.children = children
-                stack.roundingScale = 1
-            }
-
-            let childFrames = stack
-                .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-                .children
-                .map { $0.node.layoutAttributes.frame }
-
-            XCTAssertEqual(childFrames, [
-                CGRect(x: 0, y: 0, width: 33, height: 100),
-                CGRect(x: 33, y: 0, width: 33, height: 100),
-                CGRect(x: 66, y: 0, width: 34, height: 100)
-                ])
-        }
-
-        // direction = .horizontal, spacing = 15, roundingScale = 1
-        do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 15
-                stack.children = children
-                stack.roundingScale = 1
-            }
-
-            let childFrames = stack
-                .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-                .children
-                .map { $0.node.layoutAttributes.frame }
-
-            XCTAssertEqual(childFrames, [
-                CGRect(x: 0, y: 0, width: 23, height: 100),
-                CGRect(x: 38, y: 0, width: 23, height: 100),
-                CGRect(x: 76, y: 0, width: 24, height: 100)
             ])
         }
 
