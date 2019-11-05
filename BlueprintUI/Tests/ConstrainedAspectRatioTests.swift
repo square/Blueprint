@@ -5,7 +5,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_expandWide() {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 2, height: 1),
-            constraint: .expand,
+            contentMode: .fill,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
@@ -15,7 +15,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_expandTall() {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 1, height: 2),
-            constraint: .expand,
+            contentMode: .fill,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
@@ -25,7 +25,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_expandSquare() {
         let element = ConstrainedAspectRatio(
             aspectRatio: .square,
-            constraint: .expand,
+            contentMode: .fill,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
@@ -35,7 +35,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_shrinkWide() {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 2, height: 1),
-            constraint: .shrink,
+            contentMode: .fit,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
@@ -45,7 +45,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_shrinkTall() {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 1, height: 2),
-            constraint: .shrink,
+            contentMode: .fit,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
@@ -55,7 +55,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
     func test_shrinkSquare() {
         let element = ConstrainedAspectRatio(
             aspectRatio: .square,
-            constraint: .shrink,
+            contentMode: .fit,
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
