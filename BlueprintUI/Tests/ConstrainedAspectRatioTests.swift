@@ -4,7 +4,7 @@ import BlueprintUI
 class ConstrainedAspectRatioTests: XCTestCase {
     func test_expandWide() {
         let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(x: 2, y: 1),
+            aspectRatio: AspectRatio(width: 2, height: 1),
             constraint: .expand,
             wrapping: TestElement())
 
@@ -14,7 +14,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
     func test_expandTall() {
         let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(x: 1, y: 2),
+            aspectRatio: AspectRatio(width: 1, height: 2),
             constraint: .expand,
             wrapping: TestElement())
 
@@ -34,7 +34,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
     func test_shrinkWide() {
         let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(x: 2, y: 1),
+            aspectRatio: AspectRatio(width: 2, height: 1),
             constraint: .shrink,
             wrapping: TestElement())
 
@@ -44,7 +44,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
     func test_shrinkTall() {
         let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(x: 1, y: 2),
+            aspectRatio: AspectRatio(width: 1, height: 2),
             constraint: .shrink,
             wrapping: TestElement())
 

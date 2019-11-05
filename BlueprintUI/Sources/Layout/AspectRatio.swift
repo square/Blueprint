@@ -1,29 +1,33 @@
 /// Represents an a proportional relationship between width and height.
 public struct AspectRatio {
     /// A 1:1 aspect ratio.
-    public static let square = AspectRatio(x: 1, y: 1)
+    public static let square = AspectRatio(ratio: 1)
 
-    /// The horizontal component of this ratio.
-    public var x: CGFloat
-    /// The vertical component of this ratio.
-    public var y: CGFloat
+    /// The width:height ratio value.
+    public var ratio: CGFloat
 
-    /// Initializes with a horizontal and vertical components.
+    /// Initializes with a width & height ratio.
     ///
-    /// - Parameter x: The horizontal comonent.
-    /// - Parameter y: The vertical component.
-    public init(x: CGFloat, y: CGFloat) {
-        self.x = x
-        self.y = y
+    /// - Parameter width: The relative width of the ratio.
+    /// - Parameter height: The relative height of the ratio.
+    public init(width: CGFloat, height: CGFloat) {
+        self.init(ratio: width / height)
+    }
+
+    /// Initializes with a specific ratio.
+    ///
+    /// - Parameter ratio: The width:height ratio.
+    public init(ratio: CGFloat) {
+        self.ratio = ratio
     }
 
     func height(forWidth width: CGFloat) -> CGFloat {
         // TODO: round to screen scale when that lands
-        return (width * y / x).rounded()
+        return (width / ratio).rounded()
     }
 
     func width(forHeight height: CGFloat) -> CGFloat {
         // TODO: round to screen scale when that lands
-        return (height * x / y).rounded()
+        return (height * ratio).rounded()
     }
 }
