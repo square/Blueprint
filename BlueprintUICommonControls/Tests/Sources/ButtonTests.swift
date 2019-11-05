@@ -8,7 +8,7 @@ class ButtonTests: XCTestCase {
     func test_snapshots() {
 
         let label = Label(text: "Hello, world") { (label) in
-            label.roundingScale = 1
+            label.roundingScale = .scale(1)
         }
 
         do {

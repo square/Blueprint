@@ -13,7 +13,7 @@ public struct Label: Element {
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
     /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
+    public var roundingScale = RoundingScale.scale(UIScreen.main.scale)
 
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
         self.text = text

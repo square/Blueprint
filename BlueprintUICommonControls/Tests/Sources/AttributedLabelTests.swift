@@ -13,7 +13,7 @@ class AttributedLabelTests: XCTestCase {
             .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
         var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 1
+        element.roundingScale = .scale(1)
 
         compareSnapshot(of: element)
         
@@ -23,7 +23,7 @@ class AttributedLabelTests: XCTestCase {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 1
+        element.roundingScale = .scale(1)
 
         element.numberOfLines = 0
         compareSnapshot(
@@ -55,7 +55,7 @@ class AttributedLabelTests: XCTestCase {
                 .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
             var element = AttributedLabel(attributedText: string)
-            element.roundingScale = 1
+            element.roundingScale = .scale(1)
 
             var measuredSize = string.boundingRect(with: size, options: .usesLineFragmentOrigin, context: nil).size
             measuredSize.width = measuredSize.width.rounded(.up)
@@ -81,7 +81,7 @@ class AttributedLabelTests: XCTestCase {
             ])
 
         var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 2.0
+        element.roundingScale = .scale(2)
 
         let size = element.content.measure(in: SizeConstraint(CGSize(width: 100, height: 100)))
 

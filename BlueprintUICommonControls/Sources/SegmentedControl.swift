@@ -9,7 +9,7 @@ public struct SegmentedControl: Element, Measurable {
     public var selection: Selection = .none
 
     public var font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)
-    public var roundingScale: CGFloat = UIScreen.main.scale
+    public var roundingScale = RoundingScale.scale(UIScreen.main.scale)
 
     public init(items: [Item] = []) {
         self.items = items
@@ -68,7 +68,7 @@ extension SegmentedControl {
 
         public var onSelect: () -> Void
 
-        internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: CGFloat) -> CGSize {
+        internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: RoundingScale) -> CGSize {
             return CGSize(
                 width: width.requiredWidth(for: title, font: font, in: constraint, roundingScale: roundingScale),
                 height: 36.0)
@@ -97,11 +97,11 @@ extension SegmentedControl.Item {
             for title: String,
             font: UIFont,
             in constraint: SizeConstraint,
-            roundingScale: CGFloat
+            roundingScale: RoundingScale
         ) -> CGFloat {
             switch self {
             case .automatic:
-                let width = (title as NSString)
+                var width = (title as NSString)
                     .boundingRect(
                         with: constraint.maximum,
                         options: [.usesLineFragmentOrigin],
@@ -109,9 +109,11 @@ extension SegmentedControl.Item {
                         context: nil)
                     .size
                     .width
-                    .rounded(.up, by: roundingScale)
+
+                width = roundingScale.round(width, .up)
 
                 return width + 8 // 4pt padding on each side
+
             case let .specific(width):
                 return width
             }
