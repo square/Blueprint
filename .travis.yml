@@ -5,7 +5,7 @@ notifications:
 
 language: swift
 os: osx
-osx_image: xcode10.2
+osx_image: xcode10.3
 xcode_workspace: SampleApp.xcworkspace
 xcode_destination: platform=iOS Simulator,OS=12.2,name=iPad Pro (9.7-inch)
 before_install:
@@ -19,5 +19,3 @@ matrix:
   include:
     - xcode_scheme: BlueprintUI-Unit-Tests
     - xcode_scheme: BlueprintUICommonControls-Unit-SnapshotTests
-
- 
