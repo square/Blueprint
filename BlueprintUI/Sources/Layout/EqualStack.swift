@@ -1,7 +1,10 @@
-/// An element that sizes all of its children equally, stacking them according to
-/// the specified `direction` and spacing them according to the specified `spacing`.
+/// An element that sizes its children equally, stacking them in the primary axis according to
+/// the specified `direction` and spacing them according to the specified `spacing`. In the
+/// secondary axis, children are justified to fill the space of the largest child.
 ///
-/// - Note: A stack is measured to accommodate its largest child in each axis.
+/// - Note: A stack measures itself by determining its largest child in each axis, and
+///         in the case of the primary axis, multiplying by `children.count` (accounting
+///         for `spacing` as necessary).
 public struct EqualStack: Element {
 
     /// The direction in which this element will stack its children.
