@@ -109,9 +109,9 @@ final class LayoutAttributesTests: XCTestCase {
             b.center = .zero
             
             let combined = b.within(a)
-            
-            XCTAssertEqual(combined.center.x, 100)
-            XCTAssertEqual(combined.center.y, 100)
+
+            XCTAssertEqual(combined.center.x, 100, accuracy: CGFloat(100).ulp * 2)
+            XCTAssertEqual(combined.center.y, 100, accuracy: CGFloat(100).ulp * 2)
         }
 
     }
