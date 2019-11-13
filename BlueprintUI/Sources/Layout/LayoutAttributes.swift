@@ -62,6 +62,15 @@ public struct LayoutAttributes {
         }
     }
 
+    internal func rounded(toScale scale: CGFloat) -> LayoutAttributes {
+        guard CATransform3DIsIdentity(transform) else {
+            return self
+        }
+        var attributes = self
+        attributes.frame.round(toScale: scale)
+        return attributes
+    }
+
     internal func apply(to view: UIView) {
         view.bounds = bounds
         view.center = center

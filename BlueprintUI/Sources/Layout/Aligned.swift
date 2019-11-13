@@ -89,10 +89,6 @@ public struct Aligned: Element {
                 attributes.frame.origin.x = size.width - contentSize.width
             }
 
-            // TODO: screen-scale round here once that lands
-            attributes.frame.origin.x.round()
-            attributes.frame.origin.y.round()
-
             return attributes
         }
     }

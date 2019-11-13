@@ -30,6 +30,7 @@ public final class BlueprintView: UIView {
     private var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
+    private var lastScreenScale: CGFloat = 1
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
@@ -84,6 +85,14 @@ public final class BlueprintView: UIView {
         return element.content.measure(in: constraint)
     }
     
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+
+        if let window = window, window.screen.scale != lastScreenScale {
+            setNeedsViewHierarchyUpdate()
+        }
+    }
+
     override public func layoutSubviews() {
         super.layoutSubviews()
         performUpdate()
@@ -107,8 +116,11 @@ public final class BlueprintView: UIView {
         assert(!isInsideUpdate, "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates.")
         isInsideUpdate = true
 
+        let screenScale = window?.screen.scale ?? 1
+
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
+        lastScreenScale = screenScale
         
         /// Grab view descriptions
         let viewNodes = element?
@@ -122,7 +134,7 @@ public final class BlueprintView: UIView {
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes)
         
-        rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
+        rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy, screenScale: screenScale)
         hasUpdatedViewHierarchy = true
 
         isInsideUpdate = false
@@ -157,14 +169,14 @@ extension BlueprintView {
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
-            update(node: node, appearanceTransitionsEnabled: false)
+            update(node: node, appearanceTransitionsEnabled: false, screenScale: 1)
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
             return node.viewDescription.viewType == type(of: view)
         }
 
-        fileprivate func update(node: NativeViewNode, appearanceTransitionsEnabled: Bool) {
+        fileprivate func update(node: NativeViewNode, appearanceTransitionsEnabled: Bool, screenScale: CGFloat) {
             
             assert(node.viewDescription.viewType == type(of: view))
 
@@ -206,8 +218,8 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
-                        child.layoutAttributes.apply(to: controller.view)
-                        controller.update(node: child, appearanceTransitionsEnabled: true)
+                        child.layoutAttributes.rounded(toScale: screenScale).apply(to: controller.view)
+                        controller.update(node: child, appearanceTransitionsEnabled: true, screenScale: screenScale)
                     }
                 } else {
                     let controller = NativeViewController(node: child)
@@ -220,17 +232,17 @@ extension BlueprintView {
                     let contentView = node.viewDescription.contentView(in: view)
                     contentView.addSubview(controller.view)
                     
-                    controller.update(node: child, appearanceTransitionsEnabled: false)
+                    controller.update(node: child, appearanceTransitionsEnabled: false, screenScale: screenScale)
                     
                     if appearanceTransitionsEnabled {
-                        child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
+                        child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes.rounded(toScale: screenScale), completion: {})
                     }
                 }
             }
             
             for controller in oldChildren.values {
                 if let transition = controller.viewDescription.disappearingTransition {
-                    transition.performDisappearing(view: controller.view, layoutAttributes: controller.layoutAttributes, completion: {
+                    transition.performDisappearing(view: controller.view, layoutAttributes: controller.layoutAttributes.rounded(toScale: screenScale), completion: {
                         controller.view.removeFromSuperview()
                     })
                 } else {
