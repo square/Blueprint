@@ -28,8 +28,9 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
-    public init(text: String) {
+    public init(text: String, configure: (inout TextField) -> Void = { _ in }) {
         self.text = text
+        configure(&self)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
