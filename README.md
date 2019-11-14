@@ -33,7 +33,7 @@ In Xcode 11+, add Blueprint directly as a dependency to your project with
 
 #### Cocoapods
 
-[![CocoaPods compatible](https://img.shields.io/cocoapods/v/Workflow.svg)](https://cocoapods.org/pods/Workflow)
+[![CocoaPods compatible](https://img.shields.io/cocoapods/v/BlueprintUI.svg)](https://cocoapods.org/pods/BlueprintUI)
 
 If you use CocoaPods to manage your dependencies, simply add BlueprintUI and BlueprintUICommonControls to your
 Podfile:
