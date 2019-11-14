@@ -153,6 +153,12 @@ public struct LayoutAttributes {
         assert(alpha.isFinite, "LayoutAttributes.alpha must only contain finite values.")
     }
     
+    func roundedToPixelBoundaries(screenScale: CGFloat, localOriginInScreenSpace: CGPoint) -> LayoutAttributes {
+        var result = self
+        result.frame = result.frame.roundedToPixelBoundaries(screenScale: screenScale, localOriginInScreenSpace: localOriginInScreenSpace)
+        return result
+    }
+    
 }
 
 extension LayoutAttributes: Equatable {
