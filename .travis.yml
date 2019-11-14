@@ -3,19 +3,39 @@ sudo: false
 notifications:
   email: false
 
-language: swift
 os: osx
-osx_image: xcode10.3
-xcode_workspace: SampleApp.xcworkspace
-xcode_destination: platform=iOS Simulator,OS=12.2,name=iPad Pro (9.7-inch)
-before_install:
-  - gem update --system
-  - gem install bundler
-  - bundle install
-  - bundle exec pod repo update
-  - bundle exec pod install
 
 matrix:
   include:
-    - xcode_scheme: BlueprintUI-Unit-Tests
-    - xcode_scheme: BlueprintUICommonControls-Unit-SnapshotTests
+    - language: swift
+      name: "Cocoapods BlueprintUI (Xcode 10.3)"
+      xcode_scheme: BlueprintUI-Unit-Tests
+      osx_image: xcode10.3
+      xcode_workspace: SampleApp.xcworkspace
+      xcode_destination: platform=iOS Simulator,OS=12.2,name=iPad Pro (9.7-inch)
+      before_install:
+        - cd SampleApp
+        - gem update --system
+        - gem install bundler
+        - bundle install
+        - bundle exec pod repo update
+        - bundle exec pod install
+    - language: swift
+      name: "Cocoapods BlueprintUICommonControls (Xcode 10.3)"
+      xcode_scheme: BlueprintUICommonControls-Unit-SnapshotTests
+      osx_image: xcode10.3
+      xcode_workspace: SampleApp.xcworkspace
+      xcode_destination: platform=iOS Simulator,OS=12.2,name=iPad Pro (9.7-inch)
+        - cd SampleApp
+        - gem update --system
+        - gem install bundler
+        - bundle install
+        - bundle exec pod repo update
+        - bundle exec pod install
+    - language: swift
+      name: "SPM (Xcode 11.1)"
+      os: osx
+      osx_image: xcode11.1
+      script:
+        - xcodebuild -scheme "BlueprintUI-Package" test -destination "name=iPhone 11"
+
