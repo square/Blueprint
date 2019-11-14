@@ -1,3 +1,5 @@
+import UIKit
+
 /// Defines the maximum size for a measurement.
 ///
 /// Currently this constraint type can only handles layout where

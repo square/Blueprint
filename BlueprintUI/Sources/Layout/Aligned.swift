@@ -1,3 +1,5 @@
+import UIKit
+
 /// Aligns a content element within itself. The vertical and horizontal alignment may be set independently.
 ///
 /// The size of the content element is determined by calling `measure(in:)` on

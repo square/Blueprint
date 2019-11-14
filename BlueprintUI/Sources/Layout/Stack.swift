@@ -1,3 +1,5 @@
+import UIKit
+
 /// Conforming types (Row and Column) act as StackLayout powered containers.
 ///
 /// This protocol should only be used by Row and Column elements (you should never add conformance to other custom

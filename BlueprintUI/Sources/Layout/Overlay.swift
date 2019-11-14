@@ -1,3 +1,5 @@
+import UIKit
+
 public struct Overlay: Element {
 
     public var elements: [Element]
