@@ -1,3 +1,5 @@
+import UIKit
+
 /// Represents the content of an element.
 public struct ElementContent: Measurable {
 

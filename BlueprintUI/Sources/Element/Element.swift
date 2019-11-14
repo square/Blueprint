@@ -1,3 +1,5 @@
+import UIKit
+
 /// Conforming types represent a rectangular content area in a two-dimensional
 /// layout space.
 ///

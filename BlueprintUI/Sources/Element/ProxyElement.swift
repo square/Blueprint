@@ -1,3 +1,5 @@
+import UIKit
+
 /// Custom elements commonly use another element to actually display content. For example, a profile element might
 /// display an image and a few labels inside a `Column` element. The ProxyElement protocol is provided to make that
 /// task easier.

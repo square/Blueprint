@@ -1,3 +1,5 @@
+import UIKit
+
 /// Constrains the measured size of the content element.
 public struct ConstrainedSize: Element {
 

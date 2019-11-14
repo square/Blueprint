@@ -1,3 +1,5 @@
+import UIKit
+
 /// An element that does not display anything (it has neither children or a view).
 ///
 /// `Spacer` simply takes up a specified amount of space within a layout.

@@ -1,3 +1,5 @@
+import UIKit
+
 /// Contains layout-related metrics for an element.
 public struct LayoutAttributes {
 

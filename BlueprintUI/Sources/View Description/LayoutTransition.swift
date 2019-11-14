@@ -1,3 +1,5 @@
+import UIKit
+
 /// The transition used when layout attributes change for a view during an
 /// update cycle.
 ///
