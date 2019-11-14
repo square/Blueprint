@@ -6,8 +6,21 @@ import BlueprintUI
 class ImageTests: XCTestCase {
 
     private let image: UIImage = {
-        let bundle = Bundle(for: ImageTests.self)
-        let imageURL = bundle.url(forResource: "test-image", withExtension: "jpg")!
+        
+        func getImageURL(file: StaticString = #file) -> URL {
+            if let url = Bundle(for: ImageTests.self).url(forResource: "test-image", withExtension: "jpg") {
+                return url
+            } else {
+                var path = NSString(stringLiteral: file)
+                path = path.deletingLastPathComponent as NSString // filename
+                path = path.deletingLastPathComponent as NSString // `Sources`
+                path = path.appendingPathComponent("Resources") as NSString
+                path = path.appendingPathComponent("test-image.jpg") as NSString
+                return URL(fileURLWithPath: path as String)
+            }
+        }
+        
+        let imageURL = getImageURL()
         return UIImage(contentsOfFile: imageURL.path)!
     }()
 
