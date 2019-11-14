@@ -21,21 +21,9 @@ matrix:
         - bundle exec pod repo update
         - bundle exec pod install
     - language: swift
-      name: "Cocoapods BlueprintUICommonControls (Xcode 10.3)"
-      xcode_scheme: BlueprintUICommonControls-Unit-SnapshotTests
-      osx_image: xcode10.3
-      xcode_workspace: SampleApp.xcworkspace
-      xcode_destination: platform=iOS Simulator,OS=12.2,name=iPad Pro (9.7-inch)
-        - cd SampleApp
-        - gem update --system
-        - gem install bundler
-        - bundle install
-        - bundle exec pod repo update
-        - bundle exec pod install
-    - language: swift
-      name: "SPM (Xcode 11.1)"
+      name: "SPM (Xcode 11.2)"
       os: osx
-      osx_image: xcode11.1
+      osx_image: xcode11.2
       script:
-        - xcodebuild -scheme "BlueprintUI-Package" test -destination "name=iPhone 11"
+        - xcodebuild -scheme "BlueprintUI-Package" test -destination "name=iPad Pro (9.7-inch)"
 
