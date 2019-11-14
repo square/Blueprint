@@ -13,6 +13,36 @@ let rootElement = Label(text: "Hello from Blueprint!")
 let view = BlueprintView(element: rootElement)
 ```
 
+### Getting Started
+
+#### Swift Package Manager
+
+[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-orange.svg)](#swift-package-manager)
+
+If you are developing your own package, be sure that Blueprint is included in `dependencies`
+in `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "git@github.com:square/Blueprint.git", from: "0.3.0")
+]
+```
+
+In Xcode 11+, add Blueprint directly as a dependency to your project with
+`File` > `Swift Packages` > `Add Package Dependency...`. Provide the git URL when prompted: `git@github.com:square/Blueprint.git`.
+
+#### Cocoapods
+
+[![CocoaPods compatible](https://img.shields.io/cocoapods/v/Workflow.svg)](https://cocoapods.org/pods/Workflow)
+
+If you use CocoaPods to manage your dependencies, simply add BlueprintUI and BlueprintUICommonControls to your
+Podfile:
+
+```ruby
+pod 'BlueprintUI'
+pod 'BlueprintUICommonControls'
+```
+
 ---
 
 ##### What does this library do?
