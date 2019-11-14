@@ -1,3 +1,5 @@
+import UIKit
+
 /// Insets a content element within a layout.
 ///
 /// Commonly used to add padding around another element when displayed within a

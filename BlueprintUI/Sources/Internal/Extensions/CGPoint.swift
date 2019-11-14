@@ -3,14 +3,14 @@ import simd
 
 extension CGPoint {
     
-    init(_ vector: double4) {
+    init(_ vector: SIMD4<Double>) {
         self.init(
             x: CGFloat(vector.x),
             y: CGFloat(vector.y))
     }
     
-    var double4Value: double4 {
-        return double4(Double(x), Double(y), 0.0, 1.0)
+    var double4Value: SIMD4<Double> {
+        return SIMD4(Double(x), Double(y), 0.0, 1.0)
     }
     
     mutating func apply(transform: CATransform3D) {

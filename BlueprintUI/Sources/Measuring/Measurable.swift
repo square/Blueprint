@@ -1,3 +1,5 @@
+import UIKit
+
 /// Conforming types can calculate the size that they require within a layout.
 public protocol Measurable {
 
