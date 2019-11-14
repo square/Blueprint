@@ -1,3 +1,5 @@
+import UIKit
+
 /// The transition used when a view is inserted or removed during an update cycle.
 public struct VisibilityTransition {
 

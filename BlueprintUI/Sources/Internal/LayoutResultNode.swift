@@ -1,3 +1,5 @@
+import UIKit
+
 extension Element {
 
     /// Build a fully laid out element tree with complete layout attributes

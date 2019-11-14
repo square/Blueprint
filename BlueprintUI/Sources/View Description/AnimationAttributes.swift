@@ -1,3 +1,5 @@
+import UIKit
+
 /// UIView animation configuration values.
 public struct AnimationAttributes {
 

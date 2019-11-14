@@ -1,3 +1,5 @@
+import UIKit
+
 /// Constrains the size of the content element to an aspect ratio.
 public struct ConstrainedAspectRatio: Element {
     /// Represents whether the content element's size should be expanded to fill its parent

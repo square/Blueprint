@@ -1,3 +1,5 @@
+import UIKit
+
 /// Conforming types can calculate layout attributes for an array of children.
 public protocol SingleChildLayout {
 

@@ -242,6 +242,86 @@ class StackTests: XCTestCase {
                 expectedRanges: [
                     0...100
                 ])
+
+            test(
+                underflow: .justifyToStart,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 0.0)
+                ],
+                expectedRanges: [
+                    0...100
+                ])
+
+            test(
+                underflow: .justifyToStart,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 1.0)
+                ],
+                expectedRanges: [
+                    0...100
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 0.0)
+                ],
+                expectedRanges: [
+                    50...150
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 10,
+                items: [
+                    (measuredLength: 5, growPriority: 0.0)
+                ],
+                expectedRanges: [
+                    3...8
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 15,
+                items: [
+                    (measuredLength: 12, growPriority: 0.0)
+                ],
+                expectedRanges: [
+                    2...14
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 1.0)
+                ],
+                expectedRanges: [
+                    50...150
+                ])
+
+            test(
+                underflow: .justifyToEnd,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 0.0)
+                ],
+                expectedRanges: [
+                    100...200
+                ])
+
+            test(
+                underflow: .justifyToEnd,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 100, growPriority: 1.0)
+                ],
+                expectedRanges: [
+                    100...200
+                ])
         }
 
         // Test with default grow priorities
@@ -275,6 +355,36 @@ class StackTests: XCTestCase {
                 ], expectedRanges: [
                     0...400,
                     400...600
+                ])
+
+            test(
+                underflow: .justifyToStart,
+                layoutLength: 400, items: [
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    0...100,
+                    100...200
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 400, items: [
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    100...200,
+                    200...300
+                ])
+
+            test(
+                underflow: .justifyToEnd,
+                layoutLength: 400, items: [
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    200...300,
+                    300...400
                 ])
 
         }
@@ -313,6 +423,39 @@ class StackTests: XCTestCase {
                 ], expectedRanges: [
                     0...250,
                     250...400
+                ])
+
+            test(
+                underflow: .justifyToStart,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    0...100,
+                    100...200
+                ])
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    100...200,
+                    200...300
+                ])
+
+            test(
+                underflow: .justifyToEnd,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0)
+                ], expectedRanges: [
+                    200...300,
+                    300...400
                 ])
 
         }
