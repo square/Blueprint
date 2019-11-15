@@ -13,8 +13,9 @@ class CGPointExtensionTests: XCTestCase {
         
         let rotateTransform = CATransform3DMakeRotation(.pi, 0.0, 0.0, 1.0)
         let rotatedPoint = point.applying(rotateTransform)
-        XCTAssertEqual(rotatedPoint, CGPoint(x: -100.0, y: -100.0))
-        
+        XCTAssertEqual(rotatedPoint.x, -100, accuracy: CGFloat(-100).ulp * 2)
+        XCTAssertEqual(rotatedPoint.y, -100, accuracy: CGFloat(-100).ulp * 2)
+
         let translateTransform = CATransform3DMakeTranslation(33.0, 22.0, 0.0)
         let translatedPoint = point.applying(translateTransform)
         XCTAssertEqual(translatedPoint, CGPoint(x: 133.0, y: 122.0))
