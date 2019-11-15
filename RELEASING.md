@@ -32,12 +32,10 @@ See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/mak
 
 When linting before publishing, CocoaPods will build `BlueprintUICommonControls` using the latest published version of `BlueprintUI` (not your local version). You will need to run `pod repo update` to pull the new version of `BlueprintUI` into your local specs repo immediately after publishing it.
 
-The snapshot tests for `BlueprintUICommonControls` will likely fail due to the way `pod trunk` runs tests. Use the `--skip-tests` option to get around this.
-
 You may also need to quit Xcode before running these commands in order for the linting builds to succeed.
 
 ```bash
 bundle exec pod trunk push BlueprintUI.podspec
 bundle exec pod repo update
-bundle exec pod trunk push BlueprintUICommonControls.podspec --skip-tests
+bundle exec pod trunk push BlueprintUICommonControls.podspec
 ```
