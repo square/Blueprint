@@ -14,10 +14,4 @@ Pod::Spec.new do |s|
   s.source_files = 'BlueprintUICommonControls/Sources/**/*.swift'
 
   s.dependency 'BlueprintUI'
-
-  s.test_spec 'SnapshotTests' do |test_spec|
-    test_spec.source_files = 'BlueprintUICommonControls/Tests/Sources/**/*.{swift, png}'
-    test_spec.resources = 'BlueprintUICommonControls/Tests/Resources/**/*'
-    test_spec.framework = 'XCTest'
-  end
 end
