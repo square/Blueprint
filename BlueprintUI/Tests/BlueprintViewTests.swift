@@ -23,7 +23,43 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(initialView.backgroundColor, UIColor.blue)
     }
 
+    func test_viewOrder() {
+        let blueprintView = BlueprintView()
 
+        var tags: [Int]
+
+        blueprintView.element = TestContainer(
+            children: [
+                TestElement1(tag: 1),
+                TestElement1(tag: 2)
+            ]
+        )
+
+        tags = [1, 2]
+        for index in blueprintView.currentNativeViewControllers.indices {
+            let node = blueprintView.currentNativeViewControllers[index].node
+
+            let viewAtIndex = node.view.superview!.subviews[index]
+            XCTAssertEqual(node.view, viewAtIndex)
+            XCTAssertEqual(node.view.tag, tags[index])
+        }
+
+        blueprintView.element = TestContainer(
+            children: [
+                TestElement2(tag: 3),
+                TestElement1(tag: 4)
+            ]
+        )
+
+        tags = [3, 4]
+        for index in blueprintView.currentNativeViewControllers.indices {
+            let node = blueprintView.currentNativeViewControllers[index].node
+
+            let viewAtIndex = node.view.superview!.subviews[index]
+            XCTAssertEqual(node.view, viewAtIndex)
+            XCTAssertEqual(node.view.tag, tags[index])
+        }
+    }
 
 }
 
@@ -42,4 +78,58 @@ fileprivate struct SimpleViewElement: Element {
         }
     }
 
+}
+
+private struct TestElement1: Element {
+    var tag: Int
+
+    var content: ElementContent {
+        return ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        return UIView.describe { (config) in
+            config[\.tag] = tag
+        }
+    }
+}
+
+private struct TestElement2: Element {
+    var tag: Int
+
+    var content: ElementContent {
+        return ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        return UIView.describe { (config) in
+            config[\.tag] = tag
+        }
+    }
+}
+
+private struct TestContainer: Element {
+    var children: [Element]
+    
+    var content: ElementContent {
+        return ElementContent(layout: TestLayout()) { (builder) in
+            for child in children {
+                builder.add(element: child)
+            }
+        }
+    }
+
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        return nil
+    }
+
+    private class TestLayout: Layout {
+        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+            return .zero
+        }
+
+        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+            return Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        }
+    }
 }

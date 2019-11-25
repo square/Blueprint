@@ -186,13 +186,16 @@ extension BlueprintView {
             var usedKeys: Set<ElementPath> = []
             usedKeys.reserveCapacity(node.children.count)
             
-            for (path, child) in node.children {
+            for index in node.children.indices {
+                let (path, child) = node.children[index]
 
                 guard usedKeys.contains(path) == false else {
                     fatalError("Duplicate view identifier")
                 }
                 usedKeys.insert(path)
-                
+
+                let contentView = node.viewDescription.contentView(in: self.view)
+
                 if let controller = oldChildren[path], controller.canUpdateFrom(node: child) {
 
                     oldChildren.removeValue(forKey: path)
@@ -207,6 +210,9 @@ extension BlueprintView {
                     }
                     layoutTransition.perform {
                         child.layoutAttributes.apply(to: controller.view)
+
+                        contentView.insertSubview(controller.view, at: index)
+
                         controller.update(node: child, appearanceTransitionsEnabled: true)
                     }
                 } else {
@@ -217,9 +223,8 @@ extension BlueprintView {
                         child.layoutAttributes.apply(to: controller.view)
                     }
                     
-                    let contentView = node.viewDescription.contentView(in: view)
-                    contentView.addSubview(controller.view)
-                    
+                    contentView.insertSubview(controller.view, at: index)
+
                     controller.update(node: child, appearanceTransitionsEnabled: false)
                     
                     if appearanceTransitionsEnabled {
