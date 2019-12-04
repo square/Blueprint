@@ -41,7 +41,7 @@ public struct Aligned: Element {
     ///   - vertically: The vertical alignment. Defaults to centered.
     ///   - horizontally: The horizontal alignment. Defaults to centered.
     ///   - wrapping: The content element to be aligned.
-    init(
+    public init(
         vertically verticalAlignment: VerticalAlignment = .center,
         horizontally horizontalAlignment: HorizontalAlignment = .center,
         wrapping wrappedElement: Element
