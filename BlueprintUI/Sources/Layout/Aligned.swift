@@ -2,8 +2,10 @@ import UIKit
 
 /// Aligns a content element within itself. The vertical and horizontal alignment may be set independently.
 ///
-/// The size of the content element is determined by calling `measure(in:)` on
-/// the content element – even if that size is larger than the wrapping element.
+/// When using alignment mode `.fill`, the content is scaled to the width or height of the `Aligned` element.
+///
+/// For other modes, the size of the content element is determined by calling `measure(in:)`
+/// on the content element – even if that size is larger than the wrapping element.
 ///
 public struct Aligned: Element {
     /// The possible vertical alignment values.
@@ -14,6 +16,8 @@ public struct Aligned: Element {
         case center
         /// Aligns the content to the bottom edge of the containing element.
         case bottom
+        /// The content fills the full vertical height of the containing element.
+        case fill
     }
 
     /// The possible horizontal alignment values.
@@ -26,6 +30,8 @@ public struct Aligned: Element {
         /// Aligns the content to the trailing edge of the containing element.
         /// In left-to-right languages, this is the right edge.
         case trailing
+        /// The content fills the full horizontal width of the containing element.
+        case fill
     }
 
     /// The content element to be aligned.
@@ -80,6 +86,9 @@ public struct Aligned: Element {
                 attributes.frame.origin.y = (size.height - contentSize.height) / 2.0
             case .bottom:
                 attributes.frame.origin.y = size.height - contentSize.height
+            case .fill:
+                attributes.frame.origin.y = 0
+                attributes.frame.size.height = size.height
             }
 
             switch horizontalAlignment {
@@ -89,6 +98,9 @@ public struct Aligned: Element {
                 attributes.frame.origin.x = (size.width - contentSize.width) / 2.0
             case .trailing:
                 attributes.frame.origin.x = size.width - contentSize.width
+            case .fill:
+                attributes.frame.origin.x = 0
+                attributes.frame.size.width = size.width
             }
 
             // TODO: screen-scale round here once that lands

@@ -15,8 +15,6 @@ matrix:
       xcode_destination: platform=iOS Simulator,OS=9.3,name=iPhone 4s
       before_install:
         - cd SampleApp
-        - gem update --system
-        - gem install bundler
         - bundle install
         - bundle exec pod repo update
         - bundle exec pod install
