@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Displays text content.
-public struct Label: Element {
+public struct Label : ProxyElement {
 
     /// The text to be displayed.
     public var text: String
@@ -33,15 +33,8 @@ public struct Label: Element {
             ])
     }
 
-    public var content: ElementContent {
-        var element = AttributedLabel(attributedText: attributedText)
-        element.numberOfLines = numberOfLines
-        element.roundingScale = roundingScale
-        return ElementContent(child: element)
-    }
-
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return nil
+    public var elementRepresentation: Element {
+        return AttributedLabel(attributedText: self.attributedText, numberOfLines: self.numberOfLines)
     }
 
 }

@@ -18,8 +18,26 @@ class AttributedLabelTests: XCTestCase {
         compareSnapshot(of: element)
         
     }
+    
+    func test_numberOfLines_sizing() {
 
-    func test_numberOfLines() {
+        let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
+        let constraint = SizeConstraint(CGSize(width: 100.0, height: 200.0))
+        
+        var element = AttributedLabel(attributedText: string)
+        element.roundingScale = 1
+
+        element.numberOfLines = 0
+        XCTAssertEqual(element.content.measure(in: constraint), CGSize(width: 100.0, height: 122.0))
+
+        element.numberOfLines = 1
+        XCTAssertEqual(element.content.measure(in: constraint), CGSize(width: 100.0, height: 21.0))
+
+        element.numberOfLines = 2
+        XCTAssertEqual(element.content.measure(in: constraint), CGSize(width: 100.0, height: 41.0))
+    }
+
+    func test_numberOfLines_drawing() {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         var element = AttributedLabel(attributedText: string)
