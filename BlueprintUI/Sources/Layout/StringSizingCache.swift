@@ -32,7 +32,7 @@ public final class StringSizingCache
     }
 }
 
-public extension StringSizingCache
+extension StringSizingCache
 {
     struct Entry : Hashable
     {
@@ -58,7 +58,7 @@ public extension StringSizingCache
         
         private let hashCode : Int
         
-        public func hash(into hasher: inout Hasher)
+        func hash(into hasher: inout Hasher)
         {
             self.hashCode.hash(into: &hasher)
         }
