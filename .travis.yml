@@ -18,10 +18,13 @@ matrix:
         - bundle install
         - bundle exec pod repo update
         - bundle exec pod install
+
     - language: swift
       name: "SPM (Xcode 11.2)"
       os: osx
       osx_image: xcode11.2
       script:
-        - xcodebuild -scheme "BlueprintUI-Package" test -destination "name=iPad Pro (9.7-inch)"
+        # Split into two commands so that we can pass 'quiet' during build to only see errors and warnings.
+        - xcodebuild build-for-testing -quiet -scheme "BlueprintUI-Package" -destination "name=iPad Pro (9.7-inch)"
+        - xcodebuild test-without-building -scheme "BlueprintUI-Package" -destination "name=iPad Pro (9.7-inch)"
 
