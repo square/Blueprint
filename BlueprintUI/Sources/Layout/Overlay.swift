@@ -1,5 +1,12 @@
 import UIKit
 
+/// Stretches all of its child elements to fill the layout area, stacked on top of each other.
+///
+/// During a layout pass, measurent is calculated as the max size (in both x and y dimensions)
+/// produced by measuring all of the child elements.
+///
+/// View-backed descendents will be z-ordered from back to front in the order of this element's
+/// children.
 public struct Overlay: Element {
 
     public var elements: [Element]
