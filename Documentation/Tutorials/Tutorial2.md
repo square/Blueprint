@@ -9,7 +9,7 @@ This tutorial will build a receipt for a quick service restaurant.
 #### Goals
 
 - Show receipt information in a complex layout
-- Use a few of the build-in element types from Blueprint
+- Use a few of the built-in element types from Blueprint
 
 ![Screenshot of finished tutorial](tutorial_2_complete.png)
 
