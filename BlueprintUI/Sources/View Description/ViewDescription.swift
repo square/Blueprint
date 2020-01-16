@@ -45,9 +45,9 @@ public struct ViewDescription {
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
     
+    private let _onAppear: TransitionAnimation?
+    private let _onDisappear: TransitionAnimation?
     private let _layoutTransition: LayoutTransition
-    private let _appearingTransition: VisibilityTransition?
-    private let _disappearingTransition: VisibilityTransition?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -87,8 +87,8 @@ public struct ViewDescription {
         }
         
         _layoutTransition = configuration.layoutTransition
-        _appearingTransition = configuration.appearingTransition
-        _disappearingTransition = configuration.disappearingTransition
+        _onAppear = configuration.onAppear
+        _onDisappear = configuration.onDisappear
     }
     
     public var viewType: UIView.Type {
@@ -111,12 +111,12 @@ public struct ViewDescription {
         return _layoutTransition
     }
     
-    public var appearingTransition: VisibilityTransition? {
-        return _appearingTransition
+    public var onAppear: TransitionAnimation? {
+        return _onAppear
     }
     
-    public var disappearingTransition: VisibilityTransition? {
-        return _disappearingTransition
+    public var onDisappear: TransitionAnimation? {
+        return _onDisappear
     }
     
 }
@@ -148,10 +148,10 @@ extension ViewDescription {
         public var layoutTransition: LayoutTransition = .inherited
 
         /// The transition to use when this view appears.
-        public var appearingTransition: VisibilityTransition? = nil
+        public var onAppear: TransitionAnimation? = nil
 
         /// The transition to use when this view disappears.
-        public var disappearingTransition: VisibilityTransition? = nil
+        public var onDisappear: TransitionAnimation? = nil
 
         /// Initializes a default configuration object.
         public init() {
