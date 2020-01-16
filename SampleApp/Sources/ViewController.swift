@@ -28,12 +28,15 @@ let posts = [
 
 final class ViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: List(posts: posts))
+    private let blueprintView = BlueprintView()
 
     override func loadView() {
         self.view = blueprintView
+        
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
+            self.blueprintView.element = List(posts: posts)
+        }
     }
-
 }
 
 
@@ -47,7 +50,11 @@ fileprivate struct List: ProxyElement {
             col.minimumVerticalSpacing = 8.0
 
             for post in posts {
-                col.add(child: FeedItem(post: post))
+                var container = TransitionContainer(wrapping: FeedItem(post: post))
+                
+                container.appearingTransition = .scaleAndFade
+                
+                col.add(child: container)
             }
         }
 

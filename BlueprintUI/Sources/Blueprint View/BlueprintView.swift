@@ -157,7 +157,7 @@ extension BlueprintView {
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
-            update(node: node, appearanceTransitionsEnabled: false)
+            update(node: node, appearanceTransitionsEnabled: true)
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
@@ -213,7 +213,7 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        controller.update(node: child, appearanceTransitionsEnabled: true)
+                        controller.update(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
                     }
                 } else {
                     let controller = NativeViewController(node: child)
@@ -225,10 +225,12 @@ extension BlueprintView {
                     
                     contentView.insertSubview(controller.view, at: index)
 
-                    controller.update(node: child, appearanceTransitionsEnabled: false)
+                    controller.update(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
                     
                     if appearanceTransitionsEnabled {
-                        child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
+                        if let transition = child.viewDescription.appearingTransition {
+                            transition.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
+                        }
                     }
                 }
             }
