@@ -45,9 +45,10 @@ public struct ViewDescription {
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
     
-    private let _layoutTransition: LayoutTransition
-    private let _appearingTransition: VisibilityTransition?
-    private let _disappearingTransition: VisibilityTransition?
+    public let onAppear: TransitionAnimation?
+    public let onDisappear: TransitionAnimation?
+    public let onLayout: LayoutTransition
+    public var allowsAnimations : Bool?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -86,9 +87,10 @@ public struct ViewDescription {
             return configuration.contentView(typedView)
         }
         
-        _layoutTransition = configuration.layoutTransition
-        _appearingTransition = configuration.appearingTransition
-        _disappearingTransition = configuration.disappearingTransition
+        onLayout = configuration.onLayout
+        onAppear = configuration.onAppear
+        onDisappear = configuration.onDisappear
+        allowsAnimations = configuration.allowsAnimations
     }
     
     public var viewType: UIView.Type {
@@ -106,19 +108,6 @@ public struct ViewDescription {
     public func contentView(in view: UIView) -> UIView {
         return _contentView(view)
     }
-
-    public var layoutTransition: LayoutTransition {
-        return _layoutTransition
-    }
-    
-    public var appearingTransition: VisibilityTransition? {
-        return _appearingTransition
-    }
-    
-    public var disappearingTransition: VisibilityTransition? {
-        return _disappearingTransition
-    }
-    
 }
 
 extension ViewDescription {
@@ -144,14 +133,17 @@ extension ViewDescription {
         /// and managed.
         public var contentView: (View) -> UIView
 
-        /// The transition to use during layout changes.
-        public var layoutTransition: LayoutTransition = .inherited
-
         /// The transition to use when this view appears.
-        public var appearingTransition: VisibilityTransition? = nil
+        public var onAppear: TransitionAnimation? = nil
 
         /// The transition to use when this view disappears.
-        public var disappearingTransition: VisibilityTransition? = nil
+        public var onDisappear: TransitionAnimation? = nil
+        
+        /// The transition to use during layout changes.
+        public var onLayout: LayoutTransition = .inherited
+        
+        /// If the element allows animations on itself or children. Nil if unspecified.
+        public var allowsAnimations : Bool? = nil
 
         /// Initializes a default configuration object.
         public init() {

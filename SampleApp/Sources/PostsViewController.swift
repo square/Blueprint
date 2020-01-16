@@ -26,14 +26,15 @@ let posts = [
 ]
 
 
-final class ViewController: UIViewController {
+final class PostsViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: List(posts: posts))
+    private let blueprintView = BlueprintView()
 
     override func loadView() {
         self.view = blueprintView
+        
+        self.blueprintView.element = List(posts: posts)
     }
-
 }
 
 
@@ -47,7 +48,11 @@ fileprivate struct List: ProxyElement {
             col.minimumVerticalSpacing = 8.0
 
             for post in posts {
-                col.add(child: FeedItem(post: post))
+                col.add(child: Transition(
+                    onAppear: .scaleAndFade,
+                    wrapping: FeedItem(post: post)
+                    )
+                )
             }
         }
 
