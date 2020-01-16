@@ -24,19 +24,8 @@ final class DemoListViewController : UIViewController
         self.view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
     
-    fileprivate var demos : [DemoItem] {
-        return [
-            DemoItem(title: "People", onTap: {
-                self.navigationController?.pushViewController(ViewController(), animated: true)
-            }),
-            DemoItem(title: "Loyalty Screen", onTap: {
-                self.navigationController?.pushViewController(ExampleLoyaltyViewController(), animated: true)
-            }),
-        ]
-    }
-    
     var element : Element {
-        return ScrollView(wrapping: Inset(uniformInset: 40.0, wrapping: Column { column in
+        let list = Column { column in 
             column.minimumVerticalSpacing = 20.0
             column.horizontalAlignment = .fill
             
@@ -47,7 +36,28 @@ final class DemoListViewController : UIViewController
                                 
                 column.add(child: container)
             }
-        }))
+        }
+        
+        return ScrollView(
+            wrapping: Inset(
+                uniformInset: 40.0,
+                wrapping: ConstrainedSize(
+                    width: .atMost(300.0),
+                    wrapping: list
+                )
+            )
+        )
+    }
+    
+    fileprivate var demos : [DemoItem] {
+        return [
+            DemoItem(title: "People", onTap: {
+                self.navigationController?.pushViewController(ViewController(), animated: true)
+            }),
+            DemoItem(title: "Loyalty Screen", onTap: {
+                self.navigationController?.pushViewController(ExampleLoyaltyViewController(), animated: true)
+            }),
+        ]
     }
 }
 
