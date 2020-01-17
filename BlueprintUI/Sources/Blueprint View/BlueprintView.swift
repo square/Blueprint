@@ -28,33 +28,52 @@ import UIKit
 public final class BlueprintView: UIView {
 
     private var needsViewHierarchyUpdate: Bool = true
-    private var hasUpdatedViewHierarchy: Bool = false
+    private var nextViewHierarchyUpdateEnablesAppearanceTransitions: Bool = false
+    
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
     private let rootController: NativeViewController
-
+    
     /// The root element that is displayed within the view.
     public var element: Element? {
-        didSet {
-            setNeedsViewHierarchyUpdate()
+        set {
+            self.setElement(animated: false, element: newValue)
         }
+        get {
+            return self._element
+        }
+    }
+    
+    private var _element : Element?
+    
+    public func setElement(animated : Bool, element: Element?)
+    {
+        _element = element
+        
+        self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
+        
+        self.setNeedsViewHierarchyUpdate()
     }
 
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
-    public required init(element: Element?) {
+    public required init(element: Element?, animated: Bool = false) {
         
-        self.element = element
+        _element = element
+        self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
         
         rootController = NativeViewController(
             node: NativeViewNode(
                 content: UIView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
-                children: []))
+                children: []
+            ),
+            appearanceTransitionsEnabled: animated
+        )
     
         super.init(frame: CGRect.zero)
         
@@ -122,8 +141,7 @@ public final class BlueprintView: UIView {
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes)
         
-        rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
-        hasUpdatedViewHierarchy = true
+        rootController.update(node: rootNode, appearanceTransitionsEnabled: self.nextViewHierarchyUpdateEnablesAppearanceTransitions)
 
         isInsideUpdate = false
     }
@@ -152,12 +170,13 @@ extension BlueprintView {
         
         let view: UIView
         
-        init(node: NativeViewNode) {
+        init(node: NativeViewNode, appearanceTransitionsEnabled: Bool) {
             self.viewDescription = node.viewDescription
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
-            update(node: node, appearanceTransitionsEnabled: true)
+            
+            update(node: node, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
@@ -216,7 +235,7 @@ extension BlueprintView {
                         controller.update(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
                     }
                 } else {
-                    let controller = NativeViewController(node: child)
+                    let controller = NativeViewController(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
                     newChildren.append((path: path, node: controller))
                     
                     UIView.performWithoutAnimation {

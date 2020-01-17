@@ -13,14 +13,12 @@ import BlueprintUICommonControls
 
 final class DemoListViewController : UIViewController
 {
-    let blueprintView = BlueprintView()
-    
     override func loadView()
     {
-        self.view = self.blueprintView
+        let blueprintView = BlueprintView(element: self.element, animated: true)
         
-        self.blueprintView.element = self.element
-        
+        self.view = blueprintView
+                
         self.view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
     

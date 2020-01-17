@@ -18,10 +18,13 @@ final class ExampleLoyaltyViewController : UIViewController
     override func loadView()
     {
         self.view = self.blueprintView
-     
-        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-            self.blueprintView.element = Screen()
-        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool)
+    {
+        super.viewDidAppear(animated)
+        
+        blueprintView.setElement(animated: true, element: Screen())
     }
 }
 

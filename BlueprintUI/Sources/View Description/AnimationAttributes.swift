@@ -3,6 +3,7 @@ import UIKit
 /// UIView animation configuration values.
 public struct AnimationAttributes {
 
+    /// How long to delay the start of the animation.
     public var delay : TimeInterval
     
     /// The duration of the animation.
