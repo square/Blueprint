@@ -24,7 +24,7 @@ final class ExampleLoyaltyViewController : UIViewController
     {
         super.viewDidAppear(animated)
         
-        blueprintView.setElement(animated: true, element: Screen())
+        blueprintView.set(animated: animated, element: Screen())
     }
 }
 

@@ -40,7 +40,7 @@ public final class BlueprintView: UIView {
     /// The root element that is displayed within the view.
     public var element: Element? {
         set {
-            self.setElement(animated: false, element: newValue)
+            self.set(element: newValue)
         }
         get {
             return self._element
@@ -49,7 +49,7 @@ public final class BlueprintView: UIView {
     
     private var _element : Element?
     
-    public func setElement(animated : Bool, element: Element?)
+    public func set(animated : Bool = BlueprintView.shouldAnimateChanges, element: Element?)
     {
         _element = element
         
@@ -61,7 +61,7 @@ public final class BlueprintView: UIView {
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
-    public required init(element: Element?, animated: Bool = false) {
+    public required init(element: Element?, animated: Bool = BlueprintView.shouldAnimateChanges) {
         
         _element = element
         self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
@@ -156,6 +156,10 @@ public final class BlueprintView: UIView {
         return rootController.children
     }
     
+    public static var shouldAnimateChanges : Bool
+    {
+        return UIView.inheritedAnimationDuration > 0.0
+    }
 }
 
 extension BlueprintView {
