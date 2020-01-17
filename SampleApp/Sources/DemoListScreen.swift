@@ -38,15 +38,26 @@ final class DemoListViewController : UIViewController
             }
         }
         
-        return ScrollView(
+        var scrollView = ScrollView(
             wrapping: Inset(
                 uniformInset: 40.0,
-                wrapping: ConstrainedSize(
-                    width: .atMost(300.0),
-                    wrapping: list
+                wrapping: Aligned(
+                    vertically: .top,
+                    horizontally: .center,
+                    wrapping: ConstrainedSize(
+                        width: .atMost(400.0),
+                        wrapping: ConstrainedSize(
+                            width: .atLeast(300),
+                            wrapping: list
+                        )
+                    )
                 )
             )
         )
+        
+        scrollView.contentSize = .fittingHeight
+        
+        return scrollView
     }
     
     fileprivate var demos : [DemoItem] {
