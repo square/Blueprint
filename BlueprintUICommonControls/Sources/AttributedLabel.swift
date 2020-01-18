@@ -6,7 +6,7 @@ public struct AttributedLabel: Element {
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
     /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
+    public var roundingScale: CGFloat = 1.0 //UIScreen.main.scale
 
     public init(attributedText: NSAttributedString) {
         self.attributedText = attributedText

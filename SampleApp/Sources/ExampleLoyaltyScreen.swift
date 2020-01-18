@@ -37,17 +37,19 @@ fileprivate struct Screen : ProxyElement
     
     var screenContent : Element {
         return Row { row in
-            row.horizontalUnderflow = .growProportionally
+            row.horizontalUnderflow = .growUniformly
             row.verticalAlignment = .leading
             
-            row.add(child: self.leftInfo)
+            row.minimumHorizontalSpacing = 50.0
             
-            row.add(child: self.rightInput)
+            row.add(growPriority: 1.0, child: self.leftInfo)
+            
+            row.add(growPriority: 0.0, child: self.rightInput)
         }
     }
     
     var leftInfo : Element {
-        return ConstrainedSize(width: .atLeast(500.0), height: .unconstrained, wrapping: Column { column in
+        return Column { column in
             column.verticalUnderflow = .growProportionally
             column.horizontalAlignment = .fill
             column.minimumVerticalSpacing = 20.0
@@ -67,40 +69,45 @@ fileprivate struct Screen : ProxyElement
             detailLabel.appearingTransition = VisibilityTransition.slideIn(after: 0.5, for: 0.4)
             
             column.add(child: detailLabel)
-        })
+        }
     }
     
     var rightInput : Element {
-        var content = TransitionContainer(wrapping: Column { column in
-            column.verticalUnderflow = .justifyToStart
-            column.horizontalAlignment = .fill
-            column.minimumVerticalSpacing = 20.0
-            
-            column.add(child: Label(text: "Phone number") { label in
-                label.font = .systemFont(ofSize: 18.0, weight: .semibold)
-            })
-            
-            var textField = TextField(text: "")
-            textField.placeholder = "enter phone number"
-            
-            column.add(child: textField)
-            
-            column.add(child: Row { row in
-                row.horizontalUnderflow = .growProportionally
-                row.verticalAlignment = .fill
-                row.minimumHorizontalSpacing = 20.0
-                
-                row.add(child: Button(title: "No Thanks"))
-                row.add(child: Button(title: "Check In"))
-            })
-            
-            let disclaimer = "By claiming your points, you will get automated marketing texts associated with the loyalty program. Joining this program is not a condition of purchase."
-            
-            column.add(child: Label(text: disclaimer) { label in
-                label.color = .lightGray
-                label.font = .systemFont(ofSize: 14.0, weight: .regular)
-            })
-        })
+        var content = TransitionContainer(
+            wrapping: ConstrainedSize(
+                width: .absolute(300.0),
+                wrapping: Column { column in
+                    column.verticalUnderflow = .justifyToStart
+                    column.horizontalAlignment = .fill
+                    column.minimumVerticalSpacing = 20.0
+                    
+                    column.add(child: Label(text: "Phone number") { label in
+                        label.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                    })
+                    
+                    var textField = TextField(text: "")
+                    textField.placeholder = "enter phone number"
+                    
+                    column.add(child: textField)
+                    
+                    column.add(child: Row { row in
+                        row.horizontalUnderflow = .growProportionally
+                        row.verticalAlignment = .fill
+                        row.minimumHorizontalSpacing = 20.0
+                        
+                        row.add(child: Button(title: "No Thanks"))
+                        row.add(child: Button(title: "Check In"))
+                    })
+                    
+                    let disclaimer = "By claiming your points, you will get automated marketing texts associated with the loyalty program. Joining this program is not a condition of purchase."
+                    
+                    column.add(child: Label(text: disclaimer) { label in
+                        label.color = .lightGray
+                        label.font = .systemFont(ofSize: 14.0, weight: .regular)
+                    })
+                }
+            )
+        )
         
         content.appearingTransition = VisibilityTransition.slideIn(after: 0.75, for: 0.5)
         

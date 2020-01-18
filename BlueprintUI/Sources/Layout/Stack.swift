@@ -231,6 +231,7 @@ extension StackLayout {
     }
 
     fileprivate func _getBasisSizes(constraint: SizeConstraint, items: [Measurable]) -> [Vector] {
+        print("constraint: \(constraint)")
         return items.map { $0.measure(in: constraint).stackVector(axis: axis) }
     }
 
@@ -253,7 +254,7 @@ extension StackLayout {
             var priority: CGFloat
             switch overflow {
             case .condenseProportionally:
-                priority = basis.axis / totalBasisSize
+                priority = round(basis.axis / totalBasisSize)
             case .condenseUniformly:
                 priority = 1.0
             }
@@ -275,7 +276,7 @@ extension StackLayout {
 
             let basis = basisSizes[index]
 
-            let sizeAdjustment = (shrinkPriorities[index] / totalPriority) * extraSize
+            let sizeAdjustment = round((shrinkPriorities[index] / totalPriority) * extraSize)
             frames[index].size.axis = basis.axis + sizeAdjustment
             frames[index].origin.axis = axisOrigin
             axisOrigin = frames[index].maxAxis + minimumSpacing
@@ -301,7 +302,7 @@ extension StackLayout {
         case .growUniformly:
             space = minimumSpacing
         case .spaceEvenly:
-            space = (layoutSize.axis - totalBasisSize) / CGFloat(basisSizes.count-1)
+            space = ((layoutSize.axis - totalBasisSize) / CGFloat(basisSizes.count-1)).rounded()
         case .justifyToStart:
             space = minimumSpacing
         case .justifyToCenter:
@@ -365,7 +366,7 @@ extension StackLayout {
 
             let basis = basisSizes[index]
 
-            frames[index].size.axis = basis.axis + ((growPriorities[index] / totalPriority) * extraSize)
+            frames[index].size.axis = round(basis.axis + ((growPriorities[index] / totalPriority) * extraSize))
 
             axisOrigin = frames[index].maxAxis + space
         }
@@ -378,7 +379,7 @@ extension StackLayout {
             var result = Frame.zero
             switch alignment {
             case .center:
-                result.origin.cross = (layoutSize.cross - measuredSize.cross) / 2.0
+                result.origin.cross = round((layoutSize.cross - measuredSize.cross) / 2.0)
                 result.size.cross = measuredSize.cross
             case .fill:
                 result.origin.cross = 0.0
