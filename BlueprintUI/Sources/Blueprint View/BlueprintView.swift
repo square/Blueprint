@@ -72,7 +72,7 @@ public final class BlueprintView: UIView {
                 layoutAttributes: LayoutAttributes(),
                 children: []
             ),
-            appearanceTransitionsEnabled: animated
+            animated: animated
         )
     
         super.init(frame: CGRect.zero)
@@ -141,7 +141,7 @@ public final class BlueprintView: UIView {
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes)
         
-        rootController.update(node: rootNode, appearanceTransitionsEnabled: self.nextViewHierarchyUpdateEnablesAppearanceTransitions)
+        rootController.update(node: rootNode, animated: self.nextViewHierarchyUpdateEnablesAppearanceTransitions)
 
         isInsideUpdate = false
     }
@@ -174,20 +174,20 @@ extension BlueprintView {
         
         let view: UIView
         
-        init(node: NativeViewNode, appearanceTransitionsEnabled: Bool) {
+        init(node: NativeViewNode, animated: Bool) {
             self.viewDescription = node.viewDescription
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
             
-            update(node: node, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
+            update(node: node, animated: animated)
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
             return node.viewDescription.viewType == type(of: view)
         }
 
-        fileprivate func update(node: NativeViewNode, appearanceTransitionsEnabled: Bool) {
+        fileprivate func update(node: NativeViewNode, animated: Bool) {
             
             assert(node.viewDescription.viewType == type(of: view))
 
@@ -236,10 +236,10 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        controller.update(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
+                        controller.update(node: child, animated: animated)
                     }
                 } else {
-                    let controller = NativeViewController(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
+                    let controller = NativeViewController(node: child, animated: animated)
                     newChildren.append((path: path, node: controller))
                     
                     UIView.performWithoutAnimation {
@@ -248,9 +248,9 @@ extension BlueprintView {
                     
                     contentView.insertSubview(controller.view, at: index)
 
-                    controller.update(node: child, appearanceTransitionsEnabled: appearanceTransitionsEnabled)
+                    controller.update(node: child, animated: animated)
                     
-                    if appearanceTransitionsEnabled {
+                    if animated {
                         if let transition = child.viewDescription.appearingTransition {
                             transition.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
                         }
