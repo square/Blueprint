@@ -66,6 +66,9 @@ final class DemoListViewController : UIViewController
             DemoItem(title: "Loyalty Screen", onTap: {
                 self.navigationController?.pushViewController(ExampleLoyaltyViewController(), animated: true)
             }),
+            DemoItem(title: "Empty Elements Testing", onTap: {
+                self.navigationController?.pushViewController(EmptyElementTestingViewController(), animated: true)
+            }),
         ]
     }
 }
