@@ -180,6 +180,24 @@ class StackTests: XCTestCase {
 
         }
 
+        // Ensure that elements of size zero do not result in NaN in the outputted frames.
+        
+        do {
+            // Note: Only applicable to `growProportionally`.
+            
+            test(
+                underflow: .growProportionally,
+                layoutLength: 100,
+                items: [
+                    (measuredLength: 0, growPriority: 1.0),
+                    (measuredLength: 0, growPriority: 1.0),
+                ],
+                expectedRanges: [
+                    0...0,
+                    0...0
+                ]
+            )
+        }
 
         // Test single child for different underflow distributions, including different grow priorities.
         do {
@@ -513,7 +531,28 @@ class StackTests: XCTestCase {
             }
 
         }
-
+        
+        // Ensure that elements of size zero do not result in NaN in the outputted frames.
+        
+        do {
+            // Note: Only applicable to `condenseProportionally`.
+            
+            test(
+                overflow: .condenseProportionally,
+                
+                // Requires zero, otherwise we will never have an overflow (which is >= to content size).
+                layoutLength: 0,
+                
+                items: [
+                    (measuredLength: 0.0, shrinkPriority: 1.0),
+                    (measuredLength: 0.0, shrinkPriority: 1.0),
+                ],
+                expectedRanges: [
+                    0...0,
+                    0...0
+                ]
+            )
+        }
 
         // Test single child for different overflow distributions, including different shrink priorities.
         do {
@@ -608,8 +647,6 @@ class StackTests: XCTestCase {
 
 
     }
-
-
 }
 
 
