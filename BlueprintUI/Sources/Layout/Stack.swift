@@ -253,7 +253,11 @@ extension StackLayout {
             var priority: CGFloat
             switch overflow {
             case .condenseProportionally:
-                priority = basis.axis / totalBasisSize
+                if totalBasisSize > 0 {
+                    priority = basis.axis / totalBasisSize
+                } else {
+                    priority = basis.axis
+                }
             case .condenseUniformly:
                 priority = 1.0
             }
@@ -291,8 +295,9 @@ extension StackLayout {
 
         let minimumTotalSpace = minimumSpacing * CGFloat(basisSizes.count-1)
         let extraSize: CGFloat = layoutSize.axis - (totalBasisSize + minimumTotalSpace)
+        
         assert(extraSize >= 0.0)
-
+        
         let space: CGFloat
 
         switch underflow {
@@ -337,7 +342,11 @@ extension StackLayout {
             var priority: CGFloat
             switch underflow {
             case .growProportionally:
-                priority = basis.axis / totalBasisSize
+                if totalBasisSize > 0 {
+                    priority = basis.axis / totalBasisSize
+                } else {
+                    priority = basis.axis
+                }
             case .growUniformly:
                 priority = 1.0
             case .spaceEvenly:

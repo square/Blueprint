@@ -42,13 +42,12 @@ struct ElementPath: Hashable {
     static var empty: ElementPath {
         return ElementPath()
     }
-    
 }
 
 extension ElementPath {
 
     /// Represents an element in a hierarchy.
-    struct Component: Hashable {
+    struct Component: Hashable, CustomDebugStringConvertible {
 
         /// The type of element represented by this component.
         var elementType: Element.Type
@@ -71,13 +70,17 @@ extension ElementPath {
             hasher.combine(identifier)
         }
 
+        // MARK: CustomDebugStringConvertible
+        
+        var debugDescription: String {
+            return "\(self.elementType).\(self.identifier)"
+        }
     }
-    
 }
 
 extension ElementPath {
     
-    fileprivate final class Storage: Hashable {
+    fileprivate final class Storage: Hashable, CustomDebugStringConvertible {
         
         private var _hash: Int? = nil
         
@@ -110,7 +113,11 @@ extension ElementPath {
             return lhs.components == rhs.components
         }
         
+        // MARK: CustomDebugStringConvertible
+        
+        var debugDescription: String {
+            return self.components.map { $0.debugDescription }.joined()
+        }
     }
-    
 }
 

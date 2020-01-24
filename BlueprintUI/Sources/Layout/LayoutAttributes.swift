@@ -30,7 +30,8 @@ public struct LayoutAttributes {
     public init(frame: CGRect) {
         self.init(
             center: CGPoint(x: frame.midX, y: frame.midY),
-            bounds: CGRect(origin: .zero, size: frame.size))
+            bounds: CGRect(origin: .zero, size: frame.size)
+        )
     }
     
     public init(size: CGSize) {
@@ -167,38 +168,40 @@ extension LayoutAttributes: Equatable {
 }
 
 extension CGRect {
-    fileprivate var isFinite: Bool {
-        return origin.isFinite || size.isFinite
+    var isFinite: Bool {
+        return origin.isFinite && size.isFinite
     }
 }
 
 extension CGPoint {
-    fileprivate var isFinite: Bool {
-        return x.isFinite || y.isFinite
+    var isFinite: Bool {
+        return x.isFinite && y.isFinite
     }
 }
 
 extension CGSize {
-    fileprivate var isFinite: Bool {
-        return width.isFinite || height.isFinite
+    var isFinite: Bool {
+        return width.isFinite && height.isFinite
     }
 }
 
 extension CATransform3D {
-
-    fileprivate var isFinite: Bool {
+    var isFinite: Bool {
         return m11.isFinite
             && m12.isFinite
             && m13.isFinite
             && m14.isFinite
+            
             && m21.isFinite
             && m22.isFinite
             && m23.isFinite
             && m24.isFinite
+            
             && m31.isFinite
             && m32.isFinite
             && m33.isFinite
             && m34.isFinite
+            
             && m41.isFinite
             && m42.isFinite
             && m43.isFinite
