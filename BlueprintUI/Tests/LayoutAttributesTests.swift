@@ -4,9 +4,6 @@ import QuartzCore
 
 final class LayoutAttributesTests: XCTestCase {
     
-    
-    
-    
     func testEquality() {
         
         let attributes = LayoutAttributes(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
@@ -116,4 +113,47 @@ final class LayoutAttributesTests: XCTestCase {
 
     }
     
+}
+
+final class LayoutAttributesTests_CGRect : XCTestCase {
+    
+    func test_isFinite() {
+        XCTAssertTrue(CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: CGSize(width: 100.0, height: 100.0)).isFinite)
+        
+        XCTAssertFalse(CGRect(origin: CGPoint(x: 0.0, y: CGFloat.nan), size: CGSize(width: 100.0, height: 100.0)).isFinite)
+        XCTAssertFalse(CGRect(origin: CGPoint(x: 0.0, y: 0.0), size: CGSize(width: 100.0, height: CGFloat.nan)).isFinite)
+        XCTAssertFalse(CGRect(origin: CGPoint(x: 0.0, y: CGFloat.nan), size: CGSize(width: 100.0, height: CGFloat.nan)).isFinite)
+    }
+}
+
+final class LayoutAttributesTests_CGPoint : XCTestCase {
+    
+    func test_isFinite() {
+        XCTAssertTrue(CGPoint(x: 10.0, y: 5.0).isFinite)
+        
+        XCTAssertFalse(CGPoint(x: CGFloat.nan, y: 5.0).isFinite)
+        XCTAssertFalse(CGPoint(x: 10.0, y: CGFloat.nan).isFinite)
+    }
+}
+
+final class LayoutAttributesTests_CGSize : XCTestCase {
+    
+    func test_isFinite() {
+        XCTAssertTrue(CGSize(width: 10.0, height: 5.0).isFinite)
+        
+        XCTAssertFalse(CGSize(width: CGFloat.nan, height: 5.0).isFinite)
+        XCTAssertFalse(CGSize(width: 10.0, height: CGFloat.nan).isFinite)
+    }
+}
+
+final class LayoutAttributesTests_CATransform3D : XCTestCase {
+    
+    func test_isFinite() {
+        XCTAssertTrue(CATransform3DIdentity.isFinite)
+        
+        var invalid = CATransform3DIdentity
+        invalid.m11 = CGFloat.nan
+        
+        XCTAssertFalse(invalid.isFinite)
+    }
 }
