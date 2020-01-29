@@ -32,6 +32,15 @@ class TextFieldTests: XCTestCase {
                 size: CGSize(width: 200, height: 44),
                 identifier: "disabled")
         }
+        
+        do {
+            var field = TextField(text: "Right Aligned")
+            field.textAlignment = .right
+            compareSnapshot(
+                of: field,
+                size: CGSize(width: 200, height: 44),
+                identifier: "right-aligned")
+        }
 
     }
 
