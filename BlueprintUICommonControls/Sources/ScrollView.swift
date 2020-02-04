@@ -221,7 +221,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     /// The current `ScrollView` state we represent.
     private var representedElement : ScrollView
 
-    private var refreshControl: UIRefreshControl? = nil {
+    private var refreshControl: RefreshControl? = nil {
 
         didSet {
             scrollView.refreshControl = refreshControl
@@ -272,7 +272,7 @@ fileprivate final class ScrollerWrapperView: UIView {
             refreshControl = nil
         case .enabled, .refreshing:
             if refreshControl == nil {
-                let control = UIRefreshControl()
+                let control = RefreshControl()
                 control.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
                 refreshControl = control
             }
@@ -298,9 +298,15 @@ fileprivate final class ScrollerWrapperView: UIView {
         if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
             self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
         }
-
-        if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
+        
+        switch scrollView.pullToRefreshBehavior {
+        case .disabled:
             self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
+        case .enabled, .refreshing:
+            // The refresh behavior will not work when `alwaysBounceVertical` is false
+            // and the content size is less than the parent view size (no scroll is needed).
+            // Set `alwaysBounceVertical` to true when the `refreshControl` is needed.
+            self.scrollView.alwaysBounceVertical = true
         }
 
         if self.scrollView.contentSize != contentSize {
@@ -476,3 +482,23 @@ private extension UIView {
         }
     }
 }
+
+private final class RefreshControl: UIRefreshControl {
+
+    override var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set {
+            // UIRefreshControl frame does not account for UIScrollView's left inset. Offset the
+            // frame with negative inset so that the `refreshControl` is centered with respect to the content.
+            var newFrame = newValue
+            if let parentScrollView = superview as? UIScrollView {
+                newFrame.origin.x = -parentScrollView.contentInset.left
+            }
+            super.frame = newFrame
+        }
+    }
+
+}
+
