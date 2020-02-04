@@ -215,13 +215,13 @@ extension ScrollView {
 
 fileprivate final class ScrollerWrapperView: UIView {
     
-    let scrollView = UIScrollView()
+    let scrollView = CustomScrollView()
     let keyboardObserver = KeyboardObserver()
     
     /// The current `ScrollView` state we represent.
     private var representedElement : ScrollView
 
-    private var refreshControl: RefreshControl? = nil {
+    private var refreshControl: UIRefreshControl? = nil {
 
         didSet {
             scrollView.refreshControl = refreshControl
@@ -272,7 +272,7 @@ fileprivate final class ScrollerWrapperView: UIView {
             refreshControl = nil
         case .enabled, .refreshing:
             if refreshControl == nil {
-                let control = RefreshControl()
+                let control = UIRefreshControl()
                 control.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
                 refreshControl = control
             }
@@ -298,7 +298,7 @@ fileprivate final class ScrollerWrapperView: UIView {
         if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
             self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
         }
-        
+
         switch scrollView.pullToRefreshBehavior {
         case .disabled:
             self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
@@ -483,22 +483,37 @@ private extension UIView {
     }
 }
 
-private final class RefreshControl: UIRefreshControl {
+private extension ScrollerWrapperView {
 
-    override var frame: CGRect {
-        get {
-            return super.frame
-        }
-        set {
-            // UIRefreshControl frame does not account for UIScrollView's left inset. Offset the
-            // frame with negative inset so that the `refreshControl` is centered with respect to the content.
-            var newFrame = newValue
-            if let parentScrollView = superview as? UIScrollView {
-                newFrame.origin.x = -parentScrollView.contentInset.left
+    final class CustomScrollView: UIScrollView {
+
+        private var _refreshControl: UIRefreshControl? = nil
+
+        override var refreshControl: UIRefreshControl? {
+            get {
+                if #available(iOS 10.0, *) {
+                    return super.refreshControl
+                }
+                return _refreshControl
             }
-            super.frame = newFrame
+            set {
+                if #available(iOS 10.0, *) {
+                    super.refreshControl = newValue
+                } else {
+                    _refreshControl?.removeFromSuperview()
+                    _refreshControl = newValue
+                    if let newRefreshControl = newValue {
+                        addSubview(newRefreshControl)
+                    }
+                }
+            }
         }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            refreshControl?.center.x = bounds.midX
+        }
+
     }
 
 }
-
