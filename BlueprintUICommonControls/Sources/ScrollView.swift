@@ -222,12 +222,8 @@ fileprivate final class ScrollerWrapperView: UIView {
     private var representedElement : ScrollView
 
     private var refreshControl: UIRefreshControl? {
-        get {
-            return scrollView.refreshControl
-        }
-        set {
-            scrollView.refreshControl = newValue
-        }
+        get { return scrollView.refreshControl }
+        set { scrollView.refreshControl = newValue }
     }
 
     private var refreshAction: () -> Void = { }
