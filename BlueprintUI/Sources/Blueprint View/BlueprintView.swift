@@ -25,17 +25,11 @@ import UIKit
 ///
 /// }
 /// ```
-public final class BlueprintView: UIView {
-
-    private var needsViewHierarchyUpdate: Bool = true
-    private var nextViewHierarchyUpdateEnablesAppearanceTransitions: Bool = false
+public final class BlueprintView : UIView {
     
-    private var lastViewHierarchyUpdateBounds: CGRect = .zero
-
-    /// Used to detect reentrant updates
-    private var isInsideUpdate: Bool = false
-
-    private let rootController: NativeViewController
+    //
+    // MARK: Public Properties
+    //
     
     /// The root element that is displayed within the view.
     public var element: Element? {
@@ -47,39 +41,62 @@ public final class BlueprintView: UIView {
         }
     }
     
+    weak var delegate : BlueprintViewDelegate? = nil {
+        didSet {
+            self.hierarchyPresenter.delegate = self.delegate
+        }
+    }
+    
+    //
+    // MARK: Private Properties
+    //
+    
+    private var needsViewHierarchyUpdate: Bool = true
+    private var nextViewHierarchyUpdateEnablesAppearanceTransitions: Bool = false
+    
+    private var lastViewHierarchyUpdateBounds: CGRect = .zero
+
+    /// Used to detect reentrant updates
+    private var isInsideUpdate: Bool = false
+
+    private let hierarchyPresenter : ViewHierarchyPresenter
+    
     private var _element : Element?
     
-    public func set(animated : Bool = UIView.isInAnimationBlock, element: Element?)
-    {
-        _element = element
-        
-        self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
-        
-        self.setNeedsViewHierarchyUpdate()
-    }
+    //
+    // MARK: Initialization
+    //
 
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
-    public required init(element: Element?, animated: Bool = UIView.isInAnimationBlock) {
+    
+    public convenience init(element: Element?, animated: Bool = UIView.isInAnimationBlock) {
+        self.init(element: element, delegate: nil, animated: animated)
+    }
+    
+    internal init(element: Element?, delegate : BlueprintViewDelegate?, animated: Bool = UIView.isInAnimationBlock) {
+        
+        self.delegate = delegate
         
         _element = element
         
         self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
         
-        rootController = NativeViewController(
+        hierarchyPresenter = ViewHierarchyPresenter(
             node: NativeViewNode(
                 content: UIView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
                 children: []
             ),
+            delegate: self.delegate,
             animated: animated
         )
     
         super.init(frame: CGRect.zero)
         
         self.backgroundColor = .white
-        addSubview(rootController.view)
+        addSubview(hierarchyPresenter.view)
     }
 
     public override convenience init(frame: CGRect) {
@@ -91,9 +108,27 @@ public final class BlueprintView: UIView {
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    //
+    // MARK: Public Methods
+    //
+    
+    public func set(animated : Bool = UIView.isInAnimationBlock, element: Element?)
+    {
+        _element = element
+        
+        self.nextViewHierarchyUpdateEnablesAppearanceTransitions = animated
+        
+        self.setNeedsViewHierarchyUpdate()
+    }
+    
+    //
+    // MARK: UIView
+    //
 
     /// Forwarded to the `measure(in:)` implementation of the root element.
     override public func sizeThatFits(_ size: CGSize) -> CGSize {
+        
         guard let element = element else { return .zero }
         let constraint: SizeConstraint
         if size == .zero {
@@ -108,6 +143,10 @@ public final class BlueprintView: UIView {
         super.layoutSubviews()
         performUpdate()
     }
+    
+    //
+    // MARK: Private Methods
+    //
     
     private func performUpdate() {
         updateViewHierarchyIfNeeded()
@@ -137,7 +176,7 @@ public final class BlueprintView: UIView {
             .layout(frame: bounds)
             .resolve() ?? []
         
-        rootController.view.frame = bounds
+        hierarchyPresenter.view.frame = bounds
         
         let rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
@@ -145,35 +184,46 @@ public final class BlueprintView: UIView {
             children: viewNodes
         )
         
-        rootController.update(with: rootNode, animated: self.nextViewHierarchyUpdateEnablesAppearanceTransitions, context: .init())
+        hierarchyPresenter.update(with: rootNode, animated: self.nextViewHierarchyUpdateEnablesAppearanceTransitions, context: .init())
 
         isInsideUpdate = false
     }
 
-    var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
+    var currentHierarchyState: [(path: ElementPath, node: ViewHierarchyPresenter)] {
 
         /// Perform an update if needed so that the node hierarchy is fully populated.
         updateViewHierarchyIfNeeded()
 
         /// rootViewNode always contains a simple UIView – its children represent the
         /// views that are actually generated by the root element.
-        return rootController.children
+        return hierarchyPresenter.children
     }
 }
 
+
 extension BlueprintView {
     
-    final class NativeViewController {
+    final class ViewHierarchyPresenter {
+        
+        fileprivate weak var delegate : BlueprintViewDelegate? {
+            didSet {
+                for (_, presenter) in self.children {
+                    presenter.delegate = self.delegate
+                }
+            }
+        }
 
         private var viewDescription: ViewDescription
 
         private var layoutAttributes: LayoutAttributes
         
-        private (set) var children: [(ElementPath, NativeViewController)]
+        private (set) var children: [(ElementPath, ViewHierarchyPresenter)]
         
         let view: UIView
         
-        init(node: NativeViewNode, animated: Bool) {
+        init(node: NativeViewNode, delegate: BlueprintViewDelegate?, animated: Bool) {
+            
+            self.delegate = delegate
             self.viewDescription = node.viewDescription
             self.layoutAttributes = node.layoutAttributes
             self.children = []
@@ -201,16 +251,16 @@ extension BlueprintView {
             
             // Store children in a dictionary so they can later be accessed by their path.
             
-            var oldChildren: [ElementPath: NativeViewController] = [:]
+            var oldChildren: [ElementPath: ViewHierarchyPresenter] = [:]
             oldChildren.reserveCapacity(children.count)
             
-            for (path, childController) in children {
-                oldChildren[path] = childController
+            for (path, childPresenter) in children {
+                oldChildren[path] = childPresenter
             }
             
             // When the update pass is complete, this will contain all children.
             
-            var newChildren: [(path: ElementPath, node: NativeViewController)] = []
+            var newChildren: [(path: ElementPath, node: ViewHierarchyPresenter)] = []
             newChildren.reserveCapacity(node.children.count)
             
             var usedKeys: Set<ElementPath> = []
@@ -228,16 +278,16 @@ extension BlueprintView {
                 
                 var childContext = context
                                 
-                if let controller = oldChildren[path], controller.canUpdateFrom(node: child) {
+                if let presenter = oldChildren[path], presenter.canUpdateFrom(node: child) {
                     
                     // We can update the existing view if it is of the same type as the last view at this path.
 
                     oldChildren.removeValue(forKey: path)
-                    newChildren.append((path: path, node: controller))
+                    newChildren.append((path: path, node: presenter))
                     
                     let layoutTransition: LayoutTransition
                     
-                    if child.layoutAttributes != controller.layoutAttributes {
+                    if child.layoutAttributes != presenter.layoutAttributes {
                         layoutTransition = child.viewDescription.layoutTransition
                     } else {
                         layoutTransition = .inherited
@@ -247,42 +297,42 @@ extension BlueprintView {
                     // Attributes are applied inside the transition to preserve the desired animation.
                     
                     layoutTransition.perform {
-                        child.layoutAttributes.apply(to: controller.view)
+                        child.layoutAttributes.apply(to: presenter.view)
 
                         // Even though this view is already in the hierarchy,
                         // re-inserting the subview ensures we map z-ordering of the hierarchy.
-                        contentView.insertSubview(controller.view, at: index)
+                        contentView.insertSubview(presenter.view, at: index)
 
-                        controller.update(with: child, animated: animated, context: childContext)
+                        presenter.update(with: child, animated: animated, context: childContext)
                     }
                 } else {
                     // ...otherwise, we will make a new view.
                     // The `for` loop below will handle cleaning up the old view.
                     
                     let transition = child.viewDescription.onAppear
-                    let controller = NativeViewController(node: child, animated: animated)
+                    let presenter = ViewHierarchyPresenter(node: child, delegate: self.delegate, animated: animated)
                     
-                    newChildren.append((path: path, node: controller))
+                    newChildren.append((path: path, node: presenter))
                     
                     // Before we add the view to the hierarchy, ensure it is
                     // sized, positioned, etc, correctly.
                     
                     UIView.performWithoutAnimation {
-                        child.layoutAttributes.apply(to: controller.view)
+                        child.layoutAttributes.apply(to: presenter.view)
                     }
                     
-                    contentView.insertSubview(controller.view, at: index)
+                    contentView.insertSubview(presenter.view, at: index)
                     
                     childContext.add(appearanceTransition: transition)
                     
-                    controller.update(with: child, animated: animated, context: childContext)
+                    presenter.update(with: child, animated: animated, context: childContext)
                     
                     // Allow the appearance transition, if any, to take effect.
                     
                     if let transition = transition, animated, context.animate(transition) {
                         transition.animate(
                             direction: .appearing,
-                            with: controller.view,
+                            with: presenter.view,
                             layoutAttributes: child.layoutAttributes
                         )
                     }
@@ -292,19 +342,19 @@ extension BlueprintView {
             // Finally, any children remaining in `oldChildren` should be removed from the hierarchy.
             // They are left over from the previous element hierarchy.
             
-            for controller in oldChildren.values {
-                let transition = controller.viewDescription.onDisappear
+            for presenter in oldChildren.values {
+                let transition = presenter.viewDescription.onDisappear
                                 
                 if let transition = transition, animated {
                     transition.animate(
                     direction: .disappearing,
-                    with: controller.view,
-                    layoutAttributes: controller.layoutAttributes,
+                    with: presenter.view,
+                    layoutAttributes: presenter.layoutAttributes,
                     completion: { _ in
-                        controller.view.removeFromSuperview()
+                        presenter.view.removeFromSuperview()
                     })
                 } else {
-                    controller.view.removeFromSuperview()
+                    presenter.view.removeFromSuperview()
                 }
             }
             
@@ -331,4 +381,5 @@ extension BlueprintView {
             }
         }
     }
+    
 }
