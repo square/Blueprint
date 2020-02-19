@@ -1,7 +1,13 @@
 import UIKit
 
 
-/// The transition used when a view is inserted or removed during an update cycle.
+/**
+ Defines the animation used when an element is inserted or removed during an update cycle.
+ 
+ You may provide a standard UIKit animation, or an entirely custom animation via the `animationKind` property.
+ 
+ You can control how the animation should react to other parent animations via the `performing` property.
+ */
 public struct TransitionAnimation {
     
     /**
@@ -9,13 +15,17 @@ public struct TransitionAnimation {
      - A standard UIView.animate(with...) animation.
      - A `CustomAnimation` that can defer to CoreAnimation, CADisplayLink, etc.
      */
-    public var kind : Kind
+    public var animationKind : AnimationKind
     
     /// When the transition animation should be performed, if nested within other transition animations.
     public var performing : PerformRule
     
     /// Called when the appearance animation is completed.
     public var completion : (Bool) -> ()
+    
+    //
+    // MARK: Initialization
+    //
     
     public static func with(
         options : AnimationOptions = .init(),
@@ -25,74 +35,19 @@ public struct TransitionAnimation {
     ) -> Self
     {
         return self.init(
-            kind: .standard(options: options, properties: animations),
+            animationKind: .standard(options: options, properties: animations),
             performing: performing
         )
     }
     
     public init(
-        kind : Kind,
+        animationKind : AnimationKind,
         performing : PerformRule = .ifNotNested,
         completion : @escaping (Bool) -> () = { _ in }
     ) {
-        self.kind = kind
+        self.animationKind = animationKind
         self.performing = performing
         self.completion = completion
-    }
-
-    /// Returns a `VisibilityTransition` that scales in and out.
-    public static var scale: Self {
-        return .with(
-            animations: AnimatableViewProperties(transform: .init(scaleX: 0.01, y: 0.01))
-        )
-    }
-
-    /// Returns a `VisibilityTransition` that fades in and out.
-    public static var fade: Self {
-        return .with(
-            animations: AnimatableViewProperties(alpha: 0.0)
-        )
-    }
-
-    /// Returns a `VisibilityTransition` that simultaneously scales and fades in and out.
-    public static var scaleAndFade: Self {
-        return .with(
-            animations: AnimatableViewProperties(
-                alpha: 0.0,
-                transform: .init(scaleX: 0.01, y: 0.01)
-            )
-        )
-    }
-    
-    /**
-     Returns a `VisibilityTransition` that simultaneously slides content in from
-     the given direction after given delay, alongside a simultaneous fade animation.
-     
-     The animation is a spring animation.
-     
-     The default options provide a slide animation that drops in from the top over 0.5 seconds.
-     
-     Provide a negative `distance` to slide in from the top, or a positive `distance` to slide in
-     from the bottom.
-     */
-    public static func slideIn(
-        from distance : CGFloat = -50.0,
-        after delay : TimeInterval = 0.0,
-        for duration : TimeInterval = 0.5
-    ) -> Self {
-        
-        return TransitionAnimation.with(
-            options: AnimationOptions(
-                animationKind: .spring(dampingRatio: 0.5, velocity: 0.3),
-                delay: delay,
-                duration: duration,
-                curve: .easeOut
-            ),
-            animations: AnimatableViewProperties(
-                alpha: 0.0,
-                transform: CGAffineTransform(translationX: 0.0, y: distance)
-            )
-        )
     }
 }
 
@@ -109,8 +64,9 @@ extension TransitionAnimation {
         case ifNotNested
     }
     
+    
     /// The kind of animation to perform.
-    public enum Kind {
+    public enum AnimationKind {
         /**
          A standard UIKit animation (eg, `UIView.animate(with..`) that animates to/from the properties provided by `Properties`.
          
@@ -130,6 +86,7 @@ extension TransitionAnimation {
          */
         case custom(() -> AnyCustomTransitionAnimation)
     }
+    
     
     /// If the transition is appearing or disappearing the element.
     public enum Direction : Equatable {
@@ -159,7 +116,7 @@ extension TransitionAnimation {
             self.completion($0)
         }
         
-        switch self.kind {
+        switch self.animationKind {
         case .standard(let options, let properties):
             
             let finalProperties = isAppearing ? currentProperties : properties

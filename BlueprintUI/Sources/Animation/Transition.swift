@@ -3,18 +3,26 @@ import UIKit
 
 /**
  Wraps a content element and adds transitions when the element appears, disappears, or changes layout.
- 
- 
  */
 public struct Transition<Wrapped:Element> : Element {
 
+    /// The transition to use when the wrapped element is first presented on screen.
     public var onAppear: TransitionAnimation?
+    
+    /// The transition to use when the wrapped element is removed from the screen.
     public var onDisappear: TransitionAnimation?
     
+    /// The layout transition to use when an already on-screen element is updated.
     public var layoutTransition: LayoutTransition
 
+    /// The element which will be transitioned in, out, or transitioned during layout.
     public var wrapped : Wrapped
     
+    //
+    // MARK: Initialization
+    //
+    
+    /// Creates a new `Transition` with both `onAppear` and `onDisappear` set to the provided `animation`.
     public init(
         animation: TransitionAnimation,
         layout: LayoutTransition = .specific(AnimationOptions()),
@@ -28,6 +36,12 @@ public struct Transition<Wrapped:Element> : Element {
         )
     }
 
+    /**
+     Creates a new `Transition` with the provided options.
+    
+     If you only provide one of `onAppear` or `onDisappear`, only that direction of appearance
+     transition will be animated. The other one will be performed with no animation.
+     */
     public init(
         onAppear: TransitionAnimation? = nil,
         onDisappear: TransitionAnimation? = nil,
@@ -41,6 +55,10 @@ public struct Transition<Wrapped:Element> : Element {
         
         self.wrapped = element
     }
+    
+    //
+    // MARK: Element
+    //
 
     public var content: ElementContent {
         return ElementContent(child: wrapped)

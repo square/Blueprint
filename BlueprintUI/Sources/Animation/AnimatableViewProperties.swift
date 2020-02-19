@@ -30,11 +30,26 @@ import UIKit
  */
 public struct AnimatableViewProperties : Equatable {
     
+    /// The alpha of the view.
     public var alpha : CGFloat?
+    
+    /// The background color of the view.
     public var backgroundColor : UIColor?
+    
+    /// The bounds of the view.
+    /// If you set bounds, you should also set center, but not frame.
     public var bounds : CGRect?
+    
+    /// The center of the view.
+    /// If you set center, you should also set bounds, but not frame.
     public var center : CGPoint?
+    
+    /// The frame of the view.
+    /// If you set this property, you should not set bounds, center, or transform.
     public var frame : CGRect?
+    
+    /// The transform applied to the view.
+    /// If you set this property, you should set bounds and center to position the view, not frame.
     public var transform : CGAffineTransform?
     
     /**
@@ -54,6 +69,7 @@ public struct AnimatableViewProperties : Equatable {
         configure(&self)
     }
     
+    /// Creates new `AnimatableViewProperties` with the provided options.
     public init(
         alpha : CGFloat? = nil,
         backgroundColor : UIColor? = nil,
