@@ -47,6 +47,8 @@ public final class BlueprintView: UIView {
         }
     }
     
+    public var viewController : UIViewController? = nil
+    
     private var _element : Element?
     
     public func set(animated : Bool = UIView.isInAnimationBlock, element: Element?)

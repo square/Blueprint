@@ -40,15 +40,28 @@ extension NativeView where Self: UIView {
 /// contains functionality for creating, updating, and animating view instances.
 public struct ViewDescription {
     
+    public let kind : Kind
+    
+    public enum Kind {
+        case view(View)
+        case viewController(ViewController)
+        
+        public struct View {
+        }
+        
+        public struct ViewController {
+        }
+    }
+    
+    public let onAppear: TransitionAnimation?
+    public let onDisappear: TransitionAnimation?
+    public let layoutTransition: LayoutTransition
+    
     private let _viewType: UIView.Type
     private let _build: () -> UIView
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
     
-    private let _onAppear: TransitionAnimation?
-    private let _onDisappear: TransitionAnimation?
-    private let _layoutTransition: LayoutTransition
-
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
     public init<View>(_ viewType: View.Type) where View: UIView {
@@ -86,9 +99,9 @@ public struct ViewDescription {
             return configuration.contentView(typedView)
         }
         
-        _layoutTransition = configuration.layoutTransition
-        _onAppear = configuration.onAppear
-        _onDisappear = configuration.onDisappear
+        self.layoutTransition = configuration.layoutTransition
+        self.onAppear = configuration.onAppear
+        self.onDisappear = configuration.onDisappear
     }
     
     public var viewType: UIView.Type {
@@ -106,19 +119,6 @@ public struct ViewDescription {
     public func contentView(in view: UIView) -> UIView {
         return _contentView(view)
     }
-
-    public var layoutTransition: LayoutTransition {
-        return _layoutTransition
-    }
-    
-    public var onAppear: TransitionAnimation? {
-        return _onAppear
-    }
-    
-    public var onDisappear: TransitionAnimation? {
-        return _onDisappear
-    }
-    
 }
 
 extension ViewDescription {
