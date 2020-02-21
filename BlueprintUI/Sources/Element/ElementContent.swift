@@ -107,7 +107,7 @@ extension ElementContent {
 extension ElementContent.Builder {
 
     /// Adds the given child element.
-    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: String? = nil, element: Element) {
+    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil, element: Element) {
         let child = Child(
             traits: traits,
             key: key,
@@ -134,19 +134,23 @@ extension ElementContent.Builder: ContentStorage {
 
         var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
         result.reserveCapacity(children.count)
+        
+        var identifierFactory = ElementIdentifier.Factory(reserveCapacity: children.count)
 
         for index in 0..<children.count {
-            let currentChildLayoutAttributes = childAttributes[childAttributes.startIndex.advanced(by: index)]
-            let currentChild = children[children.startIndex.advanced(by: index)]
+            let currentChildLayoutAttributes = childAttributes[index]
+            let currentChild = children[index]
 
             let resultNode = LayoutResultNode(
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: currentChild.content)
-
-            let identifier = ElementIdentifier(
-                key: currentChild.key,
-                index: index)
+                content: currentChild.content
+            )
+            
+            let identifier = identifierFactory.nextIdentifier(
+                for: type(of: currentChild.element),
+                key: currentChild.key
+            )
 
             result.append((identifier: identifier, node: resultNode))
         }
@@ -166,7 +170,7 @@ extension ElementContent.Builder {
     fileprivate struct Child: Measurable {
 
         var traits: LayoutType.Traits
-        var key: String?
+        var key: AnyHashable?
         var content: ElementContent
         var element: Element
 

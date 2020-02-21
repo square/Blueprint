@@ -7,7 +7,7 @@ import UIKit
 public protocol StackElement: Element {
     init()
     var layout: StackLayout { get }
-    var children: [(element: Element, traits: StackLayout.Traits, key: String?)] { get set }
+    var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
 }
 
 extension StackElement {
@@ -74,7 +74,7 @@ extension StackElement {
     ///
     ///   - child: The child element to add to this stack
     ///
-    mutating public func add(growPriority: CGFloat = 1.0, shrinkPriority: CGFloat = 1.0, key: String? = nil, child: Element) {
+    mutating public func add(growPriority: CGFloat = 1.0, shrinkPriority: CGFloat = 1.0, key: AnyHashable? = nil, child: Element) {
         children.append((
             element: child,
             traits: StackLayout.Traits(growPriority: growPriority, shrinkPriority: shrinkPriority),
