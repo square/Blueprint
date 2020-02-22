@@ -17,6 +17,7 @@ public struct ScrollView: Element {
     public var showsHorizontalScrollIndicator: Bool = true
     public var showsVerticalScrollIndicator: Bool = true
     public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
+    public var shouldEndEditingOnTap = false
 
     public init(wrapping element: Element) {
         self.wrappedElement = element
@@ -264,6 +265,7 @@ fileprivate final class ScrollerWrapperView: UIView {
         }
 
 
+        self.scrollView.keyboardDismissMode = scrollView.shouldEndEditingOnTap ? .onDrag : .none
     }
 
 }
