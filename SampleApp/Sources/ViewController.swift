@@ -51,7 +51,7 @@ fileprivate struct MainView: ProxyElement {
         var scroll = ScrollView(wrapping: col)
         scroll.contentSize = .fittingHeight
         scroll.alwaysBounceVertical = true
-        scroll.shouldEndEditingOnTap = true
+        scroll.keyboardDismissMode = .onDrag
 
         let background = Box(
             backgroundColor: UIColor(white: 0.95, alpha: 1.0),
