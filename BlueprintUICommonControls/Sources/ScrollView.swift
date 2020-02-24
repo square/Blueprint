@@ -239,6 +239,10 @@ fileprivate final class ScrollerWrapperView: UIView {
             self.scrollView.showsHorizontalScrollIndicator = scrollView.showsHorizontalScrollIndicator
         }
 
+        if self.scrollView.keyboardDismissMode != scrollView.keyboardDismissMode {
+            self.scrollView.keyboardDismissMode = scrollView.keyboardDismissMode
+        }
+
         var contentInset = scrollView.contentInset
 
         if case .refreshing = scrollView.pullToRefreshBehavior, let refreshControl = refreshControl {
@@ -265,7 +269,6 @@ fileprivate final class ScrollerWrapperView: UIView {
         }
 
 
-        self.scrollView.keyboardDismissMode = scrollView.keyboardDismissMode
     }
 
 }
