@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'BlueprintUICommonControls'
-  s.version      = '0.5.1'
+  s.version      = '0.6.0'
   s.summary      = 'UIKit-backed elements for Blueprint'
   s.homepage     = 'https://www.github.com/square/blueprint'
   s.license      = 'Apache License, Version 2.0'
