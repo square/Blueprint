@@ -17,6 +17,7 @@ public struct ScrollView: Element {
     public var showsHorizontalScrollIndicator: Bool = true
     public var showsVerticalScrollIndicator: Bool = true
     public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
+    public var keyboardDismissMode = UIScrollView.KeyboardDismissMode.none
 
     public init(wrapping element: Element) {
         self.wrappedElement = element
@@ -236,6 +237,10 @@ fileprivate final class ScrollerWrapperView: UIView {
 
         if self.scrollView.showsHorizontalScrollIndicator != scrollView.showsHorizontalScrollIndicator {
             self.scrollView.showsHorizontalScrollIndicator = scrollView.showsHorizontalScrollIndicator
+        }
+
+        if self.scrollView.keyboardDismissMode != scrollView.keyboardDismissMode {
+            self.scrollView.keyboardDismissMode = scrollView.keyboardDismissMode
         }
 
         var contentInset = scrollView.contentInset
