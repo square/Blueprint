@@ -12,7 +12,7 @@ class AttributedLabelTests: XCTestCase {
             .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
             .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-        var element = AttributedLabel(attributedText: string)
+        var element = AttributedLabel(text: string)
         element.roundingScale = 1
 
         compareSnapshot(of: element)
@@ -24,7 +24,7 @@ class AttributedLabelTests: XCTestCase {
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         let constraint = SizeConstraint(CGSize(width: 100.0, height: 200.0))
         
-        var element = AttributedLabel(attributedText: string)
+        var element = AttributedLabel(text: string)
         element.roundingScale = 1
 
         element.numberOfLines = 0
@@ -40,7 +40,7 @@ class AttributedLabelTests: XCTestCase {
     func test_numberOfLines_drawing() {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
-        var element = AttributedLabel(attributedText: string)
+        var element = AttributedLabel(text: string)
         element.roundingScale = 1
 
         element.numberOfLines = 0
@@ -72,8 +72,10 @@ class AttributedLabelTests: XCTestCase {
                 .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
                 .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-            var element = AttributedLabel(attributedText: string)
+            var element = AttributedLabel(text: string)
             element.roundingScale = 1
+            
+            // TODO: Measured size is entirely useless now. Replace.
 
             var measuredSize = string.boundingRect(with: size, options: .usesLineFragmentOrigin, context: nil).size
             measuredSize.width = measuredSize.width.rounded(.up)
@@ -98,7 +100,7 @@ class AttributedLabelTests: XCTestCase {
                 .font: UIFont.systemFont(ofSize: 23)
             ])
 
-        var element = AttributedLabel(attributedText: string)
+        var element = AttributedLabel(text: string)
         element.roundingScale = 2.0
 
         let size = element.content.measure(in: SizeConstraint(CGSize(width: 100, height: 100)))

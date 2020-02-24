@@ -27,6 +27,9 @@ public struct Label : ProxyElement {
     /// Defaults to word wrapping.
     public var lineBreakMode: NSLineBreakMode
     
+    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
+    public var roundingScale: CGFloat = UIScreen.main.scale
+    
     //
     // MARK: Initialization
     //
@@ -58,7 +61,9 @@ public struct Label : ProxyElement {
     //
 
     public var elementRepresentation: Element {
-        return AttributedLabel(text: self.attributedText, numberOfLines: self.numberOfLines)
+        AttributedLabel(text: self.attributedText, numberOfLines: self.numberOfLines) {
+            $0.roundingScale = self.roundingScale
+        }
     }
     
     private var attributedText: NSAttributedString {

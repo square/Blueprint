@@ -16,10 +16,13 @@ public struct AttributedLabel: Element {
     /// Creates a new label with the provided text and number of lines to display.
     public init(
         text: NSAttributedString,
-        numberOfLines: Int = 0
+        numberOfLines: Int = 0,
+        configure : (inout AttributedLabel) -> () = { _ in }
     ) {
         self.text = text
         self.numberOfLines = numberOfLines
+        
+        configure(&self)
     }
     
     /**
@@ -56,8 +59,8 @@ public struct AttributedLabel: Element {
             // constraint's maximum size. UILabel can return a size larger
             // than the provided size, and we want to stay within the provided size.
             
-            size.width = min(size.width, fittingSize.width)
-            size.height = min(size.height, fittingSize.height)
+            size.width = min(size.width, fittingSize.width).rounded(.up, by: self.roundingScale)
+            size.height = min(size.height, fittingSize.height).rounded(.up, by: self.roundingScale)
 
             return size
         }
