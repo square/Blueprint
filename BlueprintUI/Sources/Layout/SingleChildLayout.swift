@@ -9,7 +9,7 @@ public protocol SingleChildLayout {
     /// - parameter child: A `Measurable` representing the single child of this layout.
     ///
     /// - returns: The measured size.
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize
+    func measure(in constraint: SizeConstraint, environment: Environment, child: Measurable) -> CGSize
 
     /// Generates layout attributes for the child.
     ///
@@ -18,6 +18,6 @@ public protocol SingleChildLayout {
     /// - parameter child: A `Measurable` representing the single child of this layout.
     ///
     /// - returns: Layout attributes for the child of this layout.
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes
+    func layout(size: CGSize, environment: Environment, child: Measurable) -> LayoutAttributes
 
 }

@@ -15,8 +15,8 @@ public struct ElementContent: Measurable {
         self.storage = builder
     }
 
-    public func measure(in constraint: SizeConstraint) -> CGSize {
-        return storage.measure(in: constraint)
+    public func measure(in constraint: SizeConstraint, environment: Environment = Environment()) -> CGSize {
+        return storage.measure(in: constraint, environment: environment)
     }
 
     public var childCount: Int {
@@ -78,11 +78,11 @@ extension ElementContent {
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
-    public init(measureFunction: @escaping (SizeConstraint) -> CGSize) {
+    public init(measureFunction: @escaping (SizeConstraint, Environment) -> CGSize) {
         struct Measurer: Measurable {
-            var _measure: (SizeConstraint) -> CGSize
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                return _measure(constraint)
+            var _measure: (SizeConstraint, Environment) -> CGSize
+            func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+                return _measure(constraint, environment)
             }
         }
         self = ElementContent(measurable: Measurer(_measure: measureFunction))
@@ -90,7 +90,7 @@ extension ElementContent {
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
     public init(intrinsicSize: CGSize) {
-        self = ElementContent(measureFunction: { _ in intrinsicSize })
+        self = ElementContent(measureFunction: { _, _ in intrinsicSize })
     }
 }
 
@@ -177,8 +177,8 @@ extension ElementContent.Builder: ContentStorage {
         return children.count
     }
 
-    public func measure(in constraint: SizeConstraint) -> CGSize {
-        return layout.measure(in: constraint, items: layoutItems)
+    public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+        return layout.measure(in: constraint, environment: environment, items: layoutItems)
     }
 
     func performLayout(
@@ -187,7 +187,7 @@ extension ElementContent.Builder: ContentStorage {
         -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
 
-        let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
+        let childAttributes = layout.layout(size: attributes.bounds.size, environment: environment, items: layoutItems)
 
         var environment = environment
         environmentAdapter.adapt(environment: &environment)
@@ -231,8 +231,8 @@ extension ElementContent.Builder {
         var content: ElementContent
         var element: Element
 
-        func measure(in constraint: SizeConstraint) -> CGSize {
-            return content.measure(in: constraint)
+        func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+            return content.measure(in: constraint, environment: environment)
         }
 
     }
@@ -255,6 +255,7 @@ struct BuildingStorage: ContentStorage {
         let child = buildChild(in: environment)
         let childAttributes = layout.layout(
             size: attributes.bounds.size,
+            environment: environment,
             child: child.content)
 
         let identifier = ElementIdentifier(key: nil, index: 0)
@@ -268,11 +269,10 @@ struct BuildingStorage: ContentStorage {
         return [(identifier, node)]
     }
 
-    func measure(in constraint: SizeConstraint) -> CGSize {
-        // TODO:
-        let environment = Environment()
+    func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
         return layout.measure(
             in: constraint,
+            environment: environment,
             child: buildChild(in: environment).content)
     }
 
@@ -292,15 +292,15 @@ fileprivate struct SingleChildLayoutHost: Layout {
         self.wrapped = layout
     }
 
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    func measure(in constraint: SizeConstraint, environment: Environment, items: [(traits: (), content: Measurable)]) -> CGSize {
         precondition(items.count == 1)
-        return wrapped.measure(in: constraint, child: items.map { $0.content }.first!)
+        return wrapped.measure(in: constraint, environment: environment, child: items.map { $0.content }.first!)
     }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+    func layout(size: CGSize, environment: Environment, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
         precondition(items.count == 1)
         return [
-            wrapped.layout(size: size, child: items.map { $0.content }.first!)
+            wrapped.layout(size: size, environment: environment, child: items.map { $0.content }.first!)
         ]
     }
 }
@@ -308,11 +308,11 @@ fileprivate struct SingleChildLayoutHost: Layout {
 // Used for elements with a single child that requires no custom layout
 fileprivate struct PassthroughLayout: SingleChildLayout {
 
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        return child.measure(in: constraint)
+    func measure(in constraint: SizeConstraint, environment: Environment, child: Measurable) -> CGSize {
+        return child.measure(in: constraint, environment: environment)
     }
 
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+    func layout(size: CGSize, environment: Environment, child: Measurable) -> LayoutAttributes {
         return LayoutAttributes(size: size)
     }
 
@@ -323,12 +323,12 @@ fileprivate struct MeasurableLayout: Layout {
 
     var measurable: Measurable
 
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    func measure(in constraint: SizeConstraint, environment: Environment, items: [(traits: (), content: Measurable)]) -> CGSize {
         precondition(items.isEmpty)
-        return measurable.measure(in: constraint)
+        return measurable.measure(in: constraint, environment: environment)
     }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+    func layout(size: CGSize, environment: Environment, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
         precondition(items.isEmpty)
         return []
     }

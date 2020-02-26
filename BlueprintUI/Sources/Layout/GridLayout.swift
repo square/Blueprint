@@ -25,7 +25,7 @@ public struct GridLayout: Layout {
     
     public var margin: CGFloat = 0.0
     
-    public func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    public func measure(in constraint: SizeConstraint, environment: Environment, items: [(traits: (), content: Measurable)]) -> CGSize {
         
         let primarySize = direction.primaryDimensionSize
         let secondarySize = Int(ceil(Double(items.count) / Double(primarySize)))
@@ -47,7 +47,7 @@ public struct GridLayout: Layout {
         }
     }
     
-    public func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+    public func layout(size: CGSize, environment: Environment, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
         guard items.count > 0 else { return [] }
         assert(direction.primaryDimensionSize > 0)
         

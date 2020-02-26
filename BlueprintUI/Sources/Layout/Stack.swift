@@ -118,13 +118,13 @@ public struct StackLayout: Layout {
         self.axis = axis
     }
 
-    public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        let size = _measureIn(constraint: constraint, items: items)
+    public func measure(in constraint: SizeConstraint, environment: Environment, items: [(traits: Traits, content: Measurable)]) -> CGSize {
+        let size = _measureIn(constraint: constraint, environment: environment, items: items)
         return size
     }
 
-    public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return _layout(size: size, items: items)
+    public func layout(size: CGSize, environment: Environment, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
+        return _layout(size: size, environment: environment, items: items)
     }
 
 }
@@ -181,7 +181,7 @@ extension StackLayout {
 
 extension StackLayout {
 
-    fileprivate func _layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
+    fileprivate func _layout(size: CGSize, environment: Environment, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
 
         guard items.count > 0 else { return [] }
 
@@ -189,7 +189,7 @@ extension StackLayout {
 
         let layoutSize = size.stackVector(axis: axis)
 
-        let basisSizes = _getBasisSizes(constraint: constraint, items: items.map { $0.content })
+        let basisSizes = _getBasisSizes(constraint: constraint, environment: environment, items: items.map { $0.content })
 
         let totalMeasuredAxis: CGFloat = basisSizes.map({ $0.axis }).reduce(0.0, +)
         let minimumTotalSpacing = CGFloat(items.count-1) * minimumSpacing
@@ -211,7 +211,7 @@ extension StackLayout {
         })
     }
 
-    fileprivate func _measureIn(constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
+    fileprivate func _measureIn(constraint: SizeConstraint, environment: Environment, items: [(traits: Traits, content: Measurable)]) -> CGSize {
 
         guard items.count > 0 else {
             return .zero
@@ -220,7 +220,7 @@ extension StackLayout {
         var result = Vector.zero
 
         for item in items {
-            let measuredSize = item.content.measure(in: constraint).stackVector(axis: axis)
+            let measuredSize = item.content.measure(in: constraint, environment: environment).stackVector(axis: axis)
             result.axis += measuredSize.axis
             result.cross = max(result.cross, measuredSize.cross)
         }
@@ -230,8 +230,8 @@ extension StackLayout {
         return result.size(axis: axis)
     }
 
-    fileprivate func _getBasisSizes(constraint: SizeConstraint, items: [Measurable]) -> [Vector] {
-        return items.map { $0.measure(in: constraint).stackVector(axis: axis) }
+    fileprivate func _getBasisSizes(constraint: SizeConstraint, environment: Environment, items: [Measurable]) -> [Vector] {
+        return items.map { $0.measure(in: constraint, environment: environment).stackVector(axis: axis) }
     }
 
     fileprivate func _layoutOverflow(basisSizes: [Vector], traits: [Traits], layoutSize: Vector) -> [Frame] {

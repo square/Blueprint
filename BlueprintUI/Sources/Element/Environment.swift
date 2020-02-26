@@ -7,6 +7,8 @@ public protocol EnvironmentKey {
 }
 
 public struct Environment {
+    public init() { }
+
     var values: [ObjectIdentifier: Any] = [:]
 
     public subscript<K>(key: K.Type) -> K.Value where K: EnvironmentKey {

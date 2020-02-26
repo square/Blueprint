@@ -15,7 +15,7 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: The measured size for the given array of items.
-    func measure(in constraint: SizeConstraint, items: [(traits: Self.Traits, content: Measurable)]) -> CGSize
+    func measure(in constraint: SizeConstraint, environment: Environment, items: [(traits: Self.Traits, content: Measurable)]) -> CGSize
 
     /// Generates layout attributes for the given items.
     ///
@@ -26,7 +26,7 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: Layout attributes for the given array of items.
-    func layout(size: CGSize, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
+    func layout(size: CGSize, environment: Environment, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
     
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }

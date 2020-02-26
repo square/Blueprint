@@ -67,12 +67,12 @@ public struct ConstrainedAspectRatio: Element {
         var aspectRatio: AspectRatio
         var contentMode: ContentMode
 
-        func measure(in sizeConstraint: SizeConstraint, child: Measurable) -> CGSize {
-            let size = child.measure(in: sizeConstraint)
+        func measure(in sizeConstraint: SizeConstraint, environment: Environment, child: Measurable) -> CGSize {
+            let size = child.measure(in: sizeConstraint, environment: environment)
             return contentMode.constrain(size: size, to: aspectRatio)
         }
 
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+        func layout(size: CGSize, environment: Environment, child: Measurable) -> LayoutAttributes {
             return LayoutAttributes(size: size)
         }
     }

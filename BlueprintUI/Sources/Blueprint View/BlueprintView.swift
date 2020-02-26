@@ -81,7 +81,7 @@ public final class BlueprintView: UIView {
         } else {
             constraint = SizeConstraint(size)
         }
-        return element.content.measure(in: constraint)
+        return element.content.measure(in: constraint, environment: Environment())
     }
     
     override public func layoutSubviews() {
