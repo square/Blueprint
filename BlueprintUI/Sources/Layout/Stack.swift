@@ -134,7 +134,7 @@ public struct StackLayout: Layout {
             return []
         }
         
-        /// !!! TODO: Deal with minimum spacing.
+        /// !!! TODO: Deal with minimum spacing??
         
         /// Turn items into a usable type for layout.
         
@@ -151,22 +151,22 @@ public struct StackLayout: Layout {
         
         /// Figure out the remaining size that can be used for underflow or overflow elements.
         
-        let remainingWidth = size.width - order.fixed.reduce(.zero) {
-            $0 + $1.finalSize.width
+        let remainingWidth = self.axis.width(for: size) - order.fixed.reduce(.zero) {
+            $0 + self.axis.width(for: $1.finalSize)
         }
         
-        /// !!! TODO: Guard here and below that remainingWidth is more than zero. Otherwise we should bail.
+        /// !!! TODO: Guard here and below that remainingWidth is more than zero. Otherwise we should bail; measuring in 0 is meaningless.
         
         /// Now, size all of the flexible elements based on the remaining width. We'll adjust the size
         /// to account for grow and shrink later on.
         
         order.flexible.forEach {
-            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(CGSize(width: remainingWidth, height: size.height)))
+            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(CGSize(width: remainingWidth, height: self.axis.height(for: size))))
         }
         
         /// Assign the unadjusted size multipliers, which we'll later use to resize the elements.
         
-        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + $1.unadjustedSize.width }
+        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + self.axis.height(for: $1.unadjustedSize) }
         
         /// How much larger is the `totalFlexibleWidth` vs. the actual `remainingWidth`?
         
@@ -179,8 +179,8 @@ public struct StackLayout: Layout {
         if flexibleWidthMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
             order.flexible.forEach {
-                let adjustedWidth = $0.unadjustedSize.width * flexibleWidthMultiplier
-                let constraint = SizeConstraint(CGSize(width: adjustedWidth, height: size.height))
+                let adjustedWidth = self.axis.width(for: $0.unadjustedSize) * flexibleWidthMultiplier
+                let constraint = SizeConstraint(CGSize(width: adjustedWidth, height: self.axis.height(for: size)))
                 
                 $0.finalSize = $0.content.measure(in: constraint)
             }
@@ -193,9 +193,14 @@ public struct StackLayout: Layout {
         order.all.forEachWithIndex {
             let isLast = ($0 == order.all.count - 1)
             
-            $1.origin = CGPoint(x: 0.0, y: lastY)
+            switch self.axis {
+            case .horizontal:
+                $1.origin = CGPoint(x: lastY, y: 0.0)
+            case .vertical:
+                $1.origin = CGPoint(x: 0.0, y: lastY)
+            }
             
-            lastY += $1.finalSize.height
+            lastY += self.axis.height(for: $1.finalSize)
             
             if isLast == false {
                 lastY += self.minimumSpacing
@@ -258,9 +263,23 @@ extension StackLayout {
 extension StackLayout {
 
     /// The direction of the stack.
-    public enum Axis {
+    public enum Axis : Equatable {
         case horizontal
         case vertical
+        
+        func width(for size : CGSize) -> CGFloat {
+            switch self {
+            case .horizontal: return size.width
+            case .vertical: return size.height
+            }
+        }
+        
+        func height(for size : CGSize) -> CGFloat {
+            switch self {
+            case .horizontal: return size.height
+            case .vertical: return size.width
+            }
+        }
     }
 
     /// Determines the on-axis layout when there is extra free space available.
@@ -307,110 +326,6 @@ extension StackLayout {
 
 extension StackLayout {
 
-    fileprivate func _calculateCross(basisSizes: [Vector], layoutSize: Vector) -> [Frame] {
-        return basisSizes.map { (measuredSize) -> Frame in
-            var result = Frame.zero
-            switch alignment {
-            case .center:
-                result.origin.cross = (layoutSize.cross - measuredSize.cross) / 2.0
-                result.size.cross = measuredSize.cross
-            case .fill:
-                result.origin.cross = 0.0
-                result.size.cross = layoutSize.cross
-            case .leading:
-                result.origin.cross = 0.0
-                result.size.cross = measuredSize.cross
-            case .trailing:
-                result.origin.cross = layoutSize.cross - measuredSize.cross
-                result.size.cross = measuredSize.cross
-            }
-            return result
-        }
-    }
-
-    fileprivate struct Vector {
-        var axis: CGFloat
-        var cross: CGFloat
-
-        static var zero: Vector {
-            return Vector(axis: 0.0, cross: 0.0)
-        }
-
-        func size(axis: StackLayout.Axis) -> CGSize {
-            switch axis {
-            case .horizontal:
-                return CGSize(width: self.axis, height: self.cross)
-            case .vertical:
-                return CGSize(width: self.cross, height: self.axis)
-            }
-        }
-
-        func point(axis: StackLayout.Axis) -> CGPoint {
-            switch axis {
-            case .horizontal:
-                return CGPoint(x: self.axis, y: self.cross)
-            case .vertical:
-                return CGPoint(x: self.cross, y: self.axis)
-            }
-        }
-    }
-
-    fileprivate struct Frame {
-
-        var origin: Vector
-        var size: Vector
-
-        static var zero: Frame {
-            return Frame(origin: .zero, size: .zero)
-        }
-
-        func rect(axis: StackLayout.Axis) -> CGRect {
-            return CGRect(origin: origin.point(axis: axis), size: size.size(axis: axis))
-        }
-
-        var maxAxis: CGFloat {
-            return origin.axis + size.axis
-        }
-
-        var minAxis: CGFloat {
-            return origin.axis
-        }
-    }
-
-}
-
-extension CGSize {
-
-    fileprivate func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
-        switch axis {
-        case .horizontal:
-            return StackLayout.Vector(axis: width, cross: height)
-        case .vertical:
-            return StackLayout.Vector(axis: height, cross: width)
-        }
-    }
-
-}
-
-extension CGPoint {
-
-    fileprivate func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
-        switch axis {
-        case .horizontal:
-            return StackLayout.Vector(axis: x, cross: y)
-        case .vertical:
-            return StackLayout.Vector(axis: y, cross: x)
-        }
-    }
-
-}
-
-extension CGRect {
-
-    fileprivate func stackFrame(axis: StackLayout.Axis) -> StackLayout.Frame {
-        return StackLayout.Frame(origin: origin.stackVector(axis: axis), size: size.stackVector(axis: axis))
-    }
-    
 }
 
 
