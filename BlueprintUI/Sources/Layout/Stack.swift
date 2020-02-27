@@ -130,6 +130,12 @@ public struct StackLayout: Layout {
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         
+        ///
+        /// **NOTE**: All layout code below is written as if we're laying out a `Column` (aka top to bottom)
+        /// to make reasoning about width, height, etc, easier. We flip dimensions when laying out
+        /// horizontally, via the `self.axis.width(for: ...)` or `self.axis.value(...` methods.
+        ///
+        
         guard items.isEmpty == false else {
             return []
         }
@@ -161,12 +167,15 @@ public struct StackLayout: Layout {
         /// to account for grow and shrink later on.
         
         order.flexible.forEach {
-            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(CGSize(width: remainingWidth, height: self.axis.height(for: size))))
+            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(self.axis.value(
+                ifHorizontal: CGSize(width:size.width, height: remainingWidth),
+                ifVertical: CGSize(width: remainingWidth, height: size.height)
+            )))
         }
         
         /// Assign the unadjusted size multipliers, which we'll later use to resize the elements.
         
-        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + self.axis.height(for: $1.unadjustedSize) }
+        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + self.axis.width(for: $1.unadjustedSize) }
         
         /// How much larger is the `totalFlexibleWidth` vs. the actual `remainingWidth`?
         
@@ -180,7 +189,11 @@ public struct StackLayout: Layout {
             
             order.flexible.forEach {
                 let adjustedWidth = self.axis.width(for: $0.unadjustedSize) * flexibleWidthMultiplier
-                let constraint = SizeConstraint(CGSize(width: adjustedWidth, height: self.axis.height(for: size)))
+                
+                let constraint = SizeConstraint(self.axis.value(
+                    ifHorizontal: CGSize(width: size.width, height: adjustedWidth),
+                    ifVertical: CGSize(width: adjustedWidth, height: size.height)
+                ))
                 
                 $0.finalSize = $0.content.measure(in: constraint)
             }
@@ -193,12 +206,10 @@ public struct StackLayout: Layout {
         order.all.forEachWithIndex {
             let isLast = ($0 == order.all.count - 1)
             
-            switch self.axis {
-            case .horizontal:
-                $1.origin = CGPoint(x: lastY, y: 0.0)
-            case .vertical:
-                $1.origin = CGPoint(x: 0.0, y: lastY)
-            }
+            $1.origin = self.axis.value(
+                ifHorizontal: CGPoint(x: lastY, y: 0.0),
+                ifVertical: CGPoint(x: 0.0, y: lastY)
+            )
             
             lastY += self.axis.height(for: $1.finalSize)
             
@@ -264,20 +275,40 @@ extension StackLayout {
 
     /// The direction of the stack.
     public enum Axis : Equatable {
+        
+        /// Used for the `Row` type.
         case horizontal
+        
+        /// Used for the `Column` type.
         case vertical
+        
+        func value<Value>(ifHorizontal : @autoclosure () -> Value, ifVertical : @autoclosure () -> Value) -> Value
+        {
+            switch self {
+            case .horizontal: return ifHorizontal()
+            case .vertical: return ifVertical()
+            }
+        }
+        
+        func value<Value>(ifHorizontal : () -> Value, ifVertical : () -> Value) -> Value
+        {
+            switch self {
+            case .horizontal: return ifHorizontal()
+            case .vertical: return ifVertical()
+            }
+        }
         
         func width(for size : CGSize) -> CGFloat {
             switch self {
-            case .horizontal: return size.width
-            case .vertical: return size.height
+            case .horizontal: return size.height
+            case .vertical: return size.width
             }
         }
         
         func height(for size : CGSize) -> CGFloat {
             switch self {
-            case .horizontal: return size.height
-            case .vertical: return size.width
+            case .horizontal: return size.width
+            case .vertical: return size.height
             }
         }
     }

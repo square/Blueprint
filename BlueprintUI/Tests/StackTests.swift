@@ -1,7 +1,52 @@
 import XCTest
 @testable import BlueprintUI
 
+
+extension Element {
+    func layoutFrames(with size : CGSize) -> [CGRect] {
+        return self.layout(frame: CGRect(origin: .zero, size: size)).children.map { $0.node.layoutAttributes.frame }
+    }
+}
+
 class StackTests: XCTestCase {
+    
+    func test_new() {
+        
+        let row = Row {
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+        }
+        
+        let rowAttributes = row.layoutFrames(with: CGSize(width: 100.0, height: 100.0))
+        
+        XCTAssertEqual(
+            rowAttributes,
+            [
+                CGRect(x: 0, y: 0, width: 20, height: 30),
+                CGRect(x: 20, y: 0, width: 20, height: 30),
+                CGRect(x: 40, y: 0, width: 20, height: 30),
+            ]
+        )
+        
+        let col = Column {
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+            $0.add(child: TestElement(size: .init(width: 20.0, height: 30.0)))
+        }
+        
+        let colAttributes = col.layoutFrames(with: CGSize(width: 100.0, height: 100.0))
+        
+        XCTAssertEqual(
+            colAttributes,
+            [
+                CGRect(x: 0, y: 0, width: 20, height: 30),
+                CGRect(x: 0, y: 30, width: 20, height: 30),
+                CGRect(x: 0, y: 60, width: 20, height: 30),
+            ]
+        )
+        
+    }
 
     func test_defaults() {
         let column = Column()
