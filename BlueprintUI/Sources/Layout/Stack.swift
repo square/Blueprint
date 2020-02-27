@@ -85,7 +85,7 @@ extension StackElement {
 }
 
 
-/// A layout implementation that linearly lays out an array of children along either the horizontal or vertial axis.
+/// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
 public struct StackLayout: Layout {
 
     /// The default traits for a child contained within a stack layout
@@ -130,23 +130,128 @@ public struct StackLayout: Layout {
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         
-        let items = items.map {
-            LayoutItem(traits: $0.traits, content: $0.content)
+        guard items.isEmpty == false else {
+            return []
         }
         
-        let measurementOrderedItems = items.sorted {
-            $0.traits.growPriority > $1.traits.growPriority
+        /// !!! TODO: Deal with minimum spacing.
+        
+        /// Turn items into a usable type for layout.
+        
+        let order = LayoutOrder(all: items.mapWithIndex {
+            LayoutItem(traits: $1.traits, content: $1.content, index: $0)
+        })
+        
+        /// First, size the non-flexible items. These can't change, so we can guarantee their size in the axis direction.
+        
+        order.fixed.forEach {
+            $0.finalSize = $0.content.measure(in: SizeConstraint(size))
+            $0.unadjustedSize = $0.finalSize
         }
         
-        fatalError()
+        /// Figure out the remaining size that can be used for underflow or overflow elements.
+        
+        let remainingWidth = size.width - order.fixed.reduce(.zero) {
+            $0 + $1.finalSize.width
+        }
+        
+        /// !!! TODO: Guard here and below that remainingWidth is more than zero. Otherwise we should bail.
+        
+        /// Now, size all of the flexible elements based on the remaining width. We'll adjust the size
+        /// to account for grow and shrink later on.
+        
+        order.flexible.forEach {
+            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(CGSize(width: remainingWidth, height: size.height)))
+        }
+        
+        /// Assign the unadjusted size multipliers, which we'll later use to resize the elements.
+        
+        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + $1.unadjustedSize.width }
+        
+        /// How much larger is the `totalFlexibleWidth` vs. the actual `remainingWidth`?
+        
+        let flexibleWidthMultiplier = totalFlexibleWidth / remainingWidth
+        
+        /// !!! TODO: Actually scale by the actual shrink and grow amount. But for now, assume they're always either 1 or 0.
+        
+        /// Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
+        
+        if flexibleWidthMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
+            
+            order.flexible.forEach {
+                let adjustedWidth = $0.unadjustedSize.width * flexibleWidthMultiplier
+                let constraint = SizeConstraint(CGSize(width: adjustedWidth, height: size.height))
+                
+                $0.finalSize = $0.content.measure(in: constraint)
+            }
+        }
+        
+        /// Lay out each item vertically.
+        
+        var lastY : CGFloat = 0.0
+        
+        order.all.forEachWithIndex {
+            let isLast = ($0 == order.all.count - 1)
+            
+            $1.origin = CGPoint(x: 0.0, y: lastY)
+            
+            lastY += $1.finalSize.height
+            
+            if isLast == false {
+                lastY += self.minimumSpacing
+            }
+        }
+        
+        /// Done! Wow!! (Map values back into layout attributes)
+        
+        return order.all.map {
+            LayoutAttributes(frame: CGRect(origin: $0.origin, size: $0.finalSize))
+        }
     }
 }
 
 
 extension StackLayout {
-    struct LayoutItem {
+    
+    final class LayoutItem {
         var traits : Traits
         var content : Measurable
+        
+        var index : Int
+        
+        var origin : CGPoint = .zero
+        
+        var unadjustedSize : CGSize = .zero
+        var unadjustedSizeMultiplier : Double = .zero
+        
+        var finalSize : CGSize = .zero
+        
+        init(
+            traits : Traits,
+            content : Measurable,
+            index : Int
+        ) {
+            self.traits = traits
+            self.content = content
+            
+            self.index = index
+        }
+    }
+    
+    final class LayoutOrder {
+        
+        var all : [LayoutItem]
+        
+        var fixed : [LayoutItem]
+        var flexible : [LayoutItem]
+        
+        init(all: [LayoutItem])
+        {
+            self.all = all
+            
+            self.fixed = all.filter { $0.traits.growPriority == 0.0 && $0.traits.shrinkPriority == 0.0 }
+            self.flexible = all.filter { $0.traits.growPriority != 0.0 || $0.traits.shrinkPriority != 0.0 }
+        }
     }
 }
 
@@ -306,4 +411,26 @@ extension CGRect {
         return StackLayout.Frame(origin: origin.stackVector(axis: axis), size: size.stackVector(axis: axis))
     }
     
+}
+
+
+extension Array {
+    
+    func mapWithIndex<Mapped>(_ map : (Int, Element) -> Mapped) -> [Mapped]
+    {
+        var mapped = [Mapped]()
+        
+        for (index, value) in self.enumerated() {
+            mapped.append(map(index, value))
+        }
+        
+        return mapped
+    }
+    
+    func forEachWithIndex(_ body : (Int, Element) -> ())
+    {
+        for (index, element) in self.enumerated() {
+            body(index, element)
+        }
+    }
 }
