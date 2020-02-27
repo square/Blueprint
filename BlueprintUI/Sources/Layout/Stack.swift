@@ -119,14 +119,35 @@ public struct StackLayout: Layout {
     }
 
     public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        let size = _measureIn(constraint: constraint, items: items)
-        return size
+        let layout = self.layout(size: constraint.maximum, items: items)
+        
+        let rect = layout.reduce(CGRect.zero) {
+            $0.union($1.frame)
+        }
+        
+        return rect.size
     }
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return _layout(size: size, items: items)
+        
+        let items = items.map {
+            LayoutItem(traits: $0.traits, content: $0.content)
+        }
+        
+        let measurementOrderedItems = items.sorted {
+            $0.traits.growPriority > $1.traits.growPriority
+        }
+        
+        fatalError()
     }
+}
 
+
+extension StackLayout {
+    struct LayoutItem {
+        var traits : Traits
+        var content : Measurable
+    }
 }
 
 extension StackLayout {
@@ -180,207 +201,6 @@ extension StackLayout {
 }
 
 extension StackLayout {
-
-    fileprivate func _layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-
-        guard items.count > 0 else { return [] }
-
-        let constraint = SizeConstraint(size)
-
-        let layoutSize = size.stackVector(axis: axis)
-
-        let basisSizes = _getBasisSizes(constraint: constraint, items: items.map { $0.content })
-
-        let totalMeasuredAxis: CGFloat = basisSizes.map({ $0.axis }).reduce(0.0, +)
-        let minimumTotalSpacing = CGFloat(items.count-1) * minimumSpacing
-
-        let frames: [Frame]
-
-        /// Determine if we are dealing with overflow or underflow
-        if totalMeasuredAxis + minimumTotalSpacing >= layoutSize.axis {
-            /// Overflow
-            frames = _layoutOverflow(basisSizes: basisSizes, traits: items.map { $0.traits }, layoutSize: layoutSize)
-        } else {
-            /// Underflow
-            frames = _layoutUnderflow(basisSizes: basisSizes, traits: items.map { $0.traits }, layoutSize: layoutSize)
-        }
-
-        return frames.map({ (frame) -> LayoutAttributes in
-            let rect = frame.rect(axis: axis)
-            return LayoutAttributes(frame: rect)
-        })
-    }
-
-    fileprivate func _measureIn(constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-
-        guard items.count > 0 else {
-            return .zero
-        }
-
-        var result = Vector.zero
-
-        for item in items {
-            let measuredSize = item.content.measure(in: constraint).stackVector(axis: axis)
-            result.axis += measuredSize.axis
-            result.cross = max(result.cross, measuredSize.cross)
-        }
-
-        result.axis += minimumSpacing * CGFloat(items.count-1)
-
-        return result.size(axis: axis)
-    }
-
-    fileprivate func _getBasisSizes(constraint: SizeConstraint, items: [Measurable]) -> [Vector] {
-        return items.map { $0.measure(in: constraint).stackVector(axis: axis) }
-    }
-
-    fileprivate func _layoutOverflow(basisSizes: [Vector], traits: [Traits], layoutSize: Vector) -> [Frame] {
-        assert(basisSizes.count > 0)
-
-        let totalBasisSize: CGFloat = basisSizes.map({ $0.axis }).reduce(0.0, +)
-        let totalSpacing = minimumSpacing * CGFloat(basisSizes.count-1)
-
-        /// The size that will be distributed among children (can be positive or negative)
-        let extraSize: CGFloat = layoutSize.axis - (totalBasisSize + totalSpacing)
-
-        assert(extraSize <= 0.0)
-
-        var shrinkPriorities: [CGFloat] = []
-
-        for index in 0..<basisSizes.count {
-            let basis = basisSizes[index]
-            let traits = traits[index]
-            var priority: CGFloat
-            switch overflow {
-            case .condenseProportionally:
-                if totalBasisSize > 0 {
-                    priority = basis.axis / totalBasisSize
-                } else {
-                    priority = basis.axis
-                }
-            case .condenseUniformly:
-                priority = 1.0
-            }
-
-            priority *= traits.shrinkPriority
-            shrinkPriorities.append(priority)
-        }
-
-        var totalPriority: CGFloat = shrinkPriorities.reduce(0, +)
-        if totalPriority == 0 {
-            totalPriority = 1
-        }
-
-        var frames = _calculateCross(basisSizes: basisSizes, layoutSize: layoutSize)
-
-        var axisOrigin: CGFloat = 0.0
-
-        for index in 0..<basisSizes.count {
-
-            let basis = basisSizes[index]
-
-            let sizeAdjustment = (shrinkPriorities[index] / totalPriority) * extraSize
-            frames[index].size.axis = basis.axis + sizeAdjustment
-            frames[index].origin.axis = axisOrigin
-            axisOrigin = frames[index].maxAxis + minimumSpacing
-        }
-
-        return frames
-    }
-
-    fileprivate func _layoutUnderflow(basisSizes: [Vector], traits: [Traits], layoutSize: Vector) -> [Frame] {
-        assert(basisSizes.count > 0)
-
-        let totalBasisSize: CGFloat = basisSizes.map({ $0.axis }).reduce(0.0, +)
-
-        let minimumTotalSpace = minimumSpacing * CGFloat(basisSizes.count-1)
-        let extraSize: CGFloat = layoutSize.axis - (totalBasisSize + minimumTotalSpace)
-        
-        assert(extraSize >= 0.0)
-        
-        let space: CGFloat
-
-        switch underflow {
-        case .growProportionally:
-            space = minimumSpacing
-        case .growUniformly:
-            space = minimumSpacing
-        case .spaceEvenly:
-            space = (layoutSize.axis - totalBasisSize) / CGFloat(basisSizes.count-1)
-        case .justifyToStart:
-            space = minimumSpacing
-        case .justifyToCenter:
-            space = minimumSpacing
-        case .justifyToEnd:
-            space = minimumSpacing
-        }
-
-        var frames = _calculateCross(basisSizes: basisSizes, layoutSize: layoutSize)
-
-        var axisOrigin: CGFloat
-
-        switch underflow {
-        case .growProportionally:
-            axisOrigin = 0.0
-        case .growUniformly:
-            axisOrigin = 0.0
-        case .spaceEvenly:
-            axisOrigin = 0.0
-        case .justifyToStart:
-            axisOrigin = 0.0
-        case .justifyToCenter:
-            axisOrigin = (extraSize / 2.0).rounded() // TODO: @narenh - Add screen scale rounding
-        case .justifyToEnd:
-            axisOrigin = extraSize
-        }
-
-        var growPriorities: [CGFloat] = []
-
-        for index in 0..<basisSizes.count {
-            let basis = basisSizes[index]
-            let traits = traits[index]
-            var priority: CGFloat
-            switch underflow {
-            case .growProportionally:
-                if totalBasisSize > 0 {
-                    priority = basis.axis / totalBasisSize
-                } else {
-                    priority = basis.axis
-                }
-            case .growUniformly:
-                priority = 1.0
-            case .spaceEvenly:
-                priority = 0.0
-            case .justifyToStart:
-                priority = 0.0
-            case .justifyToCenter:
-                priority = 0.0
-            case .justifyToEnd:
-                priority = 0.0
-            }
-
-            priority *= traits.growPriority
-            growPriorities.append(priority)
-        }
-
-        var totalPriority: CGFloat = growPriorities.reduce(0, +)
-        if totalPriority == 0 {
-            totalPriority = 1
-        }
-
-        for index in 0..<basisSizes.count {
-
-            frames[index].origin.axis = axisOrigin
-
-            let basis = basisSizes[index]
-
-            frames[index].size.axis = basis.axis + ((growPriorities[index] / totalPriority) * extraSize)
-
-            axisOrigin = frames[index].maxAxis + space
-        }
-
-        return frames
-    }
 
     fileprivate func _calculateCross(basisSizes: [Vector], layoutSize: Vector) -> [Frame] {
         return basisSizes.map { (measuredSize) -> Frame in
