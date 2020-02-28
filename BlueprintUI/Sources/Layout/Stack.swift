@@ -130,6 +130,8 @@ public struct StackLayout: Layout {
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         
+        //precondition(size != .zero)
+        
         ///
         /// **NOTE**: All layout code below is written as if we're laying out a `Column` (aka top to bottom)
         /// to make reasoning about width, height, etc, easier. We flip dimensions when laying out
@@ -189,7 +191,11 @@ public struct StackLayout: Layout {
         
         if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
+            print("Remaining Height: \(remainingHeight)")
+            print("Axis: \(self.axis)")
+            
             order.flexible.forEach {
+                
                 let adjustedHeight = self.axis.height(for: $0.unadjustedSize) * flexibleHeightMultiplier
                 
                 let constraint = SizeConstraint(self.axis.value(
@@ -197,7 +203,10 @@ public struct StackLayout: Layout {
                     ifVertical: CGSize(width: size.width, height: adjustedHeight)
                 ))
                 
-                print(constraint)
+                print("Constraint: \(constraint)")
+                print("Unadjusted Height: \(self.axis.height(for: $0.unadjustedSize))")
+                print("Adjusted Height: \(adjustedHeight)")
+                print("-------")
                 
                 $0.finalSize = $0.content.measure(in: constraint)
             }

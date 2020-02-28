@@ -13,6 +13,10 @@ public struct SizeConstraint: Hashable {
     public var height: Axis
 
     public init(width: Axis, height: Axis) {
+        
+        precondition(width.isValid, "Must pass a valid width.")
+        precondition(height.isValid, "Must pass a valid width.")
+        
         self.width = width
         self.height = height
     }
@@ -65,6 +69,13 @@ extension SizeConstraint {
 
         /// The measurement is unconstrained in the given dimension.
         case unconstrained
+        
+        public var isValid : Bool {
+            switch self {
+            case .atMost(let value): return value > 0.0
+            case .unconstrained: return true
+            }
+        }
 
         /// The maximum magnitude in the given dimension.
         public var maximum: CGFloat {
@@ -94,6 +105,5 @@ extension SizeConstraint {
                 return .unconstrained
             }
         }
-
     }
 }
