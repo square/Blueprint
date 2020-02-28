@@ -189,10 +189,19 @@ public struct StackLayout: Layout {
         
         /// Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
         
-        if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
+        if flexibleHeightMultiplier > 1.0 {
             
-            print("Remaining Height: \(remainingHeight)")
-            print("Axis: \(self.axis)")
+            
+        } else if flexibleHeightMultiplier < 1.0 {
+            
+            
+        } else {
+            order.flexible.forEach {
+                $0.finalSize = $0.unadjustedSize
+            }
+        }
+        
+        if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
             order.flexible.forEach {
                 
@@ -203,12 +212,11 @@ public struct StackLayout: Layout {
                     ifVertical: CGSize(width: size.width, height: adjustedHeight)
                 ))
                 
-                print("Constraint: \(constraint)")
-                print("Unadjusted Height: \(self.axis.height(for: $0.unadjustedSize))")
-                print("Adjusted Height: \(adjustedHeight)")
-                print("-------")
-                
                 $0.finalSize = $0.content.measure(in: constraint)
+            }
+        } else {
+            order.flexible.forEach {
+                $0.finalSize = $0.unadjustedSize
             }
         }
         
@@ -274,12 +282,18 @@ extension StackLayout {
         var fixed : [LayoutItem]
         var flexible : [LayoutItem]
         
+        var underflow : [LayoutItem]
+        var overflow : [LayoutItem]
+        
         init(all: [LayoutItem])
         {
             self.all = all
             
             self.fixed = all.filter { $0.traits.growPriority == 0.0 && $0.traits.shrinkPriority == 0.0 }
             self.flexible = all.filter { $0.traits.growPriority != 0.0 || $0.traits.shrinkPriority != 0.0 }
+            
+            self.underflow = all.filter { $0.traits.growPriority > 0.0 }
+            self.overflow = all.filter { $0.traits.shrinkPriority > 0.0 }
         }
     }
 }
