@@ -45,7 +45,7 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+            //col.add(child: CommentForm())
         }
         
         var scroll = ScrollView(wrapping: col)

@@ -151,14 +151,14 @@ public struct StackLayout: Layout {
         /// First, size the non-flexible items. These can't change, so we can guarantee their size in the axis direction.
         
         order.fixed.forEach {
-            $0.finalSize = $0.content.measure(in: SizeConstraint(size))
-            $0.unadjustedSize = $0.finalSize
+            $0.unadjustedSize = $0.content.measure(in: SizeConstraint(size))
+            $0.finalSize = $0.unadjustedSize
         }
         
         /// Figure out the remaining size that can be used for underflow or overflow elements.
         
-        let remainingWidth = self.axis.width(for: size) - order.fixed.reduce(.zero) {
-            $0 + self.axis.width(for: $1.finalSize)
+        let remainingHeight = self.axis.height(for: size) - order.fixed.reduce(.zero) {
+            $0 + self.axis.height(for: $1.finalSize)
         }
         
         /// !!! TODO: Guard here and below that remainingWidth is more than zero. Otherwise we should bail; measuring in 0 is meaningless.
@@ -168,31 +168,33 @@ public struct StackLayout: Layout {
         
         order.flexible.forEach {
             $0.unadjustedSize = $0.content.measure(in: SizeConstraint(self.axis.value(
-                ifHorizontal: CGSize(width:size.width, height: remainingWidth),
-                ifVertical: CGSize(width: remainingWidth, height: size.height)
+                ifHorizontal: CGSize(width: remainingHeight, height: size.height),
+                ifVertical: CGSize(width: size.width, height: remainingHeight)
             )))
         }
         
         /// Assign the unadjusted size multipliers, which we'll later use to resize the elements.
         
-        let totalFlexibleWidth : CGFloat = order.flexible.reduce(.zero) { $0 + self.axis.width(for: $1.unadjustedSize) }
+        let totalFlexibleItemsHeight : CGFloat = order.flexible.reduce(.zero) {
+            $0 + self.axis.height(for: $1.unadjustedSize)
+        }
         
         /// How much larger is the `totalFlexibleWidth` vs. the actual `remainingWidth`?
         
-        let flexibleWidthMultiplier = totalFlexibleWidth / remainingWidth
+        let flexibleHeightMultiplier = remainingHeight / totalFlexibleItemsHeight
         
         /// !!! TODO: Actually scale by the actual shrink and grow amount. But for now, assume they're always either 1 or 0.
         
         /// Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
         
-        if flexibleWidthMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
+        if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
             order.flexible.forEach {
-                let adjustedWidth = self.axis.width(for: $0.unadjustedSize) * flexibleWidthMultiplier
+                let adjustedHeight = self.axis.height(for: $0.unadjustedSize) * flexibleHeightMultiplier
                 
                 let constraint = SizeConstraint(self.axis.value(
-                    ifHorizontal: CGSize(width: size.width, height: adjustedWidth),
-                    ifVertical: CGSize(width: adjustedWidth, height: size.height)
+                    ifHorizontal: CGSize(width: adjustedHeight, height: size.height),
+                    ifVertical: CGSize(width: size.width, height: adjustedHeight)
                 ))
                 
                 $0.finalSize = $0.content.measure(in: constraint)
@@ -352,10 +354,6 @@ extension StackLayout {
         case center
         case trailing
     }
-
-}
-
-extension StackLayout {
 
 }
 
