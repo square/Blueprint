@@ -17,7 +17,7 @@ let posts = [
     Post(
         authorName: "Jane",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
     Post(
         authorName: "John",
         timeAgo: "2 days ago",
@@ -45,7 +45,7 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            //col.add(child: CommentForm())
+            col.add(child: CommentForm())
         }
         
         var scroll = ScrollView(wrapping: col)

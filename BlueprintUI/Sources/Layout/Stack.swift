@@ -197,6 +197,8 @@ public struct StackLayout: Layout {
                     ifVertical: CGSize(width: size.width, height: adjustedHeight)
                 ))
                 
+                print(constraint)
+                
                 $0.finalSize = $0.content.measure(in: constraint)
             }
         }
