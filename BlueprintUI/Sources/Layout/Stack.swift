@@ -160,7 +160,7 @@ public struct StackLayout: Layout {
         /// Figure out the remaining size that can be used for underflow or overflow elements.
         
         let remainingHeight = self.axis.height(for: size) - order.fixed.reduce(.zero) {
-            $0 + self.axis.height(for: $1.finalSize)
+            $0 + self.axis.height(for: $1.finalSize!)
         }
         
         /// !!! TODO: Guard here and below that remainingWidth is more than zero. Otherwise we should bail; measuring in 0 is meaningless.
@@ -187,19 +187,8 @@ public struct StackLayout: Layout {
         
         /// !!! TODO: Actually scale by the actual shrink and grow amount. But for now, assume they're always either 1 or 0.
         
-        /// Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
-        
-        if flexibleHeightMultiplier > 1.0 {
-            
-            
-        } else if flexibleHeightMultiplier < 1.0 {
-            
-            
-        } else {
-            order.flexible.forEach {
-                $0.finalSize = $0.unadjustedSize
-            }
-        }
+        /// !!! TODO: Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
+        // Do the thing above...
         
         if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
@@ -212,12 +201,34 @@ public struct StackLayout: Layout {
                     ifVertical: CGSize(width: size.width, height: adjustedHeight)
                 ))
                 
-                $0.finalSize = $0.content.measure(in: constraint)
+                let measuredSize = $0.content.measure(in: constraint)
+                
+                $0.finalSize = measuredSize
             }
         } else {
             order.flexible.forEach {
                 $0.finalSize = $0.unadjustedSize
             }
+        }
+        
+        /// Handle alignment for each item. We need to reset the width based on the alignment.
+        /// TODO: Cleaner to make this a single type, instead of splitting between here and below for layout.
+        
+        order.all.forEach { item in
+            
+            let width = self.alignment.width(
+                for: self.axis.width(for: item.finalSize!),
+                totalParentSize: self.axis.width(for: size)
+            )
+            
+            self.axis.apply(
+                ifHorizontal: {
+                    item.finalSize!.height = width
+                },
+                ifVertical: {
+                    item.finalSize!.width = width
+                }
+            )
         }
         
         /// Lay out each item vertically.
@@ -227,12 +238,17 @@ public struct StackLayout: Layout {
         order.all.forEachWithIndex {
             let isLast = ($0 == order.all.count - 1)
             
-            $1.origin = self.axis.value(
-                ifHorizontal: CGPoint(x: lastY, y: 0.0),
-                ifVertical: CGPoint(x: 0.0, y: lastY)
+            let xOrigin = self.alignment.origin(
+                for: self.axis.width(for: $1.finalSize!),
+                parentWidth: self.axis.width(for: size)
             )
             
-            lastY += self.axis.height(for: $1.finalSize)
+            $1.origin = self.axis.value(
+                ifHorizontal: CGPoint(x: lastY, y: xOrigin),
+                ifVertical: CGPoint(x: xOrigin, y: lastY)
+            )
+            
+            lastY += self.axis.height(for: $1.finalSize!)
             
             if isLast == false {
                 lastY += self.minimumSpacing
@@ -242,7 +258,7 @@ public struct StackLayout: Layout {
         /// Done! Wow!! (Map values back into layout attributes)
         
         return order.all.map {
-            LayoutAttributes(frame: CGRect(origin: $0.origin, size: $0.finalSize))
+            LayoutAttributes(frame: CGRect(origin: $0.origin, size: $0.finalSize!))
         }
     }
 }
@@ -256,12 +272,12 @@ extension StackLayout {
         
         var index : Int
         
-        var origin : CGPoint = .zero
-        
         var unadjustedSize : CGSize = .zero
         var unadjustedSizeMultiplier : Double = .zero
         
-        var finalSize : CGSize = .zero
+        var origin : CGPoint = .zero
+        
+        var finalSize : CGSize?
         
         init(
             traits : Traits,
@@ -309,6 +325,14 @@ extension StackLayout {
         /// Used for the `Column` type.
         case vertical
         
+        func apply(ifHorizontal : () -> (), ifVertical : () -> ()) {
+            
+            switch self {
+            case .horizontal: ifHorizontal()
+            case .vertical: ifVertical()
+            }
+        }
+        
         func value<Value>(ifHorizontal : @autoclosure () -> Value, ifVertical : @autoclosure () -> Value) -> Value
         {
             switch self {
@@ -343,7 +367,7 @@ extension StackLayout {
     /// Determines the on-axis layout when there is extra free space available.
     public enum UnderflowDistribution {
 
-        /// Additional space will be evenly devided into the spacing between items.
+        /// Additional space will be evenly divided into the spacing between items.
         case spaceEvenly
 
         /// Additional space will be divided proportionally by the measured size of each child.
@@ -378,6 +402,26 @@ extension StackLayout {
         case leading
         case center
         case trailing
+        
+        func width(for width : CGFloat, totalParentSize : CGFloat) -> CGFloat {
+            
+            switch self {
+            case .fill: return totalParentSize
+            case .leading: return min(width, totalParentSize)
+            case .center: return min(width, totalParentSize)
+            case .trailing: return min(width, totalParentSize)
+            }
+        }
+        
+        func origin(for width : CGFloat, parentWidth : CGFloat) -> CGFloat {
+            
+            switch self {
+            case .fill: return 0.0
+            case .leading: return 0.0
+            case .center: return round((parentWidth - width) / 2.0)
+            case .trailing: return parentWidth - width
+            }
+        }
     }
 
 }
