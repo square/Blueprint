@@ -129,9 +129,7 @@ public struct StackLayout: Layout {
     }
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        
-        //precondition(size != .zero)
-        
+                
         ///
         /// **NOTE**: All layout code below is written as if we're laying out a `Column` (aka top to bottom)
         /// to make reasoning about width, height, etc, easier. We flip dimensions when laying out
@@ -141,9 +139,7 @@ public struct StackLayout: Layout {
         guard items.isEmpty == false else {
             return []
         }
-        
-        /// !!! TODO: Deal with minimum spacing??
-        
+                
         /// Turn items into a usable type for layout.
         
         let order = LayoutOrder(all: items.mapWithIndex {
@@ -187,9 +183,6 @@ public struct StackLayout: Layout {
         
         /// !!! TODO: Actually scale by the actual shrink and grow amount. But for now, assume they're always either 1 or 0.
         
-        /// !!! TODO: Now, re-size flexible elements based on the flex multiplier, if it's not 1.0.
-        // Do the thing above...
-        
         if flexibleHeightMultiplier != 1.0 { // Eventually split this into an if/else around >1 <1, but for now...
             
             order.flexible.forEach {
@@ -211,44 +204,47 @@ public struct StackLayout: Layout {
             }
         }
         
-        /// Handle alignment for each item. We need to reset the width based on the alignment.
-        /// TODO: Cleaner to make this a single type, instead of splitting between here and below for layout.
+        /// Apply alignment rules to each item.
         
         order.all.forEach { item in
             
+            let parentWidth = self.axis.width(for: size)
+            
             let width = self.alignment.width(
                 for: self.axis.width(for: item.finalSize!),
-                totalParentSize: self.axis.width(for: size)
+                totalParentSize: parentWidth
+            )
+            
+            let xOrigin = self.alignment.origin(
+                for: width,
+                parentWidth: parentWidth
             )
             
             self.axis.apply(
                 ifHorizontal: {
+                    item.origin.y = xOrigin
                     item.finalSize!.height = width
                 },
                 ifVertical: {
+                    item.origin.x = xOrigin
                     item.finalSize!.width = width
                 }
             )
         }
         
-        /// Lay out each item vertically.
+        /// Finally, lay out each item vertically.
         
         var lastY : CGFloat = 0.0
         
-        order.all.forEachWithIndex {
-            let isLast = ($0 == order.all.count - 1)
+        order.all.forEachWithIndex { index, item in
+            let isLast = (index == order.all.count - 1)
             
-            let xOrigin = self.alignment.origin(
-                for: self.axis.width(for: $1.finalSize!),
-                parentWidth: self.axis.width(for: size)
+            self.axis.apply(
+                ifHorizontal: { item.origin.x = lastY },
+                ifVertical: { item.origin.y = lastY }
             )
             
-            $1.origin = self.axis.value(
-                ifHorizontal: CGPoint(x: lastY, y: xOrigin),
-                ifVertical: CGPoint(x: xOrigin, y: lastY)
-            )
-            
-            lastY += self.axis.height(for: $1.finalSize!)
+            lastY += self.axis.height(for: item.finalSize!)
             
             if isLast == false {
                 lastY += self.minimumSpacing

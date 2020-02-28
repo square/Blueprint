@@ -45,6 +45,9 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
+            
+            col.add(child: ConstrainedSize(height: .absolute(100.0), wrapping: Box(backgroundColor: .darkGray, cornerStyle: .square, wrapping: nil)))
+            
             col.add(child: CommentForm())
         }
         
@@ -127,20 +130,23 @@ fileprivate struct FeedItem: ProxyElement {
             row.add(
                 growPriority: 0.0,
                 shrinkPriority: 0.0,
-                child: avatar)
+                child: avatar
+            )
 
             row.add(
                 growPriority: 1.0,
                 shrinkPriority: 1.0,
-                child: FeedItemBody(post: post))
+                child: FeedItemBody(post: post)
+            )
         }
 
         let box = Box(
             backgroundColor: .white,
             wrapping: Inset(
                 uniformInset: 16.0,
-                wrapping: element))
-
+                wrapping: element
+            )
+        )
 
         return box
     }
@@ -160,6 +166,8 @@ fileprivate struct FeedItemBody: ProxyElement {
             let header = Row { row in
                 row.minimumHorizontalSpacing = 8.0
                 row.verticalAlignment = .center
+                
+                // TODO: Removing these two labels stops the alignment issue
 
                 var name = Label(text: post.authorName)
                 name.font = UIFont.boldSystemFont(ofSize: 14.0)
