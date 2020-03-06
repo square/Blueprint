@@ -109,10 +109,12 @@ public final class BlueprintView: UIView {
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
-        
+
+        let environment = Environment()
+
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(frame: bounds)
+            .layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
             .resolve() ?? []
         
         rootController.view.frame = bounds

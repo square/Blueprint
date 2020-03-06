@@ -23,10 +23,30 @@ public struct ElementContent: Measurable {
         return storage.childCount
     }
 
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        return storage.performLayout(attributes: attributes)
+    func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        return storage.performLayout(attributes: attributes, environment: environment)
     }
 
+}
+
+protocol ElementBuilder {
+    func build(in environment: Environment) -> Element
+}
+
+extension ElementContent {
+    public init(build: @escaping (Environment) -> Element) {
+        struct Builder: ElementBuilder {
+            var _build: (Environment) -> Element
+
+            func build(in environment: Environment) -> Element {
+                return _build(environment)
+            }
+        }
+
+        self.storage = BuildingStorage(
+            layout: PassthroughLayout(),
+            builder: Builder(_build: build))
+    }
 }
 
 extension ElementContent {
@@ -72,17 +92,48 @@ extension ElementContent {
     public init(intrinsicSize: CGSize) {
         self = ElementContent(measureFunction: { _ in intrinsicSize })
     }
+}
 
+extension ElementContent {
+    public init(child: Element, environment configureEnvironment: @escaping (inout Environment) -> Void) {
+        struct Adapter: EnvironmentAdapter {
+            var _adapt: (inout Environment) -> Void
+            func adapt(environment: inout Environment) {
+                _adapt(&environment)
+            }
+        }
+
+        self.init(layout: SingleChildLayoutHost(wrapping: PassthroughLayout())) { content in
+            content.add(element: child)
+            content.environmentAdapter = Adapter(_adapt: configureEnvironment)
+        }
+    }
+
+    public init<K>(child: Element, key: K.Type, value: K.Value) where K: EnvironmentKey {
+        self.init(child: child) { environment in
+            environment[key] = value
+        }
+    }
 }
 
 
 fileprivate protocol ContentStorage: Measurable {
     var childCount: Int { get }
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
 
+public protocol EnvironmentAdapter {
+    func adapt(environment: inout Environment)
+}
 
+public struct PassthroughEnvironmentAdapter: EnvironmentAdapter {
+    public func adapt(environment: inout Environment) {
+    }
+}
 
 extension ElementContent {
 
@@ -91,6 +142,8 @@ extension ElementContent {
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
         public var layout: LayoutType
+
+        public var environmentAdapter: EnvironmentAdapter = PassthroughEnvironmentAdapter()
 
         /// Child elements.
         fileprivate var children: [Child] = []
@@ -128,9 +181,16 @@ extension ElementContent.Builder: ContentStorage {
         return layout.measure(in: constraint, items: layoutItems)
     }
 
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment)
+        -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    {
 
         let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
+
+        var environment = environment
+        environmentAdapter.adapt(environment: &environment)
 
         var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
         result.reserveCapacity(children.count)
@@ -142,7 +202,8 @@ extension ElementContent.Builder: ContentStorage {
             let resultNode = LayoutResultNode(
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: currentChild.content)
+                content: currentChild.content,
+                environment: environment)
 
             let identifier = ElementIdentifier(
                 key: currentChild.key,
@@ -177,6 +238,49 @@ extension ElementContent.Builder {
     }
 
 }
+
+
+struct BuildingStorage: ContentStorage {
+    let childCount = 1
+
+    var layout: SingleChildLayout
+
+    var builder: ElementBuilder
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment)
+        -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    {
+        let child = buildChild(in: environment)
+        let childAttributes = layout.layout(
+            size: attributes.bounds.size,
+            child: child.content)
+
+        let identifier = ElementIdentifier(key: nil, index: 0)
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            content: child.content,
+            environment: environment)
+
+        return [(identifier, node)]
+    }
+
+    func measure(in constraint: SizeConstraint) -> CGSize {
+        // TODO:
+        let environment = Environment()
+        return layout.measure(
+            in: constraint,
+            child: buildChild(in: environment).content)
+    }
+
+    private func buildChild(in environment: Environment) -> Element {
+        return builder.build(in: environment)
+    }
+}
+
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.

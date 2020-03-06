@@ -17,7 +17,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .performLayout(attributes: LayoutAttributes(frame: .zero))
+            .performLayout(attributes: LayoutAttributes(frame: .zero), environment: Environment())
             .map { $0.node }
 
         XCTAssertEqual(children.count, 1)
@@ -38,7 +38,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .performLayout(attributes: LayoutAttributes(frame: .zero))
+            .performLayout(attributes: LayoutAttributes(frame: .zero), environment: Environment())
             .map { $0.node }
 
         XCTAssertEqual(children.count, 2)
