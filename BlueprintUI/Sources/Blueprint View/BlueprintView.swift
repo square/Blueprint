@@ -117,10 +117,13 @@ public final class BlueprintView: UIView {
         
         rootController.view.frame = bounds
         
-        let rootNode = NativeViewNode(
+        var rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes)
+
+        let scale = window?.screen.scale ?? 1.0
+        rootNode.round(from: .zero, correction: .zero, scale: scale)
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         hasUpdatedViewHierarchy = true
