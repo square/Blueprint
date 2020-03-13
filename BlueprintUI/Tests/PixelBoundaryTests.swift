@@ -152,7 +152,7 @@ class PixelBoundaryTests: XCTestCase {
     }
 
     func assert(rect rect1: CGRect, closeTo rect2: CGRect, file: StaticString = #file, line: UInt = #line) {
-        let accuracy: CGFloat = 1e-13
+        let accuracy: CGFloat = .ulpOfOne * 64.0
         XCTAssertEqual(rect1.minY, rect2.minY, accuracy: accuracy, file: file, line: line)
         XCTAssertEqual(rect1.minX, rect2.minX, accuracy: accuracy, file: file, line: line)
         XCTAssertEqual(rect1.maxY, rect2.maxY, accuracy: accuracy, file: file, line: line)
