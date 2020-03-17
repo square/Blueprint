@@ -9,8 +9,11 @@ class InsetTests: XCTestCase {
 
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
-        XCTAssertEqual(element.content.measure(in: constraint).width + 40, inset.content.measure(in: constraint).width)
-        XCTAssertEqual(element.content.measure(in: constraint).height + 40, inset.content.measure(in: constraint).height)
+        let contentSize = element.content.measure(in: constraint, environment: .empty)
+        let insetSize = inset.content.measure(in: constraint, environment: .empty)
+
+        XCTAssertEqual(contentSize.width + 40, insetSize.width)
+        XCTAssertEqual(contentSize.height + 40, insetSize.height)
     }
 
     func test_layout() {

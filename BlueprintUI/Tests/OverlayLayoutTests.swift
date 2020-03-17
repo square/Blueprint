@@ -9,7 +9,11 @@ class OverlayTests: XCTestCase {
             TestElement(size: CGSize(width: 100, height: 100)),
             TestElement(size: CGSize(width: 50, height: 50))
         ])
-        XCTAssertEqual(overlay.content.measure(in: .unconstrained), CGSize(width: 200, height: 200))
+        XCTAssertEqual(
+            overlay.content.measure(
+                in: .unconstrained,
+                environment: .empty),
+            CGSize(width: 200, height: 200))
     }
 
     func test_layout() {

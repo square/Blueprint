@@ -27,7 +27,9 @@ class RuleTests: XCTestCase {
 
     func test_hairline() {
         let rule = Rule(orientation: .horizontal, color: .black, thickness: .hairline)
-        let size = rule.content.measure(in: SizeConstraint(CGSize(width: 10, height: 10)))
+        let size = rule.content.measure(
+            in: SizeConstraint(CGSize(width: 10, height: 10)),
+            environment: .empty)
         XCTAssertEqual(size, CGSize(width: 0, height: 1.0 / UIScreen.main.scale))
     }
 }

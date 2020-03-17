@@ -61,7 +61,9 @@ class AttributedLabelTests: XCTestCase {
             measuredSize.width = measuredSize.width.rounded(.up)
             measuredSize.height = measuredSize.height.rounded(.up)
 
-            let elementSize = element.content.measure(in: SizeConstraint(size))
+            let elementSize = element.content.measure(
+                in: SizeConstraint(size),
+                environment: .empty)
 
             XCTAssertEqual(measuredSize, elementSize, file: file, line: line)
         }
@@ -83,7 +85,9 @@ class AttributedLabelTests: XCTestCase {
         var element = AttributedLabel(attributedText: string)
         element.roundingScale = 2.0
 
-        let size = element.content.measure(in: SizeConstraint(CGSize(width: 100, height: 100)))
+        let size = element.content.measure(
+            in: SizeConstraint(CGSize(width: 100, height: 100)),
+            environment: .empty)
 
         XCTAssertEqual(size, CGSize(width: 25.5, height: 27.5))
     }

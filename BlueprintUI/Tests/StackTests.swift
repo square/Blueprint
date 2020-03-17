@@ -16,8 +16,10 @@ class StackTests: XCTestCase {
         column.add(child: TestElement())
         column.add(child: TestElement())
 
-        XCTAssertEqual(column.content.measure(in: .unconstrained).width, 100)
-        XCTAssertEqual(column.content.measure(in: .unconstrained).height, 200)
+        let size = column.content.measure(
+            in: .unconstrained,
+            environment: .empty)
+        XCTAssertEqual(size, CGSize(width: 100, height: 200))
 
         let children = column
             .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 200))
@@ -35,8 +37,9 @@ class StackTests: XCTestCase {
         row.add(child: TestElement())
         row.add(child: TestElement())
 
-        XCTAssertEqual(row.content.measure(in: .unconstrained).width, 200)
-        XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
+        let size = row.content.measure(in: .unconstrained, environment: .empty)
+        XCTAssertEqual(size.width, 200)
+        XCTAssertEqual(size.height, 100)
 
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
@@ -55,8 +58,9 @@ class StackTests: XCTestCase {
         row.add(child: TestElement())
         row.minimumHorizontalSpacing = 10.0
 
-        XCTAssertEqual(row.content.measure(in: .unconstrained).width, 210)
-        XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
+        let size = row.content.measure(in: .unconstrained, environment: .empty)
+        XCTAssertEqual(size.width, 210)
+        XCTAssertEqual(size.height, 100)
 
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 210, height: 100))
