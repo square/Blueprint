@@ -52,9 +52,7 @@ public struct TextField: Element {
             configuration[\.autocapitalizationType] = autocapitalizationType
             configuration[\.autocorrectionType] = autocorrectionType
             configuration[\.spellCheckingType] = spellCheckingType
-            if #available(iOS 10.0, *) {
-                configuration[\.textContentType] = textContentType
-            }
+            configuration[\.textContentType] = textContentType
 
             configuration[\.onReturn] = onReturn
             configuration[\.returnKeyType] = returnKeyType
