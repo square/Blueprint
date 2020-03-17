@@ -149,14 +149,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     private var refreshControl: UIRefreshControl? = nil {
 
         didSet {
-            if #available(iOS 10.0, *) {
-                scrollView.refreshControl = refreshControl
-            } else {
-                oldValue?.removeFromSuperview()
-                if let refreshControl = refreshControl {
-                    scrollView.addSubview(refreshControl)
-                }
-            }
+            scrollView.refreshControl = refreshControl
         }
 
     }

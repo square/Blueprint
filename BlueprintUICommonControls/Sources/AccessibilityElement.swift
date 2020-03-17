@@ -20,8 +20,6 @@ public struct AccessibilityElement: Element {
         case adjustable
         case allowsDirectInteraction
         case causesPageTurn
-
-        @available(iOS 10.0, *)
         case tabBar
     }
 
@@ -83,9 +81,7 @@ public struct AccessibilityElement: Element {
             case .causesPageTurn:
                 traits.formUnion(.causesPageTurn)
             case .tabBar:
-                if #available(iOS 10.0, *) {
-                    traits.formUnion(.tabBar)
-                }
+                traits.formUnion(.tabBar)
             }
         }
 
