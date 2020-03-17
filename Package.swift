@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "BlueprintUI",
     platforms: [
-        .iOS("9.3"),
+        .iOS("10.0"),
     ],
     products: [
         .library(
