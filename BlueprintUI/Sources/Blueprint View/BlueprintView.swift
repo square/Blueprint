@@ -81,7 +81,7 @@ public final class BlueprintView: UIView {
         } else {
             constraint = SizeConstraint(size)
         }
-        return element.content.measure(in: constraint, environment: Environment())
+        return element.content.measure(in: constraint, environment: .empty)
     }
     
     override public func layoutSubviews() {
@@ -110,7 +110,7 @@ public final class BlueprintView: UIView {
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
 
-        let environment = Environment()
+        let environment = Environment.empty
 
         /// Grab view descriptions
         let viewNodes = element?

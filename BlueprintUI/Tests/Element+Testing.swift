@@ -9,6 +9,6 @@ extension Element {
     ///
     /// - Returns: A layout result
     func layout(frame: CGRect) -> LayoutResultNode {
-        return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: Environment())
+        return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: .empty)
     }
 }

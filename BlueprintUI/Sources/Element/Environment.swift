@@ -9,7 +9,9 @@ public protocol EnvironmentKey {
 public struct Environment {
     public static let empty = Environment()
 
-    var values: [ObjectIdentifier: Any] = [:]
+    private init() { }
+
+    private var values: [ObjectIdentifier: Any] = [:]
 
     public subscript<K>(key: K.Type) -> K.Value where K: EnvironmentKey {
         get {

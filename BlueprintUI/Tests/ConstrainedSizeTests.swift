@@ -5,75 +5,100 @@ class ConstrainedSizeTests: XCTestCase {
 
     func test_unconstrained() {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        let environment = Environment()
 
         XCTAssertEqual(
-            ConstrainedSize(wrapping: TestElement()).content.measure(in: constraint, environment: environment).width,
+            ConstrainedSize(wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .width,
             100
         )
 
         XCTAssertEqual(
-            ConstrainedSize(wrapping: TestElement()).content.measure(in: constraint, environment: environment).height,
+            ConstrainedSize(wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .height,
             100
         )
     }
 
     func test_atMost() {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        let environment = Environment()
 
         XCTAssertEqual(
-            ConstrainedSize(width: .atMost(75), wrapping: TestElement()).content.measure(in: constraint, environment: environment).width,
+            ConstrainedSize(width: .atMost(75), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .width,
             75
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .atMost(75), wrapping: TestElement()).content.measure(in: constraint, environment: environment).height,
+            ConstrainedSize(height: .atMost(75), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .height,
             75
         )
     }
 
     func test_atLeast() {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        let environment = Environment()
 
         XCTAssertEqual(
-            ConstrainedSize(width: .atLeast(175), wrapping: TestElement()).content.measure(in: constraint, environment: environment).width,
+            ConstrainedSize(width: .atLeast(175), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .width,
             175
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .atLeast(175), wrapping: TestElement()).content.measure(in: constraint, environment: environment).height,
+            ConstrainedSize(height: .atLeast(175), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .height,
             175
         )
     }
 
     func test_withinRange() {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        let environment = Environment()
 
         XCTAssertEqual(
-            ConstrainedSize(width: .within(0...13), wrapping: TestElement()).content.measure(in: constraint, environment: environment).width,
+            ConstrainedSize(width: .within(0...13), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .width,
             13
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .within(0...13), wrapping: TestElement()).content.measure(in: constraint, environment: environment).height,
+            ConstrainedSize(height: .within(0...13), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .height,
             13
         )
     }
 
     func test_absolute() {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        let environment = Environment()
 
         XCTAssertEqual(
-            ConstrainedSize(width: .absolute(49), wrapping: TestElement()).content.measure(in: constraint, environment: environment).width,
+            ConstrainedSize(width: .absolute(49), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .width,
             49
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .absolute(49), wrapping: TestElement()).content.measure(in: constraint, environment: environment).height,
+            ConstrainedSize(height: .absolute(49), wrapping: TestElement())
+                .content
+                .measure(in: constraint, environment: .empty)
+                .height,
             49
         )
     }

@@ -48,7 +48,7 @@ class GridLayoutTests: XCTestCase {
             container
                 .performLayout(
                     attributes: LayoutAttributes(frame: CGRect(x: 0, y: 0, width: 110, height: 10000)),
-                    environment: Environment())
+                    environment: .empty)
                 .map { $0.node.layoutAttributes.frame },
             [
                 CGRect(x: 0, y: 0, width: 50, height: 50),
