@@ -14,14 +14,14 @@ let posts = [
         authorName: "Tim",
         timeAgo: "1 hour ago",
         body: "Lorem Ipsum"),
-    Post(
-        authorName: "Jane",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-    Post(
-        authorName: "John",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
+//    Post(
+//        authorName: "Jane",
+//        timeAgo: "2 days ago",
+//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+//    Post(
+//        authorName: "John",
+//        timeAgo: "2 days ago",
+//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
 
 ]
 
@@ -48,7 +48,7 @@ fileprivate struct MainView: ProxyElement {
             
             col.add(child: ConstrainedSize(height: .absolute(100.0), wrapping: Box(backgroundColor: .darkGray, cornerStyle: .square, wrapping: nil)))
             
-            col.add(child: CommentForm())
+            //col.add(child: CommentForm())
         }
         
         var scroll = ScrollView(wrapping: col)

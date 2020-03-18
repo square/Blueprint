@@ -220,6 +220,12 @@ public struct StackLayout: Layout {
                 parentWidth: parentWidth
             )
             
+            print("Alignment: \(self.alignment)")
+            print("Parent Width: \(parentWidth)")
+            print("Width: \(width)")
+            print("X Origin: \(xOrigin)")
+            print("-------")
+            
             self.axis.apply(
                 ifHorizontal: {
                     item.origin.y = xOrigin
