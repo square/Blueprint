@@ -647,8 +647,184 @@ class StackTests: XCTestCase {
 
 
     }
+
+    func test_flexibleContents() {
+        enum TestItem {
+            case flex
+            case fixed
+
+            func element(on axis: StackLayout.Axis) -> Element {
+                switch self {
+                case .fixed:
+                    return Spacer(size: CGSize(width: 10, height: 10))
+                case .flex:
+                    return WrappingElement(axis: axis)
+                }
+            }
+        }
+
+        func test(
+            items: [(item: TestItem, priority: CGFloat)],
+            expectedSizes: [StackLayout.Vector],
+            file: StaticString = #file,
+            line: UInt = #line
+        ) {
+            do {
+                let row = Row { row in
+                    row.horizontalOverflow = .condenseUniformly
+                    for (item, priority) in items {
+                        row.add(
+                            growPriority: priority,
+                            shrinkPriority: priority,
+                            child: item.element(on: .horizontal))
+                    }
+                }
+
+                let sizes = row
+                    .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+                    .children
+                    .map { child -> CGSize in
+                        return child.node.layoutAttributes.frame.size.rounded()
+                    }
+
+                XCTAssertEqual(
+                    sizes,
+                    expectedSizes.map { $0.size(axis: .horizontal) },
+                    "Horizontal",
+                    file: file,
+                    line: line)
+            }
+
+            do {
+                let column = Column { column in
+                    column.verticalOverflow = .condenseUniformly
+                    for (item, priority) in items {
+                        column.add(
+                            growPriority: priority,
+                            shrinkPriority: priority,
+                            child: item.element(on: .vertical))
+                    }
+                }
+
+                let sizes = column
+                    .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+                    .children
+                    .map { child -> CGSize in
+                        return child.node.layoutAttributes.frame.size.rounded()
+                    }
+
+                XCTAssertEqual(
+                    sizes,
+                    expectedSizes.map { $0.size(axis: .vertical) },
+                    "Vertical",
+                    file: file,
+                    line: line)
+            }
+        }
+
+        test(
+            items: [
+                (item: .flex, priority: 1)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 100, cross: 10)
+            ]
+        )
+
+        test(
+            items: [
+                (item: .flex, priority: 1),
+                (item: .flex, priority: 1)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 50, cross: 20),
+                StackLayout.Vector(axis: 50, cross: 20)
+            ]
+        )
+
+        test(
+            items: [
+                (item: .flex, priority: 1),
+                (item: .flex, priority: 3)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 75, cross: 20), // 7 x 2
+                StackLayout.Vector(axis: 25, cross: 50)  // 2 x 5
+            ]
+        )
+
+        test(
+            items: [
+                (item: .fixed, priority: 0),
+                (item: .flex, priority: 1)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 10, cross: 10),
+                StackLayout.Vector(axis: 90, cross: 20)
+            ]
+        )
+
+        test(
+            // overflow of 120
+            items: [
+                (item: .fixed, priority: 0),
+                (item: .flex, priority: 2),  // shrinks by 80
+                (item: .flex, priority: 1),  // shrinks by 40
+                (item: .fixed, priority: 0)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 10, cross: 10),
+                StackLayout.Vector(axis: 20, cross: 50), // 2 x 5
+                StackLayout.Vector(axis: 60, cross: 20), // 6 x 2
+                StackLayout.Vector(axis: 10, cross: 10)
+            ]
+        )
+    }
+
+    /// When constrained along `axis`, this element's content "flows" and grows along the cross axis,
+    /// similar to text wrapping.
+    private struct WrappingElement: Element {
+        var itemSize = CGSize(width: 10, height: 10)
+        var itemCount = 10
+        var axis: StackLayout.Axis
+
+        var content: ElementContent {
+            return ElementContent { (constraint) -> CGSize in
+                switch self.axis {
+                case .horizontal:
+                    let itemsPerLine = max(1, Int(constraint.width.maximum / self.itemSize.width))
+                    let lineCount = (self.itemCount + itemsPerLine - 1) / itemsPerLine
+                    return CGSize(
+                        width: CGFloat(itemsPerLine) * self.itemSize.width,
+                        height: CGFloat(lineCount) * self.itemSize.height
+                    )
+
+                case .vertical:
+                    let itemsPerColumn = max(1, Int(constraint.height.maximum / self.itemSize.height))
+                    let columnCount = (self.itemCount + itemsPerColumn - 1) / itemsPerColumn
+                    let size = CGSize(
+                        width: CGFloat(columnCount) * self.itemSize.width,
+                        height: CGFloat(itemsPerColumn) * self.itemSize.height
+                    )
+                    return size
+                }
+            }
+        }
+
+        func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+            return nil
+        }
+    }
 }
 
+private extension CGSize {
+    func rounded(_ rule: FloatingPointRoundingRule = .toNearestOrAwayFromZero) -> CGSize {
+        return CGSize(
+            width: width.rounded(rule),
+            height: height.rounded(rule)
+        )
+    }
+}
 
 fileprivate struct TestElement: Element {
 
