@@ -28,26 +28,3 @@ end
 target 'Tutorial 2 (Completed)' do
   blueprint_pods
 end
-
-# In Xcode 11, swift-stdlib-tool does not copy a fat (i386 & x64)
-# libswiftsimd.dylib into the Frameworks directory of the xctest target.
-# This causes runtime failures on 32-bit simulators that look like this:
-#
-# Library not loaded: @rpath/libswiftsimd.dylib
-#   Referenced from: <build path>/BlueprintUI/BlueprintUI.framework/BlueprintUI
-#   Reason: no suitable image found.  Did find:
-#     /usr/lib/swift/libswiftsimd.dylib: mach-o, but wrong architecture
-#     /usr/lib/swift/libswiftsimd.dylib: mach-o, but wrong architecture))
-#
-# This workaround puts the fat library location on the runtime search path
-# instead.
-post_install do |installer_representation|
-  installer_representation.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      if target.name == 'BlueprintUI-Unit-Tests'
-        config.build_settings['LD_RUNPATH_SEARCH_PATHS'] =
-          '$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)/ $(inherited)'
-      end
-    end
-  end
-end

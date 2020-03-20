@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   s.source_files = 'BlueprintUI/Sources/**/*.swift'
 
   s.test_spec 'Tests' do |test_spec|
+    test_spec.library = 'swiftsimd'
     test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
     test_spec.framework = 'XCTest'
   end
