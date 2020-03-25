@@ -12,13 +12,12 @@ matrix:
       xcode_scheme: BlueprintUI-Unit-Tests
       osx_image: xcode11.2
       xcode_workspace: SampleApp.xcworkspace
-      xcode_destination: platform=iOS Simulator,OS=10.3.1,name=iPhone 7 Plus
+      xcode_destination: platform=iOS Simulator,OS=10.3.1,name=iPhone 5
       before_install:
         - cd SampleApp
         - bundle install
         - bundle exec pod repo update
         - bundle exec pod install
-
     - language: swift
       name: "SPM (Xcode 11.2)"
       os: osx
