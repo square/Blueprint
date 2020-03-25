@@ -16,9 +16,9 @@ EXTERNAL SOURCES:
     :path: "../BlueprintUICommonControls.podspec"
 
 SPEC CHECKSUMS:
-  BlueprintUI: 1a9c1398a250d748584cba4f1217c3984696c10c
-  BlueprintUICommonControls: 6ec924833f945a7f72f0b98a4bb613a3b7f57d74
+  BlueprintUI: 7da00e0adf42685e5ca94f94e3244ff18388ca01
+  BlueprintUICommonControls: a8db50d496da7f65e985fefdf5a2e8d88a8e35e1
 
 PODFILE CHECKSUM: e9562cee84054ca8676daa6bfce31541238548f0
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1

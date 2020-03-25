@@ -7,13 +7,14 @@ Pod::Spec.new do |s|
   s.author       = 'Square'
   s.source       = { :git => 'https://github.com/square/blueprint.git', :tag => s.version }
 
-  s.swift_version = '5.0'
+  s.swift_version = '5.1'
 
   s.ios.deployment_target = '10.0'
 
   s.source_files = 'BlueprintUI/Sources/**/*.swift'
 
   s.test_spec 'Tests' do |test_spec|
+    test_spec.library = 'swiftsimd'
     test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
     test_spec.framework = 'XCTest'
   end
