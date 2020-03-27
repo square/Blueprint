@@ -69,13 +69,8 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
      */
     struct Factory {
         
-        init(reserveCapacity capacity: Int? = nil) {
-            
-            self.countsByKey = [:]
-            
-            if let capacity = capacity {
-                self.countsByKey.reserveCapacity(capacity)
-            }
+        init(elementCount : Int) {
+            self.countsByKey = Dictionary(minimumCapacity: elementCount)
         }
                 
         mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?) -> ElementIdentifier {

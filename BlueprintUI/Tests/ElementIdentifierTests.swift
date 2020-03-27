@@ -42,7 +42,7 @@ class ElementIdentifier_FactoryTests : XCTestCase
 {
     func test_factory()
     {
-        var factory = ElementIdentifier.Factory()
+        var factory = ElementIdentifier.Factory(elementCount: 10)
         
         let identifierA1 = factory.nextIdentifier(for: A.self, key: nil)
         let identifierA2 = factory.nextIdentifier(for: A.self, key: nil)
