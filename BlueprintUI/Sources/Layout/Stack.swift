@@ -181,13 +181,52 @@ extension StackLayout {
 
 // MARK: - Layout logic
 
-// Stack layout is generalized to be independent of the stack's axis (which is `horizontal` for rows and `vertical`
-// for columns).
-//
-// This terminology is used to symbolically represent the two axes:
+// Stack layout is generalized to work for both Rows and Columns.
+// 
+// Some special terminology is used to symbolically represent the two axes of a stack:
 //
 //   - The axis along which elements are being laid out is generally called "axis".
-//   - The other axis is the cross axis, or often just "cross".
+//   - The other axis is the cross axis, or just "cross".
+// 
+// For Rows, the axis is horizontal and the cross is vertical.
+// For Columns, the axis is vertical and the cross is horizontal.
+//
+// Row──────────────────────────────────┐
+// │┌───────┐                      ▲    │
+// ││       │┌───────┐         ┌───┼───┐│
+// ││       ││       │         │   │   ││
+// ││       ││       │┌───────┐│ Cross ││
+// ││       ││       ││       ││   │   ││
+// │◀───────┼┼─────Axis───────┼┼───┼───▶│
+// ││       ││       ││       ││   │   ││
+// ││       ││       │└───────┘│   │   ││
+// ││       ││       │         │   │   ││
+// ││       │└───────┘         └───┼───┘│
+// │└───────┘                      ▼    │
+// └────────────────────────────────────┘
+//
+//      Column────────────────────┐
+//      │┌───────────▲───────────┐│
+//      ││           │           ││
+//      ││         Axis          ││
+//      ││           │           ││
+//      │└───────────┼───────────┘│
+//      │   ┌────────┼────────┐   │
+//      │   │        │        │   │
+//      │◀──┼────────┼─Cross──┼──▶│
+//      │   │        │        │   │
+//      │   └────────┼────────┘   │
+//      │       ┌────┼────┐       │
+//      │       │    │    │       │
+//      │       │    │    │       │
+//      │       │    │    │       │
+//      │       └────┼────┘       │
+//      │   ┌────────┼────────┐   │
+//      │   │        │        │   │
+//      │   │        │        │   │
+//      │   │        │        │   │
+//      │   └────────▼────────┘   │
+//      └─────────────────────────┘
 //
 extension StackLayout {
 
@@ -235,6 +274,29 @@ extension StackLayout {
         return zip(axisSegments, crossSegments).map(VectorFrame.init(axis:cross:))
     }
 
+    /// Measures the given items under the given constraint, and returns their
+    /// sizes along the layout axis, represented as segments.
+    ///
+    /// The axis segments of a Row look like this diagram.
+    ///
+    /// Row───────────────────────────────────────────┐
+    /// │┌───────────┐                                │
+    /// ││           │                   ┌───────────┐│
+    /// ││           │┌─────────────────┐│           ││
+    /// │◀───────────┼┼──────Axis───────┼┼───────────▶│
+    /// ││           ││                 ││           ││
+    /// ││■─segment─▶││■────segment────▶││■─segment─▶││
+    /// ││           ││                 ││           ││
+    /// ││           ││                 ││           ││
+    /// ││           │└─────────────────┘│           ││
+    /// ││           │                   └───────────┘│
+    /// │└───────────┘                                │
+    /// └─────────────────────────────────────────────┘
+    ///
+    /// - Parameters:
+    ///   - for: The items to measure.
+    ///   - in: The contraint for all measurements.
+    /// - Returns: The axis measurements as segments.
     private func _axisSegments(
         for items: [(traits: Traits, content: Measurable)],
         in vectorConstraint: VectorConstraint
@@ -420,6 +482,31 @@ extension StackLayout {
         return axisSegments
     }
 
+    /// Measures the given items and returns their sizes along the cross axis,
+    /// represented as segments. Each item is constrained by a different value
+    /// along the axis.
+    ///
+    /// The cross segments of a Row look like this diagram.
+    ///
+    /// Row───────────────────────────────────────────┐
+    /// │┌───────────┐    ▲                           │
+    /// ││     ■     │    │              ┌───────────┐│
+    /// ││     │     │┌───┼─────────────┐│     ■     ││
+    /// ││     │     ││ Cross  ■        ││     │     ││
+    /// ││     │     ││   │    │        ││     │     ││
+    /// ││  segment  ││   │ segment     ││  segment  ││
+    /// ││     │     ││   │    │        ││     │     ││
+    /// ││     │     ││   │    ▼        ││     │     ││
+    /// ││     │     │└───┼─────────────┘│     ▼     ││
+    /// ││     ▼     │    │              └───────────┘│
+    /// │└───────────┘    ▼                           │
+    /// └─────────────────────────────────────────────┘
+    ///
+    /// - Parameters:
+    ///   - for: The items to measure.
+    ///   - axisConstraints: The axis components of the constraint for each measurement.
+    ///   - crossConstraint: The cross component of the contraint for all measurements.
+    /// - Returns: The cross measurements as segments.
     private func _crossSegments(
         for items: [Measurable],
         axisConstraints: [CGFloat],
