@@ -345,7 +345,7 @@ extension StackLayout {
         let totalBasisSize: CGFloat = basisSizes.reduce(0.0, +)
         let totalSpacing = minimumSpacing * CGFloat(basisSizes.count-1)
 
-        /// The size that will be distributed among children (can be positive or negative)
+        /// The overflow size that will be distributed among children
         let extraSize: CGFloat = layoutSize - (totalBasisSize + totalSpacing)
 
         assert(extraSize <= 0.0)
@@ -397,6 +397,7 @@ extension StackLayout {
         let totalBasisSize: CGFloat = basisSizes.reduce(0.0, +)
 
         let minimumTotalSpace = minimumSpacing * CGFloat(basisSizes.count-1)
+        /// The underflow size that will be distributed among children
         let extraSize: CGFloat = layoutSize - (totalBasisSize + minimumTotalSpace)
         
         assert(extraSize >= 0.0)
