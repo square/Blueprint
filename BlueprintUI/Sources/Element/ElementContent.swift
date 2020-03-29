@@ -23,8 +23,8 @@ public struct ElementContent: Measurable {
         return storage.childCount
     }
 
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        return storage.performLayout(attributes: attributes)
+    func performLayout(attributes: LayoutAttributes, environment : Environment = .empty) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        return storage.performLayout(attributes: attributes, environment: environment)
     }
 
 }
@@ -78,7 +78,7 @@ extension ElementContent {
 
 fileprivate protocol ContentStorage: Measurable {
     var childCount: Int { get }
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    func performLayout(attributes: LayoutAttributes, environment : Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
 
@@ -128,7 +128,7 @@ extension ElementContent.Builder: ContentStorage {
         return layout.measure(in: constraint, items: layoutItems)
     }
 
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    func performLayout(attributes: LayoutAttributes, environment : Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
 
         let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
@@ -136,17 +136,30 @@ extension ElementContent.Builder: ContentStorage {
         result.reserveCapacity(children.count)
 
         for index in 0..<children.count {
-            let currentChildLayoutAttributes = childAttributes[childAttributes.startIndex.advanced(by: index)]
-            let currentChild = children[children.startIndex.advanced(by: index)]
+            let currentChildLayoutAttributes = childAttributes[index]
+            let currentChild = children[index]
+            
+            var childEnvironment = environment
+            var mutatedElement : Element? = nil
+            
+            if var element = currentChild.element as? EnvironmentElement {
+                element.editEnvironment(&childEnvironment)
+                element.environment = childEnvironment
+                
+                mutatedElement = element
+            }
 
             let resultNode = LayoutResultNode(
-                element: currentChild.element,
+                element: mutatedElement ?? currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: currentChild.content)
+                content: mutatedElement?.content ?? currentChild.content,
+                environment : environment
+            )
 
             let identifier = ElementIdentifier(
                 key: currentChild.key,
-                index: index)
+                index: index
+            )
 
             result.append((identifier: identifier, node: resultNode))
         }

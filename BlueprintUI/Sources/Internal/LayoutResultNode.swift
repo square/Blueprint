@@ -9,11 +9,24 @@ extension Element {
     ///   root element.
     ///
     /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes) -> LayoutResultNode {
+    func layout(layoutAttributes: LayoutAttributes, environment : Environment) -> LayoutResultNode {
+        
+        var childEnvironment = environment
+        var mutatedSelf : Element? = nil
+        
+        if var element = self as? EnvironmentElement {
+            element.editEnvironment(&childEnvironment)
+            element.environment = childEnvironment
+            
+            mutatedSelf = element
+        }
+        
         return LayoutResultNode(
-            element: self,
+            element: mutatedSelf ?? self,
             layoutAttributes: layoutAttributes,
-            content: content)
+            content: mutatedSelf?.content ?? self.content,
+            environment: environment
+        )
     }
 
     /// Build a fully laid out element tree with complete layout attributes
@@ -22,8 +35,8 @@ extension Element {
     /// - Parameter frame: The frame to assign to the root element.
     ///
     /// - Returns: A layout result
-    func layout(frame: CGRect) -> LayoutResultNode {
-        return layout(layoutAttributes: LayoutAttributes(frame: frame))
+    func layout(frame: CGRect, environment : Environment = .empty) -> LayoutResultNode {
+        return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
     }
 
 }
@@ -39,17 +52,20 @@ struct LayoutResultNode {
     
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
+    
+    var environment : Environment
 
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
     
-    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent) {
+    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent, environment : Environment) {
 
         self.element = element
         self.layoutAttributes = layoutAttributes
+        self.environment = environment
 
         let layoutBeginTime = DispatchTime.now()
-        children = content.performLayout(attributes: layoutAttributes)
+        children = content.performLayout(attributes: layoutAttributes, environment: self.environment)
         let layoutEndTime = DispatchTime.now()
         let layoutDuration = layoutEndTime.uptimeNanoseconds - layoutBeginTime.uptimeNanoseconds
         diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)
