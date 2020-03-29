@@ -18,17 +18,15 @@ public protocol EnvironmentKey {
 public struct Environment {
     public static let empty = Environment()
     
-    public static func `default`(with view : UIView) -> Environment {
-        return Environment {
+    internal static func `default`(with view : UIView) -> Environment {
+        Environment {
             if #available(iOS 11.0, *) {
-                $0[DefaultKeys.SafeAreaInsets.self] = view.safeAreaInsets
+                $0.safeAreaInsets = view.safeAreaInsets
             }
             
-            $0[DefaultKeys.ScreenScale.self] = view.window?.screen.scale ?? UIScreen.main.scale
-            
-            $0[DefaultKeys.CurrentLocale.self] = Locale.current
-            
-            $0[DefaultKeys.TraitCollection.self] = view.traitCollection
+            $0.screenScale = view.window?.screen.scale ?? UIScreen.main.scale
+            $0.locale = Locale.current
+            $0.traitCollection = view.traitCollection
         }
     }
 
@@ -60,10 +58,23 @@ public struct Environment {
             storage.values[ObjectIdentifier(key)] = newValue
         }
     }
+    
+    final class Storage {
+        init(values : [ObjectIdentifier:Any]) {
+            self.values = values
+        }
+        
+        var values : [ObjectIdentifier: Any]
+        
+        func copy() -> Storage {
+            return Storage(values: self.values)
+        }
+    }
 }
 
-public extension Environment {
-    enum DefaultKeys {
+
+private extension Environment {
+    private enum Keys {
         struct SafeAreaInsets : EnvironmentKey {
             
             typealias Value = UIEdgeInsets
@@ -102,33 +113,42 @@ public extension Environment {
     }
     
     public var safeAreaInsets : UIEdgeInsets {
-        return self[DefaultKeys.SafeAreaInsets.self]
+        get {
+            return self[Keys.SafeAreaInsets.self]
+        }
+        
+        set {
+            self[Keys.SafeAreaInsets.self] = newValue
+        }
     }
     
     public var screenScale : CGFloat {
-        return self[DefaultKeys.ScreenScale.self]
+        get {
+            return self[Keys.ScreenScale.self]
+        }
+        
+        set {
+            self[Keys.ScreenScale.self] = newValue
+        }
     }
     
     public var locale : Locale {
-        return self[DefaultKeys.CurrentLocale.self]
+        get {
+            return self[Keys.CurrentLocale.self]
+        }
+        
+        set {
+            self[Keys.CurrentLocale.self] = newValue
+        }
     }
     
     public var traitCollection : UITraitCollection {
-        return self[DefaultKeys.TraitCollection.self]
-    }
-}
-
-
-fileprivate extension Environment {
-    final class Storage {
-        init(values : [ObjectIdentifier:Any]) {
-            self.values = values
+        get {
+            return self[Keys.TraitCollection.self]
         }
         
-        var values : [ObjectIdentifier: Any]
-        
-        func copy() -> Storage {
-            return Storage(values: self.values)
+        set {
+            self[Keys.TraitCollection.self] = newValue
         }
     }
 }
