@@ -25,7 +25,7 @@ extension Element {
             element: mutatedSelf ?? self,
             layoutAttributes: layoutAttributes,
             content: mutatedSelf?.content ?? self.content,
-            environment: environment
+            environment: childEnvironment
         )
     }
 

@@ -153,7 +153,7 @@ extension ElementContent.Builder: ContentStorage {
                 element: mutatedElement ?? currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
                 content: mutatedElement?.content ?? currentChild.content,
-                environment : environment
+                environment : childEnvironment
             )
 
             let identifier = ElementIdentifier(

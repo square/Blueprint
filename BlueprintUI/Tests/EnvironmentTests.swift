@@ -27,6 +27,15 @@ class EnvironmentTests : XCTestCase {
     }
     
     struct A : Element, EnvironmentElement {
+        
+        struct Key : EnvironmentKey {
+            typealias Value = String
+            
+            static var defaultValue: String {
+                return "A Default"
+            }
+        }
+        
         @ENV var environment : Environment
         
         var child : B
@@ -40,12 +49,20 @@ class EnvironmentTests : XCTestCase {
         }
         
         func editEnvironment(_ environment: inout Environment) {
-            print("Edit A: \(environment)")
-            // TODO
+            environment[Key.self] = "A Key"
         }
     }
     
     struct B : Element, EnvironmentElement {
+        
+        struct Key : EnvironmentKey {
+            typealias Value = String
+            
+            static var defaultValue: String {
+                return "B Default"
+            }
+        }
+        
         @ENV var environment : Environment
 
         var child : C
@@ -59,8 +76,7 @@ class EnvironmentTests : XCTestCase {
         }
         
         func editEnvironment(_ environment: inout Environment) {
-            print("Edit B: \(environment)")
-            // TODO
+            environment[Key.self] = "B Key"
         }
     }
     
@@ -77,7 +93,6 @@ class EnvironmentTests : XCTestCase {
         
         func editEnvironment(_ environment: inout Environment) {
             print("Edit C: \(environment)")
-            // TODO
         }
     }
 }
