@@ -21,9 +21,19 @@ public extension EnvironmentElement {
     }
 }
 
-@propertyWrapper public struct ENV {
+
+public extension Element {
+    func updatedElement(with environment : Environment) -> (Element, Environment) {
+        guard var updatedElement = self as? EnvironmentElement else {
+            return (self, environment)
+        }
         
-    public init() { }
-    
-    public var wrappedValue : Environment = Environment.empty
+        var updatedEnvironment = environment
+        
+        updatedElement.editEnvironment(&updatedEnvironment)
+        
+        updatedElement.environment = updatedEnvironment
+        
+        return (updatedElement, updatedEnvironment)
+    }
 }

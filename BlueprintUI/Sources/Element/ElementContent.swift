@@ -139,21 +139,13 @@ extension ElementContent.Builder: ContentStorage {
             let currentChildLayoutAttributes = childAttributes[index]
             let currentChild = children[index]
             
-            var childEnvironment = environment
-            var mutatedElement : Element? = nil
-            
-            if var element = currentChild.element as? EnvironmentElement {
-                element.editEnvironment(&childEnvironment)
-                element.environment = childEnvironment
-                
-                mutatedElement = element
-            }
+            let (element, environment) = currentChild.element.updatedElement(with: environment)
 
             let resultNode = LayoutResultNode(
-                element: mutatedElement ?? currentChild.element,
+                element: element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: mutatedElement?.content ?? currentChild.content,
-                environment : childEnvironment
+                content: element.content,
+                environment : environment
             )
 
             let identifier = ElementIdentifier(

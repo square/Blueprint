@@ -36,7 +36,7 @@ class EnvironmentTests : XCTestCase {
             }
         }
         
-        @ENV var environment : Environment
+        var environment : Environment = .empty
         
         var child : B
         
@@ -63,7 +63,7 @@ class EnvironmentTests : XCTestCase {
             }
         }
         
-        @ENV var environment : Environment
+        var environment : Environment = .empty
 
         var child : C
         
@@ -81,7 +81,7 @@ class EnvironmentTests : XCTestCase {
     }
     
     struct C : Element, EnvironmentElement {
-        @ENV var environment : Environment
+        var environment : Environment = .empty
 
         var content: ElementContent {
             ElementContent(intrinsicSize: CGSize(width: 10.0, height: 10.0))

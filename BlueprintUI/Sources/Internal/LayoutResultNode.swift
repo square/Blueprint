@@ -11,21 +11,13 @@ extension Element {
     /// - Returns: A layout result
     func layout(layoutAttributes: LayoutAttributes, environment : Environment) -> LayoutResultNode {
         
-        var childEnvironment = environment
-        var mutatedSelf : Element? = nil
-        
-        if var element = self as? EnvironmentElement {
-            element.editEnvironment(&childEnvironment)
-            element.environment = childEnvironment
-            
-            mutatedSelf = element
-        }
+        let (element, environment) = self.updatedElement(with: environment)
         
         return LayoutResultNode(
-            element: mutatedSelf ?? self,
+            element: element,
             layoutAttributes: layoutAttributes,
-            content: mutatedSelf?.content ?? self.content,
-            environment: childEnvironment
+            content: element.content,
+            environment: environment
         )
     }
 
