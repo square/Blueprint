@@ -95,7 +95,7 @@ extension Image {
         var contentMode: ContentMode
         var imageSize: CGSize?
 
-        func measure(in constraint: SizeConstraint) -> CGSize {
+        func measure(in constraint: SizeConstraint, environment : Environment) -> CGSize {
             guard let imageSize = imageSize else { return .zero }
 
             enum Mode {

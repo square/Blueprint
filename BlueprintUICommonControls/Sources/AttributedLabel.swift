@@ -18,7 +18,7 @@ public struct AttributedLabel: Element {
             var attributedText: NSAttributedString
             var roundingScale: CGFloat
 
-            func measure(in constraint: SizeConstraint) -> CGSize {
+            func measure(in constraint: SizeConstraint, environment : Environment) -> CGSize {
                 var size = attributedText.boundingRect(
                     with: constraint.maximum,
                     options: [.usesLineFragmentOrigin],

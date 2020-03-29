@@ -24,7 +24,7 @@ public struct SegmentedControl: Element, Measurable {
         return ElementContent(measurable: self)
     }
 
-    public func measure(in constraint: SizeConstraint) -> CGSize {
+    public func measure(in constraint: SizeConstraint, environment : Environment) -> CGSize {
         return items.reduce(CGSize.zero, { (current, item) -> CGSize in
             let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
             return CGSize(
