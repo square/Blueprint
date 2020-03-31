@@ -27,7 +27,7 @@ class ScrollViewTests : XCTestCase {
         XCTAssertEqual(
             UIEdgeInsets.zero,
             
-            ScrollView.finalContentInset(
+            ScrollView.calculateContentInset(
                 scrollViewInsets: .zero,
                 safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: .zero,
@@ -41,7 +41,7 @@ class ScrollViewTests : XCTestCase {
         XCTAssertEqual(
             UIEdgeInsets(top: 10.0, left: 11.0, bottom: 50.0, right: 13.0),
             
-            ScrollView.finalContentInset(
+            ScrollView.calculateContentInset(
                 scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: 50.0,
@@ -55,7 +55,7 @@ class ScrollViewTests : XCTestCase {
         XCTAssertEqual(
             UIEdgeInsets(top: 35.0, left: 11.0, bottom:50.0, right: 13.0),
             
-            ScrollView.finalContentInset(
+            ScrollView.calculateContentInset(
                 scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: 50.0,

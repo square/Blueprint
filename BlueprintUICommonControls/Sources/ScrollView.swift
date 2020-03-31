@@ -272,19 +272,14 @@ fileprivate final class ScrollerWrapperView: UIView {
     
     private func applyContentInset(with scrollView : ScrollView)
     {
-        // Keep a copy of the content inset as provided by the developer.
-        // We will use this when adjusting the `contentInset.bottom` for the keyboard.
-
-        let contentInset = ScrollView.finalContentInset(
+        let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: scrollView.contentInset,
             safeAreaInsets: self.bp_safeAreaInsets,
             keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: scrollView.pullToRefreshBehavior,
             refreshControlBounds: refreshControl?.bounds
         )
-        
-        // Apply the updated contentInset if it changed.
-        
+                
         if self.scrollView.contentInset != contentInset {
 
             let wasScrolledToTop = self.scrollView.contentOffset.y == -self.scrollView.contentInset.top
@@ -328,7 +323,7 @@ extension ScrollView
 {
     // Calculates the correct content inset to apply for the given inputs.
     
-    static func finalContentInset(
+    static func calculateContentInset(
         scrollViewInsets : UIEdgeInsets,
         safeAreaInsets : UIEdgeInsets,
         keyboardBottomInset : CGFloat,
@@ -369,7 +364,7 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
     
     private func updateBottomContentInsetWithKeyboardFrame() {
         
-        let contentInset = ScrollView.finalContentInset(
+        let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: self.representedElement.contentInset,
             safeAreaInsets: self.bp_safeAreaInsets,
             keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
@@ -396,15 +391,10 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
                 return 0.0
             }
             
-            return {
-                switch keyboardFrame {
-                case .nonOverlapping:
-                    return 0.0
-                    
-                case .visible(let frame):
-                    return self.bounds.size.height - frame.origin.y
-                }
-            }()
+            switch keyboardFrame {
+            case .nonOverlapping: return 0.0
+            case .overlapping(let frame): return self.bounds.size.height - frame.origin.y
+            }
         }
     }
     

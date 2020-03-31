@@ -18,6 +18,25 @@ protocol KeyboardObserverDelegate : AnyObject {
 }
 
 /**
+ Encapsulates listening for system keyboard updates, plus transforming the visible frame of the keyboard into the coordinates of a requested view.
+ 
+ You use this class by providing a delegate, which receives callbacks when changes to the keyboard frame occur. You would usually implement
+ the delegate somewhat like this:
+ 
+ ```
+ func keyboardFrameWillChange(
+     for observer : KeyboardObserver,
+     animationDuration : Double,
+     options : UIView.AnimationOptions
+ ) {
+     UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
+         // Use the frame from the keyboardObserver to update insets or sizing where relevant.
+     })
+ }
+ ```
+ 
+ Notes
+ -----
  Implementation borrowed from Listable:
  https://github.com/kyleve/Listable/blob/master/Listable/Sources/Internal/KeyboardObserver.swift
  
@@ -61,7 +80,7 @@ final class KeyboardObserver {
         case nonOverlapping
         
         /// The current frame does overlap the view, by the provided rect, in the view's coordinate space.
-        case visible(frame: CGRect)
+        case overlapping(frame: CGRect)
     }
     
     /// How the keyboard overlaps the view provided. If the view is not on screen (eg, no window),
@@ -79,7 +98,7 @@ final class KeyboardObserver {
         let frame = view.convert(notification.endingFrame, from: nil)
         
         if frame.intersects(view.bounds) {
-            return .visible(frame: frame)
+            return .overlapping(frame: frame)
         } else {
             return .nonOverlapping
         }
@@ -97,10 +116,8 @@ final class KeyboardObserver {
         
         /// Only communicate a frame change to the delegate if the frame actually changed.
         
-        if let old = old {
-            guard old.endingFrame != new.endingFrame else {
-                return
-            }
+        if let old = old, old.endingFrame == new.endingFrame {
+            return
         }
                 
         /**
