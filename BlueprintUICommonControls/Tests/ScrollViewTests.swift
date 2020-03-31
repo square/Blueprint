@@ -15,12 +15,7 @@ import BlueprintUI
 
 class ScrollViewTests : XCTestCase {
     
-    func test_contentInset() {
-        
-        let view = BlueprintView()
-    }
-    
-    func test_finalContentInset()
+    func test_calculateContentInset()
     {
         // No inset
         
