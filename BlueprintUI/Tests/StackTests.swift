@@ -128,6 +128,64 @@ class StackTests: XCTestCase {
 
     }
 
+    func test_crossConstraints() {
+        func test(
+            crossConstraint: SizeConstraint.Axis,
+            layoutSize: CGFloat,
+            expectedSize: CGFloat,
+            file: StaticString = #file,
+            line: UInt = #line
+        ) {
+            do {
+                let row = Row { row in
+                    row.verticalAlignment = .fill
+                    row.add(child: TestElement(size: CGSize(width: 100, height: 100)))
+                }
+
+                let constraint = SizeConstraint(width: .unconstrained, height: crossConstraint)
+                let size = row.content.measure(in: constraint)
+
+                XCTAssertEqual(size.height, expectedSize, "Horizontal size", file: file, line: line)
+
+                let height = row
+                    .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutSize))
+                    .children[0]
+                    .node
+                    .layoutAttributes
+                    .frame
+                    .height
+
+                XCTAssertEqual(height, layoutSize, "Horizontal layout", file: file, line: line)
+            }
+
+            do {
+                let column = Column { column in
+                    column.horizontalAlignment = .fill
+                    column.add(child: TestElement(size: CGSize(width: 100, height: 100)))
+                }
+
+                let constraint = SizeConstraint(width: crossConstraint, height: .unconstrained)
+                let size = column.content.measure(in: constraint)
+
+                XCTAssertEqual(size.width, expectedSize, "Vertical size", file: file, line: line)
+
+                let width = column
+                    .layout(frame: CGRect(x: 0, y: 0, width: layoutSize, height: 100))
+                    .children[0]
+                    .node
+                    .layoutAttributes
+                    .frame
+                    .width
+
+                XCTAssertEqual(width, layoutSize, "Vertical layout", file: file, line: line)
+            }
+        }
+
+        test(crossConstraint: .unconstrained, layoutSize: 1000, expectedSize: 100)
+        test(crossConstraint: .atMost(200), layoutSize: 200, expectedSize: 100)
+        test(crossConstraint: .atMost(50), layoutSize: 50, expectedSize: 50)
+    }
+
     func test_underflow() {
 
         func test(
@@ -136,7 +194,12 @@ class StackTests: XCTestCase {
             items: [(measuredLength: CGFloat, growPriority: CGFloat)],
             expectedRanges: [ClosedRange<CGFloat>],
             file: StaticString = #file,
-            line: UInt = #line) {
+            line: UInt = #line
+        ) {
+
+            let unconstrainedSize = items
+                .map { $0.measuredLength }
+                .reduce(0, +)
 
             do {
                 var row = Row()
@@ -148,6 +211,17 @@ class StackTests: XCTestCase {
                 }
                 row.horizontalUnderflow = underflow
 
+                let size = row.content.measure(
+                    in: SizeConstraint(
+                        width: .atMost(layoutLength),
+                        height: .atMost(100)))
+                XCTAssertEqual(
+                    size,
+                    CGSize(width: unconstrainedSize, height: 100),
+                    "Horizontal size",
+                    file: file,
+                    line: line)
+
                 let childRanges = row
                     .layout(frame: CGRect(x: 0, y: 0, width: layoutLength, height: 100))
                     .children
@@ -155,7 +229,7 @@ class StackTests: XCTestCase {
                         ClosedRange(uncheckedBounds: ($0.node.layoutAttributes.frame.minX, $0.node.layoutAttributes.frame.maxX))
                     }
 
-                XCTAssertEqual(childRanges, expectedRanges, "Horizontal", file: file, line: line)
+                XCTAssertEqual(childRanges, expectedRanges, "Horizontal layout", file: file, line: line)
             }
 
             do {
@@ -168,6 +242,17 @@ class StackTests: XCTestCase {
                 }
                 column.verticalUnderflow = underflow
 
+                let size = column.content.measure(
+                    in: SizeConstraint(
+                        width: .atMost(100),
+                        height: .atMost(layoutLength)))
+                XCTAssertEqual(
+                    size,
+                    CGSize(width: 100, height: unconstrainedSize),
+                    "Vertical size",
+                    file: file,
+                    line: line)
+
                 let childRanges = column
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutLength))
                     .children
@@ -175,7 +260,7 @@ class StackTests: XCTestCase {
                         ClosedRange(uncheckedBounds: ($0.node.layoutAttributes.frame.minY, $0.node.layoutAttributes.frame.maxY))
                     }
 
-                XCTAssertEqual(childRanges, expectedRanges, "Vertical", file: file, line: line)
+                XCTAssertEqual(childRanges, expectedRanges, "Vertical layout", file: file, line: line)
             }
 
         }
@@ -489,7 +574,12 @@ class StackTests: XCTestCase {
             items: [(measuredLength: CGFloat, shrinkPriority: CGFloat)],
             expectedRanges: [ClosedRange<CGFloat>],
             file: StaticString = #file,
-            line: UInt = #line) {
+            line: UInt = #line
+        ) {
+
+            let minSize = items
+                .map { $0.shrinkPriority.isZero ? $0.measuredLength : 0 }
+                .reduce(0, +)
 
             do {
                 var row = Row()
@@ -501,13 +591,24 @@ class StackTests: XCTestCase {
                 }
                 row.horizontalOverflow = overflow
 
+                let size = row.content.measure(
+                    in: SizeConstraint(
+                        width: .atMost(layoutLength),
+                        height: .atMost(100)))
+                XCTAssertEqual(
+                    size,
+                    CGSize(width: max(layoutLength, minSize), height: 100),
+                    "Horizontal size",
+                    file: file,
+                    line: line)
+
                 let childRanges = row
                     .layout(frame: CGRect(x: 0, y: 0, width: layoutLength, height: 100))
                     .children
                     .map { ClosedRange(uncheckedBounds: ($0.node.layoutAttributes.frame.minX, $0.node.layoutAttributes.frame.maxX))
                     }
 
-                XCTAssertEqual(childRanges, expectedRanges, "Horizontal", file: file, line: line)
+                XCTAssertEqual(childRanges, expectedRanges, "Horizontal layout", file: file, line: line)
             }
 
             do {
@@ -520,6 +621,17 @@ class StackTests: XCTestCase {
                 }
                 column.verticalOverflow = overflow
 
+                let size = column.content.measure(
+                    in: SizeConstraint(
+                        width: .atMost(100),
+                        height: .atMost(layoutLength)))
+                XCTAssertEqual(
+                    size,
+                    CGSize(width: 100, height: max(layoutLength, minSize)),
+                    "Vertical size",
+                    file: file,
+                    line: line)
+
                 let childRanges = column
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutLength))
                     .children
@@ -527,7 +639,7 @@ class StackTests: XCTestCase {
                         ClosedRange(uncheckedBounds: ($0.node.layoutAttributes.frame.minY, $0.node.layoutAttributes.frame.maxY))
                     }
 
-                XCTAssertEqual(childRanges, expectedRanges, "Vertical", file: file, line: line)
+                XCTAssertEqual(childRanges, expectedRanges, "Vertical layout", file: file, line: line)
             }
 
         }
