@@ -1,12 +1,10 @@
 platform :ios, '12.0'
-inhibit_all_warnings!
-use_frameworks!
 
 project 'SampleApp.xcodeproj'
 
 def blueprint_pods
   pod 'BlueprintUI', :path => '../BlueprintUI.podspec', :testspecs => ['Tests'] 
-  pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec', :testspecs => [] 
+  pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec'
 end
 
 target 'SampleApp' do
