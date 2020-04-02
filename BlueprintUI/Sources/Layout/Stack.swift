@@ -233,7 +233,9 @@ extension StackLayout {
     private func _layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         guard items.count > 0 else { return [] }
 
-        let vectorConstraint = SizeConstraint(size).vectorConstraint(on: axis)
+        // During layout the constraints are always `.exactly` to fit the provided size
+        let vectorConstraint = size.vectorConstraint(axis: axis)
+
         let frames = _frames(for: items, in: vectorConstraint)
 
         return frames.map { frame in
@@ -244,6 +246,7 @@ extension StackLayout {
     private func _measureIn(constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
         guard items.count > 0 else { return .zero }
 
+        // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
         let vectorConstraint = constraint.vectorConstraint(on: axis)
 
         let frames = _frames(for: items, in: vectorConstraint)
@@ -266,7 +269,7 @@ extension StackLayout {
 
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
-            for: items.map { $0.content},
+            for: items.map { $0.content },
             axisConstraints: axisSegments.map { $0.magnitude },
             crossConstraint: vectorConstraint.cross)
 
@@ -303,39 +306,59 @@ extension StackLayout {
     ) -> [Segment] {
         let constraint = vectorConstraint.constraint(axis: axis)
 
+        /// The measured sizes of each item, constrained as if each were the only element in the stack.
         let basisSizes = items.map { $0.content.measure(in: constraint).axis(on: axis) }
 
-        switch vectorConstraint.axis {
-        case .atMost(let axisMax):
+        func unconstrainedAxisSize() -> CGFloat {
             let totalMeasuredAxis: CGFloat = basisSizes.reduce(0.0, +)
             let minimumTotalSpacing = CGFloat(items.count-1) * minimumSpacing
 
-            /// Determine if we are dealing with overflow or underflow
-            if totalMeasuredAxis + minimumTotalSpacing >= axisMax {
-                /// Overflow
+            return totalMeasuredAxis + minimumTotalSpacing
+        }
+
+        switch vectorConstraint.axis {
+        case .exactly(let axisSize):
+            if unconstrainedAxisSize() >= axisSize {
+                // Overflow: compress to axis constraint
+                return _layoutOverflow(
+                    basisSizes: basisSizes,
+                    traits: items.map { $0.traits },
+                    layoutSize: axisSize)
+            } else {
+                // Underflow: expand to axis constraint
+                return _layoutUnderflow(
+                    basisSizes: basisSizes,
+                    traits: items.map { $0.traits },
+                    layoutSize: axisSize)
+            }
+
+        case .atMost(let axisMax):
+            if unconstrainedAxisSize() >= axisMax {
+                // Overflow: compress to axis constraint
                 return _layoutOverflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
                     layoutSize: axisMax)
             } else {
-                /// Underflow
-                return _layoutUnderflow(
-                    basisSizes: basisSizes,
-                    traits: items.map { $0.traits },
-                    layoutSize: axisMax)
+                // Underflow: allow to fit natural size
+                return _layoutUnconstrained(basisSizes: basisSizes)
             }
 
         case .unconstrained:
-            var nextOrigin: CGFloat = 0
+            return _layoutUnconstrained(basisSizes: basisSizes)
+        }
+    }
 
-            return basisSizes.map { size -> Segment in
-                let origin = nextOrigin
-                let magnitude = size
+    private func _layoutUnconstrained(basisSizes: [CGFloat]) -> [Segment] {
+        var nextOrigin: CGFloat = 0
 
-                nextOrigin = origin + magnitude + minimumSpacing
+        return basisSizes.map { size -> Segment in
+            let origin = nextOrigin
+            let magnitude = size
 
-                return Segment(origin: origin, magnitude: magnitude)
-            }
+            nextOrigin = origin + magnitude + minimumSpacing
+
+            return Segment(origin: origin, magnitude: magnitude)
         }
     }
 
@@ -511,11 +534,13 @@ extension StackLayout {
     private func _crossSegments(
         for items: [Measurable],
         axisConstraints: [CGFloat],
-        crossConstraint: SizeConstraint.Axis
+        crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
         // First, measure cross magnitudes based on axis constraints
         let crossMagnitudes = zip(items, axisConstraints).map { (item, axisConstraint) -> CGFloat in
-            let vector = VectorConstraint(axis: .atMost(axisConstraint), cross: crossConstraint)
+            let vector = VectorConstraint(
+                axis: .atMost(axisConstraint),
+                cross: crossConstraint)
             let constraint = vector.constraint(axis: axis)
             let measuredSize = item.measure(in: constraint)
 
@@ -527,8 +552,11 @@ extension StackLayout {
         switch crossConstraint {
         case .unconstrained:
             maxCross = crossMagnitudes.reduce(0, max)
-        case .atMost(let max):
-            maxCross = max
+        case .exactly(let exactConstraint):
+            maxCross = exactConstraint
+        case .atMost(let maxConstraint):
+            let maxMagnitude = crossMagnitudes.reduce(0, max)
+            maxCross = min(maxConstraint, maxMagnitude)
         }
 
         // Finally, form segments from the magnitudes and the alignment option
@@ -596,15 +624,30 @@ extension StackLayout {
 
     /// Represents a size constraint with symbolic axes
     struct VectorConstraint {
-        var axis: SizeConstraint.Axis
-        var cross: SizeConstraint.Axis
+        enum Axis {
+            case exactly(CGFloat)
+            case atMost(CGFloat)
+            case unconstrained
+
+            var sizeConstraint: SizeConstraint.Axis {
+                switch self {
+                case .exactly(let max), .atMost(let max):
+                    return .atMost(max)
+                case .unconstrained:
+                    return .unconstrained
+                }
+            }
+        }
+
+        var axis: Axis
+        var cross: Axis
 
         func constraint(axis layoutAxis: StackLayout.Axis) -> SizeConstraint {
             switch layoutAxis {
             case .horizontal:
-                return SizeConstraint(width: axis, height: cross)
+                return SizeConstraint(width: axis.sizeConstraint, height: cross.sizeConstraint)
             case .vertical:
-                return SizeConstraint(width: cross, height: axis)
+                return SizeConstraint(width: cross.sizeConstraint, height: axis.sizeConstraint)
             }
         }
     }
@@ -659,6 +702,19 @@ private extension CGSize {
         }
     }
 
+    func vectorConstraint(axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
+        switch axis {
+        case .horizontal:
+            return StackLayout.VectorConstraint(
+                axis: .exactly(width),
+                cross: .exactly(height))
+        case .vertical:
+            return StackLayout.VectorConstraint(
+                axis: .exactly(height),
+                cross: .exactly(width))
+        }
+    }
+
     func axis(on axis: StackLayout.Axis) -> CGFloat {
         switch axis {
         case .horizontal:
@@ -682,9 +738,9 @@ private extension SizeConstraint {
     func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
         switch axis {
         case .horizontal:
-            return StackLayout.VectorConstraint(axis: width, cross: height)
+            return StackLayout.VectorConstraint(axis: width.vectorConstraint, cross: height.vectorConstraint)
         case .vertical:
-            return StackLayout.VectorConstraint(axis: height, cross: width)
+            return StackLayout.VectorConstraint(axis: height.vectorConstraint, cross: width.vectorConstraint)
         }
     }
 
@@ -703,6 +759,17 @@ private extension SizeConstraint {
             return height
         case .vertical:
             return width
+        }
+    }
+}
+
+private extension SizeConstraint.Axis {
+    var vectorConstraint: StackLayout.VectorConstraint.Axis {
+        switch self {
+        case .atMost(let max):
+            return .atMost(max)
+        case .unconstrained:
+            return .unconstrained
         }
     }
 }
