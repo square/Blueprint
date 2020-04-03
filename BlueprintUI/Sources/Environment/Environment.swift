@@ -18,8 +18,8 @@ public protocol EnvironmentKey {
 public struct Environment {
     public static let empty = Environment()
     
-    internal static func `default`(with view : UIView) -> Environment {
-        Environment {
+    internal static func `default`(with base : Environment? = nil, in view : UIView) -> Environment {
+        Environment(with: base) {
             if #available(iOS 11.0, *) {
                 $0.safeAreaInsets = view.safeAreaInsets
             }
@@ -29,8 +29,13 @@ public struct Environment {
             $0.traitCollection = view.traitCollection
         }
     }
-
-    internal init(_ configure : (inout Environment) -> () = { _ in}) {
+    
+    public init(with base : Environment? = nil, _ configure : (inout Environment) -> () = { _ in}) {
+        
+        if let base = base {
+            self.storage = base.storage
+        }
+        
         configure(&self)
     }
     

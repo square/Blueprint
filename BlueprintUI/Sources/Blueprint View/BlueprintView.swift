@@ -42,6 +42,9 @@ public final class BlueprintView: UIView {
             setNeedsViewHierarchyUpdate()
         }
     }
+    
+    /// The default environment passed down to the element tree.
+    public var environment : Environment = .empty
 
     /// Instantiates a view with the given element
     ///
@@ -114,7 +117,7 @@ public final class BlueprintView: UIView {
         let viewNodes = element?
             .layout(
                 frame: bounds,
-                environment: .default(with: self)
+                environment: .default(with: self.environment, in: self)
             )
             .resolve() ?? []
         

@@ -23,7 +23,7 @@ public struct ElementContent: Measurable {
         return storage.childCount
     }
 
-    func performLayout(attributes: LayoutAttributes, environment : Environment = .empty) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    func performLayout(attributes: LayoutAttributes, environment : Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         return storage.performLayout(attributes: attributes, environment: environment)
     }
 

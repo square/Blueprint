@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0AB0E7FF2437B2D70099DE6F /* EnvironmentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB0E7FE2437B2D70099DE6F /* EnvironmentViewController.swift */; };
 		5C40B326942B3D4913788CB6 /* Pods_Tutorial_1__Completed_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12F17E90CFF5B03DC755C199 /* Pods_Tutorial_1__Completed_.framework */; };
 		6D764555401AA55AC666B8E9 /* Pods_Tutorial_2__Completed_.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 999BE36CC630B1FB1221C6A4 /* Pods_Tutorial_2__Completed_.framework */; };
 		97545519223C12E9003E353F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* ViewController.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0AB0E7FE2437B2D70099DE6F /* EnvironmentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentViewController.swift; sourceTree = "<group>"; };
 		0DA29F056002872418F7D2C9 /* Pods-SampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SampleApp.debug.xcconfig"; path = "Target Support Files/Pods-SampleApp/Pods-SampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		12F17E90CFF5B03DC755C199 /* Pods_Tutorial_1__Completed_.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tutorial_1__Completed_.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		17497656EE201EC67FE1279C /* Pods_Tutorial_2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tutorial_2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -162,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				97545510223C12E9003E353F /* ViewController.swift */,
+				0AB0E7FE2437B2D70099DE6F /* EnvironmentViewController.swift */,
 				97545511223C12E9003E353F /* AppDelegate.swift */,
 			);
 			path = Sources;
@@ -648,6 +651,7 @@
 			files = (
 				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
 				97545519223C12E9003E353F /* ViewController.swift in Sources */,
+				0AB0E7FF2437B2D70099DE6F /* EnvironmentViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
