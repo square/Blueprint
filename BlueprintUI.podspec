@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'BlueprintUI'
-  s.version      = '0.6.0'
+  s.version      = '0.7.0'
   s.summary      = 'Swift library for declarative UI construction'
   s.homepage     = 'https://www.github.com/square/blueprint'
   s.license      = 'Apache License, Version 2.0'
@@ -18,5 +18,4 @@ Pod::Spec.new do |s|
     test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
     test_spec.framework = 'XCTest'
   end
-  
 end
