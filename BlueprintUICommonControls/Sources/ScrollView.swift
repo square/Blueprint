@@ -69,14 +69,41 @@ extension ScrollView {
         var contentSize: ContentSize
         var centersUnderflow: Bool
 
+        func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+            switch contentSize {
+            case .custom(let size):
+                return size
+
+            case .fittingContent:
+                return child.measure(in: .unconstrained)
+
+            case .fittingHeight:
+                return child.measure(
+                    in: SizeConstraint(
+                        width: constraint.width,
+                        height: .unconstrained))
+
+            case .fittingWidth:
+                return child.measure(
+                    in: SizeConstraint(
+                        width: .unconstrained,
+                        height: constraint.height))
+            }
+        }
+
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             let adjustedConstraint = constraint.inset(
                 width: contentInset.left + contentInset.right,
                 height: contentInset.top + contentInset.bottom)
 
-            var result = child.measure(in: adjustedConstraint)
+            var result = fittedSize(in: adjustedConstraint, child: child)
+
             result.width += contentInset.left + contentInset.right
             result.height += contentInset.top + contentInset.bottom
+
+            result.width = min(result.width, constraint.width.maximum)
+            result.height = min(result.height, constraint.height.maximum)
+
             return result
         }
 
@@ -85,7 +112,8 @@ extension ScrollView {
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right
             insetSize.height -= contentInset.top + contentInset.bottom
-            var itemSize = child.measure(in: SizeConstraint(insetSize))
+
+            var itemSize = fittedSize(in: SizeConstraint(insetSize), child: child)
             if self.contentSize == .fittingHeight {
                 itemSize.width = insetSize.width
             } else if self.contentSize == .fittingWidth {
