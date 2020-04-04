@@ -14,7 +14,7 @@ public struct ConstrainedSize: Element {
         self.height = height
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(child: wrappedElement, layout: Layout(width: width, height: height))
     }
 

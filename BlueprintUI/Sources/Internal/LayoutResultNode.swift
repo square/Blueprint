@@ -13,7 +13,8 @@ extension Element {
         return LayoutResultNode(
             element: self,
             layoutAttributes: layoutAttributes,
-            content: content)
+            content: content
+        )
     }
 
     /// Build a fully laid out element tree with complete layout attributes

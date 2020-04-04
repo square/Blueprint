@@ -112,7 +112,9 @@ extension ElementContent.Builder {
             traits: traits,
             key: key,
             content: element.content,
-            element: element)
+            element: element
+        )
+        
         children.append(child)
     }
 

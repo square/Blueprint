@@ -15,7 +15,7 @@ public struct Overlay: Element {
         self.elements = elements
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(layout: OverlayLayout()) {
             for element in elements {
                 $0.add(element: element)

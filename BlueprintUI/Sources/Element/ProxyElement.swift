@@ -14,7 +14,7 @@ public protocol ProxyElement: Element {
 
 extension ProxyElement {
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(child: elementRepresentation)
     }
 

@@ -29,8 +29,9 @@ public struct EqualStack: Element {
         configure(&self)
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         let layout = EqualLayout(direction: direction, spacing: spacing)
+        
         return ElementContent(layout: layout) {
             for child in children {
                 $0.add(element: child)
