@@ -83,12 +83,7 @@ extension LayoutResultNode {
                 return layoutResultNode
                     .resolve()
                     .map { path, viewDescriptionNode in
-
-                        let component = ElementPath.Component(
-                            elementType: type(of: layoutResultNode.element),
-                            identifier: identifier)
-
-                        return (path: path.prepending(component: component), node: viewDescriptionNode)
+                        return (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
                     }
         }
 

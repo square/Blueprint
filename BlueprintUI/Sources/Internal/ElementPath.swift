@@ -5,112 +5,88 @@ struct ElementPath: Hashable {
     private var storage: Storage
     
     init() {
-        storage = Storage(components: [])
+        storage = Storage(identifiers: [])
     }
     
     private mutating func storageForWriting() -> Storage {
         if !isKnownUniquelyReferenced(&storage) {
-            storage = Storage(components: storage.components)
+            storage = Storage(identifiers: storage.identifiers)
         }
+        
         return storage
     }
 
-    var components: [Component] {
-        return storage.components
+    var identifiers: [ElementIdentifier] {
+        return storage.identifiers
     }
     
-    mutating func prepend(component: Component) {
-        storageForWriting().prepend(component: component)
+    mutating func prepend(identifier: ElementIdentifier) {
+        storageForWriting().prepend(identifier: identifier)
     }
     
-    mutating func append(component: Component) {
-        storageForWriting().append(component: component)
+    mutating func append(identifier: ElementIdentifier) {
+        storageForWriting().append(identifier: identifier)
     }
     
-    func prepending(component: Component) -> ElementPath {
+    func prepending(identifier: ElementIdentifier) -> ElementPath {
         var result = self
-        result.prepend(component: component)
+        result.prepend(identifier: identifier)
         return result
     }
     
-    func appending(component: Component) -> ElementPath {
+    func appending(identifier: ElementIdentifier) -> ElementPath {
         var result = self
-        result.append(component: component)
+        result.append(identifier: identifier)
         return result
     }
 
     static var empty: ElementPath {
         return ElementPath()
     }
-    
 }
 
-extension ElementPath {
-
-    /// Represents an element in a hierarchy.
-    struct Component: Hashable {
-
-        /// The type of element represented by this component.
-        var elementType: Element.Type
-
-        /// The identifier of this component.
-        var identifier: ElementIdentifier
-        
-        init(elementType: Element.Type, identifier: ElementIdentifier) {
-            self.elementType = elementType
-            self.identifier = identifier
-        }
-        
-        static func ==(lhs: Component, rhs: Component) -> Bool {
-            return lhs.elementType == rhs.elementType
-                && lhs.identifier == rhs.identifier
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(ObjectIdentifier(elementType))
-            hasher.combine(identifier)
-        }
-
-    }
-    
-}
 
 extension ElementPath {
     
-    fileprivate final class Storage: Hashable {
+    fileprivate final class Storage: Hashable, CustomDebugStringConvertible {
         
         private var _hash: Int? = nil
         
-        private (set) var components: [ElementPath.Component] {
+        private (set) var identifiers: [ElementIdentifier] {
             didSet {
                 _hash = nil
             }
         }
         
-        init(components: [ElementPath.Component]) {
-            self.components = components
+        init(identifiers: [ElementIdentifier]) {
+            self.identifiers = identifiers
         }
         
-        func append(component: ElementPath.Component) {
-            components.append(component)
+        func append(identifier: ElementIdentifier) {
+            identifiers.append(identifier)
         }
         
-        func prepend(component: ElementPath.Component) {
-            components.insert(component, at: 0)
+        func prepend(identifier: ElementIdentifier) {
+            identifiers.insert(identifier, at: 0)
         }
 
         func hash(into hasher: inout Hasher) {
             if _hash == nil {
-                _hash = components.hashValue
+                _hash = identifiers.hashValue
             }
+            
             hasher.combine(_hash)
         }
         
         static func ==(lhs: Storage, rhs: Storage) -> Bool {
-            return lhs.components == rhs.components
+            return lhs.identifiers == rhs.identifiers
         }
         
+        // MARK: CustomDebugStringConvertible
+        
+        var debugDescription: String {
+            return self.identifiers.map { $0.debugDescription }.joined()
+        }
     }
-    
 }
 

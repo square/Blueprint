@@ -33,10 +33,34 @@ final class PostsViewController: UIViewController {
     override func loadView() {
         self.view = blueprintView
         
-        self.blueprintView.element = List(posts: posts)
+        self.blueprintView.element = MainView(posts: posts)
     }
 }
 
+fileprivate struct MainView: ProxyElement {
+    
+    var posts: [Post]
+    
+    var elementRepresentation: Element {
+        let col = Column { col in
+            col.horizontalAlignment = .fill
+
+            col.add(child: List(posts: posts))
+            col.add(child: CommentForm())
+        }
+        
+        var scroll = ScrollView(wrapping: col)
+        scroll.contentSize = .fittingHeight
+        scroll.alwaysBounceVertical = true
+        scroll.keyboardDismissMode = .onDrag
+
+        let background = Box(
+            backgroundColor: UIColor(white: 0.95, alpha: 1.0),
+            wrapping: scroll)
+
+        return background
+    }
+}
 
 fileprivate struct List: ProxyElement {
 
@@ -56,17 +80,34 @@ fileprivate struct List: ProxyElement {
             }
         }
 
-        var scroll = ScrollView(wrapping: col)
-        scroll.contentSize = .fittingHeight
-        scroll.alwaysBounceVertical = true
-
-        let background = Box(
-            backgroundColor: UIColor(white: 0.95, alpha: 1.0),
-            wrapping: scroll)
-
-        return background
+        return col
     }
+}
 
+fileprivate struct CommentForm: ProxyElement {
+    
+    var elementRepresentation: Element {
+        let col = Column { col in
+            col.horizontalAlignment = .fill
+
+            let label = Label(text: "Add your comment:")
+            col.add(child: label)
+
+            var nameField = TextField(text: "")
+            nameField.placeholder = "Name"
+            col.add(child: nameField)
+
+            var commentField = TextField(text: "")
+            commentField.placeholder = "Comment"
+            col.add(child: commentField)
+        }
+        
+        return Box(
+            backgroundColor: .lightGray,
+            wrapping: Inset(
+                uniformInset: 16.0,
+                wrapping: col))
+    }
 }
 
 

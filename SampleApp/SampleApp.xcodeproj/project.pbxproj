@@ -7,15 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A29D0E423D10DB1000CA38B /* DemoListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A29D0E323D10DB1000CA38B /* DemoListScreen.swift */; };
-		0A5474F323FDAE53002D76C8 /* ExampleCustomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5474F223FDAE53002D76C8 /* ExampleCustomAnimation.swift */; };
-		0A7347BC243BEDF000F15378 /* TransitionAnimation+Predefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7347BB243BEDF000F15378 /* TransitionAnimation+Predefined.swift */; };
-		0A8C877423D103D1008D3B56 /* ExampleLoyaltyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A8C877323D103D1008D3B56 /* ExampleLoyaltyScreen.swift */; };
-		10116800F27449FD7FCD3159 /* libPods-Tutorial 1 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4C8A7078BEDABCF2A0A0F30 /* libPods-Tutorial 1 (Completed).a */; };
-		2CF385D9ED498CFCC12885B6 /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C63C7D088698BBB792A9273 /* libPods-SampleApp.a */; };
-		3683C84E5631042ABEA183B1 /* libPods-Tutorial 2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B793E68315BCD7C6186EFFA5 /* libPods-Tutorial 2.a */; };
-		97545519223C12E9003E353F /* PostsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* PostsViewController.swift */; };
-		9754551A223C12E9003E353F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545511223C12E9003E353F /* AppDelegate.swift */; };
+		0A7F7004243C1C1100DED88A /* ExampleCustomAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F6FFD243C1C1100DED88A /* ExampleCustomAnimation.swift */; };
+		0A7F7005243C1C1100DED88A /* ScrollViewKeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F6FFE243C1C1100DED88A /* ScrollViewKeyboardViewController.swift */; };
+		0A7F7006243C1C1100DED88A /* ExampleLoyaltyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F6FFF243C1C1100DED88A /* ExampleLoyaltyScreen.swift */; };
+		0A7F7007243C1C1100DED88A /* PostsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F7000243C1C1100DED88A /* PostsViewController.swift */; };
+		0A7F7008243C1C1100DED88A /* TransitionAnimation+Predefined.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F7001243C1C1100DED88A /* TransitionAnimation+Predefined.swift */; };
+		0A7F7009243C1C1100DED88A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F7002243C1C1100DED88A /* AppDelegate.swift */; };
+		0A7F700A243C1C1100DED88A /* DemoListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7F7003243C1C1100DED88A /* DemoListScreen.swift */; };
+		4BA6A23CEA6E020DE2B93BAC /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6EBB02D3CED9FE1C62118A89 /* libPods-SampleApp.a */; };
+		6CD727ED2241C847FE76071E /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38F296775FF2518345AB3362 /* libPods-Tutorial 2 (Completed).a */; };
+		7BFF1CD68EA598E1D1C72310 /* libPods-Tutorial 1 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCB39D955649A4F41257087E /* libPods-Tutorial 1 (Completed).a */; };
+		827C9B72171DA5EAC8DDF0A6 /* libPods-Tutorial 1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BDF1B9D873CF002855E84943 /* libPods-Tutorial 1.a */; };
 		9754551B223C12E9003E353F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97545513223C12E9003E353F /* Assets.xcassets */; };
 		9754551C223C12E9003E353F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97545514223C12E9003E353F /* LaunchScreen.storyboard */; };
 		9796EC42224D1D2000E729F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97545513223C12E9003E353F /* Assets.xcassets */; };
@@ -37,30 +39,29 @@
 		979F49ED224D1BD300A3C5D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97545513223C12E9003E353F /* Assets.xcassets */; };
 		979F49EE224D1BD300A3C5D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97545514223C12E9003E353F /* LaunchScreen.storyboard */; };
 		979F49F4224D1BF200A3C5D4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 979F49E4224D1B6C00A3C5D4 /* AppDelegate.swift */; };
-		C44524054ECE771D15D835FC /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 46E2785948443EAAD76F1C5C /* libPods-Tutorial 2 (Completed).a */; };
-		CEBAC7D926642DF0B8D8571E /* libPods-Tutorial 1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C32120C13CC090339FEBCB2 /* libPods-Tutorial 1.a */; };
+		A9B5241771B561530B060284 /* libPods-Tutorial 2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A01464A24580A2CFB10C4C23 /* libPods-Tutorial 2.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0A29D0E323D10DB1000CA38B /* DemoListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoListScreen.swift; sourceTree = "<group>"; };
-		0A5474F223FDAE53002D76C8 /* ExampleCustomAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleCustomAnimation.swift; sourceTree = "<group>"; };
-		0A7347BB243BEDF000F15378 /* TransitionAnimation+Predefined.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransitionAnimation+Predefined.swift"; sourceTree = "<group>"; };
-		0A8C877323D103D1008D3B56 /* ExampleLoyaltyScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleLoyaltyScreen.swift; sourceTree = "<group>"; };
-		0C63C7D088698BBB792A9273 /* libPods-SampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A7F6FFD243C1C1100DED88A /* ExampleCustomAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleCustomAnimation.swift; sourceTree = "<group>"; };
+		0A7F6FFE243C1C1100DED88A /* ScrollViewKeyboardViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScrollViewKeyboardViewController.swift; sourceTree = "<group>"; };
+		0A7F6FFF243C1C1100DED88A /* ExampleLoyaltyScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleLoyaltyScreen.swift; sourceTree = "<group>"; };
+		0A7F7000243C1C1100DED88A /* PostsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostsViewController.swift; sourceTree = "<group>"; };
+		0A7F7001243C1C1100DED88A /* TransitionAnimation+Predefined.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransitionAnimation+Predefined.swift"; sourceTree = "<group>"; };
+		0A7F7002243C1C1100DED88A /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0A7F7003243C1C1100DED88A /* DemoListScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoListScreen.swift; sourceTree = "<group>"; };
 		0DA29F056002872418F7D2C9 /* Pods-SampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SampleApp.debug.xcconfig"; path = "Target Support Files/Pods-SampleApp/Pods-SampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		1A147478D522E763BFC19F37 /* Pods-Tutorial 2 (Completed).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2 (Completed).debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 2 (Completed)/Pods-Tutorial 2 (Completed).debug.xcconfig"; sourceTree = "<group>"; };
 		2C24AF26BD9F959834BD0A25 /* Pods-Tutorial1.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial1.debug.xcconfig"; path = "../../Pods/Target Support Files/Pods-Tutorial1/Pods-Tutorial1.debug.xcconfig"; sourceTree = "<group>"; };
 		2F2123B124F06446978E629D /* Pods-SampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SampleApp.release.xcconfig"; path = "Target Support Files/Pods-SampleApp/Pods-SampleApp.release.xcconfig"; sourceTree = "<group>"; };
-		46E2785948443EAAD76F1C5C /* libPods-Tutorial 2 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C32120C13CC090339FEBCB2 /* libPods-Tutorial 1.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 1.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		38F296775FF2518345AB3362 /* libPods-Tutorial 2 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D524EC9EF929FCE2F54EC85 /* Pods-Tutorial1.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial1.release.xcconfig"; path = "../../Pods/Target Support Files/Pods-Tutorial1/Pods-Tutorial1.release.xcconfig"; sourceTree = "<group>"; };
+		6EBB02D3CED9FE1C62118A89 /* libPods-SampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		70E2DBB7A375C527D66B2643 /* Pods-Tutorial 1.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1.debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 1/Pods-Tutorial 1.debug.xcconfig"; sourceTree = "<group>"; };
 		7A5624391C38E617246C4356 /* Pods-Tutorial 2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2.debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 2/Pods-Tutorial 2.debug.xcconfig"; sourceTree = "<group>"; };
 		7EA5EE31421ECA2CA9457450 /* Pods-Tutorial 2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 2/Pods-Tutorial 2.release.xcconfig"; sourceTree = "<group>"; };
 		8501C9E99E00354D89175E65 /* Pods-Tutorial 1.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 1/Pods-Tutorial 1.release.xcconfig"; sourceTree = "<group>"; };
 		975454FA223C1289003E353F /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		97545510223C12E9003E353F /* PostsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostsViewController.swift; sourceTree = "<group>"; };
-		97545511223C12E9003E353F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97545513223C12E9003E353F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97545515223C12E9003E353F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97545518223C12E9003E353F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -80,9 +81,10 @@
 		979F49E4224D1B6C00A3C5D4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		979F49F2224D1BD300A3C5D4 /* Tutorial 1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tutorial 1.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D59D92E955A10C9F7EF0730 /* Pods-Tutorial 2 (Completed).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2 (Completed).release.xcconfig"; path = "Target Support Files/Pods-Tutorial 2 (Completed)/Pods-Tutorial 2 (Completed).release.xcconfig"; sourceTree = "<group>"; };
-		B793E68315BCD7C6186EFFA5 /* libPods-Tutorial 2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A01464A24580A2CFB10C4C23 /* libPods-Tutorial 2.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCB39D955649A4F41257087E /* libPods-Tutorial 1 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 1 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDF1B9D873CF002855E84943 /* libPods-Tutorial 1.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 1.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CC5FC85BE57034BE39916388 /* Pods-Tutorial 1 (Completed).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1 (Completed).debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 1 (Completed)/Pods-Tutorial 1 (Completed).debug.xcconfig"; sourceTree = "<group>"; };
-		D4C8A7078BEDABCF2A0A0F30 /* libPods-Tutorial 1 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 1 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F211AAFE0FF4DC614FC65630 /* Pods-Tutorial 1 (Completed).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1 (Completed).release.xcconfig"; path = "Target Support Files/Pods-Tutorial 1 (Completed)/Pods-Tutorial 1 (Completed).release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,7 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CF385D9ED498CFCC12885B6 /* libPods-SampleApp.a in Frameworks */,
+				4BA6A23CEA6E020DE2B93BAC /* libPods-SampleApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,7 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				10116800F27449FD7FCD3159 /* libPods-Tutorial 1 (Completed).a in Frameworks */,
+				7BFF1CD68EA598E1D1C72310 /* libPods-Tutorial 1 (Completed).a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,7 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3683C84E5631042ABEA183B1 /* libPods-Tutorial 2.a in Frameworks */,
+				A9B5241771B561530B060284 /* libPods-Tutorial 2.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +117,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C44524054ECE771D15D835FC /* libPods-Tutorial 2 (Completed).a in Frameworks */,
+				6CD727ED2241C847FE76071E /* libPods-Tutorial 2 (Completed).a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,7 +125,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBAC7D926642DF0B8D8571E /* libPods-Tutorial 1.a in Frameworks */,
+				827C9B72171DA5EAC8DDF0A6 /* libPods-Tutorial 1.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,11 +135,11 @@
 		69943C07C9B6B3DCFC875540 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				0C63C7D088698BBB792A9273 /* libPods-SampleApp.a */,
-				5C32120C13CC090339FEBCB2 /* libPods-Tutorial 1.a */,
-				D4C8A7078BEDABCF2A0A0F30 /* libPods-Tutorial 1 (Completed).a */,
-				B793E68315BCD7C6186EFFA5 /* libPods-Tutorial 2.a */,
-				46E2785948443EAAD76F1C5C /* libPods-Tutorial 2 (Completed).a */,
+				6EBB02D3CED9FE1C62118A89 /* libPods-SampleApp.a */,
+				BDF1B9D873CF002855E84943 /* libPods-Tutorial 1.a */,
+				BCB39D955649A4F41257087E /* libPods-Tutorial 1 (Completed).a */,
+				A01464A24580A2CFB10C4C23 /* libPods-Tutorial 2.a */,
+				38F296775FF2518345AB3362 /* libPods-Tutorial 2 (Completed).a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -169,12 +171,13 @@
 		9754550F223C12E9003E353F /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				97545510223C12E9003E353F /* PostsViewController.swift */,
-				0A8C877323D103D1008D3B56 /* ExampleLoyaltyScreen.swift */,
-				0A29D0E323D10DB1000CA38B /* DemoListScreen.swift */,
-				97545511223C12E9003E353F /* AppDelegate.swift */,
-				0A5474F223FDAE53002D76C8 /* ExampleCustomAnimation.swift */,
-				0A7347BB243BEDF000F15378 /* TransitionAnimation+Predefined.swift */,
+				0A7F7002243C1C1100DED88A /* AppDelegate.swift */,
+				0A7F7003243C1C1100DED88A /* DemoListScreen.swift */,
+				0A7F6FFD243C1C1100DED88A /* ExampleCustomAnimation.swift */,
+				0A7F6FFF243C1C1100DED88A /* ExampleLoyaltyScreen.swift */,
+				0A7F7000243C1C1100DED88A /* PostsViewController.swift */,
+				0A7F6FFE243C1C1100DED88A /* ScrollViewKeyboardViewController.swift */,
+				0A7F7001243C1C1100DED88A /* TransitionAnimation+Predefined.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -364,7 +367,7 @@
 				TargetAttributes = {
 					975454F9223C1289003E353F = {
 						CreatedOnToolsVersion = 10.1;
-						LastSwiftMigration = 1020;
+						LastSwiftMigration = 1130;
 					};
 					9796EC3B224D1D2000E729F3 = {
 						LastSwiftMigration = 1020;
@@ -568,12 +571,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0A29D0E423D10DB1000CA38B /* DemoListScreen.swift in Sources */,
-				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
-				0A8C877423D103D1008D3B56 /* ExampleLoyaltyScreen.swift in Sources */,
-				0A5474F323FDAE53002D76C8 /* ExampleCustomAnimation.swift in Sources */,
-				97545519223C12E9003E353F /* PostsViewController.swift in Sources */,
-				0A7347BC243BEDF000F15378 /* TransitionAnimation+Predefined.swift in Sources */,
+				0A7F7009243C1C1100DED88A /* AppDelegate.swift in Sources */,
+				0A7F7007243C1C1100DED88A /* PostsViewController.swift in Sources */,
+				0A7F7004243C1C1100DED88A /* ExampleCustomAnimation.swift in Sources */,
+				0A7F7008243C1C1100DED88A /* TransitionAnimation+Predefined.swift in Sources */,
+				0A7F700A243C1C1100DED88A /* DemoListScreen.swift in Sources */,
+				0A7F7006243C1C1100DED88A /* ExampleLoyaltyScreen.swift in Sources */,
+				0A7F7005243C1C1100DED88A /* ScrollViewKeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -751,6 +755,7 @@
 			baseConfigurationReference = 0DA29F056002872418F7D2C9 /* Pods-SampleApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -759,6 +764,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.squareup.blueprint-sample-app.SampleApp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -769,6 +775,7 @@
 			baseConfigurationReference = 2F2123B124F06446978E629D /* Pods-SampleApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

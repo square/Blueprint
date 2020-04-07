@@ -10,6 +10,7 @@ public struct TextField: Element {
     public var onChange: ((String) -> Void)? = nil
     public var secure: Bool = false
     public var isEnabled: Bool = true
+    public var textAlignment: NSTextAlignment = .left
 
     public var clearButtonMode: UITextField.ViewMode = .never
 
@@ -41,6 +42,7 @@ public struct TextField: Element {
             configuration[\.onChange] = onChange
             configuration[\.isSecureTextEntry] = secure
             configuration[\.isEnabled] = isEnabled
+            configuration[\.textAlignment] = textAlignment
 
             configuration[\.clearButtonMode] = clearButtonMode
 
@@ -50,9 +52,7 @@ public struct TextField: Element {
             configuration[\.autocapitalizationType] = autocapitalizationType
             configuration[\.autocorrectionType] = autocorrectionType
             configuration[\.spellCheckingType] = spellCheckingType
-            if #available(iOS 10.0, *) {
-                configuration[\.textContentType] = textContentType
-            }
+            configuration[\.textContentType] = textContentType
 
             configuration[\.onReturn] = onReturn
             configuration[\.returnKeyType] = returnKeyType
