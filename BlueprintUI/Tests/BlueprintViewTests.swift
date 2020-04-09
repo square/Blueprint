@@ -60,7 +60,22 @@ class BlueprintViewTests: XCTestCase {
             XCTAssertEqual(node.view.tag, tags[index])
         }
     }
+    
+    func test_setElement() {
+        
+    }
+    
+    func test_updates() {
+        
+    }
 
+    func test_transitions() {
+        
+    }
+    
+    func test_animation() {
+        
+    }
 }
 
 

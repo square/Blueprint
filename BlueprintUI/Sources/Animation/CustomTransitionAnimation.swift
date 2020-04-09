@@ -51,6 +51,15 @@ public protocol CustomTransitionAnimation : AnyCustomTransitionAnimation {
      A default implementation of this method is provided, which does nothing.
      */
     func didEnd()
+    
+    /**
+     TODO
+     */
+    func skipAnimation(
+        direction : TransitionAnimation.Direction,
+        with view : ViewType,
+        currentProperties : AnimatableViewProperties
+    )
 }
 
 
@@ -64,6 +73,12 @@ public protocol AnyCustomTransitionAnimation {
     )
     
     func didEnd()
+    
+    func skipAnimationAny(
+        direction : TransitionAnimation.Direction,
+        with anyView : UIView,
+        currentProperties : AnimatableViewProperties
+    )
 }
 
 
@@ -92,6 +107,28 @@ public extension CustomTransitionAnimation {
             with: typedView,
             currentProperties: currentProperties,
             completion: completion
+        )
+    }
+    
+    func skipAnimationAny(
+        direction : TransitionAnimation.Direction,
+        with anyView : UIView,
+        currentProperties : AnimatableViewProperties
+    ) {
+        guard let containerView = anyView as? TransitionContainerView else {
+            fatalError()
+        }
+        
+        let contentView = containerView.subviews.first
+        
+        guard let typedView = contentView as? Self.ViewType else {
+            fatalError("CustomTransitionAnimation ('\(type(of: self))') Error: Animated view was not the expected type. Expected: '\(Self.ViewType.self)', Got: '\(type(of:anyView))'.")
+        }
+        
+        self.skipAnimation(
+            direction: direction,
+            with: typedView,
+            currentProperties: currentProperties
         )
     }
 }

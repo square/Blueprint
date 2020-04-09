@@ -34,7 +34,8 @@ final class StatusProgressViewController : UIViewController
             
             if self.showingProgress {
                 let spinner = Transition(
-                    onAppear: TransitionAnimation(custom: StatusProgressAnimation()),
+                    onAppear: [.slideIn(for: 0.75), .custom(StatusProgressAnimation())],
+                    onDisappear: [.scaleAndFade],
                     wrapping: StatusProgressElement(
                         model: .init(initialPoints: 1, earnedPoints: 10, lowestTierPoints: 15),
                         config: .init(radius: 100, lineWidth: 5, duration: 1.0)
@@ -60,7 +61,9 @@ final class StatusProgressViewController : UIViewController
     
     func reloadElement()
     {
-        self.blueprintView.setElement(animated: true, self.element)
+        UIView.animate(withDuration: 0.35) {
+            self.blueprintView.setElement(animated: true, self.element)
+        }
     }
     
     struct Button : ProxyElement
@@ -91,6 +94,14 @@ struct StatusProgressAnimation : CustomTransitionAnimation
         view.animate()
         
         completion(true)
+    }
+    
+    func skipAnimation(
+        direction: TransitionAnimation.Direction,
+        with view: StatusProgressView,
+        currentProperties: AnimatableViewProperties
+    ) {
+        view.circleFillLine.strokeEnd = view.model.endPercentage
     }
 }
 

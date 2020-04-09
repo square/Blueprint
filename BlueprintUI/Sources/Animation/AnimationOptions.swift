@@ -44,6 +44,7 @@ public struct AnimationOptions {
 extension AnimationOptions {
     
     public enum TimingFunction {
+        
         /**
          A  "normal" UIView animation, eg:
          

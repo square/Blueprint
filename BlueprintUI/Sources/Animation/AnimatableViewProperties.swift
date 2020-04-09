@@ -26,7 +26,6 @@ import UIKit
  `transform`
  `alpha`
  `backgroundColor`
- 
  */
 public struct AnimatableViewProperties : Equatable {
     
@@ -36,17 +35,8 @@ public struct AnimatableViewProperties : Equatable {
     /// The background color of the view.
     public var backgroundColor : UIColor?
     
-    /// The bounds of the view.
-    /// If you set bounds, you should also set center, but not frame.
-    public var bounds : CGRect?
-    
-    /// The center of the view.
-    /// If you set center, you should also set bounds, but not frame.
-    public var center : CGPoint?
-    
-    /// The frame of the view.
-    /// If you set this property, you should not set bounds, center, or transform.
-    public var frame : CGRect?
+    /// How the view is positioned – either by `frame`, or by `bounds` + `center`.
+    public var position : Position?
     
     /// The transform applied to the view.
     /// If you set this property, you should set bounds and center to position the view, not frame.
@@ -61,28 +51,35 @@ public struct AnimatableViewProperties : Equatable {
     {
         self.alpha = view.alpha
         self.backgroundColor = view.backgroundColor
-        self.bounds = view.bounds
-        self.center = view.center
-        self.frame = view.frame
+        
+        /// We use `bounds` + `center` and not `frame` in case there is a non-identity `transform`,
+        /// because the frame is meaningless in that case (as it's been adjusted by the `transform`).
+        self.position = .bounds(view.bounds, view.center)
+        
         self.transform = view.transform
         
         configure(&self)
+    }
+    
+    public static func properties(_ configure : (inout Self) -> ()) -> Self
+    {
+        var properties = Self()
+        
+        configure(&properties)
+        
+        return properties
     }
     
     /// Creates new `AnimatableViewProperties` with the provided options.
     public init(
         alpha : CGFloat? = nil,
         backgroundColor : UIColor? = nil,
-        bounds : CGRect? = nil,
-        center : CGPoint? = nil,
-        frame : CGRect? = nil,
+        position: Position? = nil,
         transform : CGAffineTransform? = nil
     ) {
         self.alpha = alpha
         self.backgroundColor = backgroundColor
-        self.bounds = bounds
-        self.center = center
-        self.frame = frame
+        self.position = position
         self.transform = transform
     }
     
@@ -102,20 +99,32 @@ public struct AnimatableViewProperties : Equatable {
             view.backgroundColor = backgroundColor
         }
         
-        if let bounds = self.bounds {
-            view.bounds = bounds
-        }
-        
-        if let center = self.center {
-            view.center = center
-        }
-        
-        if let frame = self.frame {
-            view.frame = frame
+        if let position = self.position {
+            switch position {
+            case .frame(let frame):
+                view.frame = frame
+                
+            case .bounds(let bounds, let center):
+                view.bounds = bounds
+                view.center = center
+            }
         }
         
         if let transform = self.transform {
             view.transform = transform
         }
+    }
+}
+
+
+extension AnimatableViewProperties {
+    
+    /// How the position of a view should be set when applying animated properties.
+    public enum Position : Equatable {
+        /// The `frame` is applied to the view to drive the animation.
+        case frame(CGRect)
+        
+        /// The `bounds` and `center` are applied to drive the animation.
+        case bounds(CGRect, CGPoint)
     }
 }

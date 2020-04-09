@@ -27,27 +27,27 @@ public struct TransitionAnimation {
     // MARK: Initialization
     //
     
-    public init(
+    public static func with(
+        _ animations : AnimatableViewProperties,
         options : AnimationOptions = .init(),
-        animations : AnimatableViewProperties,
         performing : PerformRule = .ifNotNested,
         completion : @escaping (Bool) -> () = { _ in }
-    )
+    ) -> Self
     {
-        self.init(
+        Self(
             animationKind: .standard(options: options, properties: animations),
             performing: performing,
             completion: completion
         )
     }
     
-    public init(
-        custom : @escaping @autoclosure () -> AnyCustomTransitionAnimation,
+    public static func custom(
+        _ custom : @escaping @autoclosure () -> AnyCustomTransitionAnimation,
         performing : PerformRule = .ifNotNested,
         completion : @escaping (Bool) -> () = { _ in }
-    )
+    ) -> Self
     {
-        self.init(
+        Self(
             animationKind: .custom(custom),
             performing: performing,
             completion: completion
@@ -151,7 +151,6 @@ extension TransitionAnimation {
         layoutAttributes: LayoutAttributes,
         completion callerCompletion : @escaping (Bool) -> () = { _ in }
     ) {
-        let isAppearing = direction == .appearing
         let currentProperties = AnimatableViewProperties(withPropertiesFrom: view)
         
         let completion : (Bool) -> () = {
@@ -162,8 +161,10 @@ extension TransitionAnimation {
         switch self.animationKind {
         case .standard(let options, let properties):
             
-            let finalProperties = isAppearing ? currentProperties : properties
+            let isAppearing = direction == .appearing
             
+            let finalProperties = isAppearing ? currentProperties : properties
+                        
             if isAppearing {
                 UIView.performWithoutAnimation {
                     properties.apply(to: view)
@@ -201,6 +202,42 @@ extension TransitionAnimation {
                     completion($0)
                 }
             )
+        }
+    }
+    
+    func skipAnimation(
+        direction : Direction,
+        with view: UIView,
+        layoutAttributes: LayoutAttributes,
+        completion callerCompletion : @escaping (Bool) -> () = { _ in }
+    ) {
+        let currentProperties = AnimatableViewProperties(withPropertiesFrom: view)
+        
+        let completion : (Bool) -> () = {
+            callerCompletion($0)
+            self.completion($0)
+        }
+        
+        switch self.animationKind {
+        case .standard(_, let properties):
+            
+            let isAppearing = direction == .appearing
+            let finalProperties = isAppearing ? currentProperties : properties
+                        
+            finalProperties.apply(to: view)
+            
+            completion(true)
+            
+        case .custom(let animationFactory):
+            let animation = animationFactory()
+
+            animation.skipAnimationAny(
+                direction: direction,
+                with: view,
+                currentProperties: currentProperties
+            )
+            
+            completion(true)
         }
     }
 }
