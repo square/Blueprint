@@ -3,16 +3,16 @@ import UIKit
 /// Represents the content of an element.
 public struct ElementContent: Measurable {
 
-    private let storage: ContentStorage
+    private let storage: AnyContentStorage
 
     /// Initializes a new `ElementContent` with the given layout and children.
     ///
     /// - parameter layout: The layout to use.
     /// - parameter configure: A closure that configures the layout and adds children to the container.
-    public init<LayoutType: Layout>(layout: LayoutType, configure: (inout Builder<LayoutType>) -> Void = { _ in }) {
-        var builder = Builder(layout: layout)
-        configure(&builder)
-        self.storage = builder
+    public init<LayoutType: Layout>(layout: LayoutType, configure: (inout ContentStorage<LayoutType>) -> Void = { _ in }) {
+        var storage = ContentStorage(layout: layout)
+        configure(&storage)
+        self.storage = storage
     }
 
     public func measure(in constraint: SizeConstraint) -> CGSize {
@@ -26,7 +26,6 @@ public struct ElementContent: Measurable {
     func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         return storage.performLayout(attributes: attributes)
     }
-
 }
 
 extension ElementContent {
@@ -76,17 +75,9 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage: Measurable {
-    var childCount: Int { get }
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
-}
-
-
-
-
 extension ElementContent {
 
-    public struct Builder<LayoutType: Layout> {
+    public struct ContentStorage<LayoutType: Layout> {
 
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
@@ -98,27 +89,41 @@ extension ElementContent {
         init(layout: LayoutType) {
             self.layout = layout
         }
+        
+        /// Adds the given child element.
+        public mutating func add(element: Element, traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil) {
+            let child = Child(
+                element: element,
+                content: element.content,
+                traits: traits,
+                key: key
+            )
+            
+            children.append(child)
+        }
+        
+        fileprivate struct Child : Measurable {
 
+            var element: Element
+            var content: ElementContent
+            var traits: LayoutType.Traits
+            var key: AnyHashable?
+
+            func measure(in constraint: SizeConstraint) -> CGSize {
+                content.measure(in: constraint)
+            }
+        }
     }
-
-
 }
 
-extension ElementContent.Builder {
 
-    /// Adds the given child element.
-    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil, element: Element) {
-        let child = Child(
-            traits: traits,
-            key: key,
-            content: element.content,
-            element: element)
-        children.append(child)
-    }
-
+fileprivate protocol AnyContentStorage : Measurable {
+    var childCount: Int { get }
+    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
-extension ElementContent.Builder: ContentStorage {
+
+extension ElementContent.ContentStorage : AnyContentStorage {
 
     var childCount: Int {
         return children.count
@@ -161,26 +166,8 @@ extension ElementContent.Builder: ContentStorage {
     private var layoutItems: [(LayoutType.Traits, Measurable)] {
         return children.map { ($0.traits, $0) }
     }
-
 }
 
-
-extension ElementContent.Builder {
-
-    fileprivate struct Child: Measurable {
-
-        var traits: LayoutType.Traits
-        var key: AnyHashable?
-        var content: ElementContent
-        var element: Element
-
-        func measure(in constraint: SizeConstraint) -> CGSize {
-            return content.measure(in: constraint)
-        }
-
-    }
-
-}
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.

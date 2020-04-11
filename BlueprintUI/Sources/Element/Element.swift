@@ -31,10 +31,9 @@ import UIKit
 ///     // backed by a UIView instance when displayed in a `BlueprintView`.
 ///     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
 ///         return UIView.describe { config in
-///             config.bind(backgroundColor, to: \.backgrouncColor)
+///             config.bind(backgroundColor, to: \.backgroundColor)
 ///         }
 ///     }
-///
 /// }
 /// ```
 ///

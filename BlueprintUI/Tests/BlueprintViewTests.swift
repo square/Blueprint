@@ -112,9 +112,9 @@ private struct TestContainer: Element {
     var children: [Element]
     
     var content: ElementContent {
-        return ElementContent(layout: TestLayout()) { (builder) in
+        return ElementContent(layout: TestLayout()) {
             for child in children {
-                builder.add(element: child)
+                $0.add(element: child)
             }
         }
     }

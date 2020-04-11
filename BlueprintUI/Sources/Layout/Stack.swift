@@ -13,9 +13,13 @@ public protocol StackElement: Element {
 extension StackElement {
 
     public var content: ElementContent {
-        return ElementContent(layout: layout) {
+        ElementContent(layout: layout) {
             for child in self.children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                $0.add(
+                    element: child.element,
+                    traits: child.traits,
+                    key: child.key
+                )
             }
         }
     }

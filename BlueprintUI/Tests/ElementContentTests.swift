@@ -13,7 +13,7 @@ class ElementContentTests: XCTestCase {
         let frame = CGRect(x: 0, y: 0, width: 20, height: 20)
 
         let container = ElementContent(layout: FrameLayout()) {
-            $0.add(traits: frame, element: SimpleElement())
+            $0.add(element: SimpleElement(), traits: frame)
         }
 
         let children = container
@@ -33,8 +33,8 @@ class ElementContentTests: XCTestCase {
         let frame2 = CGRect(x: 200, y: 300, width: 400, height: 500)
 
         let container = ElementContent(layout: FrameLayout()) {
-            $0.add(traits: frame1, element: SimpleElement())
-            $0.add(traits: frame2, element: SimpleElement())
+            $0.add(element: SimpleElement(), traits: frame1)
+            $0.add(element: SimpleElement(), traits: frame2)
         }
 
         let children = container
