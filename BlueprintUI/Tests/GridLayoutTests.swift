@@ -22,7 +22,7 @@ class GridLayoutTests: XCTestCase {
 
 
         let constraint = SizeConstraint(width: 130)
-        let measuredSize = container.measure(in: constraint)
+        let measuredSize = container.size(in: constraint)
 
         /// Default grid has 4 columns (20/4 == 5)
         let rowCount = 5

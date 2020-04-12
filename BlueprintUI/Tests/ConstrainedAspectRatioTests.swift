@@ -8,7 +8,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fill,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 200, height: 100))
     }
 
@@ -18,7 +18,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fill,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 240))
     }
 
@@ -28,7 +28,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fill,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 120))
     }
 
@@ -38,7 +38,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fit,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 60))
     }
 
@@ -48,7 +48,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fit,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 50, height: 100))
     }
 
@@ -58,7 +58,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             contentMode: .fit,
             wrapping: TestElement())
 
-        let size = element.content.measure(in: .unconstrained)
+        let size = element.content.size(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 100, height: 100))
     }
 }

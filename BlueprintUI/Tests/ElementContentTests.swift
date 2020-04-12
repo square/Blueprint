@@ -6,7 +6,7 @@ class ElementContentTests: XCTestCase {
     func test_noChildren() {
         let container = ElementContent(layout: FrameLayout())
         XCTAssertEqual(container.childCount, 0)
-        XCTAssertEqual(container.measure(in: SizeConstraint(CGSize(width: 100, height: 100))), CGSize.zero)
+        XCTAssertEqual(container.size(in: SizeConstraint(CGSize(width: 100, height: 100))), CGSize.zero)
     }
 
     func test_singleChild() {
@@ -24,7 +24,7 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(children[0].layoutAttributes, LayoutAttributes(frame: frame))
 
-        XCTAssertEqual(container.measure(in: SizeConstraint(CGSize.zero)), CGSize(width: frame.maxX, height: frame.maxY))
+        XCTAssertEqual(container.size(in: SizeConstraint(CGSize.zero)), CGSize(width: frame.maxX, height: frame.maxY))
     }
 
     func test_multipleChildren() {
@@ -46,7 +46,7 @@ class ElementContentTests: XCTestCase {
         XCTAssertEqual(children[0].layoutAttributes, LayoutAttributes(frame: frame1))
         XCTAssertEqual(children[1].layoutAttributes, LayoutAttributes(frame: frame2))
 
-        XCTAssertEqual(container.measure(in: SizeConstraint(CGSize.zero)), CGSize(width: 600, height: 800))
+        XCTAssertEqual(container.size(in: SizeConstraint(CGSize.zero)), CGSize(width: 600, height: 800))
     }
     
 }

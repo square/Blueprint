@@ -54,7 +54,9 @@ public final class BlueprintView: UIView {
             node: NativeViewNode(
                 content: UIView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
-                children: []))
+                children: []
+            )
+        )
     
         super.init(frame: CGRect.zero)
         
@@ -74,14 +76,11 @@ public final class BlueprintView: UIView {
 
     /// Forwarded to the `measure(in:)` implementation of the root element.
     override public func sizeThatFits(_ size: CGSize) -> CGSize {
-        guard let element = element else { return .zero }
-        let constraint: SizeConstraint
-        if size == .zero {
-            constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        } else {
-            constraint = SizeConstraint(size)
+        guard let element = element else {
+            return .zero
         }
-        return element.content.measure(in: constraint)
+        
+        return element.content.size(in: size == .zero ? .unconstrained : .init(size))
     }
     
     override public func layoutSubviews() {

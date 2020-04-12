@@ -26,7 +26,7 @@ class EqualStackTests: XCTestCase {
                 stack.children = children
             }
 
-            XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 450, height: 150))
+            XCTAssertEqual(stack.content.size(in: constraint), CGSize(width: 450, height: 150))
         }
 
         // direction = .horizontal, spacing = 50
@@ -36,7 +36,7 @@ class EqualStackTests: XCTestCase {
                 stack.children = children
             }
 
-            XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 550, height: 150))
+            XCTAssertEqual(stack.content.size(in: constraint), CGSize(width: 550, height: 150))
         }
 
         // direction = .vertical, spacing = 0
@@ -46,7 +46,7 @@ class EqualStackTests: XCTestCase {
                 stack.children = children
             }
 
-            XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 150, height: 450))
+            XCTAssertEqual(stack.content.size(in: constraint), CGSize(width: 150, height: 450))
         }
 
         // direction = .vertical, spacing = 50
@@ -56,7 +56,7 @@ class EqualStackTests: XCTestCase {
                 stack.children = children
             }
 
-            XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 150, height: 550))
+            XCTAssertEqual(stack.content.size(in: constraint), CGSize(width: 150, height: 550))
         }
 
     }

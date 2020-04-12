@@ -13,25 +13,18 @@ public struct AttributedLabel: Element {
     }
 
     public var content: ElementContent {
-        struct Measurer: Measurable {
+        ElementContent { constraint in
+            var size = self.attributedText.boundingRect(
+                with: constraint.maximum,
+                options: [.usesLineFragmentOrigin],
+                context: nil
+            ).size
+            
+            size.width = size.width.rounded(.up, by: self.roundingScale)
+            size.height = size.height.rounded(.up, by: self.roundingScale)
 
-            var attributedText: NSAttributedString
-            var roundingScale: CGFloat
-
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                var size = attributedText.boundingRect(
-                    with: constraint.maximum,
-                    options: [.usesLineFragmentOrigin],
-                    context: nil)
-                    .size
-                size.width = size.width.rounded(.up, by: roundingScale)
-                size.height = size.height.rounded(.up, by: roundingScale)
-
-                return size
-            }
+            return size
         }
-
-        return ElementContent(measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale))
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

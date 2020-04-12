@@ -1,7 +1,7 @@
 import UIKit
 
 /// Represents the content of an element.
-public struct ElementContent: Measurable {
+public struct ElementContent {
 
     private let storage: AnyContentStorage
 
@@ -15,18 +15,23 @@ public struct ElementContent: Measurable {
         self.storage = storage
     }
 
-    public func measure(in constraint: SizeConstraint) -> CGSize {
-        return storage.measure(in: constraint)
-    }
-
     public var childCount: Int {
-        return storage.childCount
+        storage.childCount
+    }
+    
+    public func layout(in constraint : SizeConstraint) -> LayoutResult {
+        storage.layout(in: constraint)
+    }
+    
+    public func size(in constraint : SizeConstraint) -> CGSize {
+        layout(in: constraint).size
     }
 
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        return storage.performLayout(attributes: attributes)
+    func layoutElementTree(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        storage.layoutElementTree(attributes: attributes)
     }
 }
+
 
 extension ElementContent {
 
@@ -48,36 +53,32 @@ extension ElementContent {
     public init(child: Element) {
         self = ElementContent(child: child, layout: PassthroughLayout())
     }
-
-    /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
-    public init(measurable: Measurable) {
+    
+    /// Initializes a new `ElementContent` with no children that delegates to the provided closure.
+    public init(measure: @escaping (SizeConstraint) -> CGSize) {
         self = ElementContent(
-            layout: MeasurableLayout(measurable: measurable),
-            configure: { _ in })
-    }
-
-    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
-    public init(measureFunction: @escaping (SizeConstraint) -> CGSize) {
-        struct Measurer: Measurable {
-            var _measure: (SizeConstraint) -> CGSize
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                return _measure(constraint)
-            }
-        }
-        self = ElementContent(measurable: Measurer(_measure: measureFunction))
+            layout: IntrinsicSizeLayout(measure: measure),
+            configure: { _ in }
+        )
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
     public init(intrinsicSize: CGSize) {
-        self = ElementContent(measureFunction: { _ in intrinsicSize })
+        self = ElementContent(measure: { _ in intrinsicSize })
     }
+}
 
+
+fileprivate protocol AnyContentStorage {
+    var childCount: Int { get }
+    func layout(in constraint : SizeConstraint) -> LayoutResult
+    func layoutElementTree(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
 
 extension ElementContent {
 
-    public struct ContentStorage<LayoutType: Layout> {
+    public struct ContentStorage<LayoutType: Layout> : AnyContentStorage {
 
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
@@ -92,79 +93,79 @@ extension ElementContent {
         
         /// Adds the given child element.
         public mutating func add(element: Element, traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil) {
-            let child = Child(
+            self.add(Child(
                 element: element,
                 content: element.content,
                 traits: traits,
                 key: key
-            )
-            
-            children.append(child)
+            ))
         }
         
-        fileprivate struct Child : Measurable {
+        public mutating func add(_ child : Child) {
+            self.children.append(child)
+        }
+        
+        public mutating func add(_ children : [Child]) {
+            self.children += children
+        }
+        
+        public struct Child {
+            public var element: Element
+            public var content: ElementContent
+            public var traits: LayoutType.Traits
+            public var key: AnyHashable?
+        }
+        
+        public func measure(in constraint: SizeConstraint) -> CGSize {
+            return layout(in: constraint).size
+        }
+        
+        // MARK: AnyContentStorage
+        
+        var childCount: Int {
+            return children.count
+        }
+        
+        func layout(in constraint : SizeConstraint) -> LayoutResult {
+            self.layout.layout(in: constraint, items: self.children.map {
+                LayoutItem(element: $0.element, content: $0.content, traits: $0.traits, key: $0.key)
+            })
+        }
 
-            var element: Element
-            var content: ElementContent
-            var traits: LayoutType.Traits
-            var key: AnyHashable?
+        func layoutElementTree(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
 
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                content.measure(in: constraint)
+            let childAttributes = layout.layout(in: SizeConstraint(attributes.bounds.size), items: self.layoutItems)
+            
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+            
+            return self.children.mapWithIndex { index, _, child in
+                let childLayoutAttributes = childAttributes.layoutAttributes[index]
+
+                let resultNode = LayoutResultNode(
+                    element: child.element,
+                    layoutAttributes: childLayoutAttributes,
+                    content: child.content
+                )
+                
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: child.element),
+                    key: child.key
+                )
+
+                return (identifier: identifier, node: resultNode)
             }
         }
-    }
-}
 
-
-fileprivate protocol AnyContentStorage : Measurable {
-    var childCount: Int { get }
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
-}
-
-
-extension ElementContent.ContentStorage : AnyContentStorage {
-
-    var childCount: Int {
-        return children.count
-    }
-
-    public func measure(in constraint: SizeConstraint) -> CGSize {
-        return layout.measure(in: constraint, items: layoutItems)
-    }
-
-    func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-
-        let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
-
-        var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
-        result.reserveCapacity(children.count)
-        
-        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
-
-        for index in 0..<children.count {
-            let currentChildLayoutAttributes = childAttributes[index]
-            let currentChild = children[index]
-
-            let resultNode = LayoutResultNode(
-                element: currentChild.element,
-                layoutAttributes: currentChildLayoutAttributes,
-                content: currentChild.content
-            )
-            
-            let identifier = identifierFactory.nextIdentifier(
-                for: type(of: currentChild.element),
-                key: currentChild.key
-            )
-
-            result.append((identifier: identifier, node: resultNode))
+        private var layoutItems: [LayoutItem<LayoutType>] {
+            children.map {
+                LayoutItem(
+                    element: $0.element,
+                    content: $0.content,
+                    traits: $0.traits,
+                    key: $0.key
+                )
+            }
         }
-
-        return result
-    }
-
-    private var layoutItems: [(LayoutType.Traits, Measurable)] {
-        return children.map { ($0.traits, $0) }
     }
 }
 
@@ -178,46 +179,68 @@ fileprivate struct SingleChildLayoutHost: Layout {
     init(wrapping layout: SingleChildLayout) {
         self.wrapped = layout
     }
-
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    
+    func layout(in constraint : SizeConstraint, items: [LayoutItem<Self>]) -> LayoutResult {
         precondition(items.count == 1)
-        return wrapped.measure(in: constraint, child: items.map { $0.content }.first!)
-    }
-
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.count == 1)
-        return [
-            wrapped.layout(size: size, child: items.map { $0.content }.first!)
-        ]
+        
+        let item = items[0]
+                
+        let result = wrapped.layout(
+            in: constraint,
+            child: MeasurableChild {
+                item.content.size(in: $0)
+            }
+        )
+                
+        return LayoutResult(
+            size: result.size,
+            layoutAttributes: [result.layoutAttributes]
+        )
     }
 }
 
 // Used for elements with a single child that requires no custom layout
 fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        return child.measure(in: constraint)
+    
+    func layout(in constraint : SizeConstraint, child : MeasurableChild) -> SingleChildLayoutResult {
+        SingleChildLayoutResult(
+            size: { child.size(in: constraint) },
+            layoutAttributes: { LayoutAttributes(size: $0) }
+        )
     }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        return LayoutAttributes(size: size)
-    }
-
 }
 
 // Used for empty elements with an intrinsic size
-fileprivate struct MeasurableLayout: Layout {
+fileprivate struct IntrinsicSizeLayout: Layout {
 
-    var measurable: Measurable
-
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    // TODO: This, or a layout?
+    var measure : (SizeConstraint) -> CGSize
+    
+    public func layout(in constraint : SizeConstraint, items: [LayoutItem<Self>]) -> LayoutResult {
         precondition(items.isEmpty)
-        return measurable.measure(in: constraint)
-    }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.isEmpty)
-        return []
+        return LayoutResult(
+            size: measure(constraint),
+            layoutAttributes: []
+        )
     }
+}
 
+fileprivate extension Array {
+    func mapWithIndex<Mapped>(_ block : (Int, Bool, Element) -> Mapped) -> [Mapped]
+    {
+        var mapped = [Mapped]()
+        mapped.reserveCapacity(self.count)
+        
+        let count = self.count
+        var index : Int = 0
+        
+        while index < count {
+            let element = self[index]
+            mapped.append(block(index, index == (count - 1), element))
+            index += 1
+        }
+        
+        return mapped
+    }
 }

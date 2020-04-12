@@ -13,16 +13,18 @@ let posts = [
     Post(
         authorName: "Tim",
         timeAgo: "1 hour ago",
-        body: "Lorem Ipsum"),
-    Post(
-        authorName: "Jane",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-    Post(
-        authorName: "John",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
-
+        body: "Lorem Ipsum"
+    ),
+//    Post(
+//        authorName: "Jane",
+//        timeAgo: "2 days ago",
+//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+//    ),
+//    Post(
+//        authorName: "John",
+//        timeAgo: "2 days ago",
+//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
+//    )
 ]
 
 
@@ -45,17 +47,19 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+            //col.add(child: CommentForm())
         }
         
-        var scroll = ScrollView(wrapping: col)
-        scroll.contentSize = .fittingHeight
-        scroll.alwaysBounceVertical = true
-        scroll.keyboardDismissMode = .onDrag
+        let scroll = ScrollView(wrapping: col) {
+            $0.contentSize = .fittingHeight
+            $0.alwaysBounceVertical = true
+            $0.keyboardDismissMode = .onDrag
+        }
 
         let background = Box(
             backgroundColor: UIColor(white: 0.95, alpha: 1.0),
-            wrapping: scroll)
+            wrapping: scroll
+        )
 
         return background
     }
@@ -122,24 +126,28 @@ fileprivate struct FeedItem: ProxyElement {
                 wrapping: Box(
                     backgroundColor: .lightGray,
                     cornerStyle: .rounded(radius: 32.0),
-                    wrapping: nil))
+                    wrapping: nil)
+            )
 
             row.add(
                 growPriority: 0.0,
                 shrinkPriority: 0.0,
-                child: avatar)
+                child: avatar
+            )
 
-            row.add(
-                growPriority: 1.0,
-                shrinkPriority: 1.0,
-                child: FeedItemBody(post: post))
+//            row.add(
+//                growPriority: 1.0,
+//                shrinkPriority: 1.0,
+//                child: FeedItemBody(post: post))
         }
 
         let box = Box(
             backgroundColor: .white,
             wrapping: Inset(
                 uniformInset: 16.0,
-                wrapping: element))
+                wrapping: element
+            )
+        )
 
 
         return box

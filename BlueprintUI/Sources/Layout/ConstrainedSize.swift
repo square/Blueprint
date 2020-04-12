@@ -21,7 +21,6 @@ public struct ConstrainedSize: Element {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return nil
     }
-
 }
 
 extension ConstrainedSize {
@@ -48,7 +47,6 @@ extension ConstrainedSize {
             }
         }
     }
-
 }
 
 extension Comparable {
@@ -56,29 +54,29 @@ extension Comparable {
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
         return min(max(self, limits.lowerBound), limits.upperBound)
     }
-    
 }
 
 extension ConstrainedSize {
 
     fileprivate struct Layout: SingleChildLayout {
-
+        
         var width: Constraint
         var height: Constraint
-
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            var result = child.measure(in: constraint)
-            result.width = width.applied(to: result.width)
-            result.height = height.applied(to: result.height)
-            return result
+        
+        func layout(in constraint: SizeConstraint, child: MeasurableChild) -> SingleChildLayoutResult {
+            SingleChildLayoutResult(
+                size: {
+                    var result = child.size(in: constraint)
+                    result.width = width.applied(to: result.width)
+                    result.height = height.applied(to: result.height)
+                    return result
+                },
+                layoutAttributes: {
+                    LayoutAttributes(size: $0)
+                }
+            )
         }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(size: size)
-        }
-
     }
-
 }
 
 

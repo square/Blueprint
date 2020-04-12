@@ -32,19 +32,23 @@ public struct Overlay: Element {
 /// A layout implementation that places all children on top of each other with
 /// the same frame (filling the container’s bounds).
 fileprivate struct OverlayLayout: Layout {
-
-    func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero, { (result, item) in
-            let measuredSize = item.content.measure(in: constraint)
-            result.width = max(result.width, measuredSize.width)
-            result.height = max(result.height, measuredSize.height)
-        })
+    
+    func layout(in constraint : SizeConstraint, items: [LayoutItem<Self>]) -> LayoutResult {
+        LayoutResult(
+            size: {
+                items.reduce(into: CGSize.zero, { result, item in
+                    let measuredSize = item.content.size(in: constraint)
+                    
+                    result.width = max(result.width, measuredSize.width)
+                    result.height = max(result.height, measuredSize.height)
+                })
+            },
+            layoutAttributes: {
+                Array(
+                    repeating: LayoutAttributes(size: $0),
+                    count: items.count
+                )
+            }
+        )
     }
-
-    func layout(size: CGSize, items: [(traits: Void, content: Measurable)]) -> [LayoutAttributes] {
-        return Array(
-            repeating: LayoutAttributes(size: size),
-            count: items.count)
-    }
-
 }

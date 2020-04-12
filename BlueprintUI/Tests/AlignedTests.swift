@@ -24,7 +24,7 @@ class AlignedTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
         let content = TestElement(size: testSize)
         let element = Aligned(wrapping: content)
-        XCTAssertEqual(element.content.measure(in: constraint), content.content.measure(in: constraint))
+        XCTAssertEqual(element.content.size(in: constraint), content.content.size(in: constraint))
     }
 
     func test_horizontalLeading() {

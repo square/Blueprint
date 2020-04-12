@@ -16,8 +16,8 @@ class StackTests: XCTestCase {
         column.add(child: TestElement())
         column.add(child: TestElement())
 
-        XCTAssertEqual(column.content.measure(in: .unconstrained).width, 100)
-        XCTAssertEqual(column.content.measure(in: .unconstrained).height, 200)
+        XCTAssertEqual(column.content.size(in: .unconstrained).width, 100)
+        XCTAssertEqual(column.content.size(in: .unconstrained).height, 200)
 
         let children = column
             .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 200))
@@ -35,8 +35,8 @@ class StackTests: XCTestCase {
         row.add(child: TestElement())
         row.add(child: TestElement())
 
-        XCTAssertEqual(row.content.measure(in: .unconstrained).width, 200)
-        XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
+        XCTAssertEqual(row.content.size(in: .unconstrained).width, 200)
+        XCTAssertEqual(row.content.size(in: .unconstrained).height, 100)
 
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
@@ -55,8 +55,8 @@ class StackTests: XCTestCase {
         row.add(child: TestElement())
         row.minimumHorizontalSpacing = 10.0
 
-        XCTAssertEqual(row.content.measure(in: .unconstrained).width, 210)
-        XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
+        XCTAssertEqual(row.content.size(in: .unconstrained).width, 210)
+        XCTAssertEqual(row.content.size(in: .unconstrained).height, 100)
 
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 210, height: 100))
@@ -143,7 +143,7 @@ class StackTests: XCTestCase {
                 }
 
                 let constraint = SizeConstraint(width: .unconstrained, height: crossConstraint)
-                let size = row.content.measure(in: constraint)
+                let size = row.content.size(in: constraint)
 
                 XCTAssertEqual(size.height, expectedSize, "Horizontal size", file: file, line: line)
 
@@ -165,7 +165,7 @@ class StackTests: XCTestCase {
                 }
 
                 let constraint = SizeConstraint(width: crossConstraint, height: .unconstrained)
-                let size = column.content.measure(in: constraint)
+                let size = column.content.size(in: constraint)
 
                 XCTAssertEqual(size.width, expectedSize, "Vertical size", file: file, line: line)
 
@@ -211,7 +211,7 @@ class StackTests: XCTestCase {
                 }
                 row.horizontalUnderflow = underflow
 
-                let size = row.content.measure(
+                let size = row.content.size(
                     in: SizeConstraint(
                         width: .atMost(layoutLength),
                         height: .atMost(100)))
@@ -242,7 +242,7 @@ class StackTests: XCTestCase {
                 }
                 column.verticalUnderflow = underflow
 
-                let size = column.content.measure(
+                let size = column.content.size(
                     in: SizeConstraint(
                         width: .atMost(100),
                         height: .atMost(layoutLength)))
@@ -591,7 +591,7 @@ class StackTests: XCTestCase {
                 }
                 row.horizontalOverflow = overflow
 
-                let size = row.content.measure(
+                let size = row.content.size(
                     in: SizeConstraint(
                         width: .atMost(layoutLength),
                         height: .atMost(100)))
@@ -621,7 +621,7 @@ class StackTests: XCTestCase {
                 }
                 column.verticalOverflow = overflow
 
-                let size = column.content.measure(
+                let size = column.content.size(
                     in: SizeConstraint(
                         width: .atMost(100),
                         height: .atMost(layoutLength)))

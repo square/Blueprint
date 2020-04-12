@@ -76,34 +76,38 @@ public struct Inset: Element {
 extension Inset {
 
     fileprivate struct Layout: SingleChildLayout {
-
+        
         var top: CGFloat
         var bottom: CGFloat
         var left: CGFloat
         var right: CGFloat
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            let insetConstraint = constraint.inset(
-                width: left + right,
-                height: top + bottom)
+        func layout(in constraint: SizeConstraint, child: MeasurableChild) -> SingleChildLayoutResult {
+            SingleChildLayoutResult(
+                size: {
+                    let insetConstraint = constraint.inset(
+                        width: left + right,
+                        height: top + bottom
+                    )
 
-            var size = child.measure(in: insetConstraint)
+                    var size = child.size(in: insetConstraint)
 
-            size.width += left + right
-            size.height += top + bottom
+                    size.width += left + right
+                    size.height += top + bottom
 
-            return size
+                    return size
+                },                
+                layoutAttributes: {
+                    var frame = CGRect(origin: .zero, size: $0)
+                    frame.origin.x += left
+                    frame.origin.y += top
+                    frame.size.width -= left + right
+                    frame.size.height -= top + bottom
+                    
+                    return LayoutAttributes(frame: frame)
+                }
+            )
         }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            var frame = CGRect(origin: .zero, size: size)
-            frame.origin.x += left
-            frame.origin.y += top
-            frame.size.width -= left + right
-            frame.size.height -= top + bottom
-            return LayoutAttributes(frame: frame)
-        }
-
     }
 
 }

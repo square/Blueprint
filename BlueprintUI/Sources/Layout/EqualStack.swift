@@ -60,64 +60,70 @@ extension EqualStack {
 extension EqualStack {
 
     fileprivate struct EqualLayout: Layout {
-
+        
         var direction: Direction
         var spacing: CGFloat
 
-        func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-            let itemSizes = items.map { $1.measure(in: constraint) }
+        public func layout(in constraint : SizeConstraint, items: [LayoutItem<Self>]) -> LayoutResult {
+                        
+            LayoutResult(
+                size: {
+                    let itemSizes = items.map { $0.content.size(in: constraint) }
 
-            let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
-            let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
+                    let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
+                    let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
 
-            let totalSize: CGSize
-            switch direction {
-            case .horizontal:
-                totalSize = CGSize(
-                    width: maximumItemWidth * CGFloat(items.count) + spacing * CGFloat(items.count - 1),
-                    height: maximumItemHeight)
-            case .vertical:
-                totalSize = CGSize(
-                    width: maximumItemWidth,
-                    height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1))
-            }
+                    let totalSize: CGSize
+                    switch direction {
+                    case .horizontal:
+                        totalSize = CGSize(
+                            width: maximumItemWidth * CGFloat(items.count) + spacing * CGFloat(items.count - 1),
+                            height: maximumItemHeight
+                        )
+                    case .vertical:
+                        totalSize = CGSize(
+                            width: maximumItemWidth,
+                            height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1)
+                        )
+                    }
 
-            return totalSize
-        }
+                    return totalSize
+                },
+                layoutAttributes: { size in
+                    guard items.count > 0 else { return [] }
 
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            guard items.count > 0 else { return [] }
+                    let itemSize: CGSize
+                    switch direction {
+                    case .horizontal:
+                        itemSize = CGSize(
+                            width: (size.width - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count),
+                            height: size.height
+                        )
+                    case .vertical:
+                        itemSize = CGSize(
+                            width: size.width,
+                            height: (size.height - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count)
+                        )
+                    }
 
-            let itemSize: CGSize
-            switch direction {
-            case .horizontal:
-                itemSize = CGSize(
-                    width: (size.width - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count),
-                    height: size.height)
-            case .vertical:
-                itemSize = CGSize(
-                    width: size.width,
-                    height: (size.height - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count))
-            }
+                    var result: [LayoutAttributes] = []
 
-            var result: [LayoutAttributes] = []
+                    for index in 0..<items.count {
+                        var attributes = LayoutAttributes(size: itemSize)
 
-            for index in 0..<items.count {
-                var attributes = LayoutAttributes(size: itemSize)
+                        switch direction {
+                        case .horizontal:
+                            attributes.frame.origin.x = (itemSize.width + spacing) * CGFloat(index)
+                        case .vertical:
+                            attributes.frame.origin.y = (itemSize.height + spacing) * CGFloat(index)
+                        }
 
-                switch direction {
-                case .horizontal:
-                    attributes.frame.origin.x = (itemSize.width + spacing) * CGFloat(index)
-                case .vertical:
-                    attributes.frame.origin.y = (itemSize.height + spacing) * CGFloat(index)
+                        result.append(attributes)
+                    }
+
+                    return result
                 }
-
-                result.append(attributes)
-            }
-
-            return result
+            )
         }
-
     }
-
 }

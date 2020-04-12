@@ -29,13 +29,20 @@ public struct ScrollView: Element {
     public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     public var keyboardAdjustmentMode : KeyboardAdjustmentMode = .adjustsWhenVisible
 
-
-    public init(wrapping element: Element) {
+    public init(wrapping element: Element, configure : (inout ScrollView) -> () = { _ in }) {
         self.wrappedElement = element
+        configure(&self)
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: layout)
+        return ElementContent(
+            child: wrappedElement,
+            layout: Layout(
+                contentInset: contentInset,
+                contentSize: contentSize,
+                centersUnderflow: centersUnderflow
+            )
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -51,14 +58,6 @@ public struct ScrollView: Element {
             }
         }
     }
-
-    private var layout: Layout {
-        return Layout(
-            contentInset: contentInset,
-            contentSize: contentSize,
-            centersUnderflow: centersUnderflow
-        )
-    }
 }
 
 extension ScrollView {
@@ -68,72 +67,77 @@ extension ScrollView {
         var contentInset: UIEdgeInsets
         var contentSize: ContentSize
         var centersUnderflow: Bool
+        
+        func layout(in constraint: SizeConstraint, child: MeasurableChild) -> SingleChildLayoutResult {
+            SingleChildLayoutResult(
+                size: {
+                    let adjustedConstraint = constraint.inset(
+                        width: contentInset.left + contentInset.right,
+                        height: contentInset.top + contentInset.bottom
+                    )
 
-        func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+                    var result = self.fittedSize(in: adjustedConstraint, childSize: { child.size(in: $0) })
+
+                    result.width += contentInset.left + contentInset.right
+                    result.height += contentInset.top + contentInset.bottom
+
+                    result.width = min(result.width, constraint.width.maximum)
+                    result.height = min(result.height, constraint.height.maximum)
+
+                    return result
+                },
+                layoutAttributes: { size in
+                    var insetSize = size
+                    insetSize.width -= contentInset.left + contentInset.right
+                    insetSize.height -= contentInset.top + contentInset.bottom
+
+                    var itemSize = fittedSize(in: SizeConstraint(insetSize), childSize: { child.size(in: $0) })
+                    if self.contentSize == .fittingHeight {
+                        itemSize.width = insetSize.width
+                    } else if self.contentSize == .fittingWidth {
+                        itemSize.height = insetSize.height
+                    }
+
+                    var contentAttributes = LayoutAttributes(frame: CGRect(origin: .zero, size: itemSize))
+
+                    if centersUnderflow {
+                        if contentAttributes.bounds.width < size.width {
+                            contentAttributes.center.x = size.width / 2.0
+                        }
+
+                        if contentAttributes.bounds.height < size.height {
+                            contentAttributes.center.y = size.height / 2.0
+                        }
+                    }
+                    
+                    return contentAttributes
+                }
+            )
+        }
+
+        private func fittedSize(in constraint: SizeConstraint, childSize : (SizeConstraint) -> CGSize) -> CGSize {
             switch contentSize {
             case .custom(let size):
                 return size
 
             case .fittingContent:
-                return child.measure(in: .unconstrained)
+                return childSize(.unconstrained)
 
             case .fittingHeight:
-                return child.measure(
-                    in: SizeConstraint(
+                return childSize(SizeConstraint(
                         width: constraint.width,
-                        height: .unconstrained))
+                        height: .unconstrained
+                    )
+                )
 
             case .fittingWidth:
-                return child.measure(
-                    in: SizeConstraint(
+                return childSize(SizeConstraint(
                         width: .unconstrained,
-                        height: constraint.height))
+                        height: constraint.height
+                    )
+                )
             }
         }
-
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            let adjustedConstraint = constraint.inset(
-                width: contentInset.left + contentInset.right,
-                height: contentInset.top + contentInset.bottom)
-
-            var result = fittedSize(in: adjustedConstraint, child: child)
-
-            result.width += contentInset.left + contentInset.right
-            result.height += contentInset.top + contentInset.bottom
-
-            result.width = min(result.width, constraint.width.maximum)
-            result.height = min(result.height, constraint.height.maximum)
-
-            return result
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-
-            var insetSize = size
-            insetSize.width -= contentInset.left + contentInset.right
-            insetSize.height -= contentInset.top + contentInset.bottom
-
-            var itemSize = fittedSize(in: SizeConstraint(insetSize), child: child)
-            if self.contentSize == .fittingHeight {
-                itemSize.width = insetSize.width
-            } else if self.contentSize == .fittingWidth {
-                itemSize.height = insetSize.height
-            }
-
-            var contentAttributes = LayoutAttributes(frame: CGRect(origin: .zero, size: itemSize))
-
-            if centersUnderflow {
-                if contentAttributes.bounds.width < size.width {
-                    contentAttributes.center.x = size.width / 2.0
-                }
-
-                if contentAttributes.bounds.height < size.height {
-                    contentAttributes.center.y = size.height / 2.0
-                }
-            }
-            return contentAttributes
-        }
-
     }
 
 }

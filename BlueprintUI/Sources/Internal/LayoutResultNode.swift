@@ -5,25 +5,15 @@ extension Element {
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///
-    /// - Parameter layoutAttributes: The layout attributes to assign to the
-    ///   root element.
-    ///
-    /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes) -> LayoutResultNode {
-        return LayoutResultNode(
-            element: self,
-            layoutAttributes: layoutAttributes,
-            content: content)
-    }
-
-    /// Build a fully laid out element tree with complete layout attributes
-    /// for each element.
-    ///
     /// - Parameter frame: The frame to assign to the root element.
     ///
     /// - Returns: A layout result
     func layout(frame: CGRect) -> LayoutResultNode {
-        return layout(layoutAttributes: LayoutAttributes(frame: frame))
+        LayoutResultNode(
+            element: self,
+            layoutAttributes: LayoutAttributes(frame: frame),
+            content: self.content
+        )
     }
 
 }
@@ -45,15 +35,16 @@ struct LayoutResultNode {
     
     init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent) {
 
+        let layoutBeginTime = DispatchTime.now()
+        
         self.element = element
         self.layoutAttributes = layoutAttributes
-
-        let layoutBeginTime = DispatchTime.now()
-        children = content.performLayout(attributes: layoutAttributes)
+        
+        self.children = content.layoutElementTree(attributes: layoutAttributes)
+        
         let layoutEndTime = DispatchTime.now()
         let layoutDuration = layoutEndTime.uptimeNanoseconds - layoutBeginTime.uptimeNanoseconds
-        diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)
-
+        self.diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)
     }
 
 }

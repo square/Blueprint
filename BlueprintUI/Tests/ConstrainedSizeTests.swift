@@ -7,12 +7,12 @@ class ConstrainedSizeTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
         XCTAssertEqual(
-            ConstrainedSize(wrapping: TestElement()).content.measure(in: constraint).width,
+            ConstrainedSize(wrapping: TestElement()).content.size(in: constraint).width,
             100
         )
 
         XCTAssertEqual(
-            ConstrainedSize(wrapping: TestElement()).content.measure(in: constraint).height,
+            ConstrainedSize(wrapping: TestElement()).content.size(in: constraint).height,
             100
         )
     }
@@ -21,12 +21,12 @@ class ConstrainedSizeTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
         XCTAssertEqual(
-            ConstrainedSize(width: .atMost(75), wrapping: TestElement()).content.measure(in: constraint).width,
+            ConstrainedSize(width: .atMost(75), wrapping: TestElement()).content.size(in: constraint).width,
             75
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .atMost(75), wrapping: TestElement()).content.measure(in: constraint).height,
+            ConstrainedSize(height: .atMost(75), wrapping: TestElement()).content.size(in: constraint).height,
             75
         )
     }
@@ -35,12 +35,12 @@ class ConstrainedSizeTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
         XCTAssertEqual(
-            ConstrainedSize(width: .atLeast(175), wrapping: TestElement()).content.measure(in: constraint).width,
+            ConstrainedSize(width: .atLeast(175), wrapping: TestElement()).content.size(in: constraint).width,
             175
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .atLeast(175), wrapping: TestElement()).content.measure(in: constraint).height,
+            ConstrainedSize(height: .atLeast(175), wrapping: TestElement()).content.size(in: constraint).height,
             175
         )
     }
@@ -49,12 +49,12 @@ class ConstrainedSizeTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
         XCTAssertEqual(
-            ConstrainedSize(width: .within(0...13), wrapping: TestElement()).content.measure(in: constraint).width,
+            ConstrainedSize(width: .within(0...13), wrapping: TestElement()).content.size(in: constraint).width,
             13
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .within(0...13), wrapping: TestElement()).content.measure(in: constraint).height,
+            ConstrainedSize(height: .within(0...13), wrapping: TestElement()).content.size(in: constraint).height,
             13
         )
     }
@@ -63,12 +63,12 @@ class ConstrainedSizeTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
 
         XCTAssertEqual(
-            ConstrainedSize(width: .absolute(49), wrapping: TestElement()).content.measure(in: constraint).width,
+            ConstrainedSize(width: .absolute(49), wrapping: TestElement()).content.size(in: constraint).width,
             49
         )
 
         XCTAssertEqual(
-            ConstrainedSize(height: .absolute(49), wrapping: TestElement()).content.measure(in: constraint).height,
+            ConstrainedSize(height: .absolute(49), wrapping: TestElement()).content.size(in: constraint).height,
             49
         )
     }

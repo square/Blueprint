@@ -67,25 +67,21 @@ public struct Aligned: Element {
     }
 
     private struct Layout: SingleChildLayout {
+        
         var verticalAlignment: VerticalAlignment
         var horizontalAlignment: HorizontalAlignment
+        
+        private func layoutAttributes(with size : CGSize) -> LayoutAttributes {
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            let contentSize = child.measure(in: SizeConstraint(size))
-
-            var attributes = LayoutAttributes(size: contentSize)
+            var attributes = LayoutAttributes(size: size)
 
             switch verticalAlignment {
             case .top:
                 attributes.frame.origin.y = 0
             case .center:
-                attributes.frame.origin.y = (size.height - contentSize.height) / 2.0
+                attributes.frame.origin.y = (size.height - size.height) / 2.0
             case .bottom:
-                attributes.frame.origin.y = size.height - contentSize.height
+                attributes.frame.origin.y = size.height - size.height
             case .fill:
                 attributes.frame.origin.y = 0
                 attributes.frame.size.height = size.height
@@ -95,9 +91,9 @@ public struct Aligned: Element {
             case .leading:
                 attributes.frame.origin.x = 0
             case .center:
-                attributes.frame.origin.x = (size.width - contentSize.width) / 2.0
+                attributes.frame.origin.x = (size.width - size.width) / 2.0
             case .trailing:
-                attributes.frame.origin.x = size.width - contentSize.width
+                attributes.frame.origin.x = size.width - size.width
             case .fill:
                 attributes.frame.origin.x = 0
                 attributes.frame.size.width = size.width
@@ -108,6 +104,13 @@ public struct Aligned: Element {
             attributes.frame.origin.y.round()
 
             return attributes
+        }
+        
+        func layout(in constraint: SizeConstraint, child: MeasurableChild) -> SingleChildLayoutResult {
+            SingleChildLayoutResult(
+                size: { child.size(in: constraint) },
+                layoutAttributes: { self.layoutAttributes(with: $0) }
+            )
         }
     }
 }
