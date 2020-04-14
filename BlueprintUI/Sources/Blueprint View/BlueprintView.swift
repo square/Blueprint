@@ -39,6 +39,7 @@ public final class BlueprintView: UIView {
     /// The root element that is displayed within the view.
     public var element: Element? {
         didSet {
+            invalidateIntrinsicContentSize()
             setNeedsViewHierarchyUpdate()
         }
     }
@@ -60,6 +61,9 @@ public final class BlueprintView: UIView {
         
         self.backgroundColor = .white
         addSubview(rootController.view)
+
+        setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
 
     public override convenience init(frame: CGRect) {
@@ -83,9 +87,22 @@ public final class BlueprintView: UIView {
         }
         return element.content.measure(in: constraint)
     }
-    
+
+    /// Returns the unconstrained element size
+    public override var intrinsicContentSize: CGSize {
+        guard let element = element else { return .zero }
+        let constraint: SizeConstraint
+        if bounds.width == 0 {
+            constraint = .unconstrained
+        } else {
+            constraint = SizeConstraint(width: bounds.width)
+        }
+        return element.content.measure(in: constraint)
+    }
+
     override public func layoutSubviews() {
         super.layoutSubviews()
+//        invalidateIntrinsicContentSize()
         performUpdate()
     }
     
