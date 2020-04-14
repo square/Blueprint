@@ -56,14 +56,16 @@ public struct Inset: Element {
             wrapping: element)
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(
             child: wrappedElement,
             layout: Layout(
                 top: top,
                 bottom: bottom,
                 left: left,
-                right: right))
+                right: right
+            )
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

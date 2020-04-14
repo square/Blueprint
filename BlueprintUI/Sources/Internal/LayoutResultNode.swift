@@ -16,7 +16,7 @@ extension Element {
         return LayoutResultNode(
             element: element,
             layoutAttributes: layoutAttributes,
-            content: element.content,
+            content: element.content(in: environment),
             environment: environment
         )
     }

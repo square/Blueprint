@@ -35,9 +35,9 @@ extension ElementContent {
     ///
     /// - parameter element: The single child element.
     /// - parameter layout: The layout that will be used.
-    public init(child: Element, layout: SingleChildLayout) {
+    public init(in env : Environment, child: Element, layout: SingleChildLayout) {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
-            $0.add(element: child)
+            $0.add(in: env, element: child)
         }
     }
 
@@ -46,7 +46,7 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    public init(child: Element) {
+    public init(in env : Environment, child: Element) {
         self = ElementContent(child: child, layout: PassthroughLayout())
     }
 
@@ -107,12 +107,14 @@ extension ElementContent {
 extension ElementContent.Builder {
 
     /// Adds the given child element.
-    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: String? = nil, element: Element) {
+    public mutating func add(in env : Environment, traits: LayoutType.Traits = LayoutType.defaultTraits, key: String? = nil, element: Element) {
         let child = Child(
             traits: traits,
             key: key,
-            content: element.content,
-            element: element)
+            content: element.content(in: env),
+            element: element
+        )
+        
         children.append(child)
     }
 
@@ -144,7 +146,7 @@ extension ElementContent.Builder: ContentStorage {
             let resultNode = LayoutResultNode(
                 element: element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: element.content,
+                content: element.content(in: environment),
                 environment : environment
             )
 

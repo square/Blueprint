@@ -57,7 +57,7 @@ public struct Aligned: Element {
         self.wrappedElement = wrappedElement
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         let layout = Layout(verticalAlignment: verticalAlignment, horizontalAlignment: horizontalAlignment)
         return ElementContent(child: wrappedElement, layout: layout)
     }

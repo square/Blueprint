@@ -12,10 +12,10 @@ public protocol StackElement: Element {
 
 extension StackElement {
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(layout: layout) {
             for child in self.children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                $0.add(in: env, traits: child.traits, key: child.key, element: child.element)
             }
         }
     }

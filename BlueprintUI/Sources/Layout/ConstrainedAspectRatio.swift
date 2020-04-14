@@ -55,7 +55,7 @@ public struct ConstrainedAspectRatio: Element {
         self.wrappedElement = wrappedElement
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(child: wrappedElement, layout: Layout(aspectRatio: aspectRatio, contentMode: contentMode))
     }
 

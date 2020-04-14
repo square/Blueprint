@@ -48,8 +48,8 @@ public protocol Element {
     ///   `ElementContent(measurable:)` or similar.
     /// - Container elements: these element have one or more children, which are arranged by a layout implementation.
     ///   Container elements typically use methods like `ElementContent(layout:configure:)` to instantiate
-    ///   their content.
-    var content: ElementContent { get }
+    ///   their content.    
+    func content(in env : Environment) -> ElementContent
 
     /// Returns an (optional) description of the view that should back this element.
     ///

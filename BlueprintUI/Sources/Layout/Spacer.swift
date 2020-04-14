@@ -13,7 +13,7 @@ public struct Spacer: Element {
         self.size = size
     }
 
-    public var content: ElementContent {
+    public func content(in env : Environment) -> ElementContent {
         return ElementContent(intrinsicSize: size)
     }
 

@@ -9,13 +9,13 @@ import UIKit
 public protocol ProxyElement: Element {
 
     /// Returns an element that represents the entire content of this element.
-    var elementRepresentation: Element { get }
+    func elementRepresentation(in env : Environment) -> Element
 }
 
 extension ProxyElement {
 
-    public var content: ElementContent {
-        return ElementContent(child: elementRepresentation)
+    public func content(in env : Environment) -> ElementContent {
+        return ElementContent(child: self.elementRepresentation(in: env))
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

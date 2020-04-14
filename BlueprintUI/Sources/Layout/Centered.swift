@@ -14,7 +14,7 @@ public struct Centered: ProxyElement {
         self.wrappedElement = wrappedElement
     }
 
-    public var elementRepresentation: Element {
+    public func elementRepresentation(in env : Environment) -> Element {
         return Aligned(vertically: .center, horizontally: .center, wrapping: wrappedElement)
     }
 }
