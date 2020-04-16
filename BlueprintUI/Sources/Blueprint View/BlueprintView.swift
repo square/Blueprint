@@ -122,7 +122,8 @@ public final class BlueprintView: UIView {
         let rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
             layoutAttributes: LayoutAttributes(frame: bounds),
-            children: viewNodes)
+            children: viewNodes
+        )
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         hasUpdatedViewHierarchy = true
@@ -247,7 +248,6 @@ extension BlueprintView {
             
             children = newChildren
         }
-        
     }
-    
 }
+

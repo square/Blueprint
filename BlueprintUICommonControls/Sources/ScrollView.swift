@@ -12,12 +12,23 @@ public struct ScrollView: Element {
     public var contentSize: ContentSize = .fittingHeight
     public var alwaysBounceVertical = false
     public var alwaysBounceHorizontal = false
+    
+    /**
+     How much the content of the `ScrollView` should be inset.
+     
+     Note: When `keyboardAdjustmentMode` is used, it will also adjust
+     the on-screen `UIScrollView`s `contentInset.bottom` to make space for the keyboard.
+     */
     public var contentInset: UIEdgeInsets = .zero
+    
     public var centersUnderflow: Bool = false
     public var showsHorizontalScrollIndicator: Bool = true
     public var showsVerticalScrollIndicator: Bool = true
     public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
-    public var keyboardDismissMode = UIScrollView.KeyboardDismissMode.none
+    
+    public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+    public var keyboardAdjustmentMode : KeyboardAdjustmentMode = .adjustsWhenVisible
+
 
     public init(wrapping element: Element) {
         self.wrappedElement = element
@@ -29,10 +40,15 @@ public struct ScrollView: Element {
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return ScrollerWrapperView.describe { config in
+            config.builder = {
+                ScrollerWrapperView(frame: bounds, representedElement: self)
+            }
+            
             config.contentView = { $0.scrollView }
-            config.apply({ (view) in
-                view.apply(scrollView: self, contentFrame: subtreeExtent ?? .zero)
-            })
+            
+            config.apply {
+                $0.apply(scrollView: self, contentFrame: subtreeExtent ?? .zero)
+            }
         }
     }
 
@@ -40,11 +56,9 @@ public struct ScrollView: Element {
         return Layout(
             contentInset: contentInset,
             contentSize: contentSize,
-            centersUnderflow: centersUnderflow)
+            centersUnderflow: centersUnderflow
+        )
     }
-    
-
-
 }
 
 extension ScrollView {
@@ -55,14 +69,41 @@ extension ScrollView {
         var contentSize: ContentSize
         var centersUnderflow: Bool
 
+        func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+            switch contentSize {
+            case .custom(let size):
+                return size
+
+            case .fittingContent:
+                return child.measure(in: .unconstrained)
+
+            case .fittingHeight:
+                return child.measure(
+                    in: SizeConstraint(
+                        width: constraint.width,
+                        height: .unconstrained))
+
+            case .fittingWidth:
+                return child.measure(
+                    in: SizeConstraint(
+                        width: .unconstrained,
+                        height: constraint.height))
+            }
+        }
+
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             let adjustedConstraint = constraint.inset(
                 width: contentInset.left + contentInset.right,
                 height: contentInset.top + contentInset.bottom)
 
-            var result = child.measure(in: adjustedConstraint)
+            var result = fittedSize(in: adjustedConstraint, child: child)
+
             result.width += contentInset.left + contentInset.right
             result.height += contentInset.top + contentInset.bottom
+
+            result.width = min(result.width, constraint.width.maximum)
+            result.height = min(result.height, constraint.height.maximum)
+
             return result
         }
 
@@ -71,7 +112,8 @@ extension ScrollView {
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right
             insetSize.height -= contentInset.top + contentInset.bottom
-            var itemSize = child.measure(in: SizeConstraint(insetSize))
+
+            var itemSize = fittedSize(in: SizeConstraint(insetSize), child: child)
             if self.contentSize == .fittingHeight {
                 itemSize.width = insetSize.width
             } else if self.contentSize == .fittingWidth {
@@ -97,6 +139,11 @@ extension ScrollView {
 }
 
 extension ScrollView {
+    
+    public enum KeyboardAdjustmentMode : Equatable {
+        case none
+        case adjustsWhenVisible
+    }
 
     public enum ContentSize : Equatable {
 
@@ -145,6 +192,10 @@ extension ScrollView {
 fileprivate final class ScrollerWrapperView: UIView {
     
     let scrollView = UIScrollView()
+    let keyboardObserver = KeyboardObserver()
+    
+    /// The current `ScrollView` state we represent.
+    private var representedElement : ScrollView
 
     private var refreshControl: UIRefreshControl? = nil {
 
@@ -156,8 +207,14 @@ fileprivate final class ScrollerWrapperView: UIView {
 
     private var refreshAction: () -> Void = { }
 
-    override init(frame: CGRect) {
+    init(frame: CGRect, representedElement : ScrollView) {
+        
+        self.representedElement = representedElement
+        
         super.init(frame: frame)
+        
+        self.keyboardObserver.delegate = self
+        
         addSubview(scrollView)
     }
 
@@ -177,6 +234,8 @@ fileprivate final class ScrollerWrapperView: UIView {
 
     func apply(scrollView: ScrollView, contentFrame: CGRect) {
 
+        self.representedElement = scrollView
+        
         switch scrollView.pullToRefreshBehavior {
         case .disabled, .refreshing:
             refreshAction = { }
@@ -231,20 +290,24 @@ fileprivate final class ScrollerWrapperView: UIView {
         if self.scrollView.showsHorizontalScrollIndicator != scrollView.showsHorizontalScrollIndicator {
             self.scrollView.showsHorizontalScrollIndicator = scrollView.showsHorizontalScrollIndicator
         }
-
+        
         if self.scrollView.keyboardDismissMode != scrollView.keyboardDismissMode {
             self.scrollView.keyboardDismissMode = scrollView.keyboardDismissMode
         }
-
-        var contentInset = scrollView.contentInset
-
-        if case .refreshing = scrollView.pullToRefreshBehavior, let refreshControl = refreshControl {
-            // The refresh control lives above the content and adjusts the
-            // content inset for itself when visible. Do the same adjustment to
-            // our expected content inset.
-            contentInset.top += refreshControl.bounds.height
-        }
-
+        
+        self.applyContentInset(with: scrollView)
+    }
+    
+    private func applyContentInset(with scrollView : ScrollView)
+    {
+        let contentInset = ScrollView.calculateContentInset(
+            scrollViewInsets: scrollView.contentInset,
+            safeAreaInsets: self.bp_safeAreaInsets,
+            keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
+            refreshControlState: scrollView.pullToRefreshBehavior,
+            refreshControlBounds: refreshControl?.bounds
+        )
+                
         if self.scrollView.contentInset != contentInset {
 
             let wasScrolledToTop = self.scrollView.contentOffset.y == -self.scrollView.contentInset.top
@@ -260,8 +323,132 @@ fileprivate final class ScrollerWrapperView: UIView {
                 self.scrollView.contentOffset.x = -contentInset.left
             }
         }
-
-
     }
+    
+    //
+    // MARK: UIView
+    //
+    
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        
+        if self.window != nil {
+            self.updateBottomContentInsetWithKeyboardFrame()
+        }
+    }
+    
+    public override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        
+        if self.superview != nil {
+            self.updateBottomContentInsetWithKeyboardFrame()
+        }
+    }
+}
 
+
+extension ScrollView
+{
+    // Calculates the correct content inset to apply for the given inputs.
+    
+    static func calculateContentInset(
+        scrollViewInsets : UIEdgeInsets,
+        safeAreaInsets : UIEdgeInsets,
+        keyboardBottomInset : CGFloat,
+        refreshControlState : PullToRefreshBehavior,
+        refreshControlBounds : CGRect?
+    ) -> UIEdgeInsets
+    {
+        var finalContentInset = scrollViewInsets
+        
+        // Include the keyboard's adjustment at the bottom of the scroll view.
+        
+        if keyboardBottomInset > 0.0 {
+            finalContentInset.bottom += keyboardBottomInset
+            
+            // Exclude the safe area insets, so the content hugs the top of the keyboard.
+            
+            finalContentInset.bottom -= safeAreaInsets.bottom
+        }
+        
+        // The refresh control lives above the content and adjusts the
+        // content inset for itself when visible and refreshing.
+        // Do the same adjustment to our expected content inset.
+        
+        if case .refreshing = refreshControlState {
+            finalContentInset.top += refreshControlBounds?.size.height ?? 0.0
+        }
+        
+        return finalContentInset
+    }
+}
+
+
+extension ScrollerWrapperView : KeyboardObserverDelegate {
+    
+    //
+    // MARK: Keyboard
+    //
+    
+    private func updateBottomContentInsetWithKeyboardFrame() {
+        
+        let contentInset = ScrollView.calculateContentInset(
+            scrollViewInsets: self.representedElement.contentInset,
+            safeAreaInsets: self.bp_safeAreaInsets,
+            keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
+            refreshControlState: self.representedElement.pullToRefreshBehavior,
+            refreshControlBounds: self.refreshControl?.bounds
+        )
+        
+        /// Setting contentInset, even to the same value, can cause issues during scrolling (such as stopping scrolling).
+        /// Make sure we're only assigning the value if it changed.
+        
+        if self.scrollView.contentInset.bottom != contentInset.bottom {
+            self.scrollView.contentInset.bottom = contentInset.bottom
+        }
+    }
+    
+    fileprivate var bottomContentInsetAdjustmentForKeyboard : CGFloat {
+        
+        switch self.representedElement.keyboardAdjustmentMode {
+        case .none:
+            return 0.0
+            
+        case .adjustsWhenVisible:
+            guard let keyboardFrame = self.keyboardObserver.currentFrame(in: self) else {
+                return 0.0
+            }
+            
+            switch keyboardFrame {
+            case .nonOverlapping: return 0.0
+            case .overlapping(let frame): return self.bounds.size.height - frame.origin.y
+            }
+        }
+    }
+    
+    //
+    // MARK: KeyboardObserverDelegate
+    //
+    
+    func keyboardFrameWillChange(
+        for observer : KeyboardObserver,
+        animationDuration : Double,
+        options : UIView.AnimationOptions
+    ) {
+        UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
+            self.updateBottomContentInsetWithKeyboardFrame()
+        })
+    }
+}
+
+
+private extension UIView {
+    
+    var bp_safeAreaInsets : UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return self.safeAreaInsets
+        } else {
+            return .zero
+        }
+    }
 }

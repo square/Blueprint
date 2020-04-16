@@ -7,7 +7,7 @@ class ElementPathTests: XCTestCase {
 
         XCTAssertEqual(ElementPath.empty, ElementPath.empty)
 
-        let testPath = ElementPath.init().appending(component: ElementPath.Component(elementType: A.self, identifier: .index(0)))
+        let testPath = ElementPath().appending(identifier: ElementIdentifier(elementType: A.self, key: nil, count: 0))
 
         XCTAssertNotEqual(testPath, .empty)
 
@@ -17,16 +17,16 @@ class ElementPathTests: XCTestCase {
 
     func test_copyOnWrite() {
 
-        let testPath = ElementPath.init().appending(component: ElementPath.Component(elementType: A.self, identifier: .index(0)))
+        let testPath = ElementPath().appending(identifier: ElementIdentifier(elementType: A.self, key: nil, count: 0))
 
         var otherPath = testPath
-        otherPath.prepend(component: ElementPath.Component(elementType: B.self, identifier: .key("asdf")))
+        otherPath.prepend(identifier: ElementIdentifier(elementType: B.self, key: nil, count: 1))
 
         XCTAssertNotEqual(testPath, otherPath)
     }
 
     func test_empty() {
-        XCTAssertEqual(ElementPath.empty.components, [])
+        XCTAssertEqual(ElementPath.empty.identifiers, [])
     }
 
 }

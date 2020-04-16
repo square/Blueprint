@@ -147,7 +147,7 @@ extension ElementContent {
 extension ElementContent.Builder {
 
     /// Adds the given child element.
-    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: String? = nil, element: Element) {
+    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil, element: Element) {
         let child = Child(
             traits: traits,
             key: key,
@@ -179,20 +179,24 @@ extension ElementContent.Builder: ContentStorage {
 
         var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
         result.reserveCapacity(children.count)
+        
+        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
         for index in 0..<children.count {
-            let currentChildLayoutAttributes = childAttributes[childAttributes.startIndex.advanced(by: index)]
-            let currentChild = children[children.startIndex.advanced(by: index)]
+            let currentChildLayoutAttributes = childAttributes[index]
+            let currentChild = children[index]
 
             let resultNode = LayoutResultNode(
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
                 content: currentChild.content,
-                environment: environment)
+                environment: environment
+            )
 
-            let identifier = ElementIdentifier(
-                key: currentChild.key,
-                index: index)
+            let identifier = identifierFactory.nextIdentifier(
+                for: type(of: currentChild.element),
+                key: currentChild.key
+            )
 
             result.append((identifier: identifier, node: resultNode))
         }
@@ -212,7 +216,7 @@ extension ElementContent.Builder {
     fileprivate struct Child {
 
         var traits: LayoutType.Traits
-        var key: String?
+        var key: AnyHashable?
         var content: ElementContent
         var element: Element
 
@@ -243,7 +247,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             size: attributes.bounds.size,
             child: child.content.measurable(in: environment))
 
-        let identifier = ElementIdentifier(key: nil, index: 0)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -287,7 +291,7 @@ private struct LazyStorage: ContentStorage {
             size: attributes.bounds.size,
             child: child.content.measurable(in: environment))
 
-        let identifier = ElementIdentifier(key: nil, index: 0)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,

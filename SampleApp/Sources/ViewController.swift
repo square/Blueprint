@@ -39,6 +39,7 @@ final class ViewController: UIViewController {
         update()
     }
 
+    @available(iOS 11.0, *)
     override func viewSafeAreaInsetsDidChange() {
         super.viewSafeAreaInsetsDidChange()
         update()
@@ -53,8 +54,16 @@ final class ViewController: UIViewController {
         blueprintView.element = element
     }
 
+    private var viewSafeAreaInsets: UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return view.safeAreaInsets
+        } else {
+            return .zero
+        }
+    }
+
     var element: Element {
-        let safeAreaInsets = view.safeAreaInsets
+        let safeAreaInsets = viewSafeAreaInsets
         let screenScale = traitCollection.displayScale
         let theme = FeedTheme(authorColor: .green)
 
