@@ -64,6 +64,8 @@ public final class BlueprintView: UIView {
             
             setNeedsLayout()
         }
+        
+        invalidateIntrinsicContentSize()
     }
 
     /// Instantiates a view with the given element
@@ -94,6 +96,9 @@ public final class BlueprintView: UIView {
         
         self.backgroundColor = .white
         addSubview(rootController.view)
+        
+        setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
 
     public override convenience init(frame: CGRect) {
@@ -117,9 +122,30 @@ public final class BlueprintView: UIView {
         return element.content.measure(in: constraint)
     }
     
+    /// Returns the size of the element bound to the current width (mimicking
+    /// UILabel’s `intrinsicContentSize` behavior)
+    public override var intrinsicContentSize: CGSize {
+        guard let element = element else { return .zero }
+        let constraint: SizeConstraint
+
+        // Use unconstrained when
+        // a) we need a view hierarchy update to force a loop through an
+        //    unconstrained width so we don’t end up “caching” the previous
+        //    element’s width
+        // b) the current width is zero, since constraining by zero is
+        //    nonsensical
+        if bounds.width == 0 || neededUpdateType != .none {
+            constraint = .unconstrained
+        } else {
+            constraint = SizeConstraint(width: bounds.width)
+        }
+        return element.content.measure(in: constraint)
+    }
+    
     override public func layoutSubviews() {
         super.layoutSubviews()
         
+        invalidateIntrinsicContentSize()
         updateViewHierarchyIfNeeded()
     }
     
