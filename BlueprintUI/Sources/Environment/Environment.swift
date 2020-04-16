@@ -17,8 +17,8 @@ public struct Environment {
         get {
             let objectId = ObjectIdentifier(key)
 
-            if let value = values[objectId] as? K.Value {
-                return value
+            if let value = values[objectId] {
+                return value as! K.Value
             }
 
             return key.defaultValue
