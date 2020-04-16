@@ -109,7 +109,7 @@ public struct ElementPreview : View {
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
         named name : String = "",
-        with previewType : PreviewType = .thatFits,
+        with previewType : PreviewType = .thatFits(),
         with provider : @escaping ElementProvider
     ) {
         self.init(
@@ -181,13 +181,13 @@ extension ElementPreview {
         case fixed(width : CGFloat, height : CGFloat)
         
         /// The preview will be as large as needed to preview the content.
-        case thatFits
+        case thatFits(padding : CGFloat = 10.0)
         
         fileprivate var identifier : AnyHashable {
             switch self {
             case .device(let device): return device.rawValue
             case .fixed(let width, let height): return "(\(width), \(height))"
-            case .thatFits: return "thatFits"
+            case .thatFits(let padding): return "thatFits (\(padding)"
             }
         }
         
@@ -219,11 +219,12 @@ extension ElementPreview {
                         .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
                 )
                 
-            case .thatFits:
+            case .thatFits(let padding):
                 return AnyView(
                     view
                         .previewLayout(.sizeThatFits)
                         .previewDisplayName("Size That Fits" + formattedName)
+                        .padding(.all, padding)
                 )
             }
         }
