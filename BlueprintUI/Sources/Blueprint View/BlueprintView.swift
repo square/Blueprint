@@ -39,8 +39,8 @@ public final class BlueprintView: UIView {
     /// The root element that is displayed within the view.
     public var element: Element? {
         didSet {
-            invalidateIntrinsicContentSize()
             setNeedsViewHierarchyUpdate()
+            invalidateIntrinsicContentSize()
         }
     }
 
@@ -92,7 +92,14 @@ public final class BlueprintView: UIView {
     public override var intrinsicContentSize: CGSize {
         guard let element = element else { return .zero }
         let constraint: SizeConstraint
-        if bounds.width == 0 {
+
+        // Use unconstrained when
+        // a) we need a view hierarchy update to force a loop through an
+        //    unconstrained width so we don’t end up “caching” the previous
+        //    element’s width
+        // b) the current width is zero, since constraining by zero is
+        //    nonsensical
+        if bounds.width == 0 || needsViewHierarchyUpdate {
             constraint = .unconstrained
         } else {
             constraint = SizeConstraint(width: bounds.width)
