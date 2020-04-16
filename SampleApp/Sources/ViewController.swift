@@ -67,7 +67,7 @@ final class ViewController: UIViewController {
         let screenScale = traitCollection.displayScale
         let theme = FeedTheme(authorColor: .green)
 
-        return Adapted(
+        return AdaptedEnvironment(
             by: { (environment) in
                 environment.safeAreaInsets = safeAreaInsets
                 environment.screenScale = screenScale
@@ -114,7 +114,7 @@ struct FeedTheme {
     var authorColor: UIColor
 }
 
-fileprivate struct MainView: ComposedElement {
+fileprivate struct MainView: DynamicElement {
     
     var posts: [Post]
     
@@ -226,7 +226,7 @@ fileprivate struct FeedItem: ProxyElement {
 
 }
 
-fileprivate struct FeedItemBody: ComposedElement {
+fileprivate struct FeedItemBody: DynamicElement {
 
     var post: Post
 

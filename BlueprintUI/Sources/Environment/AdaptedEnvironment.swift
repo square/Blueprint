@@ -4,8 +4,8 @@ import CoreGraphics
 ///
 /// By specifying environmental values with this element, all child elements nested
 /// will automatically inherit those values automatically. Values can be changed
-/// anywhere in a sub-tree by inserting another `Adapted` element.
-public struct Adapted: Element {
+/// anywhere in a sub-tree by inserting another `AdaptedEnvironment` element.
+public struct AdaptedEnvironment: Element {
     var wrappedElement: Element
     var environmentAdapter: (inout Environment) -> Void
 

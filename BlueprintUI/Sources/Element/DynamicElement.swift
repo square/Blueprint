@@ -1,17 +1,17 @@
 import CoreGraphics
 
-/// An element built out of other elements.
+/// An element that dynamically builds its content based on the environment.
 ///
 /// Similar in purpose to `ProxyElement`, but the contents may change depending on the `Environment`.
 ///
 /// - seealso: ProxyElement
-public protocol ComposedElement: Element {
+public protocol DynamicElement: Element {
 
     /// Return the contents of this element in the given environment.
     func elementRepresentation(in environment: Environment) -> Element
 }
 
-extension ComposedElement {
+extension DynamicElement {
     public var content: ElementContent {
         return ElementContent(build: self.elementRepresentation(in:))
     }

@@ -28,7 +28,7 @@ class EnvironmentTests: XCTestCase {
 
     func test_adapted() {
         let testValue = TestValue.right
-        let element = Adapted(
+        let element = AdaptedEnvironment(
             key: TestKey.self,
             value: testValue,
             wrapping: AdaptingElement())
@@ -53,10 +53,10 @@ class EnvironmentTests: XCTestCase {
 
     func test_nestedAdapter() {
         let testValue = TestValue.right
-        let element = Adapted(
+        let element = AdaptedEnvironment(
             key: TestKey.self,
             value: .wrong,
-            wrapping: Adapted(
+            wrapping: AdaptedEnvironment(
                 key: TestKey.self,
                 value: testValue,
                 wrapping: AdaptingElement()))
@@ -93,7 +93,7 @@ class EnvironmentTests: XCTestCase {
         return node.viewDescription
     }
 
-    struct AdaptingElement: ComposedElement {
+    struct AdaptingElement: DynamicElement {
         func elementRepresentation(in environment: Environment) -> Element {
             return TestElement(value: environment.testValue)
         }
