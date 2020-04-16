@@ -73,17 +73,23 @@ public struct ElementPreview : View {
     /// A provider which returns a new element.
     public typealias ElementProvider = () -> Element
     
+    private let name : String
+    
     /// The types of previews to include in the Xcode preview.
-    private var previewTypes : [PreviewType]
+    private let previewTypes : [PreviewType]
     
     /// The provider which vends a new element.
-    private var provider : ElementProvider
+    private let provider : ElementProvider
     
     // MARK: Initialization
     
     /// Creates a new `ElementPreview` with several common devices that your users may use.
-    public static func commonDevices(with provider : @escaping ElementProvider) -> Self {
+    public static func commonDevices(
+        named name : String = "",
+        with provider : @escaping ElementProvider
+    ) -> Self {
         return Self(
+            named: name,
             with: [
                 .device(.iPhoneSE),
                 .device(.iPhone8),
@@ -102,10 +108,12 @@ public struct ElementPreview : View {
     /// Creates a new `ElementPreview` with the provided preview type.
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
+        named name : String = "",
         with previewType : PreviewType = .thatFits,
         with provider : @escaping ElementProvider
     ) {
         self.init(
+            named: name,
             with: [previewType],
             with: provider
         )
@@ -118,9 +126,11 @@ public struct ElementPreview : View {
     ///
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
+        named name : String = "",
         with previewTypes : [PreviewType],
         with provider : @escaping ElementProvider
     ) {
+        self.name = name
         self.previewTypes = previewTypes
         self.provider = provider
     }
@@ -129,7 +139,12 @@ public struct ElementPreview : View {
     
     public var body: some View {
         ForEach(self.previewTypes, id: \.identifier) { previewType in
-            previewType.preview(for: ElementView(element: self.provider()))
+            previewType.preview(
+                with: self.name,
+                for: ElementView(
+                    element: self.provider()
+                )
+            )
         }
     }
     
@@ -176,27 +191,39 @@ extension ElementPreview {
             }
         }
         
-        fileprivate func preview<ViewType:View>(for view : ViewType) -> AnyView {
+        fileprivate func preview<ViewType:View>(
+            with name : String,
+            for view : ViewType
+        ) -> AnyView {
+            
+            let formattedName : String = {
+                if name.isEmpty == false {
+                    return " – " + name
+                } else {
+                    return ""
+                }
+            }()
+            
             switch self {
             case .device(let device):
                 return AnyView(
                     view
                         .previewDevice(.init(rawValue: device.rawValue))
-                        .previewDisplayName(device.rawValue)
+                        .previewDisplayName(device.rawValue + formattedName)
                 )
                 
             case .fixed(let width, let height):
                 return AnyView(
                     view
                         .previewLayout(.fixed(width: width, height: height))
-                        .previewDisplayName("Fixed Size: (\(width), \(height)")
+                        .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
                 )
                 
             case .thatFits:
                 return AnyView(
                     view
                         .previewLayout(.sizeThatFits)
-                        .previewDisplayName("Size That Fits")
+                        .previewDisplayName("Size That Fits" + formattedName)
                 )
             }
         }
