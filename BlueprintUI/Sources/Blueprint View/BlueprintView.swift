@@ -117,7 +117,7 @@ public final class BlueprintView: UIView {
         updateViewHierarchyIfNeeded()
     }
     
-    private func setNeedsViewHierarchyUpdate() {
+    internal func setNeedsViewHierarchyUpdate() {
         guard !needsViewHierarchyUpdate else { return }
         needsViewHierarchyUpdate = true
         

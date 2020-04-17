@@ -36,6 +36,10 @@ final class ViewController: UIViewController {
 
 }
 
+fileprivate struct DemoState {
+    var clicks : Int
+}
+
 fileprivate struct MainView: ProxyElement {
     
     var posts: [Post]
@@ -46,6 +50,15 @@ fileprivate struct MainView: ProxyElement {
 
             col.add(child: List(posts: posts))
             col.add(child: CommentForm())
+            
+            col.add(child: Stateful(initial: DemoState(clicks: 0)) { state in
+                Tappable(
+                    onTap: {
+                        state.value.clicks += 1
+                    },
+                    wrapping: Label(text: "Clicks: \(state.value.clicks)")
+                )
+            })
         }
         
         var scroll = ScrollView(wrapping: col)
