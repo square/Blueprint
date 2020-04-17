@@ -49,6 +49,10 @@ struct NativeViewNode {
     ///     rounding applied to this node's parent.
     ///   - scale: The screen scale to use when rounding.
     mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) {
+        // Per the docs for UIView.frame:
+        // > If the transform property is not the identity transform, the value of this property is undefined
+        // > and therefore should be ignored.
+        // So we do not attempt to snap the frame to pixel bounds in this case.
         guard CATransform3DIsIdentity(layoutAttributes.transform) else {
             return
         }
