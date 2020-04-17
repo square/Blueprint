@@ -20,14 +20,13 @@ public struct AccessibilityElement: Element {
         case adjustable
         case allowsDirectInteraction
         case causesPageTurn
-
-        @available(iOS 10.0, *)
         case tabBar
     }
 
     public var label: String?
     public var value: String?
     public var hint: String?
+    public var identifier: String?
     public var traits: Set<Trait>
     public var wrappedElement: Element
 
@@ -35,12 +34,14 @@ public struct AccessibilityElement: Element {
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,
+        identifier: String? = nil,
         traits: Set<Trait> = [],
         wrapping element: Element)
     {
         self.label = label
         self.value = value
         self.hint = hint
+        self.identifier = identifier
         self.traits = traits
         self.wrappedElement = element
     }
@@ -83,9 +84,7 @@ public struct AccessibilityElement: Element {
             case .causesPageTurn:
                 traits.formUnion(.causesPageTurn)
             case .tabBar:
-                if #available(iOS 10.0, *) {
-                    traits.formUnion(.tabBar)
-                }
+                traits.formUnion(.tabBar)
             }
         }
 
@@ -101,6 +100,7 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityLabel] = label
             config[\.accessibilityValue] = value
             config[\.accessibilityHint] = hint
+            config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
         }
