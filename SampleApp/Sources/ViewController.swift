@@ -37,7 +37,7 @@ final class ViewController: UIViewController {
 }
 
 fileprivate struct DemoState {
-    var clicks : Int
+    var changes : Int
 }
 
 fileprivate struct MainView: ProxyElement {
@@ -51,14 +51,24 @@ fileprivate struct MainView: ProxyElement {
             col.add(child: List(posts: posts))
             col.add(child: CommentForm())
             
-            col.add(child: Stateful(initial: DemoState(clicks: 0)) { state in
-                Tappable(
-                    onTap: {
-                        state.value.clicks += 1
+            let stateful = Stateful(initial: DemoState(changes: 0)) { state in
+                Gesture(
+                    gesture: { UIPanGestureRecognizer() },
+                    
+                    onChange: { _ in
+                        state.value.changes += 1
                     },
-                    wrapping: Label(text: "Clicks: \(state.value.clicks)")
+                    
+                    wrapping: Tappable(
+                        onTap: {
+                            state.value.changes += 1
+                        },
+                        wrapping: Label(text: "Changes: \(state.value.changes)")
+                    )
                 )
-            })
+            }
+            
+            col.add(child: stateful)
         }
         
         var scroll = ScrollView(wrapping: col)
