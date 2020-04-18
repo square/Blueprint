@@ -234,3 +234,17 @@ fileprivate struct MeasurableLayout: Layout {
     }
 
 }
+
+
+#if DEBUG && canImport(SwiftUI) && !arch(i386)
+
+import SwiftUI
+
+@available(iOS 13.0, *)
+struct ElementContent_Preview: PreviewProvider {
+    static var previews: some View {
+        Text("Hello, World!")
+    }
+}
+
+#endif
