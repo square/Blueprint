@@ -61,4 +61,15 @@ public struct LayoutItem<LayoutType:Layout> {
     public var content: ElementContent
     public var traits: LayoutType.Traits
     public var key: AnyHashable?
+    
+    public init(
+        element: Element,
+        traits: LayoutType.Traits = LayoutType.defaultTraits,
+        key: AnyHashable? = nil
+    ) {
+        self.element = element
+        self.traits = traits
+        self.content = element.content
+        self.key = key
+    }
 }

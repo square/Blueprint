@@ -14,13 +14,13 @@ extension StackElement {
 
     public var content: ElementContent {
         ElementContent(layout: layout) {
-            for child in self.children {
-                $0.add(
-                    element: child.element,
-                    traits: child.traits,
-                    key: child.key
+            $0.add(self.children.map {
+                LayoutItem(
+                    element: $0.element,
+                    traits: $0.traits,
+                    key: $0.key
                 )
-            }
+            })
         }
     }
 

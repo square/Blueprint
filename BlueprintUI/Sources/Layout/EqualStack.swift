@@ -30,11 +30,8 @@ public struct EqualStack: Element {
     }
 
     public var content: ElementContent {
-        let layout = EqualLayout(direction: direction, spacing: spacing)
-        return ElementContent(layout: layout) {
-            for child in children {
-                $0.add(element: child)
-            }
+        ElementContent(layout: EqualLayout(direction: direction, spacing: spacing)) {
+            $0.add(children)
         }
     }
 

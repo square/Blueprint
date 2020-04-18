@@ -41,7 +41,7 @@ extension ElementContent {
     /// - parameter layout: The layout that will be used.
     public init(child: Element, layout: SingleChildLayout) {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
-            $0.add(element: child)
+            $0.add(child)
         }
     }
 
@@ -85,35 +85,28 @@ extension ElementContent {
         public var layout: LayoutType
 
         /// Child elements.
-        fileprivate var children: [Child] = []
+        fileprivate var children: [LayoutItem<LayoutType>] = []
 
         init(layout: LayoutType) {
             self.layout = layout
         }
         
-        /// Adds the given child element.
-        public mutating func add(element: Element, traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil) {
-            self.add(Child(
-                element: element,
-                content: element.content,
-                traits: traits,
-                key: key
-            ))
-        }
-        
-        public mutating func add(_ child : Child) {
+        public mutating func add(_ child : LayoutItem<LayoutType>) {
             self.children.append(child)
         }
         
-        public mutating func add(_ children : [Child]) {
+        public mutating func add(_ child : Element) {
+            self.children.append(LayoutItem(element: child))
+        }
+        
+        public mutating func add(_ children : [LayoutItem<LayoutType>]) {
             self.children += children
         }
         
-        public struct Child {
-            public var element: Element
-            public var content: ElementContent
-            public var traits: LayoutType.Traits
-            public var key: AnyHashable?
+        public mutating func add(_ children : [Element]) {
+            self.children += children.map {
+                LayoutItem(element: $0)
+            }
         }
         
         public func measure(in constraint: SizeConstraint) -> CGSize {
@@ -127,7 +120,7 @@ extension ElementContent {
         }
         
         func layout(in constraint : SizeConstraint) -> LayoutResult {
-            self.layout.layout(in: constraint, items: self.layoutItems)
+            self.layout.layout(in: constraint, items: self.children)
         }
 
         func layoutElementTree(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
@@ -151,17 +144,6 @@ extension ElementContent {
                 )
 
                 return (identifier: identifier, node: resultNode)
-            }
-        }
-
-        private var layoutItems: [LayoutItem<LayoutType>] {
-            children.map {
-                LayoutItem(
-                    element: $0.element,
-                    content: $0.content,
-                    traits: $0.traits,
-                    key: $0.key
-                )
             }
         }
     }

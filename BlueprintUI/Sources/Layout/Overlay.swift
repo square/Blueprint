@@ -16,10 +16,8 @@ public struct Overlay: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(layout: OverlayLayout()) {
-            for element in elements {
-                $0.add(element: element)
-            }
+        ElementContent(layout: OverlayLayout()) {
+            $0.add(elements)
         }
     }
 
