@@ -70,7 +70,7 @@ extension ScrollView {
         
         func layout(in constraint: SizeConstraint, child: MeasurableChild) -> SingleChildLayoutResult {
             SingleChildLayoutResult(
-                size: {
+                size: {                    
                     let adjustedConstraint = constraint.inset(
                         width: contentInset.left + contentInset.right,
                         height: contentInset.top + contentInset.bottom

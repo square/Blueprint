@@ -127,19 +127,17 @@ extension ElementContent {
         }
         
         func layout(in constraint : SizeConstraint) -> LayoutResult {
-            self.layout.layout(in: constraint, items: self.children.map {
-                LayoutItem(element: $0.element, content: $0.content, traits: $0.traits, key: $0.key)
-            })
+            self.layout.layout(in: constraint, items: self.layoutItems)
         }
 
         func layoutElementTree(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
 
-            let childAttributes = layout.layout(in: SizeConstraint(attributes.bounds.size), items: self.layoutItems)
+            let layoutResult = self.layout(in: SizeConstraint(attributes.bounds.size))
             
             var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
             
             return self.children.mapWithIndex { index, _, child in
-                let childLayoutAttributes = childAttributes.layoutAttributes[index]
+                let childLayoutAttributes = layoutResult.layoutAttributes[index]
 
                 let resultNode = LayoutResultNode(
                     element: child.element,
@@ -205,7 +203,7 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
     func layout(in constraint : SizeConstraint, child : MeasurableChild) -> SingleChildLayoutResult {
         SingleChildLayoutResult(
             size: { child.size(in: constraint) },
-            layoutAttributes: { LayoutAttributes(size: $0) }
+            layoutAttributes: { _ in LayoutAttributes(size: constraint.maximum) }
         )
     }
 }
@@ -213,7 +211,6 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
 // Used for empty elements with an intrinsic size
 fileprivate struct IntrinsicSizeLayout: Layout {
 
-    // TODO: This, or a layout?
     var measure : (SizeConstraint) -> CGSize
     
     public func layout(in constraint : SizeConstraint, items: [LayoutItem<Self>]) -> LayoutResult {

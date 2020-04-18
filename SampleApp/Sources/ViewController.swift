@@ -15,16 +15,16 @@ let posts = [
         timeAgo: "1 hour ago",
         body: "Lorem Ipsum"
     ),
-//    Post(
-//        authorName: "Jane",
-//        timeAgo: "2 days ago",
-//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-//    ),
-//    Post(
-//        authorName: "John",
-//        timeAgo: "2 days ago",
-//        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
-//    )
+    Post(
+        authorName: "Jane",
+        timeAgo: "2 days ago",
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    ),
+    Post(
+        authorName: "John",
+        timeAgo: "2 days ago",
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
+    )
 ]
 
 
@@ -47,7 +47,7 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            //col.add(child: CommentForm())
+            col.add(child: CommentForm())
         }
         
         let scroll = ScrollView(wrapping: col) {
@@ -105,7 +105,8 @@ fileprivate struct CommentForm: ProxyElement {
             backgroundColor: .lightGray,
             wrapping: Inset(
                 uniformInset: 16.0,
-                wrapping: col))
+                wrapping: col)
+        )
     }
 }
 
@@ -135,10 +136,10 @@ fileprivate struct FeedItem: ProxyElement {
                 child: avatar
             )
 
-//            row.add(
-//                growPriority: 1.0,
-//                shrinkPriority: 1.0,
-//                child: FeedItemBody(post: post))
+            row.add(
+                growPriority: 1.0,
+                shrinkPriority: 1.0,
+                child: FeedItemBody(post: post))
         }
 
         let box = Box(

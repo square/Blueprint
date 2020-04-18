@@ -55,6 +55,24 @@ extension SizeConstraint {
 }
 
 extension SizeConstraint {
+    public struct Hugging : Equatable {
+        
+        var width : Mode
+        var height : Mode
+        
+        public init(width : Mode, height : Mode) {
+            self.width = width
+            self.height = height
+        }
+        
+        public enum Mode : Equatable {
+            case hugsContent
+            case fillsConstraint
+        }
+    }
+}
+
+extension SizeConstraint {
 
     /// Represents a size constraint for a single axis.
     public enum Axis: Hashable {
