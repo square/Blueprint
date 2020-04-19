@@ -22,7 +22,6 @@ let posts = [
         authorName: "John",
         timeAgo: "2 days ago",
         body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
-
 ]
 
 
@@ -31,6 +30,8 @@ final class ViewController: UIViewController {
     private let blueprintView = BlueprintView(element: MainView(posts: posts))
 
     override func loadView() {
+        blueprintView.debugging.options = [.showElementFrames]
+        
         self.view = blueprintView
     }
 
@@ -55,7 +56,8 @@ fileprivate struct MainView: ProxyElement {
 
         let background = Box(
             backgroundColor: UIColor(white: 0.95, alpha: 1.0),
-            wrapping: scroll)
+            wrapping: scroll
+        )
 
         return background
     }

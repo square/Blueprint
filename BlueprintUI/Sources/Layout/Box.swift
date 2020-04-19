@@ -1,5 +1,4 @@
 import UIKit
-import BlueprintUI
 
 
 /// A simple element that wraps a child element and adds visual styling including
@@ -14,10 +13,23 @@ public struct Box: Element {
 
     public var wrappedElement: Element?
 
-    public init(backgroundColor: UIColor = .clear, cornerStyle: CornerStyle = .square, wrapping element: Element? = nil) {
+    public init(
+        backgroundColor: UIColor = .clear,
+        cornerStyle: CornerStyle = .square,
+        wrapping element: Element? = nil
+    ) {
         self.backgroundColor = backgroundColor
         self.cornerStyle = cornerStyle
         self.wrappedElement = element
+    }
+    
+    public init(
+        wrapping element: Element? = nil,
+        configure : (inout Box) -> () = { _ in }
+    ) {
+        self.wrappedElement = element
+        
+        configure(&self)
     }
 
     public var content: ElementContent {

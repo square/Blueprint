@@ -75,13 +75,13 @@ extension LayoutResultNode {
 
     /// Returns the flattened tree of view descriptions (any element that does not return
     /// a view description will be skipped).
-    func resolve() -> [(path: ElementPath, node: NativeViewNode)] {
+    func resolve(debugging : Debugging = .none) -> [(path: ElementPath, node: NativeViewNode)] {
 
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
             .flatMap { identifier, layoutResultNode in
 
                 return layoutResultNode
-                    .resolve()
+                    .resolve(debugging: debugging)
                     .map { path, viewDescriptionNode in
                         return (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
                     }
@@ -93,15 +93,17 @@ extension LayoutResultNode {
                 rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
             }
 
-        let viewDescription = element.backingViewDescription(
-            bounds: layoutAttributes.bounds,
-            subtreeExtent: subtreeExtent)
+        let viewDescription = self.viewDescriptionForDisplay(
+            subtreeExtent: subtreeExtent,
+            debugging: debugging
+        )
 
         if let viewDescription = viewDescription {
             let node = NativeViewNode(
                 content: viewDescription,
                 layoutAttributes: layoutAttributes,
-                children: resolvedChildContent)
+                children: resolvedChildContent
+            )
             return [(path: .empty, node: node)]
         } else {
             return resolvedChildContent.map { (path, node) -> (path: ElementPath, node: NativeViewNode) in
@@ -111,6 +113,24 @@ extension LayoutResultNode {
             }
         }
 
+    }
+    
+    func viewDescriptionForDisplay(subtreeExtent : CGRect?, debugging : Debugging) -> ViewDescription? {
+        
+        let original = self.element.backingViewDescription(
+            bounds: self.layoutAttributes.bounds,
+            subtreeExtent: subtreeExtent
+        )
+        
+        if debugging.isEnabled {
+            return Debugging.viewDescriptionWrapping(
+                other: original,
+                for: self.element,
+                bounds: self.layoutAttributes.bounds
+            )
+        } else {
+            return original
+        }
     }
     
 }

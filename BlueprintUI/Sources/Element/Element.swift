@@ -63,4 +63,30 @@ public protocol Element {
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
 
+    /// The debugging info and config to use with the Blueprint element debugger.
+    var debuggingAppearance : ElementDebuggingAppearance { get }
+    
+    /// How to allow introspecting the element in the view debugger.
+    var debuggingIntrospector : ElementDebuggingIntrospector { get }
+}
+
+
+public extension Element {
+    var debuggingAppearance : ElementDebuggingAppearance {
+        ElementDebuggingAppearance()
+    }
+    
+    var debuggingIntrospector : ElementDebuggingIntrospector {
+        ElementDebuggingIntrospector()
+    }
+}
+
+
+public struct ElementDebuggingIntrospector {
+    
+}
+
+
+public struct ElementDebuggingAppearance {
+    var borderColor : UIColor? = .init(white: 0.0, alpha: 0.35)
 }
