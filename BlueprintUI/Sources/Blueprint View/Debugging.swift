@@ -204,15 +204,30 @@ final class DebuggingPreviewViewController : UIViewController {
             var elementRepresentation: Element {
                 Column {
                     $0.horizontalAlignment = .fill
+                        
+                    $0.add(
+                        child: Preview(presenting: self.presenting)
+                    )
                     
-                    let preview = FloatingBox(
+                    $0.add(
+                        child: Preview(presenting: self.presenting)
+                    )
+                }
+            }
+            
+            struct Preview : ProxyElement {
+                var presenting : Element
+                
+                var elementRepresentation: Element {
+                    FloatingBox(
                         wrapping: ConstrainedSize(
                             height: .atLeast(100.0),
-                            wrapping: Centered(self.presenting)
+                            wrapping: Centered(Box(wrapping: self.presenting) {
+                                $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.15), width: 1.0)
+                                $0.cornerStyle = .rounded(radius: 2.0)
+                            })
                         )
                     )
-                        
-                    $0.add(child: preview)
                 }
             }
             
