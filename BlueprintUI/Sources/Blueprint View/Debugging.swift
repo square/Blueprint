@@ -10,34 +10,26 @@ import Foundation
 
 public struct Debugging : Equatable {
     
-    public var options : Options
+    public var showElementFrames : ShowElementFrames
     
-    public static var none : Debugging {
-        Debugging(options: .none)
+    public enum ShowElementFrames : Equatable {
+        case none
+        case all
+        case viewBacked
     }
     
-    public var isEnabled : Bool {
-        self.options.isEnabled
-    }
+    public var longPressForDebugger : Bool
+    public var exploreElementHistory : Bool
     
-    public struct Options : OptionSet, Equatable
+    public init(
+        showElementFrames : ShowElementFrames = .none,
+        longPressForDebugger : Bool = false,
+        exploreElementHistory : Bool = false
+    )
     {
-        public var rawValue : Int
-        
-        public static var none = Options(rawValue: 0)
-        public static var all = Options(rawValue: ~0)
-        
-        public static var showElementFrames = Options(rawValue : 1 << 0)
-        public static var longPressForDebugger = Options(rawValue : 1 << 1)
-        public static var exploreElementHistory = Options(rawValue : 1 << 2)
-        
-        public init(rawValue : Int) {
-            self.rawValue = rawValue
-        }
-        
-        public var isEnabled : Bool {
-            self != .none
-        }
+        self.showElementFrames = showElementFrames
+        self.longPressForDebugger = longPressForDebugger
+        self.exploreElementHistory = exploreElementHistory
     }
 }
 
@@ -204,13 +196,14 @@ final class DebuggingPreviewViewController : UIViewController {
             var elementRepresentation: Element {
                 Column {
                     $0.horizontalAlignment = .fill
+                    $0.minimumVerticalSpacing = 10.0
                         
                     $0.add(
-                        child: Preview(presenting: self.presenting)
+                        child: FloatingBox(wrapping: Preview(presenting: self.presenting))
                     )
                     
                     $0.add(
-                        child: Preview(presenting: self.presenting)
+                        child: FloatingBox(wrapping: ElementInfo(presenting: self.presenting))
                     )
                 }
             }
@@ -219,15 +212,37 @@ final class DebuggingPreviewViewController : UIViewController {
                 var presenting : Element
                 
                 var elementRepresentation: Element {
-                    FloatingBox(
-                        wrapping: ConstrainedSize(
-                            height: .atLeast(100.0),
-                            wrapping: Centered(Box(wrapping: self.presenting) {
-                                $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.15), width: 1.0)
-                                $0.cornerStyle = .rounded(radius: 2.0)
-                            })
-                        )
+                    ConstrainedSize(
+                        height: .atLeast(100.0),
+                        wrapping: Centered(Box(wrapping: self.presenting) {
+                            $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.15), width: 1.0)
+                            $0.cornerStyle = .rounded(radius: 2.0)
+                        })
                     )
+                }
+            }
+            
+            struct ElementInfo : ProxyElement {
+                var presenting : Element
+                
+                var elementRepresentation: Element {
+                    Column {
+                        $0.horizontalAlignment = .fill
+                        
+                        let list = self.presenting.recursiveElementList()
+                        
+                        for element in list {
+                            $0.add(child: Row {
+                                $0.verticalAlignment = .fill
+                                $0.horizontalUnderflow = .justifyToStart
+                                
+                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Spacer(size: CGSize(width: CGFloat(element.depth) * 10.0, height: 0.0)))
+                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Rule(orientation: .vertical, color: .darkGray))
+                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Spacer(size: CGSize(width: 5.0, height: 0.0)))
+                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Label(text: String(describing: type(of:element.element))))
+                            })
+                        }
+                    }
                 }
             }
             
@@ -235,9 +250,7 @@ final class DebuggingPreviewViewController : UIViewController {
                 var wrapping : Element
                 
                 var elementRepresentation: Element {
-                    Inset(
-                        bottom: 10.0,
-                        wrapping: Box(
+                    Box(
                         wrapping: Inset(
                             uniformInset: 10.0,
                             wrapping: self.wrapping
@@ -249,13 +262,36 @@ final class DebuggingPreviewViewController : UIViewController {
                                 offset: CGSize(width: 0.0, height: 1.0),
                                 color: .black
                             )
-                        
+                    
                             box.cornerStyle = .rounded(radius: 10.0)
                             box.backgroundColor = .white
-                        }
-                    )
+                    }
                 }
             }
+        }
+    }
+}
+
+fileprivate struct RecursedElement {
+    var element : Element
+    var depth : Int
+}
+
+fileprivate extension Element {
+    
+    func recursiveElementList() -> [RecursedElement] {
+        var list = [RecursedElement]()
+        
+        self.appendTo(recursiveElementList: &list, depth: 0)
+        
+        return list
+    }
+    
+    func appendTo(recursiveElementList list : inout [RecursedElement], depth : Int) {
+        list.append(RecursedElement(element: self, depth: depth))
+        
+        self.content.childElements.forEach {
+            $0.appendTo(recursiveElementList: &list, depth: depth + 1)
         }
     }
 }

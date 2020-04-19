@@ -29,12 +29,30 @@ final class ViewController: UIViewController {
 
     private let blueprintView = BlueprintView(element: MainView(posts: posts))
 
-    override func loadView() {
-        blueprintView.debugging.options = [.showElementFrames]
-        
+    override func loadView() {        
         self.view = blueprintView
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Toggle Debugging",
+            style: .plain,
+            target: self,
+            action: #selector(toggleDebugging)
+        )
     }
+    
+    private var debuggingEnabled : Bool = false
 
+    @objc func toggleDebugging() {
+        
+        self.debuggingEnabled.toggle()
+        
+        if self.debuggingEnabled {
+            self.blueprintView.debugging.showElementFrames = .all
+
+        } else {
+            self.blueprintView.debugging.showElementFrames = .none
+        }
+    }
 }
 
 fileprivate struct MainView: ProxyElement {

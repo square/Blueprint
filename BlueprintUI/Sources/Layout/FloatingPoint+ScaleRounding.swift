@@ -1,6 +1,7 @@
 import Foundation
 
-extension FloatingPoint {
+
+public extension FloatingPoint {
     mutating func round(_ rule: FloatingPointRoundingRule, by scale: Self) {
         self = self.rounded(rule, by: scale)
     }

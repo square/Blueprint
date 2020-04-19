@@ -26,7 +26,10 @@ public struct ElementContent: Measurable {
     func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         return storage.performLayout(attributes: attributes)
     }
-
+    
+    internal var childElements : [Element] {
+        return self.storage.childElements
+    }
 }
 
 extension ElementContent {
@@ -78,6 +81,7 @@ extension ElementContent {
 
 fileprivate protocol ContentStorage: Measurable {
     var childCount: Int { get }
+    var childElements : [Element] { get }
     func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
@@ -122,6 +126,12 @@ extension ElementContent.Builder: ContentStorage {
 
     var childCount: Int {
         return children.count
+    }
+    
+    var childElements : [Element] {
+        self.children.map {
+            $0.element
+        }
     }
 
     public func measure(in constraint: SizeConstraint) -> CGSize {

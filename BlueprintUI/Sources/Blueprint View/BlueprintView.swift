@@ -44,13 +44,13 @@ public final class BlueprintView: UIView {
         }
     }
     
-    public static var globalDebugging : Debugging = .none {
+    public static var globalDebugging : Debugging = Debugging() {
         didSet {
             NotificationCenter.default.post(name: .BlueprintGlobalDebuggingSettingsChanged, object: nil)
         }
     }
     
-    public var debugging : Debugging = .none {
+    public var debugging : Debugging = Debugging() {
         didSet {
             self.setNeedsViewHierarchyUpdate()
         }
