@@ -144,13 +144,31 @@ extension Debugging {
                 if let wrapper = self.selectedWrapper, self.selectedWrapper === oldValue {
                     let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.element))
                     
-                    wrapper.window?.rootViewController?.present(nav, animated: true)
+                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
+                    
+                    host?.present(nav, animated: true)
                 } else {
                     oldValue?.isSelected = false
                     self.selectedWrapper?.isSelected = true
                 }
             }
         }
+    }
+}
+
+fileprivate extension UIViewController {
+    var viewControllerToPresentOn : UIViewController {
+        var toPresentOn : UIViewController = self
+        
+        repeat {
+            if let presented = toPresentOn.presentedViewController {
+                toPresentOn = presented
+            } else {
+                break
+            }
+        } while true
+
+        return toPresentOn
     }
 }
 
@@ -172,6 +190,7 @@ final class DebuggingPreviewViewController : UIViewController {
     
     override func loadView() {
         self.view = self.blueprintView
+        self.blueprintView.debugging.showElementFrames = .viewBacked
         
         self.blueprintView.element = PreviewElement(presenting: self.element)
         self.blueprintView.layoutIfNeeded()
@@ -197,14 +216,22 @@ final class DebuggingPreviewViewController : UIViewController {
                 Column {
                     $0.horizontalAlignment = .fill
                     $0.minimumVerticalSpacing = 10.0
-                        
-                    $0.add(
-                        child: FloatingBox(wrapping: Preview(presenting: self.presenting))
-                    )
                     
-                    $0.add(
-                        child: FloatingBox(wrapping: ElementInfo(presenting: self.presenting))
-                    )
+                    $0.add(child: Header(text: "Preview"))
+                    $0.add(child: FloatingBox(wrapping: Preview(presenting: self.presenting)))
+                    
+                    $0.add(child: Header(text: "Hierarchy"))
+                    $0.add(child: FloatingBox(wrapping: ElementInfo(presenting: self.presenting)))
+                }
+            }
+            
+            struct Header : ProxyElement {
+                var text : String
+                
+                var elementRepresentation: Element {
+                    Label(text: self.text) {
+                        $0.font = .systemFont(ofSize: 32.0, weight: .bold)
+                    }
                 }
             }
             
