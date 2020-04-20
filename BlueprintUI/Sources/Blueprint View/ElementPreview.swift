@@ -141,14 +141,17 @@ public struct ElementPreview : View {
         ForEach(self.previewTypes, id: \.identifier) { previewType in
             previewType.preview(
                 with: self.name,
-                for: ElementView(
-                    element: self.provider()
-                )
+                for: self.provider()
             )
         }
     }
+}
+
+
+@available(iOS 13.0, *)
+extension ElementPreview {
     
-    private struct ElementView : UIViewRepresentable {
+    fileprivate struct ElementView : UIViewRepresentable {
         
         var element : Element
         
@@ -161,11 +164,6 @@ public struct ElementPreview : View {
             view.element = self.element
         }
     }
-}
-
-
-@available(iOS 13.0, *)
-extension ElementPreview {
    
     /// The preview type to use to display an element in an Xcode preview.
     ///
@@ -192,9 +190,9 @@ extension ElementPreview {
             }
         }
         
-        fileprivate func preview<ViewType:View>(
+        fileprivate func preview(
             with name : String,
-            for view : ViewType
+            for element : Element
         ) -> AnyView {
             
             let formattedName : String = {
@@ -208,24 +206,36 @@ extension ElementPreview {
             switch self {
             case .device(let device):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewDevice(.init(rawValue: device.rawValue))
                         .previewDisplayName(device.rawValue + formattedName)
                 )
                 
             case .fixed(let width, let height):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewLayout(.fixed(width: width, height: height))
                         .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
                 )
                 
             case .thatFits(let padding):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewLayout(.sizeThatFits)
                         .previewDisplayName("Size That Fits" + formattedName)
                         .padding(.all, padding)
+                )
+            }
+        }
+        
+        private func constrained(element : Element) -> some View {
+            GeometryReader { info in
+                ElementView(
+                    element: ConstrainedSize(
+                        width: .atMost(info.size.width),
+                        height: .atMost(info.size.height),
+                        wrapping: element
+                    )
                 )
             }
         }

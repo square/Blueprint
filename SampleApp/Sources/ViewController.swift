@@ -227,13 +227,7 @@ import SwiftUI
 struct ViewController_Preview: PreviewProvider {
     static var previews: some View {
         ElementPreview(with: .device(.iPhone8Plus)) {
-            FeedItem(
-                post: Post(
-                    authorName: "Kyle",
-                    timeAgo: "1 hour ago",
-                    body: "And the preview updates!"
-                )
-            )
+            MainView(posts: posts)
         }
     }
 }
