@@ -147,7 +147,7 @@ public final class BlueprintView: UIView {
             children: viewNodes
         )
 
-        let scale = window?.screen.scale ?? 1.0
+        let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: .zero, correction: .zero, scale: scale)
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
