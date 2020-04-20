@@ -292,9 +292,9 @@ final class DebuggingPreviewViewController : UIViewController {
                 var presenting : Element
                 
                 var elementRepresentation: Element {
-                    let snapshot = FlattenedElementSnapshot(element: self.presenting, sizeConstraint: SizeConstraint(CGSize(width: 300, height: 300)))
+                    let snapshot = FlattenedElementSnapshot(element: self.presenting, sizeConstraint: SizeConstraint(UIScreen.main.bounds.size))
                     
-                    return ThreeDElementVisualization(snapshot: snapshot)
+                    return Centered(ThreeDElementVisualization(snapshot: snapshot))
                 }
             }
             
@@ -417,7 +417,8 @@ fileprivate struct ThreeDElementVisualization : Element {
     
     var content: ElementContent {
         ElementContent { _ in
-            return self.snapshot.size
+            // TODO...
+            return CGSize(width: self.snapshot.size.width, height: self.snapshot.size.height * 2)
         }
     }
     
@@ -437,17 +438,19 @@ fileprivate struct ThreeDElementVisualization : Element {
             
             super.init(frame: CGRect(origin: .zero, size: self.snapshot.size))
             
-            for view in snapshot.flatHierarchySnapshot.reversed() {
+            for view in snapshot.flatHierarchySnapshot {
                 self.addSubview(view.view)
                 view.view.frame = view.frame
-                view.view.layer.zPosition = 30 * CGFloat(view.hierarchyDepth)
+                view.view.layer.zPosition = 10 * CGFloat(view.hierarchyDepth)
             }
             
             var t = CATransform3DIdentity
-            t.m34 = 1.0 / 1200.0;
-            t = CATransform3DScale(t, 0.9, 0.9, 0.9);
-            t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 0.0, 1.0, 0.0);
-            t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 1.0, 0.0, 0.0);
+            // https://stackoverflow.com/questions/3881446/meaning-of-m34-of-catransform3d
+            t.m34 = -1.0 / 1000.0;
+            t = CATransform3DScale(t, 1.5, 1.5, 1.5);
+            t = CATransform3DTranslate(t, 0.0, 50, 0.0)
+            //t = CATransform3DRotate(t, CGFloat(45 * Double.pi / 180), 0.0, 1.0, 0.0);
+            t = CATransform3DRotate(t, CGFloat(45 * Double.pi / 180), 1.0, 0.0, 0.0);
 
             self.layer.sublayerTransform = t
         }
@@ -464,7 +467,9 @@ fileprivate struct FlattenedElementSnapshot {
     init(element : Element, sizeConstraint : SizeConstraint) {
         self.element = element
         
-        let view = BlueprintView(frame: CGRect(origin: .zero, size: sizeConstraint.maximum))
+        self.size = self.element.content.measure(in: sizeConstraint)
+        
+        let view = BlueprintView(frame: CGRect(origin: .zero, size: self.size))
         view.debugging.showElementFrames = .all
         view.element = self.element
         view.layoutIfNeeded()
@@ -472,8 +477,6 @@ fileprivate struct FlattenedElementSnapshot {
         var snapshot = [ViewSnapshot]()
         
         view.buildFlatHierarchySnapshot(in: &snapshot, rootView: view, depth: 0)
-        
-        self.size = sizeConstraint.maximum
         
         self.flatHierarchySnapshot = snapshot
     }

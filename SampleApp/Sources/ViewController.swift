@@ -41,12 +41,12 @@ final class ViewController: UIViewController {
                 target: self,
                 action: #selector(toggleDebugging)
             ),
-            UIBarButtonItem(
-                title: "Unravel",
-                style: .plain,
-                target: self,
-                action: #selector(showUnravel)
-            ),
+//            UIBarButtonItem(
+//                title: "Unravel",
+//                style: .plain,
+//                target: self,
+//                action: #selector(showUnravel)
+//            ),
         ]
     }
     
@@ -78,7 +78,7 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            //col.add(child: CommentForm())
+            col.add(child: CommentForm())
         }
         
         var scroll = ScrollView(wrapping: col)
@@ -132,10 +132,11 @@ fileprivate struct CommentForm: ProxyElement {
         }
         
         return Box(
-            backgroundColor: .lightGray,
+            backgroundColor: .init(white: 0.90, alpha: 1.0),
             wrapping: Inset(
                 uniformInset: 16.0,
-                wrapping: col)
+                wrapping: col
+            )
         )
     }
 }
@@ -217,3 +218,24 @@ fileprivate struct FeedItemBody: ProxyElement {
         return column
     }
 }
+
+#if DEBUG && canImport(SwiftUI) && !arch(i386)
+
+import SwiftUI
+
+@available(iOS 13.0, *)
+struct ViewController_Preview: PreviewProvider {
+    static var previews: some View {
+        ElementPreview(with: .device(.iPhone8Plus)) {
+            FeedItem(
+                post: Post(
+                    authorName: "Kyle",
+                    timeAgo: "1 hour ago",
+                    body: "And the preview updates!"
+                )
+            )
+        }
+    }
+}
+
+#endif
