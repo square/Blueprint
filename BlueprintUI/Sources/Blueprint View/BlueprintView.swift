@@ -53,6 +53,8 @@ public final class BlueprintView: UIView {
     public var debugging : Debugging = Debugging() {
         didSet {
             self.setNeedsViewHierarchyUpdate()
+            //self.layoutIfNeeded()
+            //self.apply3DTransform()
         }
     }
 

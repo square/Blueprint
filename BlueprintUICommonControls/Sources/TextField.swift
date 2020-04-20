@@ -67,7 +67,8 @@ public struct TextField: Element {
         return ElementContent { constraint in
             return CGSize(
                 width: max(constraint.maximum.width, 44),
-                height: 44.0)
+                height: 44.0
+            )
         }
     }
     

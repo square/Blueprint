@@ -3,22 +3,27 @@ PODS:
   - BlueprintUI/Tests (0.9.1)
   - BlueprintUICommonControls (0.9.1):
     - BlueprintUI
+  - Unravel (1.0.0.LOCAL)
 
 DEPENDENCIES:
   - BlueprintUI (from `../BlueprintUI.podspec`)
   - BlueprintUI/Tests (from `../BlueprintUI.podspec`)
   - BlueprintUICommonControls (from `../BlueprintUICommonControls.podspec`)
+  - Unravel (from `~/Desktop/Development/Register1/Frameworks/Unravel/Unravel.podspec`)
 
 EXTERNAL SOURCES:
   BlueprintUI:
     :path: "../BlueprintUI.podspec"
   BlueprintUICommonControls:
     :path: "../BlueprintUICommonControls.podspec"
+  Unravel:
+    :path: "~/Desktop/Development/Register1/Frameworks/Unravel/Unravel.podspec"
 
 SPEC CHECKSUMS:
   BlueprintUI: cc417ee4e1cedf08b9cccfdcbb5fefc0592a1f48
   BlueprintUICommonControls: 383faf9c2b7292529137e390795b5a1ad8c8f506
+  Unravel: 9ecf4c51ea402d004f36635efdc44f3a55ad0911
 
-PODFILE CHECKSUM: bef87f42e48bddbf23595cfa6a16f4bf30ae6893
+PODFILE CHECKSUM: 9a524f748f5c68f19fc96271a36a16e0e7748345
 
 COCOAPODS: 1.9.1

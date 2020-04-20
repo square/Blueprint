@@ -2,6 +2,8 @@ import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
 
+import Unravel
+
 
 struct Post {
     var authorName: String
@@ -32,12 +34,20 @@ final class ViewController: UIViewController {
     override func loadView() {        
         self.view = blueprintView
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(
-            title: "Toggle Debugging",
-            style: .plain,
-            target: self,
-            action: #selector(toggleDebugging)
-        )
+        self.navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(
+                title: "Toggle Debugging",
+                style: .plain,
+                target: self,
+                action: #selector(toggleDebugging)
+            ),
+            UIBarButtonItem(
+                title: "Unravel",
+                style: .plain,
+                target: self,
+                action: #selector(showUnravel)
+            ),
+        ]
     }
     
     private var debuggingEnabled : Bool = false
@@ -53,6 +63,10 @@ final class ViewController: UIViewController {
             self.blueprintView.debugging.showElementFrames = .none
         }
     }
+    
+    @objc func showUnravel() {
+        self.present(UNRViewController(rootView: self.view), animated: true)
+    }
 }
 
 fileprivate struct MainView: ProxyElement {
@@ -64,7 +78,7 @@ fileprivate struct MainView: ProxyElement {
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+            //col.add(child: CommentForm())
         }
         
         var scroll = ScrollView(wrapping: col)
@@ -121,7 +135,8 @@ fileprivate struct CommentForm: ProxyElement {
             backgroundColor: .lightGray,
             wrapping: Inset(
                 uniformInset: 16.0,
-                wrapping: col))
+                wrapping: col)
+        )
     }
 }
 
@@ -201,5 +216,4 @@ fileprivate struct FeedItemBody: ProxyElement {
 
         return column
     }
-
 }

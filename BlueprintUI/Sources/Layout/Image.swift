@@ -1,4 +1,4 @@
-import BlueprintUI
+
 import UIKit
 
 
@@ -16,8 +16,9 @@ public struct Image: Element {
     public var contentMode: ContentMode = .aspectFill
 
     /// Initializes an image element with the given `UIImage` instance.
-    public init(image: UIImage?) {
+    public init(image: UIImage?, configure : (inout Image) -> () = { _ in }) {
         self.image = image
+        configure(&self)
     }
 
     public var content: ElementContent {

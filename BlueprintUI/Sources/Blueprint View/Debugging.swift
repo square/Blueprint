@@ -61,11 +61,16 @@ extension Debugging {
     
     final class DebuggingWrapper : UIView {
         
-        let element : Element
+        let elementInfo : ElementInfo
+        
+        struct ElementInfo {
+            var element : Element
+            var isViewBacked : Bool
+        }
         
         let containedView : UIView?
         
-        let longPress : UILongPressGestureRecognizer
+        let longPress : UITapGestureRecognizer
         
         var isSelected : Bool = false{
             didSet {
@@ -81,14 +86,19 @@ extension Debugging {
             
             if self.isSelected {
                 self.layer.borderWidth = 2.0
-                self.layer.cornerRadius = 4.0
+                self.layer.cornerRadius = 2.0
                 
                 self.layer.borderColor = UIColor.systemBlue.cgColor
             } else {
                 self.layer.borderWidth = 1.0
                 self.layer.cornerRadius = 2.0
                 
-                self.layer.borderColor = UIColor.black.withAlphaComponent(0.3).cgColor
+                if self.elementInfo.isViewBacked {
+                    self.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.4).cgColor
+                    self.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.10)
+                } else {
+                    self.layer.borderColor = UIColor.black.withAlphaComponent(0.20).cgColor
+                }
             }
         }
         
@@ -103,9 +113,12 @@ extension Debugging {
                 self.containedView = nil
             }
             
-            self.element = element
+            self.elementInfo = ElementInfo(
+                element: element,
+                isViewBacked: element.backingViewDescription(bounds: frame, subtreeExtent: nil) != nil
+            )
             
-            self.longPress = UILongPressGestureRecognizer()
+            self.longPress = UITapGestureRecognizer()
             
             super.init(frame: frame)
 
@@ -115,9 +128,6 @@ extension Debugging {
             
             self.longPress.addTarget(self, action: #selector(didLongPress))
             self.addGestureRecognizer(self.longPress)
-            
-            self.backgroundColor = .clear
-            self.isOpaque = false
             
             self.updateIsSelected()
         }
@@ -132,7 +142,7 @@ extension Debugging {
         
         @objc private func didLongPress() {
             
-            guard self.longPress.state == .began else {
+            guard self.longPress.state == .recognized else {
                 return
             }
             
@@ -142,7 +152,7 @@ extension Debugging {
         private static weak var selectedWrapper : DebuggingWrapper? = nil {
             didSet {
                 if let wrapper = self.selectedWrapper, self.selectedWrapper === oldValue {
-                    let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.element))
+                    let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.elementInfo.element))
                     
                     let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
                     
@@ -155,6 +165,7 @@ extension Debugging {
         }
     }
 }
+
 
 fileprivate extension UIViewController {
     var viewControllerToPresentOn : UIViewController {
@@ -169,6 +180,31 @@ fileprivate extension UIViewController {
         } while true
 
         return toPresentOn
+    }
+}
+
+extension UIView {
+    func apply3DTransform() {
+        
+        var t = CATransform3DIdentity
+        t.m34 = 1.0 / 1200.0;
+        //t = CATransform3DTranslate(t, 10.0, 10.0, 0.0);
+        t = CATransform3DScale(t, 0.9, 0.9, 0.9);
+        t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 0.0, 1.0, 0.0);
+        t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 1.0, 0.0, 0.0);
+
+        self.layer.sublayerTransform = t
+        
+        self.apply3DTransformTranslation(depth: 1)
+    }
+    
+    func apply3DTransformTranslation(depth : Int) {
+        
+        self.layer.zPosition = CGFloat(depth) * 10.0
+                        
+        for view in self.subviews {
+            view.apply3DTransformTranslation(depth: depth + 1)
+        }
     }
 }
 
@@ -190,7 +226,7 @@ final class DebuggingPreviewViewController : UIViewController {
     
     override func loadView() {
         self.view = self.blueprintView
-        self.blueprintView.debugging.showElementFrames = .viewBacked
+        //self.blueprintView.debugging.showElementFrames = .viewBacked
         
         self.blueprintView.element = PreviewElement(presenting: self.element)
         self.blueprintView.layoutIfNeeded()
@@ -219,6 +255,9 @@ final class DebuggingPreviewViewController : UIViewController {
                     
                     $0.add(child: Header(text: "Preview"))
                     $0.add(child: FloatingBox(wrapping: Preview(presenting: self.presenting)))
+                    
+                    $0.add(child: Header(text: "3D Visualization"))
+                    $0.add(child: FloatingBox(wrapping: ThreeDVisualization(presenting: self.presenting)))
                     
                     $0.add(child: Header(text: "Hierarchy"))
                     $0.add(child: FloatingBox(wrapping: ElementInfo(presenting: self.presenting)))
@@ -249,25 +288,74 @@ final class DebuggingPreviewViewController : UIViewController {
                 }
             }
             
+            struct ThreeDVisualization : ProxyElement {
+                var presenting : Element
+                
+                var elementRepresentation: Element {
+                    let snapshot = FlattenedElementSnapshot(element: self.presenting, sizeConstraint: SizeConstraint(CGSize(width: 300, height: 300)))
+                    
+                    return ThreeDElementVisualization(snapshot: snapshot)
+                }
+            }
+            
             struct ElementInfo : ProxyElement {
                 var presenting : Element
                 
                 var elementRepresentation: Element {
                     Column {
                         $0.horizontalAlignment = .fill
+                        $0.minimumVerticalSpacing = 10.0
                         
                         let list = self.presenting.recursiveElementList()
                         
                         for element in list {
-                            $0.add(child: Row {
-                                $0.verticalAlignment = .fill
-                                $0.horizontalUnderflow = .justifyToStart
+                            $0.add(child: ElementRow(element: element))
+                        }
+                    }
+                }
+                
+                struct ElementRow : ProxyElement {
+                    fileprivate var element : RecursedElement
+
+                    var elementRepresentation: Element {
+                        Row {
+                            $0.verticalAlignment = .fill
+                            $0.horizontalUnderflow = .growUniformly
+                            
+                            let spacer = Spacer(size: CGSize(width: CGFloat(element.depth) * 15.0, height: 0.0))
+                            $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: spacer)
+                            
+                            let box = Box(backgroundColor: .init(white: 0.0, alpha: 0.05), wrapping: self.content)
+                            
+                            $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: box)
+                        }
+                    }
+                    
+                    private var content : Element {
+                        Row {
+                            $0.verticalAlignment = .fill
+                            $0.horizontalUnderflow = .justifyToStart
+                            
+                            $0.add(
+                                child: Rule(orientation: .vertical, color: .darkGray, thickness: .points(2.0))
+                            )
+                            
+                            let elementInfo = Column {
+                                let elementType = String(describing: type(of:element.element))
+                                    
+                                $0.add(child: Label(text: elementType) {
+                                    $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                                    $0.color = .systemBlue
+                                })
                                 
-                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Spacer(size: CGSize(width: CGFloat(element.depth) * 10.0, height: 0.0)))
-                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Rule(orientation: .vertical, color: .darkGray))
-                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Spacer(size: CGSize(width: 5.0, height: 0.0)))
-                                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: Label(text: String(describing: type(of:element.element))))
-                            })
+                                $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
+                                
+                                $0.add(child: Box(backgroundColor: .white, wrapping: element.element))
+                            }
+                            
+                            $0.add(
+                                child: Inset(uniformInset: 5.0, wrapping: elementInfo)
+                            )
                         }
                     }
                 }
@@ -319,6 +407,113 @@ fileprivate extension Element {
         
         self.content.childElements.forEach {
             $0.appendTo(recursiveElementList: &list, depth: depth + 1)
+        }
+    }
+}
+
+fileprivate struct ThreeDElementVisualization : Element {
+    
+    var snapshot : FlattenedElementSnapshot
+    
+    var content: ElementContent {
+        ElementContent { _ in
+            return self.snapshot.size
+        }
+    }
+    
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        ViewDescription(View.self) {
+            $0.builder = {
+                View(snapshot: self.snapshot)
+            }
+        }
+    }
+    
+    final class View : UIView {
+        let snapshot : FlattenedElementSnapshot
+        
+        init(snapshot : FlattenedElementSnapshot) {
+            self.snapshot = snapshot
+            
+            super.init(frame: CGRect(origin: .zero, size: self.snapshot.size))
+            
+            for view in snapshot.flatHierarchySnapshot.reversed() {
+                self.addSubview(view.view)
+                view.view.frame = view.frame
+                view.view.layer.zPosition = 30 * CGFloat(view.hierarchyDepth)
+            }
+            
+            var t = CATransform3DIdentity
+            t.m34 = 1.0 / 1200.0;
+            t = CATransform3DScale(t, 0.9, 0.9, 0.9);
+            t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 0.0, 1.0, 0.0);
+            t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 1.0, 0.0, 0.0);
+
+            self.layer.sublayerTransform = t
+        }
+        
+        required init?(coder: NSCoder) { fatalError() }
+    }
+}
+
+fileprivate struct FlattenedElementSnapshot {
+    let element : Element
+    let flatHierarchySnapshot : [ViewSnapshot]
+    let size : CGSize
+    
+    init(element : Element, sizeConstraint : SizeConstraint) {
+        self.element = element
+        
+        let view = BlueprintView(frame: CGRect(origin: .zero, size: sizeConstraint.maximum))
+        view.debugging.showElementFrames = .all
+        view.element = self.element
+        view.layoutIfNeeded()
+        
+        var snapshot = [ViewSnapshot]()
+        
+        view.buildFlatHierarchySnapshot(in: &snapshot, rootView: view, depth: 0)
+        
+        self.size = sizeConstraint.maximum
+        
+        self.flatHierarchySnapshot = snapshot
+    }
+    
+    struct ViewSnapshot {
+        var element : Element
+        var view : UIView
+        var frame : CGRect
+        var hierarchyDepth : Int
+    }
+}
+
+fileprivate extension UIView {
+    func buildFlatHierarchySnapshot(in list : inout [FlattenedElementSnapshot.ViewSnapshot], rootView : UIView, depth : Int) {
+        
+        if let self = self as? Debugging.DebuggingWrapper {
+            let snapshot = FlattenedElementSnapshot.ViewSnapshot(
+                element: self.elementInfo.element,
+                view: self,
+                frame: self.convert(self.bounds, to: rootView),
+                hierarchyDepth: depth
+            )
+            
+            list.append(snapshot)
+        }
+        
+        for view in self.subviews {
+            view.buildFlatHierarchySnapshot(in: &list, rootView: rootView, depth: depth + 1)
+        }
+        
+        if self is Debugging.DebuggingWrapper {
+            self.removeFromSuperview()
+        }
+    }
+    
+    func toImage() -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: self.bounds.size)
+        
+        return renderer.image {
+            self.layer.render(in: $0.cgContext)
         }
     }
 }

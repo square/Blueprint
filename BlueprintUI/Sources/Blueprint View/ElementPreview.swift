@@ -157,6 +157,7 @@ public struct ElementPreview : View {
         }
         
         func updateUIView(_ view: BlueprintView, context: Context) {
+            view.debugging.showElementFrames = .all
             view.element = self.element
         }
     }

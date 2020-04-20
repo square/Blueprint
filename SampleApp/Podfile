@@ -2,9 +2,13 @@ platform :ios, '10.0'
 
 project 'SampleApp.xcodeproj'
 
+use_frameworks!(:linkage => :static)
+
 def blueprint_pods
   pod 'BlueprintUI', :path => '../BlueprintUI.podspec', :testspecs => ['Tests'] 
   pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec'
+
+  pod 'Unravel', :path => '~/Desktop/Development/Register1/Frameworks/Unravel/Unravel.podspec'
 end
 
 target 'SampleApp' do
