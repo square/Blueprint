@@ -37,7 +37,10 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct TestingView_Preview: PreviewProvider {
     static var previews: some View {
-        ElementPreview(with: .thatFits(padding: 20)) {
+        ElementPreview(
+        with: .thatFits(padding: 20),
+        debugging: Debugging(showElementFrames: .all)
+        ) {
             TestElement()
         }
     }

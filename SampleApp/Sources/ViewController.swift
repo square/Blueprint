@@ -23,7 +23,8 @@ let posts = [
     Post(
         authorName: "John",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"),
+    
 ]
 
 
@@ -41,12 +42,12 @@ final class ViewController: UIViewController {
                 target: self,
                 action: #selector(toggleDebugging)
             ),
-//            UIBarButtonItem(
-//                title: "Unravel",
-//                style: .plain,
-//                target: self,
-//                action: #selector(showUnravel)
-//            ),
+            UIBarButtonItem(
+                title: "Unravel",
+                style: .plain,
+                target: self,
+                action: #selector(showUnravel)
+            ),
         ]
     }
     
@@ -226,8 +227,24 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct ViewController_Preview: PreviewProvider {
     static var previews: some View {
-        ElementPreview(with: .device(.iPhone8Plus)) {
-            MainView(posts: posts)
+        ElementPreview(
+            with: [.device(.iPhone8Plus), .device(.iPhoneSE)],
+            debugging: Debugging(showElementFrames: .viewBacked)
+        ) {
+            let posts = [
+            Post(
+                authorName: "Or whoever",
+                timeAgo: "1 hour ago",
+                body: "Lorem Ipsum"
+                ),
+            Post(
+                authorName: "Jane",
+                timeAgo: "2 days ago",
+                body: "Edits update in the IDE as you type"
+                )
+            ]
+            
+            return MainView(posts: posts)
         }
     }
 }

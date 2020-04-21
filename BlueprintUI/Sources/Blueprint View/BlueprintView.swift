@@ -53,8 +53,6 @@ public final class BlueprintView: UIView {
     public var debugging : Debugging = Debugging() {
         didSet {
             self.setNeedsViewHierarchyUpdate()
-            //self.layoutIfNeeded()
-            //self.apply3DTransform()
         }
     }
 
@@ -174,6 +172,8 @@ public final class BlueprintView: UIView {
         hasUpdatedViewHierarchy = true
 
         isInsideUpdate = false
+        
+        self.propagateDebuggingStateToNestedBlueprintViews(with: self.debugging)
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
@@ -190,6 +190,19 @@ public final class BlueprintView: UIView {
         self.setNeedsViewHierarchyUpdate()
     }
     
+}
+
+fileprivate extension UIView {
+    func propagateDebuggingStateToNestedBlueprintViews(with debugging : Debugging) {
+        
+        for view in self.subviews {
+            if let view = view as? BlueprintView {
+                view.debugging = debugging
+            }
+            
+            view.propagateDebuggingStateToNestedBlueprintViews(with: debugging)
+        }
+    }
 }
 
 extension BlueprintView {

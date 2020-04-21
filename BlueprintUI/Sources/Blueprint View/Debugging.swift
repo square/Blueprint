@@ -183,31 +183,6 @@ fileprivate extension UIViewController {
     }
 }
 
-extension UIView {
-    func apply3DTransform() {
-        
-        var t = CATransform3DIdentity
-        t.m34 = 1.0 / 1200.0;
-        //t = CATransform3DTranslate(t, 10.0, 10.0, 0.0);
-        t = CATransform3DScale(t, 0.9, 0.9, 0.9);
-        t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 0.0, 1.0, 0.0);
-        t = CATransform3DRotate(t, CGFloat(-15 * Double.pi / 180), 1.0, 0.0, 0.0);
-
-        self.layer.sublayerTransform = t
-        
-        self.apply3DTransformTranslation(depth: 1)
-    }
-    
-    func apply3DTransformTranslation(depth : Int) {
-        
-        self.layer.zPosition = CGFloat(depth) * 10.0
-                        
-        for view in self.subviews {
-            view.apply3DTransformTranslation(depth: depth + 1)
-        }
-    }
-}
-
 
 final class DebuggingPreviewViewController : UIViewController {
     
@@ -240,7 +215,7 @@ final class DebuggingPreviewViewController : UIViewController {
                 backgroundColor: UIColor(white: 0.90, alpha: 1.0),
                 wrapping: ScrollView(wrapping: Content(presenting: self.presenting)) {
                     $0.contentSize = .fittingHeight
-                    $0.contentInset = .init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+                    $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
                 }
             )
         }
@@ -248,28 +223,51 @@ final class DebuggingPreviewViewController : UIViewController {
         struct Content : ProxyElement {
             var presenting : Element
             
+            static var sideInset : CGFloat = 10.0
+            
             var elementRepresentation: Element {
                 Column {
                     $0.horizontalAlignment = .fill
                     $0.minimumVerticalSpacing = 10.0
                     
-                    $0.add(child: Header(text: "Preview"))
-                    $0.add(child: FloatingBox(wrapping: Preview(presenting: self.presenting)))
+                    $0.add(child: Section(
+                        header: "Preview",
+                        content: FloatingBox(wrapping: Preview(presenting: self.presenting))
+                    ))
                     
-                    $0.add(child: Header(text: "3D Visualization"))
-                    $0.add(child: FloatingBox(wrapping: ThreeDVisualization(presenting: self.presenting)))
+                    $0.add(child: Section(
+                        header: "Layers",
+                        content: FullWidthBox(wrapping: ThreeDVisualization(presenting: self.presenting))
+                    ))
                     
-                    $0.add(child: Header(text: "Hierarchy"))
-                    $0.add(child: FloatingBox(wrapping: ElementInfo(presenting: self.presenting)))
+                    $0.add(child: Section(
+                        header: "Hierarchy",
+                        content: FloatingBox(wrapping: ElementInfo(presenting: self.presenting))
+                    ))
                 }
             }
             
-            struct Header : ProxyElement {
-                var text : String
+            struct Section : ProxyElement {
+                var header : String
+                
+                var content : Element
                 
                 var elementRepresentation: Element {
-                    Label(text: self.text) {
-                        $0.font = .systemFont(ofSize: 32.0, weight: .bold)
+                    Column {
+                        $0.horizontalAlignment = .fill
+                        
+                        $0.add(
+                            child: Inset(
+                                sideInsets: Content.sideInset,
+                                wrapping: Label(text: self.header) {
+                                    $0.font = .systemFont(ofSize: 28.0, weight: .bold)
+                                }
+                            )
+                        )
+                        
+                        $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
+                        
+                        $0.add(child: self.content)
                     }
                 }
             }
@@ -281,8 +279,8 @@ final class DebuggingPreviewViewController : UIViewController {
                     ConstrainedSize(
                         height: .atLeast(100.0),
                         wrapping: Centered(Box(wrapping: self.presenting) {
-                            $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.15), width: 1.0)
-                            $0.cornerStyle = .rounded(radius: 2.0)
+                            $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.25), width: 1.0)
+                            $0.cornerStyle = .rounded(radius: 4.0)
                         })
                     )
                 }
@@ -294,7 +292,7 @@ final class DebuggingPreviewViewController : UIViewController {
                 var elementRepresentation: Element {
                     let snapshot = FlattenedElementSnapshot(element: self.presenting, sizeConstraint: SizeConstraint(UIScreen.main.bounds.size))
                     
-                    return Centered(ThreeDElementVisualization(snapshot: snapshot))
+                    return ThreeDElementVisualization(snapshot: snapshot)
                 }
             }
             
@@ -361,26 +359,50 @@ final class DebuggingPreviewViewController : UIViewController {
                 }
             }
             
-            struct FloatingBox : ProxyElement {
+            struct FullWidthBox : ProxyElement {
                 var wrapping : Element
                 
                 var elementRepresentation: Element {
                     Box(
                         wrapping: Inset(
-                            uniformInset: 10.0,
+                            insets: UIEdgeInsets(top: 20.0, left: 0.0, bottom: 20.0, right: 0.0),
                             wrapping: self.wrapping
                             )
                         ) { box in
                             box.shadowStyle = .simple(
-                                radius: 4.0,
+                                radius: 2.0,
                                 opacity: 0.25,
                                 offset: CGSize(width: 0.0, height: 1.0),
                                 color: .black
                             )
-                    
-                            box.cornerStyle = .rounded(radius: 10.0)
                             box.backgroundColor = .white
                     }
+                }
+            }
+            
+            struct FloatingBox : ProxyElement {
+                var wrapping : Element
+                
+                var elementRepresentation: Element {
+                    Inset(
+                        sideInsets: Content.sideInset,
+                        wrapping: Box(
+                            wrapping: Inset(
+                                uniformInset: 10.0,
+                                wrapping: self.wrapping
+                                )
+                            ) { box in
+                                box.shadowStyle = .simple(
+                                    radius: 2.0,
+                                    opacity: 0.25,
+                                    offset: CGSize(width: 0.0, height: 1.0),
+                                    color: .black
+                                )
+                        
+                                box.cornerStyle = .rounded(radius: 15.0)
+                                box.backgroundColor = .white
+                        }
+                    )
                 }
             }
         }
@@ -416,9 +438,17 @@ fileprivate struct ThreeDElementVisualization : Element {
     var snapshot : FlattenedElementSnapshot
     
     var content: ElementContent {
-        ElementContent { _ in
-            // TODO...
-            return CGSize(width: self.snapshot.size.width, height: self.snapshot.size.height * 2)
+        ElementContent { constraint in
+            
+            let scaling = constraint.maximum.width / self.snapshot.size.width
+            
+            let scaledWidth = self.snapshot.size.width * scaling
+            let scaledHeight = self.snapshot.size.height * scaling
+            
+            return CGSize(
+                width: scaledWidth,
+                height: scaledHeight
+            )
         }
     }
     
@@ -431,31 +461,153 @@ fileprivate struct ThreeDElementVisualization : Element {
     }
     
     final class View : UIView {
-        let snapshot : FlattenedElementSnapshot
+        private let snapshot : FlattenedElementSnapshot
+        private let snapshotHost : HostView
         
-        init(snapshot : FlattenedElementSnapshot) {
-            self.snapshot = snapshot
+        private let rotation : UIPanGestureRecognizer
+        private let pan : UIPanGestureRecognizer
+        
+        private var transformState : TransformState = .standard
+        
+        struct TransformState : Equatable {
             
-            super.init(frame: CGRect(origin: .zero, size: self.snapshot.size))
+            // 1.0 == 180 degrees
+            var rotationX : CGFloat
+            // 1.0 == 180 degrees
+            var rotationY : CGFloat
+            var translation : CGPoint
             
-            for view in snapshot.flatHierarchySnapshot {
-                self.addSubview(view.view)
-                view.view.frame = view.frame
-                view.view.layer.zPosition = 10 * CGFloat(view.hierarchyDepth)
+            static var standard : TransformState {
+                TransformState(
+                    rotationX: 45 / CGFloat.pi / 180,
+                    rotationY: 0,
+                    translation: .zero
+                )
             }
             
-            var t = CATransform3DIdentity
-            // https://stackoverflow.com/questions/3881446/meaning-of-m34-of-catransform3d
-            t.m34 = -1.0 / 1000.0;
-            t = CATransform3DScale(t, 1.5, 1.5, 1.5);
-            t = CATransform3DTranslate(t, 0.0, 50, 0.0)
-            //t = CATransform3DRotate(t, CGFloat(45 * Double.pi / 180), 0.0, 1.0, 0.0);
-            t = CATransform3DRotate(t, CGFloat(45 * Double.pi / 180), 1.0, 0.0, 0.0);
+            func transform(scale : CGFloat? = nil) -> CATransform3D {
+                
+                var t = CATransform3DIdentity
+                
+                // https://stackoverflow.com/questions/3881446/meaning-of-m34-of-catransform3d
+                t.m34 = -1.0 / 1000.0
+                
+                if let scale = scale {
+                    t = CATransform3DScale(t, scale, scale, scale)
+                }
+                
+                t = CATransform3DTranslate(t, self.translation.x, self.translation.y, 0.0)
+                t = CATransform3DRotate(t, self.rotationX * CGFloat.pi, 1.0, 0.0, 0.0)
+                t = CATransform3DRotate(t, self.rotationY * CGFloat.pi, 0.0, 1.0, 0.0)
+                
+                return t
+            }
+        }
+        
+        init(snapshot : FlattenedElementSnapshot) {
+            
+            self.snapshot = snapshot
+            self.snapshotHost = HostView(snapshot: self.snapshot)
+            
+            self.rotation = UIPanGestureRecognizer()
+            self.rotation.maximumNumberOfTouches = 1;
 
-            self.layer.sublayerTransform = t
+            self.pan = UIPanGestureRecognizer()
+            self.pan.require(toFail: self.rotation)
+            
+            super.init(frame: CGRect(origin: .zero, size: self.snapshot.size))
+        
+            self.addSubview(self.snapshotHost)
+            
+            self.rotation.addTarget(self, action: #selector(handleRotation))
+            self.pan.addTarget(self, action: #selector(handlePan))
+            
+            self.addGestureRecognizer(self.rotation)
+            self.addGestureRecognizer(self.pan)
         }
         
         required init?(coder: NSCoder) { fatalError() }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            self.snapshotHost.frame.origin = CGPoint(
+                x: round((self.bounds.width - self.snapshotHost.frame.width) / 2.0),
+                y: round((self.bounds.height - self.snapshotHost.frame.height) / 2.0)
+            )
+            
+            self.updateSublayerTransform(animated: false)
+        }
+        
+        @objc private func handleRotation() {
+            
+            let dragFactor : CGFloat = 2.0
+            
+            self.transformState.rotationX -= (self.rotation.translation(in: self).y / self.bounds.size.width) / dragFactor
+            self.transformState.rotationY += (self.rotation.translation(in: self).x / self.bounds.size.width) / dragFactor
+            
+            self.rotation.setTranslation(.zero, in: self)
+            
+            self.updateSublayerTransform(animated: false)
+        }
+        
+        @objc private func handlePan() {
+            
+            let dragFactor : CGFloat = 2.0
+                        
+            self.transformState.translation.x += self.pan.translation(in: self).x / dragFactor
+            self.transformState.translation.y += self.pan.translation(in: self).y / dragFactor
+            
+            self.pan.setTranslation(.zero, in: self)
+            
+            self.updateSublayerTransform(animated: false)
+        }
+        
+        private func updateSublayerTransform(animated : Bool) {
+            // Apply once so that we have the updated frames to use when calculating visible positions.
+            self.snapshotHost.layer.sublayerTransform = self.transformState.transform()
+            // Now that the transform is applied, update the scale using the visible positions.
+            self.snapshotHost.layer.sublayerTransform = self.transformState.transform(scale: self.snapshotHost.scaleToShowAllSubviews(in: self))
+        }
+        
+        final class HostView : UIView {
+            private let snapshot : FlattenedElementSnapshot
+            
+            init(snapshot : FlattenedElementSnapshot) {
+                self.snapshot = snapshot
+                
+                super.init(frame: CGRect(origin: .zero, size: self.snapshot.size))
+                
+                for view in snapshot.flatHierarchySnapshot {
+                    self.addSubview(view.view)
+                    view.view.frame = view.frame
+                    view.view.layer.zPosition = 10 * CGFloat(view.hierarchyDepth)
+                }
+            }
+            
+            required init?(coder: NSCoder) { fatalError() }
+            
+            override func sizeThatFits(_ size: CGSize) -> CGSize {
+                self.snapshot.size
+            }
+            
+            func scaleToShowAllSubviews(in parent : UIView) -> CGFloat {
+            
+                var union : CGRect = .zero
+                
+                self.recurse { view in
+                    let rect = view.convert(view.bounds, to: parent)
+                    union = union.union(rect)
+                }
+                
+                let widthScale = union.width / parent.bounds.width
+                let heightScale = union.height / parent.bounds.height
+                
+                let maxScale = max(widthScale, heightScale)
+                
+                return 1.0 / maxScale
+            }
+        }
     }
 }
 
@@ -490,6 +642,14 @@ fileprivate struct FlattenedElementSnapshot {
 }
 
 fileprivate extension UIView {
+    func recurse(with block : (UIView) -> ()) {
+        block(self)
+        
+        for view in self.subviews {
+            view.recurse(with: block)
+        }
+    }
+    
     func buildFlatHierarchySnapshot(in list : inout [FlattenedElementSnapshot.ViewSnapshot], rootView : UIView, depth : Int) {
         
         if let self = self as? Debugging.DebuggingWrapper {

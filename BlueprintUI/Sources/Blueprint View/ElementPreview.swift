@@ -75,6 +75,8 @@ public struct ElementPreview : View {
     
     private let name : String
     
+    private let debugging : Debugging
+    
     /// The types of previews to include in the Xcode preview.
     private let previewTypes : [PreviewType]
     
@@ -86,6 +88,7 @@ public struct ElementPreview : View {
     /// Creates a new `ElementPreview` with several common devices that your users may use.
     public static func commonDevices(
         named name : String = "",
+        debugging : Debugging = Debugging(),
         with provider : @escaping ElementProvider
     ) -> Self {
         return Self(
@@ -110,11 +113,13 @@ public struct ElementPreview : View {
     public init(
         named name : String = "",
         with previewType : PreviewType = .thatFits(),
+        debugging : Debugging = Debugging(),
         with provider : @escaping ElementProvider
     ) {
         self.init(
             named: name,
             with: [previewType],
+            debugging: debugging,
             with: provider
         )
     }
@@ -128,10 +133,12 @@ public struct ElementPreview : View {
     public init(
         named name : String = "",
         with previewTypes : [PreviewType],
+        debugging : Debugging = Debugging(),
         with provider : @escaping ElementProvider
     ) {
         self.name = name
         self.previewTypes = previewTypes
+        self.debugging = debugging
         self.provider = provider
     }
     
@@ -141,6 +148,7 @@ public struct ElementPreview : View {
         ForEach(self.previewTypes, id: \.identifier) { previewType in
             previewType.preview(
                 with: self.name,
+                debugging: self.debugging,
                 for: self.provider()
             )
         }
@@ -153,14 +161,19 @@ extension ElementPreview {
     
     fileprivate struct ElementView : UIViewRepresentable {
         
+        var debugging : Debugging
         var element : Element
         
         func makeUIView(context: Context) -> BlueprintView {
-            return BlueprintView(element: self.element)
+            let view = BlueprintView()
+            view.element = self.element
+            view.debugging = self.debugging
+            
+            return view
         }
         
         func updateUIView(_ view: BlueprintView, context: Context) {
-            view.debugging.showElementFrames = .all
+            view.debugging = self.debugging
             view.element = self.element
         }
     }
@@ -192,6 +205,7 @@ extension ElementPreview {
         
         fileprivate func preview(
             with name : String,
+            debugging : Debugging,
             for element : Element
         ) -> AnyView {
             
@@ -206,21 +220,21 @@ extension ElementPreview {
             switch self {
             case .device(let device):
                 return AnyView(
-                    self.constrained(element: element)
+                    self.constrained(debugging: debugging, element: element)
                         .previewDevice(.init(rawValue: device.rawValue))
                         .previewDisplayName(device.rawValue + formattedName)
                 )
                 
             case .fixed(let width, let height):
                 return AnyView(
-                    self.constrained(element: element)
+                    self.constrained(debugging: debugging, element: element)
                         .previewLayout(.fixed(width: width, height: height))
                         .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
                 )
                 
             case .thatFits(let padding):
                 return AnyView(
-                    self.constrained(element: element)
+                    self.constrained(debugging: debugging, element: element)
                         .previewLayout(.sizeThatFits)
                         .previewDisplayName("Size That Fits" + formattedName)
                         .padding(.all, padding)
@@ -228,9 +242,13 @@ extension ElementPreview {
             }
         }
         
-        private func constrained(element : Element) -> some View {
+        private func constrained(
+            debugging : Debugging,
+            element : Element
+        ) -> some View {
             GeometryReader { info in
                 ElementView(
+                    debugging: debugging,
                     element: ConstrainedSize(
                         width: .atMost(info.size.width),
                         height: .atMost(info.size.height),
