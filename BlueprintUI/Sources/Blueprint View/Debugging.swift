@@ -526,9 +526,7 @@ fileprivate struct ThreeDElementVisualization : Element {
     
     var content: ElementContent {
         ElementContent { constraint in
-            
-            assert(constraint.maximum.width != .greatestFiniteMagnitude)
-            
+                        
             let scaling = constraint.maximum.width / (self.snapshot.size.width > 0.0 ? self.snapshot.size.width : 1.0)
             
             let scaledWidth = self.snapshot.size.width * scaling
@@ -536,7 +534,7 @@ fileprivate struct ThreeDElementVisualization : Element {
             
             return CGSize(
                 width: scaledWidth,
-                height: scaledHeight
+                height: max(scaledWidth, scaledHeight)
             )
         }
     }

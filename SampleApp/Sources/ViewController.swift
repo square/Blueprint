@@ -15,16 +15,18 @@ let posts = [
     Post(
         authorName: "Tim",
         timeAgo: "1 hour ago",
-        body: "Lorem Ipsum"),
+        body: "Lorem Ipsum"
+    ),
     Post(
         authorName: "Jane",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    ),
     Post(
         authorName: "John",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"),
-    
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
+    ),
 ]
 
 
