@@ -12,6 +12,8 @@ public struct Debugging : Equatable {
     
     public var showElementFrames : ShowElementFrames
     
+    public var isIn3DPreview : Bool = false
+    
     public enum ShowElementFrames : Equatable {
         case none
         case all
@@ -34,11 +36,11 @@ public struct Debugging : Equatable {
 }
 
 extension Debugging {
-    static func viewDescriptionWrapping(other : ViewDescription?, for element : Element, bounds : CGRect) -> ViewDescription {
+    func viewDescriptionWrapping(other : ViewDescription?, for element : Element, bounds : CGRect) -> ViewDescription {
         
         ViewDescription(DebuggingWrapper.self) {
             $0.builder = {
-                DebuggingWrapper(frame: bounds, containing: other, for: element)
+                DebuggingWrapper(frame: bounds, containing: other, for: element, debugging: self)
             }
             
             $0.contentView = {
@@ -60,8 +62,9 @@ extension Debugging {
     }
     
     final class DebuggingWrapper : UIView {
-        
+       
         let elementInfo : ElementInfo
+        let debugging : Debugging
         
         struct ElementInfo {
             var element : Element
@@ -69,7 +72,9 @@ extension Debugging {
         }
         
         let containedView : UIView?
+        private let infoView : InfoView
         
+        /// TODO: Rename me!
         let longPress : UITapGestureRecognizer
         
         var isSelected : Bool = false{
@@ -85,24 +90,38 @@ extension Debugging {
         private func updateIsSelected() {
             
             if self.isSelected {
-                self.layer.borderWidth = 2.0
-                self.layer.cornerRadius = 2.0
+                self.layer.borderWidth = debugging.isIn3DPreview ? 3.0 : 2.0
+                self.layer.cornerRadius = 3.0
                 
                 self.layer.borderColor = UIColor.systemBlue.cgColor
             } else {
-                self.layer.borderWidth = 1.0
-                self.layer.cornerRadius = 2.0
+                self.layer.borderWidth = debugging.isIn3DPreview ? 2.0 : 1.0
+                self.layer.cornerRadius = 3.0
                 
                 if self.elementInfo.isViewBacked {
-                    self.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.4).cgColor
-                    self.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.10)
+                    self.layer.borderColor = UIColor.systemBlue.withAlphaComponent(debugging.isIn3DPreview ? 0.6 : 0.4).cgColor
+                    self.backgroundColor = UIColor.systemBlue.withAlphaComponent(debugging.isIn3DPreview ? 0.2 : 0.10)
                 } else {
-                    self.layer.borderColor = UIColor.black.withAlphaComponent(0.20).cgColor
+                    self.layer.borderColor = UIColor.black.withAlphaComponent(debugging.isIn3DPreview ? 0.3 : 0.20).cgColor
                 }
+            }
+            
+            if debugging.isIn3DPreview {
+                self.layer.shadowColor = UIColor(white: 0.6, alpha: 1.0).cgColor
+                self.layer.shadowOpacity = 1.0
+                self.layer.shadowRadius = 3.0
+                self.layer.shadowOffset = CGSize(width: 0.0, height: 16.0)
+                self.layer.shadowPath = UIBezierPath(ovalIn: CGRect(x: 0.0, y: self.bounds.height, width: self.bounds.width, height: 4.0)).cgPath
+            } else {
+                self.layer.shadowColor = UIColor(white: 0.85, alpha: 1.0).cgColor
+                self.layer.shadowOpacity = 1.0
+                self.layer.shadowRadius = 2.0
+                self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+                self.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: self.bounds.height, width: self.bounds.width, height: 1.0)).cgPath
             }
         }
         
-        init(frame: CGRect, containing : ViewDescription?, for element : Element) {
+        init(frame: CGRect, containing : ViewDescription?, for element : Element, debugging : Debugging) {
             
             if let containing = containing {
                 let view = containing.build()
@@ -118,10 +137,18 @@ extension Debugging {
                 isViewBacked: element.backingViewDescription(bounds: frame, subtreeExtent: nil) != nil
             )
             
+            self.infoView = InfoView(elementInfo: self.elementInfo)
+            
+            self.debugging = debugging
+            
             self.longPress = UITapGestureRecognizer()
             
             super.init(frame: frame)
 
+            if debugging.isIn3DPreview {
+                self.addSubview(self.infoView)
+            }
+            
             if let view = self.containedView {
                 self.addSubview(view)
             }
@@ -136,6 +163,8 @@ extension Debugging {
             super.layoutSubviews()
             
             self.containedView?.frame = self.bounds
+                        
+            self.infoView.frame = CGRect(x: 0.0, y: self.bounds.height + 2.0, width: self.bounds.width, height: 14.0)
         }
         
         required init?(coder: NSCoder) { fatalError() }
@@ -160,6 +189,60 @@ extension Debugging {
                 } else {
                     oldValue?.isSelected = false
                     self.selectedWrapper?.isSelected = true
+                }
+            }
+        }
+        
+        private final class InfoView : UIView {
+            let elementInfo : ElementInfo
+            
+            private let content : BlueprintView
+            
+            init(elementInfo : ElementInfo) {
+                self.elementInfo = elementInfo
+                
+                self.content = BlueprintView()
+                self.content.isOpaque = false
+                self.content.backgroundColor = .clear
+                self.content.acceptsDebugMode = false
+                
+                super.init(frame: .zero)
+                
+                self.content.element = self.element
+                
+                self.addSubview(self.content)
+            }
+            
+            required init?(coder: NSCoder) { fatalError() }
+            
+            override func layoutSubviews() {
+                super.layoutSubviews()
+                
+                self.content.frame = self.bounds
+            }
+            
+            private var element : Element {
+                Box(
+                    wrapping: Inset(
+                        uniformInset: 3.0,
+                        wrapping: Label(text: String(describing: type(of: self.elementInfo.element))) {
+                            $0.font = .systemFont(ofSize: 8.0, weight: .semibold)
+                            $0.color = UIColor.white
+                            $0.lineBreakMode = .byTruncatingMiddle
+                            //$0.adjustsFontSizeToFitWidth = true
+                            //$0.minimumScaleFactor = 0.4
+                        }
+                    )
+                ) {
+                    if self.elementInfo.isViewBacked {
+                        $0.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.6)
+                        $0.borderStyle = .solid(color: UIColor.systemBlue, width: 1.0)
+                    } else {
+                        $0.backgroundColor = UIColor.lightGray.withAlphaComponent(0.8)
+                        $0.borderStyle = .solid(color: UIColor.darkGray.withAlphaComponent(0.8), width: 1.0)
+                    }
+                    
+                    $0.cornerStyle = .rounded(radius: 4.0)
                 }
             }
         }
@@ -203,17 +286,19 @@ final class DebuggingPreviewViewController : UIViewController {
         self.view = self.blueprintView
         //self.blueprintView.debugging.showElementFrames = .viewBacked
         
-        self.blueprintView.element = PreviewElement(presenting: self.element)
+        self.blueprintView.element = PreviewElement(presenting: self.element, presentOn: self)
         self.blueprintView.layoutIfNeeded()
     }
     
     struct PreviewElement : ProxyElement {
         var presenting : Element
         
+        weak var presentOn : UIViewController?
+        
         var elementRepresentation: Element {
             Box(
                 backgroundColor: UIColor(white: 0.90, alpha: 1.0),
-                wrapping: ScrollView(wrapping: Content(presenting: self.presenting)) {
+                wrapping: ScrollView(wrapping: Content(presenting: self.presenting, presentOn: self.presentOn)) {
                     $0.contentSize = .fittingHeight
                     $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
                 }
@@ -222,27 +307,42 @@ final class DebuggingPreviewViewController : UIViewController {
         
         struct Content : ProxyElement {
             var presenting : Element
+            weak var presentOn : UIViewController?
             
             static var sideInset : CGFloat = 10.0
             
             var elementRepresentation: Element {
                 Column {
                     $0.horizontalAlignment = .fill
-                    $0.minimumVerticalSpacing = 10.0
+                    $0.minimumVerticalSpacing = 20.0
                     
                     $0.add(child: Section(
                         header: "Preview",
-                        content: FloatingBox(wrapping: Preview(presenting: self.presenting))
+                        content: ContentBox(
+                            sideInsets: true,
+                            wrapping: Preview(presenting: self.presenting)
+                        )
                     ))
                     
                     $0.add(child: Section(
                         header: "Layers",
-                        content: FullWidthBox(wrapping: ThreeDVisualization(presenting: self.presenting))
+                        content: ContentBox(
+                            sideInsets: false,
+                            wrapping: ThreeDVisualization(presenting: self.presenting)
+                        )
                     ))
                     
                     $0.add(child: Section(
                         header: "Hierarchy",
-                        content: FloatingBox(wrapping: ElementInfo(presenting: self.presenting))
+                        content: ContentBox(
+                            sideInsets: true,
+                            wrapping: ElementInfo(presenting: self.presenting, onTap: { element in
+                                self.presentOn?.present(
+                                    UINavigationController(rootViewController: DebuggingPreviewViewController(element: element)),
+                                    animated: true
+                                )
+                            })
+                        )
                     ))
                 }
             }
@@ -290,7 +390,10 @@ final class DebuggingPreviewViewController : UIViewController {
                 var presenting : Element
                 
                 var elementRepresentation: Element {
-                    let snapshot = FlattenedElementSnapshot(element: self.presenting, sizeConstraint: SizeConstraint(UIScreen.main.bounds.size))
+                    let snapshot = FlattenedElementSnapshot(
+                        element: self.presenting,
+                        sizeConstraint: SizeConstraint(UIScreen.main.bounds.size)
+                    )
                     
                     return ThreeDElementVisualization(snapshot: snapshot)
                 }
@@ -298,6 +401,7 @@ final class DebuggingPreviewViewController : UIViewController {
             
             struct ElementInfo : ProxyElement {
                 var presenting : Element
+                var onTap : (Element) -> ()
                 
                 var elementRepresentation: Element {
                     Column {
@@ -307,13 +411,14 @@ final class DebuggingPreviewViewController : UIViewController {
                         let list = self.presenting.recursiveElementList()
                         
                         for element in list {
-                            $0.add(child: ElementRow(element: element))
+                            $0.add(child: ElementRow(element: element, onTap: self.onTap))
                         }
                     }
                 }
                 
                 struct ElementRow : ProxyElement {
                     fileprivate var element : RecursedElement
+                    var onTap : (Element) -> ()
 
                     var elementRepresentation: Element {
                         Row {
@@ -348,7 +453,12 @@ final class DebuggingPreviewViewController : UIViewController {
                                 
                                 $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
                                 
-                                $0.add(child: Box(backgroundColor: .white, wrapping: element.element))
+                                $0.add(
+                                    child: Tappable(
+                                        onTap: { self.onTap(self.element.element) },
+                                        wrapping: Box(backgroundColor: .white, wrapping: element.element)
+                                    )
+                                )
                             }
                             
                             $0.add(
@@ -359,13 +469,16 @@ final class DebuggingPreviewViewController : UIViewController {
                 }
             }
             
-            struct FullWidthBox : ProxyElement {
+            struct ContentBox : ProxyElement {
+                var sideInsets : Bool
                 var wrapping : Element
                 
                 var elementRepresentation: Element {
-                    Box(
+                    let inset = self.sideInsets ? Content.sideInset : 0.0
+                    
+                    return Box(
                         wrapping: Inset(
-                            insets: UIEdgeInsets(top: 20.0, left: 0.0, bottom: 20.0, right: 0.0),
+                            insets: UIEdgeInsets(top: 20.0, left: inset, bottom: 20.0, right: inset),
                             wrapping: self.wrapping
                             )
                         ) { box in
@@ -377,32 +490,6 @@ final class DebuggingPreviewViewController : UIViewController {
                             )
                             box.backgroundColor = .white
                     }
-                }
-            }
-            
-            struct FloatingBox : ProxyElement {
-                var wrapping : Element
-                
-                var elementRepresentation: Element {
-                    Inset(
-                        sideInsets: Content.sideInset,
-                        wrapping: Box(
-                            wrapping: Inset(
-                                uniformInset: 10.0,
-                                wrapping: self.wrapping
-                                )
-                            ) { box in
-                                box.shadowStyle = .simple(
-                                    radius: 2.0,
-                                    opacity: 0.25,
-                                    offset: CGSize(width: 0.0, height: 1.0),
-                                    color: .black
-                                )
-                        
-                                box.cornerStyle = .rounded(radius: 15.0)
-                                box.backgroundColor = .white
-                        }
-                    )
                 }
             }
         }
@@ -440,7 +527,9 @@ fileprivate struct ThreeDElementVisualization : Element {
     var content: ElementContent {
         ElementContent { constraint in
             
-            let scaling = constraint.maximum.width / self.snapshot.size.width
+            assert(constraint.maximum.width != .greatestFiniteMagnitude)
+            
+            let scaling = constraint.maximum.width / (self.snapshot.size.width > 0.0 ? self.snapshot.size.width : 1.0)
             
             let scaledWidth = self.snapshot.size.width * scaling
             let scaledHeight = self.snapshot.size.height * scaling
@@ -581,7 +670,7 @@ fileprivate struct ThreeDElementVisualization : Element {
                 for view in snapshot.flatHierarchySnapshot {
                     self.addSubview(view.view)
                     view.view.frame = view.frame
-                    view.view.layer.zPosition = 10 * CGFloat(view.hierarchyDepth)
+                    view.view.layer.zPosition = 20 * CGFloat(view.hierarchyDepth)
                 }
             }
             
@@ -623,6 +712,8 @@ fileprivate struct FlattenedElementSnapshot {
         
         let view = BlueprintView(frame: CGRect(origin: .zero, size: self.size))
         view.debugging.showElementFrames = .all
+        view.debugging.isIn3DPreview = true
+        
         view.element = self.element
         view.layoutIfNeeded()
         

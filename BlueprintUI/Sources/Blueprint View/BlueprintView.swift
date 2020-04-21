@@ -55,6 +55,8 @@ public final class BlueprintView: UIView {
             self.setNeedsViewHierarchyUpdate()
         }
     }
+    
+    internal var acceptsDebugMode : Bool = true
 
     /// Instantiates a view with the given element
     ///
@@ -196,7 +198,7 @@ fileprivate extension UIView {
     func propagateDebuggingStateToNestedBlueprintViews(with debugging : Debugging) {
         
         for view in self.subviews {
-            if let view = view as? BlueprintView {
+            if let view = view as? BlueprintView, view.acceptsDebugMode {
                 view.debugging = debugging
             }
             
