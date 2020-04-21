@@ -41,13 +41,7 @@ final class ViewController: UIViewController {
                 style: .plain,
                 target: self,
                 action: #selector(toggleDebugging)
-            ),
-            UIBarButtonItem(
-                title: "Unravel",
-                style: .plain,
-                target: self,
-                action: #selector(showUnravel)
-            ),
+            )
         ]
     }
     

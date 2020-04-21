@@ -113,7 +113,7 @@ extension Debugging {
                 self.layer.shadowOffset = CGSize(width: 0.0, height: 16.0)
                 self.layer.shadowPath = UIBezierPath(ovalIn: CGRect(x: 0.0, y: self.bounds.height, width: self.bounds.width, height: 4.0)).cgPath
             } else {
-                self.layer.shadowColor = UIColor(white: 0.85, alpha: 1.0).cgColor
+                self.layer.shadowColor = UIColor(white: 0.75, alpha: 1.0).cgColor
                 self.layer.shadowOpacity = 1.0
                 self.layer.shadowRadius = 2.0
                 self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)

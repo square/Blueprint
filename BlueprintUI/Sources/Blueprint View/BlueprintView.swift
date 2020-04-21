@@ -191,7 +191,6 @@ public final class BlueprintView: UIView {
     @objc private func globalDebuggingSettingsChanged() {
         self.setNeedsViewHierarchyUpdate()
     }
-    
 }
 
 fileprivate extension UIView {
