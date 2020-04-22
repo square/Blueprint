@@ -112,7 +112,6 @@ extension LayoutResultNode {
                 return (path, transformedNode)
             }
         }
-
     }
     
     func viewDescriptionForDisplay(subtreeExtent : CGRect?, debugging : Debugging) -> ViewDescription? {
@@ -137,5 +136,4 @@ extension LayoutResultNode {
             }
         }
     }
-    
 }

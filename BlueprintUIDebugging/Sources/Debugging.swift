@@ -145,7 +145,8 @@ extension Debugging {
             
             self.containedView?.frame = self.bounds
                         
-            self.infoView.frame = CGRect(x: 0.0, y: self.bounds.height + 2.0, width: self.bounds.width, height: 14.0)
+            let size = self.infoView.sizeThatFits(self.bounds.size)
+            self.infoView.frame = CGRect(x: 0.0, y: self.bounds.height + 2.0, width: size.width, height: size.height)
         }
         
         required init?(coder: NSCoder) { fatalError() }
@@ -200,6 +201,10 @@ extension Debugging {
                 super.layoutSubviews()
                 
                 self.content.frame = self.bounds
+            }
+            
+            override func sizeThatFits(_ size: CGSize) -> CGSize {
+                return self.content.sizeThatFits(size)
             }
             
             private var element : Element {
