@@ -1,8 +1,5 @@
-
-import UIKit
-
 import BlueprintUI
-
+import UIKit
 
 public struct AttributedLabel: Element {
 
