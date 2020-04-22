@@ -112,6 +112,11 @@ public final class BlueprintView: UIView {
         invalidateIntrinsicContentSize()
         performUpdate()
     }
+
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        setNeedsViewHierarchyUpdate()
+    }
     
     private func performUpdate() {
         updateViewHierarchyIfNeeded()
