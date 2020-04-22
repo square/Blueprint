@@ -26,7 +26,7 @@ import UIKit
 /// }
 /// ```
 public final class BlueprintView: UIView {
-
+    
     private var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
@@ -44,6 +44,8 @@ public final class BlueprintView: UIView {
         }
     }
     
+    public fileprivate(set) static var isDebuggingAvailable : Bool = false
+    
     public static var globalDebugging : Debugging = Debugging() {
         didSet {
             NotificationCenter.default.post(name: .BlueprintGlobalDebuggingSettingsChanged, object: nil)
@@ -56,7 +58,7 @@ public final class BlueprintView: UIView {
         }
     }
     
-    internal var acceptsDebugMode : Bool = true
+    public var acceptsDebugMode : Bool = true
 
     /// Instantiates a view with the given element
     ///
@@ -79,6 +81,10 @@ public final class BlueprintView: UIView {
         
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
+        
+        // Debugging Setup
+        
+        BlueprintView.attemptToConfigureDebuggingIfNeeded()
         
         NotificationCenter.default.addObserver(
             self,
@@ -193,6 +199,7 @@ public final class BlueprintView: UIView {
     }
 }
 
+
 fileprivate extension UIView {
     func propagateDebuggingStateToNestedBlueprintViews(with debugging : Debugging) {
         
@@ -205,6 +212,28 @@ fileprivate extension UIView {
         }
     }
 }
+
+
+fileprivate extension BlueprintView {
+    static var hasAttemptedToConfigureDebugging : Bool = false
+    
+    static func attemptToConfigureDebuggingIfNeeded() {
+        guard BlueprintView.hasAttemptedToConfigureDebugging == false else {
+            return
+        }
+        
+        BlueprintView.hasAttemptedToConfigureDebugging = true
+        
+        guard let debugging = NSClassFromString("BlueprintUIDebugging.DebuggingSetup") as? DebuggingSetup.Type else {
+            return
+        }
+        
+        debugging.setup()
+        
+        BlueprintView.isDebuggingAvailable = true
+    }
+}
+
 
 extension BlueprintView {
     

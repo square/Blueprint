@@ -22,13 +22,13 @@ public struct ElementContent: Measurable {
     public var childCount: Int {
         return storage.childCount
     }
+    
+    public var childElements : [Element] {
+        return self.storage.childElements
+    }
 
     func performLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         return storage.performLayout(attributes: attributes)
-    }
-    
-    internal var childElements : [Element] {
-        return self.storage.childElements
     }
 }
 

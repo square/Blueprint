@@ -3,27 +3,29 @@ PODS:
   - BlueprintUI/Tests (0.9.1)
   - BlueprintUICommonControls (0.9.1):
     - BlueprintUI
-  - Unravel (1.0.0.LOCAL)
+  - BlueprintUIDebugging (0.9.1):
+    - BlueprintUI
+    - BlueprintUICommonControls
 
 DEPENDENCIES:
   - BlueprintUI (from `../BlueprintUI.podspec`)
   - BlueprintUI/Tests (from `../BlueprintUI.podspec`)
   - BlueprintUICommonControls (from `../BlueprintUICommonControls.podspec`)
-  - Unravel (from `~/Desktop/Development/Register1/Frameworks/Unravel/Unravel.podspec`)
+  - BlueprintUIDebugging (from `../BlueprintUIDebugging.podspec`)
 
 EXTERNAL SOURCES:
   BlueprintUI:
     :path: "../BlueprintUI.podspec"
   BlueprintUICommonControls:
     :path: "../BlueprintUICommonControls.podspec"
-  Unravel:
-    :path: "~/Desktop/Development/Register1/Frameworks/Unravel/Unravel.podspec"
+  BlueprintUIDebugging:
+    :path: "../BlueprintUIDebugging.podspec"
 
 SPEC CHECKSUMS:
   BlueprintUI: cc417ee4e1cedf08b9cccfdcbb5fefc0592a1f48
   BlueprintUICommonControls: 383faf9c2b7292529137e390795b5a1ad8c8f506
-  Unravel: 9ecf4c51ea402d004f36635efdc44f3a55ad0911
+  BlueprintUIDebugging: 81672bb2a4454bb6b3d326ec59aacd96ad4f7ee9
 
-PODFILE CHECKSUM: 9a524f748f5c68f19fc96271a36a16e0e7748345
+PODFILE CHECKSUM: ae9dd7b5b0405270ee0159a604bb0649804e0368
 
 COCOAPODS: 1.9.1

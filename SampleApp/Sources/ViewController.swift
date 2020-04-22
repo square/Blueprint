@@ -2,8 +2,6 @@ import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
 
-import Unravel
-
 
 struct Post {
     var authorName: String
@@ -59,10 +57,6 @@ final class ViewController: UIViewController {
         } else {
             self.blueprintView.debugging.showElementFrames = .none
         }
-    }
-    
-    @objc func showUnravel() {
-        self.present(UNRViewController(rootView: self.view), animated: true)
     }
 }
 

@@ -1,6 +1,8 @@
 
 import UIKit
 
+import BlueprintUI
+
 
 /// Wraps a content element and makes it scrollable.
 public struct ScrollView: Element {

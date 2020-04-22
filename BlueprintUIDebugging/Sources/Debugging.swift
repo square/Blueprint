@@ -7,60 +7,41 @@
 
 import Foundation
 
+import BlueprintUI
+import BlueprintUICommonControls
 
-public struct Debugging : Equatable {
-    
-    public var showElementFrames : ShowElementFrames
-    
-    public var isIn3DPreview : Bool = false
-    
-    public enum ShowElementFrames : Equatable {
-        case none
-        case all
-        case viewBacked
-    }
-    
-    public var longPressForDebugger : Bool
-    public var exploreElementHistory : Bool
-    
-    public init(
-        showElementFrames : ShowElementFrames = .none,
-        longPressForDebugger : Bool = false,
-        exploreElementHistory : Bool = false
-    )
-    {
-        self.showElementFrames = showElementFrames
-        self.longPressForDebugger = longPressForDebugger
-        self.exploreElementHistory = exploreElementHistory
-    }
-}
 
-extension Debugging {
-    func viewDescriptionWrapping(other : ViewDescription?, for element : Element, bounds : CGRect) -> ViewDescription {
-        
-        ViewDescription(DebuggingWrapper.self) {
-            $0.builder = {
-                DebuggingWrapper(frame: bounds, containing: other, for: element, debugging: self)
-            }
-            
-            $0.contentView = {
-                if let other = other, let contained = $0.containedView {
-                    return other.contentView(in: contained)
-                } else {
-                    return $0
+public final class DebuggingSetup : NSObject, BlueprintUI.DebuggingSetup {
+    
+    @objc public static func setup() {
+        DebuggingSupport.viewDescriptionProvider = { other, element, bounds, debugging in
+            ViewDescription(Debugging.DebuggingWrapper.self) {
+                $0.builder = {
+                    Debugging.DebuggingWrapper(frame: bounds, containing: other, for: element, debugging: debugging)
                 }
-            }
-            
-            $0.apply {
-                guard let other = other, let view = $0.containedView else {
-                    return
+                
+                $0.contentView = {
+                    if let other = other, let contained = $0.containedView {
+                        return other.contentView(in: contained)
+                    } else {
+                        return $0
+                    }
                 }
+                
+                $0.apply {
+                    guard let other = other, let view = $0.containedView else {
+                        return
+                    }
 
-                other.apply(to: view)
+                    other.apply(to: view)
+                }
             }
         }
     }
-    
+}
+
+
+extension Debugging {
     final class DebuggingWrapper : UIView {
        
         let elementInfo : ElementInfo
@@ -768,9 +749,4 @@ fileprivate extension UIView {
             self.layer.render(in: $0.cgContext)
         }
     }
-}
-
-
-extension Notification.Name {
-    static var BlueprintGlobalDebuggingSettingsChanged = Notification.Name("BlueprintGlobalDebuggingSettingsChanged")
 }

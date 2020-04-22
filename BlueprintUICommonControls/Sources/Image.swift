@@ -1,6 +1,8 @@
 
 import UIKit
 
+import BlueprintUI
+
 
 /// Displays an image within an element hierarchy.
 public struct Image: Element {

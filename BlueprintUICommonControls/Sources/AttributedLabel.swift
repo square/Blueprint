@@ -1,6 +1,9 @@
 
 import UIKit
 
+import BlueprintUI
+
+
 public struct AttributedLabel: Element {
 
     public var attributedText: NSAttributedString

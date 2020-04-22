@@ -1,5 +1,7 @@
 import UIKit
 
+import BlueprintUI
+
 
 /// A simple element that wraps a child element and adds visual styling including
 /// background color.

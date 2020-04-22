@@ -7,6 +7,8 @@ use_frameworks!(:linkage => :static)
 def blueprint_pods
   pod 'BlueprintUI', :path => '../BlueprintUI.podspec', :testspecs => ['Tests'] 
   pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec'
+  
+  pod 'BlueprintUIDebugging', :path => '../BlueprintUIDebugging.podspec' #, :testspecs => ['Tests'] # once there's tests
 end
 
 target 'SampleApp' do

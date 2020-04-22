@@ -127,19 +127,11 @@ extension LayoutResultNode {
             return original
             
         case .all:
-            return debugging.viewDescriptionWrapping(
-                other: original,
-                for: self.element,
-                bounds: self.layoutAttributes.bounds
-            )
+            return DebuggingSupport.viewDescriptionProvider(original, self.element, self.layoutAttributes.bounds, debugging)
             
         case .viewBacked:
             if original != nil {
-                return debugging.viewDescriptionWrapping(
-                    other: original,
-                    for: self.element,
-                    bounds: self.layoutAttributes.bounds
-                )
+                return DebuggingSupport.viewDescriptionProvider(original, self.element, self.layoutAttributes.bounds, debugging)
             } else {
                 return nil
             }
