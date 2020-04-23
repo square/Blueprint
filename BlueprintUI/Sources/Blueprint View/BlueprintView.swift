@@ -92,6 +92,14 @@ public final class BlueprintView: UIView {
             name: .BlueprintGlobalDebuggingSettingsChanged,
             object: nil
         )
+        
+        let toggleDebugGesture = UILongPressGestureRecognizer(target: self, action: #selector(toggleDebugMode))
+        
+        self.addGestureRecognizer(toggleDebugGesture)
+    }
+    
+    @objc func toggleDebugMode() {
+        self.debugging.showElementFrames = .all 
     }
 
     public override convenience init(frame: CGRect) {

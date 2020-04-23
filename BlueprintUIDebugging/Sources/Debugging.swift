@@ -58,7 +58,7 @@ extension Debugging {
         /// TODO: Rename me!
         let longPress : UITapGestureRecognizer
         
-        var isSelected : Bool = false{
+        var isSelected : Bool = false {
             didSet {
                 guard oldValue != self.isSelected else {
                     return
@@ -93,12 +93,6 @@ extension Debugging {
                 self.layer.shadowRadius = 3.0
                 self.layer.shadowOffset = CGSize(width: 0.0, height: 16.0)
                 self.layer.shadowPath = UIBezierPath(ovalIn: CGRect(x: 0.0, y: self.bounds.height, width: self.bounds.width, height: 4.0)).cgPath
-            } else {
-                self.layer.shadowColor = UIColor(white: 0.75, alpha: 1.0).cgColor
-                self.layer.shadowOpacity = 1.0
-                self.layer.shadowRadius = 2.0
-                self.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-                self.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: self.bounds.height, width: self.bounds.width, height: 1.0)).cgPath
             }
         }
         
@@ -157,17 +151,43 @@ extension Debugging {
                 return
             }
             
+            let point = self.longPress.location(in: self)
+            
+            let subviews = self.views(at: point) {
+                $0 is BlueprintView
+            }
+            
+            let filtered : [DebuggingWrapper] = subviews.compactMap { view in
+                if let view = view as? DebuggingWrapper {
+                    return view
+                } else {
+                    return nil
+                }
+            }
+            
+            let column = Column { col in
+                for view in filtered {
+                    col.add(child: view.elementInfo.element)
+                }
+            }
+            
+            let nav = UINavigationController(rootViewController: ElementInfoViewController(element: column))
+            
+            let host = self.window?.rootViewController?.viewControllerToPresentOn
+            
+            host?.present(nav, animated: true)
+            
             Self.selectedWrapper = self
         }
         
         private static weak var selectedWrapper : DebuggingWrapper? = nil {
             didSet {
                 if let wrapper = self.selectedWrapper, self.selectedWrapper === oldValue {
-                    let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.elementInfo.element))
-                    
-                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
-                    
-                    host?.present(nav, animated: true)
+//                    let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.elementInfo.element))
+//
+//                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
+//
+//                    host?.present(nav, animated: true)
                 } else {
                     oldValue?.isSelected = false
                     self.selectedWrapper?.isSelected = true
@@ -210,9 +230,9 @@ extension Debugging {
             private var element : Element {
                 Box(
                     wrapping: Inset(
-                        uniformInset: 3.0,
+                        uniformInset: 2.0,
                         wrapping: Label(text: String(describing: type(of: self.elementInfo.element))) {
-                            $0.font = .systemFont(ofSize: 8.0, weight: .semibold)
+                            $0.font = .systemFont(ofSize: 7.0, weight: .semibold)
                             $0.color = UIColor.white
                             $0.lineBreakMode = .byTruncatingMiddle
                             //$0.adjustsFontSizeToFitWidth = true
@@ -228,7 +248,7 @@ extension Debugging {
                         $0.borderStyle = .solid(color: UIColor.darkGray.withAlphaComponent(0.8), width: 1.0)
                     }
                     
-                    $0.cornerStyle = .rounded(radius: 4.0)
+                    $0.cornerStyle = .rounded(radius: 3.0)
                 }
             }
         }
@@ -253,14 +273,138 @@ fileprivate extension UIViewController {
 }
 
 
-final class DebuggingPreviewViewController : UIViewController {
+final class ChooseElementViewController : UIViewController {
+    
+    let elements : [Element]
+        
+    let blueprintView = BlueprintView()
+    
+    init(elements : [Element]) {
+        self.elements = elements
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        self.title = "Choose Element"
+    }
+    
+    required init?(coder: NSCoder) { fatalError() }
+    
+    override func loadView() {
+        self.view = self.blueprintView
+        
+        self.blueprintView.element = nil // TODO
+        
+        self.blueprintView.layoutIfNeeded()
+    }
+}
+
+
+struct DebuggingScreenContent : ProxyElement {
+    
+    var section : [Section]
+    
+    static var sideInset : CGFloat = 10.0
+    
+    var elementRepresentation: Element {
+        Box(
+            backgroundColor: UIColor(white: 0.90, alpha: 1.0),
+            wrapping: self.content
+        )
+    }
+    
+    private var content : Element {
+        
+        let allSections = Column {
+            $0.horizontalAlignment = .fill
+            $0.minimumVerticalSpacing = 20.0
+                                
+            for section in self.section {
+                let section = SectionElement(
+                    header: "Preview",
+                    content: ContentBox(
+                        sideInsets: section.wantsDefaultInset,
+                        wrapping: section.content
+                    )
+                )
+                
+                $0.add(child: section)
+            }
+        }
+        
+        return ScrollView(wrapping: allSections) {
+            $0.contentSize = .fittingHeight
+            $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
+        }
+    }
+    
+    struct Section {
+        var title : String
+        var content : Element
+        var wantsDefaultInset : Bool = true
+    }
+    
+
+    struct ContentBox : ProxyElement {
+        var sideInsets : Bool
+        var wrapping : Element
+        
+        var elementRepresentation: Element {
+            let inset = self.sideInsets ? DebuggingScreenContent.sideInset : 0.0
+            
+            return Box(
+                wrapping: Inset(
+                    insets: UIEdgeInsets(top: 20.0, left: inset, bottom: 20.0, right: inset),
+                    wrapping: self.wrapping
+                    )
+                ) { box in
+                    box.shadowStyle = .simple(
+                        radius: 2.0,
+                        opacity: 0.25,
+                        offset: CGSize(width: 0.0, height: 1.0),
+                        color: .black
+                    )
+                    
+                    box.backgroundColor = .white
+            }
+        }
+    }
+    
+    private struct SectionElement : ProxyElement {
+        var header : String
+        
+        var content : Element
+        
+        var elementRepresentation: Element {
+            Column {
+                $0.horizontalAlignment = .fill
+                
+                $0.add(
+                    child: Inset(
+                        sideInsets: DebuggingScreenContent.sideInset,
+                        wrapping: Label(text: self.header) {
+                            $0.font = .systemFont(ofSize: 28.0, weight: .bold)
+                        }
+                    )
+                )
+                
+                $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
+                
+                $0.add(child: self.content)
+            }
+        }
+    }
+}
+
+
+final class ElementInfoViewController : UIViewController {
     
     let element : Element
-    
+        
     let blueprintView = BlueprintView()
     
     init(element : Element) {
         self.element = element
+        
         super.init(nibName: nil, bundle: nil)
         
         self.title = "Inspector"
@@ -272,7 +416,11 @@ final class DebuggingPreviewViewController : UIViewController {
         self.view = self.blueprintView
         //self.blueprintView.debugging.showElementFrames = .viewBacked
         
-        self.blueprintView.element = PreviewElement(presenting: self.element, presentOn: self)
+        self.blueprintView.element = PreviewElement(
+            presenting: self.element,
+            presentOn: self
+        )
+        
         self.blueprintView.layoutIfNeeded()
     }
     
@@ -284,7 +432,11 @@ final class DebuggingPreviewViewController : UIViewController {
         var elementRepresentation: Element {
             Box(
                 backgroundColor: UIColor(white: 0.90, alpha: 1.0),
-                wrapping: ScrollView(wrapping: Content(presenting: self.presenting, presentOn: self.presentOn)) {
+                wrapping: ScrollView(
+                wrapping: Content(
+                    presenting: self.presenting,
+                    presentOn: self.presentOn
+                )) {
                     $0.contentSize = .fittingHeight
                     $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
                 }
@@ -293,6 +445,7 @@ final class DebuggingPreviewViewController : UIViewController {
         
         struct Content : ProxyElement {
             var presenting : Element
+            
             weak var presentOn : UIViewController?
             
             static var sideInset : CGFloat = 10.0
@@ -324,7 +477,7 @@ final class DebuggingPreviewViewController : UIViewController {
                             sideInsets: true,
                             wrapping: ElementInfo(presenting: self.presenting, onTap: { element in
                                 self.presentOn?.present(
-                                    UINavigationController(rootViewController: DebuggingPreviewViewController(element: element)),
+                                    UINavigationController(rootViewController: ElementInfoViewController(element: element)),
                                     animated: true
                                 )
                             })
@@ -717,12 +870,46 @@ fileprivate struct FlattenedElementSnapshot {
 }
 
 fileprivate extension UIView {
+    
     func recurse(with block : (UIView) -> ()) {
         block(self)
         
         for view in self.subviews {
             view.recurse(with: block)
         }
+    }
+    
+    func superview(passing : (UIView) -> Bool) -> UIView? {
+        
+        var current = self.superview
+        
+        while let superview = current {
+            if passing(superview) {
+                return superview
+            }
+            
+            current = superview.superview
+        }
+        
+        return nil
+    }
+    
+    func views(at point : CGPoint, below superview : (UIView) -> Bool) -> [UIView] {
+        var views = [UIView]()
+        
+        let startingView = self.superview(passing: superview) ?? self
+        
+        startingView.recurse { view in
+            let isPointInside = view.point(inside: self.convert(point, to: view), with: nil)
+            
+            let isSmallerThanView = self.frame.contains(view.convert(view.bounds, to: self))
+            
+            if isPointInside && isSmallerThanView {
+                views.append(view)
+            }
+        }
+        
+        return views
     }
     
     func buildFlatHierarchySnapshot(in list : inout [FlattenedElementSnapshot.ViewSnapshot], rootView : UIView, depth : Int) {
