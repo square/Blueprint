@@ -290,19 +290,26 @@ final class ChooseElementViewController : UIViewController {
     override func loadView() {
         self.view = self.blueprintView
         
-        self.blueprintView.element = Content(elements: self.elements)
+        self.blueprintView.element = Content(elements: self.elements, presentOn: self)
         
         self.blueprintView.layoutIfNeeded()
     }
     
     struct Content : ProxyElement {
         let elements : [Element]
+        weak var presentOn : UIViewController?
         
         var elementRepresentation: Element {
             DebuggingScreenContent(
                 sections: [
                     .init(
                         title: "Elements",
+                        detail:
+                        """
+                        You selected an element which overlays other elements entirely contained within the selected elements frame.
+
+                        The below list is all those elements; please click on the one you want to inspect!
+                        """,
                         element: Column {
                             $0.minimumVerticalSpacing = 20.0
                             
@@ -311,8 +318,11 @@ final class ChooseElementViewController : UIViewController {
                                     child: DebuggingScreenContent.ElementRow(
                                         element: element,
                                         depth: 0,
-                                        onTap: { _ in
-                                            
+                                        onTap: { element in
+                                            self.presentOn?.viewControllerToPresentOn.present(
+                                                UINavigationController(rootViewController: ElementInfoViewController(element: element)),
+                                                animated: true
+                                            )
                                         }
                                     )
                                 )
@@ -384,24 +394,49 @@ struct DebuggingScreenContent : ProxyElement {
     struct Section : ProxyElement {
         
         var title : String
-        var detail : String? = nil
+        var detail : String = ""
         var element : Element
         var horizontallyInsetsContent : Bool = true
+        
+        init(
+            title : String,
+            detail : String = "",
+            element : Element,
+            horizontallyInsetsContent : Bool = true
+        ) {
+            self.title = title
+            self.detail = detail
+            self.element = element
+            self.horizontallyInsetsContent = horizontallyInsetsContent
+        }
         
         var elementRepresentation: Element {
             Column {
                 $0.horizontalAlignment = .fill
                 
                 $0.add(
+                    // TODO: Split into header type
                     child: Inset(
                         sideInsets: DebuggingScreenContent.sideInset,
-                        wrapping: Label(text: self.title) {
-                            $0.font = .systemFont(ofSize: 28.0, weight: .bold)
+                        wrapping: Column {
+                            
+                            $0.add(child: Label(text: self.title) {
+                                $0.font = .systemFont(ofSize: 28.0, weight: .bold)
+                            })
+                            
+                            $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
+                            
+                            if self.detail.isEmpty == false {
+                                $0.add(child: Label(text: self.detail) {
+                                    $0.font = .systemFont(ofSize: 13.0, weight: .regular)
+                                    $0.color = .darkGray
+                                })
+                                
+                                $0.add(child: Spacer(size: CGSize(width: 0.0, height: 10.0)))
+                            }
                         }
                     )
                 )
-                
-                $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
                 
                 $0.add(child: ContentBox(
                     sideInsets: self.horizontallyInsetsContent,
@@ -441,9 +476,8 @@ struct DebuggingScreenContent : ProxyElement {
                 )
                 
                 let elementInfo = Column {
-                    let elementType = String(describing: type(of:element))
                         
-                    $0.add(child: Label(text: elementType) {
+                    $0.add(child: Label(text: String(describing: type(of: self.element))) {
                         $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
                         $0.color = .systemBlue
                     })
@@ -453,7 +487,13 @@ struct DebuggingScreenContent : ProxyElement {
                     $0.add(
                         child: Tappable(
                             onTap: { self.onTap(self.element) },
-                            wrapping: Box(backgroundColor: .white, wrapping: element)
+                            wrapping: Box(
+                                backgroundColor: .white,
+                                wrapping: UserInteraction(
+                                    enabled: false,
+                                    wrapping: self.element
+                                )
+                            )
                         )
                     )
                 }
