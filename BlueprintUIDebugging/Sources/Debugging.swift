@@ -152,11 +152,11 @@ extension Debugging {
             }
             
             let point = self.longPress.location(in: self)
-            
+
             let subviews = self.views(at: point) {
                 $0 is BlueprintView
             }
-            
+
             let filtered : [DebuggingWrapper] = subviews.compactMap { view in
                 if let view = view as? DebuggingWrapper {
                     return view
@@ -164,17 +164,15 @@ extension Debugging {
                     return nil
                 }
             }
-            
-            let column = Column { col in
-                for view in filtered {
-                    col.add(child: view.elementInfo.element)
-                }
+
+            let elements : [Element] = filtered.map {
+                $0.elementInfo.element
             }
-            
-            let nav = UINavigationController(rootViewController: ElementInfoViewController(element: column))
-            
+
+            let nav = UINavigationController(rootViewController: ChooseElementViewController(elements: elements))
+
             let host = self.window?.rootViewController?.viewControllerToPresentOn
-            
+
             host?.present(nav, animated: true)
             
             Self.selectedWrapper = self
@@ -183,11 +181,11 @@ extension Debugging {
         private static weak var selectedWrapper : DebuggingWrapper? = nil {
             didSet {
                 if let wrapper = self.selectedWrapper, self.selectedWrapper === oldValue {
-//                    let nav = UINavigationController(rootViewController: DebuggingPreviewViewController(element: wrapper.elementInfo.element))
-//
-//                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
-//
-//                    host?.present(nav, animated: true)
+                    let nav = UINavigationController(rootViewController: ElementInfoViewController(element: wrapper.elementInfo.element))
+
+                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
+
+                    host?.present(nav, animated: true)
                 } else {
                     oldValue?.isSelected = false
                     self.selectedWrapper?.isSelected = true
@@ -292,16 +290,45 @@ final class ChooseElementViewController : UIViewController {
     override func loadView() {
         self.view = self.blueprintView
         
-        self.blueprintView.element = nil // TODO
+        self.blueprintView.element = Content(elements: self.elements)
         
         self.blueprintView.layoutIfNeeded()
+    }
+    
+    struct Content : ProxyElement {
+        let elements : [Element]
+        
+        var elementRepresentation: Element {
+            DebuggingScreenContent(
+                sections: [
+                    .init(
+                        title: "Elements",
+                        element: Column {
+                            $0.minimumVerticalSpacing = 20.0
+                            
+                            for element in self.elements {
+                                $0.add(
+                                    child: DebuggingScreenContent.ElementRow(
+                                        element: element,
+                                        depth: 0,
+                                        onTap: { _ in
+                                            
+                                        }
+                                    )
+                                )
+                            }
+                        }
+                    )
+                ]
+            )
+        }
     }
 }
 
 
 struct DebuggingScreenContent : ProxyElement {
     
-    var section : [Section]
+    var sections : [Section]
     
     static var sideInset : CGFloat = 10.0
     
@@ -318,15 +345,7 @@ struct DebuggingScreenContent : ProxyElement {
             $0.horizontalAlignment = .fill
             $0.minimumVerticalSpacing = 20.0
                                 
-            for section in self.section {
-                let section = SectionElement(
-                    header: "Preview",
-                    content: ContentBox(
-                        sideInsets: section.wantsDefaultInset,
-                        wrapping: section.content
-                    )
-                )
-                
+            for section in self.sections {
                 $0.add(child: section)
             }
         }
@@ -336,13 +355,6 @@ struct DebuggingScreenContent : ProxyElement {
             $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
         }
     }
-    
-    struct Section {
-        var title : String
-        var content : Element
-        var wantsDefaultInset : Bool = true
-    }
-    
 
     struct ContentBox : ProxyElement {
         var sideInsets : Bool
@@ -369,10 +381,12 @@ struct DebuggingScreenContent : ProxyElement {
         }
     }
     
-    private struct SectionElement : ProxyElement {
-        var header : String
+    struct Section : ProxyElement {
         
-        var content : Element
+        var title : String
+        var detail : String? = nil
+        var element : Element
+        var horizontallyInsetsContent : Bool = true
         
         var elementRepresentation: Element {
             Column {
@@ -381,7 +395,7 @@ struct DebuggingScreenContent : ProxyElement {
                 $0.add(
                     child: Inset(
                         sideInsets: DebuggingScreenContent.sideInset,
-                        wrapping: Label(text: self.header) {
+                        wrapping: Label(text: self.title) {
                             $0.font = .systemFont(ofSize: 28.0, weight: .bold)
                         }
                     )
@@ -389,7 +403,64 @@ struct DebuggingScreenContent : ProxyElement {
                 
                 $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
                 
-                $0.add(child: self.content)
+                $0.add(child: ContentBox(
+                    sideInsets: self.horizontallyInsetsContent,
+                    wrapping: self.element
+                ))
+            }
+        }
+    }
+    
+    struct ElementRow : ProxyElement {
+        var element : Element
+        var depth : Int
+        
+        var onTap : (Element) -> ()
+
+        var elementRepresentation: Element {
+            Row {
+                $0.verticalAlignment = .fill
+                $0.horizontalUnderflow = .growUniformly
+                
+                let spacer = Spacer(size: CGSize(width: CGFloat(depth) * 15.0, height: 0.0))
+                $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: spacer)
+                
+                let box = Box(backgroundColor: .init(white: 0.0, alpha: 0.05), wrapping: self.content)
+                
+                $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: box)
+            }
+        }
+        
+        private var content : Element {
+            Row {
+                $0.verticalAlignment = .fill
+                $0.horizontalUnderflow = .justifyToStart
+                
+                $0.add(
+                    child: Rule(orientation: .vertical, color: .darkGray, thickness: .points(2.0))
+                )
+                
+                let elementInfo = Column {
+                    let elementType = String(describing: type(of:element))
+                        
+                    $0.add(child: Label(text: elementType) {
+                        $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                        $0.color = .systemBlue
+                    })
+                    
+                    $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
+                    
+                    $0.add(
+                        child: Tappable(
+                            onTap: { self.onTap(self.element) },
+                            wrapping: Box(backgroundColor: .white, wrapping: element)
+                        )
+                    )
+                }
+                
+                $0.add(
+                    child: Inset(uniformInset: 5.0, wrapping: elementInfo)
+                )
             }
         }
     }
@@ -430,204 +501,77 @@ final class ElementInfoViewController : UIViewController {
         weak var presentOn : UIViewController?
         
         var elementRepresentation: Element {
-            Box(
-                backgroundColor: UIColor(white: 0.90, alpha: 1.0),
-                wrapping: ScrollView(
-                wrapping: Content(
-                    presenting: self.presenting,
-                    presentOn: self.presentOn
-                )) {
-                    $0.contentSize = .fittingHeight
-                    $0.contentInset = .init(top: 10.0, left: 0.0, bottom: 10.0, right: 0.0)
-                }
+            DebuggingScreenContent(
+                sections: [
+                    .init(
+                        title: "Preview",
+                        element: Preview(presenting: self.presenting)
+                    ),
+                    
+                    .init(
+                        title: "Layers",
+                        element: ThreeDVisualization(presenting: self.presenting)
+                    ),
+                    
+                    .init(
+                        title: "Hierarchy",
+                        element: RecursiveElements(presenting: self.presenting, onTap: { element in
+                            self.presentOn?.present(
+                                UINavigationController(rootViewController: ElementInfoViewController(element: element)),
+                                animated: true
+                            )
+                        })
+                    ),
+                ]
             )
         }
         
-        struct Content : ProxyElement {
+        struct Preview : ProxyElement {
             var presenting : Element
             
-            weak var presentOn : UIViewController?
+            var elementRepresentation: Element {
+                ConstrainedSize(
+                    height: .atLeast(100.0),
+                    wrapping: Centered(Box(wrapping: self.presenting) {
+                        $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.25), width: 1.0)
+                        $0.cornerStyle = .rounded(radius: 4.0)
+                    })
+                )
+            }
+        }
+        
+        struct ThreeDVisualization : ProxyElement {
+            var presenting : Element
             
-            static var sideInset : CGFloat = 10.0
+            var elementRepresentation: Element {
+                let snapshot = FlattenedElementSnapshot(
+                    element: self.presenting,
+                    sizeConstraint: SizeConstraint(UIScreen.main.bounds.size)
+                )
+                
+                return ThreeDElementVisualization(snapshot: snapshot)
+            }
+        }
+        
+        struct RecursiveElements : ProxyElement {
+            var presenting : Element
+            var onTap : (Element) -> ()
             
             var elementRepresentation: Element {
                 Column {
                     $0.horizontalAlignment = .fill
-                    $0.minimumVerticalSpacing = 20.0
+                    $0.minimumVerticalSpacing = 10.0
                     
-                    $0.add(child: Section(
-                        header: "Preview",
-                        content: ContentBox(
-                            sideInsets: true,
-                            wrapping: Preview(presenting: self.presenting)
-                        )
-                    ))
+                    let list = self.presenting.recursiveElementList()
                     
-                    $0.add(child: Section(
-                        header: "Layers",
-                        content: ContentBox(
-                            sideInsets: false,
-                            wrapping: ThreeDVisualization(presenting: self.presenting)
-                        )
-                    ))
-                    
-                    $0.add(child: Section(
-                        header: "Hierarchy",
-                        content: ContentBox(
-                            sideInsets: true,
-                            wrapping: ElementInfo(presenting: self.presenting, onTap: { element in
-                                self.presentOn?.present(
-                                    UINavigationController(rootViewController: ElementInfoViewController(element: element)),
-                                    animated: true
-                                )
-                            })
-                        )
-                    ))
-                }
-            }
-            
-            struct Section : ProxyElement {
-                var header : String
-                
-                var content : Element
-                
-                var elementRepresentation: Element {
-                    Column {
-                        $0.horizontalAlignment = .fill
-                        
+                    for element in list {
                         $0.add(
-                            child: Inset(
-                                sideInsets: Content.sideInset,
-                                wrapping: Label(text: self.header) {
-                                    $0.font = .systemFont(ofSize: 28.0, weight: .bold)
-                                }
+                            child: DebuggingScreenContent.ElementRow(
+                                element: element.element,
+                                depth: element.depth,
+                                onTap: self.onTap
                             )
                         )
-                        
-                        $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
-                        
-                        $0.add(child: self.content)
-                    }
-                }
-            }
-            
-            struct Preview : ProxyElement {
-                var presenting : Element
-                
-                var elementRepresentation: Element {
-                    ConstrainedSize(
-                        height: .atLeast(100.0),
-                        wrapping: Centered(Box(wrapping: self.presenting) {
-                            $0.borderStyle = .solid(color: UIColor(white: 0.0, alpha: 0.25), width: 1.0)
-                            $0.cornerStyle = .rounded(radius: 4.0)
-                        })
-                    )
-                }
-            }
-            
-            struct ThreeDVisualization : ProxyElement {
-                var presenting : Element
-                
-                var elementRepresentation: Element {
-                    let snapshot = FlattenedElementSnapshot(
-                        element: self.presenting,
-                        sizeConstraint: SizeConstraint(UIScreen.main.bounds.size)
-                    )
-                    
-                    return ThreeDElementVisualization(snapshot: snapshot)
-                }
-            }
-            
-            struct ElementInfo : ProxyElement {
-                var presenting : Element
-                var onTap : (Element) -> ()
-                
-                var elementRepresentation: Element {
-                    Column {
-                        $0.horizontalAlignment = .fill
-                        $0.minimumVerticalSpacing = 10.0
-                        
-                        let list = self.presenting.recursiveElementList()
-                        
-                        for element in list {
-                            $0.add(child: ElementRow(element: element, onTap: self.onTap))
-                        }
-                    }
-                }
-                
-                struct ElementRow : ProxyElement {
-                    fileprivate var element : RecursedElement
-                    var onTap : (Element) -> ()
-
-                    var elementRepresentation: Element {
-                        Row {
-                            $0.verticalAlignment = .fill
-                            $0.horizontalUnderflow = .growUniformly
-                            
-                            let spacer = Spacer(size: CGSize(width: CGFloat(element.depth) * 15.0, height: 0.0))
-                            $0.add(growPriority: 0.0, shrinkPriority: 0.0, child: spacer)
-                            
-                            let box = Box(backgroundColor: .init(white: 0.0, alpha: 0.05), wrapping: self.content)
-                            
-                            $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: box)
-                        }
-                    }
-                    
-                    private var content : Element {
-                        Row {
-                            $0.verticalAlignment = .fill
-                            $0.horizontalUnderflow = .justifyToStart
-                            
-                            $0.add(
-                                child: Rule(orientation: .vertical, color: .darkGray, thickness: .points(2.0))
-                            )
-                            
-                            let elementInfo = Column {
-                                let elementType = String(describing: type(of:element.element))
-                                    
-                                $0.add(child: Label(text: elementType) {
-                                    $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
-                                    $0.color = .systemBlue
-                                })
-                                
-                                $0.add(child: Spacer(size: CGSize(width: 0.0, height: 5.0)))
-                                
-                                $0.add(
-                                    child: Tappable(
-                                        onTap: { self.onTap(self.element.element) },
-                                        wrapping: Box(backgroundColor: .white, wrapping: element.element)
-                                    )
-                                )
-                            }
-                            
-                            $0.add(
-                                child: Inset(uniformInset: 5.0, wrapping: elementInfo)
-                            )
-                        }
-                    }
-                }
-            }
-            
-            struct ContentBox : ProxyElement {
-                var sideInsets : Bool
-                var wrapping : Element
-                
-                var elementRepresentation: Element {
-                    let inset = self.sideInsets ? Content.sideInset : 0.0
-                    
-                    return Box(
-                        wrapping: Inset(
-                            insets: UIEdgeInsets(top: 20.0, left: inset, bottom: 20.0, right: inset),
-                            wrapping: self.wrapping
-                            )
-                        ) { box in
-                            box.shadowStyle = .simple(
-                                radius: 2.0,
-                                opacity: 0.25,
-                                offset: CGSize(width: 0.0, height: 1.0),
-                                color: .black
-                            )
-                            box.backgroundColor = .white
                     }
                 }
             }
@@ -716,7 +660,7 @@ fileprivate struct ThreeDElementVisualization : Element {
                 var t = CATransform3DIdentity
                 
                 // https://stackoverflow.com/questions/3881446/meaning-of-m34-of-catransform3d
-                t.m34 = -1.0 / 1000.0
+                t.m34 = -1.0 / 2000.0
                 
                 if let scale = scale {
                     t = CATransform3DScale(t, scale, scale, scale)
