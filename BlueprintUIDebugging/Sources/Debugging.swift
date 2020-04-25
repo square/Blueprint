@@ -15,9 +15,9 @@ public final class DebuggingSetup : NSObject, BlueprintUI.DebuggingSetup {
     
     @objc public static func setup() {
         DebuggingSupport.viewDescriptionProvider = { other, element, bounds, debugging in
-            ViewDescription(Debugging.DebuggingWrapper.self) {
+            ViewDescription(DebuggingOptions.DebuggingWrapper.self) {
                 $0.builder = {
-                    Debugging.DebuggingWrapper(frame: bounds, containing: other, for: element, debugging: debugging)
+                    DebuggingOptions.DebuggingWrapper(frame: bounds, containing: other, for: element, debugging: debugging)
                 }
                 
                 $0.contentView = {
@@ -41,11 +41,12 @@ public final class DebuggingSetup : NSObject, BlueprintUI.DebuggingSetup {
 }
 
 
-extension Debugging {
+extension DebuggingOptions {
+    
     final class DebuggingWrapper : UIView {
        
         let elementInfo : ElementInfo
-        let debugging : Debugging
+        let debugging : DebuggingOptions
         
         struct ElementInfo {
             var element : Element
@@ -55,8 +56,7 @@ extension Debugging {
         let containedView : UIView?
         private let infoView : InfoView
         
-        /// TODO: Rename me!
-        let longPress : UITapGestureRecognizer
+        let tapRecognizer : UITapGestureRecognizer
         
         var isSelected : Bool = false {
             didSet {
@@ -96,7 +96,7 @@ extension Debugging {
             }
         }
         
-        init(frame: CGRect, containing : ViewDescription?, for element : Element, debugging : Debugging) {
+        init(frame: CGRect, containing : ViewDescription?, for element : Element, debugging : DebuggingOptions) {
             
             if let containing = containing {
                 let view = containing.build()
@@ -116,7 +116,7 @@ extension Debugging {
             
             self.debugging = debugging
             
-            self.longPress = UITapGestureRecognizer()
+            self.tapRecognizer = UITapGestureRecognizer()
             
             super.init(frame: frame)
 
@@ -128,8 +128,8 @@ extension Debugging {
                 self.addSubview(view)
             }
             
-            self.longPress.addTarget(self, action: #selector(didLongPress))
-            self.addGestureRecognizer(self.longPress)
+            self.tapRecognizer.addTarget(self, action: #selector(didTap))
+            self.addGestureRecognizer(self.tapRecognizer)
             
             self.updateIsSelected()
         }
@@ -145,13 +145,13 @@ extension Debugging {
         
         required init?(coder: NSCoder) { fatalError() }
         
-        @objc private func didLongPress() {
+        @objc private func didTap() {
             
-            guard self.longPress.state == .recognized else {
+            guard self.tapRecognizer.state == .recognized else {
                 return
             }
             
-            let point = self.longPress.location(in: self)
+            let point = self.tapRecognizer.location(in: self)
 
             let subviews = self.views(at: point) {
                 $0 is BlueprintView
@@ -180,16 +180,12 @@ extension Debugging {
         
         private static weak var selectedWrapper : DebuggingWrapper? = nil {
             didSet {
-                if let wrapper = self.selectedWrapper, self.selectedWrapper === oldValue {
-                    let nav = UINavigationController(rootViewController: ElementInfoViewController(element: wrapper.elementInfo.element))
-
-                    let host = wrapper.window?.rootViewController?.viewControllerToPresentOn
-
-                    host?.present(nav, animated: true)
-                } else {
-                    oldValue?.isSelected = false
-                    self.selectedWrapper?.isSelected = true
+                guard oldValue !== self.selectedWrapper else {
+                    return
                 }
+                
+                oldValue?.isSelected = false
+                self.selectedWrapper?.isSelected = true
             }
         }
         
@@ -489,10 +485,7 @@ struct DebuggingScreenContent : ProxyElement {
                             onTap: { self.onTap(self.element) },
                             wrapping: Box(
                                 backgroundColor: .white,
-                                wrapping: UserInteraction(
-                                    enabled: false,
-                                    wrapping: self.element
-                                )
+                                wrapping: self.element
                             )
                         )
                     )
@@ -898,7 +891,7 @@ fileprivate extension UIView {
     
     func buildFlatHierarchySnapshot(in list : inout [FlattenedElementSnapshot.ViewSnapshot], rootView : UIView, depth : Int) {
         
-        if let self = self as? Debugging.DebuggingWrapper {
+        if let self = self as? DebuggingOptions.DebuggingWrapper {
             let snapshot = FlattenedElementSnapshot.ViewSnapshot(
                 element: self.elementInfo.element,
                 view: self,
@@ -913,7 +906,7 @@ fileprivate extension UIView {
             view.buildFlatHierarchySnapshot(in: &list, rootView: rootView, depth: depth + 1)
         }
         
-        if self is Debugging.DebuggingWrapper {
+        if self is DebuggingOptions.DebuggingWrapper {
             self.removeFromSuperview()
         }
     }

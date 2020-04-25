@@ -75,7 +75,7 @@ public struct ElementPreview : View {
     
     private let name : String
     
-    private let debugging : Debugging
+    private let debugging : DebuggingOptions
     
     /// The types of previews to include in the Xcode preview.
     private let previewTypes : [PreviewType]
@@ -88,7 +88,7 @@ public struct ElementPreview : View {
     /// Creates a new `ElementPreview` with several common devices that your users may use.
     public static func commonDevices(
         named name : String = "",
-        debugging : Debugging = Debugging(),
+        debugging : DebuggingOptions = .init(),
         with provider : @escaping ElementProvider
     ) -> Self {
         return Self(
@@ -113,7 +113,7 @@ public struct ElementPreview : View {
     public init(
         named name : String = "",
         with previewType : PreviewType = .thatFits(),
-        debugging : Debugging = Debugging(),
+        debugging : DebuggingOptions = .init(),
         with provider : @escaping ElementProvider
     ) {
         self.init(
@@ -133,7 +133,7 @@ public struct ElementPreview : View {
     public init(
         named name : String = "",
         with previewTypes : [PreviewType],
-        debugging : Debugging = Debugging(),
+        debugging : DebuggingOptions = .init(),
         with provider : @escaping ElementProvider
     ) {
         self.name = name
@@ -161,7 +161,7 @@ extension ElementPreview {
     
     fileprivate struct ElementView : UIViewRepresentable {
         
-        var debugging : Debugging
+        var debugging : DebuggingOptions
         var element : Element
         
         func makeUIView(context: Context) -> BlueprintView {
@@ -205,7 +205,7 @@ extension ElementPreview {
         
         fileprivate func preview(
             with name : String,
-            debugging : Debugging,
+            debugging : DebuggingOptions,
             for element : Element
         ) -> AnyView {
             
@@ -243,7 +243,7 @@ extension ElementPreview {
         }
         
         private func constrained(
-            debugging : Debugging,
+            debugging : DebuggingOptions,
             element : Element
         ) -> some View {
             GeometryReader { info in

@@ -39,7 +39,7 @@ struct TestingView_Preview: PreviewProvider {
     static var previews: some View {
         ElementPreview(
         with: .thatFits(padding: 20),
-        debugging: Debugging(showElementFrames: .all)
+        debugging: DebuggingOptions(showElementFrames: .all)
         ) {
             TestElement()
         }

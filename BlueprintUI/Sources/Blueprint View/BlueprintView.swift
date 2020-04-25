@@ -46,13 +46,13 @@ public final class BlueprintView: UIView {
     
     public fileprivate(set) static var isDebuggingAvailable : Bool = false
     
-    public static var globalDebugging : Debugging = Debugging() {
+    public static var globalDebugging : DebuggingOptions = .init() {
         didSet {
             NotificationCenter.default.post(name: .BlueprintGlobalDebuggingSettingsChanged, object: nil)
         }
     }
     
-    public var debugging : Debugging = Debugging() {
+    public var debugging : DebuggingOptions = .init() {
         didSet {
             self.setNeedsViewHierarchyUpdate()
         }
@@ -209,7 +209,7 @@ public final class BlueprintView: UIView {
 
 
 fileprivate extension UIView {
-    func propagateDebuggingStateToNestedBlueprintViews(with debugging : Debugging) {
+    func propagateDebuggingStateToNestedBlueprintViews(with debugging : DebuggingOptions) {
         
         for view in self.subviews {
             if let view = view as? BlueprintView, view.acceptsDebugMode {

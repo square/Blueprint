@@ -9,7 +9,7 @@ import Foundation
 
 
 public struct DebuggingSupport {
-    public static var viewDescriptionProvider : (ViewDescription?, Element, CGRect, Debugging) -> ViewDescription? = { description, _, _, _ in
+    public static var viewDescriptionProvider : (ViewDescription?, Element, CGRect, DebuggingOptions) -> ViewDescription? = { description, _, _, _ in
         return description
     }
 }
@@ -17,6 +17,15 @@ public struct DebuggingSupport {
 
 @objc public protocol DebuggingSetup {
     static func setup()
+}
+
+
+public protocol DebuggingSelectionManagerContainer : UIView {
+    var selectionManager : DebuggingSelectionManager { get }
+}
+
+public protocol DebuggingSelectionManager {
+    
 }
 
 

@@ -219,7 +219,7 @@ struct ViewController_Preview: PreviewProvider {
     static var previews: some View {
         ElementPreview(
             with: [.device(.iPhone8Plus), .device(.iPhoneSE)],
-            debugging: Debugging(showElementFrames: .viewBacked)
+            debugging: DebuggingOptions(showElementFrames: .viewBacked)
         ) {
             let posts = [
             Post(

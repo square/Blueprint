@@ -75,7 +75,7 @@ extension LayoutResultNode {
 
     /// Returns the flattened tree of view descriptions (any element that does not return
     /// a view description will be skipped).
-    func resolve(debugging : Debugging = Debugging()) -> [(path: ElementPath, node: NativeViewNode)] {
+    func resolve(debugging : DebuggingOptions = .init()) -> [(path: ElementPath, node: NativeViewNode)] {
 
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
             .flatMap { identifier, layoutResultNode in
@@ -114,7 +114,7 @@ extension LayoutResultNode {
         }
     }
     
-    func viewDescriptionForDisplay(subtreeExtent : CGRect?, debugging : Debugging) -> ViewDescription? {
+    func viewDescriptionForDisplay(subtreeExtent : CGRect?, debugging : DebuggingOptions) -> ViewDescription? {
         
         let original = self.element.backingViewDescription(
             bounds: self.layoutAttributes.bounds,
