@@ -88,7 +88,7 @@ fileprivate struct Content : ProxyElement {
         var presenting : Element
         
         var elementRepresentation: Element {
-            let snapshot = FlattenedElementSnapshot(
+            let snapshot = FlattenedElementViewHierarchy(
                 element: self.presenting,
                 sizeConstraint: SizeConstraint(UIScreen.main.bounds.size)
             )
@@ -110,7 +110,7 @@ fileprivate struct Content : ProxyElement {
                 
                 for element in list {
                     $0.add(
-                        child: DebuggingScreenContent.ElementRow(
+                        child: Screen.ElementRow(
                             element: element.element,
                             depth: element.depth,
                             onTap: self.onTap
