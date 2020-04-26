@@ -19,6 +19,13 @@ public struct Spacer: Element {
             size: CGSize(width: width, height: height)
         )
     }
+    
+    /// Initializes a new spacer with the given value for the width and height.
+    public init(_ value : CGFloat) {
+        self.init(
+            size: CGSize(width: value, height: value)
+        )
+    }
 
     public var content: ElementContent {
         return ElementContent(intrinsicSize: size)
