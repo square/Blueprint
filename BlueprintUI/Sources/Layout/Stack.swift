@@ -81,7 +81,24 @@ extension StackElement {
             key: key
         ))
     }
-
+    
+    mutating public func add(key : AnyHashable? = nil, fixed : Element) {
+        self.add(growPriority: 0.0, shrinkPriority: 0.0, key: key, child: fixed)
+    }
+    
+    mutating public func add(key : AnyHashable? = nil, flexible : Element) {
+        self.add(growPriority: 1.0, shrinkPriority: 1.0, key: key, child: flexible)
+    }
+    
+    public static func += (lhs : inout Self, rhs : Element) {
+        lhs.add(child: rhs)
+    }
+    
+    public static func += (lhs : inout Self, rhs : [Element]) {
+        for element in rhs {
+            lhs.add(child: element)
+        }
+    }
 }
 
 

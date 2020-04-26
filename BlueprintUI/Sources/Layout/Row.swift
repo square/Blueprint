@@ -28,5 +28,4 @@ public struct Row: StackElement {
         get { return layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
-
 }

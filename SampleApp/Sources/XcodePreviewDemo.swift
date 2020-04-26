@@ -15,8 +15,8 @@ struct TestElement : ProxyElement {
         Column {
             $0.verticalUnderflow = .justifyToStart
             
-            for index in 1...12 {
-                $0.add(child: Label(text: "Hello, World") {
+            $0 += (1...12).map { index in
+                Label(text: "Hello, World") {
                     $0.font = .boldSystemFont(ofSize: 10.0 + CGFloat(index * 4))
                     $0.color = .init(
                         red: CGFloat.random(in: 0...1),
@@ -24,7 +24,7 @@ struct TestElement : ProxyElement {
                         blue: CGFloat.random(in: 0...1),
                         alpha: 1.0
                     )
-                })
+                }
             }
         }
     }

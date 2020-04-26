@@ -51,6 +51,17 @@ extension ConstrainedSize {
 
 }
 
+public extension Element {
+    
+    func constrainedTo(
+        width: ConstrainedSize.Constraint = .unconstrained,
+        height: ConstrainedSize.Constraint = .unconstrained
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(width: width, height: height, wrapping: self)
+    }
+}
+
 extension Comparable {
 
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
@@ -80,5 +91,3 @@ extension ConstrainedSize {
     }
 
 }
-
-

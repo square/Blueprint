@@ -30,8 +30,9 @@ public struct ScrollView: Element {
     public var keyboardAdjustmentMode : KeyboardAdjustmentMode = .adjustsWhenVisible
 
 
-    public init(wrapping element: Element) {
+    public init(wrapping element: Element, configure : (inout ScrollView) -> () = { _ in }) {
         self.wrappedElement = element
+        configure(&self)
     }
 
     public var content: ElementContent {

@@ -19,5 +19,10 @@ public struct AccessibilityBlocker: Element {
             config[\.accessibilityElementsHidden] = true
         }
     }
+}
 
+public extension Element {
+    func disableAccessibility() -> AccessibilityBlocker {
+        AccessibilityBlocker(wrapping: self)
+    }
 }

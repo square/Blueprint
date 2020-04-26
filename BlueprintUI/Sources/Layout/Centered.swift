@@ -18,3 +18,12 @@ public struct Centered: ProxyElement {
         return Aligned(vertically: .center, horizontally: .center, wrapping: wrappedElement)
     }
 }
+
+
+public extension Element {
+    
+    /// Wraps the element in a `Centered` element to center it within its parent.
+    func centered() -> Centered {
+        Centered(self)
+    }
+}
