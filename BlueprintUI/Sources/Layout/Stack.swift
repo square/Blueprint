@@ -7,8 +7,73 @@ import UIKit
 public protocol StackElement: Element {
     init()
     var layout: StackLayout { get }
-    var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
+    var children: [StackChild] { get set }
 }
+
+public struct StackChild {
+    public var traits : StackLayout.Traits
+    public var key : AnyHashable?
+    public var element : Element
+    
+    public init(
+        traits : StackLayout.Traits = .flexible,
+        key : AnyHashable? = nil,
+        element : () -> Element
+    ) {
+        self.traits = traits
+        self.key = key
+        self.element = element()
+    }
+    
+    public static func fixed(
+        key : AnyHashable? = nil,
+        element : () -> Element
+    ) -> StackChild
+    {
+        StackChild(
+            traits: .fixed,
+            key: key,
+            element : element
+        )
+    }
+    
+    public static func flexible(
+        key : AnyHashable? = nil,
+        element : () -> Element
+    ) -> StackChild
+    {
+        StackChild(
+            traits: .flexible,
+            key: key,
+            element: element
+        )
+    }
+    
+    public static func grows(
+        key : AnyHashable? = nil,
+        element : () -> Element
+    ) -> StackChild
+    {
+        StackChild(
+            traits: .grows,
+            key: key,
+            element: element
+        )
+    }
+    
+    public static func shrinks(
+        key : AnyHashable? = nil,
+        element : () -> Element
+    ) -> StackChild
+    {
+        StackChild(
+            traits: .shrinks,
+            key: key,
+            element: element
+        )
+    }
+}
+
 
 extension StackElement {
 
@@ -75,29 +140,25 @@ extension StackElement {
     ///   - child: The child element to add to this stack
     ///
     mutating public func add(growPriority: CGFloat = 1.0, shrinkPriority: CGFloat = 1.0, key: AnyHashable? = nil, child: Element) {
-        children.append((
-            element: child,
+        self.add(child: StackChild(
             traits: StackLayout.Traits(growPriority: growPriority, shrinkPriority: shrinkPriority),
-            key: key
+            key: key,
+            element: { child }
         ))
     }
     
-    mutating public func add(key : AnyHashable? = nil, fixed : Element) {
-        self.add(growPriority: 0.0, shrinkPriority: 0.0, key: key, child: fixed)
-    }
-    
-    mutating public func add(key : AnyHashable? = nil, flexible : Element) {
-        self.add(growPriority: 1.0, shrinkPriority: 1.0, key: key, child: flexible)
-    }
-    
-    public static func += (lhs : inout Self, rhs : Element) {
+    public static func += (lhs : inout Self, rhs : StackChild) {
         lhs.add(child: rhs)
     }
     
-    public static func += (lhs : inout Self, rhs : [Element]) {
+    public static func += (lhs : inout Self, rhs : [StackChild]) {
         for element in rhs {
             lhs.add(child: element)
         }
+    }
+    
+    mutating public func add(child : StackChild) {
+        children.append(child)
     }
 }
 
@@ -121,6 +182,33 @@ public struct StackLayout: Layout {
             self.shrinkPriority = shrinkPriority
         }
 
+        public static var fixed : Traits {
+            Traits(
+                growPriority: 0.0,
+                shrinkPriority: 0.0
+            )
+        }
+        
+        public static var flexible : Traits {
+            Traits(
+                growPriority: 1.0,
+                shrinkPriority: 1.0
+            )
+        }
+        
+        public static var grows : Traits {
+            Traits(
+                growPriority: 1.0,
+                shrinkPriority: 0.0
+            )
+        }
+
+        public static var shrinks : Traits {
+            Traits(
+                growPriority: 0.0,
+                shrinkPriority: 1.0
+            )
+        }
     }
 
     public var axis: Axis

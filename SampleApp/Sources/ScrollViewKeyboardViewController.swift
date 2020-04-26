@@ -24,15 +24,17 @@ final class ScrollViewKeyboardViewController : UIViewController
     
     private func content() -> Element
     {
-        ScrollView(wrapping: Column {
+        Column {
             $0.horizontalAlignment = .fill
             
             $0 += (1...20).map { _ in
-                TextField(text: "Hello")
-                    .inset(uniform: 20.0)
-                    .box(backgroundColor: .init(white: 0.95, alpha: 1.0))
+                .fixed {
+                    TextField(text: "Hello, World")
+                        .inset(uniform: 20.0)
+                        .box(background: .init(white: 0.95, alpha: 1.0))
+                }
             }
-        }) {
+        }.scrollable {
             $0.keyboardAdjustmentMode = .adjustsWhenVisible
         }
     }

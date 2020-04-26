@@ -43,18 +43,17 @@ fileprivate struct MainView: ProxyElement {
     var posts: [Post]
     
     var elementRepresentation: Element {
-        ScrollView(
-            wrapping: Column { col in
+        Column { col in
                 col.horizontalAlignment = .fill
                 
-                col += List(posts: posts)
-                col += CommentForm()
-        }) {
+            col += .fixed { List(posts: posts) }
+            col += .fixed { CommentForm() }
+        }.scrollable {
             $0.contentSize = .fittingHeight
             $0.alwaysBounceVertical = true
             $0.keyboardDismissMode = .onDrag
         }
-        .box(backgroundColor: UIColor(white: 0.95, alpha: 1.0))
+        .box(background: UIColor(white: 0.95, alpha: 1.0))
     }
 }
 
@@ -67,8 +66,8 @@ fileprivate struct List: ProxyElement {
             col.horizontalAlignment = .fill
             col.minimumVerticalSpacing = 8.0
 
-            col += posts.map {
-                FeedItem(post: $0)
+            col += posts.map { post in
+                .fixed { FeedItem(post: post) }
             }
         }
     }
@@ -80,19 +79,24 @@ fileprivate struct CommentForm: ProxyElement {
         Column { col in
             col.horizontalAlignment = .fill
 
-            let label = Label(text: "Add your comment:")
-            col.add(child: label)
-
-            col += TextField(text: "") {
-                $0.placeholder = "Name"
+            col += .fixed {
+                Label(text: "Add your comment:")
             }
 
-            col += TextField(text: "") {
-                $0.placeholder = "Comment"
+            col += .fixed {
+                TextField(text: "") {
+                    $0.placeholder = "Name"
+                }
+            }
+
+            col += .fixed {
+                TextField(text: "") {
+                    $0.placeholder = "Comment"
+                }
             }
         }
         .inset(uniform: 16.0)
-        .box(backgroundColor: .lightGray)
+        .box(background: .lightGray)
     }
 }
 
@@ -107,18 +111,20 @@ fileprivate struct FeedItem: ProxyElement {
             row.minimumHorizontalSpacing = 16.0
             row.horizontalUnderflow = .growUniformly
             
-            let avatar = Box(
-                backgroundColor: .lightGray,
-                cornerStyle: .rounded(radius: 32.0),
-                wrapping: nil
-            ).constrainedTo(width: .absolute(64), height: .absolute(64))
-
-            row.add(fixed: avatar)
+            row += .fixed {
+                Box(
+                    backgroundColor: .lightGray,
+                    cornerStyle: .rounded(radius: 32.0),
+                    wrapping: nil
+                ).constrainedTo(width: .absolute(64), height: .absolute(64))
+            }
             
-            row += FeedItemBody(post: post)
+            row += .flexible {
+                FeedItemBody(post: post)
+            }
         }
         .inset(uniform: 16.0)
-        .box(backgroundColor: .white)
+        .box(background: .white)
     }
 
 }
@@ -132,22 +138,30 @@ fileprivate struct FeedItemBody: ProxyElement {
             col.horizontalAlignment = .leading
             col.minimumVerticalSpacing = 8.0
 
-            col += Row { row in
-                row.minimumHorizontalSpacing = 8.0
-                row.verticalAlignment = .center
+            col += .fixed {
+                Row { row in
+                    row.minimumHorizontalSpacing = 8.0
+                    row.verticalAlignment = .center
 
-                row += Label(text: post.authorName) {
-                    $0.font = UIFont.boldSystemFont(ofSize: 14.0)
-                }
+                    row += .flexible {
+                        Label(text: post.authorName) {
+                            $0.font = UIFont.boldSystemFont(ofSize: 14.0)
+                        }
+                    }
 
-                row += Label(text: post.timeAgo) {
-                    $0.font = UIFont.systemFont(ofSize: 14.0)
-                    $0.color = .lightGray
+                    row += .flexible {
+                        Label(text: post.timeAgo) {
+                            $0.font = UIFont.systemFont(ofSize: 14.0)
+                            $0.color = .lightGray
+                        }
+                    }
                 }
             }
 
-            col += Label(text: post.body) {
-                $0.font = UIFont.systemFont(ofSize: 13.0)
+            col += .flexible {
+                Label(text: post.body) {
+                    $0.font = UIFont.systemFont(ofSize: 13.0)
+                }
             }
         }
     }

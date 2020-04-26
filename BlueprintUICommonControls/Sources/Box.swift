@@ -118,18 +118,18 @@ extension Box {
 
 public extension Element {
     func box(
-        backgroundColor: UIColor = .clear,
-        cornerStyle: Box.CornerStyle = .square,
-        borderStyle: Box.BorderStyle = .none,
-        shadowStyle: Box.ShadowStyle = .none,
+        background: UIColor = .clear,
+        corners: Box.CornerStyle = .square,
+        borders: Box.BorderStyle = .none,
+        shadow: Box.ShadowStyle = .none,
         clipsContent: Bool = false
     ) -> Box
     {
         Box(
-            backgroundColor: backgroundColor,
-            cornerStyle: cornerStyle,
-            borderStyle: borderStyle,
-            shadowStyle: shadowStyle,
+            backgroundColor: background,
+            cornerStyle: corners,
+            borderStyle: borders,
+            shadowStyle: shadow,
             clipsContent: clipsContent,
             wrapping: self
         )

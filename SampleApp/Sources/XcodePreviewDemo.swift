@@ -16,14 +16,16 @@ struct TestElement : ProxyElement {
             $0.verticalUnderflow = .justifyToStart
             
             $0 += (1...12).map { index in
-                Label(text: "Hello, World") {
-                    $0.font = .boldSystemFont(ofSize: 10.0 + CGFloat(index * 4))
-                    $0.color = .init(
-                        red: CGFloat.random(in: 0...1),
-                        green: CGFloat.random(in: 0...1),
-                        blue: CGFloat.random(in: 0...1),
-                        alpha: 1.0
-                    )
+                .fixed {
+                    Label(text: "Hello, World") {
+                        $0.font = .boldSystemFont(ofSize: 10.0 + CGFloat(index * 4))
+                        $0.color = .init(
+                            red: CGFloat.random(in: 0...1),
+                            green: CGFloat.random(in: 0...1),
+                            blue: CGFloat.random(in: 0...1),
+                            alpha: 1.0
+                        )
+                    }
                 }
             }
         }
