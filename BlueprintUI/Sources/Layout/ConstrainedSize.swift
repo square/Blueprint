@@ -3,19 +3,26 @@ import UIKit
 /// Constrains the measured size of the content element.
 public struct ConstrainedSize: Element {
 
-    public var wrappedElement: Element
+    public var wrapped: Element
 
     public var width: Constraint
     public var height: Constraint
 
-    public init(width: Constraint = .unconstrained, height: Constraint = .unconstrained, wrapping element: Element) {
-        self.wrappedElement = element
+    public init(
+        width: Constraint = .unconstrained,
+        height: Constraint = .unconstrained,
+        wrapping element: Element
+    ) {
         self.width = width
         self.height = height
+        self.wrapped = element
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(width: width, height: height))
+        ElementContent(
+            child: wrapped,
+            layout: Layout(width: width, height: height)
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -51,6 +58,18 @@ extension ConstrainedSize {
 
 }
 
+public extension Element {
+    
+    /// Constrains the measured size of the content element.
+    func constrainedTo(
+        width: ConstrainedSize.Constraint = .unconstrained,
+        height: ConstrainedSize.Constraint = .unconstrained
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(width: width, height: height, wrapping: self)
+    }
+}
+
 extension Comparable {
 
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
@@ -80,5 +99,3 @@ extension ConstrainedSize {
     }
 
 }
-
-

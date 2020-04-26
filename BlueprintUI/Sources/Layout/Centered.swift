@@ -7,14 +7,27 @@
 public struct Centered: ProxyElement {
 
     /// The content element to be centered.
-    public var wrappedElement: Element
+    public var wrapped: Element
 
     /// Initializes a `Centered` element with the given content element.
-    public init(_ wrappedElement: Element) {
-        self.wrappedElement = wrappedElement
+    public init(_ wrapped: Element) {
+        self.wrapped = wrapped
     }
 
     public var elementRepresentation: Element {
-        return Aligned(vertically: .center, horizontally: .center, wrapping: wrappedElement)
+        Aligned(
+            vertically: .center,
+            horizontally: .center,
+            wrapping: wrapped
+        )
+    }
+}
+
+
+public extension Element {
+    
+    /// Wraps the element in a `Centered` element to center it within its parent.
+    func centered() -> Centered {
+        Centered(self)
     }
 }

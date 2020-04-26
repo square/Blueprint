@@ -36,8 +36,8 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         traits: Set<Trait> = [],
-        wrapping element: Element)
-    {
+        wrapping element: Element
+    ) {
         self.label = label
         self.value = value
         self.hint = hint
@@ -105,5 +105,25 @@ public struct AccessibilityElement: Element {
             config[\.isAccessibilityElement] = true
         }
     }
+}
 
+
+public extension AccessibilityElement {
+    func accessibility(
+        label: String? = nil,
+        value: String? = nil,
+        hint: String? = nil,
+        identifier: String? = nil,
+        traits: Set<Trait> = []
+        ) -> AccessibilityElement
+    {
+        AccessibilityElement(
+            label: label,
+            value: value,
+            hint: hint,
+            identifier: identifier,
+            traits: traits,
+            wrapping: self
+        )
+    }
 }

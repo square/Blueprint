@@ -1,16 +1,17 @@
 import BlueprintUI
 import UIKit
 
+
 public struct AccessibilityBlocker: Element {
 
-    public var wrappedElement: Element
+    public var wrapped: Element
 
     public init(wrapping element: Element) {
-        self.wrappedElement = element
+        self.wrapped = element
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        return ElementContent(child: wrapped)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -19,5 +20,10 @@ public struct AccessibilityBlocker: Element {
             config[\.accessibilityElementsHidden] = true
         }
     }
+}
 
+public extension Element {
+    func blockAccessibility() -> AccessibilityBlocker {
+        AccessibilityBlocker(wrapping: self)
+    }
 }

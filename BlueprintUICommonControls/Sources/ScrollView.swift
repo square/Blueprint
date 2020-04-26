@@ -9,7 +9,7 @@ public struct ScrollView: Element {
     public var wrappedElement: Element
 
     /// Determines the sizing behavior of the content within the scroll view.
-    public var contentSize: ContentSize = .fittingHeight
+    public var contentSize: ContentSize
     public var alwaysBounceVertical = false
     public var alwaysBounceHorizontal = false
     
@@ -30,8 +30,15 @@ public struct ScrollView: Element {
     public var keyboardAdjustmentMode : KeyboardAdjustmentMode = .adjustsWhenVisible
 
 
-    public init(wrapping element: Element) {
+    public init(
+        _ contentSize: ContentSize = .fittingHeight,
+        wrapping element: Element,
+        configure : (inout ScrollView) -> () = { _ in }
+    ) {
+        self.contentSize = contentSize
         self.wrappedElement = element
+        
+        configure(&self)
     }
 
     public var content: ElementContent {
@@ -57,6 +64,20 @@ public struct ScrollView: Element {
             contentInset: contentInset,
             contentSize: contentSize,
             centersUnderflow: centersUnderflow
+        )
+    }
+}
+
+public extension Element {
+    func scrollable(
+        _ contentSize: ScrollView.ContentSize = .fittingHeight,
+        configure : (inout ScrollView) -> () = { _ in }
+    ) -> ScrollView
+    {
+        ScrollView(
+            contentSize,
+            wrapping: self,
+            configure: configure
         )
     }
 }
