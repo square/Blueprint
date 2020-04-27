@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.author       = 'Square'
   s.source       = { :git => 'https://github.com/square/blueprint.git', :tag => s.version }
 
-  s.swift_version = '5.1'
+  s.swift_version = '5.0'
 
   s.ios.deployment_target = '10.0'
 
