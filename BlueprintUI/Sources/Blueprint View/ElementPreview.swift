@@ -5,7 +5,7 @@
 //  Created by Kyle Van Essen on 4/14/20.
 //
 
-#if DEBUG && canImport(SwiftUI) && !arch(i386) && !arch(arm)
+#if DEBUG && canImport(SwiftUI) && (arch(x86_64) || arch(arm64))
 
 import UIKit
 import SwiftUI
