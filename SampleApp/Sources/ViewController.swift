@@ -43,11 +43,9 @@ fileprivate struct MainView: ProxyElement {
     var posts: [Post]
     
     var elementRepresentation: Element {
-        Column { col in
-                col.horizontalAlignment = .fill
-                
-            col += .fixed { List(posts: posts) }
-            col += .fixed { CommentForm() }
+        Column(alignment: .fill) { col in
+            col += List(posts: posts)
+            col += CommentForm()
         }.scrollable {
             $0.contentSize = .fittingHeight
             $0.alwaysBounceVertical = true

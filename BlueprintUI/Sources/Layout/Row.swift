@@ -4,10 +4,27 @@ import UIKit
 public struct Row: StackElement {
 
     public var children: [StackChild] = []
+    
+    public var defaults: StackDefaults
 
-    private (set) public var layout = StackLayout(axis: .horizontal)
+    private (set) public var layout : StackLayout
 
-    public init() {}
+    public init(
+        alignment : StackLayout.Alignment = .leading,
+        underflow : StackLayout.UnderflowDistribution = .growUniformly,
+        overflow : StackLayout.OverflowDistribution = .condenseUniformly,
+        _ configure: (inout Self) -> Void
+    ) {
+        self.defaults = StackDefaults()
+        
+        self.layout = StackLayout(axis: .horizontal) {
+            $0.alignment = alignment
+            $0.underflow = underflow
+            $0.overflow = overflow
+        }
+        
+        configure(&self)
+    }
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {
         get { return layout.underflow }

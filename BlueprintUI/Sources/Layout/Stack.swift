@@ -5,9 +5,14 @@ import UIKit
 /// This protocol should only be used by Row and Column elements (you should never add conformance to other custom
 /// types).
 public protocol StackElement: Element {
-    init()
     var layout: StackLayout { get }
+    var defaults : StackDefaults { get }
     var children: [StackChild] { get set }
+}
+
+public struct StackDefaults : Equatable {
+    var growPriority : CGFloat = 0.0
+    var shrinkPriority : CGFloat = 0.0
 }
 
 public struct StackChild {
@@ -18,11 +23,11 @@ public struct StackChild {
     public init(
         traits : StackLayout.Traits = .flexible,
         key : AnyHashable? = nil,
-        element : () -> Element
+        element : Element
     ) {
         self.traits = traits
         self.key = key
-        self.element = element()
+        self.element = element
     }
     
     public static func fixed(
@@ -33,7 +38,7 @@ public struct StackChild {
         StackChild(
             traits: .fixed,
             key: key,
-            element : element
+            element : element()
         )
     }
     
@@ -45,7 +50,7 @@ public struct StackChild {
         StackChild(
             traits: .flexible,
             key: key,
-            element: element
+            element: element()
         )
     }
     
@@ -57,7 +62,7 @@ public struct StackChild {
         StackChild(
             traits: .grows,
             key: key,
-            element: element
+            element: element()
         )
     }
     
@@ -69,7 +74,7 @@ public struct StackChild {
         StackChild(
             traits: .shrinks,
             key: key,
-            element: element
+            element: element()
         )
     }
 }
@@ -92,11 +97,6 @@ extension StackElement {
 }
 
 extension StackElement {
-
-    public init(_ configure: (inout Self) -> Void) {
-        self.init()
-        configure(&self)
-    }
 
     /// Adds a given child element to the stack.
     ///
@@ -143,7 +143,7 @@ extension StackElement {
         self.add(child: StackChild(
             traits: StackLayout.Traits(growPriority: growPriority, shrinkPriority: shrinkPriority),
             key: key,
-            element: { child }
+            element: child
         ))
     }
     
@@ -152,6 +152,21 @@ extension StackElement {
     }
     
     public static func += (lhs : inout Self, rhs : [StackChild]) {
+        for element in rhs {
+            lhs.add(child: element)
+        }
+    }
+    
+    public static func += (lhs : inout Self, rhs : Element) {
+        lhs.add(child: StackChild(
+            traits: .init(growPriority: lhs.defaults.growPriority, shrinkPriority: lhs.defaults.growPriority),
+            key: nil,
+            element: rhs
+            )
+        )
+    }
+    
+    public static func += (lhs : inout Self, rhs : [Element]) {
         for element in rhs {
             lhs.add(child: element)
         }
@@ -219,8 +234,9 @@ public struct StackLayout: Layout {
     public var minimumSpacing: CGFloat = 0
 
 
-    public init(axis: Axis) {
+    public init(axis: Axis, configure : (inout Self) -> () = { _ in }) {
         self.axis = axis
+        configure(&self)
     }
 
     public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
