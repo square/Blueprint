@@ -112,6 +112,11 @@ public final class BlueprintView: UIView {
         invalidateIntrinsicContentSize()
         performUpdate()
     }
+
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        setNeedsViewHierarchyUpdate()
+    }
     
     private func performUpdate() {
         updateViewHierarchyIfNeeded()
@@ -141,11 +146,14 @@ public final class BlueprintView: UIView {
         
         rootController.view.frame = bounds
         
-        let rootNode = NativeViewNode(
+        var rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes
         )
+
+        let scale = window?.screen.scale ?? UIScreen.main.scale
+        rootNode.round(from: .zero, correction: .zero, scale: scale)
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         hasUpdatedViewHierarchy = true
