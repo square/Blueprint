@@ -153,7 +153,34 @@ public struct LayoutAttributes {
     private func validateAlpha() {
         assert(alpha.isFinite, "LayoutAttributes.alpha must only contain finite values.")
     }
-    
+
+    /// Performs rounding on the frame to snap to pixel boundaries.
+    ///
+    /// - Parameters:
+    ///   - origin: The global origin to offset the frame by before rounding. This offset is used to ensure that
+    ///     positive and negative frame coordinates both round away from zero.
+    ///   - correction: The amount of rounding correction to apply to the origin before rounding, to account for the
+    ///     rounding applied to this node's parent.
+    ///   - scale: The screen scale to use when rounding.
+    mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) -> CGPoint {
+        // Apply origin offset and rounding correction
+        let correctedFrame = self.frame
+            .offset(by: origin)
+            .offset(by: correction)
+
+        // Round
+        let roundedFrame = correctedFrame
+            .rounded(.toNearestOrAwayFromZero, by: scale)
+
+        // Save rounding correction
+        let roundingCorrection = correctedFrame.origin - roundedFrame.origin
+
+        // Reverse origin offset and set new frame
+        self.frame = roundedFrame
+            .offset(by: -origin)
+
+        return roundingCorrection
+    }
 }
 
 extension LayoutAttributes: Equatable {
