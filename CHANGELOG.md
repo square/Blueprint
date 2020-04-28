@@ -12,6 +12,12 @@
 
 # Past Releases
 
+## [0.10.0] - 2020-04-27
+
+### Added
+
+- BlueprintView will align view frames to pixel boundaries after layout ([#64]).
+
 ## 0.9.2
 
 ### Fixed
@@ -37,3 +43,6 @@
 
 - Change how stack [layouts are measured](https://github.com/square/Blueprint/pull/68) to resolve an issue where text would be truncated.
 - [Properly measure](https://github.com/square/Blueprint/pull/73) the child of `ScrollView` to allow for unconstrained measurement.
+
+[0.10.0]: https://github.com/square/Blueprint/compare/0.9.2...0.10.0
+[#64]: https://github.com/square/Blueprint/pull/64
