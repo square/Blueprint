@@ -8,11 +8,11 @@
 import UIKit
 
 
-protocol KeyboardObserverDelegate : AnyObject {
+public protocol KeyboardObserverDelegate : AnyObject {
     
     func keyboardFrameWillChange(
         for observer : KeyboardObserver,
-        animationDuration : Double,
+        duration : Double,
         options : UIView.AnimationOptions
     )
 }
@@ -43,17 +43,17 @@ protocol KeyboardObserverDelegate : AnyObject {
  iOS Docs for keyboard management:
  https://developer.apple.com/library/archive/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html
  */
-final class KeyboardObserver {
+public final class KeyboardObserver {
     
     private let center : NotificationCenter
     
-    weak var delegate : KeyboardObserverDelegate?
+    public weak var delegate : KeyboardObserverDelegate?
     
     //
     // MARK: Initialization
     //
     
-    init(center : NotificationCenter = .default) {
+    public init(center : NotificationCenter = .default) {
         
         self.center = center
         
@@ -74,18 +74,34 @@ final class KeyboardObserver {
     // MARK: Handling Changes
     //
     
-    enum KeyboardFrame : Equatable {
+    public enum KeyboardFrame : Equatable {
         
         /// The current frame does not overlap the current view at all.
         case nonOverlapping
         
         /// The current frame does overlap the view, by the provided rect, in the view's coordinate space.
-        case overlapping(frame: CGRect)
+        case overlapping(frame: CGRect, type : KeyboardType)
+        
+        public enum KeyboardType : Equatable {
+            case bottomAnchored
+            case undocked
+            case floating
+            
+            init(notificationFrame : CGRect) {
+                let root = UIApplication.shared.delegate!.window!!
+                
+                let frameInWindow = root.convert(notificationFrame, to: root)
+                
+                print("KeyboardType: \(frameInWindow)")
+                
+                self = .bottomAnchored
+            }
+        }
     }
     
     /// How the keyboard overlaps the view provided. If the view is not on screen (eg, no window),
     /// or the observer has not yet learned about the keyboard's position, this method returns nil.
-    func currentFrame(in view : UIView) -> KeyboardFrame? {
+    public func currentFrame(in view : UIView) -> KeyboardFrame? {
         
         guard view.window != nil else {
             return nil
@@ -98,7 +114,12 @@ final class KeyboardObserver {
         let frame = view.convert(notification.endingFrame, from: nil)
         
         if frame.intersects(view.bounds) {
-            return .overlapping(frame: frame)
+            return .overlapping(
+                frame: frame,
+                type : KeyboardFrame.KeyboardType(
+                    notificationFrame: notification.endingFrame
+                )
+            )
         } else {
             return .nonOverlapping
         }
@@ -109,7 +130,7 @@ final class KeyboardObserver {
     //
     
     private func receivedUpdatedKeyboardInfo(_ new : NotificationInfo) {
-        
+                
         let old = self.latestNotification
         
         self.latestNotification = new
@@ -130,7 +151,7 @@ final class KeyboardObserver {
         
         self.delegate?.keyboardFrameWillChange(
             for: self,
-            animationDuration: new.animationDuration,
+            duration: new.animationDuration,
             options: animationOptions
         )
     }
@@ -140,6 +161,8 @@ final class KeyboardObserver {
     //
     
     @objc private func keyboardFrameChanged(_ notification : Notification) {
+        
+        print("Changed: \(notification)")
         
         do {
             let info = try NotificationInfo(with: notification)

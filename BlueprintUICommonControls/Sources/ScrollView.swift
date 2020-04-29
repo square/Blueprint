@@ -421,7 +421,7 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
             
             switch keyboardFrame {
             case .nonOverlapping: return 0.0
-            case .overlapping(let frame): return self.bounds.size.height - frame.origin.y
+            case .overlapping(let frame, _): return self.bounds.size.height - frame.origin.y
             }
         }
     }
@@ -432,10 +432,10 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
     
     func keyboardFrameWillChange(
         for observer : KeyboardObserver,
-        animationDuration : Double,
+        duration : Double,
         options : UIView.AnimationOptions
-    ) {
-        UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
+    ) {        
+        UIView.animate(withDuration: duration, delay: 0.0, options: options, animations: {
             self.updateBottomContentInsetWithKeyboardFrame()
         })
     }

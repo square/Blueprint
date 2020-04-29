@@ -28,7 +28,7 @@ let posts = [
 
 final class ViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: MainView(posts: posts))
+    private let blueprintView = BlueprintView(element: MessagesView())
 
     override func loadView() {
         self.view = blueprintView
