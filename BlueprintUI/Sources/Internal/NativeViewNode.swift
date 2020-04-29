@@ -39,5 +39,33 @@ struct NativeViewNode {
         self.layoutAttributes = layoutAttributes
         self.children = children
     }
-    
+
+    /// Recursively rounds this node's layout frame and all its children to snap to pixel boundaries.
+    ///
+    /// - Parameters:
+    ///   - origin: The global origin to offset the frame by before rounding. This offset is used to ensure that
+    ///     positive and negative frame coordinates both round away from zero.
+    ///   - correction: The amount of rounding correction to apply to the origin before rounding, to account for the
+    ///     rounding applied to this node's parent.
+    ///   - scale: The screen scale to use when rounding.
+    mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) {
+        // Per the docs for UIView.frame:
+        // > If the transform property is not the identity transform, the value of this property is undefined
+        // > and therefore should be ignored.
+        // So we do not attempt to snap the frame to pixel bounds in this case.
+        guard CATransform3DIsIdentity(layoutAttributes.transform) else {
+            return
+        }
+
+        let childCorrection = layoutAttributes.round(
+            from: origin,
+            correction: correction,
+            scale: scale)
+
+        let childOrigin = origin + layoutAttributes.frame.origin
+
+        for i in children.indices {
+            children[i].node.round(from: childOrigin, correction: childCorrection, scale: scale)
+        }
+    }
 }
