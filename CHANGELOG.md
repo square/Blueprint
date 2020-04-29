@@ -2,6 +2,8 @@
 
 ### Fixed
 
+- [Fixed `ConstrainedSize`](https://github.com/square/Blueprint/pull/87) to ensure that the measurement of its inner element respects the `ConstrainedSize`'s maximum size, which matters for measuring elements which re-flow based on width, such as elements containing text.
+
 ### Added
 
 ### Removed
