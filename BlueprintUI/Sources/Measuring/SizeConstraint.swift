@@ -65,6 +65,15 @@ extension SizeConstraint {
 
         /// The measurement is unconstrained in the given dimension.
         case unconstrained
+        
+        /// Creates a `SizeConstraint` with the provided value.
+        init(_ value : CGFloat) {
+            if value == Axis.maxValue {
+                self = .unconstrained
+            } else {
+                self = .atMost(value)
+            }
+        }
 
         /// The maximum magnitude in the given dimension.
         public var maximum: CGFloat {
@@ -72,7 +81,7 @@ extension SizeConstraint {
             case .atMost(let value):
                 return value
             case .unconstrained:
-                return .greatestFiniteMagnitude
+                return Axis.maxValue
             }
         }
 
@@ -85,6 +94,8 @@ extension SizeConstraint {
                 return 0.0
             }
         }
+        
+        private static var maxValue : CGFloat = .greatestFiniteMagnitude
 
         public static func -(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
