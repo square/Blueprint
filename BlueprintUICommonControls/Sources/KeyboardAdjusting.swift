@@ -68,12 +68,8 @@ public struct KeyboardAdjusting : Element {
         override func layoutSubviews() {
             super.layoutSubviews()
             
-            let insets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: self.keyboardInset, right: 0.0)
-            
-            let frame = self.bounds.inset(by: insets)
-            
-            if frame != self.contentView.frame {
-                self.contentView.frame = frame
+            if self.contentView.frame != self.bounds {
+                self.contentView.frame = self.bounds
                 self.updateElement()
             }
         }

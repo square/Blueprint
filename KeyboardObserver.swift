@@ -161,9 +161,7 @@ public final class KeyboardObserver {
     //
     
     @objc private func keyboardFrameChanged(_ notification : Notification) {
-        
-        print("Changed: \(notification)")
-        
+                
         do {
             let info = try NotificationInfo(with: notification)
             self.receivedUpdatedKeyboardInfo(info)
