@@ -95,23 +95,23 @@ public struct KeyboardAdjusting : Element {
             }
         }
         
-        private var addedContentOffset : CGFloat = 0.0
-        
-        func updateContentOffset() {
-            let scrollViews = self.findSubviews {
-                $0 is UIScrollView
-            }
-            
-            guard let scrollView = scrollViews.first as? UIScrollView else {
-                return
-            }
-            
-            let offsetToAdd = self.keyboardInset - self.addedContentOffset
-            
-            scrollView.contentOffset.y += offsetToAdd
-            
-            self.addedContentOffset += offsetToAdd
-        }
+//        private var addedContentOffset : CGFloat = 0.0
+//
+//        func updateContentOffset() {
+//            let scrollViews = self.findSubviews {
+//                $0 is UIScrollView
+//            }
+//
+//            guard let scrollView = scrollViews.first as? UIScrollView else {
+//                return
+//            }
+//
+//            let offsetToAdd = self.keyboardInset - self.addedContentOffset
+//
+//            scrollView.contentOffset.y += offsetToAdd
+//
+//            self.addedContentOffset += offsetToAdd
+//        }
         
         // MARK: KeyboardObserverDelegate
         
@@ -125,7 +125,6 @@ public struct KeyboardAdjusting : Element {
             UIView.animate(withDuration: duration, delay: 0.0, options: options, animations: {
                 self.setNeedsLayout()
                 self.updateElement()
-                self.updateContentOffset()
                 self.layoutIfNeeded()
             })
         }

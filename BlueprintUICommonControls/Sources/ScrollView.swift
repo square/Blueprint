@@ -325,6 +325,18 @@ fileprivate final class ScrollerWrapperView: UIView {
         }
     }
     
+    private var addedContentOffset : CGFloat = 0.0
+    
+    func updateContentOffset(keyboardInset : CGFloat) {
+        let offsetToAdd = keyboardInset - self.addedContentOffset
+        
+        if offsetToAdd != 0 {
+            self.scrollView.contentOffset.y += offsetToAdd
+        }
+        
+        self.addedContentOffset += offsetToAdd
+    }
+    
     //
     // MARK: UIView
     //
@@ -406,6 +418,8 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
         if self.scrollView.contentInset.bottom != contentInset.bottom {
             self.scrollView.contentInset.bottom = contentInset.bottom
         }
+        
+        self.updateContentOffset(keyboardInset: self.bottomContentInsetAdjustmentForKeyboard)
     }
     
     fileprivate var bottomContentInsetAdjustmentForKeyboard : CGFloat {
