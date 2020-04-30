@@ -111,7 +111,7 @@ public final class KeyboardObserver {
             return nil
         }
         
-        let frame = view.convert(notification.endingFrame, from: nil)
+        let frame = view.convert(notification.endingFrame, from: UIScreen.main.coordinateSpace)
         
         if frame.intersects(view.bounds) {
             return .overlapping(

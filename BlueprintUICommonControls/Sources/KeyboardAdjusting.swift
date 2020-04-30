@@ -11,11 +11,21 @@ import UIKit
 
 public struct KeyboardAdjusting : Element {
     
-    public typealias Provider = (Info) -> Element
+    public typealias Provider = (Info) -> Content
     
     public struct Info : Equatable {
         public var size : CGSize
         public var keyboardInset : CGFloat
+    }
+    
+    public struct Content {
+        public var element : Element
+        public var inputAccessory : Element?
+        
+        public init(element : Element, inputAccessory : Element? = nil) {
+            self.element = element
+            self.inputAccessory = inputAccessory
+        }
     }
     
     public var provider : Provider
@@ -74,6 +84,16 @@ public struct KeyboardAdjusting : Element {
             }
         }
         
+        override var canBecomeFirstResponder: Bool {
+            return true
+        }
+        
+        private var inputAccessoryBlueprintView : BlueprintView = BlueprintView()
+        
+        override var inputAccessoryView: UIView? {
+            return self.inputAccessoryBlueprintView
+        }
+        
         private var lastInfo : Info? = nil
         
         func updateElement() {
@@ -94,24 +114,6 @@ public struct KeyboardAdjusting : Element {
                 self.contentView.element = provider(info)
             }
         }
-        
-//        private var addedContentOffset : CGFloat = 0.0
-//
-//        func updateContentOffset() {
-//            let scrollViews = self.findSubviews {
-//                $0 is UIScrollView
-//            }
-//
-//            guard let scrollView = scrollViews.first as? UIScrollView else {
-//                return
-//            }
-//
-//            let offsetToAdd = self.keyboardInset - self.addedContentOffset
-//
-//            scrollView.contentOffset.y += offsetToAdd
-//
-//            self.addedContentOffset += offsetToAdd
-//        }
         
         // MARK: KeyboardObserverDelegate
         
