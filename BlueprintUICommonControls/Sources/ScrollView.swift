@@ -69,6 +69,9 @@ public struct ScrollView: Element {
 }
 
 public extension Element {
+    
+    /// Wraps the element in a `ScrollView` to allow it to be scrolled
+    /// if it takes up more space then is available on screen.
     func scrollable(
         _ contentSize: ScrollView.ContentSize = .fittingHeight,
         configure : (inout ScrollView) -> () = { _ in }

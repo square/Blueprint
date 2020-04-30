@@ -79,8 +79,20 @@ public struct Inset: Element {
 public extension Element {
     
     /// Insets the element by the given amount on each side.
-    func inset(top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0) -> Inset {
-        Inset(top: top, bottom: bottom, left: left, right: right, wrapping: self)
+    func inset(
+        top: CGFloat = 0.0,
+        bottom: CGFloat = 0.0,
+        left: CGFloat = 0.0,
+        right: CGFloat = 0.0
+    ) -> Inset
+    {
+        Inset(
+            top: top,
+            bottom: bottom,
+            left: left,
+            right: right,
+            wrapping: self
+        )
     }
     
     /// Insets the element by the given amount on each side.
@@ -94,8 +106,18 @@ public extension Element {
     }
     
     /// Insets the element by the given amount on each side.
-    func inset(horizontal : CGFloat = 0.0, vertical : CGFloat = 0.0) -> Inset {
-        Inset(top: vertical, bottom: vertical, left: horizontal, right: horizontal, wrapping: self)
+    func inset(
+        horizontal : CGFloat = 0.0,
+        vertical : CGFloat = 0.0
+    ) -> Inset
+    {
+        Inset(
+            top: vertical,
+            bottom: vertical,
+            left: horizontal,
+            right: horizontal,
+            wrapping: self
+        )
     }
 }
 

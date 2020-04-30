@@ -88,7 +88,7 @@ extension ConstrainedSize {
 
 public extension Element {
     
-    /// Constrains the measured size of the content element.
+    /// Constrains the measured size of the element to the provided width and height.
     func constrainedTo(
         width: ConstrainedSize.Constraint = .unconstrained,
         height: ConstrainedSize.Constraint = .unconstrained

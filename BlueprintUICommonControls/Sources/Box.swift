@@ -118,7 +118,7 @@ extension Box {
 
 public extension Element {
     
-    /// Wraps the given element in a box to provide basic styling.
+    /// Wraps the element in a box to provide basic styling.
     func box(
         background: UIColor = .clear,
         corners: Box.CornerStyle = .square,

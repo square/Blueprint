@@ -108,13 +108,16 @@ public struct AccessibilityElement: Element {
 }
 
 
-public extension AccessibilityElement {
+public extension Element {
+    
+    /// Wraps the element to provide the passed accessibility
+    /// options to the accessibility system.
     func accessibility(
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,
         identifier: String? = nil,
-        traits: Set<Trait> = []
+        traits: Set<AccessibilityElement.Trait> = []
         ) -> AccessibilityElement
     {
         AccessibilityElement(
