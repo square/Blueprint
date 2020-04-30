@@ -52,17 +52,21 @@ struct MessagesView : ProxyElement {
             scrollView.keyboardDismissMode = .interactive
             scrollView.contentSize = .fittingHeight
             
-            
-            return Overlay(
-                elements: [
-                    scrollView,
-                    Aligned(vertically: .bottom, wrapping: Column {
-                        $0.horizontalAlignment = .fill
-                        $0.add(growPriority: 0, shrinkPriority: 0, child: MessageBar())
-                        $0.add(growPriority: 0, shrinkPriority: 0, child: BlueprintUI.Spacer(size: CGSize(width: 0.0, height: info.keyboardInset)))
-                    })
-                ]
+            return .init(
+                element: scrollView,
+                inputAccessory: MessageBar()
             )
+            
+//            return Overlay(
+//                elements: [
+//                    scrollView,
+//                    Aligned(vertically: .bottom, wrapping: Column {
+//                        $0.horizontalAlignment = .fill
+//                        $0.add(growPriority: 0, shrinkPriority: 0, child: MessageBar())
+//                        $0.add(growPriority: 0, shrinkPriority: 0, child: BlueprintUI.Spacer(size: CGSize(width: 0.0, height: info.keyboardInset)))
+//                    })
+//                ]
+//            )
         }
     }
     

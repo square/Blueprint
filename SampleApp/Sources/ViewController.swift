@@ -33,7 +33,10 @@ final class ViewController: UIViewController {
     override func loadView() {
         self.view = blueprintView
     }
-
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
 }
 
 fileprivate struct MainView: ProxyElement {
