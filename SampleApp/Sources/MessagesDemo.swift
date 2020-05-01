@@ -61,12 +61,15 @@ struct MessagesView : ProxyElement {
     
     struct MessageBar : ProxyElement {
         var elementRepresentation: Element {
-            ConstrainedSize(
-                height: .atLeast(60.0),
-                wrapping: Row {
-                    $0.verticalAlignment = .fill
-                    $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: BlueprintUICommonControls.TextField(text: "My Message!"))
-                }
+            Box(
+                backgroundColor: .lightGray,
+                wrapping: Inset(
+                    uniformInset: 15.0,
+                    wrapping: Row {
+                        $0.verticalAlignment = .fill
+                        $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: BlueprintUICommonControls.TextField(text: "My Message!"))
+                    }
+                )
             )
         }
     }

@@ -23,15 +23,12 @@ public struct InputAccessoryScreen : Element {
     }
     
     public var content: ElementContent {
-        ElementContent {
-            $0.maximum
-        }
+        ElementContent(child: self.wrapped)
     }
     
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         View.describe {
             $0.apply {
-                $0.wrapped = self.wrapped
                 $0.inputAccessory = self.inputAccessory
             }
         }
@@ -39,14 +36,7 @@ public struct InputAccessoryScreen : Element {
     
     private final class View : UIView {
         
-        private let contentView : BlueprintView
         private let accessoryView : InputAccessoryView
-                
-        public var wrapped : Element? = nil {
-            didSet {
-                self.contentView.element = self.wrapped
-            }
-        }
         
         public var inputAccessory : InputAccessory? = nil {
             didSet {
@@ -55,21 +45,12 @@ public struct InputAccessoryScreen : Element {
         }
         
         override init(frame: CGRect) {
-            self.contentView = BlueprintView()
             self.accessoryView = InputAccessoryView()
             
             super.init(frame: frame)
-                        
-            self.addSubview(self.contentView)
         }
         
         required init?(coder: NSCoder) { fatalError() }
-             
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            
-            self.contentView.frame = self.bounds
-        }
         
         override var canBecomeFirstResponder: Bool {
             return true
@@ -128,9 +109,7 @@ public struct InputAccessoryScreen : Element {
         
         override var intrinsicContentSize: CGSize {
             if let element = self.contentView.element {
-                let size = element.content.measure(in: SizeConstraint(width: UIScreen.main.bounds.width))
-                print(size)
-                return size
+                return element.content.measure(in: SizeConstraint(width: UIScreen.main.bounds.width))
             } else {
                 return .zero
             }

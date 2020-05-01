@@ -419,6 +419,10 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
             self.scrollView.contentInset.bottom = contentInset.bottom
         }
         
+        if self.scrollView.scrollIndicatorInsets.bottom != contentInset.bottom {
+            self.scrollView.scrollIndicatorInsets.bottom = contentInset.bottom
+        }
+        
         self.updateContentOffset(keyboardInset: self.bottomContentInsetAdjustmentForKeyboard)
     }
     
