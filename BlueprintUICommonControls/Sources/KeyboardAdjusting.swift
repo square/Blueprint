@@ -9,29 +9,17 @@ import BlueprintUI
 import UIKit
 
 
-public struct KeyboardAdjusting : Element {
+public struct InputAccessoryScreen : Element {
     
-    public typealias Provider = (Info) -> Content
+    public var wrapped : Element
+    public var inputAccessory : InputAccessory?
     
-    public struct Info : Equatable {
-        public var size : CGSize
-        public var keyboardInset : CGFloat
-    }
-    
-    public struct Content {
-        public var element : Element
-        public var inputAccessory : Element?
-        
-        public init(element : Element, inputAccessory : Element? = nil) {
-            self.element = element
-            self.inputAccessory = inputAccessory
-        }
-    }
-    
-    public var provider : Provider
-    
-    public init(provider : @escaping Provider) {
-        self.provider = provider
+    public init(
+        wrapping : Element,
+        inputAccessory : InputAccessory? = nil
+    ) {
+        self.wrapped = wrapping
+        self.inputAccessory = inputAccessory
     }
     
     public var content: ElementContent {
@@ -43,55 +31,52 @@ public struct KeyboardAdjusting : Element {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         View.describe {
             $0.apply {
-                $0.provider = self.provider
+                $0.wrapped = self.wrapped
+                $0.inputAccessory = self.inputAccessory
             }
         }
     }
     
-    private final class View : UIView, KeyboardObserverDelegate {
-        let contentView : BlueprintView
+    private final class View : UIView {
         
-        let keyboardObserver : KeyboardObserver
-        
-        var provider : Provider? {
+        private let contentView : BlueprintView
+        private let accessoryView : InputAccessoryView
+                
+        public var wrapped : Element? = nil {
             didSet {
-                self.updateElement()
+                self.contentView.element = self.wrapped
+            }
+        }
+        
+        public var inputAccessory : InputAccessory? = nil {
+            didSet {
+                self.accessoryView.element = self.inputAccessory
             }
         }
         
         override init(frame: CGRect) {
             self.contentView = BlueprintView()
-            
-            self.keyboardObserver = KeyboardObserver()
+            self.accessoryView = InputAccessoryView()
             
             super.init(frame: frame)
-            
-            self.keyboardObserver.delegate = self
-            
+                        
             self.addSubview(self.contentView)
         }
         
         required init?(coder: NSCoder) { fatalError() }
-        
-        private var keyboardInset : CGFloat = 0.0
-        
+             
         override func layoutSubviews() {
             super.layoutSubviews()
             
-            if self.contentView.frame != self.bounds {
-                self.contentView.frame = self.bounds
-                self.updateElement()
-            }
+            self.contentView.frame = self.bounds
         }
         
         override var canBecomeFirstResponder: Bool {
             return true
         }
-        
-        private var inputAccessoryBlueprintView : BlueprintView = BlueprintView()
-        
-        override var inputAccessoryView: UIView? {
-            return self.inputAccessoryBlueprintView
+                
+        override var inputAccessoryView : UIView {
+            self.accessoryView
         }
         
         override func willMove(toSuperview newSuperview: UIView?) {
@@ -99,56 +84,55 @@ public struct KeyboardAdjusting : Element {
             
             self.becomeFirstResponder()
         }
+    }
+    
+    private final class InputAccessoryView : UIView {
         
-        private var lastInfo : Info? = nil
-        
-        func updateElement() {
-            guard let provider = self.provider else {
-                self.contentView.element = nil
+        var element : Element? {
+            didSet {
+                self.contentView.element = element
                 
-                return
-            }
-            
-            let info = Info(
-                size: self.contentView.bounds.size,
-                keyboardInset: self.keyboardInset
-            )
-                        
-            if self.lastInfo != info {
-                self.lastInfo = info
+                if let element = self.element, self.frame.size == .zero {
+                    self.frame.size = element.content.measure(in: .init(width: UIScreen.main.bounds.width))
+                }
                 
-                let content = provider(info)
-                
-                self.contentView.element = content.element
-                self.inputAccessoryBlueprintView.element = content.inputAccessory
-                self.inputAccessoryBlueprintView.frame.size = self.inputAccessoryBlueprintView.sizeThatFits(CGSize(width: UIScreen.main.bounds.width, height: .greatestFiniteMagnitude))
+                self.contentView.layoutIfNeeded()
+                self.contentView.invalidateIntrinsicContentSize()
             }
         }
         
-        // MARK: KeyboardObserverDelegate
+        private let contentView : BlueprintView
         
-        func keyboardFrameWillChange(
-            for observer : KeyboardObserver,
-            duration : Double,
-            options : UIView.AnimationOptions
-        ) {
-            self.keyboardInset = self.bottomInset(for: observer)
+        override init(frame: CGRect) {
+            let bounds = CGRect(origin: .zero, size: frame.size)
             
-            UIView.animate(withDuration: duration, delay: 0.0, options: options, animations: {
-                self.setNeedsLayout()
-                self.updateElement()
-                self.layoutIfNeeded()
-            })
+            self.contentView = BlueprintView(frame: bounds)
+            self.contentView.backgroundColor = .clear
+            
+            super.init(frame: frame)
+            
+            self.addSubview(self.contentView)
         }
         
-        func bottomInset(for observer : KeyboardObserver) -> CGFloat {
-            guard let keyboardFrame = self.keyboardObserver.currentFrame(in: self) else {
-                return 0.0
-            }
+        required init?(coder: NSCoder) { fatalError() }
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
             
-            switch keyboardFrame {
-            case .nonOverlapping: return 0.0
-            case .overlapping(let frame, _): return self.bounds.size.height - frame.origin.y
+            self.contentView.frame = self.bounds
+        }
+        
+        override func sizeThatFits(_ size: CGSize) -> CGSize {
+            self.contentView.sizeThatFits(size)
+        }
+        
+        override var intrinsicContentSize: CGSize {
+            if let element = self.contentView.element {
+                let size = element.content.measure(in: SizeConstraint(width: UIScreen.main.bounds.width))
+                print(size)
+                return size
+            } else {
+                return .zero
             }
         }
     }
@@ -175,7 +159,7 @@ public struct InputAccessory : Element {
         }
     }
     
-    init(style : Style, wrapping : () -> Element) {
+    public init(style : Style, wrapping : () -> Element) {
         self.style = style
         self.wrapped = wrapping()
     }
@@ -216,8 +200,8 @@ public struct InputAccessory : Element {
             }
         }
         
-        let contentView : UIInputView? = nil
-        let blueprintView : BlueprintView
+        private var contentView : UIInputView? = nil
+        private let blueprintView : BlueprintView
         
         init(style : Style, frame: CGRect, wrapping : Element) {
             
@@ -227,6 +211,7 @@ public struct InputAccessory : Element {
             let bounds = CGRect(origin: .zero, size: frame.size)
             
             self.blueprintView = BlueprintView(frame: bounds)
+            self.blueprintView.backgroundColor = .clear
             self.blueprintView.element = wrapping
             
             super.init(frame: frame)
@@ -239,7 +224,7 @@ public struct InputAccessory : Element {
         override func layoutSubviews() {
             super.layoutSubviews()
             
-            self.inputView?.frame = self.bounds
+            self.contentView?.frame = self.bounds
             self.blueprintView.frame = self.bounds
         }
         
@@ -254,6 +239,8 @@ public struct InputAccessory : Element {
                 let inputView = UIInputView(frame: self.bounds, inputViewStyle: style)
                 inputView.addSubview(self.blueprintView)
                 self.addSubview(inputView)
+                
+                self.contentView = inputView
             } else {
                 self.addSubview(self.blueprintView)
             }

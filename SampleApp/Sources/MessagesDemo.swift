@@ -24,64 +24,49 @@ struct MessagesDemo_Preview : PreviewProvider {
 
 struct MessagesView : ProxyElement {
     var elementRepresentation: Element {
-        KeyboardAdjusting { info in
-            
-            let messages = Inset(
-                uniformInset: 15.0,
-                wrapping: Column {
-                    $0.horizontalAlignment = .fill
-                    $0.minimumVerticalSpacing = 20.0
-                    
-                    for message in Message.messages {
-                        $0.add(
-                            growPriority: 0.0,
-                            shrinkPriority: 0.0,
-                            child: Aligned(
-                                horizontally: .trailing,
-                                wrapping: ConstrainedSize(
-                                    width: .atMost(350),
-                                    wrapping: Message(content: message)
-                                )
+        
+        let messages = Inset(
+            uniformInset: 15.0,
+            wrapping: Column {
+                $0.horizontalAlignment = .fill
+                $0.minimumVerticalSpacing = 20.0
+                
+                for message in Message.messages {
+                    $0.add(
+                        growPriority: 0.0,
+                        shrinkPriority: 0.0,
+                        child: Aligned(
+                            horizontally: .trailing,
+                            wrapping: ConstrainedSize(
+                                width: .atMost(350),
+                                wrapping: Message(content: message)
                             )
                         )
-                    }
+                    )
                 }
-            )
-            
-            var scrollView = ScrollView(wrapping: messages)
-            scrollView.keyboardDismissMode = .interactive
-            scrollView.contentSize = .fittingHeight
-            
-            return .init(
-                element: scrollView,
-                inputAccessory: MessageBar()
-            )
-            
-//            return Overlay(
-//                elements: [
-//                    scrollView,
-//                    Aligned(vertically: .bottom, wrapping: Column {
-//                        $0.horizontalAlignment = .fill
-//                        $0.add(growPriority: 0, shrinkPriority: 0, child: MessageBar())
-//                        $0.add(growPriority: 0, shrinkPriority: 0, child: BlueprintUI.Spacer(size: CGSize(width: 0.0, height: info.keyboardInset)))
-//                    })
-//                ]
-//            )
-        }
+            }
+        )
+        
+        var scrollView = ScrollView(wrapping: messages)
+        scrollView.keyboardDismissMode = .interactive
+        scrollView.contentSize = .fittingHeight
+        
+        return InputAccessoryScreen(
+            wrapping: scrollView,
+            inputAccessory: InputAccessory(style: .keyboard) {
+                MessageBar()
+            }
+        )
     }
     
     struct MessageBar : ProxyElement {
         var elementRepresentation: Element {
             ConstrainedSize(
                 height: .atLeast(60.0),
-                wrapping: Box(
-                    backgroundColor: .lightGray,
-                    wrapping: Row {
-                        $0.verticalAlignment = .fill
-                        
-                        $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: BlueprintUICommonControls.TextField(text: "My Message!"))
-                    }
-                )
+                wrapping: Row {
+                    $0.verticalAlignment = .fill
+                    $0.add(growPriority: 1.0, shrinkPriority: 1.0, child: BlueprintUICommonControls.TextField(text: "My Message!"))
+                }
             )
         }
     }
