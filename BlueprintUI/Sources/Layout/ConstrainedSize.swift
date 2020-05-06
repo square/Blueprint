@@ -29,13 +29,13 @@ public struct ConstrainedSize: Element {
         height: Constraint = .unconstrained,
         wrapping element: Element
     ) {
-        self.wrapped = element
         self.width = width
         self.height = height
+        self.wrapped = element
     }
 
     public var content: ElementContent {
-        return ElementContent(
+        ElementContent(
             child: wrapped,
             layout: Layout(width: width, height: height)
         )
@@ -82,6 +82,19 @@ extension ConstrainedSize {
                 return absoluteValue
             }
         }
+    }
+}
+
+
+public extension Element {
+    
+    /// Constrains the measured size of the element to the provided width and height.
+    func constrainedTo(
+        width: ConstrainedSize.Constraint = .unconstrained,
+        height: ConstrainedSize.Constraint = .unconstrained
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(width: width, height: height, wrapping: self)
     }
 }
 
