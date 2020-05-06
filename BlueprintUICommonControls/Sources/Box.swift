@@ -6,17 +6,28 @@ import BlueprintUI
 /// background color.
 public struct Box: Element {
     
-    public var backgroundColor: UIColor = .clear
-    public var cornerStyle: CornerStyle = .square
-    public var borderStyle: BorderStyle = .none
-    public var shadowStyle: ShadowStyle = .none
-    public var clipsContent: Bool = false
+    public var backgroundColor: UIColor
+    public var cornerStyle: CornerStyle
+    public var borderStyle: BorderStyle
+    public var shadowStyle: ShadowStyle
+    public var clipsContent: Bool
 
     public var wrappedElement: Element?
 
-    public init(backgroundColor: UIColor = .clear, cornerStyle: CornerStyle = .square, wrapping element: Element? = nil) {
+    public init(
+        backgroundColor: UIColor = .clear,
+        cornerStyle: CornerStyle = .square,
+        borderStyle: BorderStyle = .none,
+        shadowStyle: ShadowStyle = .none,
+        clipsContent: Bool = false,
+        wrapping element: Element? = nil
+    ) {
         self.backgroundColor = backgroundColor
         self.cornerStyle = cornerStyle
+        self.borderStyle = borderStyle
+        self.shadowStyle = shadowStyle
+        self.clipsContent = clipsContent
+        
         self.wrappedElement = element
     }
 
@@ -103,7 +114,28 @@ extension Box {
         case none
         case simple(radius: CGFloat, opacity: CGFloat, offset: CGSize, color: UIColor)
     }
+}
 
+public extension Element {
+    
+    /// Wraps the element in a box to provide basic styling.
+    func box(
+        background: UIColor = .clear,
+        corners: Box.CornerStyle = .square,
+        borders: Box.BorderStyle = .none,
+        shadow: Box.ShadowStyle = .none,
+        clipsContent: Bool = false
+    ) -> Box
+    {
+        Box(
+            backgroundColor: background,
+            cornerStyle: corners,
+            borderStyle: borders,
+            shadowStyle: shadow,
+            clipsContent: clipsContent,
+            wrapping: self
+        )
+    }
 }
 
 extension Box.CornerStyle {

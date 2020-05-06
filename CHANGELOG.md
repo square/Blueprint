@@ -6,6 +6,39 @@
 
 ### Added
 
+- [Added support](https://github.com/square/Blueprint/pull/88) for `SwiftUI`-style element building within `BlueprintUI` and `BlueprintUICommonControls`.
+
+This allows you to replace this code:
+
+```
+ScrollView(.fittingHeight) (
+   wrapping: Box(
+        backgroundColor .lightGrey,
+       wrapping: Inset(
+          uniformInset: 10.0,
+          wrapping: ConstrainedSize(
+             height: .atLeast(20.0),
+             wrapping: Label(
+                text: "Hello, world!"
+             )
+         )
+      )
+   )
+)
+```
+
+With this code:
+
+```
+Label(text: "Hello, World!")
+   .constrainedTo(height: .atLeast(20.0))
+   .inset(by: 20.0)
+   .box(background: .lightGrey)
+   .scrollable(.fittingHeight)
+```
+
+Improving readability and conciseness of your elements.
+
 ### Removed
 
 ### Changed
@@ -24,7 +57,7 @@
 
 ### Fixed
 
-- Only support `SwiftUI` previews on 32 bit ARM devices.
+- [Don't try to build](https://github.com/square/Blueprint/pull/89) `SwiftUI` previews on 32 bit ARM devices – `SwiftUI` does not exist on these devices.
 
 ## 0.9.1
 

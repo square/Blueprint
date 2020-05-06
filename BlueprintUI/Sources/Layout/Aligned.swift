@@ -111,3 +111,23 @@ public struct Aligned: Element {
         }
     }
 }
+
+public extension Element {
+    /// Wraps the element in an `Aligned` element with the provided parameters.
+    ///
+    /// - parameters:
+    ///   - vertically: The vertical alignment. Defaults to `.centered`.
+    ///   - horizontally: The horizontal alignment. Defaults to `.centered`.
+    ///
+    func aligned(
+        vertically: Aligned.VerticalAlignment,
+        horizontally: Aligned.HorizontalAlignment
+    ) -> Aligned
+    {
+        Aligned(
+            vertically: vertically,
+            horizontally: horizontally,
+            wrapping: self
+        )
+    }
+}
