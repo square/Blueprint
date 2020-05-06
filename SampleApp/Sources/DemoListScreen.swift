@@ -28,7 +28,7 @@ final class DemoListViewController : UIViewController
             column.horizontalAlignment = .fill
             
             for (index, demo) in self.demos.enumerated() {
-                column.add(child: Transition(
+                column.add(child: AppearanceTransition(
                     onAppear: .slideIn(from: -50.0, after: TimeInterval(0.5 + TimeInterval(index) * 0.2), for: 0.25),
                     wrapping: demo
                 ))
@@ -68,6 +68,9 @@ final class DemoListViewController : UIViewController
             DemoItem(title: "Custom Animations", onTap: {
                 self.navigationController?.pushViewController(StatusProgressViewController(), animated: true)
             }),
+//            DemoItem(title: "Text Field Layout", onTap: {
+//                self.navigationController?.pushViewController(TextFieldViewController(), animated: true)
+//            }),
         ]
     }
 }

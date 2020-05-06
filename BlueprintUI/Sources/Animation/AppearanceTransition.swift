@@ -4,7 +4,7 @@ import UIKit
 /**
  Wraps a content element and adds transitions when the element appears, disappears, or changes layout.
  */
-public struct Transition : Element {
+public struct AppearanceTransition : Element {
 
     /// The transition to use when the wrapped element is first presented on screen.
     public var onAppear: TransitionAnimation?
@@ -70,7 +70,7 @@ public struct Transition : Element {
             onAppear.append(contentsOf: Array(repeating: nil, count: countDifference))
         }
         
-        var nested = Transition(
+        var nested = AppearanceTransition(
             onAppear: onAppear.popLast()!,
             onDisappear: onDisappear.popLast()!,
             layout: layout,
@@ -81,7 +81,7 @@ public struct Transition : Element {
         nested.onDisappear?.performing = .always
         
         while onAppear.isEmpty == false || onDisappear.isEmpty == false {
-            nested = Transition(
+            nested = AppearanceTransition(
                 onAppear: onAppear.popLast()!,
                 onDisappear: onDisappear.popLast()!,
                 layout: layout,

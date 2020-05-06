@@ -53,13 +53,13 @@ fileprivate struct Screen : ProxyElement
             column.horizontalAlignment = .fill
             column.minimumVerticalSpacing = 20.0
             
-            column.add(child: Transition(
+            column.add(child: AppearanceTransition(
                 onAppear: .slideIn(),
                 wrapping: Label(text: "Get 10 points for your purchase today.") { label in
                     label.font = .systemFont(ofSize: 36.0, weight: .bold)
             }))
             
-            column.add(child: Transition(
+            column.add(child: AppearanceTransition(
                 onAppear: .slideIn(after: 0.5),
                 wrapping: Label(text: "Earn 1 point for every $1 spent.\nRedeem points for rewards.") { label in
                 label.font = .systemFont(ofSize: 18.0, weight: .regular)
@@ -68,7 +68,7 @@ fileprivate struct Screen : ProxyElement
     }
     
     var rightInput : Element {
-        return Transition(
+        return AppearanceTransition(
             onAppear: .slideIn(after: 1.0),
             
             wrapping: ConstrainedSize(

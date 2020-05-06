@@ -29,8 +29,10 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
-    public init(text: String) {
+    public init(text: String = "", configure : (inout TextField) -> () = { _ in }) {
         self.text = text
+        
+        configure(&self)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -62,12 +64,21 @@ public struct TextField: Element {
             configuration[\.resignActiveTrigger] = resignActiveTrigger
         })
     }
+    
+    fileprivate static let measurementTextField = CallbackTextField()
 
     public var content: ElementContent {
         return ElementContent { constraint in
-            return CGSize(
-                width: max(constraint.maximum.width, 44),
-                height: 44.0)
+            let field = TextField.measurementTextField
+            
+            let description = self.backingViewDescription(
+                bounds: CGRect(origin: .zero, size: constraint.maximum),
+                subtreeExtent: nil
+            )!
+            
+            description.apply(to: field)
+            
+            return field.sizeThatFits(constraint.maximum)
         }
     }
     

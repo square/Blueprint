@@ -72,7 +72,7 @@ fileprivate struct List: ProxyElement {
             col.minimumVerticalSpacing = 8.0
 
             for post in posts {
-                col.add(child: Transition(
+                col.add(child: AppearanceTransition(
                     onAppear: .scaleAndFade,
                     wrapping: FeedItem(post: post)
                     )

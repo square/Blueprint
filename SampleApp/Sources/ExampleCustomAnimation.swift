@@ -33,7 +33,7 @@ final class StatusProgressViewController : UIViewController
             column.horizontalAlignment = .center
             
             if self.showingProgress {
-                let spinner = Transition(
+                let spinner = AppearanceTransition(
                     onAppear: [.slideIn(for: 0.75), .custom(StatusProgressAnimation())],
                     onDisappear: [.scaleAndFade],
                     wrapping: StatusProgressElement(
