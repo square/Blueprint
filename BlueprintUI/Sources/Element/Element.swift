@@ -38,7 +38,7 @@ import UIKit
 /// }
 /// ```
 ///
-public protocol Element {
+public protocol Element : CustomDebugStringConvertible {
 
     /// Returns the content of this element.
     ///
@@ -89,4 +89,79 @@ public struct ElementDebuggingIntrospector {
 
 public struct ElementDebuggingAppearance {
     var borderColor : UIColor? = .init(white: 0.0, alpha: 0.35)
+}
+
+
+extension Element {
+    
+    public var debugDescription : String {
+        self.debugDescription(with: UIScreen.main.bounds.size)
+    }
+    
+    public func debugDescription(with size : CGSize) -> String {
+        self.debugDescription(with: size, depth: 0)
+    }
+    
+    internal func debugDescription(with size : CGSize, depth : Int) -> String {
+        let result = self.layout(frame: CGRect(origin: .zero, size: size))
+        
+        var list = [DebugDescriptionElementInfo]()
+        result.appendTo(info: &list, depth: depth)
+        
+        return DebugDescriptionElementInfo.toString(list)
+    }
+}
+
+
+fileprivate extension LayoutResultNode {
+    func appendTo(info : inout [DebugDescriptionElementInfo], depth : Int) {
+        info.append(DebugDescriptionElementInfo(
+            depth: depth,
+            element: self.element,
+            frame: self.layoutAttributes.frame
+        ))
+        
+        self.children.forEach { _, node in
+            node.appendTo(info: &info, depth: depth + 1)
+        }
+    }
+}
+
+
+fileprivate struct DebugDescriptionElementInfo {
+    var depth : Int
+    var element : Element
+    var frame : CGRect
+    
+    var stringValue : String {
+        let inset = String.init(repeating: "  ", count: self.depth)
+        
+        let typeName = String(describing:type(of: self.element))
+        let frameDescription = "Frame: (\(self.frame.origin.x), \(self.frame.origin.y), \(self.frame.size.width), \(self.frame.size.height))"
+        
+        let viewType = self.element.backingViewDescription(bounds: self.frame, subtreeExtent: nil)?.viewType
+        let viewTypeDescription : String? = {
+            guard let viewType = viewType else {
+                return nil
+            }
+            
+            return "UIView Type: \(String(describing: viewType))"
+        }()
+        
+        let components : [String?] = [
+            viewTypeDescription,
+            frameDescription
+        ]
+        
+        
+        return inset + "| <\(typeName): \(components.compactMap({$0}).joined(separator: ", "))>"
+    }
+    
+    static func toString(_ list : [Self]) -> String {
+        let strings : [String] = list.map {
+            $0.stringValue
+        }
+        
+        return strings.joined(separator: "\n")
+    }
 }

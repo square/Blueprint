@@ -25,7 +25,7 @@ import UIKit
 ///
 /// }
 /// ```
-public final class BlueprintView: UIView {
+public final class BlueprintView : UIView {
     
     private var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
@@ -204,6 +204,19 @@ public final class BlueprintView: UIView {
     
     @objc private func globalDebuggingSettingsChanged() {
         self.setNeedsViewHierarchyUpdate()
+    }
+}
+
+
+extension BlueprintView {
+    public override var debugDescription: String {
+        let superDescription = super.debugDescription
+        
+        guard let element = self.element else {
+            return superDescription
+        }
+        
+        return element.debugDescription(with: self.bounds.size)
     }
 }
 

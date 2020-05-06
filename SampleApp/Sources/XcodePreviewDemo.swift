@@ -38,8 +38,8 @@ import SwiftUI
 struct TestingView_Preview: PreviewProvider {
     static var previews: some View {
         ElementPreview(
-        with: .thatFits(padding: 20),
-        debugging: DebuggingOptions(showElementFrames: .all)
+            with: .thatFits(padding: 20),
+            debugging: DebuggingOptions(showElementFrames: .all)
         ) {
             TestElement()
         }
