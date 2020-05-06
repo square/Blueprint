@@ -56,7 +56,7 @@ public final class BlueprintView : UIView {
     /// is only updated as as part of UIKit's `layoutSubviews()` pass.  This property contains
     /// the `Element` most recently rendered by `BlueprintView`.
     ///
-    internal private(set) var displayedElement : Element?
+    internal private(set) var presentationElement : Element?
     
     public fileprivate(set) static var isDebuggingAvailable : Bool = false
     
@@ -203,7 +203,7 @@ public final class BlueprintView : UIView {
 
         isInsideUpdate = false
         
-        self.renderedElement = self.element
+        self.presentationElement = self.element
         
         self.propagateDebuggingStateToNestedBlueprintViews(with: self.debugging)
     }
@@ -228,11 +228,13 @@ extension BlueprintView {
     public override var debugDescription: String {
         let superDescription = super.debugDescription
         
-        guard let element = self.renderedElement else {
+        guard let element = self.presentationElement ?? self.element else {
             return superDescription
         }
         
-        return element.debugDescription(with: self.bounds.size)
+        let elementDescription = element.debugDescription(with: self.bounds.size, depth: 1)
+        
+        return [superDescription, elementDescription].joined(separator: "\n")
     }
 }
 
