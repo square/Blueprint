@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */; };
 		0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */; };
+		0AF36345246266AF0027E172 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36342246266AF0027E172 /* README.md */; };
+		0AF36346246266AF0027E172 /* RELEASING.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36343246266AF0027E172 /* RELEASING.md */; };
+		0AF36347246266AF0027E172 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36344246266AF0027E172 /* CHANGELOG.md */; };
 		2009E82B0B9D98A685E8637B /* libPods-Tutorial 1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 237956659E4F5F4AEE53B303 /* libPods-Tutorial 1.a */; };
 		4EE23713D657C21C6806E771 /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDB22E4D9B4379A15C5AF69 /* libPods-SampleApp.a */; };
 		6B58C7884AE69FA55EA64E57 /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */; };
@@ -42,6 +45,9 @@
 /* Begin PBXFileReference section */
 		0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewKeyboardViewController.swift; sourceTree = "<group>"; };
 		0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodePreviewDemo.swift; sourceTree = "<group>"; };
+		0AF36342246266AF0027E172 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		0AF36343246266AF0027E172 /* RELEASING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = RELEASING.md; path = ../RELEASING.md; sourceTree = "<group>"; };
+		0AF36344246266AF0027E172 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		0DA29F056002872418F7D2C9 /* Pods-SampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SampleApp.debug.xcconfig"; path = "Target Support Files/Pods-SampleApp/Pods-SampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A147478D522E763BFC19F37 /* Pods-Tutorial 2 (Completed).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2 (Completed).debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 2 (Completed)/Pods-Tutorial 2 (Completed).debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,6 +147,9 @@
 		975454F1223C1289003E353F = {
 			isa = PBXGroup;
 			children = (
+				0AF36344246266AF0027E172 /* CHANGELOG.md */,
+				0AF36342246266AF0027E172 /* README.md */,
+				0AF36343246266AF0027E172 /* RELEASING.md */,
 				97545512223C12E9003E353F /* Resources */,
 				9754550F223C12E9003E353F /* Sources */,
 				979F49E1224D1B4500A3C5D4 /* Tutorials */,
@@ -401,6 +410,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AF36345246266AF0027E172 /* README.md in Resources */,
+				0AF36347246266AF0027E172 /* CHANGELOG.md in Resources */,
+				0AF36346246266AF0027E172 /* RELEASING.md in Resources */,
 				9754551B223C12E9003E353F /* Assets.xcassets in Resources */,
 				9754551C223C12E9003E353F /* LaunchScreen.storyboard in Resources */,
 			);
