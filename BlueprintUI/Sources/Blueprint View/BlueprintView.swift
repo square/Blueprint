@@ -37,12 +37,26 @@ public final class BlueprintView : UIView {
     private let rootController: NativeViewController
 
     /// The root element that is displayed within the view.
+    ///
+    /// By default, when you set the `element` on a `BlueprintView`, the view's hierarchy
+    /// is only updated as as part of UIKit's `layoutSubviews()` pass.  If you would like
+    /// the view hierarchy to update immediately, call `layoutIfNeeded` on the `BlueprintView`.
+    ///
     public var element: Element? {
         didSet {
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// The current rendered element as displayed by the `BlueprintView`.
+    /// This property reflects the current state of the subview tree.
+    ///
+    /// By default, when you set the `element` on a `BlueprintView`, the view's hierarchy
+    /// is only updated as as part of UIKit's `layoutSubviews()` pass.  This property contains
+    /// the `Element` most recently rendered by `BlueprintView`.
+    ///
+    internal private(set) var displayedElement : Element?
     
     public fileprivate(set) static var isDebuggingAvailable : Bool = false
     
@@ -189,6 +203,8 @@ public final class BlueprintView : UIView {
 
         isInsideUpdate = false
         
+        self.renderedElement = self.element
+        
         self.propagateDebuggingStateToNestedBlueprintViews(with: self.debugging)
     }
 
@@ -212,7 +228,7 @@ extension BlueprintView {
     public override var debugDescription: String {
         let superDescription = super.debugDescription
         
-        guard let element = self.element else {
+        guard let element = self.renderedElement else {
             return superDescription
         }
         
