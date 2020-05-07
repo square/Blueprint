@@ -136,6 +136,36 @@ public struct AppearanceTransition : Element {
 }
 
 
+public extension Element {
+    
+    func transition(
+        with animation: TransitionAnimation,
+        layout: LayoutTransition = .inherited
+    ) -> AppearanceTransition
+    {
+        AppearanceTransition(with: animation, layout: layout, wrapping: self)
+    }
+    
+    func transition(
+        onAppear: TransitionAnimation? = nil,
+        onDisappear: TransitionAnimation? = nil,
+        layout: LayoutTransition = .inherited
+    ) -> AppearanceTransition
+    {
+        AppearanceTransition(onAppear: onAppear, onDisappear: onDisappear, layout: layout, wrapping: self)
+    }
+    
+    func transition(
+        onAppear: [TransitionAnimation] = [],
+        onDisappear: [TransitionAnimation] = [],
+        layout: LayoutTransition = .inherited
+    ) -> AppearanceTransition
+    {
+        AppearanceTransition(onAppear: onAppear, onDisappear: onDisappear, layout: layout, wrapping: self)
+    }
+}
+
+
 /**
  A view class used to wrap elements that are within a `TransitionContainer`.
  The animations of the `TransitionContainer` are applied to this view.
@@ -143,29 +173,4 @@ public struct AppearanceTransition : Element {
  This is used instead of a plain `UIView` so when examining the view hierarchy,
  there's an indication of where the view is coming from.
  */
-final class TransitionContainerView : UIView {
-    
-    override var bounds: CGRect {
-        didSet {
-            if self.bounds.size.width > 10000 {
-                print(self.frame)
-            }
-        }
-    }
-    
-    override var frame: CGRect {
-        didSet {
-            if self.frame.size.width > 10000 {
-                print(self.frame)
-            }
-        }
-    }
-    
-    override var transform: CGAffineTransform {
-        didSet {
-            if self.frame.size.width > 10000 {
-                print(self.frame)
-            }
-        }
-    }
-}
+final class TransitionContainerView : UIView {}

@@ -33,13 +33,12 @@ final class StatusProgressViewController : UIViewController
             column.horizontalAlignment = .center
             
             if self.showingProgress {
-                let spinner = AppearanceTransition(
+                let spinner = StatusProgressElement(
+                    model: .init(initialPoints: 1, earnedPoints: 10, lowestTierPoints: 15),
+                    config: .init(radius: 100, lineWidth: 5, duration: 1.0)
+                ).transition(
                     onAppear: [.slideIn(for: 0.75), .custom(StatusProgressAnimation())],
-                    onDisappear: [.scaleAndFade],
-                    wrapping: StatusProgressElement(
-                        model: .init(initialPoints: 1, earnedPoints: 10, lowestTierPoints: 15),
-                        config: .init(radius: 100, lineWidth: 5, duration: 1.0)
-                    )
+                    onDisappear: [.scaleAndFade]
                 )
                 
                 column.add(growPriority: 0.0, shrinkPriority: 0.0, child: spinner)
