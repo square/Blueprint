@@ -26,6 +26,7 @@ public struct AccessibilityElement: Element {
     public var label: String?
     public var value: String?
     public var hint: String?
+    public var identifier: String?
     public var traits: Set<Trait>
     public var wrappedElement: Element
 
@@ -33,12 +34,14 @@ public struct AccessibilityElement: Element {
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,
+        identifier: String? = nil,
         traits: Set<Trait> = [],
-        wrapping element: Element)
-    {
+        wrapping element: Element
+    ) {
         self.label = label
         self.value = value
         self.hint = hint
+        self.identifier = identifier
         self.traits = traits
         self.wrappedElement = element
     }
@@ -97,9 +100,33 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityLabel] = label
             config[\.accessibilityValue] = value
             config[\.accessibilityHint] = hint
+            config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
         }
     }
+}
 
+
+public extension Element {
+    
+    /// Wraps the element to provide the passed accessibility
+    /// options to the accessibility system.
+    func accessibility(
+        label: String? = nil,
+        value: String? = nil,
+        hint: String? = nil,
+        identifier: String? = nil,
+        traits: Set<AccessibilityElement.Trait> = []
+        ) -> AccessibilityElement
+    {
+        AccessibilityElement(
+            label: label,
+            value: value,
+            hint: hint,
+            identifier: identifier,
+            traits: traits,
+            wrapping: self
+        )
+    }
 }

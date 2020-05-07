@@ -59,11 +59,18 @@ extension XCTestCase {
 
     }
 
-    func compareSnapshot(of view: UIView, identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line) {
+    func compareSnapshot(
+        of view: UIView,
+        identifier: String? = nil,
+        scale: CGFloat = 1,
+        file: StaticString = #file,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
 
         view.layoutIfNeeded()
 
-        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, 1)
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, scale)
 
         guard let context = UIGraphicsGetCurrentContext() else {
             XCTFail("Failed to get graphics context", file: file, line: line)
@@ -82,7 +89,15 @@ extension XCTestCase {
         compareSnapshot(of: image, identifier: identifier, file: file, testName: testName, line: line)
     }
 
-    func compareSnapshot(of element: Element, size: CGSize? = nil, identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line) {
+    func compareSnapshot(
+        of element: Element,
+        size: CGSize? = nil,
+        identifier: String? = nil,
+        scale: CGFloat = 1,
+        file: StaticString = #file,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
         let view = BlueprintView(element: element)
 
         if let size = size {
@@ -91,7 +106,7 @@ extension XCTestCase {
             view.sizeToFit()
         }
 
-        compareSnapshot(of: view, identifier: identifier, file: file, testName: testName, line: line)
+        compareSnapshot(of: view, identifier: identifier, scale: scale, file: file, testName: testName, line: line)
     }
 
 }

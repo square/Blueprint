@@ -1,21 +1,44 @@
 import UIKit
 
-/// Constrains the measured size of the content element.
+/// Constrains the measured size of the contained element in the ranges specified by the `width` and `height` properties.
+///
+/// There are several constraint types available for each axis. See `ConstrainedSize.Constraint` for a full list and in-depth
+/// descriptions of each.
+///
+/// Notes
+/// --------
+/// An important note is that the constraints of `ConstrainedSize` are authoritative during measurement. For example,
+/// if your `ConstrainedSize` specifies `.atLeast(300)` for `width`, and the `ConstrainedSize` is asked to measure within
+/// a `SizeConstraint` that is at most 100 points wide, the returned measurement will still be 300 points. The same goes for the
+/// height of the `ConstrainedSize`.
+///
 public struct ConstrainedSize: Element {
 
-    public var wrappedElement: Element
+    /// The element whose measurement will be constrained by the `ConstrainedSize`.
+    public var wrapped: Element
 
+    /// The constraint to place on the width of the element.
     public var width: Constraint
+    
+    /// The constraint to place on the height of the element.
     public var height: Constraint
 
-    public init(width: Constraint = .unconstrained, height: Constraint = .unconstrained, wrapping element: Element) {
-        self.wrappedElement = element
+    /// Creates a new `ConstrainedSize` with the provided constraint options.
+    public init(
+        width: Constraint = .unconstrained,
+        height: Constraint = .unconstrained,
+        wrapping element: Element
+    ) {
         self.width = width
         self.height = height
+        self.wrapped = element
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(width: width, height: height))
+        ElementContent(
+            child: wrapped,
+            layout: Layout(width: width, height: height)
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
@@ -26,11 +49,23 @@ public struct ConstrainedSize: Element {
 
 extension ConstrainedSize {
 
+    /// The available ways to constrain the measurement of a given axis within a `ConstrainedSize` element.
     public enum Constraint {
+        /// There is no constraint for this axis – the natural size of the element will be used.
         case unconstrained
+        
+        /// The measured size for this axis will be **no greater** than the value provided.
         case atMost(CGFloat)
+        
+        /// The measured size for this axis will be **no less** than the value provided.
         case atLeast(CGFloat)
+        
+        /// The measured size for this axis will be **within** the range provided.
+        /// If the measured value is below the bottom of the range, the lower value will be used.
+        /// If the measured value is above the top of the range, the lower value will be used.
         case within(ClosedRange<CGFloat>)
+        
+        /// The measured size for this axis will be **exactly**  the value provided.
         case absolute(CGFloat)
 
         fileprivate func applied(to value: CGFloat) -> CGFloat {
@@ -48,16 +83,29 @@ extension ConstrainedSize {
             }
         }
     }
-
 }
 
-extension Comparable {
 
+public extension Element {
+    
+    /// Constrains the measured size of the element to the provided width and height.
+    func constrainedTo(
+        width: ConstrainedSize.Constraint = .unconstrained,
+        height: ConstrainedSize.Constraint = .unconstrained
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(width: width, height: height, wrapping: self)
+    }
+}
+
+
+extension Comparable {
+    
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
         return min(max(self, limits.lowerBound), limits.upperBound)
     }
-    
 }
+
 
 extension ConstrainedSize {
 
@@ -67,18 +115,35 @@ extension ConstrainedSize {
         var height: Constraint
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            var result = child.measure(in: constraint)
-            result.width = width.applied(to: result.width)
-            result.height = height.applied(to: result.height)
-            return result
+                        
+            /// 1) Measure how big the element should be by constraining the passed in
+            /// `SizeConstraint` to not be larger than our maximum size. This ensures
+            /// the real maximum possible width is passed to the child, not an unconstrained width.
+            ///
+            /// This is important because some elements heights are affected by their width (eg, a text label),
+            /// or any other elements type which reflows its content.
+            
+            let maximumConstraint = SizeConstraint(
+                width: .init(self.width.applied(to: constraint.width.maximum)),
+                height: .init(self.height.applied(to: constraint.height.maximum))
+            )
+            
+            let measurement = child.measure(in: maximumConstraint)
+            
+            /// 2) If our returned size needs to be larger than the measured size,
+            /// eg: the element did not take up all the space during measurement,
+            /// and we have a minimum size in either axis. In that case, adjust the
+            /// measured size to that minimum size before returning.
+            
+            return CGSize(
+                width: width.applied(to: measurement.width),
+                height: height.applied(to: measurement.height)
+            )
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             return LayoutAttributes(size: size)
         }
-
     }
 
 }
-
-

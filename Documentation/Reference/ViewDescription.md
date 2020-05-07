@@ -1,6 +1,6 @@
 # `ViewDescription`
 
-View Descriptions contain all the information needed to create an instance of a native UIView. **Importantly, view desctiptions do not contain *instances* of a view**. They only contain the data necessary to instantiate or update a view.
+View Descriptions contain all the information needed to create an instance of a native UIView. **Importantly, view descriptions do not contain *instances* of a view**. They only contain the data necessary to instantiate or update a view.
 
 ## Creating a view description
 

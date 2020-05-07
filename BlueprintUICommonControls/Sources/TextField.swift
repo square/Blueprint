@@ -29,9 +29,9 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
-    public init(text: String = "", configure : (inout TextField) -> () = { _ in }) {
+    public init(text: String, configure : (inout TextField) -> () = { _ in }) {
         self.text = text
-        
+
         configure(&self)
     }
 

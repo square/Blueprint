@@ -42,23 +42,18 @@ fileprivate struct MainView: ProxyElement {
     var posts: [Post]
     
     var elementRepresentation: Element {
-        let col = Column { col in
+        Column { col in
             col.horizontalAlignment = .fill
 
             col.add(child: List(posts: posts))
             col.add(child: CommentForm())
         }
-        
-        var scroll = ScrollView(wrapping: col)
-        scroll.contentSize = .fittingHeight
-        scroll.alwaysBounceVertical = true
-        scroll.keyboardDismissMode = .onDrag
-
-        let background = Box(
-            backgroundColor: UIColor(white: 0.95, alpha: 1.0),
-            wrapping: scroll)
-
-        return background
+        .scrollable {
+            $0.contentSize = .fittingHeight
+            $0.alwaysBounceVertical = true
+            $0.keyboardDismissMode = .onDrag
+        }
+        .box(background: UIColor(white: 0.95, alpha: 1.0))
     }
 }
 
@@ -67,7 +62,7 @@ fileprivate struct List: ProxyElement {
     var posts: [Post]
 
     var elementRepresentation: Element {
-        let col = Column { col in
+        Column { col in
             col.horizontalAlignment = .fill
             col.minimumVerticalSpacing = 8.0
 
@@ -79,15 +74,13 @@ fileprivate struct List: ProxyElement {
                 )
             }
         }
-
-        return col
     }
 }
 
 fileprivate struct CommentForm: ProxyElement {
     
     var elementRepresentation: Element {
-        let col = Column { col in
+        Column { col in
             col.horizontalAlignment = .fill
 
             let label = Label(text: "Add your comment:")
@@ -101,12 +94,8 @@ fileprivate struct CommentForm: ProxyElement {
             commentField.placeholder = "Comment"
             col.add(child: commentField)
         }
-        
-        return Box(
-            backgroundColor: .lightGray,
-            wrapping: Inset(
-                uniformInset: 16.0,
-                wrapping: col))
+        .inset(uniform: 16.0)
+        .box(background: .lightGray)
     }
 }
 
@@ -116,38 +105,30 @@ fileprivate struct FeedItem: ProxyElement {
     var post: Post
 
     var elementRepresentation: Element {
-        let element = Row { row in
+        Row { row in
             row.verticalAlignment = .leading
             row.minimumHorizontalSpacing = 16.0
             row.horizontalUnderflow = .growUniformly
 
-            let avatar = ConstrainedSize(
-                width: .absolute(64),
-                height: .absolute(64),
-                wrapping: Box(
-                    backgroundColor: .lightGray,
-                    cornerStyle: .rounded(radius: 32.0),
-                    wrapping: nil))
+            let avatar = Box(
+                backgroundColor: .lightGray,
+                cornerStyle: .rounded(radius: 32.0)
+            ).constrainedTo(width: .absolute(64.0), height: .absolute(64.0))
 
             row.add(
                 growPriority: 0.0,
                 shrinkPriority: 0.0,
-                child: avatar)
+                child: avatar
+            )
 
             row.add(
                 growPriority: 1.0,
                 shrinkPriority: 1.0,
-                child: FeedItemBody(post: post))
+                child: FeedItemBody(post: post)
+            )
         }
-
-        let box = Box(
-            backgroundColor: .white,
-            wrapping: Inset(
-                uniformInset: 16.0,
-                wrapping: element))
-
-
-        return box
+        .inset(uniform: 16.0)
+        .box(background: .white)
     }
 
 }

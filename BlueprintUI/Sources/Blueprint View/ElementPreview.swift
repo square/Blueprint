@@ -5,7 +5,7 @@
 //  Created by Kyle Van Essen on 4/14/20.
 //
 
-#if DEBUG && canImport(SwiftUI) && !arch(i386)
+#if DEBUG && canImport(SwiftUI) && !arch(i386) && !arch(arm)
 
 import UIKit
 import SwiftUI
@@ -26,7 +26,7 @@ import SwiftUI
 ///
 /// // Add this at the bottom of your element's source file.
 ///
-/// #if DEBUG && canImport(SwiftUI) && !arch(i386)
+/// #if DEBUG && canImport(SwiftUI) && !arch(i386) && !arch(arm)
 ///
 /// import SwiftUI
 ///
@@ -234,7 +234,7 @@ extension ElementPreview {
         private func constrained(
             element : Element
         ) -> some View {
-            GeometryReader { info in                
+            GeometryReader { info in
                 return ElementView(
                     element: ConstrainedSize(
                         width: .atMost(info.size.width),

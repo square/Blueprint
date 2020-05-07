@@ -2,6 +2,86 @@ import XCTest
 @testable import BlueprintUI
 
 class BlueprintViewTests: XCTestCase {
+    
+    func test_sizeThatFits() {
+        
+        /// NOTE: References to `.greatestFiniteMagnitude` always refer to the fully qualified type,
+        /// `CGFloat.greatestFiniteMagnitude` to ensure we are not implicitly comparing against doubles,
+        /// which have a different underlying type on 32 bit devices.
+        
+        let blueprintView = BlueprintView()
+        
+        // Normal sizes.
+        
+        do {
+            let element = MeasurableElement { constraint in
+                XCTAssertEqual(constraint.maximum, CGSize(width: 200, height: 100))
+                return CGSize(width: 100, height: 50)
+            }
+            
+            blueprintView.element = element
+            
+            XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: 200, height: 100)), CGSize(width: 100, height: 50))
+        }
+        
+        // Unconstrained in both axes.
+        
+        do {
+            let element = MeasurableElement { constraint in
+                XCTAssertEqual(constraint.width, .unconstrained)
+                XCTAssertEqual(constraint.height, .unconstrained)
+                XCTAssertEqual(constraint.maximum, CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+                
+                return CGSize(width: 100, height: 50)
+            }
+            
+            blueprintView.element = element
+            
+            XCTAssertEqual(blueprintView.sizeThatFits(.zero), CGSize(width: 100, height: 50))
+            XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)), CGSize(width: 100, height: 50))
+            XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: CGFloat.infinity, height: CGFloat.infinity)), CGSize(width: 100, height: 50))
+        }
+        
+        // Unconstrained in one axis only.
+        
+        do {
+            // X
+            
+            do {
+                let element = MeasurableElement { constraint in
+                    XCTAssertEqual(constraint.width, .unconstrained)
+                    XCTAssertEqual(constraint.height.maximum, 100.0)
+                    XCTAssertEqual(constraint.maximum, CGSize(width: CGFloat.greatestFiniteMagnitude, height: 100.0))
+                    
+                    return CGSize(width: 100, height: 50)
+                }
+                
+                blueprintView.element = element
+                
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: 0.0, height: 100.0)), CGSize(width: 100, height: 50))
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: 100.0)), CGSize(width: 100, height: 50))
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: CGFloat.infinity, height: 100.0)), CGSize(width: 100, height: 50))
+            }
+            
+            // Y
+            
+            do {
+                let element = MeasurableElement { constraint in
+                    XCTAssertEqual(constraint.width.maximum, 100.0)
+                    XCTAssertEqual(constraint.height, .unconstrained)
+                    XCTAssertEqual(constraint.maximum, CGSize(width: 100.0, height: CGFloat.greatestFiniteMagnitude))
+                    
+                    return CGSize(width: 100, height: 50)
+                }
+                
+                blueprintView.element = element
+                
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: 100.0, height: 0.0)), CGSize(width: 100, height: 50))
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: 100.0, height: CGFloat.greatestFiniteMagnitude)), CGSize(width: 100, height: 50))
+                XCTAssertEqual(blueprintView.sizeThatFits(CGSize(width: 100.0, height: CGFloat.infinity)), CGSize(width: 100, height: 50))
+            }
+        }
+    }
 
     func test_displaysSimpleView() {
 
@@ -78,6 +158,20 @@ class BlueprintViewTests: XCTestCase {
     }
 }
 
+fileprivate struct MeasurableElement : Element {
+        
+    var validate : (SizeConstraint) -> CGSize
+    
+    var content: ElementContent {
+        ElementContent {
+            self.validate($0)
+        }
+    }
+    
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        return nil
+    }
+}
 
 fileprivate struct SimpleViewElement: Element {
 
