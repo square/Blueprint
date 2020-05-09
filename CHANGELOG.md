@@ -6,6 +6,8 @@
 
 - Changed [BlueprintView.sizeThatFits(:)](https://github.com/square/Blueprint/pull/92/files) to treat width and height separately when determining if measurement should be unconstrained in a given axis.
 
+- Removed layout rounding no longer needed since [#64] ([#95]).
+
 ### Added
 
 - [Added support](https://github.com/square/Blueprint/pull/88) for `SwiftUI`-style element building within `BlueprintUI` and `BlueprintUICommonControls`.
@@ -83,3 +85,4 @@ Improving readability and conciseness of your elements.
 
 [0.10.0]: https://github.com/square/Blueprint/compare/0.9.2...0.10.0
 [#64]: https://github.com/square/Blueprint/pull/64
+[#95]: https://github.com/square/Blueprint/pull/95
