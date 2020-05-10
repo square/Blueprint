@@ -91,7 +91,7 @@ public struct ElementPreview : View {
         return Self(
             named: name,
             with: [
-                .device(.iPhoneSE),
+                .device(.iPhoneSE_1),
                 .device(.iPhone8),
                 .device(.iPhone8Plus),
                 .device(.iPhoneXs),
@@ -251,43 +251,70 @@ extension ElementPreview {
 /// Via https://developer.apple.com/documentation/swiftui/securefield/3289399-previewdevice
 @available(iOS 13.0, *)
 public extension PreviewDevice {
+    
+    /// iPhone 7
+    
     static var iPhone7 = PreviewDevice("iPhone 7")
     static var iPhone7Plus = PreviewDevice("iPhone 7 Plus")
+    
+    /// iPhone 8
     
     static var iPhone8 = PreviewDevice("iPhone 8")
     static var iPhone8Plus = PreviewDevice("iPhone 8 Plus")
     
-    static var iPhoneSE = PreviewDevice("iPhone SE")
+    /// iPhone SE
+    
+    static var iPhoneSE_1 : PreviewDevice {
+        if #available(iOS 13.4.1, *) {
+            return PreviewDevice("iPhone SE (1st generation)")
+        } else {
+            return PreviewDevice("iPhone SE")
+        }
+    }
+    
+    @available(iOS 13.4.1, *)
+    static var iPhoneSE_2 : PreviewDevice {
+        return PreviewDevice("iPhone SE (2nd generation)")
+    }
+    
+    /// iPhone X
     
     static var iPhoneX = PreviewDevice("iPhone X")
     
     static var iPhoneXs = PreviewDevice("iPhone Xs")
     static var iPhoneXsMax = PreviewDevice("iPhone Xs Max")
     
+    /// iPhone Xr
+    
     static var iPhoneXr = PreviewDevice("iPhone Xr")
     
+    /// iPad Mini
+    
     static var iPadMini_4 = PreviewDevice("iPad mini 4")
-    
-    static var iPadAir_2 = PreviewDevice("iPad Air 2")
-    
-    static var iPadPro_9_7 = PreviewDevice("iPad Pro (9.7-inch)")
-    static var iPadPro_11 = PreviewDevice("iPad Pro (11-inch) (1st generation)")
-    
-    static var iPadPro_12_9 = PreviewDevice("iPad Pro (12.9-inch)")
-    
-    static var iPad_5 = PreviewDevice("iPad (5th generation)")
-    
-    static var iPadPro_12_9_2 = PreviewDevice("iPad Pro (12.9-inch) (2nd generation)")
-    static var iPadPro_10_5 = PreviewDevice("iPad Pro (10.5-inch)")
-    
-    static var iPad_6 = PreviewDevice("iPad (6th generation)")
-    
-    static var iPadPro_11_2 = PreviewDevice("iPad Pro (11-inch) (2nd generation)")
-    static var iPadPro_12_9_3 = PreviewDevice("iPad Pro (12.9-inch) (3rd generation)")
-    
     static var iPadMini_5 = PreviewDevice("iPad mini (5th generation)")
     
+    /// iPad Air
+    
+    static var iPadAir_2 = PreviewDevice("iPad Air 2")
     static var iPadAir_3 = PreviewDevice("iPad Air (3rd generation)")
+    
+    /// iPad
+        
+    static var iPad_5 = PreviewDevice("iPad (5th generation)")
+    static var iPad_6 = PreviewDevice("iPad (6th generation)")
+    
+    /// iPad Pro
+    
+    static var iPadPro_9_7 = PreviewDevice("iPad Pro (9.7-inch)")
+    
+    static var iPadPro_10_5 = PreviewDevice("iPad Pro (10.5-inch)")
+    
+    static var iPadPro_11_1 = PreviewDevice("iPad Pro (11-inch) (1st generation)")
+    static var iPadPro_11_2 = PreviewDevice("iPad Pro (11-inch) (2nd generation)")
+    
+    static var iPadPro_12_9_1 = PreviewDevice("iPad Pro (12.9-inch)")
+    static var iPadPro_12_9_2 = PreviewDevice("iPad Pro (12.9-inch) (2nd generation)")
+    static var iPadPro_12_9_3 = PreviewDevice("iPad Pro (12.9-inch) (3rd generation)")
 }
 
 #endif
