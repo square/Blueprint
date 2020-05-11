@@ -17,6 +17,8 @@ See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/mak
 
 1. Update the library version in both `BlueprintUI.podspec` and `BlueprintUICommonControls.podspec` if it has not already been updated (it should match the version number that you are about to release).
 
+1. Update `CHANGELOG.md` (in the root of the repo), moving current changes under `Master` to a new section under `Past Releases` for the version you are releasing.
+
 1. Change directory into the `SampleApp` dir: `cd SampleApp`.
 
 1. Run `bundle exec pod install` to update the `Podfile.lock` with the new versions.

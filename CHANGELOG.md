@@ -2,6 +2,20 @@
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Misc
+
+# Past Releases
+
+## [0.11.0] - 2020-05-10
+
+### Fixed
+
 - [Fixed `ConstrainedSize`](https://github.com/square/Blueprint/pull/87) to ensure that the measurement of its inner element respects the `ConstrainedSize`'s maximum size, which matters for measuring elements which re-flow based on width, such as elements containing text.
 
 - Changed [BlueprintView.sizeThatFits(:)](https://github.com/square/Blueprint/pull/92/files) to treat width and height separately when determining if measurement should be unconstrained in a given axis.
@@ -40,14 +54,6 @@ Label(text: "Hello, World!")
 ```
 
 Improving readability and conciseness of your elements.
-
-### Removed
-
-### Changed
-
-### Misc
-
-# Past Releases
 
 ## [0.10.0] - 2020-04-27
 
