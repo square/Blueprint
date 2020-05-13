@@ -20,7 +20,7 @@ class CenteredTests: XCTestCase {
             XCTAssertEqual(
                 child.layoutAttributes.frame,
                 CGRect(
-                    x: 2439,
+                    x: 2438.5,
                     y: 2772,
                     width: 123,
                     height: 456))

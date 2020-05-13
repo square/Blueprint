@@ -454,7 +454,7 @@ extension StackLayout {
         case .justifyToStart:
             axisOrigin = 0.0
         case .justifyToCenter:
-            axisOrigin = (extraSize / 2.0).rounded() // TODO: @narenh - Add screen scale rounding
+            axisOrigin = extraSize / 2.0
         case .justifyToEnd:
             axisOrigin = extraSize
         }
