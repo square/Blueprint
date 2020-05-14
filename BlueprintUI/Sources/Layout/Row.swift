@@ -28,5 +28,9 @@ public struct Row: StackElement {
         get { return layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
-
+    
+    public var itemWidthConstraint : StackLayout.AxisLengthConstraint {
+        get { return layout.itemAxisConstraint }
+        set { layout.itemAxisConstraint = newValue }
+    }
 }

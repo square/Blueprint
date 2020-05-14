@@ -28,5 +28,9 @@ public struct Column: StackElement {
         get { return layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
-
+    
+    public var itemHeightConstraint : StackLayout.AxisLengthConstraint {
+        get { return layout.itemAxisConstraint }
+        set { layout.itemAxisConstraint = newValue }
+    }
 }

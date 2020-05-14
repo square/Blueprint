@@ -69,6 +69,13 @@ fileprivate struct MainView: ProxyElement {
             }
             
             col.add(child: stateful)
+            
+            col.add(child: DiningOptions(options : [
+                "For Here",
+                "To Go",
+                "Pickup",
+                "Delivery"
+            ]))
         }
         
         var scroll = ScrollView(wrapping: col)

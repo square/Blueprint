@@ -166,5 +166,4 @@ public struct Gesture<GestureType:UIGestureRecognizer> : ProxyElement {
             self.onChange(self.gesture)
         }
     }
-
 }

@@ -73,7 +73,7 @@ public struct ElementPreview : View {
     /// A provider which returns a new element.
     public typealias ElementProvider = () -> Element
     
-    private let name : String
+    private let name : String?
     
     /// The types of previews to include in the Xcode preview.
     private let previewTypes : [PreviewType]
@@ -108,7 +108,7 @@ public struct ElementPreview : View {
     /// Creates a new `ElementPreview` with the provided preview type.
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
-        named name : String = "",
+        named name : String? = nil,
         with previewType : PreviewType = .thatFits(),
         with provider : @escaping ElementProvider
     ) {
@@ -126,7 +126,7 @@ public struct ElementPreview : View {
     ///
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
-        named name : String = "",
+        named name : String? = nil,
         with previewTypes : [PreviewType],
         with provider : @escaping ElementProvider
     ) {
@@ -192,38 +192,31 @@ extension ElementPreview {
         }
         
         fileprivate func preview<ViewType:View>(
-            with name : String,
+            with name : String? = nil,
             for view : ViewType
         ) -> AnyView {
-            
-            let formattedName : String = {
-                if name.isEmpty == false {
-                    return " – " + name
-                } else {
-                    return ""
-                }
-            }()
             
             switch self {
             case .device(let device):
                 return AnyView(
                     view
                         .previewDevice(.init(rawValue: device.rawValue))
-                        .previewDisplayName(device.rawValue + formattedName)
+                        .previewDisplayName(name ?? device.rawValue)
                 )
                 
             case .fixed(let width, let height):
                 return AnyView(
                     view
+                        .frame(width: width, height: height, alignment: .center)
                         .previewLayout(.fixed(width: width, height: height))
-                        .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
+                        .previewDisplayName(name ?? "Fixed Size: (\(width), \(height)")
                 )
                 
             case .thatFits(let padding):
                 return AnyView(
                     view
                         .previewLayout(.sizeThatFits)
-                        .previewDisplayName("Size That Fits" + formattedName)
+                        .previewDisplayName(name ?? "Size That Fits")
                         .padding(.all, padding)
                 )
             }

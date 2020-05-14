@@ -112,6 +112,30 @@ public struct StackLayout: Layout {
     public var overflow = OverflowDistribution.condenseProportionally
     public var alignment = Alignment.leading
     public var minimumSpacing: CGFloat = 0
+    public var itemAxisConstraint : AxisLengthConstraint = .unconstrained
+    
+    public enum AxisLengthConstraint {
+        case atLeast(CGFloat)
+        case atMost (CGFloat)
+        case within(CGFloat, CGFloat)
+        case dynamic((CGFloat, CGFloat) -> CGFloat)
+        case unconstrained
+        
+        public func clamp(in parent : CGFloat, value : CGFloat) -> CGFloat {
+            switch self {
+            case .atLeast(let min):
+                return max(min, value)
+            case .atMost(let max):
+                return min(max, value)
+            case .within(let minV, let maxV):
+                return min(max(minV, value), maxV)
+            case .dynamic(let provider):
+                return provider(parent, value)
+            case .unconstrained:
+                return value
+            }
+        }
+    }
 
 
     public init(axis: Axis) {
@@ -307,7 +331,14 @@ extension StackLayout {
         let constraint = vectorConstraint.constraint(axis: axis)
 
         /// The measured sizes of each item, constrained as if each were the only element in the stack.
-        let basisSizes = items.map { $0.content.measure(in: constraint).axis(on: axis) }
+        let basisSizes : [CGFloat] = items.map {
+            let size = $0.content.measure(in: constraint).axis(on: axis)
+            
+            return self.itemAxisConstraint.clamp(
+                in: constraint.maximum.width,
+                value: size
+            )
+        }
 
         func unconstrainedAxisSize() -> CGFloat {
             let totalMeasuredAxis: CGFloat = basisSizes.reduce(0.0, +)
