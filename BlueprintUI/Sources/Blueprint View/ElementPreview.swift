@@ -5,7 +5,7 @@
 //  Created by Kyle Van Essen on 4/14/20.
 //
 
-#if DEBUG && canImport(SwiftUI) && !arch(i386)
+#if DEBUG && canImport(SwiftUI) && !arch(i386) && !arch(arm)
 
 import UIKit
 import SwiftUI
@@ -26,7 +26,7 @@ import SwiftUI
 ///
 /// // Add this at the bottom of your element's source file.
 ///
-/// #if DEBUG && canImport(SwiftUI) && !arch(i386)
+/// #if DEBUG && canImport(SwiftUI) && !arch(i386) && !arch(arm)
 ///
 /// import SwiftUI
 ///
@@ -73,19 +73,25 @@ public struct ElementPreview : View {
     /// A provider which returns a new element.
     public typealias ElementProvider = () -> Element
     
+    private let name : String
+        
     /// The types of previews to include in the Xcode preview.
-    private var previewTypes : [PreviewType]
+    private let previewTypes : [PreviewType]
     
     /// The provider which vends a new element.
-    private var provider : ElementProvider
+    private let provider : ElementProvider
     
     // MARK: Initialization
     
     /// Creates a new `ElementPreview` with several common devices that your users may use.
-    public static func commonDevices(with provider : @escaping ElementProvider) -> Self {
+    public static func commonDevices(
+        named name : String = "",
+        with provider : @escaping ElementProvider
+    ) -> Self {
         return Self(
+            named: name,
             with: [
-                .device(.iPhoneSE),
+                .device(.iPhoneSE_1),
                 .device(.iPhone8),
                 .device(.iPhone8Plus),
                 .device(.iPhoneXs),
@@ -102,10 +108,12 @@ public struct ElementPreview : View {
     /// Creates a new `ElementPreview` with the provided preview type.
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
-        with previewType : PreviewType = .thatFits,
+        named name : String = "",
+        with previewType : PreviewType = .thatFits(),
         with provider : @escaping ElementProvider
     ) {
         self.init(
+            named: name,
             with: [previewType],
             with: provider
         )
@@ -118,9 +126,11 @@ public struct ElementPreview : View {
     ///
     /// If you do not pass a preview type, `.thatFits` is used.
     public init(
+        named name : String = "",
         with previewTypes : [PreviewType],
         with provider : @escaping ElementProvider
     ) {
+        self.name = name
         self.previewTypes = previewTypes
         self.provider = provider
     }
@@ -129,20 +139,10 @@ public struct ElementPreview : View {
     
     public var body: some View {
         ForEach(self.previewTypes, id: \.identifier) { previewType in
-            previewType.preview(for: ElementView(element: self.provider()))
-        }
-    }
-    
-    private struct ElementView : UIViewRepresentable {
-        
-        var element : Element
-        
-        func makeUIView(context: Context) -> BlueprintView {
-            return BlueprintView(element: self.element)
-        }
-        
-        func updateUIView(_ view: BlueprintView, context: Context) {
-            view.element = self.element
+            previewType.preview(
+                with: self.name,
+                for: self.provider()
+            )
         }
     }
 }
@@ -150,6 +150,22 @@ public struct ElementPreview : View {
 
 @available(iOS 13.0, *)
 extension ElementPreview {
+    
+    fileprivate struct ElementView : UIViewRepresentable {
+        
+        var element : Element
+        
+        func makeUIView(context: Context) -> BlueprintView {
+            let view = BlueprintView()
+            view.element = self.element
+            
+            return view
+        }
+        
+        func updateUIView(_ view: BlueprintView, context: Context) {
+            view.element = self.element
+        }
+    }
    
     /// The preview type to use to display an element in an Xcode preview.
     ///
@@ -166,37 +182,64 @@ extension ElementPreview {
         case fixed(width : CGFloat, height : CGFloat)
         
         /// The preview will be as large as needed to preview the content.
-        case thatFits
+        case thatFits(padding : CGFloat = 10.0)
         
         fileprivate var identifier : AnyHashable {
             switch self {
             case .device(let device): return device.rawValue
             case .fixed(let width, let height): return "(\(width), \(height))"
-            case .thatFits: return "thatFits"
+            case .thatFits(let padding): return "thatFits (\(padding)"
             }
         }
         
-        fileprivate func preview<ViewType:View>(for view : ViewType) -> AnyView {
+        fileprivate func preview(
+            with name : String,
+            for element : Element
+        ) -> AnyView {
+            
+            let formattedName : String = {
+                if name.isEmpty == false {
+                    return " – " + name
+                } else {
+                    return ""
+                }
+            }()
+            
             switch self {
             case .device(let device):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewDevice(.init(rawValue: device.rawValue))
-                        .previewDisplayName(device.rawValue)
+                        .previewDisplayName(device.rawValue + formattedName)
                 )
                 
             case .fixed(let width, let height):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewLayout(.fixed(width: width, height: height))
-                        .previewDisplayName("Fixed Size: (\(width), \(height)")
+                        .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
                 )
                 
-            case .thatFits:
+            case .thatFits(let padding):
                 return AnyView(
-                    view
+                    self.constrained(element: element)
                         .previewLayout(.sizeThatFits)
-                        .previewDisplayName("Size That Fits")
+                        .previewDisplayName("Size That Fits" + formattedName)
+                        .padding(.all, padding)
+                )
+            }
+        }
+        
+        private func constrained(
+            element : Element
+        ) -> some View {
+            GeometryReader { info in
+                return ElementView(
+                    element: ConstrainedSize(
+                        width: .atMost(info.size.width),
+                        height: .atMost(info.size.height),
+                        wrapping: element
+                    )
                 )
             }
         }
@@ -208,43 +251,70 @@ extension ElementPreview {
 /// Via https://developer.apple.com/documentation/swiftui/securefield/3289399-previewdevice
 @available(iOS 13.0, *)
 public extension PreviewDevice {
+    
+    /// iPhone 7
+    
     static var iPhone7 = PreviewDevice("iPhone 7")
     static var iPhone7Plus = PreviewDevice("iPhone 7 Plus")
+    
+    /// iPhone 8
     
     static var iPhone8 = PreviewDevice("iPhone 8")
     static var iPhone8Plus = PreviewDevice("iPhone 8 Plus")
     
-    static var iPhoneSE = PreviewDevice("iPhone SE")
+    /// iPhone SE
+    
+    static var iPhoneSE_1 : PreviewDevice {
+        if #available(iOS 13.4.1, *) {
+            return PreviewDevice("iPhone SE (1st generation)")
+        } else {
+            return PreviewDevice("iPhone SE")
+        }
+    }
+    
+    @available(iOS 13.4.1, *)
+    static var iPhoneSE_2 : PreviewDevice {
+        return PreviewDevice("iPhone SE (2nd generation)")
+    }
+    
+    /// iPhone X
     
     static var iPhoneX = PreviewDevice("iPhone X")
     
     static var iPhoneXs = PreviewDevice("iPhone Xs")
     static var iPhoneXsMax = PreviewDevice("iPhone Xs Max")
     
+    /// iPhone Xr
+    
     static var iPhoneXr = PreviewDevice("iPhone Xr")
     
+    /// iPad Mini
+    
     static var iPadMini_4 = PreviewDevice("iPad mini 4")
-    
-    static var iPadAir_2 = PreviewDevice("iPad Air 2")
-    
-    static var iPadPro_9_7 = PreviewDevice("iPad Pro (9.7-inch)")
-    static var iPadPro_11 = PreviewDevice("iPad Pro (11-inch) (1st generation)")
-    
-    static var iPadPro_12_9 = PreviewDevice("iPad Pro (12.9-inch)")
-    
-    static var iPad_5 = PreviewDevice("iPad (5th generation)")
-    
-    static var iPadPro_12_9_2 = PreviewDevice("iPad Pro (12.9-inch) (2nd generation)")
-    static var iPadPro_10_5 = PreviewDevice("iPad Pro (10.5-inch)")
-    
-    static var iPad_6 = PreviewDevice("iPad (6th generation)")
-    
-    static var iPadPro_11_2 = PreviewDevice("iPad Pro (11-inch) (2nd generation)")
-    static var iPadPro_12_9_3 = PreviewDevice("iPad Pro (12.9-inch) (3rd generation)")
-    
     static var iPadMini_5 = PreviewDevice("iPad mini (5th generation)")
     
+    /// iPad Air
+    
+    static var iPadAir_2 = PreviewDevice("iPad Air 2")
     static var iPadAir_3 = PreviewDevice("iPad Air (3rd generation)")
+    
+    /// iPad
+        
+    static var iPad_5 = PreviewDevice("iPad (5th generation)")
+    static var iPad_6 = PreviewDevice("iPad (6th generation)")
+    
+    /// iPad Pro
+    
+    static var iPadPro_9_7 = PreviewDevice("iPad Pro (9.7-inch)")
+    
+    static var iPadPro_10_5 = PreviewDevice("iPad Pro (10.5-inch)")
+    
+    static var iPadPro_11_1 = PreviewDevice("iPad Pro (11-inch) (1st generation)")
+    static var iPadPro_11_2 = PreviewDevice("iPad Pro (11-inch) (2nd generation)")
+    
+    static var iPadPro_12_9_1 = PreviewDevice("iPad Pro (12.9-inch)")
+    static var iPadPro_12_9_2 = PreviewDevice("iPad Pro (12.9-inch) (2nd generation)")
+    static var iPadPro_12_9_3 = PreviewDevice("iPad Pro (12.9-inch) (3rd generation)")
 }
 
 #endif

@@ -24,12 +24,10 @@ public struct AspectRatio {
     }
 
     func height(forWidth width: CGFloat) -> CGFloat {
-        // TODO: round to screen scale when that lands
-        return (width / ratio).rounded()
+        return width / ratio
     }
 
     func width(forHeight height: CGFloat) -> CGFloat {
-        // TODO: round to screen scale when that lands
-        return (height * ratio).rounded()
+        return height * ratio
     }
 }

@@ -6,9 +6,9 @@ import UIKit
 public struct Tappable: Element {
 
     public var wrappedElement: Element
-    public var onTap: ()->Void
+    public var onTap: () -> Void
 
-    public init(onTap: @escaping ()->Void, wrapping element: Element) {
+    public init(onTap: @escaping () -> Void, wrapping element: Element) {
         self.wrappedElement = element
         self.onTap = onTap
     }
@@ -23,6 +23,15 @@ public struct Tappable: Element {
         }
     }
 
+}
+
+
+public extension Element {
+    
+    /// Wraps the element and calls the provided closure when tapped.
+    func tappable(onTap: @escaping () -> Void) -> Tappable {
+        Tappable(onTap: onTap, wrapping: self)
+    }
 }
 
 

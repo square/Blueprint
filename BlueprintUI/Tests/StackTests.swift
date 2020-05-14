@@ -389,7 +389,7 @@ class StackTests: XCTestCase {
                     (measuredLength: 5, growPriority: 0.0)
                 ],
                 expectedRanges: [
-                    3...8
+                    2.5...7.5
                 ])
 
             test(
@@ -399,7 +399,7 @@ class StackTests: XCTestCase {
                     (measuredLength: 12, growPriority: 0.0)
                 ],
                 expectedRanges: [
-                    2...14
+                    1.5...13.5
                 ])
 
             test(

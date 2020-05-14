@@ -1,5 +1,5 @@
 import XCTest
-@testable import BlueprintUICommonControls
+import BlueprintUI
 
 final class ScaleRoundingTests: XCTestCase {
     func assert(

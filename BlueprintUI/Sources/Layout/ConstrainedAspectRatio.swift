@@ -77,3 +77,22 @@ public struct ConstrainedAspectRatio: Element {
         }
     }
 }
+
+
+public extension Element {
+    ///
+    /// Constrains the element to the provided aspect ratio.
+    ///
+    /// - parameters:
+    ///   - aspectRatio: The aspect ratio that the content size should match.
+    ///   - contentMode: Whether the aspect ratio should be reached by expanding the content
+    ///     element's size to fill its parent or shrinking it to fit.
+    ///
+    func constrainedTo(
+        aspectRatio: AspectRatio,
+        contentMode: ConstrainedAspectRatio.ContentMode = .fill
+    ) -> ConstrainedAspectRatio
+    {
+        ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
+    }
+}

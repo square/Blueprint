@@ -2,8 +2,8 @@ import UIKit
 
 /// Insets a content element within a layout.
 ///
-/// Commonly used to add padding around another element when displayed within a
-/// container.
+/// Commonly used to add padding around another element when displayed within a container.
+///
 public struct Inset: Element {
 
     /// The wrapped element to be inset.
@@ -46,14 +46,16 @@ public struct Inset: Element {
                 left: sideInsets,
                 bottom: 0.0,
                 right: sideInsets),
-            wrapping: element)
+            wrapping: element
+        )
     }
     
     public init(vertical: CGFloat, wrapping element: Element) {
         self.init(
             top: vertical,
             bottom: vertical,
-            wrapping: element)
+            wrapping: element
+        )
     }
 
     public var content: ElementContent {
@@ -63,13 +65,60 @@ public struct Inset: Element {
                 top: top,
                 bottom: bottom,
                 left: left,
-                right: right))
+                right: right
+            )
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return nil
     }
+}
+
+
+public extension Element {
     
+    /// Insets the element by the given amount on each side.
+    func inset(
+        top: CGFloat = 0.0,
+        bottom: CGFloat = 0.0,
+        left: CGFloat = 0.0,
+        right: CGFloat = 0.0
+    ) -> Inset
+    {
+        Inset(
+            top: top,
+            bottom: bottom,
+            left: left,
+            right: right,
+            wrapping: self
+        )
+    }
+    
+    /// Insets the element by the given amount on each side.
+    func inset(by edgeInsets : UIEdgeInsets) -> Inset {
+        Inset(insets: edgeInsets, wrapping: self)
+    }
+    
+    /// Insets the element by the given amount on each side.
+    func inset(uniform : CGFloat) -> Inset {
+        Inset(uniformInset: uniform, wrapping: self)
+    }
+    
+    /// Insets the element by the given amount on each side.
+    func inset(
+        horizontal : CGFloat = 0.0,
+        vertical : CGFloat = 0.0
+    ) -> Inset
+    {
+        Inset(
+            top: vertical,
+            bottom: vertical,
+            left: horizontal,
+            right: horizontal,
+            wrapping: self
+        )
+    }
 }
 
 
@@ -103,7 +152,5 @@ extension Inset {
             frame.size.height -= top + bottom
             return LayoutAttributes(frame: frame)
         }
-
     }
-
 }

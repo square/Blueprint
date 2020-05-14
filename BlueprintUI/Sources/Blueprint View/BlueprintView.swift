@@ -75,16 +75,43 @@ public final class BlueprintView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    /// Forwarded to the `measure(in:)` implementation of the root element.
+    ///
+    /// Measures the size needed to display the view within then given constraining size,
+    /// by measuring the current `element` of the `BlueprintView`.
+    ///
+    /// If you would like to not constrain the measurement in a given axis,
+    /// pass `0.0` or `.greatestFiniteMagnitude` for that axis, eg:
+    ///
+    /// ```
+    /// // Measures with a width of 100, and no height constraint.
+    /// blueprintView.sizeThatFits(CGSize(width: 100.0, height: 0.0))
+    ///
+    /// // Measures with a height of 100, and no width constraint.
+    /// blueprintView.sizeThatFits(CGSize(width: 0.0, height: 100.0))
+    ///
+    /// // Measures unconstrained in both axes.
+    /// blueprintView.sizeThatFits(.zero)
+    /// ```
+    ///
     override public func sizeThatFits(_ size: CGSize) -> CGSize {
-        guard let element = element else { return .zero }
-        let constraint: SizeConstraint
-        if size == .zero {
-            constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
-        } else {
-            constraint = SizeConstraint(size)
+        guard let element = element else {
+            return .zero
         }
-        return element.content.measure(in: constraint, environment: .empty)
+        
+        func measurementConstraint(with size : CGSize) -> SizeConstraint {
+            
+            let unconstrainedValues : [CGFloat] = [0.0, .greatestFiniteMagnitude, .infinity]
+            
+            let widthUnconstrained = unconstrainedValues.contains(size.width)
+            let heightUnconstrained = unconstrainedValues.contains(size.height)
+            
+            return SizeConstraint(
+                width: widthUnconstrained ? .unconstrained : .atMost(size.width),
+                height: heightUnconstrained ? .unconstrained : .atMost(size.height)
+            )
+        }
+        
+        return element.content.measure(in: measurementConstraint(with: size), environment: .empty)
     }
 
     /// Returns the size of the element bound to the current width (mimicking
@@ -111,6 +138,11 @@ public final class BlueprintView: UIView {
         super.layoutSubviews()
         invalidateIntrinsicContentSize()
         performUpdate()
+    }
+
+    public override func didMoveToWindow() {
+        super.didMoveToWindow()
+        setNeedsViewHierarchyUpdate()
     }
     
     private func performUpdate() {
@@ -143,11 +175,14 @@ public final class BlueprintView: UIView {
         
         rootController.view.frame = bounds
         
-        let rootNode = NativeViewNode(
+        var rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes
         )
+
+        let scale = window?.screen.scale ?? UIScreen.main.scale
+        rootNode.round(from: .zero, correction: .zero, scale: scale)
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         hasUpdatedViewHierarchy = true

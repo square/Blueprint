@@ -103,11 +103,27 @@ public struct Aligned: Element {
                 attributes.frame.size.width = size.width
             }
 
-            // TODO: screen-scale round here once that lands
-            attributes.frame.origin.x.round()
-            attributes.frame.origin.y.round()
-
             return attributes
         }
+    }
+}
+
+public extension Element {
+    /// Wraps the element in an `Aligned` element with the provided parameters.
+    ///
+    /// - parameters:
+    ///   - vertically: The vertical alignment. Defaults to `.centered`.
+    ///   - horizontally: The horizontal alignment. Defaults to `.centered`.
+    ///
+    func aligned(
+        vertically: Aligned.VerticalAlignment,
+        horizontally: Aligned.HorizontalAlignment
+    ) -> Aligned
+    {
+        Aligned(
+            vertically: vertically,
+            horizontally: horizontally,
+            wrapping: self
+        )
     }
 }
