@@ -39,3 +39,15 @@ public struct AdaptedEnvironment: Element {
         return nil
     }
 }
+
+public extension Element {
+    /// Wraps this element in an `AdaptedEnvironment` with the given enviroment key and value.
+    func adaptedEnvironment<Key>(key: Key.Type, value: Key.Value) -> Element where Key: EnvironmentKey {
+        AdaptedEnvironment(key: key, value: value, wrapping: self)
+    }
+
+    /// Wraps this element in an `AdaptedEnvironment` with the given configuration block.
+    func adaptedEnvironment(by environmentAdapter: @escaping (inout Environment) -> Void) -> Element {
+        AdaptedEnvironment(by: environmentAdapter, wrapping: self)
+    }
+}
