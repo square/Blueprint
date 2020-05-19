@@ -14,12 +14,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 100, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 100, height: 110),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -31,12 +31,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 147),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -48,12 +48,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 85),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 85),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -65,12 +65,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 110),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -82,12 +82,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 150),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 150),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -99,12 +99,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 120, height: 92),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -116,12 +116,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 120),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 120, height: 120),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -133,12 +133,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 88),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -150,12 +150,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 135),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 135),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
     }
@@ -171,12 +171,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 100, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 147),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -188,12 +188,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 85, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 147),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -205,12 +205,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 85, height: 85),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 75, height: 85),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -222,12 +222,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 63),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -239,12 +239,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 150),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 175, height: 150),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -256,12 +256,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 100),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -273,12 +273,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 120),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 110, height: 120),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -290,12 +290,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 110),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 88),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
         
@@ -307,12 +307,12 @@ class ConstrainedSizeTests: XCTestCase {
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 135),
-                fixed.content.measure(in: constraint, environment: .empty)
+                fixed.content.measure(in: constraint)
             )
             
             XCTAssertEqual(
                 CGSize(width: 125, height: 135),
-                flexible.content.measure(in: constraint, environment: .empty)
+                flexible.content.measure(in: constraint)
             )
         }
     }

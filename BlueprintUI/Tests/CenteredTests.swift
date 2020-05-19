@@ -8,13 +8,7 @@ class CenteredTests: XCTestCase {
         let constraint = SizeConstraint(width: .unconstrained, height: .unconstrained)
         let element = TestElement()
         let centered = Centered(element)
-        XCTAssertEqual(
-            centered.content.measure(
-                in: constraint,
-                environment: .empty),
-            element.content.measure(
-                in: constraint,
-                environment: .empty))
+        XCTAssertEqual(centered.content.measure(in: constraint), element.content.measure(in: constraint))
     }
 
     func test_layout() {

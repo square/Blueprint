@@ -33,9 +33,7 @@ class ImageTests: XCTestCase {
     func test_measuring() {
         let element = Image(image: image)
         XCTAssertEqual(
-            element.content.measure(
-                in: SizeConstraint(width: .unconstrained, height: .unconstrained),
-                environment: .empty),
+            element.content.measure(in: SizeConstraint(width: .unconstrained, height: .unconstrained)),
             image.size
         )
 

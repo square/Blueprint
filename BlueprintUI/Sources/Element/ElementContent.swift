@@ -15,6 +15,11 @@ public struct ElementContent {
         self.storage = builder
     }
 
+    /// Measures the required size of this element's content.
+    /// - Parameters:
+    ///   - constraint: The size constraint.
+    ///   - environment: The environment to measure in.
+    /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
         return storage.measure(in: constraint, environment: environment)
     }

@@ -82,9 +82,7 @@ class ScrollViewTests : XCTestCase {
 
                 scrollView.contentSize = contentSize
 
-                let measuredSize = scrollView.content.measure(
-                    in: SizeConstraint(boundingSize),
-                    environment: .empty)
+                let measuredSize = scrollView.content.measure(in: SizeConstraint(boundingSize))
 
                 compareSnapshot(
                     of: scrollView,
