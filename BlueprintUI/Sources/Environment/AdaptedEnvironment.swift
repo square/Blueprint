@@ -27,7 +27,7 @@ public struct AdaptedEnvironment: Element {
     ///   - key: The environment key to modify.
     ///   - value: The new environment value to cascade.
     ///   - wrapping: The element to be wrapped.
-    public init<K>(key: K.Type, value: K.Value, wrapping child: Element) where K: EnvironmentKey {
+    public init<Key>(key: Key.Type, value: Key.Value, wrapping child: Element) where Key: EnvironmentKey {
         self.init(by: { $0[key] = value }, wrapping: child)
     }
 

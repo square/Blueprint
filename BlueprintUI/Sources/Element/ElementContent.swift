@@ -110,7 +110,7 @@ extension ElementContent {
             child: child)
     }
 
-    public init<K>(child: Element, key: K.Type, value: K.Value) where K: EnvironmentKey {
+    public init<Key>(child: Element, key: Key.Type, value: Key.Value) where Key: EnvironmentKey {
         self.init(child: child) { environment in
             environment[key] = value
         }

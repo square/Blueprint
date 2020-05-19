@@ -42,12 +42,12 @@ public struct Environment {
     private var values: [ObjectIdentifier: Any] = [:]
 
     /// Gets or sets an environment value by its key.
-    public subscript<K>(key: K.Type) -> K.Value where K: EnvironmentKey {
+    public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
             let objectId = ObjectIdentifier(key)
 
             if let value = values[objectId] {
-                return value as! K.Value
+                return value as! Key.Value
             }
 
             return key.defaultValue
