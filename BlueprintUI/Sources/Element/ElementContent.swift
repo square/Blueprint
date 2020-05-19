@@ -51,9 +51,7 @@ extension ElementContent {
 
 extension ElementContent {
     public init(build builder: @escaping (Environment) -> Element) {
-        self.storage = LazyStorage(
-            layout: PassthroughLayout(),
-            builder: builder)
+        self.storage = LazyStorage(builder: builder)
     }
 }
 
@@ -105,7 +103,6 @@ extension ElementContent {
 extension ElementContent {
     public init(child: Element, environment environmentAdapter: @escaping (inout Environment) -> Void) {
         self.storage = EnvironmentAdaptingStorage(
-            layout: PassthroughLayout(),
             adapter: environmentAdapter,
             child: child)
     }
@@ -232,8 +229,6 @@ extension ElementContent.Builder {
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
 
-    var layout: SingleChildLayout
-
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
     ///
@@ -248,9 +243,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     {
         let environment = adapted(environment: environment)
 
-        let childAttributes = layout.layout(
-            size: attributes.bounds.size,
-            child: child.content.measurable(in: environment))
+        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
@@ -266,9 +259,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
         let environment = adapted(environment: environment)
 
-        return layout.measure(
-            in: constraint,
-            child: child.content.measurable(in: environment))
+        return child.content.measure(in: constraint, environment: environment)
     }
 
     private func adapted(environment: Environment) -> Environment {
@@ -282,8 +273,6 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 private struct LazyStorage: ContentStorage {
     let childCount = 1
 
-    var layout: SingleChildLayout
-
     var builder: (Environment) -> Element
 
     func performLayout(
@@ -292,9 +281,7 @@ private struct LazyStorage: ContentStorage {
         -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         let child = buildChild(in: environment)
-        let childAttributes = layout.layout(
-            size: attributes.bounds.size,
-            child: child.content.measurable(in: environment))
+        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
@@ -308,9 +295,8 @@ private struct LazyStorage: ContentStorage {
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        return layout.measure(
-            in: constraint,
-            child: buildChild(in: environment).content.measurable(in: environment))
+        let child = buildChild(in: environment)
+        return child.content.measure(in: constraint, environment: environment)
     }
 
     private func buildChild(in environment: Environment) -> Element {
