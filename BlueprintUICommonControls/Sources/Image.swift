@@ -9,15 +9,21 @@ public struct Image: Element {
     public var image: UIImage?
 
     /// The tint color.
-    public var tintColor: UIColor? = nil
+    public var tintColor: UIColor?
 
     /// The content mode determines the layout of the image when its size does
     /// not precisely match the size that the element is assigned.
-    public var contentMode: ContentMode = .aspectFill
+    public var contentMode: ContentMode
 
     /// Initializes an image element with the given `UIImage` instance.
-    public init(image: UIImage?) {
+    public init(
+        image: UIImage?,
+        contentMode: ContentMode = .aspectFill,
+        tintColor: UIColor? = nil
+    ) {
         self.image = image
+        self.contentMode = contentMode
+        self.tintColor = tintColor
     }
 
     public var content: ElementContent {
