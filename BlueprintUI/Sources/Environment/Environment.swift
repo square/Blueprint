@@ -21,15 +21,16 @@ import Foundation
 ///         wrapping: childElement
 ///     )
 ///
-/// To read an environment value, use `DynamicElement`. If this element were part of the child
+/// To read an environment value, use `EnvironmentReader`. If this element were part of the child
 /// element in the previous example, `myValue` would be set to `someValue`. If the key had not
 /// been set in an ancestor element, the value would be `MyEnvironmentKey.defaultValue`.
 ///
-///     struct MyElement: DynamicElement {
-///         func elementRepresentation(in environment: Environment) -> Element {
-///             let myValue = environment[MyEnvironmentKey.self]
-///     
-///             return SomeElement(using: myValue)
+///     struct MyElement: ProxyElement {
+///         var elementRepresentation: Element {
+///             return EnvironmentReader { environment -> Element in
+///                 let myValue = environment[MyEnvironmentKey.self]
+///                 return SomeElement(using: myValue)
+///             }
 ///         }
 ///     }
 public struct Environment {

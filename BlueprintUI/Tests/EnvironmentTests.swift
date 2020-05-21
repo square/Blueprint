@@ -93,9 +93,11 @@ class EnvironmentTests: XCTestCase {
         return node.viewDescription
     }
 
-    struct AdaptingElement: DynamicElement {
-        func elementRepresentation(in environment: Environment) -> Element {
-            return TestElement(value: environment.testValue)
+    struct AdaptingElement: ProxyElement {
+        var elementRepresentation: Element {
+            return EnvironmentReader { environment -> Element in
+                return TestElement(value: environment.testValue)
+            }
         }
     }
 }

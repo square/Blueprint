@@ -114,24 +114,26 @@ struct FeedTheme {
     var authorColor: UIColor
 }
 
-fileprivate struct MainView: DynamicElement {
+fileprivate struct MainView: ProxyElement {
     
     var posts: [Post]
     
-    func elementRepresentation(in environment: Environment) -> Element {
-        Column { col in
-            col.horizontalAlignment = .fill
+    var elementRepresentation: Element {
+        EnvironmentReader { (environment) -> Element in
+            Column { col in
+                col.horizontalAlignment = .fill
 
-            col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+                col.add(child: List(posts: self.posts))
+                col.add(child: CommentForm())
+            }
+            .scrollable {
+                $0.contentSize = .fittingHeight
+                $0.alwaysBounceVertical = true
+                $0.keyboardDismissMode = .onDrag
+            }
+            .inset(by: environment.safeAreaInsets)
+            .box(background: UIColor(white: 0.95, alpha: 1.0))
         }
-        .scrollable {
-            $0.contentSize = .fittingHeight
-            $0.alwaysBounceVertical = true
-            $0.keyboardDismissMode = .onDrag
-        }
-        .inset(by: environment.safeAreaInsets)
-        .box(background: UIColor(white: 0.95, alpha: 1.0))
     }
 }
 
@@ -207,11 +209,11 @@ fileprivate struct FeedItem: ProxyElement {
 
 }
 
-fileprivate struct FeedItemBody: DynamicElement {
+fileprivate struct FeedItemBody: ProxyElement {
 
     var post: Post
 
-    func elementRepresentation(in environment: Environment) -> Element {
+    var elementRepresentation: Element {
         let column = Column { col in
 
             col.horizontalAlignment = .leading
@@ -221,9 +223,12 @@ fileprivate struct FeedItemBody: DynamicElement {
                 row.minimumHorizontalSpacing = 8.0
                 row.verticalAlignment = .center
 
-                var name = Label(text: post.authorName)
-                name.font = UIFont.boldSystemFont(ofSize: 14.0)
-                name.color = environment.feedTheme.authorColor
+                let name = EnvironmentReader { (environment) -> Element in
+                    var name = Label(text: self.post.authorName)
+                    name.font = UIFont.boldSystemFont(ofSize: 14.0)
+                    name.color = environment.feedTheme.authorColor
+                    return name
+                }
                 row.add(child: name)
 
                 var timeAgo = Label(text: post.timeAgo)
