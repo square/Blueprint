@@ -50,7 +50,7 @@ class ViewDescriptionTests: XCTestCase {
 }
 
 
-final class TestView: UIView {
+private final class TestView: UIView {
 
     let initializationProperty: String
 

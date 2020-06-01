@@ -28,12 +28,90 @@ let posts = [
 
 final class ViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: MainView(posts: posts))
+    private let blueprintView = BlueprintView()
 
     override func loadView() {
         self.view = blueprintView
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        update()
+    }
+
+    @available(iOS 11.0, *)
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        update()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        update()
+    }
+
+    private func update() {
+        blueprintView.element = element
+    }
+
+    private var viewSafeAreaInsets: UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return view.safeAreaInsets
+        } else {
+            return .zero
+        }
+    }
+
+    var element: Element {
+        let safeAreaInsets = viewSafeAreaInsets
+        let screenScale = traitCollection.displayScale
+        let theme = FeedTheme(authorColor: .green)
+
+        return AdaptedEnvironment(
+            by: { (environment) in
+                environment.safeAreaInsets = safeAreaInsets
+                environment.screenScale = screenScale
+                environment.feedTheme = theme
+            },
+            wrapping: MainView(posts: posts))
+    }
+}
+
+enum SafeAreaInsetsKey: EnvironmentKey {
+    static let defaultValue = UIEdgeInsets.zero
+}
+
+extension Environment {
+    var safeAreaInsets: UIEdgeInsets {
+        get { return self[SafeAreaInsetsKey.self] }
+        set { self[SafeAreaInsetsKey.self] = newValue }
+    }
+}
+
+enum ScreenScaleKey: EnvironmentKey {
+    static let defaultValue = UIScreen.main.scale
+}
+
+extension Environment {
+    var screenScale: CGFloat {
+        get { return self[ScreenScaleKey.self] }
+        set { self[ScreenScaleKey.self] = newValue }
+    }
+}
+
+enum FeedThemeKey: EnvironmentKey {
+    static let defaultValue = FeedTheme(authorColor: .black)
+}
+
+extension Environment {
+    var feedTheme: FeedTheme {
+        get { return self[FeedThemeKey.self] }
+        set { self[FeedThemeKey.self] = newValue }
+    }
+}
+
+struct FeedTheme {
+    var authorColor: UIColor
 }
 
 fileprivate struct MainView: ProxyElement {
@@ -41,18 +119,21 @@ fileprivate struct MainView: ProxyElement {
     var posts: [Post]
     
     var elementRepresentation: Element {
-        Column { col in
-            col.horizontalAlignment = .fill
+        EnvironmentReader { (environment) -> Element in
+            Column { col in
+                col.horizontalAlignment = .fill
 
-            col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+                col.add(child: List(posts: self.posts))
+                col.add(child: CommentForm())
+            }
+            .scrollable {
+                $0.contentSize = .fittingHeight
+                $0.alwaysBounceVertical = true
+                $0.keyboardDismissMode = .onDrag
+            }
+            .inset(by: environment.safeAreaInsets)
+            .box(background: UIColor(white: 0.95, alpha: 1.0))
         }
-        .scrollable {
-            $0.contentSize = .fittingHeight
-            $0.alwaysBounceVertical = true
-            $0.keyboardDismissMode = .onDrag
-        }
-        .box(background: UIColor(white: 0.95, alpha: 1.0))
     }
 }
 
@@ -142,8 +223,12 @@ fileprivate struct FeedItemBody: ProxyElement {
                 row.minimumHorizontalSpacing = 8.0
                 row.verticalAlignment = .center
 
-                var name = Label(text: post.authorName)
-                name.font = UIFont.boldSystemFont(ofSize: 14.0)
+                let name = EnvironmentReader { (environment) -> Element in
+                    var name = Label(text: self.post.authorName)
+                    name.font = UIFont.boldSystemFont(ofSize: 14.0)
+                    name.color = environment.feedTheme.authorColor
+                    return name
+                }
                 row.add(child: name)
 
                 var timeAgo = Label(text: post.timeAgo)

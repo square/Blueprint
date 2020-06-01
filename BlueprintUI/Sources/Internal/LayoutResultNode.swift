@@ -9,21 +9,12 @@ extension Element {
     ///   root element.
     ///
     /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes) -> LayoutResultNode {
+    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
         return LayoutResultNode(
             element: self,
             layoutAttributes: layoutAttributes,
-            content: content)
-    }
-
-    /// Build a fully laid out element tree with complete layout attributes
-    /// for each element.
-    ///
-    /// - Parameter frame: The frame to assign to the root element.
-    ///
-    /// - Returns: A layout result
-    func layout(frame: CGRect) -> LayoutResultNode {
-        return layout(layoutAttributes: LayoutAttributes(frame: frame))
+            content: content,
+            environment: environment)
     }
 
 }
@@ -43,13 +34,13 @@ struct LayoutResultNode {
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
     
-    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent) {
+    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent, environment: Environment) {
 
         self.element = element
         self.layoutAttributes = layoutAttributes
 
         let layoutBeginTime = DispatchTime.now()
-        children = content.performLayout(attributes: layoutAttributes)
+        children = content.performLayout(attributes: layoutAttributes, environment: environment)
         let layoutEndTime = DispatchTime.now()
         let layoutDuration = layoutEndTime.uptimeNanoseconds - layoutBeginTime.uptimeNanoseconds
         diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)

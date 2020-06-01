@@ -111,7 +111,7 @@ public final class BlueprintView: UIView {
             )
         }
         
-        return element.content.measure(in: measurementConstraint(with: size))
+        return element.content.measure(in: measurementConstraint(with: size), environment: .empty)
     }
 
     /// Returns the size of the element bound to the current width (mimicking
@@ -131,7 +131,7 @@ public final class BlueprintView: UIView {
         } else {
             constraint = SizeConstraint(width: bounds.width)
         }
-        return element.content.measure(in: constraint)
+        return element.content.measure(in: constraint, environment: .empty)
     }
     
     override public func layoutSubviews() {
@@ -165,10 +165,12 @@ public final class BlueprintView: UIView {
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
-        
+
+        let environment = Environment.empty
+
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(frame: bounds)
+            .layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
             .resolve() ?? []
         
         rootController.view.frame = bounds

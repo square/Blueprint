@@ -340,7 +340,7 @@ fileprivate struct FixedElement: Element {
 fileprivate struct FlexibleElement: Element {
 
     var content: ElementContent {
-        return ElementContent { constraint in
+        return ElementContent { constraint -> CGSize in
             let totalArea : CGFloat = 100 * 110
             
             let width : CGFloat
