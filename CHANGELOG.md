@@ -14,7 +14,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [Add support for the iPhone SE 2](https://github.com/square/Blueprint/pull/96) in `ElementPreview`.
-- Added `tintColor` and `contentMode` into the initializer for `Image`
+- Added `tintColor` and `contentMode` into the initializer for `Image`. ([#100])
+
+- Environment ([#101]).
+
+  You can now read and write values from an `Environment` that is automatically propagated down the element tree. You can use these values to dynamically build the contents of an element, without having to explicitly pass every value through the tree yourself.
+
+  You can read these values with `EnvironmentReader`:
+
+  ```swift
+  struct Foo: ProxyElement {
+      var elementRepresentation: Element {
+          EnvironmentReader { environment -> Element in
+              Label(text: "value from environment: \(environment.fooValue)")
+          }
+      }
+  }
+  ```
+
+  And set them with `AdaptedEnvironment`:
+
+  ```swift
+  struct Bar: ProxyElement {
+      var elementRepresentation: Element {
+          ComplicatedElement()
+              .adaptedEnvironment { environment in
+                  environment.fooValue = "bar"
+              }
+      }
+  }
+  ```
 
 ### Removed
 
@@ -209,6 +238,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#101]: https://github.com/square/Blueprint/pull/101
+[#100]: https://github.com/square/Blueprint/pull/100
 [#95]: https://github.com/square/Blueprint/pull/95
 [#72]: https://github.com/square/Blueprint/pull/72
 [#68]: https://github.com/square/Blueprint/pull/68
