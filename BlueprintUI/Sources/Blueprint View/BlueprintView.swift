@@ -136,7 +136,9 @@ public final class BlueprintView: UIView {
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
         didSet {
-            setNeedsViewHierarchyUpdate()
+            if semanticContentAttribute != oldValue {
+                setNeedsViewHierarchyUpdate()
+            }
         }
     }
 
