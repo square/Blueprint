@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add support for the iPhone SE 2](https://github.com/square/Blueprint/pull/96) in `ElementPreview`.
 - Added `tintColor` and `contentMode` into the initializer for `Image`. ([#100])
+- Added an [Empty element](https://github.com/square/Blueprint/pull/104), to mirror `EmptyView` in SwiftUI. It is an element with no size and draws no content.
 
 - Environment ([#101]).
 
