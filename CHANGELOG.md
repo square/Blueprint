@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   struct Foo: ProxyElement {
       var elementRepresentation: Element {
           EnvironmentReader { environment -> Element in
-              Label(text: "value from environment: \(environment.fooValue)")
+              Label(text: "value from environment: \(environment.foo)")
           }
       }
   }
@@ -40,8 +40,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       var elementRepresentation: Element {
           ComplicatedElement()
               .adaptedEnvironment { environment in
-                  environment.fooValue = "bar"
+                  environment.foo = "bar"
               }
+      }
+  }
+  ```
+
+  Several enviroment keys are available by default ([#102]):
+
+  - calendar
+  - display scale
+  - layout direction
+  - locale
+  - safe area insets
+  - time zone
+
+  You can create your own by making a type that conforms to `EnvironmentKey`, and extending `Environment` with a new property:
+
+  ```swift
+  extension Environment {
+      private enum FooKey: EnvironmentKey {
+          static let defaultValue: String = "default value"
+      }
+
+      /// The current Foo that elements should use.
+      public var foo: String {
+          get { self[FooKey.self] }
+          set { self[FooKey.self] = newValue }
       }
   }
   ```
@@ -239,6 +264,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#102]: https://github.com/square/Blueprint/pull/102
 [#101]: https://github.com/square/Blueprint/pull/101
 [#100]: https://github.com/square/Blueprint/pull/100
 [#95]: https://github.com/square/Blueprint/pull/95
