@@ -180,7 +180,7 @@ public final class BlueprintView: UIView {
 
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+            .layout(layoutAttributes: LayoutAttributes(frame: frame), environment: makeEnvironment())
             .resolve() ?? []
         
         rootController.view.frame = bounds
@@ -210,7 +210,7 @@ public final class BlueprintView: UIView {
         return rootController.children
     }
 
-    private var environment: Environment {
+    private func makeEnvironment() -> Environment {
         var environment = Environment.empty
 
         if let displayScale = window?.screen.scale {
