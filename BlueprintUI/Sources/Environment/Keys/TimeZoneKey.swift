@@ -8,6 +8,8 @@ extension Environment {
     }
 
     /// The current time zone that elements should use when handling dates.
+    ///
+    /// Defaults to `TimeZone.current`.
     public var timeZone: TimeZone {
         get { self[TimeZoneKey.self] }
         set { self[TimeZoneKey.self] = newValue }

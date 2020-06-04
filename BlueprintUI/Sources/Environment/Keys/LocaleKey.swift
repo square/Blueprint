@@ -8,6 +8,8 @@ extension Environment {
     }
 
     /// The current locale that elements should use.
+    ///
+    /// Defaults to `Locale.current`.
     public var locale: Locale {
         get { self[LocaleKey.self] }
         set { self[LocaleKey.self] = newValue }

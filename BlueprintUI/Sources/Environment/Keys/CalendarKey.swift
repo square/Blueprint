@@ -8,6 +8,8 @@ extension Environment {
     }
 
     /// The current calendar that elements should use when handling dates.
+    ///
+    /// Defaults to `Calendar.current`.
     public var calendar: Calendar {
         get { self[CalendarKey.self] }
         set { self[CalendarKey.self] = newValue }
