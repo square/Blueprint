@@ -39,17 +39,6 @@ final class ViewController: UIViewController {
         update()
     }
 
-    @available(iOS 11.0, *)
-    override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        update()
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        update()
-    }
-
     private func update() {
         blueprintView.element = element
     }
@@ -63,47 +52,18 @@ final class ViewController: UIViewController {
     }
 
     var element: Element {
-        let safeAreaInsets = viewSafeAreaInsets
-        let screenScale = traitCollection.displayScale
         let theme = FeedTheme(authorColor: .green)
 
-        return AdaptedEnvironment(
-            by: { (environment) in
-                environment.safeAreaInsets = safeAreaInsets
-                environment.screenScale = screenScale
-                environment.feedTheme = theme
-            },
-            wrapping: MainView(posts: posts))
+        return MainView(posts: posts)
+            .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
     }
 }
 
-enum SafeAreaInsetsKey: EnvironmentKey {
-    static let defaultValue = UIEdgeInsets.zero
-}
-
 extension Environment {
-    var safeAreaInsets: UIEdgeInsets {
-        get { return self[SafeAreaInsetsKey.self] }
-        set { self[SafeAreaInsetsKey.self] = newValue }
+    private enum FeedThemeKey: EnvironmentKey {
+        static let defaultValue = FeedTheme(authorColor: .black)
     }
-}
 
-enum ScreenScaleKey: EnvironmentKey {
-    static let defaultValue = UIScreen.main.scale
-}
-
-extension Environment {
-    var screenScale: CGFloat {
-        get { return self[ScreenScaleKey.self] }
-        set { self[ScreenScaleKey.self] = newValue }
-    }
-}
-
-enum FeedThemeKey: EnvironmentKey {
-    static let defaultValue = FeedTheme(authorColor: .black)
-}
-
-extension Environment {
     var feedTheme: FeedTheme {
         get { return self[FeedThemeKey.self] }
         set { self[FeedThemeKey.self] = newValue }
