@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.12.0] - 06-04-2020
+
+### Fixed
+
 - Removed layout rounding no longer needed since [#64] ([#95]).
 
 ### Added
@@ -70,20 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       }
   }
   ```
-
-### Removed
-
-### Changed
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.11.0] - 2020-05-10
 
