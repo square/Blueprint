@@ -111,7 +111,10 @@ public final class BlueprintView: UIView {
             )
         }
         
-        return element.content.measure(in: measurementConstraint(with: size), environment: .empty)
+        return element.content.measure(
+            in: measurementConstraint(with: size),
+            environment: self.makeEnvironment()
+        )
     }
 
     /// Returns the size of the element bound to the current width (mimicking
@@ -131,7 +134,11 @@ public final class BlueprintView: UIView {
         } else {
             constraint = SizeConstraint(width: bounds.width)
         }
-        return element.content.measure(in: constraint, environment: .empty)
+        
+        return element.content.measure(
+            in: constraint,
+            environment: self.makeEnvironment()
+        )
     }
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
