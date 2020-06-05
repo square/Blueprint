@@ -16,9 +16,7 @@ public struct Empty : Element {
     public init() {}
     
     public var content: ElementContent {
-        ElementContent { _ in
-            .zero
-        }
+        ElementContent(intrinsicSize: .zero)
     }
     
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

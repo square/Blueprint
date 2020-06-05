@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Use default environment when [measuring `BlueprintView`](https://github.com/square/Blueprint/pull/107).
+
 ### Added
 
 ### Removed
