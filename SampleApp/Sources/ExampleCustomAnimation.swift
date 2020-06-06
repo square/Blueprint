@@ -19,7 +19,7 @@ final class StatusProgressViewController : UIViewController
         
         self.view = self.blueprintView
         
-        self.blueprintView.setElement(animated: true, self.element)
+        self.blueprintView.setElement(animated: false, self.element)
                 
         self.view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }

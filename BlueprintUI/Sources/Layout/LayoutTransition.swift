@@ -27,8 +27,7 @@ public enum LayoutTransition {
     case inherited
 
     /// The view will animate along with an inherited transition (if present) or the specified fallback attributes.
-    case inheritedWithFallback(AnimationOptions)
-
+    case inheritedWith(fallback: AnimationOptions)
 }
 
 
@@ -42,21 +41,15 @@ extension LayoutTransition {
         case .none:
             UIView.performWithoutAnimation(animations)
             
-        case .inheritedWithFallback(let fallback):
+        case .inheritedWith(let fallback):
             if UIView.isInAnimationBlock {
                 animations()
             } else {
-                fallback.perform(
-                    animations: animations,
-                    completion: { _ in }
-                )
+                fallback.perform(animations: animations)
             }
             
         case .specific(let attributes):
-            attributes.perform(
-                animations: animations,
-                completion: { _ in }
-            )
+            attributes.perform(animations: animations)
         }
 
     }

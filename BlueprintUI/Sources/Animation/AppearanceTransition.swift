@@ -124,19 +124,31 @@ public struct AppearanceTransition : Element {
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        ViewDescription(TransitionContainerView.self) {
+        ViewDescription(TransitionContainerView.self) { config in
             
-            $0.builder = { TransitionContainerView(frame: bounds) }
+            config.builder = { TransitionContainerView(frame: bounds) }
             
-            $0.onAppear = onAppear
-            $0.onDisappear = onDisappear
-            $0.onLayout = onLayout
+            config.onAppear = onAppear
+            config.onDisappear = onDisappear
+            config.onLayout = onLayout
         }
     }
 }
 
 
 public extension Element {
+    
+    func onAppear(_ animation : TransitionAnimation) -> AppearanceTransition {
+        AppearanceTransition(onAppear: animation, wrapping: self)
+    }
+    
+    func onDisappear(_ animation : TransitionAnimation) -> AppearanceTransition {
+        AppearanceTransition(onDisappear: animation, wrapping: self)
+    }
+    
+    func onLayout(_ layout : LayoutTransition) -> AppearanceTransition {
+        AppearanceTransition(onAppear: nil, onDisappear: nil, layout: layout, wrapping: self)
+    }
     
     func transition(
         with animation: TransitionAnimation,
