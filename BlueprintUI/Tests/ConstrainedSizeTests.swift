@@ -323,7 +323,7 @@ class ConstrainedSizeTests: XCTestCase {
 fileprivate struct FixedElement: Element {
 
     var content: ElementContent {
-        return ElementContent { _ in
+        ElementContent { constraint -> CGSize in
             // Using different sizes for width and height in case
             // any internal calculations mix up x and y; we'll catch that.
             
@@ -340,7 +340,7 @@ fileprivate struct FixedElement: Element {
 fileprivate struct FlexibleElement: Element {
 
     var content: ElementContent {
-        return ElementContent { constraint -> CGSize in
+        ElementContent { constraint -> CGSize in
             let totalArea : CGFloat = 100 * 110
             
             let width : CGFloat
