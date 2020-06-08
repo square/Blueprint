@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Master]
 
+- Add [delaysContentTouches](https://github.com/square/Blueprint/pull/109) to the `ScrollView` element.
+
 ### Fixed
 
 ### Added
