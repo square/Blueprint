@@ -84,8 +84,8 @@ public protocol UIViewElement : Element {
 
 public extension UIViewElement {
     
-    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize
-    {
+    /// The default implementation simply forwards to `sizeThatFits(_:)`.
+    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize {
         view.sizeThatFits(size)
     }
     
@@ -102,15 +102,6 @@ public extension UIViewElement {
     
     /// Provide the view for the element.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        self.elementViewDescription(bounds: bounds)
-    }
-}
-
-
-extension UIViewElement {
-    /// Map the create and update methods of `UIViewElement` to a `ViewDescription`.
-    func elementViewDescription(bounds: CGRect) -> ViewDescription {
-        
         UIViewType.describe {
             $0.builder = {
                 Self.makeUIView()
@@ -134,19 +125,15 @@ final class UIViewElementMeasurer {
     func measure<ViewElement:UIViewElement>(element : ViewElement, in constraint : SizeConstraint) -> CGSize {
         
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
-        let viewDescription = element.elementViewDescription(bounds: bounds)
         
-        let view = self.measurementView(
-            for: element,
-            viewDescription: viewDescription
-        )
+        let view = self.measurementView(for: element)
         
-        viewDescription.apply(to: view)
+        element.updateUIView(view)
         
         return element.size(bounds.size, thatFits: view)
     }
     
-    func measurementView<ViewElement:UIViewElement>(for element : ViewElement, viewDescription: ViewDescription) -> ViewElement.UIViewType
+    func measurementView<ViewElement:UIViewElement>(for element : ViewElement) -> ViewElement.UIViewType
     {
         let key = Key(
             elementType: ObjectIdentifier(ViewElement.self)
@@ -155,9 +142,9 @@ final class UIViewElementMeasurer {
         if let existing = self.views[key] {
             return existing as! ViewElement.UIViewType
         } else {
-            let new = viewDescription.build()
+            let new = ViewElement.makeUIView()
             self.views[key] = new
-            return new as! ViewElement.UIViewType
+            return new
         }
     }
     
