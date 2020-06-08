@@ -63,10 +63,31 @@ public protocol UIViewElement : Element {
     /// }
     /// ```
     func updateUIView(_ view: UIViewType)
+    
+    /// Returns the sizing measurement for the element for the provided
+    /// measurement view.
+    ///
+    /// You usually do not need to implement this method – the default implementation of
+    /// this method simply calls `sizeThatFits(_:)` on the provided view.
+    ///
+    /// The view is fully configured and updated before this method is called – you do not need to
+    /// update it in any way.
+    ///
+    /// When To Override
+    /// ----------------
+    /// You may want to override this method if you need to mutate the value returned from `sizeThatFits(_:)`,
+    /// for example to round it up to an integral pixel value in the case of a `UILabel`, or if you
+    /// want to use some other sizing method like `systemLayoutSizeFitting(...)`.
+    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize
 }
 
 
 public extension UIViewElement {
+    
+    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize
+    {
+        view.sizeThatFits(size)
+    }
     
     //
     // MARK: Element
@@ -103,8 +124,8 @@ extension UIViewElement {
 }
 
 
-/// A private type which caches `UIViewElement` views to be reused for sizing and measurement.
-private final class UIViewElementMeasurer {
+/// An internal type which caches `UIViewElement` views to be reused for sizing and measurement.
+final class UIViewElementMeasurer {
     
     /// The standard shared cache.
     static let shared = UIViewElementMeasurer()
@@ -113,26 +134,31 @@ private final class UIViewElementMeasurer {
     func measure<ViewElement:UIViewElement>(element : ViewElement, in constraint : SizeConstraint) -> CGSize {
         
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
-        
         let viewDescription = element.elementViewDescription(bounds: bounds)
         
+        let view = self.measurementView(
+            for: element,
+            viewDescription: viewDescription
+        )
+        
+        viewDescription.apply(to: view)
+        
+        return element.size(bounds.size, thatFits: view)
+    }
+    
+    func measurementView<ViewElement:UIViewElement>(for element : ViewElement, viewDescription: ViewDescription) -> ViewElement.UIViewType
+    {
         let key = Key(
             elementType: ObjectIdentifier(ViewElement.self)
         )
         
-        let view : UIView = {
-            if let existing = self.views[key] {
-                return existing
-            } else {
-                let new = viewDescription.build()
-                self.views[key] = new
-                return new
-            }
-        }()
-        
-        viewDescription.apply(to: view)
-        
-        return view.sizeThatFits(bounds.size)
+        if let existing = self.views[key] {
+            return existing as! ViewElement.UIViewType
+        } else {
+            let new = viewDescription.build()
+            self.views[key] = new
+            return new as! ViewElement.UIViewType
+        }
     }
     
     private var views : [Key:UIView] = [:]
