@@ -189,7 +189,7 @@ public final class BlueprintView: UIView {
 
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: frame), environment: makeEnvironment())
+            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
             .resolve() ?? []
         
         rootController.view.frame = bounds
