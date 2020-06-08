@@ -11,3 +11,6 @@ xcuserdata/
 
 Pods/
 *.xcworkspace
+
+# SPM
+.swiftpm/

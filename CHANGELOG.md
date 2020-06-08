@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Removed layout rounding no longer needed since [#64] ([#95]).
-
 ### Added
-
-- [Add support for the iPhone SE 2](https://github.com/square/Blueprint/pull/96) in `ElementPreview`.
 
 ### Removed
 
@@ -28,6 +24,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.12.1] - 06-05-2020
+
+### Fixed
+
+- Use default environment when [measuring `BlueprintView`](https://github.com/square/Blueprint/pull/107).
+
+## [0.12.0] - 06-04-2020
+
+### Fixed
+
+- Removed layout rounding no longer needed since [#64] ([#95]).
+
+### Added
+
+- [Add support for the iPhone SE 2](https://github.com/square/Blueprint/pull/96) in `ElementPreview`.
+- Added `tintColor` and `contentMode` into the initializer for `Image`. ([#100])
+- Added an [Empty element](https://github.com/square/Blueprint/pull/104), to mirror `EmptyView` in SwiftUI. It is an element with no size and draws no content.
+
+- Environment ([#101]).
+
+  You can now read and write values from an `Environment` that is automatically propagated down the element tree. You can use these values to dynamically build the contents of an element, without having to explicitly pass every value through the tree yourself.
+
+  You can read these values with `EnvironmentReader`:
+
+  ```swift
+  struct Foo: ProxyElement {
+      var elementRepresentation: Element {
+          EnvironmentReader { environment -> Element in
+              Label(text: "value from environment: \(environment.foo)")
+          }
+      }
+  }
+  ```
+
+  And set them with `AdaptedEnvironment`:
+
+  ```swift
+  struct Bar: ProxyElement {
+      var elementRepresentation: Element {
+          ComplicatedElement()
+              .adaptedEnvironment { environment in
+                  environment.foo = "bar"
+              }
+      }
+  }
+  ```
+
+  Several enviroment keys are available by default ([#102]):
+
+  - calendar
+  - display scale
+  - layout direction
+  - locale
+  - safe area insets
+  - time zone
+
+  You can create your own by making a type that conforms to `EnvironmentKey`, and extending `Environment` with a new property:
+
+  ```swift
+  extension Environment {
+      private enum FooKey: EnvironmentKey {
+          static let defaultValue: String = "default value"
+      }
+
+      /// The current Foo that elements should use.
+      public var foo: String {
+          get { self[FooKey.self] }
+          set { self[FooKey.self] = newValue }
+      }
+  }
+  ```
 
 ## [0.11.0] - 2020-05-10
 
@@ -208,6 +276,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#102]: https://github.com/square/Blueprint/pull/102
+[#101]: https://github.com/square/Blueprint/pull/101
+[#100]: https://github.com/square/Blueprint/pull/100
 [#95]: https://github.com/square/Blueprint/pull/95
 [#72]: https://github.com/square/Blueprint/pull/72
 [#68]: https://github.com/square/Blueprint/pull/68

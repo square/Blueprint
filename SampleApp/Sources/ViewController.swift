@@ -28,12 +28,50 @@ let posts = [
 
 final class ViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: MainView(posts: posts))
+    private let blueprintView = BlueprintView()
 
     override func loadView() {
         self.view = blueprintView
     }
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        update()
+    }
+
+    private func update() {
+        blueprintView.element = element
+    }
+
+    private var viewSafeAreaInsets: UIEdgeInsets {
+        if #available(iOS 11.0, *) {
+            return view.safeAreaInsets
+        } else {
+            return .zero
+        }
+    }
+
+    var element: Element {
+        let theme = FeedTheme(authorColor: .green)
+
+        return MainView(posts: posts)
+            .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
+    }
+}
+
+extension Environment {
+    private enum FeedThemeKey: EnvironmentKey {
+        static let defaultValue = FeedTheme(authorColor: .black)
+    }
+
+    var feedTheme: FeedTheme {
+        get { return self[FeedThemeKey.self] }
+        set { self[FeedThemeKey.self] = newValue }
+    }
+}
+
+struct FeedTheme {
+    var authorColor: UIColor
 }
 
 fileprivate struct MainView: ProxyElement {
@@ -41,18 +79,21 @@ fileprivate struct MainView: ProxyElement {
     var posts: [Post]
     
     var elementRepresentation: Element {
-        Column { col in
-            col.horizontalAlignment = .fill
+        EnvironmentReader { (environment) -> Element in
+            Column { col in
+                col.horizontalAlignment = .fill
 
-            col.add(child: List(posts: posts))
-            col.add(child: CommentForm())
+                col.add(child: List(posts: self.posts))
+                col.add(child: CommentForm())
+            }
+            .scrollable {
+                $0.contentSize = .fittingHeight
+                $0.alwaysBounceVertical = true
+                $0.keyboardDismissMode = .onDrag
+            }
+            .inset(by: environment.safeAreaInsets)
+            .box(background: UIColor(white: 0.95, alpha: 1.0))
         }
-        .scrollable {
-            $0.contentSize = .fittingHeight
-            $0.alwaysBounceVertical = true
-            $0.keyboardDismissMode = .onDrag
-        }
-        .box(background: UIColor(white: 0.95, alpha: 1.0))
     }
 }
 
@@ -142,8 +183,12 @@ fileprivate struct FeedItemBody: ProxyElement {
                 row.minimumHorizontalSpacing = 8.0
                 row.verticalAlignment = .center
 
-                var name = Label(text: post.authorName)
-                name.font = UIFont.boldSystemFont(ofSize: 14.0)
+                let name = EnvironmentReader { (environment) -> Element in
+                    var name = Label(text: self.post.authorName)
+                    name.font = UIFont.boldSystemFont(ofSize: 14.0)
+                    name.color = environment.feedTheme.authorColor
+                    return name
+                }
                 row.add(child: name)
 
                 var timeAgo = Label(text: post.timeAgo)

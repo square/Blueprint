@@ -148,8 +148,8 @@ fileprivate struct MeasurableElement : Element {
     var validate : (SizeConstraint) -> CGSize
     
     var content: ElementContent {
-        ElementContent {
-            self.validate($0)
+        ElementContent { constraint -> CGSize in
+            self.validate(constraint)
         }
     }
     
