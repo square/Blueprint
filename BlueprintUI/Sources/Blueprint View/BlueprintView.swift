@@ -30,6 +30,8 @@ public final class BlueprintView: UIView {
     private var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
+    
+    internal let hostingViewController : UIViewController?
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
@@ -47,8 +49,13 @@ public final class BlueprintView: UIView {
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
-    public required init(element: Element?) {
+    public convenience init(element: Element?) {
+        self.init(hostingViewController: nil, element: element)
+    }
+
+    init(hostingViewController : UIViewController?, element: Element?) {
         
+        self.hostingViewController = hostingViewController
         self.element = element
         
         rootController = NativeViewController(
@@ -64,7 +71,7 @@ public final class BlueprintView: UIView {
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
-
+    
     public override convenience init(frame: CGRect) {
         self.init(element: nil)
         self.frame = frame
