@@ -13,25 +13,28 @@ import UIKit
 /// provides its own sizing via `sizeThatFits`. An instance of the view is used for
 /// sizing and measurement, so that you do not need to re-implement your own measurement.
 ///
+/// Note
+/// ----
+/// The sizing and measurement prototype view is kept alive for the lifetime of the containing application.
+/// Do not pass anything to the initializer of this type that you expect to be quickly released.
+///
 /// Example
 /// -------
-/// If you were implementing a very basic `Label` element, your implementation would look something
+/// If you were implementing a very basic `Image` element, your implementation would look something
 /// like this:
 /// ```
-/// struct Label : UIViewElement {
+/// struct Image : UIViewElement {
 ///
-///     var text : String
-///     var font : UIFont
+///     var image : UIImage
 ///
-///     typealias UIViewType = UILabel
+///     typealias UIViewType = UIImageView
 ///
-///     static func makeUIView() -> UILabel {
-///         UILabel()
+///     static func makeUIView() -> UIImageView {
+///         UIImageView()
 ///     }
 ///
-///     func updateUIView(_ view: UILabel) {
-///         view.text = self.text
-///         view.font = self.font
+///     func updateUIView(_ view: UIImageView) {
+///         view.image = self.image
 ///     }
 /// }
 /// ```
@@ -53,13 +56,12 @@ public protocol UIViewElement : Element {
     ///
     /// Example
     /// -------
-    /// If you were to implement a simple `UIViewElement` which wraps a `UILabel`,
+    /// If you were to implement a simple `UIViewElement` which wraps a `UIImageView`,
     /// your update method would look like this:
     /// 
     /// ```
-    /// func updateUIView(_ view: UILabel) {
-    ///     view.text = self.text
-    ///     view.font = self.font
+    /// func updateUIView(_ view: UIImageView) {
+    ///    view.image = self.image
     /// }
     /// ```
     func updateUIView(_ view: UIViewType)
@@ -76,8 +78,7 @@ public protocol UIViewElement : Element {
     /// When To Override
     /// ----------------
     /// You may want to override this method if you need to mutate the value returned from `sizeThatFits(_:)`,
-    /// for example to round it up to an integral pixel value in the case of a `UILabel`, or if you
-    /// want to use some other sizing method like `systemLayoutSizeFitting(...)`.
+    /// or if you want to use some other sizing method like `systemLayoutSizeFitting(...)`.
     func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize
 }
 
@@ -102,21 +103,21 @@ public extension UIViewElement {
     
     /// Provide the view for the element.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        UIViewType.describe {
-            $0.builder = {
+        UIViewType.describe { config in
+            config.builder = {
                 Self.makeUIView()
             }
             
-            $0.apply {
-                self.updateUIView($0)
+            config.apply { view in
+                self.updateUIView(view)
             }
         }
     }
 }
 
 
-/// An internal type which caches `UIViewElement` views to be reused for sizing and measurement.
-final class UIViewElementMeasurer {
+/// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
+private final class UIViewElementMeasurer {
     
     /// The standard shared cache.
     static let shared = UIViewElementMeasurer()
