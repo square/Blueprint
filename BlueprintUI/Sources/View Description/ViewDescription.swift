@@ -44,8 +44,9 @@ public struct ViewDescription {
     private let _build: () -> UIView
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
-    
+
     private let _layoutTransition: LayoutTransition
+    private let _updateTransition: UpdateTransition?
     private let _appearingTransition: VisibilityTransition?
     private let _disappearingTransition: VisibilityTransition?
 
@@ -87,6 +88,7 @@ public struct ViewDescription {
         }
         
         _layoutTransition = configuration.layoutTransition
+        _updateTransition = configuration.updateTransition
         _appearingTransition = configuration.appearingTransition
         _disappearingTransition = configuration.disappearingTransition
     }
@@ -110,7 +112,11 @@ public struct ViewDescription {
     public var layoutTransition: LayoutTransition {
         return _layoutTransition
     }
-    
+
+    public var updateTransition: UpdateTransition? {
+        return _updateTransition
+    }
+
     public var appearingTransition: VisibilityTransition? {
         return _appearingTransition
     }
@@ -146,6 +152,8 @@ extension ViewDescription {
 
         /// The transition to use during layout changes.
         public var layoutTransition: LayoutTransition = .inherited
+
+        public var updateTransition: UpdateTransition? = nil
 
         /// The transition to use when this view appears.
         public var appearingTransition: VisibilityTransition? = nil

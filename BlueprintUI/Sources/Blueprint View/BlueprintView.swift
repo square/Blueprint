@@ -276,8 +276,16 @@ extension BlueprintView {
 
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
-            
-            viewDescription.apply(to: view)
+
+            if appearanceTransitionsEnabled, let transition = viewDescription.updateTransition {
+                transition.perform(in: view) {
+                    self.viewDescription.apply(to: self.view)
+                }
+            } else {
+                viewDescription.apply(to: view)
+            }
+
+
             
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update
