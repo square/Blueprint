@@ -31,7 +31,7 @@ extension NativeView where Self: UIView {
 /// - The view's class.
 /// - How an instance of the view should be instantiated.
 /// - How to update a view instance by setting properties appropriately.
-/// - Which subview of a view instance should be used as a contain for
+/// - Which subview of a view instance should be used as a container for
 ///   additional subviews.
 /// - How to animate transitions for appearance, layout changes, and
 ///   disappearance.
@@ -43,11 +43,14 @@ public struct ViewDescription {
     private let _viewType: UIView.Type
     private let _build: () -> UIView
     private let _apply: (UIView) -> Void
+    private let _applyAnimated: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
     
     private let _layoutTransition: LayoutTransition
     private let _appearingTransition: VisibilityTransition?
     private let _disappearingTransition: VisibilityTransition?
+    private var _updateTransition: ((@escaping () -> Void) -> Void)? = nil
+
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -80,12 +83,20 @@ public struct ViewDescription {
                 binding.apply(to: typedView)
             }
         }
+
+        _applyAnimated = { view in
+            let typedView = configuration.typeChecked(view: view)
+            for binding in configuration.animatedBindings.values {
+                binding.apply(to: typedView)
+            }
+        }
         
         _contentView = { (view) in
             let typedView = configuration.typeChecked(view: view)
             return configuration.contentView(typedView)
         }
-        
+
+        _updateTransition = configuration.updateTransition
         _layoutTransition = configuration.layoutTransition
         _appearingTransition = configuration.appearingTransition
         _disappearingTransition = configuration.disappearingTransition
@@ -102,9 +113,17 @@ public struct ViewDescription {
     public func apply(to view: UIView) {
         _apply(view)
     }
-    
+
+    public func applyAnimated(to view: UIView) {
+        _applyAnimated(view)
+    }
+
     public func contentView(in view: UIView) -> UIView {
         return _contentView(view)
+    }
+
+    public var updateTransition: ((@escaping () -> Void) -> Void)? {
+        return _updateTransition
     }
 
     public var layoutTransition: LayoutTransition {
@@ -127,6 +146,8 @@ extension ViewDescription {
     public struct Configuration<View: UIView> {
 
         fileprivate var bindings: [AnyHashable:AnyValueBinding] = [:]
+
+        fileprivate var animatedBindings: [AnyHashable: AnyValueBinding] = [:]
 
         /// A closure that is applied to the native view instance during an update cycle.
         /// - parameter view: The native view instance.
@@ -152,6 +173,8 @@ extension ViewDescription {
 
         /// The transition to use when this view disappears.
         public var disappearingTransition: VisibilityTransition? = nil
+
+        public var updateTransition: ((@escaping () -> Void) -> Void)? = nil
 
         /// Initializes a default configuration object.
         public init() {
@@ -230,6 +253,40 @@ extension ViewDescription.Configuration {
         set {
             let key = AnyHashable(keyPath)
             bindings[key] = ValueBinding(keyPath: keyPath, value: newValue)
+        }
+    }
+
+    public subscript<Value>(animated keyPath: ReferenceWritableKeyPath<View, Value>) -> Value? {
+        get {
+            let key = AnyHashable(keyPath)
+            if let binding = animatedBindings[key] as? ValueBinding<Value> {
+                return binding.value
+            } else {
+                return nil
+            }
+        }
+        set {
+            let key = AnyHashable(keyPath)
+            if let value = newValue {
+                animatedBindings[key] = ValueBinding(keyPath: keyPath, value: value)
+            } else {
+                animatedBindings[key] = nil
+            }
+        }
+    }
+
+    public subscript<Value>(animated keyPath: ReferenceWritableKeyPath<View, Value?>) -> Value? {
+        get {
+            let key = AnyHashable(keyPath)
+            if let binding = animatedBindings[key] as? ValueBinding<Value> {
+                return binding.value
+            } else {
+                return nil
+            }
+        }
+        set {
+            let key = AnyHashable(keyPath)
+            animatedBindings[key] = ValueBinding(keyPath: keyPath, value: newValue)
         }
     }
     

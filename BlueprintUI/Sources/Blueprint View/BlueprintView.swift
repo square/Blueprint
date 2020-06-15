@@ -269,6 +269,15 @@ extension BlueprintView {
             layoutAttributes = node.layoutAttributes
             
             viewDescription.apply(to: view)
+
+            if appearanceTransitionsEnabled {
+                viewDescription.updateTransition?({ [weak self] in
+                    guard let self = self else { return }
+                    self.viewDescription.applyAnimated(to: self.view)
+                })
+            } else {
+                viewDescription.applyAnimated(to: view)
+            }
             
             var oldChildren: [ElementPath: NativeViewController] = [:]
             oldChildren.reserveCapacity(children.count)
