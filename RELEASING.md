@@ -11,9 +11,9 @@ bundle exec pod trunk info BlueprintUICommonControls
 
 See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/making/getting-setup-with-trunk) for more information about setting up credentials on your device. If you need to be added as an owner, ping in #blueprint on Slack (Square only).
 
-1. Make sure you're on the `master` branch, and `git pull` to get the latest commits.
+1. Make sure you're on the `main` branch, and `git pull` to get the latest commits.
 
-1. Create a branch off `master` to update the version numbers and `Podfile.lock`. An example name would be `your-username/release-0.1.0`.
+1. Create a branch off `main` to update the version numbers and `Podfile.lock`. An example name would be `your-username/release-0.1.0`.
 
 1. Update the library version in both `BlueprintUI.podspec` and `BlueprintUICommonControls.podspec` if it has not already been updated (it should match the version number that you are about to release).
 
@@ -28,7 +28,7 @@ See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/mak
    git commit -am "Bumping versions to 0.1.0."
    ```
 
-1. Push your branch and open a PR into `master`.
+1. Push your branch and open a PR into `main`.
 
 1. Once the PR is merged, fetch changes and tag the release, using the merge commit:
    ```bash
