@@ -20,21 +20,21 @@ import UIKit
 ///
 /// Example
 /// -------
-/// If you were implementing a very basic `Image` element, your implementation would look something
+/// If you were implementing a very basic `Switch` element, your implementation would look something
 /// like this:
 /// ```
-/// struct Image : UIViewElement {
+/// struct Switch : UIViewElement
+/// {
+///     var isOn : Bool
 ///
-///     var image : UIImage
+///     typealias UIViewType = UISwitch
 ///
-///     typealias UIViewType = UIImageView
-///
-///     static func makeUIView() -> UIImageView {
-///         UIImageView()
+///     static func makeUIView() -> UISwitch {
+///         UISwitch()
 ///     }
 ///
-///     func updateUIView(_ view: UIImageView) {
-///         view.image = self.image
+///     func updateUIView(_ view: UISwitch) {
+///         view.isOn = self.isOn
 ///     }
 /// }
 /// ```
@@ -56,12 +56,12 @@ public protocol UIViewElement : Element {
     ///
     /// Example
     /// -------
-    /// If you were to implement a simple `UIViewElement` which wraps a `UIImageView`,
+    /// If you were to implement a simple `UIViewElement` which wraps a `UISwitch`,
     /// your update method would look like this:
     /// 
     /// ```
-    /// func updateUIView(_ view: UIImageView) {
-    ///    view.image = self.image
+    /// func updateUIView(_ view: UISwitch) {
+    ///    view.isOn = self.isOn
     /// }
     /// ```
     func updateUIView(_ view: UIViewType)
@@ -155,3 +155,4 @@ private final class UIViewElementMeasurer {
         let elementType : ObjectIdentifier
     }
 }
+
