@@ -1,31 +1,28 @@
 /// Represents a path into an element hierarchy.
 /// Used for disambiguation during diff operations.
-struct ElementPath: Hashable {
+struct ElementPath: Hashable, CustomDebugStringConvertible {
     
-    private var storage: Storage
-    
-    init() {
-        storage = Storage(identifiers: [])
-    }
-    
-    private mutating func storageForWriting() -> Storage {
-        if !isKnownUniquelyReferenced(&storage) {
-            storage = Storage(identifiers: storage.identifiers)
-        }
-        
-        return storage
-    }
+    private var identifiersHash : Int? = nil
 
-    var identifiers: [ElementIdentifier] {
-        return storage.identifiers
+    private(set) var identifiers: [ElementIdentifier] = []
+    
+    private mutating func setIdentifiersHash()
+    {
+        var hasher = Hasher()
+        hasher.combine(identifiers)
+        
+        identifiersHash = hasher.finalize()
     }
     
     mutating func prepend(identifier: ElementIdentifier) {
-        storageForWriting().prepend(identifier: identifier)
+        identifiers.insert(identifier, at: 0)
+        self.setIdentifiersHash()
+       
     }
     
     mutating func append(identifier: ElementIdentifier) {
-        storageForWriting().append(identifier: identifier)
+        identifiers.append(identifier)
+        self.setIdentifiersHash()
     }
     
     func prepending(identifier: ElementIdentifier) -> ElementPath {
@@ -43,50 +40,16 @@ struct ElementPath: Hashable {
     static var empty: ElementPath {
         return ElementPath()
     }
-}
-
-
-extension ElementPath {
     
-    fileprivate final class Storage: Hashable, CustomDebugStringConvertible {
-        
-        private var _hash: Int? = nil
-        
-        private (set) var identifiers: [ElementIdentifier] {
-            didSet {
-                _hash = nil
-            }
-        }
-        
-        init(identifiers: [ElementIdentifier]) {
-            self.identifiers = identifiers
-        }
-        
-        func append(identifier: ElementIdentifier) {
-            identifiers.append(identifier)
-        }
-        
-        func prepend(identifier: ElementIdentifier) {
-            identifiers.insert(identifier, at: 0)
-        }
-
-        func hash(into hasher: inout Hasher) {
-            if _hash == nil {
-                _hash = identifiers.hashValue
-            }
-            
-            hasher.combine(_hash)
-        }
-        
-        static func ==(lhs: Storage, rhs: Storage) -> Bool {
-            return lhs.identifiers == rhs.identifiers
-        }
-        
-        // MARK: CustomDebugStringConvertible
-        
-        var debugDescription: String {
-            return self.identifiers.map { $0.debugDescription }.joined()
-        }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifiersHash)
+    }
+    
+    // MARK: CustomDebugStringConvertible
+    
+    var debugDescription: String {
+        return self.identifiers.map { $0.debugDescription }.joined()
     }
 }
+
 

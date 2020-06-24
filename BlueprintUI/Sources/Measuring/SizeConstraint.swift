@@ -16,7 +16,6 @@ public struct SizeConstraint: Hashable {
         self.width = width
         self.height = height
     }
-
 }
 
 extension SizeConstraint {
@@ -26,8 +25,7 @@ extension SizeConstraint {
     }
 
     public init(_ size: CGSize) {
-        width = .atMost(size.width)
-        height = .atMost(size.height)
+        self.init(width: .atMost(size.width), height: .atMost(size.height))
     }
 
     public init(width: CGFloat) {
