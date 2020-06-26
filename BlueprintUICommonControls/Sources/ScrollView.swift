@@ -436,6 +436,10 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
         if self.scrollView.contentInset.bottom != contentInset.bottom {
             self.scrollView.contentInset.bottom = contentInset.bottom
         }
+
+        if self.scrollView.scrollIndicatorInset.bottom != contentInset.bottom {
+            self.scrollView.scrollIndicatorInset.bottom = contentInset.bottom
+        }
     }
     
     fileprivate var bottomContentInsetAdjustmentForKeyboard : CGFloat {
