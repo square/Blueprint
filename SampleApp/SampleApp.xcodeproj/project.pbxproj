@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A50E8DF24A69DB70049705B /* PointerInteractionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A50E8DE24A69DB70049705B /* PointerInteractionViewController.swift */; };
 		0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */; };
 		0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */; };
 		0AF36345246266AF0027E172 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36342246266AF0027E172 /* README.md */; };
@@ -43,6 +44,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A50E8DE24A69DB70049705B /* PointerInteractionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointerInteractionViewController.swift; sourceTree = "<group>"; };
 		0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewKeyboardViewController.swift; sourceTree = "<group>"; };
 		0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodePreviewDemo.swift; sourceTree = "<group>"; };
 		0AF36342246266AF0027E172 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 			children = (
 				97545510223C12E9003E353F /* ViewController.swift */,
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
+				0A50E8DE24A69DB70049705B /* PointerInteractionViewController.swift */,
 				97545511223C12E9003E353F /* AppDelegate.swift */,
 				0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */,
 			);
@@ -574,6 +577,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A50E8DF24A69DB70049705B /* PointerInteractionViewController.swift in Sources */,
 				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
 				97545519223C12E9003E353F /* ViewController.swift in Sources */,
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
