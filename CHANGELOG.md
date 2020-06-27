@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [Update Demo app](https://github.com/square/Blueprint/pull/116) to support more demo screen types.
+
 ### Deprecated
 
 ### Security
