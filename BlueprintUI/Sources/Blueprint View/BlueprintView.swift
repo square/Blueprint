@@ -34,7 +34,8 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
-    private let rootController: NativeViewController
+    private let rootController : NativeViewController
+    private let liveElementState : LiveElementState
 
     /// The root element that is displayed within the view.
     public var element: Element? {
@@ -56,6 +57,12 @@ public final class BlueprintView: UIView {
                 content: UIView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
                 children: []))
+        
+        liveElementState = LiveElementState(
+            element: RootElement(root: Empty()),
+            key: nil,
+            parent: nil
+        )
     
         super.init(frame: CGRect.zero)
         

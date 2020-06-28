@@ -23,7 +23,23 @@ final class LiveElementState
     
     private let key : AnyHashable?
     
-    private(set) var element : Element
+    private(set) var elementInfo : ElementInfo
+    
+    private(set) var layoutState : LayoutState
+    
+    struct ElementInfo {
+        let element : Element
+        let content : ElementContent
+        
+        init(_ element : Element) {
+            self.element = element
+            self.content = element.content
+        }
+    }
+    
+    struct LayoutState : Equatable {
+        var frame : CGRect
+    }
     
     // MARK: Parent / Child Tree
     
@@ -35,28 +51,57 @@ final class LiveElementState
     
     init(element : Element, key : AnyHashable?, parent : LiveElementState?)
     {
-        self.element = element
         self.key = key
+        self.elementInfo = ElementInfo(element)
         self.parent = parent
+        
+        self.layoutState = LayoutState(frame: .zero)
         
         self.children = []
         
-        self.children = self.element.content.children(in: .empty).map { child in
+        self.children = self.elementInfo.content.children(in: .empty).map { child in
             .init(element: child.element, key: child.key, parent: self)
         }
     }
+    
+    // MARK: Measurement
+    
+    var cachedMeasurements : [SizeConstraint:CGSize] = [:]
+    
+    func measure(in constraint : SizeConstraint) -> CGSize
+    {
+        if let existing = self.cachedMeasurements[constraint] {
+            return existing
+        }
+        
+        let measurement = self.elementInfo.content.measurable(in: <#T##Environment#>)
+        
+        fatalError()
+    }
+    
+    func layout(in size : CGSize)
+    {
+        fatalError()
+    }
+    
+    // MARK: Layout
+    
     // MARK: Updating
     
     private func validate(update updated : Element)
     {
-        precondition(type(of: self.element) == type(of: updated))
+        precondition(type(of: self.elementInfo.element) == type(of: updated))
     }
     
-    func update(with element : Element)
+    func update(with newElement : Element)
     {
-        self.validate(update: element)
+        self.validate(update: newElement)
         
-        let newChildren = element.content.children(in: .empty)
+        let oldInfo = self.elementInfo
+        
+        self.elementInfo = ElementInfo(newElement)
+        
+        let newChildren = self.elementInfo.content.children(in: .empty)
         
         if self.children.isEmpty && newChildren.isEmpty {
             // Fast path. No changes at all – we don't have any children.
@@ -65,7 +110,7 @@ final class LiveElementState
             
             let newChild = newChildren[0]
             
-            let isSame = DiffIdentifier(self.element, key: self.key) == DiffIdentifier(newChild.element, key: newChild.key)
+            let isSame = DiffIdentifier(oldInfo.element, key: self.key) == DiffIdentifier(self.elementInfo.element, key: newChild.key)
             
             if isSame {
                 self.children[0].update(with: newChild.element)
@@ -153,8 +198,6 @@ final class LiveElementState
                 self.children = new
             }
         }
-        
-        self.element = element
     }
     
     func didInsert(_ state : LiveElementState) {
@@ -246,7 +289,7 @@ extension LiveElementState
             factory.reserveCapacity(state.count)
             
             return state.map {
-                factory.makeIdentifier(for: type(of: $0.element), key: $0.key)
+                factory.makeIdentifier(for: type(of: $0.elementInfo.element), key: $0.key)
             }
         }
         
