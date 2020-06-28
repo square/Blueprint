@@ -31,7 +31,11 @@ public struct ElementContent {
     func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         return storage.performLayout(attributes: attributes, environment: environment)
     }
-
+    
+    func children(in environment: Environment) -> [AnyElementContentChild]
+    {
+        self.storage.children(in: environment)
+    }
 }
 
 extension ElementContent {
@@ -117,6 +121,8 @@ extension ElementContent {
 
 fileprivate protocol ContentStorage {
     var childCount: Int { get }
+    
+    func children(in environment : Environment) -> [AnyElementContentChild]
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize
 
@@ -140,10 +146,7 @@ extension ElementContent {
         init(layout: LayoutType) {
             self.layout = layout
         }
-
     }
-
-
 }
 
 extension ElementContent.Builder {
@@ -154,7 +157,9 @@ extension ElementContent.Builder {
             traits: traits,
             key: key,
             content: element.content,
-            element: element)
+            element: element
+        )
+        
         children.append(child)
     }
 
@@ -164,6 +169,11 @@ extension ElementContent.Builder: ContentStorage {
 
     var childCount: Int {
         return children.count
+    }
+    
+    func children(in environment : Environment) -> [AnyElementContentChild]
+    {
+        return self.children
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
@@ -209,13 +219,19 @@ extension ElementContent.Builder: ContentStorage {
     private func layoutItems(in environment: Environment) -> [(LayoutType.Traits, Measurable)] {
         return children.map { ($0.traits, $0.content.measurable(in: environment)) }
     }
-
 }
 
 
+public protocol AnyElementContentChild {
+
+    var element: Element { get }
+    
+    var key: AnyHashable? { get }
+}
+
 extension ElementContent.Builder {
 
-    fileprivate struct Child {
+    fileprivate struct Child : AnyElementContentChild {
 
         var traits: LayoutType.Traits
         var key: AnyHashable?
@@ -228,6 +244,16 @@ extension ElementContent.Builder {
 
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
+    
+    func children(in environment: Environment) -> [AnyElementContentChild] {
+        [Child(element: self.child)]
+    }
+    
+    private struct Child : AnyElementContentChild {
+        let key: AnyHashable? = nil
+        
+        var element: Element
+    }
 
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
@@ -272,6 +298,16 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 /// Content storage that defers creation of its child until measurement or layout time.
 private struct LazyStorage: ContentStorage {
     let childCount = 1
+    
+    func children(in environment: Environment) -> [AnyElementContentChild] {
+        [Child(element: self.builder(environment))]
+    }
+    
+    struct Child : AnyElementContentChild {
+        let key: AnyHashable? = nil
+        
+        var element: Element
+    }
 
     var builder: (Environment) -> Element
 
