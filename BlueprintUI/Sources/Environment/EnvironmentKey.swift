@@ -26,4 +26,29 @@ public protocol EnvironmentKey {
     /// The default value that will be vended by an `Environment` for this key if no other value
     /// has been set.
     static var defaultValue: Self.Value { get }
+    
+    static func areValuesEqual(lhs : Value?, rhs : Value?) -> Bool
+}
+
+
+public extension EnvironmentKey {
+    static func areValuesEqual(lhs : Value?, rhs : Value?) -> Bool {
+        false
+    }
+}
+
+
+public extension EnvironmentKey where Self.Value : Equatable {
+    static func areValuesEqual(lhs : Value?, rhs : Value?) -> Bool {
+        lhs == rhs
+    }
+}
+
+
+internal struct EnvironmentKeyType : Hashable {
+    private let keyType : ObjectIdentifier
+    
+    init<Key:EnvironmentKey>(_ keyType : Key.Type) {
+        self.keyType = ObjectIdentifier(keyType)
+    }
 }

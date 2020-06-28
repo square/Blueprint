@@ -39,7 +39,7 @@ public struct ElementContent {
 }
 
 extension ElementContent {
-    func measurable(in environment: Environment) -> Measurable {
+    fileprivate func measurable(in environment: Environment) -> Measurable {
         struct EnvironmentMeasurable: Measurable {
             var environment: Environment
             var content: ElementContent

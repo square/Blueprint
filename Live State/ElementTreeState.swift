@@ -68,15 +68,20 @@ final class LiveElementState
     
     var cachedMeasurements : [SizeConstraint:CGSize] = [:]
     
-    func measure(in constraint : SizeConstraint) -> CGSize
+    func measure(in constraint : SizeConstraint, environment : Environment) -> CGSize
     {
         if let existing = self.cachedMeasurements[constraint] {
             return existing
         }
         
-        let measurement = self.elementInfo.content.measurable(in: <#T##Environment#>)
+        let measurement = self.elementInfo.content.measure(
+            in: constraint,
+            environment: environment
+        )
         
-        fatalError()
+        self.cachedMeasurements[constraint] = measurement
+        
+        return measurement
     }
     
     func layout(in size : CGSize)

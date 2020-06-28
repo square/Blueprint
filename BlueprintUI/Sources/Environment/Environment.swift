@@ -41,20 +41,48 @@ public struct Environment {
     private init() { }
 
     private var values: [ObjectIdentifier: Any] = [:]
+    
+    private var readNotifications : [ReadNotification] = []
+    private var writeNotifications : [WriteNotification] = []
+    
+    struct ReadNotification {
+        weak var observer : AnyObject?
+        var callback : (EnvironmentKeyType) -> ()
+    }
 
+    struct WriteNotification {
+        weak var observer : AnyObject?
+        var callback : (EnvironmentKeyType) -> ()
+    }
+    
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
+            let keyType = EnvironmentKeyType(Key.self)
             let objectId = ObjectIdentifier(key)
-
-            if let value = values[objectId] {
-                return value as! Key.Value
+            let existing = self.values[objectId] as! Key.Value?
+            
+            let value : Key.Value = existing ?? key.defaultValue
+            
+            self.readNotifications.forEach {
+                $0.callback(keyType)
             }
 
-            return key.defaultValue
+            return value
         }
         set {
-            values[ObjectIdentifier(key)] = newValue
+            let key = ObjectIdentifier(key)
+            let existing = values[key] as! Key.Value?
+            
+            values[key] = newValue
+            
+            if Key.areValuesEqual(lhs: existing, rhs: newValue) == false {
+                let keyType = EnvironmentKeyType(Key.self)
+                
+                self.writeNotifications.forEach {
+                    $0.callback(keyType)
+                }
+            }
         }
     }
 }
