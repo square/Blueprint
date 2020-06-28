@@ -10,12 +10,18 @@ import Foundation
 
 final class ElementState
 {
+    // MARK: Element Data
+    
     private(set) var element : Element
     private(set) var key : AnyHashable?
+    
+    // MARK: Parent / Child Tree
     
     private(set) weak var parent : ElementState?
     
     private(set) var children : [ElementState]
+    
+    // MARK: Initialization
     
     init(element : Element, key : AnyHashable?, parent : ElementState?)
     {
@@ -29,14 +35,14 @@ final class ElementState
             .init(element: child.element, key: child.key, parent: self)
         }
     }
+    // MARK: Updating
     
     func update(with element : Element)
     {
         let newChildren = element.content.children(in: .empty)
         
         if self.children.isEmpty && newChildren.isEmpty {
-            // Fast path. No changes at all, both sides of the change are empty.
-            
+            // Fast path. No changes at all – we don't have any children.
         } else if self.children.count == 1 && newChildren.count == 1 {
             // Fast path: Same count before and after, we can just check types without diffing.
             
@@ -47,7 +53,11 @@ final class ElementState
             if isSame {
                 self.children[0].update(with: newChild.element)
             } else {
-                self.children = [ElementState(element: newChild.element, key: newChild.key, parent: self)]
+                self.didRemove(self.children[0])
+                
+                let new = ElementState(element: newChild.element, key: newChild.key, parent: self)
+                self.children = [new]
+                self.didInsert(new)
             }
             
         } else if self.children.isEmpty && newChildren.isEmpty == false {
@@ -56,18 +66,28 @@ final class ElementState
             self.children = newChildren.map {
                 ElementState(element: $0.element, key: $0.key, parent: self)
             }
+            
+            self.children.forEach {
+                self.didInsert($0)
+            }
 
         } else if self.children.isEmpty == false && newChildren.isEmpty {
             // Fast path: All children were removed. Remove them without diffing.
+            
+            self.children.forEach {
+                self.didRemove($0)
+            }
             
             self.children = []
         } else {
             // Slightly slower paths, where we need to compare contained elements.
             
-            let oldIDs = DiffIdentifier.identifiers(with: self.children)
-            let newIDs = DiffIdentifier.identifiers(with: newChildren)
+            let oldIDs = Lazy { DiffIdentifier.identifiers(with: self.children) }
+            let newIDs = Lazy { DiffIdentifier.identifiers(with: newChildren) }
             
-            if oldIDs == newIDs {
+            let countsMatch = self.children.count == newChildren.count
+            
+            if countsMatch && oldIDs == newIDs {
                 // Fast path, no diffing needed. Just update in place.
                 
                 for (index, child) in self.children.enumerated() {
@@ -76,25 +96,101 @@ final class ElementState
             } else {
                 // Slow path: Some other type of change happened, diff the collections.
                 
+                let oldIDs = OrderedSet(oldIDs.value)
+                let newIDs = OrderedSet(newIDs.value)
+                
                 var old = [DiffIdentifier:ElementState]()
                 
                 for (index, child) in self.children.enumerated() {
-                    old[oldIDs[index]] = child
+                    let ID = oldIDs[index]
+                    old[ID] = child
                 }
                 
                 var new = [ElementState]()
                 
                 for (index, child) in newChildren.enumerated() {
+                    let ID = newIDs[index]
                     
+                    
+                    if let existing = old.removeValue(forKey: ID) {
+                        new.append(existing)
+                        
+                        let indexChanged = oldIDs[ID] != newIDs[ID]
+                        
+                        if indexChanged {
+                            // TODO Move the view to the right place in the hierarchy.
+                        }
+                        
+                    } else {
+                        let newState = ElementState(element: child.element, key: child.key, parent: self)
+                        new.append(newState)
+                        
+                        self.didInsert(newState)
+                    }
                 }
+                
+                for (_, removed) in old {
+                    self.didRemove(removed)
+                }
+                
+                self.children = new
             }
         }
+    }
+    
+    func didInsert(_ state : ElementState) {
+        // TODO...
+    }
+    
+    func didRemove(_ state : ElementState) {
+        // TODO...
     }
 }
 
 
 extension ElementState
 {
+    final class Lazy<Value> {
+        
+        var value : Value {
+            get {
+                if let value = self.storage {
+                    return value
+                } else {
+                    let value = self.provider()
+                    self.storage = value
+                    return value
+                }
+            }
+        }
+        
+        private var provider : () -> Value
+        private var storage : Value?
+        
+        init(_ provider : @escaping () -> Value) {
+            self.provider = provider
+        }
+    }
+    
+    struct OrderedSet<Element:Hashable> {
+    
+        let values : [Element]
+        let indexes : [Element:Int]
+        
+        init(_ values : [Element]) {
+            self.values = values
+            self.indexes = self.values.toDictionary { ($1, $0) }
+        }
+        
+        subscript(_ index : Int) -> Element {
+            self.values[index]
+        }
+        
+        subscript(_ element : Element) -> Int {
+            self.indexes[element]!
+        }
+    }
+    
     struct DiffIdentifier : Hashable {
         
         private let typeIdentifier : ObjectIdentifier
@@ -130,7 +226,7 @@ extension ElementState
             var factory = Factory()
             factory.reserveCapacity(state.count)
             
-            return state.lazy.map {
+            return state.map {
                 factory.makeIdentifier(for: type(of: $0.element), key: $0.key)
             }
         }
@@ -140,7 +236,7 @@ extension ElementState
             var factory = Factory()
             factory.reserveCapacity(children.count)
             
-            return children.lazy.map {
+            return children.map {
                 factory.makeIdentifier(for: type(of: $0.element), key: $0.key)
             }
         }
@@ -189,180 +285,15 @@ extension ElementState
             }
         }
     }
-    
-    struct Diff<Diffed:Hashable> {
-        
-        let inserted : [Inserted]
-        let removed : [Removed]
-        let moved : [Moved]
-        let noChange : [NoChange]
-        
-        init(old : [Diffed], new : [Diffed]) {
-                        
-            var added = Set(new)
-            var removed = Set(old)
-            
-            precondition(added.count == new.count, "Duplicate identifiers")
-            precondition(removed.count == old.count, "Duplicate identifiers")
+}
 
-            added.subtract(old)
-            removed.subtract(new)
-            
-            let oldIndexes : [Diffed:Int] = old.toDictionary { ($1, $0) }
-            let newIndexes : [Diffed:Int] = new.toDictionary { ($1, $0) }
-            
-            self.inserted = added.map {
-                .init(index: newIndexes[$0]!, newValue: $0)
-            }.sorted {
-                $0.index < $1.index
-            }
-            
-            self.removed = removed.map {
-                .init(index: oldIndexes[$0]!, oldValue: $0)
-            }.sorted {
-                $0.index > $1.index
-            }
-            
-            if old.isEmpty || new.isEmpty {
-                self.moved = []
-                self.noChange = []
-            } else {
-                let overlappingOld = old.compactMap {
-                    added.contains($0) == false && removed.contains($0) == false ? $0 : nil
-                }
-                
-                let overlappingNew = new.compactMap {
-                    added.contains($0) == false && removed.contains($0) == false ? $0 : nil
-                }
-                
-                precondition(overlappingOld.count == overlappingNew.count, "Overlapping counts must match.")
-                
-                if overlappingOld == overlappingNew {
-                    self.moved = []
-                    
-                    self.noChange = overlappingNew.map {
-                        NoChange(oldIndex: oldIndexes[$0]!, newIndex: newIndexes[$0]!, value: $0)
-                    }
-                } else {
-                    var moved = [Moved]()
-                    var noChange = [NoChange]()
-                    
-                    var currentOld = OrderedSet(overlappingNew)
-                    let currentNew = OrderedSet(overlappingNew)
-                    
-                    let range = (0 ..< overlappingNew.count)
-                    
-                    for index in range {
-                        let value = currentOld[index]
-                        let newIndex = currentNew.index(of: value)
-                        
-                        if index != newIndex {
-                            currentOld.move(from: index, to: newIndex)
-                            moved.append(Moved(oldIndex: oldIndexes[value]!, newIndex: newIndexes[value]!, value: value))
-                        } else {
-                            noChange.append(NoChange(oldIndex: oldIndexes[value]!, newIndex: newIndexes[value]!, value: value))
-                        }
-                    }
-                    
-                    self.moved = moved
-                    self.noChange = noChange
-                }
-            }
-        }
-        
-        mutating func transform<Element>(
-            _ array : [Element],
-            inserted : (Inserted) -> Element,
-            removed : (Element, Removed) -> (),
-            moved : (inout Element, Moved) -> (),
-            notChanged : (inout Element, NoChange) -> ()
-        ) -> [Element]
-        {
-            var new = array
-            
-            self.removed.forEach {
-                let value = new[$0.index]
-                new.remove(at: $0.index)
-                
-                removed(value, $0)
-            }
-            
-            self.moved.sorted { $0.oldIndex > $1.oldIndex }.forEach {
-                var value = 
-            }
-            
-            self.inserted.forEach {
-                let value = inserted($0)
-                new.insert(value, at: $0.index)
-            }
-            
-            
-            
-            return new
-        }
-        
-        struct OrderedSet {
-            private var values : [Diffed]
-            private var indexes : [Diffed:Int]
-            
-            init(_ values : [Diffed])
-            {
-                self.values = values
-                
-                self.indexes = self.values.toDictionary {
-                    ($1, $0)
-                }
-            }
-            
-            subscript(_ index : Int) -> Diffed {
-                self.values[index]
-            }
-            
-            mutating func move(from oldIndex : Int, to newIndex : Int)
-            {
-                guard oldIndex != newIndex else {
-                    return
-                }
-                
-                let value = self.values.remove(at: oldIndex)
-                
-                self.values.insert(value, at: newIndex)
-                
-                self.indexes = self.values.toDictionary {
-                    ($1, $0)
-                }
-            }
-            
-            func index(of element : Diffed) -> Int {
-                self.indexes[element]!
-            }
-        }
-        
-        struct Inserted {
-            let index : Int
-            let newValue : Diffed
-        }
-        
-        struct Removed {
-            let index : Int
-            let oldValue : Diffed
-        }
-        
-        struct Moved {
-            let oldIndex : Int
-            let newIndex : Int
-            
-            let value : Diffed
-        }
-        
-        struct NoChange {
-            let oldIndex : Int
-            let newIndex : Int
-            
-            let value : Diffed
-        }
+
+extension ElementState.Lazy : Equatable where Value : Equatable {
+    static func == (lhs: ElementState.Lazy<Value>, rhs: ElementState.Lazy<Value>) -> Bool {
+        lhs.value == rhs.value
     }
 }
+
 
 fileprivate extension Array {
         
