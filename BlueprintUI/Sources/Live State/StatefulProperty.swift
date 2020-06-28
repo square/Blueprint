@@ -34,20 +34,22 @@ extension Element {
 @propertyWrapper
 public struct ElementState<Value> : StatefulElementProperty {
     
+    private let initialValue : Value
+    
     public var wrappedValue : Value {
         get {
-            return storage.value
+            return storage?.value ?? self.initialValue
         }
         
         nonmutating set {
-            self.storage.value = newValue
+            self.storage?.value = newValue
         }
     }
     
-    internal var storage : Storage
+    internal var storage : Storage?
     
     public init(wrappedValue : Value) {
-        self.storage = Storage(wrappedValue)
+        self.initialValue = wrappedValue
     }
     
     final internal class Storage {
