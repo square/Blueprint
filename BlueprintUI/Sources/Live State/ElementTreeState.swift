@@ -64,7 +64,13 @@ final class LiveElementState
         }
     }
     
-    // MARK: Measurement
+    // MARK: Measurement & Layout
+    
+    private var needsUpdate : Bool = true
+    
+    func setNeedsUpdate() {
+        self.needsUpdate = true
+    }
     
     var cachedMeasurements : [SizeConstraint:CGSize] = [:]
     
@@ -88,8 +94,6 @@ final class LiveElementState
     {
         fatalError()
     }
-    
-    // MARK: Layout
     
     // MARK: Updating
     
@@ -217,7 +221,7 @@ final class LiveElementState
 
 extension LiveElementState
 {
-    final class Lazy<Value> {
+    final class Lazy<Value:Equatable> : Equatable {
         
         var value : Value {
             get {
@@ -236,6 +240,10 @@ extension LiveElementState
         
         init(_ provider : @escaping () -> Value) {
             self.provider = provider
+        }
+        
+        static func == (lhs: Lazy, rhs: Lazy) -> Bool {
+            lhs.value == rhs.value
         }
     }
     
@@ -351,13 +359,6 @@ extension LiveElementState
                 }
             }
         }
-    }
-}
-
-
-extension LiveElementState.Lazy : Equatable where Value : Equatable {
-    static func == (lhs: LiveElementState.Lazy<Value>, rhs: LiveElementState.Lazy<Value>) -> Bool {
-        lhs.value == rhs.value
     }
 }
 
