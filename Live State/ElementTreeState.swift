@@ -8,22 +8,32 @@
 import Foundation
 
 
-final class ElementState
+struct RootElement : ProxyElement {
+    var root : Element
+    
+    var elementRepresentation: Element {
+        self.root
+    }
+}
+
+
+final class LiveElementState
 {
     // MARK: Element Data
     
+    private let key : AnyHashable?
+    
     private(set) var element : Element
-    private(set) var key : AnyHashable?
     
     // MARK: Parent / Child Tree
     
-    private(set) weak var parent : ElementState?
+    private(set) weak var parent : LiveElementState?
     
-    private(set) var children : [ElementState]
+    private(set) var children : [LiveElementState]
     
     // MARK: Initialization
     
-    init(element : Element, key : AnyHashable?, parent : ElementState?)
+    init(element : Element, key : AnyHashable?, parent : LiveElementState?)
     {
         self.element = element
         self.key = key
@@ -37,8 +47,15 @@ final class ElementState
     }
     // MARK: Updating
     
+    private func validate(update updated : Element)
+    {
+        precondition(type(of: self.element) == type(of: updated))
+    }
+    
     func update(with element : Element)
     {
+        self.validate(update: element)
+        
         let newChildren = element.content.children(in: .empty)
         
         if self.children.isEmpty && newChildren.isEmpty {
@@ -55,7 +72,7 @@ final class ElementState
             } else {
                 self.didRemove(self.children[0])
                 
-                let new = ElementState(element: newChild.element, key: newChild.key, parent: self)
+                let new = LiveElementState(element: newChild.element, key: newChild.key, parent: self)
                 self.children = [new]
                 self.didInsert(new)
             }
@@ -64,7 +81,7 @@ final class ElementState
             // Fast path: All children were added. Add them without diffing.
             
             self.children = newChildren.map {
-                ElementState(element: $0.element, key: $0.key, parent: self)
+                LiveElementState(element: $0.element, key: $0.key, parent: self)
             }
             
             self.children.forEach {
@@ -99,14 +116,14 @@ final class ElementState
                 let oldIDs = OrderedSet(oldIDs.value)
                 let newIDs = OrderedSet(newIDs.value)
                 
-                var old = [DiffIdentifier:ElementState]()
+                var old = [DiffIdentifier:LiveElementState]()
                 
                 for (index, child) in self.children.enumerated() {
                     let ID = oldIDs[index]
                     old[ID] = child
                 }
                 
-                var new = [ElementState]()
+                var new = [LiveElementState]()
                 
                 for (index, child) in newChildren.enumerated() {
                     let ID = newIDs[index]
@@ -122,7 +139,7 @@ final class ElementState
                         }
                         
                     } else {
-                        let newState = ElementState(element: child.element, key: child.key, parent: self)
+                        let newState = LiveElementState(element: child.element, key: child.key, parent: self)
                         new.append(newState)
                         
                         self.didInsert(newState)
@@ -136,19 +153,21 @@ final class ElementState
                 self.children = new
             }
         }
+        
+        self.element = element
     }
     
-    func didInsert(_ state : ElementState) {
+    func didInsert(_ state : LiveElementState) {
         // TODO...
     }
     
-    func didRemove(_ state : ElementState) {
+    func didRemove(_ state : LiveElementState) {
         // TODO...
     }
 }
 
 
-extension ElementState
+extension LiveElementState
 {
     final class Lazy<Value> {
         
@@ -221,7 +240,7 @@ extension ElementState
             hasher.combine(self.hashCode)
         }
         
-        static func identifiers(with state : [ElementState]) -> [DiffIdentifier]
+        static func identifiers(with state : [LiveElementState]) -> [DiffIdentifier]
         {
             var factory = Factory()
             factory.reserveCapacity(state.count)
@@ -288,8 +307,8 @@ extension ElementState
 }
 
 
-extension ElementState.Lazy : Equatable where Value : Equatable {
-    static func == (lhs: ElementState.Lazy<Value>, rhs: ElementState.Lazy<Value>) -> Bool {
+extension LiveElementState.Lazy : Equatable where Value : Equatable {
+    static func == (lhs: LiveElementState.Lazy<Value>, rhs: LiveElementState.Lazy<Value>) -> Bool {
         lhs.value == rhs.value
     }
 }
