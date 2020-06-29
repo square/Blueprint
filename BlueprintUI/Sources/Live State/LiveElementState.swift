@@ -99,12 +99,17 @@ final class LiveElementState
         let oldElement = self.element
         let oldElementContent = self.elementContent
         
-        var newElement = intermediateNewElement
+        self.element = {
+            guard let controller = self.elementStateController else {
+                return intermediateNewElement
+            }
+            
+            var newElement = intermediateNewElement
+            controller.set(on: &newElement)
+            return newElement
+        }()
         
-        self.elementStateController?.set(on: &newElement)
-        
-        self.element = newElement
-        self.elementContent = newElement.content
+        self.elementContent = self.element.content
         
         let newChildren = self.elementContent.children(in: .empty)
         
@@ -115,7 +120,7 @@ final class LiveElementState
             
             let newChild = newChildren[0]
             
-            let isSame = DiffIdentifier(oldInfo.element, key: self.key) == DiffIdentifier(self.elementInfo.element, key: newChild.key)
+            let isSame = DiffIdentifier(oldElement, key: self.key) == DiffIdentifier(self.element, key: newChild.key)
             
             if isSame {
                 self.children[0].update(with: newChild.element)
@@ -298,7 +303,7 @@ extension LiveElementState
             factory.reserveCapacity(state.count)
             
             return state.map {
-                factory.makeIdentifier(for: type(of: $0.elementInfo.element), key: $0.key)
+                factory.makeIdentifier(for: type(of: $0.element), key: $0.key)
             }
         }
         
