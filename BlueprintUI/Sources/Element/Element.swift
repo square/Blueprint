@@ -63,4 +63,34 @@ public protocol Element {
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
 
+    ///
+    /// When using stateful properties like `@Stateful var myName : String` or `@Binding var isEnabled : Bool`,
+    /// you should return the `StateKeyPath`s of your element's stateful properties like so:
+    ///
+    /// ```
+    /// static var stateKeyPaths : Set<StateKeyPath>? {
+    ///     [
+    ///         .init(\.Self.myName),
+    ///         .init(\.Self.isEnabled),
+    ///     ]
+    /// }
+    /// ```
+    /// This allow Blueprint to hook up these stateful properties to the view management system.
+    /// Not returning all stateful property keypaths from this method is programmer error, and will fail at runtime.
+    ///
+    static var stateKeyPaths : Set<StateKeyPath>? { get }
+}
+
+
+public extension Element {
+    static var stateKeyPaths : Set<StateKeyPath>? {
+        nil
+    }
+}
+
+
+extension Element {
+    var stateKeyPaths : Set<StateKeyPath>? {
+        Self.stateKeyPaths
+    }
 }

@@ -1,5 +1,5 @@
 //
-//  ElementTreeState.swift
+//  LiveElementState.swift
 //  BlueprintUI
 //
 //  Created by Kyle Van Essen on 6/23/20.
@@ -23,23 +23,8 @@ final class LiveElementState
     
     private let key : AnyHashable?
     
-    private(set) var elementInfo : ElementInfo
-    
-    private(set) var layoutState : LayoutState
-    
-    struct ElementInfo {
-        let element : Element
-        let content : ElementContent
-        
-        init(_ element : Element) {
-            self.element = element
-            self.content = element.content
-        }
-    }
-    
-    struct LayoutState : Equatable {
-        var frame : CGRect
-    }
+    private(set) var element : Element
+    private(set) var elementContent : ElementContent
     
     // MARK: Parent / Child Tree
     
@@ -47,21 +32,28 @@ final class LiveElementState
     
     private(set) var children : [LiveElementState]
     
+    // MARK: State Management
+    
+    let elementStateController : ElementStateController?
+    
     // MARK: Initialization
     
     init(element : Element, key : AnyHashable?, parent : LiveElementState?)
     {
-        self.key = key
-        self.elementInfo = ElementInfo(element)
-        self.parent = parent
+        StatefulElementPropertyValidator.validate(typeOf: element)
         
-        self.layoutState = LayoutState(frame: .zero)
+        self.key = key
+        
+        self.element = element
+        self.elementContent = element.content
+        
+        self.parent = parent
         
         self.children = []
         
-        self.children = self.elementInfo.content.children(in: .empty).map { child in
-            .init(element: child.element, key: child.key, parent: self)
-        }
+        self.elementStateController = ElementStateController(with: element)
+        
+        self.update(with: element)
     }
     
     // MARK: Measurement & Layout
@@ -80,10 +72,8 @@ final class LiveElementState
             return existing
         }
         
-        let measurement = self.elementInfo.content.measure(
-            in: constraint,
-            environment: environment
-        )
+        // TODO...
+        let measurement : CGSize = .zero
         
         self.cachedMeasurements[constraint] = measurement
         
@@ -99,18 +89,24 @@ final class LiveElementState
     
     private func validate(update updated : Element)
     {
-        precondition(type(of: self.elementInfo.element) == type(of: updated))
+        precondition(type(of: self.element) == type(of: updated))
     }
     
-    func update(with newElement : Element)
+    func update(with intermediateNewElement : Element)
     {
-        self.validate(update: newElement)
+        self.validate(update: intermediateNewElement)
         
-        let oldInfo = self.elementInfo
+        let oldElement = self.element
+        let oldElementContent = self.elementContent
         
-        self.elementInfo = ElementInfo(newElement)
+        var newElement = intermediateNewElement
         
-        let newChildren = self.elementInfo.content.children(in: .empty)
+        self.elementStateController?.set(on: &newElement)
+        
+        self.element = newElement
+        self.elementContent = newElement.content
+        
+        let newChildren = self.elementContent.children(in: .empty)
         
         if self.children.isEmpty && newChildren.isEmpty {
             // Fast path. No changes at all – we don't have any children.

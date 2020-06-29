@@ -13,26 +13,39 @@ class StatefulPropertyTests : XCTestCase
 {
     func test_state()
     {
-        let test = Test(name: "Kyle")
+        let test = Person(name: "Kyle", isEnabled: false)
     }
     
-    struct Test {
-        @ElementState var name : String = ""
+    fileprivate struct Person : ProxyElement {
+        @Stateful var name : String
+        @Stateful var isEnabled : Bool
         
-        init(name : String) {
-            self.name = name
-            self.name = name
+        init(name : String, isEnabled : Bool) {
+            _name = .init(name)
+            _isEnabled = .init(isEnabled)
         }
         
-        var body : Element {
-            Toggle { isOn in
-                self.name = isOn ? "Kyle" : "Not Kyle"
+        var elementRepresentation: Element {
+            Row { row in
+                row.verticalAlignment = .center
+                row.minimumHorizontalSpacing = 20.0
+                
+                row.add(child: Toggle { isOn in
+                    self.isEnabled = isOn
+                })
             }
         }
+        
+        static var states: [StateKeyPath] {
+            [
+                .init(\Self.name),
+                .init(\Self.isEnabled)
+            ]
+        }
+        
     }
 
-
-    struct Toggle : UIViewElement {
+    fileprivate  struct Toggle : UIViewElement {
         
         var onToggle : (Bool) -> ()
         
@@ -54,5 +67,4 @@ class StatefulPropertyTests : XCTestCase
             var onToggle : (Bool) -> () = { _ in }
         }
     }
-
 }
