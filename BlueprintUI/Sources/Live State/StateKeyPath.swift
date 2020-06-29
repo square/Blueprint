@@ -14,7 +14,7 @@ import Foundation
 
 public struct StateKeyPath : Hashable {
         
-    init<Root:Element, Value>(_ keyPath : WritableKeyPath<Root, Value>)
+    init<Root:Element, Value:StatefulElementProperty>(_ keyPath : WritableKeyPath<Root, Value>)
     {
         self.anyKeyPath = keyPath
         
@@ -22,22 +22,22 @@ public struct StateKeyPath : Hashable {
             (root as! Root)[keyPath: keyPath]
         }
         
-        self.setValue = { anyRoot, newValue in
-            
+        self.setStorage = { anyRoot, storage in
             var root = anyRoot as! Root
             
-            root[keyPath: keyPath] = newValue as! Value
+            root[keyPath: keyPath].setLiveStorage(storage)
             
             anyRoot = root
         }
         
         self.makeStorage = { root in
-            StatefulStorage((root as! Root)[keyPath: keyPath])
+            StatefulStorage((root as! Root)[keyPath: keyPath].wrappedValue)
         }
     }
 
     let getValue : (Element) -> Any
-    let setValue : (inout Element, Any) -> ()
+    
+    let setStorage : (inout Element, AnyStatefulStorage) -> ()
     
     let makeStorage : (Element) -> AnyStatefulStorage
     

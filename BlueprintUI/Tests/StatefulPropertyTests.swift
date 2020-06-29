@@ -13,7 +13,11 @@ class StatefulPropertyTests : XCTestCase
 {
     func test_state()
     {
-        let test = Person(name: "Kyle", isEnabled: false)
+        let person = Person(name: "Kyle", isEnabled: false)
+        
+        let state = LiveElementState(element: person, key: nil, parent: nil)
+        
+        print("\(state)")
     }
     
     fileprivate struct Person : ProxyElement {
@@ -36,13 +40,10 @@ class StatefulPropertyTests : XCTestCase
             }
         }
         
-        static var states: [StateKeyPath] {
-            [
-                .init(\Self.name),
-                .init(\Self.isEnabled)
-            ]
-        }
-        
+        static let stateKeyPaths: Set<StateKeyPath>? = [
+            .init(\Self._name),
+            .init(\Self._isEnabled)
+        ]
     }
 
     fileprivate  struct Toggle : UIViewElement {

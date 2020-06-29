@@ -8,11 +8,20 @@
 import Foundation
 
 
-protocol StatefulElementProperty {}
+protocol AnyStatefulElementProperty {}
+
+protocol StatefulElementProperty {
+    
+    associatedtype Value
+    
+    var wrappedValue : Value { get set }
+    
+    mutating func setLiveStorage(_ liveStorage : AnyStatefulStorage)
+}
 
 
 @propertyWrapper
-public struct Stateful<Value> : StatefulElementProperty {
+public struct Stateful<Value> : StatefulElementProperty, AnyStatefulElementProperty {
     
     private var initialValue : Value
     
@@ -42,6 +51,13 @@ public struct Stateful<Value> : StatefulElementProperty {
     
     public init(_ wrappedValue : Value) {
         self.initialValue = wrappedValue
+    }
+    
+    // MARK: StatefulElementProperty
+    
+    mutating func setLiveStorage(_ liveStorage : AnyStatefulStorage)
+    {
+        self.liveStorage = (liveStorage as! StatefulStorage<Value>)
     }
 }
 
@@ -95,14 +111,17 @@ extension StatefulStorage where Value : Equatable {
 
 
 @propertyWrapper
-public struct Binding<Value> : StatefulElementProperty {
+public struct Binding<Value> : StatefulElementProperty, AnyStatefulElementProperty {
     public var wrappedValue : Value
     
     public init(_ value : Value) {
         self.wrappedValue = value
     }
     
-    func update() {
-        
+        // MARK: StatefulElementProperty
+    
+    mutating func setLiveStorage(_ liveStorage : AnyStatefulStorage)
+    {
+        fatalError()
     }
 }

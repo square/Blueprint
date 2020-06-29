@@ -31,7 +31,7 @@ internal final class StatefulElementPropertyValidator {
         let mirror = Mirror(reflecting: element)
         
         let properties : [String] = mirror.children.compactMap { child in
-            guard let name = child.label, child.value is StatefulElementProperty else {
+            guard let name = child.label, child.value is AnyStatefulElementProperty else {
                 return nil
             }
             

@@ -32,7 +32,7 @@ final class ElementStateController {
     func set(on element : inout Element)
     {
         self.states.forEach { state in
-            state.keyPath.setValue(&element, state.storage.anyValue)
+            state.keyPath.setStorage(&element, state.storage)
         }
     }
     
