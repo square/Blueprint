@@ -12,6 +12,8 @@ final class ElementStateController {
     
     private var states : [ElementState] = []
     
+    var stateDidChange : () -> ()
+    
     init?(with element : Element) {
         guard let keyPaths = element.stateKeyPaths else {
             return nil
@@ -19,6 +21,14 @@ final class ElementStateController {
         
         self.states = keyPaths.map { keyPath in
             ElementState(keyPath: keyPath, element: element)
+        }
+        
+        self.stateDidChange = { }
+        
+        self.states.forEach { state in
+            state.storage.valueDidChange = { [weak self] in
+                self?.elementStateDidChange()
+            }
         }
     }
     
@@ -34,6 +44,11 @@ final class ElementStateController {
         self.states.forEach { state in
             state.keyPath.setStorage(&element, state.storage)
         }
+    }
+    
+    private func elementStateDidChange()
+    {
+        self.stateDidChange()
     }
     
     final class ElementState {

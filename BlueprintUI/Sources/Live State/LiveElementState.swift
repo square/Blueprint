@@ -25,6 +25,7 @@ final class LiveElementState
     
     private(set) var element : Element
     private(set) var elementContent : ElementContent
+    private(set) var viewDescription : ViewDescription?
     
     // MARK: Parent / Child Tree
     
@@ -52,6 +53,10 @@ final class LiveElementState
         self.children = []
         
         self.elementStateController = ElementStateController(with: element)
+        
+        self.elementStateController?.stateDidChange = { [weak self] in
+            self?.elementStateControllerStateDidChange()
+        }
         
         self.update(with: element)
     }
@@ -85,6 +90,16 @@ final class LiveElementState
         fatalError()
     }
     
+    // MARK: State
+    
+    func elementStateControllerStateDidChange()
+    {
+        // TODO: How to do "backpressure" up the stack?
+        // Measure ourselves in an infinite bounds and if that changes from last time, push up recursively?
+        
+        self.setNeedsUpdate()
+    }
+    
     // MARK: Updating
     
     private func validate(update updated : Element)
@@ -98,6 +113,7 @@ final class LiveElementState
         
         let oldElement = self.element
         let oldElementContent = self.elementContent
+        let oldViewDescription = self.viewDescription
         
         self.element = {
             guard let controller = self.elementStateController else {
@@ -110,6 +126,7 @@ final class LiveElementState
         }()
         
         self.elementContent = self.element.content
+        self.viewDescription = self.element.backingViewDescription(bounds: .zero, subtreeExtent: nil)
         
         let newChildren = self.elementContent.children(in: .empty)
         
@@ -187,12 +204,13 @@ final class LiveElementState
                     if let existing = old.removeValue(forKey: ID) {
                         new.append(existing)
                         
+                        existing.update(with: child.element)
+                        
                         let indexChanged = oldIDs[ID] != newIDs[ID]
                         
                         if indexChanged {
                             // TODO Move the view to the right place in the hierarchy.
                         }
-                        
                     } else {
                         let newState = LiveElementState(element: child.element, key: child.key, parent: self)
                         new.append(newState)
