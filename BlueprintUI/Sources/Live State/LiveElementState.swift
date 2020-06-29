@@ -17,7 +17,7 @@ struct RootElement : ProxyElement {
 }
 
 
-final class LiveElementState
+final class LiveElementState : Measurable // TODO eventually conform in a smaller type
 {
     // MARK: Element Data
     
@@ -45,14 +45,14 @@ final class LiveElementState
         
         self.key = key
         
-        self.element = element
-        self.elementContent = element.content
+        self.elementStateController = ElementStateController(with: element)
+        
+        self.element = self.elementStateController?.setting(on: element) ?? element
+        self.elementContent = self.element.content
         
         self.parent = parent
         
         self.children = []
-        
-        self.elementStateController = ElementStateController(with: element)
         
         self.elementStateController?.stateDidChange = { [weak self] in
             self?.elementStateControllerStateDidChange()
@@ -70,6 +70,11 @@ final class LiveElementState
     }
     
     var cachedMeasurements : [SizeConstraint:CGSize] = [:]
+    
+    func measure(in constraint: SizeConstraint) -> CGSize
+    {
+        fatalError()
+    }
     
     func measure(in constraint : SizeConstraint, environment : Environment) -> CGSize
     {
@@ -115,15 +120,7 @@ final class LiveElementState
         let oldElementContent = self.elementContent
         let oldViewDescription = self.viewDescription
         
-        self.element = {
-            guard let controller = self.elementStateController else {
-                return intermediateNewElement
-            }
-            
-            var newElement = intermediateNewElement
-            controller.set(on: &newElement)
-            return newElement
-        }()
+        self.element = self.elementStateController?.setting(on: intermediateNewElement) ?? intermediateNewElement
         
         self.elementContent = self.element.content
         self.viewDescription = self.element.backingViewDescription(bounds: .zero, subtreeExtent: nil)

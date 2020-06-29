@@ -39,11 +39,15 @@ final class ElementStateController {
         }
     }
     
-    func set(on element : inout Element)
+    func setting(on element : Element) -> Element
     {
+        var updated = element
+        
         self.states.forEach { state in
-            state.keyPath.setStorage(&element, state.storage)
+            state.keyPath.setStorage(&updated, state.storage)
         }
+        
+        return updated
     }
     
     private func elementStateDidChange()

@@ -34,9 +34,11 @@ class StatefulPropertyTests : XCTestCase
                 row.verticalAlignment = .center
                 row.minimumHorizontalSpacing = 20.0
                 
-                row.add(child: Toggle { isOn in
+                row.add(child: CallbackToggle { isOn in
                     self.isEnabled = isOn
                 })
+                
+                row.add(child: BindingToggle(self.$isEnabled))
             }
         }
         
@@ -46,7 +48,7 @@ class StatefulPropertyTests : XCTestCase
         ]
     }
 
-    fileprivate  struct Toggle : UIViewElement {
+    fileprivate  struct CallbackToggle : UIViewElement {
         
         var onToggle : (Bool) -> ()
         
@@ -62,6 +64,31 @@ class StatefulPropertyTests : XCTestCase
         
         func updateUIView(_ view: UIViewType) {
             view.onToggle = self.onToggle
+        }
+        
+        final class SwitchView : UISwitch {
+            var onToggle : (Bool) -> () = { _ in }
+        }
+    }
+    
+    fileprivate  struct BindingToggle : UIViewElement {
+        
+        var isOn : Binding<Bool>
+        
+        init(_ isOn : Binding<Bool>) {
+            self.isOn = isOn
+        }
+        
+        typealias UIViewType = SwitchView
+        
+        static func makeUIView() -> UIViewType {
+            SwitchView()
+        }
+        
+        func updateUIView(_ view: UIViewType) {
+            view.onToggle = { isOn in
+                self.isOn.wrappedValue = isOn
+            }
         }
         
         final class SwitchView : UISwitch {

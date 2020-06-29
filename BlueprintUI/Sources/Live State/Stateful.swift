@@ -8,7 +8,10 @@
 import Foundation
 
 
-protocol AnyStatefulElementProperty {}
+protocol AnyStatefulElementProperty {
+    
+}
+
 
 protocol StatefulElementProperty {
     
@@ -40,10 +43,14 @@ public struct Stateful<Value> : StatefulElementProperty, AnyStatefulElementPrope
     }
     
     public var projectedValue : Binding<Value> {
-        fatalError()
+        guard let storage = self.liveStorage else {
+            fatalError("Cannot access the projectedValue of a state outside of element building.")
+        }
+        
+        return Binding(storage)
     }
     
-    internal var liveStorage : StatefulStorage<Value>?
+    var liveStorage : StatefulStorage<Value>?
     
     public init(wrappedValue : Value) {
         self.initialValue = wrappedValue
@@ -61,12 +68,46 @@ public struct Stateful<Value> : StatefulElementProperty, AnyStatefulElementPrope
     }
 }
 
+
+@propertyWrapper
+public struct Binding<Value> : StatefulElementProperty, AnyStatefulElementProperty {
+    
+    public var wrappedValue : Value {
+        get {
+            self.liveStorage.value
+        }
+        
+        nonmutating set {
+            self.liveStorage.value = newValue
+        }
+    }
+    
+    public var projectedValue : Binding<Value> {
+        self
+    }
+    
+    var liveStorage : StatefulStorage<Value>
+    
+    init(_ liveStorage : StatefulStorage<Value>) {
+        self.liveStorage = liveStorage
+    }
+    
+    // MARK: StatefulElementProperty
+    
+    mutating func setLiveStorage(_ liveStorage : AnyStatefulStorage)
+    {
+        fatalError()
+    }
+}
+
+
 protocol AnyStatefulStorage : AnyObject
 {
     var valueDidChange : () -> () { get set }
     
     var anyValue : Any { get set }
 }
+
 
 final class StatefulStorage<Value> : AnyStatefulStorage {
     
@@ -106,22 +147,5 @@ extension StatefulStorage {
 extension StatefulStorage where Value : Equatable {
     func isValueEqual(to other : Value) -> Bool {
         value == other
-    }
-}
-
-
-@propertyWrapper
-public struct Binding<Value> : StatefulElementProperty, AnyStatefulElementProperty {
-    public var wrappedValue : Value
-    
-    public init(_ value : Value) {
-        self.wrappedValue = value
-    }
-    
-        // MARK: StatefulElementProperty
-    
-    mutating func setLiveStorage(_ liveStorage : AnyStatefulStorage)
-    {
-        fatalError()
     }
 }
