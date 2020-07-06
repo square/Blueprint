@@ -12,8 +12,6 @@ public struct Label: Element {
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
-    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
 
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
         self.text = text
@@ -36,7 +34,6 @@ public struct Label: Element {
     public var content: ElementContent {
         var element = AttributedLabel(attributedText: attributedText)
         element.numberOfLines = numberOfLines
-        element.roundingScale = roundingScale
         return ElementContent(child: element)
     }
 

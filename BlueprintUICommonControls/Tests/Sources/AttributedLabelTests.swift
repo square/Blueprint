@@ -12,8 +12,7 @@ class AttributedLabelTests: XCTestCase {
             .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
             .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-        var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 1
+        let element = AttributedLabel(attributedText: string)
 
         compareSnapshot(of: element)
         
@@ -23,7 +22,6 @@ class AttributedLabelTests: XCTestCase {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 1
 
         element.numberOfLines = 0
         compareSnapshot(
@@ -46,46 +44,32 @@ class AttributedLabelTests: XCTestCase {
 
     func test_measuring() {
 
-        func test(in size: CGSize, file: StaticString = #file, line: UInt = #line) {
-
+        func test(in size: CGSize, expectedSize: CGSize, file: StaticString = #file, line: UInt = #line) {
             let string = NSAttributedString()
                 .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)
                 .appending(string: "e", font: .systemFont(ofSize: 14.0), color: .blue)
                 .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
                 .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
-            var element = AttributedLabel(attributedText: string)
-            element.roundingScale = 1
-
-            var measuredSize = string.boundingRect(with: size, options: .usesLineFragmentOrigin, context: nil).size
-            measuredSize.width = measuredSize.width.rounded(.up)
-            measuredSize.height = measuredSize.height.rounded(.up)
+            let element = AttributedLabel(attributedText: string)
 
             let elementSize = element.content.measure(in: SizeConstraint(size))
-
-            XCTAssertEqual(measuredSize, elementSize, file: file, line: line)
+            XCTAssertEqual(expectedSize, elementSize, file: file, line: line)
         }
 
-        test(in: CGSize(width: 30, height: 20))
-        test(in: CGSize(width: 100, height: 300))
-        test(in: CGSize(width: 120, height: 300))
-        test(in: CGSize(width: 8000, height: 4000))
+        test(
+            in: CGSize(width: 30, height: 20),
+            expectedSize: CGSize(width: 30, height: 235.5))
+        test(
+            in: CGSize(width: 100, height: 300),
+            expectedSize: CGSize(width: 95, height: 105.5))
+        test(
+            in: CGSize(width: 120, height: 300),
+            expectedSize: CGSize(width: 107, height: 67))
+        test(
+            in: CGSize(width: 8000, height: 4000),
+            expectedSize: CGSize(width: 153.5, height: 38.5))
 
-    }
-
-    func test_rounding() {
-        let string = NSAttributedString(
-            string: "iiiii",
-            attributes: [
-                .font: UIFont.systemFont(ofSize: 23)
-            ])
-
-        var element = AttributedLabel(attributedText: string)
-        element.roundingScale = 2.0
-
-        let size = element.content.measure(in: SizeConstraint(CGSize(width: 100, height: 100)))
-
-        XCTAssertEqual(size, CGSize(width: 25.5, height: 27.5))
     }
 }
 

@@ -5,8 +5,6 @@ public struct AttributedLabel: Element {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
-    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
 
     public init(attributedText: NSAttributedString) {
         self.attributedText = attributedText
@@ -14,31 +12,33 @@ public struct AttributedLabel: Element {
 
     public var content: ElementContent {
         struct Measurer: Measurable {
+            private static let prototypeLabel = LabelView()
 
-            var attributedText: NSAttributedString
-            var roundingScale: CGFloat
+            var model: AttributedLabel
 
             func measure(in constraint: SizeConstraint) -> CGSize {
-                var size = attributedText.boundingRect(
-                    with: constraint.maximum,
-                    options: [.usesLineFragmentOrigin],
-                    context: nil)
-                    .size
-                size.width = size.width.rounded(.up, by: roundingScale)
-                size.height = size.height.rounded(.up, by: roundingScale)
-
-                return size
+                let label = Self.prototypeLabel
+                model.update(label: label)
+                return label.sizeThatFits(constraint.maximum)
             }
         }
 
-        return ElementContent(measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale))
+        return ElementContent(measurable: Measurer(model: self))
+    }
+
+    private func update(label: LabelView) {
+        label.attributedText = attributedText
+        label.numberOfLines = numberOfLines
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return UILabel.describe { (config) in
-            config[\.attributedText] = attributedText
-            config[\.numberOfLines] = numberOfLines
+        return LabelView.describe { (config) in
+            config.apply(update)
         }
     }
+}
 
+extension AttributedLabel {
+    private final class LabelView: UILabel {
+    }
 }
