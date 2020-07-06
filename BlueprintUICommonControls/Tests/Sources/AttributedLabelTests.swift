@@ -23,22 +23,23 @@ class AttributedLabelTests: XCTestCase {
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")
         var element = AttributedLabel(attributedText: string)
 
+        func constrained() -> Element {
+            element.constrainedTo(width: .atMost(100), height: .atMost(800))
+        }
+
         element.numberOfLines = 0
         compareSnapshot(
-            of: element,
-            size: CGSize(width: 100, height: 800),
+            of: constrained(),
             identifier: "zero")
 
         element.numberOfLines = 1
         compareSnapshot(
-            of: element,
-            size: CGSize(width: 100, height: 800),
+            of: constrained(),
             identifier: "one")
 
         element.numberOfLines = 2
         compareSnapshot(
-            of: element,
-            size: CGSize(width: 100, height: 800),
+            of: constrained(),
             identifier: "two")
     }
 
