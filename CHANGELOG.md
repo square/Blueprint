@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Master]
+## [Main]
 
 ### Fixed
 
@@ -13,9 +13,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Introduce `UIViewElement` [to make wrapping self-sizing UIViews easier](https://github.com/square/Blueprint/pull/106).
+  
+  You can now write a `UIViewElement` like this:
+
+  ```
+  struct Switch : UIViewElement
+  {
+    var isOn : Bool
+
+    typealias UIViewType = UISwitch
+
+    static func makeUIView() -> UISwitch {
+        UISwitch()
+    }
+
+    func updateUIView(_ view: UISwitch) {
+        view.isOn = self.isOn
+    }
+  }
+  ```
+
+  And the elements will be sized and presented correctly based on the view's `sizeThatFits`.
+
 ### Removed
 
 ### Changed
+
+- [Update Demo app](https://github.com/square/Blueprint/pull/116) to support more demo screen types.
 
 ### Deprecated
 

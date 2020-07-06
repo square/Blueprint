@@ -26,7 +26,7 @@ let posts = [
 ]
 
 
-final class ViewController: UIViewController {
+final class PostsViewController: UIViewController {
 
     private let blueprintView = BlueprintView()
 
