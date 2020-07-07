@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [Update the scroll indicator inset](https://github.com/square/Blueprint/pull/117) when adjusting the content inset.
+
 ### Added
 
 - Introduce `UIViewElement` [to make wrapping self-sizing UIViews easier](https://github.com/square/Blueprint/pull/106).
