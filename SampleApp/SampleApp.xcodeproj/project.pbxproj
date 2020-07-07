@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A50E8DB24A685DA0049705B /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A50E8DA24A685DA0049705B /* RootViewController.swift */; };
 		0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */; };
 		0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */; };
 		0AF36345246266AF0027E172 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36342246266AF0027E172 /* README.md */; };
@@ -15,7 +16,7 @@
 		2009E82B0B9D98A685E8637B /* libPods-Tutorial 1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 237956659E4F5F4AEE53B303 /* libPods-Tutorial 1.a */; };
 		4EE23713D657C21C6806E771 /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDB22E4D9B4379A15C5AF69 /* libPods-SampleApp.a */; };
 		6B58C7884AE69FA55EA64E57 /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */; };
-		97545519223C12E9003E353F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* ViewController.swift */; };
+		97545519223C12E9003E353F /* PostsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* PostsViewController.swift */; };
 		9754551A223C12E9003E353F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545511223C12E9003E353F /* AppDelegate.swift */; };
 		9754551B223C12E9003E353F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97545513223C12E9003E353F /* Assets.xcassets */; };
 		9754551C223C12E9003E353F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97545514223C12E9003E353F /* LaunchScreen.storyboard */; };
@@ -43,6 +44,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A50E8DA24A685DA0049705B /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewKeyboardViewController.swift; sourceTree = "<group>"; };
 		0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodePreviewDemo.swift; sourceTree = "<group>"; };
 		0AF36342246266AF0027E172 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
@@ -62,7 +64,7 @@
 		7EA5EE31421ECA2CA9457450 /* Pods-Tutorial 2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 2/Pods-Tutorial 2.release.xcconfig"; sourceTree = "<group>"; };
 		8501C9E99E00354D89175E65 /* Pods-Tutorial 1.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 1/Pods-Tutorial 1.release.xcconfig"; sourceTree = "<group>"; };
 		975454FA223C1289003E353F /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		97545510223C12E9003E353F /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		97545510223C12E9003E353F /* PostsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostsViewController.swift; sourceTree = "<group>"; };
 		97545511223C12E9003E353F /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97545513223C12E9003E353F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97545515223C12E9003E353F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -174,7 +176,8 @@
 		9754550F223C12E9003E353F /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				97545510223C12E9003E353F /* ViewController.swift */,
+				0A50E8DA24A685DA0049705B /* RootViewController.swift */,
+				97545510223C12E9003E353F /* PostsViewController.swift */,
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
 				97545511223C12E9003E353F /* AppDelegate.swift */,
 				0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */,
@@ -574,8 +577,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A50E8DB24A685DA0049705B /* RootViewController.swift in Sources */,
 				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
-				97545519223C12E9003E353F /* ViewController.swift in Sources */,
+				97545519223C12E9003E353F /* PostsViewController.swift in Sources */,
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
 				0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */,
 			);
