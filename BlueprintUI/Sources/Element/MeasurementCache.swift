@@ -5,7 +5,8 @@
 //  Created by Kyle Van Essen on 6/23/20.
 //
 
-import Foundation
+import UIKit
+
 
 ///
 /// A cache used to speed up measurement and layout, when the measurement of an `Element` can
