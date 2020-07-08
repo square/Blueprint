@@ -3,15 +3,17 @@ import UIKit
 
 
 /// Displays text content.
-public struct Label: Element {
+public struct Label: ProxyElement {
 
     /// The text to be displayed.
     public var text: String
+    
     public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
+    
     /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
     public var roundingScale: CGFloat = UIScreen.main.scale
 
@@ -33,15 +35,10 @@ public struct Label: Element {
             ])
     }
 
-    public var content: ElementContent {
-        var element = AttributedLabel(attributedText: attributedText)
-        element.numberOfLines = numberOfLines
-        element.roundingScale = roundingScale
-        return ElementContent(child: element)
+    public var elementRepresentation: Element {
+        AttributedLabel(attributedText: attributedText) { label in
+            label.numberOfLines = self.numberOfLines
+            label.roundingScale = self.roundingScale
+        }
     }
-
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return nil
-    }
-
 }

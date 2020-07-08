@@ -66,6 +66,11 @@ public protocol UIViewElement : Element {
     /// ```
     func updateUIView(_ view: UIViewType)
     
+    /// A key which is used to cache measurement results of the `UIViewElement`.
+    /// If your element is made of values which can be easily combined to cache its sizing,
+    /// you should return them from this variable, to speed up measurement and layout.
+    var measurementCacheKey : AnyHashable? { get }
+    
     /// Returns the sizing measurement for the element for the provided
     /// measurement view.
     ///
@@ -85,6 +90,10 @@ public protocol UIViewElement : Element {
 
 public extension UIViewElement {
     
+    var measurementCacheKey : AnyHashable? {
+        nil
+    }
+    
     /// The default implementation simply forwards to `sizeThatFits(_:)`.
     func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize {
         view.sizeThatFits(size)
@@ -96,7 +105,11 @@ public extension UIViewElement {
     
     /// Defer to the reused measurement view to provide the size of the element.
     var content: ElementContent {
-        ElementContent {
+        let key = self.measurementCacheKey.map {
+            MeasurementCachingKey(type: Self.self, input: $0)
+        }
+        
+        return ElementContent(measurementCachingKey: key) {
             UIViewElementMeasurer.shared.measure(element: self, in: $0)
         }
     }

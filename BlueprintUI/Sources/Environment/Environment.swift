@@ -36,9 +36,11 @@ import Foundation
 public struct Environment {
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
-    public static let empty = Environment()
+    public static let empty = Environment(measurementCache: .init())
 
-    private init() { }
+    private init(measurementCache : MeasurementCache) {
+        self.measurementCache = measurementCache
+    }
 
     private var values: [ObjectIdentifier: Any] = [:]
 
@@ -57,4 +59,9 @@ public struct Environment {
             values[ObjectIdentifier(key)] = newValue
         }
     }
+    
+    /// Cache used to speed up measurements during a layout pass.
+    /// This is declared on the `Environment` directly, because access to the `measurementCache` is a hot path
+    /// which we can optimize by not needing the usual `env.values[...]` lookup.
+    var measurementCache : MeasurementCache
 }

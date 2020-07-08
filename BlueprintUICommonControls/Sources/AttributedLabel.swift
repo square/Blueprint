@@ -1,15 +1,18 @@
 import BlueprintUI
 import UIKit
 
-public struct AttributedLabel: Element {
+public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
+    
     /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
     public var roundingScale: CGFloat = UIScreen.main.scale
 
-    public init(attributedText: NSAttributedString) {
+    public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
         self.attributedText = attributedText
+        
+        configure(&self)
     }
 
     public var content: ElementContent {
@@ -31,7 +34,10 @@ public struct AttributedLabel: Element {
             }
         }
 
-        return ElementContent(measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale))
+        return ElementContent(
+            measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale),
+            measurementCachingKey: .init(type: Self.self, input: self)
+        )
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
