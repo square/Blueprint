@@ -71,6 +71,30 @@ class AttributedLabelTests: XCTestCase {
             expectedSize: CGSize(width: 153.5, height: 38.5))
 
     }
+
+    func test_textRectOffset() {
+        let lineHeight: CGFloat = 50
+        let font = UIFont.systemFont(ofSize: 17)
+
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.minimumLineHeight = lineHeight
+        paragraphStyle.maximumLineHeight = lineHeight
+
+        let string = NSAttributedString(
+            string: "This text should be centered within the line height", attributes: [
+                .font: font,
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+
+        let offset = (font.lineHeight - lineHeight) / 2
+
+        var label = AttributedLabel(attributedText: string)
+        label.textRectOffset = UIOffset(horizontal: 0, vertical: offset)
+
+        let element = ConstrainedSize(width: .atMost(150), wrapping: label)
+        compareSnapshot(of: element)
+    }
 }
 
 
