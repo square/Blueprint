@@ -3,10 +3,11 @@ import UIKit
 
 
 /// Displays text content.
-public struct Label: Element {
+public struct Label: ProxyElement {
 
     /// The text to be displayed.
     public var text: String
+    
     public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
@@ -53,32 +54,26 @@ public struct Label: Element {
             ])
     }
 
-    public var content: ElementContent {
-        var element = AttributedLabel(attributedText: attributedText)
-        element.numberOfLines = numberOfLines
-        element.isAccessibilityElement = isAccessibilityElement
+    public var elementRepresentation: Element {
+        AttributedLabel(attributedText: attributedText) { label in
+            label.numberOfLines = numberOfLines
+            label.isAccessibilityElement = isAccessibilityElement
 
-        switch lineHeight {
-        case .custom(let lineHeight, .top):
-            let leading = lineHeight - font.lineHeight
-            element.textRectOffset = UIOffset(horizontal: 0, vertical: -leading)
+            switch lineHeight {
+            case .custom(let lineHeight, .top):
+                let leading = lineHeight - font.lineHeight
+                label.textRectOffset = UIOffset(horizontal: 0, vertical: -leading)
 
-        case .custom(let lineHeight, .center):
-            let halfLeading = (lineHeight - font.lineHeight) / 2
-            element.textRectOffset = UIOffset(horizontal: 0, vertical: -halfLeading)
+            case .custom(let lineHeight, .center):
+                let halfLeading = (lineHeight - font.lineHeight) / 2
+                label.textRectOffset = UIOffset(horizontal: 0, vertical: -halfLeading)
 
-        case .font, .custom(_, .bottom):
-            // do nothing, use default behavior
-            break
+            case .font, .custom(_, .bottom):
+                // do nothing, use default behavior
+                break
+            }
         }
-
-        return ElementContent(child: element)
     }
-
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return nil
-    }
-
 }
 
 extension Label {

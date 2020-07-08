@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-public struct AttributedLabel: Element {
+public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
@@ -13,8 +13,10 @@ public struct AttributedLabel: Element {
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
 
-    public init(attributedText: NSAttributedString) {
+    public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
         self.attributedText = attributedText
+        
+        configure(&self)
     }
 
     public var content: ElementContent {
@@ -30,11 +32,13 @@ public struct AttributedLabel: Element {
             }
         }
 
-        return ElementContent(measurable: Measurer(model: self))
+        return ElementContent(
+            measurable: Measurer(model: self),
+            measurementCachingKey: .init(type: Self.self, input: self)
+        )
     }
 
     private func update(label: LabelView) {
-        label.attributedText = attributedText
         label.numberOfLines = numberOfLines
         label.isAccessibilityElement = isAccessibilityElement
         label.textRectOffset = textRectOffset
@@ -60,5 +64,12 @@ extension AttributedLabel {
         override func drawText(in rect: CGRect) {
             super.drawText(in: rect.offsetBy(dx: textRectOffset.horizontal, dy: textRectOffset.vertical))
         }
+    }
+}
+
+extension UIOffset: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(horizontal)
+        hasher.combine(vertical)
     }
 }
