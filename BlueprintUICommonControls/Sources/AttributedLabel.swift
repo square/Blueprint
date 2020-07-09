@@ -39,6 +39,7 @@ public struct AttributedLabel: Element, Hashable {
     }
 
     private func update(label: LabelView) {
+        label.attributedText = attributedText
         label.numberOfLines = numberOfLines
         label.isAccessibilityElement = isAccessibilityElement
         label.textRectOffset = textRectOffset
