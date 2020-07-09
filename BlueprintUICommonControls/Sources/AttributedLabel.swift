@@ -5,9 +5,13 @@ public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
-    
-    /// The scale to which pixel measurements will be rounded. Defaults to `UIScreen.main.scale`.
-    public var roundingScale: CGFloat = UIScreen.main.scale
+    public var isAccessibilityElement = false
+
+    /// An offset that will be applied to the rect used by `drawText(in:)`.
+    ///
+    /// This can be used to adjust the positioning of text within each line's frame, such as adjusting
+    /// the way text is distributed within the line height.
+    public var textRectOffset: UIOffset = .zero
 
     public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
         self.attributedText = attributedText
@@ -17,34 +21,56 @@ public struct AttributedLabel: Element, Hashable {
 
     public var content: ElementContent {
         struct Measurer: Measurable {
+            private static let prototypeLabel = LabelView()
 
-            var attributedText: NSAttributedString
-            var roundingScale: CGFloat
+            var model: AttributedLabel
 
             func measure(in constraint: SizeConstraint) -> CGSize {
-                var size = attributedText.boundingRect(
-                    with: constraint.maximum,
-                    options: [.usesLineFragmentOrigin],
-                    context: nil)
-                    .size
-                size.width = size.width.rounded(.up, by: roundingScale)
-                size.height = size.height.rounded(.up, by: roundingScale)
-
-                return size
+                let label = Self.prototypeLabel
+                model.update(label: label)
+                return label.sizeThatFits(constraint.maximum)
             }
         }
 
         return ElementContent(
-            measurable: Measurer(attributedText: attributedText, roundingScale: roundingScale),
+            measurable: Measurer(model: self),
             measurementCachingKey: .init(type: Self.self, input: self)
         )
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return UILabel.describe { (config) in
-            config[\.attributedText] = attributedText
-            config[\.numberOfLines] = numberOfLines
-        }
+    private func update(label: LabelView) {
+        label.attributedText = attributedText
+        label.numberOfLines = numberOfLines
+        label.isAccessibilityElement = isAccessibilityElement
+        label.textRectOffset = textRectOffset
     }
 
+    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        return LabelView.describe { (config) in
+            config.apply(update)
+        }
+    }
+}
+
+extension AttributedLabel {
+    private final class LabelView: UILabel {
+        var textRectOffset: UIOffset = .zero {
+            didSet {
+                if oldValue != textRectOffset {
+                    setNeedsDisplay()
+                }
+            }
+        }
+
+        override func drawText(in rect: CGRect) {
+            super.drawText(in: rect.offsetBy(dx: textRectOffset.horizontal, dy: textRectOffset.vertical))
+        }
+    }
+}
+
+extension UIOffset: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(horizontal)
+        hasher.combine(vertical)
+    }
 }

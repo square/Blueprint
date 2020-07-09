@@ -104,6 +104,8 @@ extension XCTestCase {
             view.frame = CGRect(origin: .zero, size: size)
         } else {
             view.sizeToFit()
+            view.frame.size.width.round(.up, by: scale)
+            view.frame.size.height.round(.up, by: scale)
         }
 
         compareSnapshot(of: view, identifier: identifier, scale: scale, file: file, testName: testName, line: line)

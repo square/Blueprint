@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Update the scroll indicator inset](https://github.com/square/Blueprint/pull/117) when adjusting the content inset.
 
+- `Label` & `AttributedLabel` use an internal `UILabel` for measurement. This fixes measurement when there is a line limit set. However, it also means that the screen scale cannot be specified and is always assumed to be `UIScreen.main.scale`. These elements may not be measured correctly if they are placed on a screen other than `UIScreen.main`. ([#120])
+
 ### Added
 
 - Introduce [MeasurementCachingKey](https://github.com/square/Blueprint/pull/115), to allow for elements to provide a way to cache their measurement during layout passes. This provides performance optimizations for elements whose layout and measurement is expensive to calculate.
@@ -37,6 +39,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
   And the elements will be sized and presented correctly based on the view's `sizeThatFits`.
+
+- Add `isAccessibilityElement` to `Label` and `AttributedLabel`. ([#120])
+- Add `lineHeight` to `Label` for specifying custom line heights. `AttributedLabel` has a `textRectOffset` property to support this. ([#120])
 
 ### Removed
 
@@ -301,7 +306,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[master]: https://github.com/square/Blueprint/compare/0.11.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.12.2...HEAD
+[0.12.2]: https://github.com/square/Blueprint/compare/0.12.1...0.12.2
+[0.12.1]: https://github.com/square/Blueprint/compare/0.12.0...0.12.1
+[0.12.0]: https://github.com/square/Blueprint/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/square/Blueprint/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/square/Blueprint/compare/0.9.2...0.10.0
 [0.9.2]: https://github.com/square/Blueprint/compare/0.9.1...0.9.2
@@ -315,6 +323,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#120]: https://github.com/square/Blueprint/pull/120
 [#102]: https://github.com/square/Blueprint/pull/102
 [#101]: https://github.com/square/Blueprint/pull/101
 [#100]: https://github.com/square/Blueprint/pull/100
