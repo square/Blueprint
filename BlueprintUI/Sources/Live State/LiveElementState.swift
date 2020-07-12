@@ -21,7 +21,7 @@ final class LiveElementState : Measurable // TODO eventually conform in a smalle
 {
     // MARK: Element Data
     
-    private let key : AnyHashable?
+    let key : AnyHashable?
     
     private(set) var element : Element
     private(set) var elementContent : ElementContent

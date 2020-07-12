@@ -119,6 +119,14 @@ extension ElementContent {
 }
 
 
+public protocol AnyElementContentChild {
+
+    var element: Element { get }
+    
+    var key: AnyHashable? { get }
+}
+
+
 fileprivate protocol ContentStorage {
     var childCount: Int { get }
     
@@ -132,60 +140,34 @@ fileprivate protocol ContentStorage {
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
-extension ElementContent {
 
-    public struct Builder<LayoutType: Layout> {
+final class LiveElementStorage<LayoutType: Layout> : ContentStorage {
 
-        /// The layout object that is ultimately responsible for measuring
-        /// and layout tasks.
-        public var layout: LayoutType
-
-        /// Child elements.
-        fileprivate var children: [Child] = []
-
-        init(layout: LayoutType) {
-            self.layout = layout
-        }
-    }
-}
-
-extension ElementContent.Builder {
-
-    /// Adds the given child element.
-    public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil, element: Element) {
-        let child = Child(
-            traits: traits,
-            key: key,
-            content: element.content,
-            element: element
-        )
-        
-        children.append(child)
-    }
-
-}
-
-extension ElementContent.Builder: ContentStorage {
-
-    var childCount: Int {
-        return children.count
+    let live : LiveElementState
+    let layout : LayoutType
+    
+    init(_ live : LiveElementState, layout : LayoutType) {
+        self.live = live
+        self.layout = layout
     }
     
-    func children(in environment : Environment) -> [AnyElementContentChild]
-    {
-        return self.children
+    var childCount: Int {
+        self.live.children.count
     }
-
+    
+    func children(in environment: Environment) -> [AnyElementContentChild] {
+        fatalError()
+    }
+    
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
         let layoutItems = self.layoutItems(in: environment)
         return layout.measure(in: constraint, items: layoutItems)
     }
-
-    func performLayout(
-        attributes: LayoutAttributes,
-        environment: Environment)
-        -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
-    {
+    
+    func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        
+        let children = self.live.children
+        
         let layoutItems = self.layoutItems(in: environment)
         let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
@@ -201,7 +183,7 @@ extension ElementContent.Builder: ContentStorage {
             let resultNode = LayoutResultNode(
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
-                content: currentChild.content,
+                content: currentChild.elementContent,
                 environment: environment
             )
 
@@ -215,32 +197,111 @@ extension ElementContent.Builder: ContentStorage {
 
         return result
     }
-
-    private func layoutItems(in environment: Environment) -> [(LayoutType.Traits, Measurable)] {
-        return children.map { ($0.traits, $0.content.measurable(in: environment)) }
-    }
-}
-
-
-public protocol AnyElementContentChild {
-
-    var element: Element { get }
     
-    var key: AnyHashable? { get }
-}
-
-extension ElementContent.Builder {
-
-    fileprivate struct Child : AnyElementContentChild {
-
-        var traits: LayoutType.Traits
-        var key: AnyHashable?
-        var content: ElementContent
-        var element: Element
-
+    private func layoutItems(in environment: Environment) -> [(LayoutType.Traits, Measurable)] {
+        return self.live.children.map { ($0.traits, $0.content.measurable(in: environment)) }
     }
-
 }
+
+
+extension ElementContent {
+
+    public struct Builder<LayoutType: Layout> : ContentStorage {
+        
+        func toLiveElementStorage(with live : LiveElementState) -> LiveElementStorage<LayoutType>
+        {
+            LiveElementStorage(live, layout: self.layout)
+        }
+
+        /// The layout object that is ultimately responsible for measuring
+        /// and layout tasks.
+        public var layout: LayoutType
+
+        /// Child elements.
+        fileprivate var children: [Child] = []
+
+        init(layout: LayoutType) {
+            self.layout = layout
+        }
+        
+        /// Adds the given child element.
+        public mutating func add(traits: LayoutType.Traits = LayoutType.defaultTraits, key: AnyHashable? = nil, element: Element) {
+            let child = Child(
+                traits: traits,
+                key: key,
+                content: element.content,
+                element: element
+            )
+            
+            children.append(child)
+        }
+        
+        fileprivate struct Child : AnyElementContentChild {
+
+            var traits: LayoutType.Traits
+            var key: AnyHashable?
+            var content: ElementContent
+            var element: Element
+
+        }
+        
+        // MARK: ContentStorage
+        
+        var childCount: Int {
+            return children.count
+        }
+        
+        func children(in environment : Environment) -> [AnyElementContentChild]
+        {
+            return self.children
+        }
+
+        func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+            let layoutItems = self.layoutItems(in: environment)
+            return layout.measure(in: constraint, items: layoutItems)
+        }
+
+        func performLayout(
+            attributes: LayoutAttributes,
+            environment: Environment)
+            -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        {
+            let layoutItems = self.layoutItems(in: environment)
+            let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
+
+            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+            result.reserveCapacity(children.count)
+            
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+
+            for index in 0..<children.count {
+                let currentChildLayoutAttributes = childAttributes[index]
+                let currentChild = children[index]
+
+                let resultNode = LayoutResultNode(
+                    element: currentChild.element,
+                    layoutAttributes: currentChildLayoutAttributes,
+                    content: currentChild.content,
+                    environment: environment
+                )
+
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: currentChild.element),
+                    key: currentChild.key
+                )
+
+                result.append((identifier: identifier, node: resultNode))
+            }
+
+            return result
+        }
+
+        private func layoutItems(in environment: Environment) -> [(LayoutType.Traits, Measurable)] {
+            return children.map { ($0.traits, $0.content.measurable(in: environment)) }
+        }
+    }
+}
+
 
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
