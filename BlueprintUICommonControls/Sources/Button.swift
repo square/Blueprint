@@ -32,6 +32,22 @@ public struct Button: Element {
 
 }
 
+public extension Element {
+
+    /// Wraps the element in a `Button` element that calls the provided handler when tapped.
+    func button(
+        isEnabled: Bool = true,
+        onTap: @escaping () -> Void
+    ) -> Button {
+        Button(
+            isEnabled: isEnabled,
+            onTap: onTap,
+            wrapping: self
+        )
+    }
+
+}
+
 extension Button {
 
     fileprivate final class NativeButton: UIControl {
