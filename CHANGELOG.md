@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.13.0] - 07-20-2020
+
+### Fixed
+
 - [Update the scroll indicator inset](https://github.com/square/Blueprint/pull/117) when adjusting the content inset.
 
 - `Label` & `AttributedLabel` use an internal `UILabel` for measurement. This fixes measurement when there is a line limit set. However, it also means that the screen scale cannot be specified and is always assumed to be `UIScreen.main.scale`. These elements may not be measured correctly if they are placed on a screen other than `UIScreen.main`. ([#120])
@@ -43,21 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `isAccessibilityElement` to `Label` and `AttributedLabel`. ([#120])
 - Add `lineHeight` to `Label` for specifying custom line heights. `AttributedLabel` has a `textRectOffset` property to support this. ([#120])
 
-### Removed
-
 ### Changed
 
 - [Update Demo app](https://github.com/square/Blueprint/pull/116) to support more demo screen types.
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.12.2] - 06-08-2020
 
@@ -306,7 +314,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.12.2...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/square/Blueprint/compare/0.13.0...0.12.2
 [0.12.2]: https://github.com/square/Blueprint/compare/0.12.1...0.12.2
 [0.12.1]: https://github.com/square/Blueprint/compare/0.12.0...0.12.1
 [0.12.0]: https://github.com/square/Blueprint/compare/0.11.0...0.12.0
