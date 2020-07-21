@@ -27,7 +27,7 @@ import UIKit
 /// ```
 public final class BlueprintView: UIView {
 
-    private var needsViewHierarchyUpdate: Bool = true
+    private(set) var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
 
@@ -39,6 +39,11 @@ public final class BlueprintView: UIView {
     /// The root element that is displayed within the view.
     public var element: Element? {
         didSet {
+            // Minor performance optimization: We do not need to update anything if the element remains nil.
+            if oldValue == nil && self.element == nil {
+                return
+            }
+            
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
         }

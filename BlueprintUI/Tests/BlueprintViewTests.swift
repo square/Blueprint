@@ -140,7 +140,18 @@ class BlueprintViewTests: XCTestCase {
             XCTAssertEqual(node.view.tag, tags[index])
         }
     }
-
+    
+    func test_nil_element() {
+        
+        let view = BlueprintView()
+        view.layoutIfNeeded()
+        
+        XCTAssertNil(view.element)
+        XCTAssertEqual(view.needsViewHierarchyUpdate, false)
+        
+        view.element = nil
+        XCTAssertEqual(view.needsViewHierarchyUpdate, false)
+    }
 }
 
 fileprivate struct MeasurableElement : Element {
