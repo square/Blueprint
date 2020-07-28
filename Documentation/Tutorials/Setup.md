@@ -23,6 +23,7 @@ bundle install
 Next, we'll use CocoaPods to integrate the workspace that we will use for completing the tutorials.
 
 ```bash
+cd SampleApp
 bundle exec pod install
 ```
 
