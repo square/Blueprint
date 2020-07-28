@@ -44,4 +44,4 @@ Tutorial 1 (Completed)
 /// etc...
 ```
 
-To follow along with [Tutorial 1](./Tutorial1.md), navigate to `Tutorials` > `Tutorial 1` in the project navigator to see the source dode. Also be sure to select the `Tutorial 1` target before building so you can see the tutorial running in the simulator.
+To follow along with [Tutorial 1](./Tutorial1.md), navigate to `Tutorials` > `Tutorial 1` in the project navigator to see the source code. Also be sure to select the `Tutorial 1` target before building so you can see the tutorial running in the simulator.
