@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Introduce `AccessibilityContainer` element for wrapping an element with multiple sub-elements that should be in a voice over container.
+
 ### Removed
 
 ### Changed
