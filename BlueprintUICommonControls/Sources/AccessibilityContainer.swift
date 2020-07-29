@@ -48,7 +48,7 @@ extension AccessibilityContainer {
     private final class AccessibilityContainerView: UIView {
         override var accessibilityElements: [Any]? {
             get { recursiveAccessibleSubviews() }
-            set { fatalError() }
+            set { fatalError("This property is not settable") }
         }
     }
 }
