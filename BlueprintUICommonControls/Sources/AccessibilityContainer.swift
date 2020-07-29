@@ -54,7 +54,7 @@ extension AccessibilityContainer {
 }
 
 extension UIView {
-    fileprivate func recursiveAccessibleSubviews() -> [Any] {
+    func recursiveAccessibleSubviews() -> [Any] {
         subviews.flatMap { subview -> [Any] in
             if let accessibilityElements = subview.accessibilityElements {
                 return accessibilityElements
