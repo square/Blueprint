@@ -42,6 +42,15 @@ class TextFieldTests: XCTestCase {
                 identifier: "right-aligned")
         }
 
+        do {
+            var field = TextField(text: "Title font")
+            field.font = .preferredFont(forTextStyle: .title1)
+            compareSnapshot(
+                of: field,
+                size: CGSize(width: 200, height: 44),
+                identifier: "title-font")
+        }
+
     }
 
 }
