@@ -33,7 +33,7 @@ struct BlueSquare: Element {
 
 ## `backingViewDescription(bounds:subtreeExtent:)`
 
-If the element is be view-backed, it should return a view description from this method.
+If the element is view-backed, it should return a view description from this method.
 
 This method is called after layout is complete, and the passed in parameters provide information about the layout:
 
