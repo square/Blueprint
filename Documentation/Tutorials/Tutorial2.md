@@ -83,8 +83,8 @@ struct ReceiptElement: ProxyElement {
         label.color = .darkGray
 
         let inset = Inset(
-            wrapping: label,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: label)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight // Stretches content to fill width, but sizes height to fit
