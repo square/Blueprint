@@ -201,14 +201,14 @@ struct LineItemElement: ProxyElement {
 
             row.horizontalUnderflow = .spaceEvenly
 
-            var titleLabel = Label(text: title)
+            let titleLabel = Label(text: title)
             row.add(child: titleLabel)
 
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
             let formattedPrice = formatter.string(from: NSNumber(value: price)) ?? ""
 
-            var priceLabel = Label(text: formattedPrice)
+            let priceLabel = Label(text: formattedPrice)
             row.add(child: priceLabel)
 
         }
