@@ -92,6 +92,16 @@ extension SizeConstraint {
                 return 0.0
             }
         }
+
+        /// The constraint value in this dimension, or `nil` if this dimension is unconstrained.
+        public var constrainedValue: CGFloat? {
+            switch self {
+            case .atMost(let value):
+                return value
+            case .unconstrained:
+                return nil
+            }
+        }
         
         private static var maxValue : CGFloat = .greatestFiniteMagnitude
 
