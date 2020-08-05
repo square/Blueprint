@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Default `ScrollView.delaysContentTouches` to `true` ([#132](https://github.com/square/Blueprint/pull/132))
+
 ### Deprecated
 
 ### Security

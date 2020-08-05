@@ -29,7 +29,7 @@ public struct ScrollView: Element {
     public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     public var keyboardAdjustmentMode: KeyboardAdjustmentMode = .adjustsWhenVisible
 
-    public var delaysContentTouches: Bool = false
+    public var delaysContentTouches: Bool = true
 
 
     public init(
