@@ -233,7 +233,7 @@ extension ElementPreview {
         private func constrained(
             element : Element
         ) -> some View {
-            GeometryReader { info in
+            SwiftUI.GeometryReader { info in
                 return ElementView(
                     element: ConstrainedSize(
                         width: .atMost(info.size.width),

@@ -24,7 +24,9 @@ public struct EnvironmentReader: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(build: self.elementRepresentation)
+        return ElementContent { (_, environment) in
+            self.elementRepresentation(environment)
+        }
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
