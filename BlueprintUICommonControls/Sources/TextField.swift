@@ -12,6 +12,7 @@ public struct TextField: Element {
     public var isEnabled: Bool = true
     public var textAlignment: NSTextAlignment = .left
     public var font: UIFont = .preferredFont(forTextStyle: .body)
+    public var textColor: UIColor = .black
 
     public var clearButtonMode: UITextField.ViewMode = .never
 
@@ -46,6 +47,7 @@ public struct TextField: Element {
             configuration[\.isEnabled] = isEnabled
             configuration[\.textAlignment] = textAlignment
             configuration[\.font] = font
+            configuration[\.textColor] = textColor
 
             configuration[\.clearButtonMode] = clearButtonMode
 
