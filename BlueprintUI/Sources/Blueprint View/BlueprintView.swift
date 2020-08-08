@@ -238,6 +238,10 @@ public final class BlueprintView: UIView {
             environment.safeAreaInsets = safeAreaInsets
         }
 
+        if let window = window {
+            environment.windowSize = window.bounds.size
+        }
+
         return environment
     }
 }
