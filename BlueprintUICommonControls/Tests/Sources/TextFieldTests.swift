@@ -51,6 +51,15 @@ class TextFieldTests: XCTestCase {
                 identifier: "title-font")
         }
 
+        do {
+            var field = TextField(text: "Blue text color")
+            field.textColor = .blue
+            compareSnapshot(
+                of: field,
+                size: CGSize(width: 200, height: 44),
+                identifier: "blue-text-color")
+        }
+
     }
 
 }
