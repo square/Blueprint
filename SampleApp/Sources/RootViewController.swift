@@ -24,6 +24,9 @@ final class RootViewController : UIViewController
             DemoItem(title: "Keyboard Scrolling", onTap: { [weak self] in
                 self?.push(ScrollViewKeyboardViewController())
             }),
+            DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
+                self?.push(ResponsiveViewController())
+            }),
         ]
     }
     

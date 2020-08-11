@@ -57,11 +57,13 @@ extension ElementContent {
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
-    /// - parameter builder: A closure that provides the content `Element` based on the provided `Environment`.
+    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey`
+    ///     documentation for more.
+    /// - parameter builder: A closure that provides the content `Element` based on the provided `SizeConstraint`
+    ///     and `Environment`.
     public init(
         measurementCachingKey : MeasurementCachingKey? = nil,
-        build builder: @escaping (Environment) -> Element
+        build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
         self.measurementCachingKey = measurementCachingKey
         self.storage = LazyStorage(builder: builder)
@@ -349,14 +351,15 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 private struct LazyStorage: ContentStorage {
     let childCount = 1
 
-    var builder: (Environment) -> Element
+    var builder: (SizeConstraint, Environment) -> Element
 
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment)
         -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
-        let child = buildChild(in: environment)
+        let constraint = SizeConstraint(attributes.bounds.size)
+        let child = buildChild(in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
@@ -371,12 +374,12 @@ private struct LazyStorage: ContentStorage {
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        let child = buildChild(in: environment)
+        let child = buildChild(in: constraint, environment: environment)
         return child.content.measure(in: constraint, environment: environment)
     }
 
-    private func buildChild(in environment: Environment) -> Element {
-        return builder(environment)
+    private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
+        return builder(constraint, environment)
     }
 }
 
