@@ -2,14 +2,14 @@
 
 1. You must be listed as an owner of the pods `BlueprintUI` and `BlueprintUICommonControls`.
 
-To check this run:
+   To check this run:
 
-```bash
-bundle exec pod trunk info BlueprintUI
-bundle exec pod trunk info BlueprintUICommonControls
-```
+   ```bash
+   bundle exec pod trunk info BlueprintUI
+   bundle exec pod trunk info BlueprintUICommonControls
+   ```
 
-See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/making/getting-setup-with-trunk) for more information about setting up credentials on your device. If you need to be added as an owner, ping in #blueprint on Slack (Square only).
+   See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/making/getting-setup-with-trunk) for more information about setting up credentials on your device. If you need to be added as an owner, ping in #blueprint on Slack (Square only).
 
 1. Make sure you're on the `main` branch, and `git pull` to get the latest commits.
 
@@ -17,7 +17,9 @@ See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/mak
 
 1. Update the library version in both `BlueprintUI.podspec` and `BlueprintUICommonControls.podspec` if it has not already been updated (it should match the version number that you are about to release).
 
-1. Update `CHANGELOG.md` (in the root of the repo), moving current changes under `Master` to a new section under `Past Releases` for the version you are releasing.
+1. Update `CHANGELOG.md` (in the root of the repo), moving current changes under `Main` to a new section under `Past Releases` for the version you are releasing.
+  
+   The changelog uses [reference links](https://daringfireball.net/projects/markdown/syntax#link) to link each version's changes. Remember to add a link to the new version at the bottom of the file, and to update the link to `[main]`.
 
 1. Change directory into the `SampleApp` dir: `cd SampleApp`.
 
@@ -39,12 +41,11 @@ See [the CocoaPods documentation for pod trunk](https://guides.cocoapods.org/mak
 
 1. Publish to CocoaPods
 
-When linting before publishing, CocoaPods will build `BlueprintUICommonControls` using the latest published version of `BlueprintUI` (not your local version). You will need to run `pod repo update` to pull the new version of `BlueprintUI` into your local specs repo immediately after publishing it.
+   Note: You may also need to quit Xcode before running these commands in order for the linting builds to succeed.
 
-Note: You may also need to quit Xcode before running these commands in order for the linting builds to succeed.
-
-```bash
-bundle exec pod trunk push BlueprintUI.podspec
-bundle exec pod repo update
-bundle exec pod trunk push BlueprintUICommonControls.podspec
-```
+   ```bash
+   bundle exec pod trunk push BlueprintUI.podspec
+   # The --synchronous argument ensures this command builds against the
+   # version of BlueprintUI that we just published.
+   bundle exec pod trunk push --synchronous BlueprintUICommonControls.podspec
+   ```
