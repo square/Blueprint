@@ -231,6 +231,15 @@ fileprivate final class BoxView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.frame = bounds
+
+        if layer.shadowColor != nil {
+            layer.shadowPath = CGPath(
+                roundedRect: bounds,
+                cornerWidth: layer.cornerRadius,
+                cornerHeight: layer.cornerRadius,
+                transform: nil
+            )
+        }
     }
     
 }

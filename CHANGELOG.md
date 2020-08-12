@@ -49,6 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Misc
 
+- Set an explicit shadow path on `Box` ([#137](https://github.com/square/Blueprint/pull/137))
+
 # Past Releases
 
 ## [0.13.1] - 07-30-2020
