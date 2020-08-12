@@ -12,6 +12,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `textColor` property on TextField ([#133](https://github.com/square/Blueprint/pull/133)).
+- Add the `windowSize` environment key. ([#134])
+
+- Add `GeometryReader`. ([#135])
+
+  This element allow you to compose elements whose contents depend on the amount of space available.
+
+  Here is an example that dynamically chooses an image based on the width available:
+
+  ```swift
+  GeometryReader { (geometry) -> Element in
+      let image: UIImage
+      switch geometry.constraint.width.maximum {
+      case ..<100:
+          image = UIImage(named: "small")!
+      case 100..<500:
+          image = UIImage(named: "medium")!
+      default:
+          image = UIImage(named: "large")!
+      }
+      return Image(image: image)
+  }
+  ```
 
 ### Removed
 
@@ -328,7 +350,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.13.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.13.1...HEAD
+[0.13.1]: https://github.com/square/Blueprint/compare/0.13.1...0.13.0
 [0.13.0]: https://github.com/square/Blueprint/compare/0.13.0...0.12.2
 [0.12.2]: https://github.com/square/Blueprint/compare/0.12.1...0.12.2
 [0.12.1]: https://github.com/square/Blueprint/compare/0.12.0...0.12.1
@@ -346,6 +369,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#135]: https://github.com/square/Blueprint/pull/135
+[#134]: https://github.com/square/Blueprint/pull/134
 [#120]: https://github.com/square/Blueprint/pull/120
 [#102]: https://github.com/square/Blueprint/pull/102
 [#101]: https://github.com/square/Blueprint/pull/101
