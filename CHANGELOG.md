@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.14.0] - 2020-08-12
+
+### Added
+
 - Add `textColor` property on TextField ([#133](https://github.com/square/Blueprint/pull/133)).
 - Add the `windowSize` environment key. ([#134])
 
@@ -35,25 +53,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
-### Removed
-
 ### Changed
 
 - Default `ScrollView.delaysContentTouches` to `true` ([#132](https://github.com/square/Blueprint/pull/132))
-
-### Deprecated
-
-### Security
-
-### Documentation
 
 ### Misc
 
 - Set an explicit shadow path on `Box` ([#137](https://github.com/square/Blueprint/pull/137))
 
-# Past Releases
-
-## [0.13.1] - 07-30-2020
+## [0.13.1] - 2020-07-30
 
 ### Added
 
@@ -61,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `font` property on TextField ([#127](https://github.com/square/Blueprint/pull/127)).
 
-## [0.13.0] - 07-20-2020
+## [0.13.0] - 2020-07-20
 
 ### Fixed
 
@@ -103,7 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Update Demo app](https://github.com/square/Blueprint/pull/116) to support more demo screen types.
 
-## [0.12.2] - 06-08-2020
+## [0.12.2] - 2020-06-08
 
 ### Fixed
 
@@ -113,13 +121,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add [delaysContentTouches](https://github.com/square/Blueprint/pull/109) to the `ScrollView` element.
 
-## [0.12.1] - 06-05-2020
+## [0.12.1] - 2020-06-05
 
 ### Fixed
 
 - Use default environment when [measuring `BlueprintView`](https://github.com/square/Blueprint/pull/107).
 
-## [0.12.0] - 06-04-2020
+## [0.12.0] - 2020-06-04
 
 ### Fixed
 
@@ -350,7 +358,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.13.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.14.0...HEAD
+[0.14.0]: https://github.com/square/Blueprint/compare/0.14.0...0.13.1
 [0.13.1]: https://github.com/square/Blueprint/compare/0.13.1...0.13.0
 [0.13.0]: https://github.com/square/Blueprint/compare/0.13.0...0.12.2
 [0.12.2]: https://github.com/square/Blueprint/compare/0.12.1...0.12.2
