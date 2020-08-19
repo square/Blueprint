@@ -109,8 +109,8 @@ public extension UIViewElement {
             MeasurementCachingKey(type: Self.self, input: $0)
         }
         
-        return ElementContent(measurementCachingKey: key) {
-            UIViewElementMeasurer.shared.measure(element: self, in: $0)
+        return ElementContent(measurementCachingKey: key) { constraint, _ in
+            UIViewElementMeasurer.shared.measure(element: self, in: constraint)
         }
     }
     

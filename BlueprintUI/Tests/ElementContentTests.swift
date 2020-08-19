@@ -78,7 +78,7 @@ fileprivate struct MeasurableElement : Element {
     static var measureCount : Int = 0
     
     var content: ElementContent {
-        ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint -> CGSize in
+        ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint, _ -> CGSize in
             Self.measureCount += 1
             return .init(width: 20.0, height: 20.0)
         }

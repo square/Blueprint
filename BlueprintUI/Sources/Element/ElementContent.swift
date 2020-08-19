@@ -109,9 +109,10 @@ extension ElementContent {
         measurementCachingKey : MeasurementCachingKey? = nil
     ) {
         self = ElementContent(
-            layout: MeasurableLayout(measurable: measurable),
             measurementCachingKey: measurementCachingKey,
-            configure: { _ in }
+            measureFunction: { constraint, _ in
+                measurable.measure(in: constraint)
+            }
         )
     }
 
@@ -121,21 +122,15 @@ extension ElementContent {
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint`.
     public init(
         measurementCachingKey : MeasurementCachingKey? = nil,
-        measureFunction: @escaping (SizeConstraint) -> CGSize
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
-        struct Measurer: Measurable {
-            var _measure: (SizeConstraint) -> CGSize
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                return _measure(constraint)
-            }
-        }
-        
-        self = ElementContent(measurable: Measurer(_measure: measureFunction), measurementCachingKey: measurementCachingKey)
+        self.measurementCachingKey = measurementCachingKey
+        self.storage = LeafStorage(measurer: measureFunction)
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
     public init(intrinsicSize: CGSize) {
-        self = ElementContent(measureFunction: { _ in intrinsicSize })
+        self = ElementContent(measureFunction: { _, _ in intrinsicSize })
     }
 }
 
@@ -383,6 +378,23 @@ private struct LazyStorage: ContentStorage {
     }
 }
 
+/// Content storage suitable for elements with no children
+private struct LeafStorage: ContentStorage {
+    let childCount = 0
+
+    var measurer: (SizeConstraint, Environment) -> CGSize
+
+    func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+        measurer(constraint, environment)
+    }
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        []
+    }
+}
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
@@ -417,24 +429,6 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
 
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
         return LayoutAttributes(size: size)
-    }
-
-}
-
-
-// Used for empty elements with an intrinsic size
-fileprivate struct MeasurableLayout: Layout {
-
-    var measurable: Measurable
-
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        precondition(items.isEmpty)
-        return measurable.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.isEmpty)
-        return []
     }
 
 }
