@@ -8,9 +8,11 @@ gen/
 xcuserdata/
 
 # Cocoapods
-
 Pods/
 *.xcworkspace
 
 # SPM
 .swiftpm/
+
+# jazzy
+.docs/
