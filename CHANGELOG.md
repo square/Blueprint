@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `addFixed(child:)` and `addFlexible(child:)` methods to `StackElement` for adding children with a grow & shrink priority of 0.0 and 1.0 respectively.
 
+- Add [`Fill` element](https://github.com/square/Blueprint/pull/121), which supports growing a child element to take up all the space given by a parent during measurement and layout.
+
 ### Removed
 
 ### Changed
