@@ -1,0 +1,73 @@
+module: Blueprint
+title: Blueprint
+github_url: https://github.com/square/Blueprint
+skip_undocumented: false
+output: .docs
+theme: fullwidth
+# TODO: to enable this, first rename docs whose names conflict with symbols
+# documentation: Documentation/**/*.md
+custom_categories:
+  # - name: Getting Started
+  #   children:
+  #   - HelloWorld
+  #   - ElementHierarchy
+  #   - CustomElements
+  #   - Layout
+  # - name: Reference
+  #   children:
+  #   - Element
+  #   - BlueprintView
+  #   - ViewDescription
+  #   - Transitions
+  # - name: Tutorials
+  #   children:
+  #   - Setup
+  #   - Tutorial1
+  #   - Tutorial2
+  - name: Creating Custom Elements
+    children:
+    - Element
+    - ProxyElement
+    - ElementContent
+    - ViewDescription
+    - LayoutTransition
+    - VisibilityTransition
+  - name: Displaying Elements
+    children:
+    - BlueprintView
+    - ElementPreview
+  - name: Common Elements
+    children:
+    - AccessibilityBlocker
+    - AccessibilityContainer
+    - AccessibilityElement
+    - AdaptedEnvironment
+    - EnvironmentReader
+    - Aligned
+    - AttributedLabel
+    - Box
+    - Button
+    - Centered
+    - Column
+    - ConstrainedAspectRatio
+    - ConstrainedSize
+    - Empty
+    - EqualStack
+    - GeometryReader
+    - Image
+    - Inset
+    - Label
+    - Overlay
+    - Row
+    - Rule
+    - ScrollView
+    - SegmentedControl
+    - Spacer
+    - Tappable
+    - TextField
+    - TransitionContainer
+  - name: Environment
+    children:
+    - Environment
+    - EnvironmentKey
+custom_categories_unlisted_prefix: ''

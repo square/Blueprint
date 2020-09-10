@@ -1,0 +1,25 @@
+name: Generate and publish docs
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Generate docs with jazzy and publish to Github pages
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Generate Docs
+        run: |
+          bundle
+          ./generate_docs.sh
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: .docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
