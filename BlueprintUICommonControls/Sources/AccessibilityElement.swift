@@ -28,6 +28,7 @@ public struct AccessibilityElement: Element {
     public var hint: String?
     public var identifier: String?
     public var traits: Set<Trait>
+    public var accessibilityFrameSize: CGSize?
     public var wrappedElement: Element
 
     public init(
@@ -36,6 +37,7 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         traits: Set<Trait> = [],
+        accessibilityFrameSize: CGSize? = nil,
         wrapping element: Element
     ) {
         self.label = label
@@ -43,6 +45,7 @@ public struct AccessibilityElement: Element {
         self.hint = hint
         self.identifier = identifier
         self.traits = traits
+        self.accessibilityFrameSize = accessibilityFrameSize
         self.wrappedElement = element
     }
 
@@ -96,20 +99,44 @@ public struct AccessibilityElement: Element {
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return UIView.describe { config in
+        return AccessibilityView.describe { config in
             config[\.accessibilityLabel] = label
             config[\.accessibilityValue] = value
             config[\.accessibilityHint] = hint
             config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
+            config[\.accessibilityFrameSize] = accessibilityFrameSize
+        }
+    }
+
+    private final class AccessibilityView: UIView {
+
+        var accessibilityFrameSize: CGSize?
+
+        override var accessibilityFrame: CGRect {
+            get {
+                guard let accessibilityFrameSize = accessibilityFrameSize else {
+                    return UIAccessibility.convertToScreenCoordinates(bounds, in: self)
+                }
+
+                let adjustedFrame = bounds.insetBy(
+                    dx: bounds.width - accessibilityFrameSize.width,
+                    dy: bounds.height - accessibilityFrameSize.height
+                )
+
+                return UIAccessibility.convertToScreenCoordinates(adjustedFrame, in: self)
+            }
+            set {
+                fatalError("accessibilityFrame is not settable on AccessibilityView")
+            }
         }
     }
 }
 
 
 public extension Element {
-    
+
     /// Wraps the element to provide the passed accessibility
     /// options to the accessibility system.
     func accessibility(
@@ -117,15 +144,16 @@ public extension Element {
         value: String? = nil,
         hint: String? = nil,
         identifier: String? = nil,
-        traits: Set<AccessibilityElement.Trait> = []
-        ) -> AccessibilityElement
-    {
+        traits: Set<AccessibilityElement.Trait> = [],
+        accessibilityFrameSize: CGSize? = nil
+    ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
             value: value,
             hint: hint,
             identifier: identifier,
             traits: traits,
+            accessibilityFrameSize: accessibilityFrameSize,
             wrapping: self
         )
     }
