@@ -18,13 +18,26 @@ class BoxTests: XCTestCase {
             identifier: "clear")
     }
 
-    func test_cornerRadius() {
-        var box = Box()
-        box.backgroundColor = .blue
-        box.cornerStyle = .rounded(radius: 10.0)
-        compareSnapshot(
-            of: box,
-            size: CGSize(width: 100, height: 100))
+    func test_cornerStyle() {
+        do {
+            var box = Box()
+            box.backgroundColor = .blue
+            box.cornerStyle = .semicircular
+            compareSnapshot(
+                of: box,
+                size: CGSize(width: 200, height: 100),
+                identifier: "semicircular")
+        }
+
+        do {
+            var box = Box()
+            box.backgroundColor = .blue
+            box.cornerStyle = .rounded(radius: 10.0)
+            compareSnapshot(
+                of: box,
+                size: CGSize(width: 100, height: 100),
+                identifier: "rounded")
+        }
     }
 
     func test_shadow() {
