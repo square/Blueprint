@@ -13,6 +13,8 @@ Pods/
 
 # SPM
 .swiftpm/
+.build/
+BlueprintUI.xcodeproj/
 
 # jazzy
 .docs/
