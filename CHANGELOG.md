@@ -33,6 +33,8 @@ Box(cornerStyle: .capsule)
 
 ### Changed
 
+- `BlueprintView` will call `layoutIfNeeded` on backing views during its layout pass. This allows backing views' subviews that are laid out during `layoutSubviews` to participate in animations. ([#139])
+
 ### Deprecated
 
 ### Security
@@ -396,6 +398,7 @@ Box(cornerStyle: .capsule)
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#139]: https://github.com/square/Blueprint/pull/139
 [#135]: https://github.com/square/Blueprint/pull/135
 [#134]: https://github.com/square/Blueprint/pull/134
 [#120]: https://github.com/square/Blueprint/pull/120
