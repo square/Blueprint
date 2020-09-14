@@ -13,6 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `addFixed(child:)` and `addFlexible(child:)` methods to `StackElement` for adding children with a grow & shrink priority of 0.0 and 1.0 respectively.
 
+- Add `capsule` case to `Box.CornerStyle` ([#145]). This addition sugars the following pattern  
+
+```
+GeometryReader { geometry in
+  Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
+}
+```
+
+into
+
+```
+Box(cornerStyle: .capsule)
+```
+
 ### Removed
 
 ### Changed
