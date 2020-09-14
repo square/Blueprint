@@ -152,6 +152,50 @@ class BlueprintViewTests: XCTestCase {
         view.element = nil
         XCTAssertEqual(view.needsViewHierarchyUpdate, false)
     }
+
+    func test_recursiveLayout() {
+        let view = BlueprintView()
+
+        var layoutRecursed = false
+
+        func onLayoutSubviews() {
+            layoutRecursed = true
+        }
+
+        struct TestElement: Element {
+            var onLayoutSubviews: () -> Void
+
+            var content: ElementContent {
+                ElementContent(intrinsicSize: .zero)
+            }
+
+            func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+                TestView.describe { (config) in
+                    config.apply { (view) in
+                        // make sure UIKit knows we want a chance for layout
+                        view.setNeedsLayout()
+                    }
+                    config[\.onLayoutSubviews] = self.onLayoutSubviews
+                }
+            }
+
+            class TestView: UIView {
+                var onLayoutSubviews: (() -> Void)?
+
+                override func layoutSubviews() {
+                    super.layoutSubviews()
+                    onLayoutSubviews?()
+                }
+            }
+        }
+
+        view.element = TestElement(onLayoutSubviews: onLayoutSubviews)
+
+        // trigger a layout pass
+        _ = view.currentNativeViewControllers
+
+        XCTAssertTrue(layoutRecursed)
+    }
 }
 
 fileprivate struct MeasurableElement : Element {
