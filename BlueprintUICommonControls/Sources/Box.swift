@@ -102,7 +102,7 @@ extension Box {
 
     public enum CornerStyle {
         case square
-        case semicircular
+        case capsule
         case rounded(radius: CGFloat)
     }
 
@@ -145,8 +145,8 @@ extension Box.CornerStyle {
         switch self {
         case .square:
             return 0
-        case .semicircular:
-            return bounds.height / 2.0
+        case .capsule:
+            return min(bounds.height, bounds.width) / 2.0
         case let .rounded(radius: radius):
             return radius
         }

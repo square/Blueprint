@@ -22,11 +22,16 @@ class BoxTests: XCTestCase {
         do {
             var box = Box()
             box.backgroundColor = .blue
-            box.cornerStyle = .semicircular
+            box.cornerStyle = .capsule
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 200, height: 100),
-                identifier: "semicircular")
+                identifier: "wideCapsule")
+
+            compareSnapshot(
+                of: box,
+                size: CGSize(width: 100, height: 200),
+                identifier: "longCapsule")
         }
 
         do {
