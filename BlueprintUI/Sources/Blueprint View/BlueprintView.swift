@@ -278,6 +278,12 @@ extension BlueprintView {
             layoutAttributes = node.layoutAttributes
             
             viewDescription.apply(to: view)
+
+            // After this view's children are updated, allow it to run a layout pass.
+            // This ensures backing view layout changes are contained in animation blocks.
+            defer {
+                view.layoutIfNeeded()
+            }
             
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update

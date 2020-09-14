@@ -48,8 +48,8 @@ public struct Box: Element {
                     view.backgroundColor = self.backgroundColor
                 }
 
-                if self.cornerStyle.radius != view.layer.cornerRadius {
-                    view.layer.cornerRadius = self.cornerStyle.radius
+                if self.cornerStyle.radius(for: bounds) != view.layer.cornerRadius {
+                    view.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
                 }
 
                 if self.borderStyle.color?.cgColor != view.layer.borderColor {
@@ -83,8 +83,8 @@ public struct Box: Element {
                     view.contentView.clipsToBounds = self.clipsContent
                 }
 
-                if self.cornerStyle.radius != view.contentView.layer.cornerRadius {
-                    view.contentView.layer.cornerRadius = self.cornerStyle.radius
+                if self.cornerStyle.radius(for: bounds) != view.contentView.layer.cornerRadius {
+                    view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
                 }
 
             })
@@ -102,6 +102,7 @@ extension Box {
 
     public enum CornerStyle {
         case square
+        case capsule
         case rounded(radius: CGFloat)
     }
 
@@ -140,10 +141,12 @@ public extension Element {
 
 extension Box.CornerStyle {
 
-    fileprivate var radius: CGFloat {
+    fileprivate func radius(for bounds: CGRect) -> CGFloat {
         switch self {
         case .square:
             return 0
+        case .capsule:
+            return min(bounds.height, bounds.width) / 2.0
         case let .rounded(radius: radius):
             return radius
         }

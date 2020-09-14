@@ -13,9 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `addFixed(child:)` and `addFlexible(child:)` methods to `StackElement` for adding children with a grow & shrink priority of 0.0 and 1.0 respectively.
 
+- Add `capsule` case to `Box.CornerStyle` ([#145]). This addition sugars the following pattern  
+
+```
+GeometryReader { geometry in
+  Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
+}
+```
+
+into
+
+```
+Box(cornerStyle: .capsule)
+```
+
+- Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over.
+
 ### Removed
 
 ### Changed
+
+- `BlueprintView` will call `layoutIfNeeded` on backing views during its layout pass. This allows backing views' subviews that are laid out during `layoutSubviews` to participate in animations. ([#139])
 
 ### Deprecated
 
@@ -380,6 +398,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#139]: https://github.com/square/Blueprint/pull/139
 [#135]: https://github.com/square/Blueprint/pull/135
 [#134]: https://github.com/square/Blueprint/pull/134
 [#120]: https://github.com/square/Blueprint/pull/120
