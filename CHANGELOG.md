@@ -27,6 +27,8 @@ into
 Box(cornerStyle: .capsule)
 ```
 
+- Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over.
+
 ### Removed
 
 ### Changed
