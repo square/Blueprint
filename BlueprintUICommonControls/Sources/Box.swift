@@ -236,12 +236,10 @@ fileprivate final class BoxView: UIView {
         contentView.frame = bounds
 
         if layer.shadowColor != nil {
-            layer.shadowPath = CGPath(
+            layer.shadowPath = UIBezierPath(
                 roundedRect: bounds,
-                cornerWidth: layer.cornerRadius,
-                cornerHeight: layer.cornerRadius,
-                transform: nil
-            )
+                cornerRadius: layer.cornerRadius
+            ).cgPath
         }
     }
     
