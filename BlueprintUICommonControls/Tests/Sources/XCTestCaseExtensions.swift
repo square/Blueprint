@@ -30,7 +30,7 @@ extension XCTestCase {
 
 
         let testName = testName.prefix(testName.count - 2)
-        let majorVersion = UIDevice.current.systemVersion.components(separatedBy: ".")[0]
+        let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
         imageURL.appendPathComponent("\(testName)_\(identifier ?? "")_iOS-\(majorVersion).png")
 
         if let referenceImage = UIImage(contentsOfFile: imageURL.path) {
