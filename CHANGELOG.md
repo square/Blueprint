@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixes a crash that can occur in `Box` when specifying a corner radius and shadow. ([#149])
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.15.1] - 2020-09-16
+
+### Fixed
+
+- Fixes a crash that can occur in `Box` when specifying a corner radius and shadow. ([#149])
 
 ## [0.15.0] - 2020-09-14
 
@@ -389,6 +393,7 @@ Box(cornerStyle: .capsule)
 - First stable release.
 
 [main]: https://github.com/square/Blueprint/compare/0.15.0...HEAD
+[0.15.0]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/square/Blueprint/compare/0.13.1...0.14.0
 [0.13.1]: https://github.com/square/Blueprint/compare/0.13.0...0.13.1
