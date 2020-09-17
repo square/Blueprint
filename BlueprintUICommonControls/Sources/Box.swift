@@ -146,9 +146,10 @@ extension Box.CornerStyle {
         case .square:
             return 0
         case .capsule:
-            return min(bounds.height, bounds.width) / 2.0
+            return min(bounds.width, bounds.height) / 2
         case let .rounded(radius: radius):
-            return radius
+            let maximumRadius = min(bounds.width, bounds.height) / 2
+            return min(maximumRadius, radius)
         }
     }
 
