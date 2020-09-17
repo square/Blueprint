@@ -19,9 +19,7 @@ script:
 jobs:
   include:
   - name: "Cocoapods BlueprintUI"
-    xcode_scheme: BlueprintUI-Unit-Tests
-    xcode_workspace: SampleApp.xcworkspace
-    xcode_destination: platform=iOS Simulator,OS=14.0,name=iPhone 8
+    script: xcodebuild -workspace "SampleApp.xcworkspace" -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=14.0,name=iPhone 8"
     before_install:
       - cd SampleApp
       - bundle install
