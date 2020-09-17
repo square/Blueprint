@@ -1,0 +1,29 @@
+name: Swift
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+
+    runs-on: macos-latest
+    
+    strategy:
+      matrix: 
+        destination: ['platform=iOS Simulator,OS=10.3.1,name=iPhone 7', 'platform=iOS Simulator,OS=11.4,name=iPhone 7', 'platform=iOS Simulator,OS=12.4,name=iPhone 7', 'platform=iOS Simulator,OS=13.5,name=iPhone 7']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Change directory
+      run: cd SampleApp
+    - name: Bundle install
+      run: bundle install
+    - name: Pod install
+      run: bundle exec pod install --repo-update
+    - name: Run tests
+      run: xcodebuild -scheme "BlueprintUI-Package" test -destination "${destination}"
+      env:
+          destination: ${{ matrix.destination }}
