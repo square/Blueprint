@@ -87,6 +87,16 @@ class BoxTests: XCTestCase {
             of: element,
             size: CGSize(width: 100, height: 100))
     }
+
+    func test_largeCornerRadius() {
+        var element = InsettingElement()
+        element.box.backgroundColor = .blue
+        element.box.cornerStyle = .rounded(radius: 100)
+        element.box.shadowStyle = .simple(radius: 2, opacity: 1, offset: .zero, color: .red)
+        compareSnapshot(
+            of: element,
+            size: CGSize(width: 120, height: 100))
+    }
     
 }
 

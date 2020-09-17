@@ -146,9 +146,10 @@ extension Box.CornerStyle {
         case .square:
             return 0
         case .capsule:
-            return min(bounds.height, bounds.width) / 2.0
+            return min(bounds.width, bounds.height) / 2
         case let .rounded(radius: radius):
-            return radius
+            let maximumRadius = min(bounds.width, bounds.height) / 2
+            return min(maximumRadius, radius)
         }
     }
 
@@ -236,12 +237,10 @@ fileprivate final class BoxView: UIView {
         contentView.frame = bounds
 
         if layer.shadowColor != nil {
-            layer.shadowPath = CGPath(
+            layer.shadowPath = UIBezierPath(
                 roundedRect: bounds,
-                cornerWidth: layer.cornerRadius,
-                cornerHeight: layer.cornerRadius,
-                transform: nil
-            )
+                cornerRadius: layer.cornerRadius
+            ).cgPath
         }
     }
     
