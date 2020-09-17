@@ -10,6 +10,9 @@ jobs:
   test:
 
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: SampleApp
     
     strategy:
       matrix: 
@@ -17,8 +20,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Change directory
-      run: cd SampleApp
     - name: Bundle install
       run: bundle install
     - name: Pod install
