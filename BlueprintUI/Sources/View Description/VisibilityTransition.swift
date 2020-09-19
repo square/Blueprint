@@ -18,6 +18,13 @@ public struct VisibilityTransition {
         self.attributes = attributes
     }
 
+    /// Returns a `VisibilityTransition` that has no effect.
+    public static var none: VisibilityTransition {
+        return VisibilityTransition(
+            alpha: 1.0,
+            transform: CATransform3DIdentity)
+    }
+
     /// Returns a `VisibilityTransition` that scales in and out.
     public static var scale: VisibilityTransition {
         return VisibilityTransition(
