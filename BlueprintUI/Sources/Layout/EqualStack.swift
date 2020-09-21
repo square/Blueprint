@@ -65,6 +65,8 @@ extension EqualStack {
         var spacing: CGFloat
 
         func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
+            guard items.count > 0 else { return .zero }
+
             let totalSpacing = (spacing * CGFloat(items.count - 1))
             let itemConstraint: SizeConstraint
             switch direction {
