@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
+
 ### Changed
 
 ### Deprecated
