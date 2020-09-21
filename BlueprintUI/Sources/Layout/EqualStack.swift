@@ -65,7 +65,21 @@ extension EqualStack {
         var spacing: CGFloat
 
         func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-            let itemSizes = items.map { $1.measure(in: constraint) }
+            let totalSpacing = (spacing * CGFloat(items.count - 1))
+            let itemConstraint: SizeConstraint
+            switch direction {
+            case .horizontal:
+                itemConstraint = SizeConstraint(
+                    width: (constraint.width - totalSpacing) / CGFloat(items.count),
+                    height: constraint.height
+                )
+            case .vertical:
+                itemConstraint = SizeConstraint(
+                    width: constraint.width,
+                    height: (constraint.height - totalSpacing) / CGFloat(items.count)
+                )
+            }
+            let itemSizes = items.map { $1.measure(in: itemConstraint) }
 
             let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
             let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
@@ -88,16 +102,17 @@ extension EqualStack {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             guard items.count > 0 else { return [] }
 
+            let totalSpacing = (spacing * CGFloat(items.count - 1))
             let itemSize: CGSize
             switch direction {
             case .horizontal:
                 itemSize = CGSize(
-                    width: (size.width - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count),
+                    width: (size.width - totalSpacing) / CGFloat(items.count),
                     height: size.height)
             case .vertical:
                 itemSize = CGSize(
                     width: size.width,
-                    height: (size.height - (spacing * CGFloat(items.count - 1))) / CGFloat(items.count))
+                    height: (size.height - totalSpacing) / CGFloat(items.count))
             }
 
             var result: [LayoutAttributes] = []
