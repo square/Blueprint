@@ -43,31 +43,31 @@ public extension Element {
     /// Wraps the element in a transition container to provide an animated transition.
     ///
     /// - Parameters:
-    ///   - appear: The transition to use when the element appears. By default, `.none`.
-    ///   - disappear: The transition to use when the element disappears. By default, `.none`.
-    ///   - layout: The animation to use when the element changes layout. By default, `.none`.
+    ///   - onAppear: The transition to use when the element appears. By default, `.none`.
+    ///   - onDisappear: The transition to use when the element disappears. By default, `.none`.
+    ///   - onLayout: The animation to use when the element changes layout. By default, `.none`.
     func transition(
-        appear: VisibilityTransition = .none,
-        disappear: VisibilityTransition = .none,
-        layout: LayoutTransition = .none
+        onAppear: VisibilityTransition = .none,
+        onDisappear: VisibilityTransition = .none,
+        onLayout: LayoutTransition = .none
     ) -> TransitionContainer {
         TransitionContainer(
             wrapping: self,
-            appearingTransition: appear,
-            disappearingTransition: disappear,
-            layoutTransition: layout
+            appearingTransition: onAppear,
+            disappearingTransition: onDisappear,
+            layoutTransition: onLayout
         )
     }
 
     /// Wraps the element in a transition container to provide an animated transition when its visibility changes.
     ///
     /// - Parameters:
-    ///   - appearAndDisappear: The transition to use when the element appears and disappears.
-    func transition(appearAndDisappear: VisibilityTransition) -> TransitionContainer {
+    ///   - onAppearOrDisappear: The transition to use when the element appears or disappears.
+    func transition(_ onAppearOrDisappear: VisibilityTransition) -> TransitionContainer {
         TransitionContainer(
             wrapping: self,
-            appearingTransition: appearAndDisappear,
-            disappearingTransition: appearAndDisappear,
+            appearingTransition: onAppearOrDisappear,
+            disappearingTransition: onAppearOrDisappear,
             layoutTransition: .none
         )
     }

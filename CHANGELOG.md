@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Extend `TransitionContainer.init` to support further customization during initialization. ([#155])
 
-- Add `transition(appear:disappear:layout)` and `transition(appearAndDisappear:)` methods to `Element` to describe transition animations. ([#155])
+- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155])
 
 - Add `VisibilityTransition.none` to describe an animation with no effect. ([#155])
 
