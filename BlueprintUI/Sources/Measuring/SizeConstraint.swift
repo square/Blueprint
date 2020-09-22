@@ -105,6 +105,19 @@ extension SizeConstraint {
         
         private static var maxValue : CGFloat = .greatestFiniteMagnitude
 
+        /// Adds a scalar value to an Axis. If the Axis is unconstrained the
+        /// result will remain unconstrained.
+        public static func +(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+            switch lhs {
+            case .atMost(let limit):
+                return .atMost(limit + rhs)
+            case .unconstrained:
+                return .unconstrained
+            }
+        }
+
+        /// Subtracts a scalar value from an Axis. If the Axis is unconstrained
+        /// the result will remain unconstrained.
         public static func -(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
@@ -112,6 +125,52 @@ extension SizeConstraint {
             case .unconstrained:
                 return .unconstrained
             }
+        }
+
+        /// Divides an Axis by a scalar value. If the Axis is unconstrained the
+        /// result will remain unconstrained.
+        public static func /(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+            switch lhs {
+            case .atMost(let limit):
+                return .atMost(limit / rhs)
+            case .unconstrained:
+                return .unconstrained
+            }
+        }
+
+        /// Multiplies an Axis by a scalar value. If the Axis is unconstrained
+        /// the result will remain unconstrained.
+        public static func *(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+            switch lhs {
+            case .atMost(let limit):
+                return .atMost(limit * rhs)
+            case .unconstrained:
+                return .unconstrained
+            }
+        }
+
+        /// Adds a scalar value to an Axis. If the Axis is unconstrained the
+        /// result will remain unconstrained.
+        public static func +=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+            lhs = lhs + rhs
+        }
+
+        /// Subtracts a scalar value from an Axis. If the Axis is unconstrained
+        /// the result will remain unconstrained.
+        public static func -=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+            lhs = lhs - rhs
+        }
+
+        /// Divides an Axis by a scalar value. If the Axis is unconstrained the
+        /// result will remain unconstrained.
+        public static func /=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+            lhs = lhs / rhs
+        }
+
+        /// Multiplies an Axis by a scalar value. If the Axis is unconstrained
+        /// the result will remain unconstrained.
+        public static func *=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+            lhs = lhs * rhs
         }
 
     }

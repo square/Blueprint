@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
+
 ### Added
 
 - Extend `TransitionContainer.init` to support further customization during initialization. ([#155])
