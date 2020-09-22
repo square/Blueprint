@@ -13,11 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Extend `TransitionContainer.init` to support further customization during initialization. ([#155])
+- Add a new `TransitionContainer.init` that supports further customization during initialization and has the same defaults as `ViewDescription`. ([#155], [#158])
 
-- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155])
-
-- Add `VisibilityTransition.none` to describe an animation with no effect. ([#155])
+- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155], [#158])
 
 ### Removed
 
@@ -26,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Deprecated
+
+- `TransitionContainer(wrapping:)` is deprecated. Use the new `TransitionContainer(transitioning:)` instead. ([#158])
 
 ### Security
 
@@ -426,6 +426,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#158]: https://github.com/square/Blueprint/pull/158
+[#155]: https://github.com/square/Blueprint/pull/155
 [#154]: https://github.com/square/Blueprint/pull/154
 [#149]: https://github.com/square/Blueprint/pull/149
 [#147]: https://github.com/square/Blueprint/pull/147
