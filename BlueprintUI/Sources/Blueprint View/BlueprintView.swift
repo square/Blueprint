@@ -263,7 +263,6 @@ extension BlueprintView {
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
-            update(node: node, appearanceTransitionsEnabled: false)
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {

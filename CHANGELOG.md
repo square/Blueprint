@@ -9,9 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
+
 ### Added
 
+- Extend `TransitionContainer.init` to support further customization during initialization. ([#155])
+
+- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155])
+
+- Add `VisibilityTransition.none` to describe an animation with no effect. ([#155])
+
 ### Removed
+
+- [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
 
 ### Changed
 
@@ -22,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 ### Misc
+
+- Removed some redundant work being done during rendering. ([#154])
 
 # Past Releases
 
@@ -39,18 +51,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `capsule` case to `Box.CornerStyle` ([#145]). This addition sugars the following pattern:
 
-```
-GeometryReader { geometry in
-  Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
-}
-```
-
-into
-
-```
-Box(cornerStyle: .capsule)
-```
-
+  ```swift
+  GeometryReader { geometry in
+    Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
+  }
+  ```
+  
+  into
+  
+  ```swift
+  Box(cornerStyle: .capsule)
+  ```
+  
 - Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over. ([#144])
 
 - Add `Opacity` element for modifying the opacity of a wrapped element. ([#147])
@@ -392,8 +404,8 @@ Box(cornerStyle: .capsule)
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.15.0...HEAD
-[0.15.0]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
+[main]: https://github.com/square/Blueprint/compare/0.15.1...HEAD
+[0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/square/Blueprint/compare/0.13.1...0.14.0
 [0.13.1]: https://github.com/square/Blueprint/compare/0.13.0...0.13.1
@@ -414,6 +426,7 @@ Box(cornerStyle: .capsule)
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#154]: https://github.com/square/Blueprint/pull/154
 [#149]: https://github.com/square/Blueprint/pull/149
 [#147]: https://github.com/square/Blueprint/pull/147
 [#145]: https://github.com/square/Blueprint/pull/145
