@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.16.0] - 2020-09-22
+
+### Fixed
+
 - Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
 
 ### Added
@@ -21,21 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
 
-### Changed
-
 ### Deprecated
 
 - `TransitionContainer(wrapping:)` is deprecated. Use the new `TransitionContainer(transitioning:)` instead. ([#158])
 
-### Security
-
-### Documentation
-
 ### Misc
 
 - Removed some redundant work being done during rendering. ([#154])
-
-# Past Releases
 
 ## [0.15.1] - 2020-09-16
 
@@ -404,7 +416,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.15.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.16.0...HEAD
+[0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0
 [0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/square/Blueprint/compare/0.13.1...0.14.0
