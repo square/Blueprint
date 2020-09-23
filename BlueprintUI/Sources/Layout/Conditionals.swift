@@ -77,4 +77,17 @@ extension Element {
         
         return copy
     }
+    
+    //
+    // MARK: Modify
+    //
+    
+    func modify(_ modify : (inout Self) -> ()) -> Element
+    {
+        var copy = self
+        
+        modify(&copy)
+        
+        return copy
+    }
 }
