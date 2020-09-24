@@ -9,19 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
-
 ### Added
 
-- Extend `TransitionContainer.init` to support further customization during initialization. ([#155])
-
-- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155])
-
-- Add `VisibilityTransition.none` to describe an animation with no effect. ([#155])
-
 ### Removed
-
-- [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
 
 ### Changed
 
@@ -33,9 +23,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Misc
 
-- Removed some redundant work being done during rendering. ([#154])
-
 # Past Releases
+
+## [0.16.0] - 2020-09-22
+
+### Fixed
+
+- Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
+
+### Added
+
+- Add a new `TransitionContainer.init` that supports further customization during initialization and has the same defaults as `ViewDescription`. ([#155], [#158])
+
+- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155], [#158])
+
+### Removed
+
+- [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
+
+### Deprecated
+
+- `TransitionContainer(wrapping:)` is deprecated. Use the new `TransitionContainer(transitioning:)` instead. ([#158])
+
+### Misc
+
+- Removed some redundant work being done during rendering. ([#154])
 
 ## [0.15.1] - 2020-09-16
 
@@ -404,7 +416,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.15.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.16.0...HEAD
+[0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0
 [0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
 [0.14.0]: https://github.com/square/Blueprint/compare/0.13.1...0.14.0
@@ -426,6 +439,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#158]: https://github.com/square/Blueprint/pull/158
+[#155]: https://github.com/square/Blueprint/pull/155
 [#154]: https://github.com/square/Blueprint/pull/154
 [#149]: https://github.com/square/Blueprint/pull/149
 [#147]: https://github.com/square/Blueprint/pull/147
