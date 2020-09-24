@@ -154,7 +154,6 @@ public final class BlueprintView: UIView {
         }
     }
 
-    @available(iOS 11.0, *)
     public override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
         setNeedsViewHierarchyUpdate()
@@ -234,9 +233,7 @@ public final class BlueprintView: UIView {
         let layoutDirection = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute)
         environment.layoutDirection = Environment.LayoutDirection(layoutDirection)
 
-        if #available(iOS 11.0, *) {
-            environment.safeAreaInsets = safeAreaInsets
-        }
+        environment.safeAreaInsets = safeAreaInsets
 
         if let window = window {
             environment.windowSize = window.bounds.size

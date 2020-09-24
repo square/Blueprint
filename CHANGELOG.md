@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- [Removed support for iOS 10](https://github.com/square/Blueprint/pull/161). Future releases will only support iOS 11 and later.
+
 ### Changed
 
 ### Deprecated
