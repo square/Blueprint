@@ -5,7 +5,7 @@ notifications:
 
 branches:
   only:
-    - master
+    - main
 
 os: osx
 osx_image: xcode12
