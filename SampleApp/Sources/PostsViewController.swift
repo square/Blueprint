@@ -43,14 +43,6 @@ final class PostsViewController: UIViewController {
         blueprintView.element = element
     }
 
-    private var viewSafeAreaInsets: UIEdgeInsets {
-        if #available(iOS 11.0, *) {
-            return view.safeAreaInsets
-        } else {
-            return .zero
-        }
-    }
-
     var element: Element {
         let theme = FeedTheme(authorColor: .green)
 
