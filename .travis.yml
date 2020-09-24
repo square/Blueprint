@@ -3,6 +3,10 @@ sudo: false
 notifications:
   email: false
 
+branches:
+  only:
+    - main
+
 os: osx
 osx_image: xcode12
 
