@@ -4,24 +4,24 @@ notifications:
   email: false
 
 os: osx
+osx_image: xcode12
 
-matrix:
+env:
+  - DESTINATION="platform=iOS Simulator,OS=10.3.1,name=iPhone 7"
+  - DESTINATION="platform=iOS Simulator,OS=11.4,name=iPhone 7"
+  - DESTINATION="platform=iOS Simulator,OS=12.4,name=iPhone 7"
+  - DESTINATION="platform=iOS Simulator,OS=13.5,name=iPhone 8"
+  - DESTINATION="platform=iOS Simulator,OS=14.0,name=iPhone 8"
+
+script:
+  xcodebuild -scheme "BlueprintUI-Package" test -destination "$DESTINATION"
+
+jobs:
   include:
-    - language: swift
-      name: "Cocoapods BlueprintUI (Xcode 11.2)"
-      xcode_scheme: BlueprintUI-Unit-Tests
-      osx_image: xcode11.2
-      xcode_workspace: SampleApp.xcworkspace
-      xcode_destination: platform=iOS Simulator,OS=10.3.1,name=iPhone 5
-      before_install:
-        - cd SampleApp
-        - bundle install
-        - bundle exec pod repo update
-        - bundle exec pod install
-    - language: swift
-      name: "SPM (Xcode 11.2)"
-      os: osx
-      osx_image: xcode11.2
-      script:
-        - xcodebuild -scheme "BlueprintUI-Package" test -destination "name=iPad Pro (9.7-inch)"
-
+  - name: "Cocoapods BlueprintUI"
+    script: xcodebuild -workspace "SampleApp.xcworkspace" -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=14.0,name=iPhone 8"
+    before_install:
+      - cd SampleApp
+      - bundle install
+      - bundle exec pod repo update
+      - bundle exec pod install
