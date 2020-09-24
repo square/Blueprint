@@ -20,6 +20,62 @@
                ReferencedContainer = "container:SampleApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "979F49E5224D1BD300A3C5D4"
+               BuildableName = "Tutorial 1.app"
+               BlueprintName = "Tutorial 1"
+               ReferencedContainer = "container:SampleApp.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9796EC3B224D1D2000E729F3"
+               BuildableName = "Tutorial 1 (Completed).app"
+               BlueprintName = "Tutorial 1 (Completed)"
+               ReferencedContainer = "container:SampleApp.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9796EC52224DB3BF00E729F3"
+               BuildableName = "Tutorial 2.app"
+               BlueprintName = "Tutorial 2"
+               ReferencedContainer = "container:SampleApp.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9796EC61224DB3C500E729F3"
+               BuildableName = "Tutorial 2 (Completed).app"
+               BlueprintName = "Tutorial 2 (Completed)"
+               ReferencedContainer = "container:SampleApp.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
