@@ -134,7 +134,7 @@ fileprivate struct FeedItem: ProxyElement {
 
     var elementRepresentation: Element {
         Row { row in
-            row.verticalAlignment = .leading
+            row.verticalAlignment = .top
             row.minimumHorizontalSpacing = 16.0
             row.horizontalUnderflow = .growUniformly
 
