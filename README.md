@@ -13,6 +13,8 @@ let rootElement = Label(text: "Hello from Blueprint!")
 let view = BlueprintView(element: rootElement)
 ```
 
+Generated documentation is available at [square.github.io/Blueprint](https://square.github.io/Blueprint/)
+
 ### Getting Started
 
 #### Swift Package Manager
