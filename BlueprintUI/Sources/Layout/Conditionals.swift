@@ -14,13 +14,11 @@ extension Element {
     
     func `if`(
         _ isTrue : Bool,
-        modify : (inout Self) -> ()
+        modify : (Self) -> Element
     ) -> Element
     {
         if isTrue {
-            var copy = self
-            modify(&copy)
-            return copy
+            return modify(self)
         } else {
             return self
         }
@@ -28,19 +26,15 @@ extension Element {
     
     func `if`(
         _ isTrue : Bool,
-        onTrue : (inout Self) -> (),
-        onFalse : (inout Self) -> ()
+        then : (Self) -> Element,
+        else : (Self) -> Element
     ) -> Element
     {
-        var copy = self
-        
         if isTrue {
-            onTrue(&copy)
+            return then(self)
         } else {
-            onFalse(&copy)
+            return `else`(self)
         }
-        
-        return copy
     }
     
     //
@@ -49,13 +43,11 @@ extension Element {
     
     func `ifLet`<Value>(
         _ value : Value?,
-        modify : (Value, inout Self) -> ()
+        modify : (Value, Self) -> Element
     ) -> Element
     {
         if let value = value {
-            var copy = self
-            modify(value, &copy)
-            return copy
+            return modify(value, self)
         } else {
             return self
         }
@@ -63,19 +55,15 @@ extension Element {
     
     func `ifLet`<Value>(
         _ value : Value?,
-        hadValue : (Value, inout Self) -> (),
-        nilValue : (inout Self) -> ()
+        then : (Value, Self) -> Element,
+        else : (Self) -> Element
     ) -> Element
     {
-        var copy = self
-        
         if let value = value {
-            hadValue(value, &copy)
+            return then(value, self)
         } else {
-            nilValue(&copy)
+            return `else`(self)
         }
-        
-        return copy
     }
     
     //
@@ -89,5 +77,10 @@ extension Element {
         modify(&copy)
         
         return copy
+    }
+    
+    func modify(_ modify : (Self) -> Element) -> Element
+    {
+        modify(self)
     }
 }
