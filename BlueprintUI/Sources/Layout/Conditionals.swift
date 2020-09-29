@@ -79,8 +79,17 @@ extension Element {
         return copy
     }
     
-    func modify(_ modify : (Self) -> Element) -> Element
+    func map(_ map : (Self) -> Element) -> Element
     {
-        modify(self)
+        map(self)
+    }
+    
+    func compactMap(_ modify : (Self) -> Element?) -> Element
+    {
+        if let result = modify(self) {
+            return result
+        } else {
+            return self
+        }
     }
 }
