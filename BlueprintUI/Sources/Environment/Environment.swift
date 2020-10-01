@@ -37,6 +37,22 @@ public struct Environment {
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static let empty = Environment(measurementCache: .init())
+    
+    /// Allows creating a customized environment, by setting the keys
+    /// you would like to provide on the `Environment` within the provided `configure` closure.
+    ///
+    /// The environment passed to the closure is entirely empty with no values set.
+    /// ```
+    /// let environment = Environment.empty {
+    ///     $0.myCustomKey = aValue
+    ///     $0.otherCustomKey = anotherValue
+    /// }
+    /// ```
+    public static func empty(with configure : (inout Environment) -> ()) -> Environment {
+        var empty = self.empty
+        configure(&empty)
+        return empty
+    }
 
     private init(measurementCache : MeasurementCache) {
         self.measurementCache = measurementCache

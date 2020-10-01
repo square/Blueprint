@@ -48,6 +48,60 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// When creating the `Environment` which is passed to the root element of
+    /// the `BlueprintView`, this is the `Environment` which is used as the base
+    /// to create that `Environment`.
+    ///
+    /// You usually do not have to set this property. However, if you are embedding a
+    /// `BlueprintView` within another `BlueprintView`, you might want
+    /// to set this property to the `Environment` of the outer `BlueprintView`, like so:
+    /// ```
+    /// public struct MyElement : ProxyElement {
+    ///
+    ///     public var provider : () -> Element
+    ///
+    ///     public var elementRepresentation: Element {
+    ///         EnvironmentReader { environment in
+    ///             InnerElement(environment: environment, provider: provider)
+    ///         }
+    ///     }
+    ///
+    ///     private struct InnerElement : Element {
+    ///
+    ///         var environment : Environment
+    ///         var provider : () -> Element
+    ///
+    ///         public var content: ElementContent {
+    ///             ElementContent { constraint in
+    ///                 self.provider().content.measure(in: constraint, environment: self.environment)
+    ///             }
+    ///         }
+    ///
+    ///         public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    ///             View.describe { config in
+    ///                 config[\.environment] = self.environment
+    ///                 config[\.provider] = self.provider
+    ///             }
+    ///         }
+    ///     }
+    ///
+    ///     private final class View : UIView {
+    ///         private let blueprintView : BlueprintView
+    ///         ...
+    ///
+    ///         private func updateElement() {
+    ///             self.blueprintView.inheritedEnvironment = self.environment
+    ///             self.blueprintView.element = self.provider()
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    public var inheritedEnvironment : Environment? = nil {
+        didSet {
+            self.setNeedsViewHierarchyUpdate()
+        }
+    }
 
     /// Instantiates a view with the given element
     ///
@@ -224,7 +278,7 @@ public final class BlueprintView: UIView {
     }
     
     private func makeEnvironment() -> Environment {
-        var environment = Environment.empty
+        var environment = self.inheritedEnvironment ?? .empty
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale
