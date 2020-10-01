@@ -162,8 +162,7 @@ fileprivate extension KeyboardReader {
                 animations: {
                     self.setNeedsLayout()
                     self.layoutIfNeeded()
-                },
-                completion: nil
+                }
             )
         }
     }

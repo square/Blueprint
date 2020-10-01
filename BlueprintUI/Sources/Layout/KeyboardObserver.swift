@@ -8,6 +8,9 @@
 import UIKit
 
 
+///
+///
+///
 public protocol KeyboardObserverDelegate : AnyObject {
     
     func keyboardFrameWillChange(
@@ -18,6 +21,9 @@ public protocol KeyboardObserverDelegate : AnyObject {
 }
 
 
+///
+///
+///
 public enum KeyboardFrame : Equatable {
     
     /// The current frame does not overlap the current view at all.
@@ -61,6 +67,11 @@ public final class KeyboardObserver {
     ///
     /// Thus, the `shared` observer is set up the first time a view that needs to know about the
     /// keyboard is created, to ensure later views have keyboard information.
+    ///
+    /// To ensure that the keyboard is always being observed, it is recommended that
+    /// you call `BlueprintView.beginObservingKeyboard()` within your
+    /// application or view controller, before the first `BlueprintView` is presented on screen,
+    /// if you are utilizing `KeyboardReader` or `KeyboardObserver` within your application.
     public static let shared : KeyboardObserver = KeyboardObserver(center: .default)
     
     private let center : NotificationCenter
@@ -195,6 +206,22 @@ public final class KeyboardObserver {
         }
     }
 }
+
+
+extension BlueprintView {
+    
+    ///
+    /// Begins observing system notifications to track the position of the keyboard.
+    ///
+    /// To ensure that the keyboard is always being observed, it is recommended that
+    /// you call `BlueprintView.beginObservingKeyboard()` within your
+    /// application or view controller, before the first `BlueprintView` is presented on screen,
+    /// if you are utilizing `KeyboardReader` or `KeyboardObserver` within your application.
+    public static func beginObservingKeyboard() {
+        _ = KeyboardObserver.shared
+    }
+}
+
 
 extension KeyboardObserver
 {
