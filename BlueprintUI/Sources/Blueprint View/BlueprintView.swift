@@ -97,7 +97,11 @@ public final class BlueprintView: UIView {
     ///     }
     /// }
     /// ```
-    public var inheritedEnvironment : Environment? = nil
+    public var inheritedEnvironment : Environment? = nil {
+        didSet {
+            self.setNeedsViewHierarchyUpdate()
+        }
+    }
 
     /// Instantiates a view with the given element
     ///

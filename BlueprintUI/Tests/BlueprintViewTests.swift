@@ -1,6 +1,7 @@
 import XCTest
 @testable import BlueprintUI
 
+
 class BlueprintViewTests: XCTestCase {
     
     func test_sizeThatFits() {
@@ -196,9 +197,44 @@ class BlueprintViewTests: XCTestCase {
 
         XCTAssertTrue(layoutRecursed)
     }
+    
+    func test_inheritedEnvironment() {
+        
+        let blueprintView = BlueprintView()
+        
+        var didInherit : Bool? = nil
+        
+        blueprintView.element = InheritedEnvironmentElement {
+            didInherit = $0[InheritedEnvironmentElement.Key]
+        }
+        
+        /// Should be false during the first pass, with a nil `inheritedEnvironment`.
+        
+        blueprintView.layoutIfNeeded()
+        XCTAssertNil(blueprintView.inheritedEnvironment)
+        XCTAssertEqual(didInherit, false)
+        
+        /// Should be true once we provide an `inheritedEnvironment`.
+        
+        blueprintView.inheritedEnvironment = Environment.empty {
+            $0[InheritedEnvironmentElement.Key] = true
+        }
+        
+        blueprintView.layoutIfNeeded()
+        XCTAssertNotNil(blueprintView.inheritedEnvironment)
+        XCTAssertEqual(didInherit, true)
+        
+        /// Validate nil-ing out the `inheritedEnvironment` works as expected.
+        
+        blueprintView.inheritedEnvironment = nil
+        
+        blueprintView.layoutIfNeeded()
+        XCTAssertNil(blueprintView.inheritedEnvironment)
+        XCTAssertEqual(didInherit, false)
+    }
 }
 
-fileprivate struct MeasurableElement : Element {
+private struct MeasurableElement : Element {
         
     var validate : (SizeConstraint) -> CGSize
     
@@ -213,7 +249,8 @@ fileprivate struct MeasurableElement : Element {
     }
 }
 
-fileprivate struct SimpleViewElement: Element {
+
+private  struct SimpleViewElement: Element {
 
     var color: UIColor
 
@@ -226,8 +263,8 @@ fileprivate struct SimpleViewElement: Element {
             config[\.backgroundColor] = color
         }
     }
-
 }
+
 
 private struct TestElement1: Element {
     var tag: Int
@@ -243,6 +280,7 @@ private struct TestElement1: Element {
     }
 }
 
+
 private struct TestElement2: Element {
     var tag: Int
 
@@ -256,6 +294,7 @@ private struct TestElement2: Element {
         }
     }
 }
+
 
 private struct TestContainer: Element {
     var children: [Element]
@@ -279,6 +318,25 @@ private struct TestContainer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             return Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        }
+    }
+}
+
+
+private struct InheritedEnvironmentElement : ProxyElement {
+    
+    var onBuild : (Environment) -> ()
+    
+    var elementRepresentation: Element {
+        EnvironmentReader { env in
+            self.onBuild(env)
+            return SimpleViewElement(color: .blue)
+        }
+    }
+    
+    struct Key : EnvironmentKey {
+        static var defaultValue: Bool {
+            false
         }
     }
 }
