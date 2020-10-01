@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add alignment guides to stacks. ([#153])
+
+  Alignment guides let you fine-tune the cross axis alignment. You can specifying a guide value for any child in that element's coordinate space. Children are aligned relatively to each other so that the guide values line up, and then the content as a whole is aligned to the stack's bounds.
+
+  In this example, the center of one element is aligned 10 points from the bottom of another element, and the contents are collectively aligned to the bottom of the row:
+
+  ```swift
+  Row { row in
+      row.verticalAlignment = .bottom
+
+      row.add(
+          alignmentGuide: { d in d[VerticalAlignment.center] },
+          child: element1
+      )
+
+      row.add(
+          alignmentGuide: { d in d.height - 10 },
+          child: element2
+      )
+  }
+  ```
+
 ### Removed
 
 - [Removed support for iOS 10](https://github.com/square/Blueprint/pull/161). Future releases will only support iOS 11 and later.
@@ -18,6 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Deprecated
+
+- `Row` alignments `leading` and `trailing` are deprecated. Use `top` and `bottom` instead. ([#153])
 
 ### Security
 
@@ -444,6 +468,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [#158]: https://github.com/square/Blueprint/pull/158
 [#155]: https://github.com/square/Blueprint/pull/155
 [#154]: https://github.com/square/Blueprint/pull/154
+[#153]: https://github.com/square/Blueprint/pull/153
 [#149]: https://github.com/square/Blueprint/pull/149
 [#147]: https://github.com/square/Blueprint/pull/147
 [#145]: https://github.com/square/Blueprint/pull/145

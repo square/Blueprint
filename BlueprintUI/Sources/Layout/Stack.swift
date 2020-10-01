@@ -36,69 +36,138 @@ extension StackElement {
     /// Adds a given child element to the stack.
     ///
     /// - parameters:
-    ///   - growPriority: If the layout underflows (there is extra space to be distributed) and the layout's underflow distribution
-    ///                   is set to either `growProportionally` or `growUniformly`, additional space will be given to children
-    ///                   within the layout. `growPriority` is used to customize how much of that additional space should be given
-    ///                   to a particular child.
+    ///   - growPriority:
     ///
-    ///                   The default value is 1.0
+    ///     If the layout underflows (there is extra space to be distributed) and the layout's
+    ///     underflow distribution is set to either `growProportionally` or `growUniformly`,
+    ///     additional space will be given to children within the layout. `growPriority` is used to
+    ///     customize how much of that additional space should be given to a particular child.
     ///
-    ///                   The algorithm for distributing space is functionally equal to the following:
+    ///     The default value is 1.0
     ///
-    ///                   ```
-    ///                   let totalGrowPriority: CGFloat = /// The sum of the grow priority from all children
-    ///                   let totalUnderflowSize: CGFloat = /// The extra space to be distributed
-    ///                   for child in children {
-    ///                       let extraSize = (child.growPriority / totalGrowPriority) * totalUnderflowSize
-    ///                       /// `extraSize` is then added to the original measured size
-    ///                   }
-    ///                   ```
+    ///     The algorithm for distributing space is functionally equal to the following:
     ///
-    ///   - shrinkPriority: If the layout overflows (there is not enough space to fit all children as measured), each child will receive
-    ///                     a smaller size within the layout. `shrinkPriority` is used to customize how much each child should shrink.
+    ///     ```
+    ///     let totalGrowPriority: CGFloat = /// The sum of the grow priority from all children
+    ///     let totalUnderflowSize: CGFloat = /// The extra space to be distributed
+    ///     for child in children {
+    ///         let extraSize = (child.growPriority / totalGrowPriority) * totalUnderflowSize
+    ///         /// `extraSize` is then added to the original measured size
+    ///     }
+    ///     ```
     ///
-    ///                     The default value is 1.0
+    ///   - shrinkPriority:
     ///
-    ///                     The algorithm for removing space is functionally equal to the following:
+    ///     If the layout overflows (there is not enough space to fit all children as measured),
+    ///     each child will receive a smaller size within the layout. `shrinkPriority` is used to
+    ///     customize how much each child should shrink.
     ///
-    ///                     ```
-    ///                     let totalShrinkPriority: CGFloat = /// The sum of the shrink priority from all children
-    ///                     let totalOverflowSize: CGFloat = /// The overflow space to be subtracted
-    ///                     for child in children {
-    ///                         let shrinkSize = (child.shrinkPriority / totalShrinkPriority) * totalOverflowSize
-    ///                         /// `extraSize` is then subtracted from the original measured size
-    ///                     }
-    ///                     ```
+    ///     The default value is 1.0
     ///
-    ///   - key: A key used to disambiguate children between subsequent updates of the view hierarchy
+    ///     The algorithm for removing space is functionally equal to the following:
+    ///
+    ///     ```
+    ///     let totalShrinkPriority: CGFloat = /// The sum of the shrink priority from all children
+    ///     let totalOverflowSize: CGFloat = /// The overflow space to be subtracted
+    ///     for child in children {
+    ///         let shrinkSize = (child.shrinkPriority / totalShrinkPriority) * totalOverflowSize
+    ///         /// `extraSize` is then subtracted from the original measured size
+    ///     }
+    ///     ```
+    ///
+    ///   - alignmentGuide: 
+    ///
+    ///     A closure that can be used to provide a custom alignment guide for this child.
+    ///
+    ///     This closure will be called with an `ElementDimensions` containing the dimensions of
+    ///     this child, and should return a value in the child's own coordinate space. This value
+    ///     represents the position along the child's cross axis that should be aligned relative to
+    ///     the values of its siblings.
+    ///
+    ///     If not specified, the default value is provided by the stack's alignment.
+    ///
+    ///     The alignment guide is ignored by the `fill` alignment type.
+    ///
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy
     ///
     ///   - child: The child element to add to this stack
     ///
-    public mutating func add(growPriority: CGFloat = 1.0, shrinkPriority: CGFloat = 1.0, key: AnyHashable? = nil, child: Element) {
+    /// - Tag: StackElement.add
+    ///
+    mutating public func add(
+        growPriority: CGFloat = 1.0,
+        shrinkPriority: CGFloat = 1.0,
+        alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+        key: AnyHashable? = nil,
+        child: Element
+    ) {
         children.append((
             element: child,
-            traits: StackLayout.Traits(growPriority: growPriority, shrinkPriority: shrinkPriority),
+            traits: StackLayout.Traits(
+                growPriority: growPriority,
+                shrinkPriority: shrinkPriority,
+                alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init)
+            ),
             key: key
         ))
     }
 
 
-    /// Convenience method for adding a child with a grow and shrink priority of 0.0
+    /// Convenience method for adding a child with a grow and shrink priority of 0.0.
+    ///
+    /// See `StackElement.add(...)` for details.
     ///
     /// - parameters:
+    ///   - alignmentGuide: A closure that can be used to provide a custom alignment guide for this
+    ///     child.
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy
     ///   - child: The child element to add to this stack
     ///
-    public mutating func addFixed(child: Element) {
-        self.add(growPriority: 0, shrinkPriority: 0, child: child)
+    /// ## In Xcode
+    /// [StackElement.add()](x-source-tag://StackElement.add)
+    ///
+    public mutating func addFixed(
+        alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+        key: AnyHashable? = nil,
+        child: Element
+    ) {
+        self.add(
+            growPriority: 0,
+            shrinkPriority: 0,
+            alignmentGuide: alignmentGuide,
+            key: key,
+            child: child
+        )
     }
 
-    /// Convenience method for adding a child with a grow and shrink priority of 1.0
+    /// Convenience method for adding a child with a grow and shrink priority of 1.0.
+    ///
+    /// See `StackElement.add(...)` for details.
     ///
     /// - parameters:
+    ///   - alignmentGuide: A closure that can be used to provide a custom alignment guide for this
+    ///     child.
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy
     ///   - child: The child element to add to this stack
     ///
-    public mutating func addFlexible(child: Element) {
-        self.add(growPriority: 1, shrinkPriority: 1, child: child)
+    /// ## In Xcode
+    /// [StackElement.add()](x-source-tag://StackElement.add)
+    ///
+    public mutating func addFlexible(
+        alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+        key: AnyHashable? = nil,
+        child: Element
+    ) {
+        self.add(
+            growPriority: 1,
+            shrinkPriority: 1,
+            alignmentGuide: alignmentGuide,
+            key: key,
+            child: child
+        )
     }
 }
 
@@ -111,29 +180,72 @@ public struct StackLayout: Layout {
         return Traits()
     }
 
+    /// Determines how a stack child will be aligned on the cross axis relative to other children.
+    public struct AlignmentGuide {
+        /// Returns a value along the stack's cross axis, in the element's own coordinate space,
+        /// where a child should be aligned relative to the alignment guides of its siblings.
+        public var computeValue: (ElementDimensions) -> CGFloat
+    }
+
+    /// Contains traits that affect the layout of individual children in the stack.
+    ///
+    /// See `StackElement.add(...)` for details.
+    ///
+    /// # In Xcode
+    /// [StackElement.add()](x-source-tag://StackElement.add)
+    ///
     public struct Traits {
 
+        /// Controls the amount of extra space distributed to this child during underflow.
+        ///
+        /// See `StackElement.add(...)` for details.
+        ///
+        /// # In Xcode
+        /// [StackElement.add()](x-source-tag://StackElement.add)
+        ///
         public var growPriority: CGFloat
 
+        /// Controls the amount of space allowd for this dhild during overflow.
+        ///
+        /// See `StackElement.add(...)` for details.
+        ///
+        /// # In Xcode
+        /// [StackElement.add()](x-source-tag://StackElement.add)
+        ///
         public var shrinkPriority: CGFloat
 
-        public init(growPriority: CGFloat = 1.0, shrinkPriority: CGFloat = 1.0) {
+        /// Allows for custom alignment of a child along the cross axis.
+        ///
+        /// See `StackElement.add(...)` for details.
+        ///
+        /// # In Xcode
+        /// [StackElement.add()](x-source-tag://StackElement.add)
+        ///
+        public var alignmentGuide: AlignmentGuide?
+
+        /// Creates a new set of traits with default values.
+        public init(
+            growPriority: CGFloat = 1.0,
+            shrinkPriority: CGFloat = 1.0,
+            alignmentGuide: AlignmentGuide? = nil
+        ) {
             self.growPriority = growPriority
             self.shrinkPriority = shrinkPriority
+            self.alignmentGuide = alignmentGuide
         }
-
     }
 
     public var axis: Axis
 
     public var underflow = UnderflowDistribution.spaceEvenly
     public var overflow = OverflowDistribution.condenseProportionally
-    public var alignment = Alignment.leading
+    public var alignment: Alignment
     public var minimumSpacing: CGFloat = 0
 
 
-    public init(axis: Axis) {
+    public init(axis: Axis, alignment: Alignment) {
         self.axis = axis
+        self.alignment = alignment
     }
 
     public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
@@ -189,10 +301,11 @@ extension StackLayout {
 
     /// Determines the cross-axis layout (height for a horizontal stack, width for a vertical stack).
     public enum Alignment {
+        /// Children will be stretched to the size of the stack.
         case fill
-        case leading
-        case center
-        case trailing
+        /// Children will be aligned relatively to each other, and then all the contents will be
+        /// aligned to the stack's bounding box, according to the specified alignment.
+        case align(to: AlignmentID.Type)
     }
 
 }
@@ -287,7 +400,7 @@ extension StackLayout {
 
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
-            for: items.map { $0.content },
+            for: items,
             axisConstraints: axisSegments.map { $0.magnitude },
             crossConstraint: vectorConstraint.cross)
 
@@ -550,7 +663,7 @@ extension StackLayout {
     ///   - crossConstraint: The cross component of the contraint for all measurements.
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
-        for items: [Measurable],
+        for items: [(traits: Traits, content: Measurable)],
         axisConstraints: [CGFloat],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
@@ -560,50 +673,97 @@ extension StackLayout {
                 axis: .atMost(axisConstraint),
                 cross: crossConstraint)
             let constraint = vector.constraint(axis: axis)
-            let measuredSize = item.measure(in: constraint)
+            let measuredSize = item.content.measure(in: constraint)
 
             return measuredSize.cross(on: axis)
         }
 
-        // Then pick the max cross value based on the constraint
-        let maxCross: CGFloat
-        switch crossConstraint {
-        case .unconstrained:
-            maxCross = crossMagnitudes.reduce(0, max)
-        case .exactly(let exactConstraint):
-            maxCross = exactConstraint
-        case .atMost(let maxConstraint):
-            let maxMagnitude = crossMagnitudes.reduce(0, max)
-            maxCross = min(maxConstraint, maxMagnitude)
-        }
-
-        // Finally, form segments from the magnitudes and the alignment option
-        let segments = zip(items, crossMagnitudes).map { (item, measuredCross) -> Segment in
-            let origin: CGFloat
-            let magnitude: CGFloat
-
-            switch alignment {
-            case .center:
-                origin = (maxCross - measuredCross) / 2.0
-                magnitude = measuredCross
-
-            case .fill:
-                origin = 0.0
-                magnitude = maxCross
-
-            case .leading:
-                origin = 0.0
-                magnitude = measuredCross
-
-            case .trailing:
-                origin = maxCross - measuredCross
-                magnitude = measuredCross
+        func fillSegments() -> [Segment] {
+            // Determine the available cross based on the constraint
+            let availableCross: CGFloat
+            switch crossConstraint {
+            case .unconstrained:
+                availableCross = crossMagnitudes.reduce(0, max)
+            case .exactly(let exactConstraint):
+                availableCross = exactConstraint
+            case .atMost(let maxConstraint):
+                let maxMagnitude = crossMagnitudes.reduce(0, max)
+                availableCross = min(maxConstraint, maxMagnitude)
             }
 
-            return Segment(origin: origin, magnitude: magnitude)
+            // Form segments that fill the available space
+            let segments = Array(
+                repeating: Segment(origin: 0, magnitude: availableCross),
+                count: items.count
+            )
+
+            return segments
         }
 
-        return segments
+        func alignSegments(to alignment: AlignmentID.Type) -> [Segment] {
+            // Get the alignment values for each child
+            let alignmentValues = items.indices.map { i -> CGFloat in
+                let measuredCross = crossMagnitudes[i]
+                let axisSize = axisConstraints[i]
+
+                let size = Vector(axis: axisSize, cross: measuredCross).size(axis: axis)
+                let dimensions = ElementDimensions(size: size)
+                let alignmentGuide = items[i].traits.alignmentGuide
+
+                let value = alignmentGuide?.computeValue(dimensions) ?? alignment.defaultValue(in: dimensions)
+
+                return value
+            }
+
+            // Find the relative distance from the "lowest" edge to the "highest" edge.
+            // This may be greater than the size of any single child, if alignment values push
+            // children outside of their normal bounds.
+
+            let minAlignedCross = -alignmentValues.max()!
+            let maxAlignedCross = zip(crossMagnitudes, alignmentValues).map(-).max()!
+            let normalizedCrossMagnitude = maxAlignedCross - minAlignedCross
+
+            // Determine the available cross based on the constraint
+            let availableCross: CGFloat
+            switch crossConstraint {
+            case .unconstrained:
+                availableCross = normalizedCrossMagnitude
+            case .exactly(let exactConstraint):
+                availableCross = exactConstraint
+            case .atMost(let maxConstraint):
+                availableCross = min(maxConstraint, normalizedCrossMagnitude)
+            }
+
+            let availableAxis = axisConstraints.reduce(0, +)
+            let availableSize = Vector(axis: availableAxis, cross: availableCross).size(axis: axis)
+            let contentsSize = Vector(axis: availableAxis, cross: normalizedCrossMagnitude).size(axis: axis)
+
+            // Align the contents as a whole within the stack, which may be larger or smaller than
+            // the relatively aligned contents.
+            let stackAnchor = alignment.defaultValue(in: ElementDimensions(size: availableSize))
+            let contentsAnchor = alignment.defaultValue(in: ElementDimensions(size: contentsSize))
+
+            let offset = stackAnchor - contentsAnchor - minAlignedCross
+
+            // Form segments from the alignment values and measured magnitudes
+            let segments = items.indices.map { i -> Segment in
+                let measuredCross = crossMagnitudes[i]
+                let alignmentValue = alignmentValues[i]
+
+                let origin = offset - alignmentValue
+
+                return Segment(origin: origin, magnitude: measuredCross)
+            }
+
+            return segments
+        }
+
+        switch alignment {
+        case .fill:
+            return fillSegments()
+        case let .align(to: id):
+            return alignSegments(to: id)
+        }
     }
 
     // MARK: - Layout types
