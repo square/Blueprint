@@ -21,11 +21,14 @@ final class RootViewController : UIViewController
             DemoItem(title: "Post List", onTap: { [weak self] in
                 self?.push(PostsViewController())
             }),
-            DemoItem(title: "Keyboard Scrolling", onTap: { [weak self] in
+            DemoItem(title: "ScrollView Keyboard Demo", onTap: { [weak self] in
                 self?.push(ScrollViewKeyboardViewController())
             }),
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
+            }),
+            DemoItem(title: "KeyboardReader Keyboard Observation", onTap: { [weak self] in
+                self?.push(KeyboardReaderViewController())
             }),
         ]
     }

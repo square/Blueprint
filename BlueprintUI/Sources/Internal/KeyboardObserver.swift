@@ -8,7 +8,7 @@
 import UIKit
 
 
-protocol KeyboardObserverDelegate : AnyObject {
+public protocol KeyboardObserverDelegate : AnyObject {
     
     func keyboardFrameWillChange(
         for observer : KeyboardObserver,
@@ -16,6 +16,17 @@ protocol KeyboardObserverDelegate : AnyObject {
         options : UIView.AnimationOptions
     )
 }
+
+
+public enum KeyboardFrame : Equatable {
+    
+    /// The current frame does not overlap the current view at all.
+    case nonOverlapping
+    
+    /// The current frame does overlap the view, by the provided rect, in the view's coordinate space.
+    case overlapping(frame: CGRect)
+}
+
 
 /**
  Encapsulates listening for system keyboard updates, plus transforming the visible frame of the keyboard into the coordinates of a requested view.
@@ -43,17 +54,17 @@ protocol KeyboardObserverDelegate : AnyObject {
  iOS Docs for keyboard management:
  https://developer.apple.com/library/archive/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html
  */
-final class KeyboardObserver {
+public final class KeyboardObserver {
     
     private let center : NotificationCenter
     
-    weak var delegate : KeyboardObserverDelegate?
+    public weak var delegate : KeyboardObserverDelegate?
     
     //
     // MARK: Initialization
     //
     
-    init(center : NotificationCenter = .default) {
+    public init(center : NotificationCenter = .default) {
         
         self.center = center
         
@@ -74,18 +85,9 @@ final class KeyboardObserver {
     // MARK: Handling Changes
     //
     
-    enum KeyboardFrame : Equatable {
-        
-        /// The current frame does not overlap the current view at all.
-        case nonOverlapping
-        
-        /// The current frame does overlap the view, by the provided rect, in the view's coordinate space.
-        case overlapping(frame: CGRect)
-    }
-    
     /// How the keyboard overlaps the view provided. If the view is not on screen (eg, no window),
     /// or the observer has not yet learned about the keyboard's position, this method returns nil.
-    func currentFrame(in view : UIView) -> KeyboardFrame? {
+    public func currentFrame(in view : UIView) -> KeyboardFrame? {
         
         guard view.window != nil else {
             return nil

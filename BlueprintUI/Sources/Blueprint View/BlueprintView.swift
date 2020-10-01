@@ -48,6 +48,14 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// When creating an `Environment` to pass to embedded elements, this
+    /// environment is used as the starting point to construct the `Environment`.
+    ///
+    /// You usually do not have to set this property. However, if you are embedding a
+    /// `BlueprintView` within another `BlueprintView`, you might want
+    /// to set this property to the `Environment` of the outer `BlueprintView`.
+    public var baseEnvironment : Environment? = nil
 
     /// Instantiates a view with the given element
     ///
@@ -224,7 +232,7 @@ public final class BlueprintView: UIView {
     }
     
     private func makeEnvironment() -> Environment {
-        var environment = Environment.empty
+        var environment = self.baseEnvironment ?? Environment.empty
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale
