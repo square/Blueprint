@@ -145,7 +145,6 @@ fileprivate extension KeyboardReader {
                     size: self.bounds.size
                 )
             )
-            //.aligned(vertically: .top, horizontally: .center)
         }
         
         // MARK: KeyboardObserverDelegate

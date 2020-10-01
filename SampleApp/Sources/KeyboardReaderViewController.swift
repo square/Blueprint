@@ -24,8 +24,8 @@ final class KeyboardReaderViewController : UIViewController
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Dismiss", style: .plain, target: self, action: #selector(dismissKeyboard))
     }
     
-    private func content() -> Element
-    {
+    private func content() -> Element {
+        
         KeyboardReader { info in
             
             Overlay { overlay in
@@ -79,7 +79,6 @@ final class KeyboardReaderViewController : UIViewController
                     .aligned(vertically: .bottom, horizontally: .fill)
                 }
             }
-
         }
     }
     
