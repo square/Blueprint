@@ -9,7 +9,12 @@ import Foundation
 
 
 ///
+/// A `KeyboardReader` is used to build an element which is responsive to the position of
+/// the on-screen iOS keyboard. This allows you to customize your elements based on the
+/// state of the on-screen keyboard.
 ///
+/// While Blueprint's `ScrollView` already adjusts insets for the keyboard, other custom
+/// elements and UIs do not.
 ///
 public struct KeyboardReader : ProxyElement {
     
@@ -83,7 +88,7 @@ fileprivate extension KeyboardReader {
     
     final class View : UIView, KeyboardObserverDelegate {
         private let blueprintView : BlueprintView
-        private let keyboardObserver : KeyboardObserver
+        private let keyboardObserver : KeyboardObserver = .shared
         
         var environment : Environment = .empty {
             didSet {
@@ -102,11 +107,10 @@ fileprivate extension KeyboardReader {
         override init(frame: CGRect) {
             
             self.blueprintView = BlueprintView()
-            self.keyboardObserver = KeyboardObserver()
             
             super.init(frame: frame)
             
-            self.keyboardObserver.delegate = self
+            self.keyboardObserver.add(delegate: self)
             
             self.addSubview(self.blueprintView)
         }

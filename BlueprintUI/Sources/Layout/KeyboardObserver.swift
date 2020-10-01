@@ -1,6 +1,6 @@
 //
 //  KeyboardObserver.swift
-//  BlueprintUICommonControls
+//  BlueprintUI
 //
 //  Created by Kyle Van Essen on 2/16/20.
 //
@@ -27,7 +27,6 @@ public enum KeyboardFrame : Equatable {
     case overlapping(frame: CGRect)
 }
 
-
 /**
  Encapsulates listening for system keyboard updates, plus transforming the visible frame of the keyboard into the coordinates of a requested view.
  
@@ -48,29 +47,43 @@ public enum KeyboardFrame : Equatable {
  
  Notes
  -----
- Implementation borrowed from Listable:
- https://github.com/kyleve/Listable/blob/master/Listable/Sources/Internal/KeyboardObserver.swift
- 
  iOS Docs for keyboard management:
  https://developer.apple.com/library/archive/documentation/StringsTextFonts/Conceptual/TextAndWebiPhoneOS/KeyboardManagement/KeyboardManagement.html
  */
 public final class KeyboardObserver {
     
+    /// The global shared keyboard observer. Why is it a global shared instance?
+    /// We can only know the keyboard position via the keyboard frame notifications.
+    ///
+    /// If a view is created while a keyboard is already on-screen, we'd have
+    /// no way to determine the keyboard frame, and thus couldn't provide the correct
+    /// content insets to avoid the visible keyboard.
+    ///
+    /// Thus, the `shared` observer is set up the first time a view that needs to know about the
+    /// keyboard is created, to ensure later views have keyboard information.
+    public static let shared : KeyboardObserver = KeyboardObserver(center: .default)
+    
     private let center : NotificationCenter
     
-    public weak var delegate : KeyboardObserverDelegate?
+    private(set) var delegates : [Delegate] = []
+    
+    struct Delegate {
+        private(set) weak var value : KeyboardObserverDelegate?
+    }
     
     //
     // MARK: Initialization
     //
     
-    public init(center : NotificationCenter = .default) {
+    init(center : NotificationCenter) {
         
         self.center = center
         
         /// We need to listen to both `will` and `keyboardDidChangeFrame` notifications. Why?
+        ///
         /// When dealing with an undocked or floating keyboard, moving the keyboard
         /// around the screen does NOT call `willChangeFrame`; only `didChangeFrame` is called.
+        ///
         /// Before calling the delegate, we compare `old.endingFrame != new.endingFrame`,
         /// which ensures that the delegate is notified if the frame really changes, and
         /// prevents duplicate calls.
@@ -80,6 +93,35 @@ public final class KeyboardObserver {
     }
     
     private var latestNotification : NotificationInfo?
+    
+    //
+    // MARK: Delegates
+    //
+    
+    public func add(delegate : KeyboardObserverDelegate) {
+        
+        if self.delegates.contains(where: { $0.value === delegate}) {
+            return
+        }
+        
+        self.delegates.append(Delegate(value: delegate))
+        
+        self.removeDeallocatedDelegates()
+    }
+    
+    public func remove(delegate : KeyboardObserverDelegate) {
+        self.delegates.removeAll {
+            $0.value === delegate
+        }
+        
+        self.removeDeallocatedDelegates()
+    }
+    
+    private func removeDeallocatedDelegates() {
+        self.delegates.removeAll {
+            $0.value == nil
+        }
+    }
     
     //
     // MARK: Handling Changes
@@ -130,11 +172,13 @@ public final class KeyboardObserver {
          */
         let animationOptions = UIView.AnimationOptions(rawValue: new.animationCurve << 16)
         
-        self.delegate?.keyboardFrameWillChange(
-            for: self,
-            animationDuration: new.animationDuration,
-            options: animationOptions
-        )
+        self.delegates.forEach {
+            $0.value?.keyboardFrameWillChange(
+                for: self,
+                animationDuration: new.animationDuration,
+                options: animationOptions
+            )
+        }
     }
     
     //

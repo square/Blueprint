@@ -1,10 +1,82 @@
 import XCTest
 import UIKit
 
-@testable import BlueprintUICommonControls
+@testable import BlueprintUI
 
 
 class KeyboardObserverTests: XCTestCase {
+    
+    func test_add()
+    {
+        let center = NotificationCenter()
+        let observer = KeyboardObserver(center: center)
+        
+        var delegate1 : Delegate? = Delegate()
+        weak var weakDelegate1 = delegate1
+        
+        let delegate2 = Delegate()
+        let delegate3 = Delegate()
+        
+        // Validate that delegates are only registered once.
+        
+        XCTAssertEqual(observer.delegates.count, 0)
+        
+        observer.add(delegate: delegate1!)
+        XCTAssertEqual(observer.delegates.count, 1)
+
+        observer.add(delegate: delegate1!)
+        XCTAssertEqual(observer.delegates.count, 1)
+        
+        // Register a second observer
+        
+        observer.add(delegate: delegate2)
+        XCTAssertEqual(observer.delegates.count, 2)
+        
+        // Register a third, but deallocate the first. Should be removed.
+        
+        delegate1 = nil
+        
+        self.waitFor {
+            weakDelegate1 == nil
+        }
+        
+        observer.add(delegate: delegate3)
+        XCTAssertEqual(observer.delegates.count, 2)
+    }
+    
+    func test_remove()
+    {
+        let center = NotificationCenter()
+        let observer = KeyboardObserver(center: center)
+        
+        let delegate1 : Delegate? = Delegate()
+        
+        var delegate2 : Delegate? = Delegate()
+        weak var weakDelegate2 = delegate2
+        
+        let delegate3 : Delegate? = Delegate()
+        
+        // Register all 3 observers
+        
+        observer.add(delegate: delegate1!)
+        observer.add(delegate: delegate2!)
+        observer.add(delegate: delegate3!)
+
+        XCTAssertEqual(observer.delegates.count, 3)
+        
+        // Nil out the second delegate
+        
+        delegate2 = nil
+        
+        self.waitFor {
+            weakDelegate2 == nil
+        }
+        
+        // Should only have 1 left
+        
+        observer.remove(delegate: delegate3!)
+        XCTAssertEqual(observer.delegates.count, 1)
+    }
     
     func test_notifications() {
         let center = NotificationCenter()
@@ -14,7 +86,7 @@ class KeyboardObserverTests: XCTestCase {
             let observer = KeyboardObserver(center: center)
 
             let delegate = Delegate()
-            observer.delegate = delegate
+            observer.add(delegate: delegate)
             
             let userInfo : [AnyHashable:Any] = [
                 UIResponder.keyboardFrameEndUserInfoKey : NSValue(cgRect: CGRect(x: 10.0, y: 10.0, width: 100.0, height: 200.0)),
@@ -32,7 +104,7 @@ class KeyboardObserverTests: XCTestCase {
             let observer = KeyboardObserver(center: center)
 
             let delegate = Delegate()
-            observer.delegate = delegate
+            observer.add(delegate: delegate)
             
             let userInfo : [AnyHashable:Any] = [
                 UIResponder.keyboardFrameEndUserInfoKey : NSValue(cgRect: CGRect(x: 10.0, y: 10.0, width: 100.0, height: 200.0)),
@@ -50,7 +122,7 @@ class KeyboardObserverTests: XCTestCase {
             let observer = KeyboardObserver(center: center)
 
              let delegate = Delegate()
-             observer.delegate = delegate
+            observer.add(delegate: delegate)
              
              let userInfo : [AnyHashable:Any] = [
                  UIResponder.keyboardFrameEndUserInfoKey : NSValue(cgRect: CGRect(x: 10.0, y: 10.0, width: 100.0, height: 200.0)),
@@ -156,5 +228,24 @@ class KeyboardObserver_NotificationInfo_Tests : XCTestCase {
                 }
             }
         }
+    }
+}
+
+
+fileprivate extension XCTestCase {
+    
+    func waitFor(timeout : TimeInterval = 10.0, predicate : () -> Bool) {
+        let runloop = RunLoop.main
+        let timeout = Date(timeIntervalSinceNow: timeout)
+        
+        while Date() < timeout {
+            if predicate() {
+                return
+            }
+            
+            runloop.run(mode: .default, before: Date(timeIntervalSinceNow: 0.001))
+        }
+        
+        XCTFail("waitUntil timed out waiting for a check to pass.")
     }
 }
