@@ -14,6 +14,20 @@ public struct Overlay: Element {
     public init(elements: [Element]) {
         self.elements = elements
     }
+    
+    public init(_ configure : (inout Self) -> ()) {
+        self.elements = []
+        
+        configure(&self)
+    }
+    
+    public mutating func add(_ element : Element) {
+        self.elements.append(element)
+    }
+    
+    public mutating func add(_ element : () -> Element) {
+        self.elements.append(element())
+    }
 
     public var content: ElementContent {
         return ElementContent(layout: OverlayLayout()) {
@@ -26,7 +40,6 @@ public struct Overlay: Element {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return nil
     }
-
 }
 
 /// A layout implementation that places all children on top of each other with

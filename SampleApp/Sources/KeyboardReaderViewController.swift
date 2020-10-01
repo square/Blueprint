@@ -27,20 +27,59 @@ final class KeyboardReaderViewController : UIViewController
     private func content() -> Element
     {
         KeyboardReader { info in
-            Column {
-                $0.verticalUnderflow = .justifyToCenter
+            
+            Overlay { overlay in
+                overlay.add {
+                    Column {
+                        $0.verticalUnderflow = .justifyToCenter
+                        
+                        $0.addFixed {
+                            TextField(text: "I'm a text field, tap me!")
+                        }
+                        
+                        $0.addFixed {
+                            TextField(text: "I am also a text field.")
+                        }
+                    }
+                    .map {
+                        switch info.keyboardFrame {
+                        case .nonOverlapping:
+                            return $0.constrainedTo(height: .absolute(info.size.height))
+                            
+                        case .overlapping(let frame):
+                            return $0.constrainedTo(height: .absolute(info.size.height - frame.height))
+                        }
+                    }
+                    .aligned(vertically: .top, horizontally: .fill)
+                }
                 
-                $0.addFixed(child: TextField(text: "Hello, World!"))
-            }
-            .map {
-                switch info.keyboardFrame {
-                case .nonOverlapping:
-                    return $0.constrainedTo(height: .absolute(info.size.height))
-                    
-                case .overlapping(let frame):
-                    return $0.constrainedTo(height: .absolute(info.size.height - frame.height))
+                overlay.add {
+                    Column { col in
+                        col.horizontalAlignment = .fill
+                        
+                        col.addFixed {
+                            Label(text: "Hello, I am a button") {
+                                $0.color = .white
+                                $0.font = .systemFont(ofSize: 16.0, weight: .semibold)
+                            }
+                            .inset(uniform: 20.0)
+                            .box(background: .systemBlue, corners: .rounded(radius: 4.0))
+                            .tappable {
+                                print("Tapped me!")
+                            }
+                            .inset(uniform: 10.0)
+                        }
+                        
+                        if case let .overlapping(frame) = info.keyboardFrame {
+                            col.addFixed {
+                                Spacer(width: 0, height: frame.height)
+                            }
+                        }
+                    }
+                    .aligned(vertically: .bottom, horizontally: .fill)
                 }
             }
+
         }
     }
     

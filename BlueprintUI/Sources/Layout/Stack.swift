@@ -82,7 +82,6 @@ extension StackElement {
         ))
     }
 
-
     /// Convenience method for adding a child with a grow and shrink priority of 0.0
     ///
     /// - parameters:
@@ -90,6 +89,15 @@ extension StackElement {
     ///
     public mutating func addFixed(child: Element) {
         self.add(growPriority: 0, shrinkPriority: 0, child: child)
+    }
+    
+    /// Convenience method for adding a child with a grow and shrink priority of 0.0
+    ///
+    /// - parameters:
+    ///   - child: The child element to add to this stack
+    ///
+    public mutating func addFixed(child: () -> Element) {
+        self.add(growPriority: 0, shrinkPriority: 0, child: child())
     }
 
     /// Convenience method for adding a child with a grow and shrink priority of 1.0
@@ -99,6 +107,15 @@ extension StackElement {
     ///
     public mutating func addFlexible(child: Element) {
         self.add(growPriority: 1, shrinkPriority: 1, child: child)
+    }
+    
+    /// Convenience method for adding a child with a grow and shrink priority of 1.0
+    ///
+    /// - parameters:
+    ///   - child: The child element to add to this stack
+    ///
+    public mutating func addFlexible(child: () -> Element) {
+        self.add(growPriority: 1, shrinkPriority: 1, child: child())
     }
 }
 
