@@ -97,7 +97,7 @@ extension StackElement {
     ///   - child: The child element to add to this stack
     ///
     public mutating func addFixed(child: () -> Element) {
-        self.add(growPriority: 0, shrinkPriority: 0, child: child())
+        self.addFixed(child: child())
     }
 
     /// Convenience method for adding a child with a grow and shrink priority of 1.0
@@ -115,7 +115,7 @@ extension StackElement {
     ///   - child: The child element to add to this stack
     ///
     public mutating func addFlexible(child: () -> Element) {
-        self.add(growPriority: 1, shrinkPriority: 1, child: child())
+        self.addFlexible(child: child())
     }
 }
 
