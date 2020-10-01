@@ -137,7 +137,7 @@ fileprivate extension KeyboardReader {
         private func updateElement() {
             let keyboardFrame = self.keyboardObserver.currentFrame(in: self)
             
-            self.blueprintView.baseEnvironment = self.environment
+            self.blueprintView.inheritedEnvironment = self.environment
             
             self.blueprintView.element = self.provider?(
                 KeyboardProxy(
