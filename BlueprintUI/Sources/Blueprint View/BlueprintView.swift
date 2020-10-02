@@ -112,7 +112,7 @@ public final class BlueprintView: UIView {
         
         rootController = NativeViewController(
             node: NativeViewNode(
-                content: UIView.describe() { _ in },
+                content: RootView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
                 children: []))
     
@@ -224,6 +224,10 @@ public final class BlueprintView: UIView {
         setNeedsViewHierarchyUpdate()
     }
     
+    public override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        self.point(insideSubviewsOnly: point, with: event)
+    }
+    
     private func performUpdate() {
         updateViewHierarchyIfNeeded()
     }
@@ -253,7 +257,7 @@ public final class BlueprintView: UIView {
         rootController.view.frame = bounds
         
         var rootNode = NativeViewNode(
-            content: UIView.describe() { _ in },
+            content: RootView.describe() { _ in },
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes
         )
@@ -296,6 +300,18 @@ public final class BlueprintView: UIView {
         return environment
     }
 }
+
+
+extension BlueprintView {
+
+    final class RootView : UIView {
+        override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+            self.point(insideSubviewsOnly: point, with: event)
+        }
+    }
+    
+}
+
 
 extension BlueprintView {
     

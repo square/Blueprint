@@ -8,9 +8,20 @@
 import UIKit
 
 
-///
-///
-///
+/// Provides callbacks when the `KeyboardObserver`'s observed keyboard frame
+/// changes. You can use the provided `animationDuration` and `options`
+/// to animate any changes you require alongside the keyboard:
+/// ```
+/// func keyboardFrameWillChange(
+///     for observer : KeyboardObserver,
+///     animationDuration : Double,
+///     options : UIView.AnimationOptions
+/// ) {
+///     UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
+///         // But your animations in here.
+///     })
+/// }
+/// ```
 public protocol KeyboardObserverDelegate : AnyObject {
     
     func keyboardFrameWillChange(
@@ -21,9 +32,7 @@ public protocol KeyboardObserverDelegate : AnyObject {
 }
 
 
-///
-///
-///
+/// The possible states of a keyboard as monitored by the `KeyboardObserver`.
 public enum KeyboardFrame : Equatable {
     
     /// The current frame does not overlap the current view at all.
@@ -36,20 +45,7 @@ public enum KeyboardFrame : Equatable {
 /**
  Encapsulates listening for system keyboard updates, plus transforming the visible frame of the keyboard into the coordinates of a requested view.
  
- You use this class by providing a delegate, which receives callbacks when changes to the keyboard frame occur. You would usually implement
- the delegate somewhat like this:
- 
- ```
- func keyboardFrameWillChange(
-     for observer : KeyboardObserver,
-     animationDuration : Double,
-     options : UIView.AnimationOptions
- ) {
-     UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
-         // Use the frame from the keyboardObserver to update insets or sizing where relevant.
-     })
- }
- ```
+ You use this class by providing a delegate, which receives callbacks when changes to the keyboard frame occur.
  
  Notes
  -----
@@ -74,7 +70,7 @@ public final class KeyboardObserver {
     /// if you are utilizing `KeyboardReader` or `KeyboardObserver` within your application.
     public static let shared : KeyboardObserver = KeyboardObserver(center: .default)
     
-    private let center : NotificationCenter
+    public let center : NotificationCenter
     
     private(set) var delegates : [Delegate] = []
     

@@ -14,16 +14,64 @@ import Foundation
 /// state of the on-screen keyboard.
 ///
 /// While Blueprint's `ScrollView` already adjusts insets for the keyboard, other custom
-/// elements and UIs do not.
+/// elements and UIs do not. Use a `KeyboardReader` to implement keyboard management
+/// within your element.
 ///
+/// The initializer for `KeyboardReader` takes an escaping closure, which is called each time
+/// the keyboard frame changes, or the element's frame changes, in order to update the element
+/// to account for the new keyboard position.
+///
+/// ```
+/// KeyboardReader { info in
+///     myElement.inset(bottom: info.keyboardFrame.height)
+/// }
+/// ```
 public struct KeyboardReader : ProxyElement {
     
+    /// Provides an element rendered with the provided keyboard information.
     public typealias ElementProvider = (KeyboardProxy) -> Element
     
+    /// The provider which is called to generate a new element.
     public var provider : ElementProvider
     
+    /// Creates a new instance of `KeyboardReader` that renders
+    /// the provided element from the element provider.
     public init(_ provider : @escaping ElementProvider) {
         self.provider = provider
+    }
+    
+    public static func adjustedForKeyboard(_ provider : @escaping ElementProvider) -> Self {
+        self.init(
+            background: { Empty() },
+            adjustedForKeyboard: provider
+        )
+    }
+    
+    /// Creates a new instance of `KeyboardReader` that renders
+    /// the provided element from the element provider.
+    ///
+    ///
+    public init(
+        background : @escaping () -> Element,
+        adjustedForKeyboard : @escaping ElementProvider
+    ) {
+        self.provider = { info in
+            Overlay { overlay in
+                overlay.add(background())
+                
+                overlay.add {
+                    adjustedForKeyboard(info).map { element in
+                        switch info.keyboardFrame {
+                        case .nonOverlapping:
+                            return element
+                            
+                        case .overlapping(let frame):
+                            return element.constrainedTo(height: .absolute(info.size.height - frame.height))
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public var elementRepresentation: Element {
@@ -32,6 +80,8 @@ public struct KeyboardReader : ProxyElement {
         }
     }
     
+    /// Private element which is used to capture the `Environment` to
+    /// pass through to the inner `BlueprintView`.
     private struct Content : Element {
         
         var environment : Environment
@@ -55,6 +105,10 @@ public struct KeyboardReader : ProxyElement {
                         
             View.describe { config in
                 config.apply { view in
+                    
+                    /// Pass all properties through to the view; then
+                    /// force an update on the content via a layout pass.
+                    
                     view.environment = self.environment
                     view.provider = self.provider
                     
@@ -67,11 +121,15 @@ public struct KeyboardReader : ProxyElement {
 }
 
 
-///
-///
-///
+/// Provides relevant information about the keyboard and view state
+/// for you to use to adjust your provided element to account for the current
+/// position of the keyboard.
 public struct KeyboardProxy {
+    
+    /// The current frame of the keyboard.
     public var keyboardFrame : KeyboardFrame
+    
+    /// The size of the element is using to lay out.
     public var size : CGSize
     
     public init(
@@ -101,12 +159,11 @@ fileprivate extension KeyboardReader {
                 self.needsElementUpdate = true
             }
         }
-        
-        private var lastKeyboardFrame : KeyboardFrame? = nil
-        
+                
         override init(frame: CGRect) {
             
             self.blueprintView = BlueprintView()
+            self.blueprintView.backgroundColor = .clear
             
             super.init(frame: frame)
             
@@ -117,6 +174,7 @@ fileprivate extension KeyboardReader {
         
         @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
         
+        private var lastKeyboardFrame : KeyboardFrame? = nil
         private var needsElementUpdate : Bool = true
         
         override func layoutSubviews() {
@@ -124,18 +182,20 @@ fileprivate extension KeyboardReader {
             
             self.blueprintView.frame = self.bounds
             
-            let frame = self.keyboardObserver.currentFrame(in: self)
+            let keyboardFrame = self.keyboardObserver.currentFrame(in: self)
             
-            if frame != self.lastKeyboardFrame || self.needsElementUpdate {
+            /// If the keyboard frame has changed; either due to the keyboard moving,
+            /// or our view position changing, we should update the element.
+            
+            if keyboardFrame != self.lastKeyboardFrame || self.needsElementUpdate {
                 self.needsElementUpdate = false
-                self.lastKeyboardFrame = frame
+                self.lastKeyboardFrame = keyboardFrame
                 
-                self.updateElement()
+                self.updateElement(with: keyboardFrame)
             }
         }
         
-        private func updateElement() {
-            let keyboardFrame = self.keyboardObserver.currentFrame(in: self)
+        private func updateElement(with keyboardFrame : KeyboardFrame?) {
             
             self.blueprintView.inheritedEnvironment = self.environment
             

@@ -33,3 +33,21 @@ public struct EnvironmentReader: Element {
         return nil
     }
 }
+
+
+extension Element {
+    
+    /// Returns a new element, created by the passed in function which gives
+    /// you access to the current state of the `Environment`.
+    /// ```
+    /// myElement.withEnvironment { env, element in
+    ///     element.inset(by: env.safeAreaInsets)
+    /// }
+    /// ```
+    public func withEnvironment(_ map : @escaping (Self, Environment) -> Element) -> Element
+    {
+        EnvironmentReader { env in
+            map(self, env)
+        }
+    }
+}

@@ -25,8 +25,8 @@ final class KeyboardReaderViewController : UIViewController
     }
     
     private func content() -> Element {
-        
-        KeyboardReader { info in
+                
+        KeyboardReader { keyboard in
             
             Overlay { overlay in
                 overlay.add {
@@ -42,41 +42,47 @@ final class KeyboardReaderViewController : UIViewController
                         }
                     }
                     .map {
-                        switch info.keyboardFrame {
+                        switch keyboard.keyboardFrame {
                         case .nonOverlapping:
-                            return $0.constrainedTo(height: .absolute(info.size.height))
+                            return $0.constrainedTo(height: .absolute(keyboard.size.height))
                             
                         case .overlapping(let frame):
-                            return $0.constrainedTo(height: .absolute(info.size.height - frame.height))
+                            return $0.constrainedTo(height: .absolute(keyboard.size.height - frame.height))
                         }
                     }
                     .aligned(vertically: .top, horizontally: .fill)
                 }
                 
                 overlay.add {
-                    Column { col in
-                        col.horizontalAlignment = .fill
-                        
-                        col.addFixed {
-                            Label(text: "Hello, I am a button") {
-                                $0.color = .white
-                                $0.font = .systemFont(ofSize: 16.0, weight: .semibold)
-                            }
-                            .inset(uniform: 20.0)
-                            .box(background: .systemBlue, corners: .rounded(radius: 4.0))
-                            .tappable {
-                                print("Tapped me!")
-                            }
-                            .inset(uniform: 10.0)
-                        }
-                        
-                        if case let .overlapping(frame) = info.keyboardFrame {
+                    EnvironmentReader { env in
+                        Column { col in
+                            col.horizontalAlignment = .fill
+                            
                             col.addFixed {
-                                Spacer(width: 0, height: frame.height)
+                                Label(text: "Hello, I am a button") {
+                                    $0.color = .white
+                                    $0.font = .systemFont(ofSize: 16.0, weight: .semibold)
+                                }
+                                .inset(uniform: 20.0)
+                                .box(background: .systemBlue, corners: .rounded(radius: 6.0))
+                                .tappable {
+                                    print("Tapped me!")
+                                }
+                                .inset(uniform: 10.0)
+                            }
+                            
+                            if case let .overlapping(frame) = keyboard.keyboardFrame {
+                                col.addFixed {
+                                    Spacer(width: 0, height: frame.height)
+                                }
+                            } else {
+                                col.addFixed {
+                                    Spacer(width: 0, height: env.safeAreaInsets.bottom)
+                                }
                             }
                         }
+                        .aligned(vertically: .bottom, horizontally: .fill)
                     }
-                    .aligned(vertically: .bottom, horizontally: .fill)
                 }
             }
         }
