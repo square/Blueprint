@@ -22,11 +22,11 @@ extension Element {
     /// ```
     public func `if`(
         _ isTrue : Bool,
-        modify : (Self) -> Element
+        then : (Self) -> Element
     ) -> Element
     {
         if isTrue {
-            return modify(self)
+            return then(self)
         } else {
             return self
         }
@@ -73,11 +73,11 @@ extension Element {
     /// ```
     public func `if`<Value>(
         `let` value : Value?,
-        modify : (Value, Self) -> Element
+        then : (Value, Self) -> Element
     ) -> Element
     {
         if let value = value {
-            return modify(value, self)
+            return then(value, self)
         } else {
             return self
         }

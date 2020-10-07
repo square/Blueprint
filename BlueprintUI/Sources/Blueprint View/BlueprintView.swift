@@ -108,6 +108,8 @@ public final class BlueprintView: UIView {
     /// - parameter element: The root element that will be displayed in the view.
     public required init(element: Element?) {
         
+        Self.beginObservingKeyboard()
+        
         self.element = element
         
         rootController = NativeViewController(
@@ -304,6 +306,9 @@ public final class BlueprintView: UIView {
 
 extension BlueprintView {
 
+    /// The root view used to render the element tree within the `BlueprintView`,
+    /// which overrides `point(inside:with:)` to pass through touches not detected
+    /// by a contained element.
     final class RootView : UIView {
         override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
             self.point(insideSubviewsOnly: point, with: event)

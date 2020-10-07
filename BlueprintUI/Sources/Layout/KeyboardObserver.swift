@@ -105,6 +105,8 @@ public final class KeyboardObserver {
     // MARK: Delegates
     //
     
+    /// Adds the given `delegate`, so it will begin recieving updates when the keyboard frame changes.
+    /// If the `delegate` is already observing, this method has no effect.
     public func add(delegate : KeyboardObserverDelegate) {
         
         if self.delegates.contains(where: { $0.value === delegate}) {
@@ -116,6 +118,8 @@ public final class KeyboardObserver {
         self.removeDeallocatedDelegates()
     }
     
+    /// Removes the given `delegate`, so it will stop recieving updates when the keyboard frame changes.
+    /// If the `delegate` is not observing, this method has no effect.
     public func remove(delegate : KeyboardObserverDelegate) {
         self.delegates.removeAll {
             $0.value === delegate
