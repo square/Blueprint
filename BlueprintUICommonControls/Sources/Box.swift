@@ -38,18 +38,28 @@ public struct Box: Element {
             return ElementContent(intrinsicSize: .zero)
         }
     }
+    
+    private var toViewModel : ViewModel {
+        ViewModel(
+            backgroundColor: self.backgroundColor,
+            cornerStyle: self.cornerStyle,
+            borderStyle: self.borderStyle,
+            shadowStyle: self.shadowStyle,
+            clipsContent: self.clipsContent
+        )
+    }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return Box.View.describe { config in
+        Box.View.describe { config in
             
-            config[\.model] = ViewModel(
-                backgroundColor: self.backgroundColor,
-                cornerStyle: self.cornerStyle,
-                borderStyle: self.borderStyle,
-                shadowStyle: self.shadowStyle,
-                clipsContent: self.clipsContent
-            )
-
+            config.builder = {
+                Box.View(frame: bounds, model: self.toViewModel)
+            }
+            
+            config.apply { view in
+                view.model = self.toViewModel
+            }
+            
             config.contentView = { view in
                 view.contentView
             }
@@ -196,19 +206,19 @@ extension UIRectCorner {
         var mask = CACornerMask()
         
         if self.contains(.topLeft) {
-            mask.formUnion(.layerMinXMaxYCorner)
+            mask.formUnion(.layerMinXMinYCorner)
         }
         
         if self.contains(.topRight) {
-            mask.formUnion(.layerMaxXMaxYCorner)
-        }
-        
-        if self.contains(.bottomRight) {
             mask.formUnion(.layerMaxXMinYCorner)
         }
         
+        if self.contains(.bottomRight) {
+            mask.formUnion(.layerMaxXMaxYCorner)
+        }
+        
         if self.contains(.bottomLeft) {
-            mask.formUnion(.layerMinXMinYCorner)
+            mask.formUnion(.layerMinXMaxYCorner)
         }
         
         return mask
@@ -225,7 +235,8 @@ extension Box {
         var model : ViewModel {
             didSet {
                 guard oldValue != self.model else { return }
-                
+             
+                self.needsUpdateFromModel = true
                 self.setNeedsLayout()
             }
         }
@@ -245,6 +256,7 @@ extension Box {
         }
         
         
+        private var needsUpdateFromModel : Bool = true
         private var lastSize : CGSize? = nil
         
         override func layoutSubviews() {
@@ -252,8 +264,10 @@ extension Box {
             
             contentView.frame = bounds
 
-            if self.lastSize != self.bounds.size {
+            if self.lastSize != self.bounds.size || self.needsUpdateFromModel {
                 self.lastSize = self.bounds.size
+                self.needsUpdateFromModel = false
+                
                 self.model.applyTo(view: self)
             }
         }
@@ -282,11 +296,11 @@ extension Box {
             }
             
             if self.cornerStyle.radius(for: view.bounds) != view.contentView.layer.cornerRadius {
-                view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: view.bounds)
+                view.layer.cornerRadius = self.cornerStyle.radius(for: view.bounds)
             }
             
             if self.cornerStyle.roundedCorners.toCACornerMask != view.contentView.layer.maskedCorners {
-                view.contentView.layer.maskedCorners = self.cornerStyle.roundedCorners.toCACornerMask
+                view.layer.maskedCorners = self.cornerStyle.roundedCorners.toCACornerMask
             }
             
             // Border
@@ -319,7 +333,7 @@ extension Box {
             
             if view.layer.shadowColor != nil {
                 let radius = cornerStyle.radius(for: view.bounds)
-                
+
                 view.layer.shadowPath = UIBezierPath(
                     roundedRect: view.bounds,
                     byRoundingCorners: self.cornerStyle.roundedCorners,
