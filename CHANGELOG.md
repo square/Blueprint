@@ -33,6 +33,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
+- Add a fraction-based sizing strategy. ([#168])
+
+  `ConstrainedSizeFraction` describes the layout of children which occupy a fraction of their parents' layout space. 
+
+  Previously, this effect could be achieved by composing a `ConstrainedSize` layout as a child of a `GeometryReader`.
+
+  ```swift
+  GeometryReader { geometry in
+    Row { row in 
+
+      ...
+
+      let availableWidth = geometry.constraint.width.maximum
+      row.addFixed(child: self.element.constrainedTo(width: .absolute(width * 0.25)))
+    }
+  }
+  ```
+
+  `ConstrainedSizeFraction` allows the following alternative:
+
+  ```swift
+  Row { row in
+
+    ...
+
+    row.addFixed(child: element.constrainedTo(fractionOfWidth: 0.25))
+  }
+  ```
+
 ### Removed
 
 - [Removed support for iOS 10](https://github.com/square/Blueprint/pull/161). Future releases will only support iOS 11 and later.
