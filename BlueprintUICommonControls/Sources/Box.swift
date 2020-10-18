@@ -157,7 +157,6 @@ extension Box.BorderStyle {
             return color
         }
     }
-    
 }
 
 
@@ -202,6 +201,10 @@ extension Box.ShadowStyle {
 
 
 extension UIRectCorner {
+    
+    /// `CACornerMask` is based on the macOS coordinate system, which starts in the top left, not the bottom left.
+    /// You know when you try to plug in a USB connector and it takes 3 tries and you end up exactly where you started? Anyways.
+    
     var toCACornerMask : CACornerMask {
         var mask = CACornerMask()
         
