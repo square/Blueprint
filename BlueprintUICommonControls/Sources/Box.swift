@@ -70,12 +70,19 @@ public struct Box: Element {
 
 extension Box {
 
+    /// How to style the corners of the box.
     public enum CornerStyle : Equatable {
+        
+        /// The corners of the box are not rounded at all.
         case square
+        
+        /// The corners of the box are rounded to the radius needed to draw a capsule / pill.
         case capsule
+        
+        /// The provided corners are rounded with the provided radius.
         case rounded(radius: CGFloat, corners : UIRectCorner = .allCorners)
         
-        var roundedCorners : UIRectCorner {
+        public var rectCorners : UIRectCorner {
             switch self {
             case .square:
                 return []
@@ -202,7 +209,7 @@ extension Box.ShadowStyle {
 
 extension UIRectCorner {
     
-    /// `CACornerMask` is based on the macOS coordinate system, which starts in the top left, not the bottom left.
+    /// `CACornerMask` is based on the macOS coordinate system, which starts in the top left, not the bottom left like iOS.
     /// You know when you try to plug in a USB connector and it takes 3 tries and you end up exactly where you started? Anyways.
     
     var toCACornerMask : CACornerMask {
@@ -302,8 +309,8 @@ extension Box {
                 view.layer.cornerRadius = self.cornerStyle.radius(for: view.bounds)
             }
             
-            if self.cornerStyle.roundedCorners.toCACornerMask != view.contentView.layer.maskedCorners {
-                view.layer.maskedCorners = self.cornerStyle.roundedCorners.toCACornerMask
+            if self.cornerStyle.rectCorners.toCACornerMask != view.contentView.layer.maskedCorners {
+                view.layer.maskedCorners = self.cornerStyle.rectCorners.toCACornerMask
             }
             
             // Border
@@ -339,7 +346,7 @@ extension Box {
 
                 view.layer.shadowPath = UIBezierPath(
                     roundedRect: view.bounds,
-                    byRoundingCorners: self.cornerStyle.roundedCorners,
+                    byRoundingCorners: self.cornerStyle.rectCorners,
                     cornerRadii: CGSize(width: radius, height: radius)
                 ).cgPath
             } else {
