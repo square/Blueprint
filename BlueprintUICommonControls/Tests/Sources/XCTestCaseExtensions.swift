@@ -68,17 +68,11 @@ extension XCTestCase {
         testName: String = #function,
         line: UInt = #line
     ) {
-
         view.layoutIfNeeded()
 
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, scale)
-
-        guard let context = UIGraphicsGetCurrentContext() else {
-            XCTFail("Failed to get graphics context", file: file, line: line)
-            return
-        }
-
-        view.layer.render(in: context)
+        
+        view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
         
         guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
             XCTFail("Failed to get snapshot image from view", file: file, line: line)
