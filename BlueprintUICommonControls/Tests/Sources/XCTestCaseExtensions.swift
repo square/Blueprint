@@ -79,7 +79,7 @@ extension XCTestCase {
         }
 
         view.layer.render(in: context)
-
+        
         guard let image = UIGraphicsGetImageFromCurrentImageContext() else {
             XCTFail("Failed to get snapshot image from view", file: file, line: line)
             return

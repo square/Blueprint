@@ -294,23 +294,32 @@ extension Box {
         func applyTo(view : View) {
             
             // Background
-            
+                        
             if self.backgroundColor != view.backgroundColor {
                 view.backgroundColor = self.backgroundColor
             }
             
-            // Corners
+            // Corners - view
+            
+            let cornerRadius = self.cornerStyle.radius(for: view.bounds)
+            let roundedCorners = self.cornerStyle.rectCorners.toCACornerMask
 
-            if self.cornerStyle.radius(for: view.bounds) != view.layer.cornerRadius {
-                view.layer.cornerRadius = self.cornerStyle.radius(for: view.bounds)
+            if cornerRadius != view.layer.cornerRadius {
+                view.layer.cornerRadius = cornerRadius
+            }
+
+            if roundedCorners != view.layer.maskedCorners {
+                view.layer.maskedCorners = roundedCorners
             }
             
-            if self.cornerStyle.radius(for: view.bounds) != view.contentView.layer.cornerRadius {
-                view.layer.cornerRadius = self.cornerStyle.radius(for: view.bounds)
+            // Corners - contentView
+            
+            if cornerRadius != view.contentView.layer.cornerRadius {
+                view.contentView.layer.cornerRadius = cornerRadius
             }
             
-            if self.cornerStyle.rectCorners.toCACornerMask != view.contentView.layer.maskedCorners {
-                view.layer.maskedCorners = self.cornerStyle.rectCorners.toCACornerMask
+            if roundedCorners != view.contentView.layer.maskedCorners {
+                view.contentView.layer.maskedCorners = roundedCorners
             }
             
             // Border
@@ -342,12 +351,10 @@ extension Box {
             }
             
             if view.layer.shadowColor != nil {
-                let radius = cornerStyle.radius(for: view.bounds)
-
                 view.layer.shadowPath = UIBezierPath(
                     roundedRect: view.bounds,
                     byRoundingCorners: self.cornerStyle.rectCorners,
-                    cornerRadii: CGSize(width: radius, height: radius)
+                    cornerRadii: CGSize(width: cornerRadius, height: cornerRadius)
                 ).cgPath
             } else {
                 view.layer.shadowPath = nil
@@ -357,7 +364,7 @@ extension Box {
 
             if self.clipsContent != view.contentView.clipsToBounds {
                 view.contentView.clipsToBounds = self.clipsContent
-            }
+            }            
         }
     }
 }

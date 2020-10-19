@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Add support for rounding specific corners on a `Box`](https://github.com/square/Blueprint/pull/166).
+
 - Add alignment guides to stacks. ([#153])
 
   Alignment guides let you fine-tune the cross axis alignment. You can specifying a guide value for any child in that element's coordinate space. Children are aligned relatively to each other so that the guide values line up, and then the content as a whole is aligned to the stack's bounds.

@@ -23,6 +23,7 @@ class BoxTests: XCTestCase {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .capsule
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 200, height: 100),
@@ -40,6 +41,7 @@ class BoxTests: XCTestCase {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .rounded(radius: 10.0)
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
@@ -51,6 +53,7 @@ class BoxTests: XCTestCase {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .rounded(radius: 10.0, corners: [.topLeft, .topRight])
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
@@ -62,6 +65,7 @@ class BoxTests: XCTestCase {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .rounded(radius: 10.0, corners: [.bottomLeft, .bottomRight])
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
