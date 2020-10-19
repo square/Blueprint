@@ -6,38 +6,38 @@ public struct ConstrainedSizeFraction: Element {
     public var wrappedElement: Element
     /// The fraction of the parent's horizontal layout space the content element should occupy. `nil` if the width is
     /// unconstrained.
-    public var width: CGFloat?
+    public var fractionalWidth: CGFloat?
     /// The fraction of the parent's vertical layout space the content element should occupy. `nil` if the height is
     /// unconstrained.
-    public var height: CGFloat?
+    public var fractionalHeight: CGFloat?
 
     /// Initializes with the given properties.
     ///
     /// - parameters:
-    ///   - width: The fraction of the parent's horizontal layout space the content element should occupy. `nil` if
+    ///   - fractionalWidth: The fraction of the parent's horizontal layout space the content element should occupy. `nil` if
     ///   the width is unconstrained. By default, `nil`.
-    ///   - height: The fraction of the parent's vertical layout space the content element should occupy. `nil` if
+    ///   - fractionalHeight: The fraction of the parent's vertical layout space the content element should occupy. `nil` if
     ///   the height is unconstrained. By default, `nil`.
     ///   - wrapping: The content element.
-    public init(width: CGFloat? = nil, height: CGFloat? = nil, wrapping wrappedElement: Element) {
+    public init(fractionalWidth: CGFloat? = nil, fractionalHeight: CGFloat? = nil, wrapping wrappedElement: Element) {
         precondition(
-            width.map { $0 >= 0 && $0 <= 1} ?? true,
+            fractionalWidth.map { $0 >= 0 && $0 <= 1} ?? true,
             "The provided width fraction must be a value in the range of `0...1`."
         )
         precondition(
-            height.map { $0 >= 0 && $0 <= 1} ?? true,
+            fractionalHeight.map { $0 >= 0 && $0 <= 1} ?? true,
             "The provided height fraction must be a value in the range of `0...1`."
         )
 
-        self.width = width
-        self.height = height
+        self.fractionalWidth = fractionalWidth
+        self.fractionalHeight = fractionalHeight
         self.wrappedElement = wrappedElement
     }
 
     public var content: ElementContent {
         ElementContent(
             child: wrappedElement,
-            layout: Layout(width: width, height: height)
+            layout: Layout(width: fractionalWidth, height: fractionalHeight)
         )
     }
 
@@ -80,15 +80,15 @@ public extension Element {
     /// Constrains the element to a fraction of its parent's size.
     ///
     /// - parameters:
-    ///   - width: The fraction of the parent's horizontal layout space the element should occupy. `nil`
+    ///   - fractionalWidth: The fraction of the parent's horizontal layout space the element should occupy. `nil`
     ///   if the width is unconstrained. By default, `nil`.
-    ///   - height: The fraction of the parent's vertical layout space the element should occupy. `nil`
+    ///   - fractionalHeight: The fraction of the parent's vertical layout space the element should occupy. `nil`
     ///   if the height is unconstrained. By default, `nil`.
     func constrainedTo(
-        widthFraction width: CGFloat? = nil,
-        heightFraction height: CGFloat? = nil
+        fractionalWidth: CGFloat? = nil,
+        fractionalHeight: CGFloat? = nil
     ) -> ConstrainedSizeFraction
     {
-        ConstrainedSizeFraction(width: width, height: height, wrapping: self)
+        ConstrainedSizeFraction(fractionalWidth: fractionalWidth, fractionalHeight: fractionalHeight, wrapping: self)
     }
 }

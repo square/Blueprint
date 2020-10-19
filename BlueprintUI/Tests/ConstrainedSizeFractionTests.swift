@@ -4,7 +4,7 @@ import BlueprintUI
 class ConstrainedSizeFractionTests: XCTestCase {
     func test_unconstrainedHeight() {
         let element = ConstrainedSizeFraction(
-            width: 0.5,
+            fractionalWidth: 0.5,
             wrapping: TestElement()
         )
         let size = element.content.measure(in: .init(width: .atMost(300), height: .atMost(400)))
@@ -13,7 +13,7 @@ class ConstrainedSizeFractionTests: XCTestCase {
 
     func test_unconstrainedWidth() {
         let element = ConstrainedSizeFraction(
-            height: 0.5,
+            fractionalHeight: 0.5,
             wrapping: TestElement()
         )
         let size = element.content.measure(in: .init(width: .atMost(300), height: .atMost(400)))
@@ -22,8 +22,8 @@ class ConstrainedSizeFractionTests: XCTestCase {
 
     func test_fullyConstrained() {
         let element = ConstrainedSizeFraction(
-            width: 0.5,
-            height: 0.25,
+            fractionalWidth: 0.5,
+            fractionalHeight: 0.25,
             wrapping: TestElement()
         )
         let size = element.content.measure(in: .init(width: .atMost(300), height: .atMost(400)))
