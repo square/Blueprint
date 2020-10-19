@@ -21,12 +21,12 @@ public struct ConstrainedSizeFraction: Element {
     ///   - wrapping: The content element.
     public init(width: CGFloat? = nil, height: CGFloat? = nil, wrapping wrappedElement: Element) {
         precondition(
-            width.map { $0 > 0 && $0 <= 1} ?? true,
-            "The provided width fraction must be greater than 0 and less than or equal to 1."
+            width.map { $0 >= 0 && $0 <= 1} ?? true,
+            "The provided width fraction must be a value in the range of `0...1`."
         )
         precondition(
-            height.map { $0 > 0 && $0 <= 1} ?? true,
-            "The provided height fraction must be greater than 0 and less than or equal to 1."
+            height.map { $0 >= 0 && $0 <= 1} ?? true,
+            "The provided height fraction must be a value in the range of `0...1`."
         )
 
         self.width = width
