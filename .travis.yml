@@ -10,21 +10,36 @@ branches:
 os: osx
 osx_image: xcode12
 
-env:
-  - DESTINATION="platform=iOS Simulator,OS=11.4,name=iPhone 7"
-  - DESTINATION="platform=iOS Simulator,OS=12.4,name=iPhone 7"
-  - DESTINATION="platform=iOS Simulator,OS=13.5,name=iPhone 8"
-  - DESTINATION="platform=iOS Simulator,OS=14.0,name=iPhone 8"
+# env:
+#   - DESTINATION="platform=iOS Simulator,OS=11.4,name=iPhone 7"
+#   - DESTINATION="platform=iOS Simulator,OS=12.4,name=iPhone 7"
+#   - DESTINATION="platform=iOS Simulator,OS=13.5,name=iPhone 8"
+#   - DESTINATION="platform=iOS Simulator,OS=14.0,name=iPhone 8"
 
-script:
-  xcodebuild -scheme "BlueprintUI-Package" test -destination "$DESTINATION"
+# script:
+#   xcodebuild -scheme "BlueprintUI-Package" test -destination "$DESTINATION"
+
+
+before_install:
+  - bundle install
+
+install:
+  - bundle exec pod install
 
 jobs:
   include:
-  - name: "Cocoapods BlueprintUI"
-    script: xcodebuild -workspace "SampleApp.xcworkspace" -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=14.0,name=iPhone 8"
-    before_install:
-      - cd SampleApp
-      - bundle install
-      - bundle exec pod repo update
-      - bundle exec pod install
+    - name: Swift Package Manager
+      script:
+        xcodebuild -scheme "BlueprintUI-Package" test -destination "platform=iOS Simulator,OS=14.0,name=iPhone 8"
+
+    - name: iOS 14 Tests
+      script: Scripts/run_ios14_tests.sh
+
+    - name: iOS 13 Tests
+      script: Scripts/run_ios13_tests.sh
+
+    - name: iOS 12 Tests
+      script: Scripts/run_ios12_tests.sh
+
+    - name: iOS 11 Tests
+      script: Scripts/run_ios11_tests.sh
