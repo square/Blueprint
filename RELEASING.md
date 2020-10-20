@@ -44,8 +44,8 @@
    Note: You may also need to quit Xcode before running these commands in order for the linting builds to succeed.
 
    ```bash
-   bundle exec pod trunk push BlueprintUI.podspec --skip-tests
+   BLUEPRINT_PUBLISHING=true bundle exec pod trunk push BlueprintUI.podspec
    # The --synchronous argument ensures this command builds against the
    # version of BlueprintUI that we just published.
-   bundle exec pod trunk push BlueprintUICommonControls.podspec --synchronous --skip-tests
+   BLUEPRINT_PUBLISHING=true bundle exec pod trunk push BlueprintUICommonControls.podspec --synchronous
    ```

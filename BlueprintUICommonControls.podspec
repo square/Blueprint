@@ -15,10 +15,12 @@ Pod::Spec.new do |s|
 
   s.dependency 'BlueprintUI'
 
-  s.test_spec 'Tests' do |test_spec|
-    test_spec.library = 'swiftsimd'
-    test_spec.source_files = 'BlueprintUICommonControls/Tests/**/*.swift'
-    test_spec.framework = 'XCTest'
-    test_spec.requires_app_host = true
+  unless ENV['BLUEPRINT_PUBLISHING']
+    s.test_spec 'Tests' do |test_spec|
+      test_spec.library = 'swiftsimd'
+      test_spec.source_files = 'BlueprintUICommonControls/Tests/**/*.swift'
+      test_spec.framework = 'XCTest'
+      test_spec.requires_app_host = true
+    end
   end
 end
