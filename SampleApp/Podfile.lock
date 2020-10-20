@@ -3,11 +3,14 @@ PODS:
   - BlueprintUI/Tests (0.16.0)
   - BlueprintUICommonControls (0.16.0):
     - BlueprintUI
+  - BlueprintUICommonControls/Tests (0.16.0):
+    - BlueprintUI
 
 DEPENDENCIES:
   - BlueprintUI (from `../BlueprintUI.podspec`)
   - BlueprintUI/Tests (from `../BlueprintUI.podspec`)
   - BlueprintUICommonControls (from `../BlueprintUICommonControls.podspec`)
+  - BlueprintUICommonControls/Tests (from `../BlueprintUICommonControls.podspec`)
 
 EXTERNAL SOURCES:
   BlueprintUI:
@@ -17,8 +20,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   BlueprintUI: e0caa063575bc925ce4ebb1028190f0c73c35231
-  BlueprintUICommonControls: d55b5d64320d68c29f216ca9e1e0c992c01247e8
+  BlueprintUICommonControls: 80090f63b9aaa440b7760f7ed1e406afe7f542b0
 
-PODFILE CHECKSUM: a01a59366bcd21b6f7030cb454d88867c7b2cf25
+PODFILE CHECKSUM: 7f3fd7a27af27c859b54a7210edbca6e5c09d7b8
 
 COCOAPODS: 1.9.3

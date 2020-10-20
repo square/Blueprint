@@ -15,9 +15,11 @@ Pod::Spec.new do |s|
 
   s.weak_framework = 'SwiftUI'
 
-  s.test_spec 'Tests' do |test_spec|
-    test_spec.library = 'swiftsimd'
-    test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
-    test_spec.framework = 'XCTest'
+  unless ENV['BLUEPRINT_PUBLISHING']
+    s.test_spec 'Tests' do |test_spec|
+      test_spec.library = 'swiftsimd'
+      test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
+      test_spec.framework = 'XCTest'
+    end
   end
 end

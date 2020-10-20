@@ -38,84 +38,73 @@ public struct Box: Element {
             return ElementContent(intrinsicSize: .zero)
         }
     }
+    
+    private var toViewModel : ViewModel {
+        ViewModel(
+            backgroundColor: self.backgroundColor,
+            cornerStyle: self.cornerStyle,
+            borderStyle: self.borderStyle,
+            shadowStyle: self.shadowStyle,
+            clipsContent: self.clipsContent
+        )
+    }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return BoxView.describe { config in
-
-            config.apply({ (view) in
-
-                if self.backgroundColor != view.backgroundColor {
-                    view.backgroundColor = self.backgroundColor
-                }
-
-                if self.cornerStyle.radius(for: bounds) != view.layer.cornerRadius {
-                    view.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
-                }
-
-                if self.borderStyle.color?.cgColor != view.layer.borderColor {
-                    view.layer.borderColor = self.borderStyle.color?.cgColor
-                }
-
-                if self.borderStyle.width != view.layer.borderWidth {
-                    view.layer.borderWidth = self.borderStyle.width
-                }
-
-                if self.shadowStyle.radius != view.layer.shadowRadius {
-                    view.layer.shadowRadius = self.shadowStyle.radius
-                }
-
-                if self.shadowStyle.offset != view.layer.shadowOffset {
-                    view.layer.shadowOffset = self.shadowStyle.offset
-                }
-
-                if self.shadowStyle.color?.cgColor != view.layer.shadowColor {
-                    view.layer.shadowColor = self.shadowStyle.color?.cgColor
-                }
-
-                if self.shadowStyle.opacity != CGFloat(view.layer.shadowOpacity) {
-                    view.layer.shadowOpacity = Float(self.shadowStyle.opacity)
-                }
-
-                /// `.contentView` is used for clipping, make sure the corner radius
-                /// matches.
-
-                if self.clipsContent != view.contentView.clipsToBounds {
-                    view.contentView.clipsToBounds = self.clipsContent
-                }
-
-                if self.cornerStyle.radius(for: bounds) != view.contentView.layer.cornerRadius {
-                    view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
-                }
-
-            })
-
-
-            config.contentView = { view in
-                return view.contentView
+        Box.View.describe { config in
+            
+            config.builder = {
+                Box.View(frame: bounds, model: self.toViewModel)
             }
-
+            
+            config.apply { view in
+                view.model = self.toViewModel
+            }
+            
+            config.contentView = { view in
+                view.contentView
+            }
         }
     }
 }
 
+
 extension Box {
 
-    public enum CornerStyle {
+    /// How to style the corners of the box.
+    public enum CornerStyle : Equatable {
+        
+        /// The corners of the box are not rounded at all.
         case square
+        
+        /// The corners of the box are rounded to the radius needed to draw a capsule / pill.
         case capsule
-        case rounded(radius: CGFloat)
+        
+        /// The provided corners are rounded with the provided radius.
+        case rounded(radius: CGFloat, corners : UIRectCorner = .allCorners)
+        
+        public var rectCorners : UIRectCorner {
+            switch self {
+            case .square:
+                return []
+            case .capsule:
+                return .allCorners
+            case .rounded(_, let corners):
+                return corners
+            }
+        }
     }
 
-    public enum BorderStyle {
+    public enum BorderStyle : Equatable {
         case none
         case solid(color: UIColor, width: CGFloat)
     }
 
-    public enum ShadowStyle {
+    public enum ShadowStyle : Equatable {
         case none
         case simple(radius: CGFloat, opacity: CGFloat, offset: CGSize, color: UIColor)
     }
 }
+
 
 public extension Element {
     
@@ -139,6 +128,7 @@ public extension Element {
     }
 }
 
+
 extension Box.CornerStyle {
 
     fileprivate func radius(for bounds: CGRect) -> CGFloat {
@@ -147,13 +137,13 @@ extension Box.CornerStyle {
             return 0
         case .capsule:
             return min(bounds.width, bounds.height) / 2
-        case let .rounded(radius: radius):
+        case let .rounded(radius: radius, _):
             let maximumRadius = min(bounds.width, bounds.height) / 2
             return min(maximumRadius, radius)
         }
     }
-
 }
+
 
 extension Box.BorderStyle {
     
@@ -174,8 +164,8 @@ extension Box.BorderStyle {
             return color
         }
     }
-    
 }
+
 
 extension Box.ShadowStyle {
     
@@ -214,34 +204,167 @@ extension Box.ShadowStyle {
             return color
         }
     }
-    
-    
 }
 
-fileprivate final class BoxView: UIView {
-    
-    let contentView = UIView()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        contentView.frame = bounds
-        addSubview(contentView)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        contentView.frame = bounds
 
-        if layer.shadowColor != nil {
-            layer.shadowPath = UIBezierPath(
-                roundedRect: bounds,
-                cornerRadius: layer.cornerRadius
-            ).cgPath
+extension UIRectCorner {
+    
+    /// `CACornerMask` is based on the macOS coordinate system, which starts in the top left, not the bottom left like iOS.
+    /// You know when you try to plug in a USB connector and it takes 3 tries and you end up exactly where you started? Anyways.
+    
+    var toCACornerMask : CACornerMask {
+        var mask = CACornerMask()
+        
+        if self.contains(.topLeft) {
+            mask.formUnion(.layerMinXMinYCorner)
+        }
+        
+        if self.contains(.topRight) {
+            mask.formUnion(.layerMaxXMinYCorner)
+        }
+        
+        if self.contains(.bottomRight) {
+            mask.formUnion(.layerMaxXMaxYCorner)
+        }
+        
+        if self.contains(.bottomLeft) {
+            mask.formUnion(.layerMinXMaxYCorner)
+        }
+        
+        return mask
+    }
+}
+
+
+extension Box {
+    
+    fileprivate final class View : UIView {
+        
+        let contentView = UIView()
+        
+        var model : ViewModel {
+            didSet {
+                guard oldValue != self.model else { return }
+             
+                self.needsUpdateFromModel = true
+                self.setNeedsLayout()
+            }
+        }
+        
+        init(frame: CGRect, model : ViewModel) {
+            
+            self.model = model
+            
+            super.init(frame: frame)
+            
+            contentView.frame = bounds
+            addSubview(contentView)
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        
+        private var needsUpdateFromModel : Bool = true
+        private var lastSize : CGSize? = nil
+        
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            
+            contentView.frame = bounds
+
+            if self.lastSize != self.bounds.size || self.needsUpdateFromModel {
+                self.lastSize = self.bounds.size
+                self.needsUpdateFromModel = false
+                
+                self.model.applyTo(view: self)
+            }
         }
     }
     
+    
+    fileprivate struct ViewModel : Equatable {
+        public var backgroundColor: UIColor
+        public var cornerStyle: CornerStyle
+        public var borderStyle: BorderStyle
+        public var shadowStyle: ShadowStyle
+        public var clipsContent: Bool
+        
+        func applyTo(view : View) {
+            
+            // Background
+                        
+            if self.backgroundColor != view.backgroundColor {
+                view.backgroundColor = self.backgroundColor
+            }
+            
+            // Corners - view
+            
+            let cornerRadius = self.cornerStyle.radius(for: view.bounds)
+            let roundedCorners = self.cornerStyle.rectCorners.toCACornerMask
+
+            if cornerRadius != view.layer.cornerRadius {
+                view.layer.cornerRadius = cornerRadius
+            }
+
+            if roundedCorners != view.layer.maskedCorners {
+                view.layer.maskedCorners = roundedCorners
+            }
+            
+            // Corners - contentView
+            
+            if cornerRadius != view.contentView.layer.cornerRadius {
+                view.contentView.layer.cornerRadius = cornerRadius
+            }
+            
+            if roundedCorners != view.contentView.layer.maskedCorners {
+                view.contentView.layer.maskedCorners = roundedCorners
+            }
+            
+            // Border
+
+            if self.borderStyle.color?.cgColor != view.layer.borderColor {
+                view.layer.borderColor = self.borderStyle.color?.cgColor
+            }
+
+            if self.borderStyle.width != view.layer.borderWidth {
+                view.layer.borderWidth = self.borderStyle.width
+            }
+            
+            // Shadow
+
+            if self.shadowStyle.radius != view.layer.shadowRadius {
+                view.layer.shadowRadius = self.shadowStyle.radius
+            }
+
+            if self.shadowStyle.offset != view.layer.shadowOffset {
+                view.layer.shadowOffset = self.shadowStyle.offset
+            }
+
+            if self.shadowStyle.color?.cgColor != view.layer.shadowColor {
+                view.layer.shadowColor = self.shadowStyle.color?.cgColor
+            }
+
+            if self.shadowStyle.opacity != CGFloat(view.layer.shadowOpacity) {
+                view.layer.shadowOpacity = Float(self.shadowStyle.opacity)
+            }
+            
+            if view.layer.shadowColor != nil {
+                view.layer.shadowPath = UIBezierPath(
+                    roundedRect: view.bounds,
+                    byRoundingCorners: self.cornerStyle.rectCorners,
+                    cornerRadii: CGSize(width: cornerRadius, height: cornerRadius)
+                ).cgPath
+            } else {
+                view.layer.shadowPath = nil
+            }
+            
+            // Content Views
+
+            if self.clipsContent != view.contentView.clipsToBounds {
+                view.contentView.clipsToBounds = self.clipsContent
+            }            
+        }
+    }
 }

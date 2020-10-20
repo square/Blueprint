@@ -25,14 +25,11 @@ let package = Package(
             name: "BlueprintUITests",
             dependencies: ["BlueprintUI"],
             path: "BlueprintUI/Tests"),
+            
         .target(
             name: "BlueprintUICommonControls",
             dependencies: ["BlueprintUI"],
             path: "BlueprintUICommonControls/Sources"),
-        .testTarget(
-            name: "BlueprintUICommonControlsTests",
-            dependencies: ["BlueprintUICommonControls"],
-            path: "BlueprintUICommonControls/Tests"),
     ],
     swiftLanguageVersions: [.v5]
 )

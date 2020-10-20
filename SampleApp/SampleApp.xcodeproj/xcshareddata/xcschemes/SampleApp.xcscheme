@@ -103,6 +103,16 @@
                ReferencedContainer = "container:Pods/Pods.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7E570D38AB322DDDC9CAA6AB1EC2BD87"
+               BuildableName = "BlueprintUICommonControls-Unit-Tests.xctest"
+               BlueprintName = "BlueprintUICommonControls-Unit-Tests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

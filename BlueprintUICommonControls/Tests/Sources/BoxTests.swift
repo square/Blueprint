@@ -23,25 +23,54 @@ class BoxTests: XCTestCase {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .capsule
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 200, height: 100),
-                identifier: "wideCapsule")
+                identifier: "wideCapsule"
+            )
 
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 200),
-                identifier: "longCapsule")
+                identifier: "longCapsule"
+            )
         }
 
         do {
             var box = Box()
             box.backgroundColor = .blue
             box.cornerStyle = .rounded(radius: 10.0)
+            
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
-                identifier: "rounded")
+                identifier: "roundedAllCorners"
+            )
+        }
+        
+        do {
+            var box = Box()
+            box.backgroundColor = .blue
+            box.cornerStyle = .rounded(radius: 10.0, corners: [.topLeft, .topRight])
+            
+            compareSnapshot(
+                of: box,
+                size: CGSize(width: 100, height: 100),
+                identifier: "roundTopCorners"
+            )
+        }
+        
+        do {
+            var box = Box()
+            box.backgroundColor = .blue
+            box.cornerStyle = .rounded(radius: 10.0, corners: [.bottomLeft, .bottomRight])
+            
+            compareSnapshot(
+                of: box,
+                size: CGSize(width: 100, height: 100),
+                identifier: "roundBottomCorners"
+            )
         }
     }
 
@@ -98,6 +127,20 @@ class BoxTests: XCTestCase {
             size: CGSize(width: 120, height: 100))
     }
     
+}
+
+
+class UIRectCornerTests : XCTestCase {
+    
+    func test_toCACornerMask() {
+        
+        /// `CACornerMask` is based on the macOS coordinate system, which starts in the top left, not the bottom left like iOS.
+        
+        XCTAssertEqual(UIRectCorner.topLeft.toCACornerMask, CACornerMask.layerMinXMinYCorner)
+        XCTAssertEqual(UIRectCorner.topRight.toCACornerMask, CACornerMask.layerMaxXMinYCorner)
+        XCTAssertEqual(UIRectCorner.bottomRight.toCACornerMask, CACornerMask.layerMaxXMaxYCorner)
+        XCTAssertEqual(UIRectCorner.bottomLeft.toCACornerMask, CACornerMask.layerMinXMaxYCorner)
+    }
 }
 
 
