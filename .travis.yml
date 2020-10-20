@@ -24,6 +24,7 @@ before_install:
   - bundle install
 
 install:
+  - cd SampleApp
   - bundle exec pod install
 
 jobs:
