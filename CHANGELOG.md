@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.17.0] - 2020-10-21
+
+### Added
+
 - Add alignment guides to stacks. ([#153])
 
   Alignment guides let you fine-tune the cross axis alignment. You can specifying a guide value for any child in that element's coordinate space. Children are aligned relatively to each other so that the guide values line up, and then the content as a whole is aligned to the stack's bounds.
@@ -37,19 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Removed support for iOS 10](https://github.com/square/Blueprint/pull/161). Future releases will only support iOS 11 and later.
 
-### Changed
-
 ### Deprecated
 
 - `Row` alignments `leading` and `trailing` are deprecated. Use `top` and `bottom` instead. ([#153])
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.16.0] - 2020-09-22
 
@@ -442,7 +450,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.16.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.17.0...HEAD
+[0.17.0]: https://github.com/square/Blueprint/compare/0.16.0...0.17.0
 [0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0
 [0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
 [0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
