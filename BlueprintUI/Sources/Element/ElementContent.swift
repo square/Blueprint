@@ -51,9 +51,8 @@ public struct ElementContent {
 
     func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         SignpostLogger.log(log: .blueprintView, name: "Layout Element", for: self) {
-            
+            storage.performLayout(attributes: attributes, environment: environment)
         }
-        return storage.performLayout(attributes: attributes, environment: environment)
     }
 }
 
