@@ -96,11 +96,15 @@ public struct ViewDescription {
     }
     
     public func build() -> UIView {
-        return _build()
+        SignpostLogger.log(log: .blueprintView, name: "Create View", for: self) {
+            _build()
+        }
     }
     
     public func apply(to view: UIView) {
-        _apply(view)
+        SignpostLogger.log(log: .blueprintView, name: "Update View", for: self) {
+            _apply(view)
+        }
     }
     
     public func contentView(in view: UIView) -> UIView {
@@ -117,6 +121,16 @@ public struct ViewDescription {
     
     public var disappearingTransition: VisibilityTransition? {
         return _disappearingTransition
+    }
+    
+}
+
+extension ViewDescription : SignpostLoggable {
+    
+    var signpostInfo: SignpostLoggingInfo {
+        .init(
+            identifiers: [String(describing: self.viewType)]
+        )
     }
     
 }

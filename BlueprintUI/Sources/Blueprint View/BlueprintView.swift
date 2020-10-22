@@ -192,9 +192,11 @@ public final class BlueprintView: UIView {
         lastViewHierarchyUpdateBounds = bounds
 
         /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
-            .resolve() ?? []
+        let viewNodes : [LayoutResultNode.ResolvedNodes] = SignpostLogger.log(log: .blueprintView, name: "BlueprintView: Layout & Resolve Element", for: self) {
+            element?
+                .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
+                .resolve() ?? []
+        }
         
         rootController.view.frame = bounds
         
@@ -207,7 +209,10 @@ public final class BlueprintView: UIView {
         let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: .zero, correction: .zero, scale: scale)
         
-        rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
+        SignpostLogger.log(log: .blueprintView, name: "BlueprintView: Update View Hierarchy", for: self) {
+            rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
+        }
+        
         hasUpdatedViewHierarchy = true
 
         isInsideUpdate = false
@@ -240,6 +245,14 @@ public final class BlueprintView: UIView {
         }
 
         return environment
+    }
+}
+
+extension BlueprintView : SignpostLoggable {
+    var signpostInfo: SignpostLoggingInfo {
+        .init(
+            identifiers: ["\(self.bounds.width) x \(self.bounds.height)"]
+        )
     }
 }
 

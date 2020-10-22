@@ -64,9 +64,11 @@ extension LayoutResultNode {
 
 extension LayoutResultNode {
 
+    typealias ResolvedNodes = (path: ElementPath, node: NativeViewNode)
+    
     /// Returns the flattened tree of view descriptions (any element that does not return
     /// a view description will be skipped).
-    func resolve() -> [(path: ElementPath, node: NativeViewNode)] {
+    func resolve() -> [ResolvedNodes] {
 
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
             .flatMap { identifier, layoutResultNode in

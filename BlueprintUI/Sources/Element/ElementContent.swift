@@ -3,7 +3,7 @@ import UIKit
 /// Represents the content of an element.
 public struct ElementContent {
 
-    private let storage: ContentStorage
+    fileprivate let storage: ContentStorage
     
     /// The key to use to cache measurement values.
     private let measurementCachingKey : MeasurementCachingKey?
@@ -37,9 +37,12 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, environment: environment)
+        SignpostLogger.log(log: .blueprintView, name: "Measure Element", for: self) {
+            environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
+                self.storage.measure(in: constraint, environment: environment)
+            }
         }
+
     }
 
     public var childCount: Int {
@@ -47,7 +50,17 @@ public struct ElementContent {
     }
 
     func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        SignpostLogger.log(log: .blueprintView, name: "Layout Element", for: self) {
+            
+        }
         return storage.performLayout(attributes: attributes, environment: environment)
+    }
+}
+
+
+extension ElementContent : SignpostLoggable {
+    var signpostInfo : SignpostLoggingInfo {
+        self.storage.signpostInfo
     }
 }
 
@@ -197,7 +210,7 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage {
+fileprivate protocol ContentStorage : SignpostLoggable {
     var childCount: Int { get }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize
@@ -237,6 +250,12 @@ extension ElementContent {
         }
         
         // MARK: ContentStorage
+        
+        var signpostInfo: SignpostLoggingInfo {
+            .init(
+                identifiers: [String(describing: LayoutType.self)]
+            )
+        }
         
         var childCount: Int {
             return children.count
@@ -305,6 +324,12 @@ extension ElementContent {
 
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
+    
+    var signpostInfo: SignpostLoggingInfo {
+        .init(
+            identifiers: [String(describing: type(of: child))]
+        )
+    }
 
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
@@ -352,6 +377,10 @@ private struct LazyStorage: ContentStorage {
     let childCount = 1
 
     var builder: (SizeConstraint, Environment) -> Element
+    
+    var signpostInfo: SignpostLoggingInfo {
+        .init(identifiers: ["LazyStorage"])
+    }
 
     func performLayout(
         attributes: LayoutAttributes,
