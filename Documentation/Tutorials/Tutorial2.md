@@ -83,8 +83,8 @@ struct ReceiptElement: ProxyElement {
         label.color = .darkGray
 
         let inset = Inset(
-            wrapping: label,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: label)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight // Stretches content to fill width, but sizes height to fit
@@ -201,14 +201,14 @@ struct LineItemElement: ProxyElement {
 
             row.horizontalUnderflow = .spaceEvenly
 
-            var titleLabel = Label(text: title)
+            let titleLabel = Label(text: title)
             row.add(child: titleLabel)
 
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
             let formattedPrice = formatter.string(from: NSNumber(value: price)) ?? ""
 
-            var priceLabel = Label(text: formattedPrice)
+            let priceLabel = Label(text: formattedPrice)
             row.add(child: priceLabel)
 
         }
@@ -273,8 +273,8 @@ struct ReceiptElement: ProxyElement {
         }
 
         let inset = Inset(
-            wrapping: column,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: column)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight
@@ -316,8 +316,8 @@ struct ReceiptElement: ProxyElement {
         }
 
         let inset = Inset(
-            wrapping: column,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: column)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight
@@ -374,8 +374,8 @@ struct ReceiptElement: ProxyElement {
         }
 
         let inset = Inset(
-            wrapping: column,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: column)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight
@@ -399,8 +399,8 @@ import BlueprintUICommonControls
 struct RuleElement: ProxyElement {
     var elementRepresentation: Element {
         return ConstrainedSize(
-            wrapping: Box(backgroundColor: .black),
-            height: .absolute(1.0))
+            height: .absolute(1.0),
+            wrapping: Box(backgroundColor: .black))
     }
 }
 ```
@@ -568,8 +568,8 @@ struct ReceiptElement: ProxyElement {
         }
 
         let inset = Inset(
-            wrapping: column,
-            uniformInset: 24.0)
+            uniformInset: 24.0,
+            wrapping: column)
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight

@@ -11,6 +11,168 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.17.0] - 2020-10-21
+
+### Added
+
+- Add alignment guides to stacks. ([#153])
+
+  Alignment guides let you fine-tune the cross axis alignment. You can specifying a guide value for any child in that element's coordinate space. Children are aligned relatively to each other so that the guide values line up, and then the content as a whole is aligned to the stack's bounds.
+
+  In this example, the center of one element is aligned 10 points from the bottom of another element, and the contents are collectively aligned to the bottom of the row:
+
+  ```swift
+  Row { row in
+      row.verticalAlignment = .bottom
+
+      row.add(
+          alignmentGuide: { d in d[VerticalAlignment.center] },
+          child: element1
+      )
+
+      row.add(
+          alignmentGuide: { d in d.height - 10 },
+          child: element2
+      )
+  }
+  ```
+
+### Removed
+
+- [Removed support for iOS 10](https://github.com/square/Blueprint/pull/161). Future releases will only support iOS 11 and later.
+
+### Deprecated
+
+- `Row` alignments `leading` and `trailing` are deprecated. Use `top` and `bottom` instead. ([#153])
+
+## [0.16.0] - 2020-09-22
+
+### Fixed
+
+- Fixed `EqualStack` to properly constrain children when measuring. ([#157](https://github.com/square/Blueprint/pull/157))
+
+### Added
+
+- Add a new `TransitionContainer.init` that supports further customization during initialization and has the same defaults as `ViewDescription`. ([#155], [#158])
+
+- Add `transition(onAppear:onDisappear:onLayout)` and `transition(_:)` methods to `Element` to describe transition animations. ([#155], [#158])
+
+### Removed
+
+- [Remove `GridLayout`](https://github.com/square/Blueprint/pull/156); it's incomplete and was never really intended to be consumed widely. The intended replacement is putting `EqualStacks` inside of a `Column`, or `Rows` inside a `Column`.
+
+### Deprecated
+
+- `TransitionContainer(wrapping:)` is deprecated. Use the new `TransitionContainer(transitioning:)` instead. ([#158])
+
+### Misc
+
+- Removed some redundant work being done during rendering. ([#154])
+
+## [0.15.1] - 2020-09-16
+
+### Fixed
+
+- Fixes a crash that can occur in `Box` when specifying a corner radius and shadow. ([#149])
+
+## [0.15.0] - 2020-09-14
+
+### Added
+
+- Add `addFixed(child:)` and `addFlexible(child:)` methods to `StackElement` for adding children with a grow & shrink priority of 0.0 and 1.0 respectively. ([#143])
+
+- Add `capsule` case to `Box.CornerStyle` ([#145]). This addition sugars the following pattern:
+
+  ```swift
+  GeometryReader { geometry in
+    Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
+  }
+  ```
+  
+  into
+  
+  ```swift
+  Box(cornerStyle: .capsule)
+  ```
+  
+- Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over. ([#144])
+
+- Add `Opacity` element for modifying the opacity of a wrapped element. ([#147])
+
+### Changed
+
+- `BlueprintView` will call `layoutIfNeeded` on backing views during its layout pass. This allows backing views' subviews that are laid out during `layoutSubviews` to participate in animations. ([#139])
+
+## [0.14.0] - 2020-08-12
+
+### Added
+
+- Add `textColor` property on TextField ([#133](https://github.com/square/Blueprint/pull/133)).
+- Add the `windowSize` environment key. ([#134])
+
+- Add `GeometryReader`. ([#135])
+
+  This element allow you to compose elements whose contents depend on the amount of space available.
+
+  Here is an example that dynamically chooses an image based on the width available:
+
+  ```swift
+  GeometryReader { (geometry) -> Element in
+      let image: UIImage
+      switch geometry.constraint.width.maximum {
+      case ..<100:
+          image = UIImage(named: "small")!
+      case 100..<500:
+          image = UIImage(named: "medium")!
+      default:
+          image = UIImage(named: "large")!
+      }
+      return Image(image: image)
+  }
+  ```
+
+### Changed
+
+- Default `ScrollView.delaysContentTouches` to `true` ([#132](https://github.com/square/Blueprint/pull/132))
+
+### Misc
+
+- Set an explicit shadow path on `Box` ([#137](https://github.com/square/Blueprint/pull/137))
+
+## [0.13.1] - 2020-07-30
+
+### Added
+
+- Introduce `AccessibilityContainer` element for wrapping an element with multiple sub-elements that should be in a voice over container.
+
+- Add `font` property on TextField ([#127](https://github.com/square/Blueprint/pull/127)).
+
+## [0.13.0] - 2020-07-20
+
+### Fixed
+
+- [Update the scroll indicator inset](https://github.com/square/Blueprint/pull/117) when adjusting the content inset.
+
+- `Label` & `AttributedLabel` use an internal `UILabel` for measurement. This fixes measurement when there is a line limit set. However, it also means that the screen scale cannot be specified and is always assumed to be `UIScreen.main.scale`. These elements may not be measured correctly if they are placed on a screen other than `UIScreen.main`. ([#120])
+
+### Added
+
+- Introduce [MeasurementCachingKey](https://github.com/square/Blueprint/pull/115), to allow for elements to provide a way to cache their measurement during layout passes. This provides performance optimizations for elements whose layout and measurement is expensive to calculate.
+
 - Introduce `UIViewElement` [to make wrapping self-sizing UIViews easier](https://github.com/square/Blueprint/pull/106).
   
   You can now write a `UIViewElement` like this:
@@ -34,21 +196,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   And the elements will be sized and presented correctly based on the view's `sizeThatFits`.
 
-### Removed
+- Add `isAccessibilityElement` to `Label` and `AttributedLabel`. ([#120])
+- Add `lineHeight` to `Label` for specifying custom line heights. `AttributedLabel` has a `textRectOffset` property to support this. ([#120])
 
 ### Changed
 
-### Deprecated
+- [Update Demo app](https://github.com/square/Blueprint/pull/116) to support more demo screen types.
 
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
-
-## [0.12.2] - 06-08-2020
+## [0.12.2] - 2020-06-08
 
 ### Fixed
 
@@ -58,13 +213,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add [delaysContentTouches](https://github.com/square/Blueprint/pull/109) to the `ScrollView` element.
 
-## [0.12.1] - 06-05-2020
+## [0.12.1] - 2020-06-05
 
 ### Fixed
 
 - Use default environment when [measuring `BlueprintView`](https://github.com/square/Blueprint/pull/107).
 
-## [0.12.0] - 06-04-2020
+## [0.12.0] - 2020-06-04
 
 ### Fixed
 
@@ -295,7 +450,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[master]: https://github.com/square/Blueprint/compare/0.11.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.17.0...HEAD
+[0.17.0]: https://github.com/square/Blueprint/compare/0.16.0...0.17.0
+[0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0
+[0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
+[0.15.0]: https://github.com/square/Blueprint/compare/0.14.0...0.15.0
+[0.14.0]: https://github.com/square/Blueprint/compare/0.13.1...0.14.0
+[0.13.1]: https://github.com/square/Blueprint/compare/0.13.0...0.13.1
+[0.13.0]: https://github.com/square/Blueprint/compare/0.12.2...0.13.0
+[0.12.2]: https://github.com/square/Blueprint/compare/0.12.1...0.12.2
+[0.12.1]: https://github.com/square/Blueprint/compare/0.12.0...0.12.1
+[0.12.0]: https://github.com/square/Blueprint/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/square/Blueprint/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/square/Blueprint/compare/0.9.2...0.10.0
 [0.9.2]: https://github.com/square/Blueprint/compare/0.9.1...0.9.2
@@ -309,6 +474,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#158]: https://github.com/square/Blueprint/pull/158
+[#155]: https://github.com/square/Blueprint/pull/155
+[#154]: https://github.com/square/Blueprint/pull/154
+[#153]: https://github.com/square/Blueprint/pull/153
+[#149]: https://github.com/square/Blueprint/pull/149
+[#147]: https://github.com/square/Blueprint/pull/147
+[#145]: https://github.com/square/Blueprint/pull/145
+[#144]: https://github.com/square/Blueprint/pull/144
+[#143]: https://github.com/square/Blueprint/pull/143
+[#139]: https://github.com/square/Blueprint/pull/139
+[#135]: https://github.com/square/Blueprint/pull/135
+[#134]: https://github.com/square/Blueprint/pull/134
+[#120]: https://github.com/square/Blueprint/pull/120
 [#102]: https://github.com/square/Blueprint/pull/102
 [#101]: https://github.com/square/Blueprint/pull/101
 [#100]: https://github.com/square/Blueprint/pull/100

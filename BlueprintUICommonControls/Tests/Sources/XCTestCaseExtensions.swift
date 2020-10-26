@@ -30,7 +30,8 @@ extension XCTestCase {
 
 
         let testName = testName.prefix(testName.count - 2)
-        imageURL.appendPathComponent("\(testName)_\(identifier ?? "").png")
+        let majorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+        imageURL.appendPathComponent("\(testName)_\(identifier ?? "")_iOS-\(majorVersion).png")
 
         if let referenceImage = UIImage(contentsOfFile: imageURL.path) {
             if referenceImage.pixelData == image.pixelData {
@@ -104,6 +105,8 @@ extension XCTestCase {
             view.frame = CGRect(origin: .zero, size: size)
         } else {
             view.sizeToFit()
+            view.frame.size.width.round(.up, by: scale)
+            view.frame.size.height.round(.up, by: scale)
         }
 
         compareSnapshot(of: view, identifier: identifier, scale: scale, file: file, testName: testName, line: line)

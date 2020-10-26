@@ -29,7 +29,7 @@ public struct ScrollView: Element {
     public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
     public var keyboardAdjustmentMode: KeyboardAdjustmentMode = .adjustsWhenVisible
 
-    public var delaysContentTouches: Bool = false
+    public var delaysContentTouches: Bool = true
 
 
     public init(
@@ -332,7 +332,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     {
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: scrollView.contentInset,
-            safeAreaInsets: self.bp_safeAreaInsets,
+            safeAreaInsets: self.safeAreaInsets,
             keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: scrollView.pullToRefreshBehavior,
             refreshControlBounds: refreshControl?.bounds
@@ -424,7 +424,7 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
         
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: self.representedElement.contentInset,
-            safeAreaInsets: self.bp_safeAreaInsets,
+            safeAreaInsets: self.safeAreaInsets,
             keyboardBottomInset: self.bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: self.representedElement.pullToRefreshBehavior,
             refreshControlBounds: self.refreshControl?.bounds
@@ -435,6 +435,10 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
         
         if self.scrollView.contentInset.bottom != contentInset.bottom {
             self.scrollView.contentInset.bottom = contentInset.bottom
+        }
+
+        if self.scrollView.scrollIndicatorInsets.bottom != contentInset.bottom {
+            self.scrollView.scrollIndicatorInsets.bottom = contentInset.bottom
         }
     }
     
@@ -471,14 +475,3 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
     }
 }
 
-
-private extension UIView {
-    
-    var bp_safeAreaInsets : UIEdgeInsets {
-        if #available(iOS 11.0, *) {
-            return self.safeAreaInsets
-        } else {
-            return .zero
-        }
-    }
-}

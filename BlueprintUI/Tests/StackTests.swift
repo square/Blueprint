@@ -67,65 +67,285 @@ class StackTests: XCTestCase {
         XCTAssertEqual(children[1].layoutAttributes.frame, CGRect(x: 110, y: 0, width: 100, height: 100))
     }
 
-    func test_alignment() {
-
-
+    func test_columnAlignment() {
         func test(
-            alignment: StackLayout.Alignment,
+            alignment: Column.ColumnAlignment,
             layoutCrossSize: CGFloat,
             elementCrossSize: CGFloat,
             expectedOrigin: CGFloat,
             expectedSize: CGFloat,
             file: StaticString = #file,
-            line: UInt = #line) {
-
-            do {
-                var column = Column()
+            line: UInt = #line
+        ) {
+            let column = Column { column in
                 column.add(child: TestElement(size: CGSize(width: elementCrossSize, height: 100)))
                 column.horizontalAlignment = alignment
-
-                XCTAssertEqual(
-                    column
-                        .layout(frame: CGRect(x: 0, y: 0, width: layoutCrossSize, height: 100))
-                        .children[0]
-                        .node
-                        .layoutAttributes
-                        .frame,
-                    CGRect(x: expectedOrigin, y: 0.0, width: expectedSize, height: 100),
-                    "Vertical",
-                    file: file,
-                    line: line
-                )
             }
 
-            do {
-                var row = Row()
-                row.add(child: TestElement(size: CGSize(width: 100, height: elementCrossSize)))
-                row.verticalAlignment = alignment
-
-                XCTAssertEqual(
-                    row
-                        .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutCrossSize))
-                        .children[0]
-                        .node
-                        .layoutAttributes
-                        .frame,
-                    CGRect(x: 0.0, y: expectedOrigin, width: 100, height: expectedSize),
-                    "Horizontal",
-                    file: file,
-                    line: line
-                )
-            }
-
-
-
+            XCTAssertEqual(
+                column
+                    .layout(frame: CGRect(x: 0, y: 0, width: layoutCrossSize, height: 100))
+                    .children[0]
+                    .node
+                    .layoutAttributes
+                    .frame,
+                CGRect(x: expectedOrigin, y: 0.0, width: expectedSize, height: 100),
+                "Vertical",
+                file: file,
+                line: line
+            )
         }
 
         test(alignment: .leading, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 0, expectedSize: 100)
         test(alignment: .trailing, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 100, expectedSize: 100)
         test(alignment: .fill, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 0, expectedSize: 200)
         test(alignment: .center, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 50, expectedSize: 100)
+        test(alignment: .align(to: .test25), layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 25, expectedSize: 100)
+    }
 
+    func test_rowAlignment() {
+        func test(
+            alignment: Row.RowAlignment,
+            layoutCrossSize: CGFloat,
+            elementCrossSize: CGFloat,
+            expectedOrigin: CGFloat,
+            expectedSize: CGFloat,
+            file: StaticString = #file,
+            line: UInt = #line
+        ) {
+            let row = Row { row in
+                row.add(child: TestElement(size: CGSize(width: 100, height: elementCrossSize)))
+                row.verticalAlignment = alignment
+            }
+
+            XCTAssertEqual(
+                row
+                    .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutCrossSize))
+                    .children[0]
+                    .node
+                    .layoutAttributes
+                    .frame,
+                CGRect(x: 0.0, y: expectedOrigin, width: 100, height: expectedSize),
+                "Horizontal",
+                file: file,
+                line: line
+            )
+        }
+
+        test(alignment: .top, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 0, expectedSize: 100)
+        test(alignment: .bottom, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 100, expectedSize: 100)
+        test(alignment: .fill, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 0, expectedSize: 200)
+        test(alignment: .center, layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 50, expectedSize: 100)
+        test(alignment: .align(to: .test25), layoutCrossSize: 200, elementCrossSize: 100, expectedOrigin: 25, expectedSize: 100)
+    }
+
+    func test_alignmentGuides() {
+        func test(
+            stack: StackElement,
+            layoutSize: CGSize,
+            expectedSize: CGSize,
+            expectedOrigins: [CGFloat],
+            file: StaticString = #file,
+            line: UInt = #line
+        ) {
+            let layoutResult = stack.layout(frame: CGRect(origin: .zero, size: layoutSize))
+            let frames = layoutResult
+                .children
+                .map { child in child.node.layoutAttributes.frame }
+
+            let size = stack.content.measure(in: .unconstrained)
+            XCTAssertEqual(size, expectedSize, "measured size", file: file, line: line)
+
+            XCTAssertEqual(frames.count, expectedOrigins.count, "child count", file: file, line: line)
+            for i in frames.indices {
+                let origin = stack.layout.axis == .horizontal
+                    ? CGPoint(x: CGFloat(i) * 100, y: expectedOrigins[i])
+                    : CGPoint(x: expectedOrigins[i], y: CGFloat(i) * 100)
+
+                XCTAssertEqual(
+                    frames[i],
+                    CGRect(origin: origin, size: CGSize(width: 100, height: 100)),
+                    "child \(i) frame",
+                    file: file,
+                    line: line
+                )
+            }
+        }
+
+        // In this test, 3 boxes are aligned to their top & bottom edges.
+        // The stack size matches the size of the content and needs no further alignment.
+        //
+        //          ┌ ─ ─ ─ ─ ─ ─ ┬──────────┐─ ─ ─ ─ ─ ─ ─
+        //                        │100       │             │
+        //          │             │          │
+        //                        │          │             │
+        //          │             │          │
+        //                        │          │             │
+        //        ─ ┼┌──────────┬ ┴──────────┘─┌──────────┬ ─ guide
+        //           │0         │              │0         ││
+        //          ││          │              │          │
+        //           │          │              │          ││
+        //          ││          │              │          │
+        //           │          │              │          ││
+        //  anchor ▶┴┴──────────┴──────────────┴──────────┴─◀
+        //
+        test(
+            stack: Row { row in
+                row.verticalAlignment = .bottom
+
+                // align to top edge
+                row.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                // align to bottom edge
+                row.add(alignmentGuide: { d in d.height }, child: TestElement())
+                // align to top using another guide
+                row.add(alignmentGuide: { d in d[.top] }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 300, height: 200),
+            expectedSize: CGSize(width: 300, height: 200),
+            expectedOrigins: [
+                100,
+                0,
+                100,
+            ]
+        )
+        // Same test on the other axis.
+        test(
+            stack: Column { column in
+                column.horizontalAlignment = .trailing
+
+                column.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                column.add(alignmentGuide: { d in d.width }, child: TestElement())
+                column.add(alignmentGuide: { d in d[.leading] }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 200, height: 300),
+            expectedSize: CGSize(width: 200, height: 300),
+            expectedOrigins: [
+                100,
+                0,
+                100,
+            ]
+        )
+
+        // In this test, 4 boxes are aligned relatively based on an arbitrary offset.
+        // The relatively aligned content is larger than the stack bounds,
+        // so the alignment is used to anchor the content to the center.
+        // Note that the relative alignment guide does not lie at the center of the content.
+        //
+        //           ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┬──────────┐
+        //            content bounds                         │160       │
+        //           │                                       │          │
+        //                                                   │          │
+        //          ┌│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│          ├
+        //           stack bounds                            │          ││
+        //          ││            ┌──────────┐               └──────────┘
+        //                        │50        │                          ││
+        //  anchor ▶┼┼────────────┤          ├────────────────────────────◀
+        //        ─ ─┌──────────┬ ┼ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┼│─ guide
+        //          ││0         │ │          │
+        //           │          │ │          │  ┌──────────┐            ││
+        //          └│          ├ ┴──────────┘─ ┤-40       │─ ─ ─ ─ ─ ─ ─
+        //           │          │               │          │            │
+        //           │          │               │          │
+        //           └──────────┘               │          │            │
+        //           │                          │          │
+        //            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┴──────────┘─ ─ ─ ─ ─ ─ ┘
+        test(
+            stack: Row { row in
+                row.verticalAlignment = .center
+
+                // align to top edge
+                row.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                // default (center)
+                row.add(child: TestElement())
+                // align outside bounds
+                row.add(alignmentGuide: { d in -40 }, child: TestElement())
+                // align outside bounds
+                row.add(alignmentGuide: { d in 160 }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 400, height: 200),
+            expectedSize: CGSize(width: 400, height: 300),
+            expectedOrigins: [
+                110,
+                60,
+                150,
+                -50,
+            ]
+        )
+        // Same test on the other axis.
+        test(
+            stack: Column { column in
+                column.horizontalAlignment = .center
+
+                column.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                column.add(child: TestElement())
+                column.add(alignmentGuide: { d in -40 }, child: TestElement())
+                column.add(alignmentGuide: { d in 160 }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 200, height: 400),
+            expectedSize: CGSize(width: 300, height: 400),
+            expectedOrigins: [
+                110,
+                60,
+                150,
+                -50,
+            ]
+        )
+
+        // This test mimicks baseline alignment of text.
+        // The relatively aligned content is smaller than the stack bounds,
+        // so the alignment is used to anchor the content to the bottom.
+        //
+        //          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+        //           stack bounds                          │
+        //          │
+        //                                          ┌──────┼── content bounds
+        //          │                               │
+        //           ┌ ─ ─ ─ ─ ─ ─┌──────────┬ ─ ─ ─│─ ─ ─ │
+        //          │┌──────────┐ │100       │            │
+        //           │90        │ │          │ ┌──────────┐│
+        //          ││          │ │          │ │80        │
+        //           │          │ │          │ │          ││
+        //          ││          │ │          │ │          │
+        //        ─ ─│─ ─ ─ ─ ─ ┼ ┴──────────┘─│─ ─ ─ ─ ─ ┼│─  guide
+        //          │└──────────┘              │          │
+        //  anchor ▶─┴─────────────────────────┴──────────┴┴◀
+        //
+        test(
+            stack: Row { row in
+                row.verticalAlignment = .bottom
+
+                // 10 from bottom
+                row.add(alignmentGuide: { d in d.height - 10 }, child: TestElement())
+                // default (bottom)
+                row.add(child: TestElement())
+                // 20 from bottom
+                row.add(alignmentGuide: { d in d.height - 20 }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 300, height: 200),
+            expectedSize: CGSize(width: 300, height: 120),
+            expectedOrigins: [
+                90,
+                80,
+                100,
+            ]
+        )
+        // Same test on the other axis.
+        test(
+            stack: Column { column in
+                column.horizontalAlignment = .trailing
+
+                column.add(alignmentGuide: { d in d.width - 10 }, child: TestElement())
+                column.add(child: TestElement())
+                column.add(alignmentGuide: { d in d.width - 20 }, child: TestElement())
+            },
+            layoutSize: CGSize(width: 200, height: 300),
+            expectedSize: CGSize(width: 120, height: 300),
+            expectedOrigins: [
+                90,
+                80,
+                100,
+            ]
+        )
     }
 
     func test_crossConstraints() {
@@ -954,4 +1174,22 @@ fileprivate struct TestElement: Element {
         return nil
     }
 
+}
+
+extension HorizontalAlignment {
+    enum Test25: AlignmentID {
+        static func defaultValue(in d: ElementDimensions) -> CGFloat {
+            d.width * 0.25
+        }
+    }
+    static let test25 = HorizontalAlignment(Test25.self)
+}
+
+extension VerticalAlignment {
+    enum Test25: AlignmentID {
+        static func defaultValue(in d: ElementDimensions) -> CGFloat {
+            d.height * 0.25
+        }
+    }
+    static let test25 = VerticalAlignment(Test25.self)
 }

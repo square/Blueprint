@@ -8,9 +8,13 @@ gen/
 xcuserdata/
 
 # Cocoapods
-
 Pods/
 *.xcworkspace
 
 # SPM
 .swiftpm/
+.build/
+BlueprintUI.xcodeproj/
+
+# jazzy
+.docs/
