@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce `PointerInteraction`, to easily add `UIPointerInteraction` to your elements](https://github.com/square/Blueprint/pull/118). Most of the time, you just have to call `myElement.pointerInteraction()`, and UIKit will figure out the right styling for you automatically. 
+
 ### Removed
 
 ### Changed
