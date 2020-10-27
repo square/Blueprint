@@ -6,8 +6,6 @@
 //
 
 import UIKit
-import BlueprintUI
-
 
 
 /// An `Element` which lets you add `UIPointerInteraction` interactions
@@ -16,8 +14,7 @@ import BlueprintUI
 /// A `UIPointerInteraction` allows you to respond to hover events for buttons,
 /// text, icons, etc, when a user is using an iPad that has support for a pointer, usually from a trackpad.
 ///
-/// **Note** – On iOS versions before 13.4, this has no effect.
-///
+/// - Note: On iOS versions before 13.4, this has no effect.
 public struct PointerInteraction : Element
 {
     /// The element to which the pointer action will be applied.
@@ -35,7 +32,7 @@ public struct PointerInteraction : Element
     /// You don't need to provide a `StyleProvider` – the default one will simply
     /// return a `.automatic` style.
     ///
-    /// **Note** – On iOS versions before 13.4, this has no effect.
+    /// - Note: On iOS versions before 13.4, this has no effect.
     public init(
         _ wrapping : Element,
         with style : @escaping StyleProvider = { _, _ in .automatic }
@@ -70,13 +67,22 @@ public struct PointerInteraction : Element
 public extension Element {
     
     /// Creates a new `PointerInteraction` instance that wraps the element,
+    /// styling the interaction with the provided `Style`.
+    ///
+    /// - Note: On iOS versions before 13.4, this has no effect.
+    func pointerInteraction(
+        with style : PointerInteraction.Style
+    ) -> Element {
+        PointerInteraction(self, with: { _, _ in style })
+    }
+    
+    /// Creates a new `PointerInteraction` instance that wraps the element,
     /// styling the interaction via the `StyleProvider`.
     ///
     /// You don't need to provide a `StyleProvider` – the default one will simply
     /// return a `.automatic` style.
     ///
-    /// **Note** – On iOS versions before 13.4, this has no effect.
-    ///
+    /// - Note: On iOS versions before 13.4, this has no effect.
     func pointerInteraction(
         with style : @escaping PointerInteraction.StyleProvider = { _, _ in .automatic }
     ) -> Element {
