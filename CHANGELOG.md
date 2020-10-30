@@ -9,10 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixes an issue where view descriptions were applied with unintentional animations while creating backing views. This could happen if an element was added during a transition. ([#175])
-
-- Fixed pull-to-refresh inset for iOS 13+. ([#176])
-
 ### Added
 
 ### Removed
@@ -28,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.17.1] - 2020-10-30
+
+### Fixed
+
+- Fixed an issue where view descriptions were applied with unintentional animations while creating backing views. This could happen if an element was added during a transition. ([#175])
+
+- Fixed pull-to-refresh inset for iOS 13+. ([#176])
 
 ## [0.17.0] - 2020-10-21
 
@@ -454,7 +458,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.17.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.17.1...HEAD
+[0.17.1]: https://github.com/square/Blueprint/compare/0.17.0...0.17.1
 [0.17.0]: https://github.com/square/Blueprint/compare/0.16.0...0.17.0
 [0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0
 [0.15.1]: https://github.com/square/Blueprint/compare/0.15.0...0.15.1
