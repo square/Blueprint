@@ -46,9 +46,17 @@ class ScrollViewTests : XCTestCase {
         )
         
         // Keyboard Inset and refreshing state
-        
+        let expectedTopInset: CGFloat
+        if #available(iOS 13, *) {
+            // rdar://35866834
+            // On iOS 13, `UIRefreshControl` will change `adjustedContentInset` automatically as needed.
+            // No need to add extra `contentInset` manually.
+            expectedTopInset = 10.0
+        } else {
+            expectedTopInset = 35.0
+        }
         XCTAssertEqual(
-            UIEdgeInsets(top: 35.0, left: 11.0, bottom:50.0, right: 13.0),
+            UIEdgeInsets(top: expectedTopInset, left: 11.0, bottom:50.0, right: 13.0),
             
             ScrollView.calculateContentInset(
                 scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
