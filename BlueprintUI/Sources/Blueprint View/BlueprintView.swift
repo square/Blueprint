@@ -342,17 +342,21 @@ extension BlueprintView {
                         controller.update(node: child, appearanceTransitionsEnabled: true)
                     }
                 } else {
-                    let controller = NativeViewController(node: child)
-                    newChildren.append((path: path, node: controller))
-                    
-                    UIView.performWithoutAnimation {
-                        child.layoutAttributes.apply(to: controller.view)
-                    }
-                    
-                    contentView.insertSubview(controller.view, at: index)
+                    var controller: NativeViewController!
 
-                    controller.update(node: child, appearanceTransitionsEnabled: false)
-                    
+                    // Building the view and applying the initial layout and update need to be wrapped in
+                    // performWithoutAnimation so they're not caught up inside an occuring transition.
+                    UIView.performWithoutAnimation {
+                        controller = NativeViewController(node: child)
+                        child.layoutAttributes.apply(to: controller.view)
+
+                        contentView.insertSubview(controller.view, at: index)
+
+                        controller.update(node: child, appearanceTransitionsEnabled: false)
+                    }
+
+                    newChildren.append((path: path, node: controller))
+
                     if appearanceTransitionsEnabled {
                         child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
                     }
