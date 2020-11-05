@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce `DecorateBackground`](https://github.com/square/Blueprint/pull/178) to allow placing a background behind an `Element`, without affecting its layout. This is useful for rendering tap or selection states which should overflow the natural bounds of the `Element`, similar to a shadow.
+
 ### Removed
 
 ### Changed

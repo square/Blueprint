@@ -67,22 +67,26 @@ fileprivate struct DemoItem : ProxyElement
     var onTap : () -> ()
 
     var elementRepresentation: Element {
-         Label(text: self.title) { label in
+        
+        Label(text: self.title) { label in
             label.font = .systemFont(ofSize: 18.0, weight: .semibold)
         }
         .inset(uniform: 20.0)
         .box(
             background: .white,
-            corners: .rounded(radius: 20.0),
+            corners: .rounded(radius: 15.0),
             shadow: .simple(
-                radius: 6.0,
-                opacity: 0.2,
-                offset: .init(width: 0, height: 3.0),
+                radius: 5.0,
+                opacity: 0.3,
+                offset: .init(width: 0, height: 2.0),
                 color: .black
             )
         )
         .tappable {
             self.onTap()
+        }
+        .decorateBackground(with: 5.0) {
+            Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
         }
     }
 }
