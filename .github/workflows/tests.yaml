@@ -1,0 +1,84 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  spm:
+    name: "iOS ${{ matrix.sdk }}"
+
+    runs-on: macos-10.15
+
+    strategy:
+      fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
+      matrix:
+        include:
+          - sdk: "11.4"
+            destination: platform=iOS Simulator,OS=11.4,name=iPhone 7
+
+          - sdk: "12.4"
+            destination: platform=iOS Simulator,OS=12.4,name=iPhone 7
+
+          - sdk: "13.5"
+            destination: platform=iOS Simulator,OS=13.5,name=iPhone 8
+
+          - sdk: "14.0"
+            destination: platform=iOS Simulator,OS=14.0.1,name=iPhone 8
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Switch Xcode 12
+      run: sudo xcode-select -switch /Applications/Xcode_12.2.app
+
+    - name: Install iOS ${{ matrix.sdk }}
+      run: xcversion simulators --install="iOS ${{ matrix.sdk }}"
+
+    - name: Build & Test
+      run: |
+        xcodebuild -scheme "BlueprintUI-Package" -destination "${{ matrix.destination }}" build test
+
+    - name: Package snapshot changes
+      if: ${{ failure() }}
+      run: |
+        git ls-files -m BlueprintUICommonControls/Tests/Sources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
+
+    - name: Archive snapshot changes
+      uses: actions/upload-artifact@v2
+      if: ${{ failure() }}
+      with:
+        name: snapshot_changes_${{ matrix.sdk }}
+        path: snapshot_changes_${{ matrix.sdk }}.tar
+
+
+  cocoapods:
+    name: "Cocoapods"
+
+    runs-on: macos-10.15
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Cache gems
+      uses: actions/cache@v1
+      with:
+          path: .bundle
+          key: gems-${{ hashFiles('Gemfile.lock') }}
+
+    - name: Bundle Install
+      run: |
+        bundle check || bundle install --path .bundle
+
+    - name: Pod Install
+      run: |
+        bundle exec pod install --project-directory=SampleApp/
+
+    - name: Switch Xcode
+      run: sudo xcode-select -s 	/Applications/Xcode_12.app
+
+    - name: Build & Test
+      run: |
+        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=14.0,name=iPhone 8"
