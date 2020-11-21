@@ -139,7 +139,7 @@ public struct ElementPreview : View {
     
     public var body: some View {
         ForEach(self.previewTypes, id: \.identifier) { previewType in
-            previewType.preview(
+            previewType.previewView(
                 with: self.name,
                 for: self.provider()
             )
@@ -184,7 +184,7 @@ extension ElementPreview {
         /// The preview will be as large as needed to preview the content.
         case thatFits(padding : CGFloat = 10.0)
         
-        fileprivate var identifier : AnyHashable {
+        public var identifier : AnyHashable {
             switch self {
             case .device(let device): return device.rawValue
             case .fixed(let width, let height): return "(\(width), \(height))"
@@ -192,7 +192,7 @@ extension ElementPreview {
             }
         }
         
-        fileprivate func preview(
+        public func previewView(
             with name : String,
             for element : Element
         ) -> AnyView {
@@ -217,7 +217,7 @@ extension ElementPreview {
                 return AnyView(
                     self.constrained(element: element)
                         .previewLayout(.fixed(width: width, height: height))
-                        .previewDisplayName("Fixed Size: (\(width), \(height)" + formattedName)
+                        .previewDisplayName("Fixed Size: (\(width), \(height))" + formattedName)
                 )
                 
             case .thatFits(let padding):
@@ -233,14 +233,23 @@ extension ElementPreview {
         private func constrained(
             element : Element
         ) -> some View {
-            SwiftUI.GeometryReader { info in
-                return ElementView(
-                    element: ConstrainedSize(
-                        width: .atMost(info.size.width),
-                        height: .atMost(info.size.height),
-                        wrapping: element
+            
+            /// `GeometryReader` differs between iOS 13 and iOS 14.
+            /// On iOS 13; the `GeometryReader` reports back the size
+            /// of its child. In iOS 14; it reports the size of the device within a preview.
+            
+            if #available(iOS 14.0, *) {
+                return AnyView(ElementView(element: element))
+            } else {
+                return AnyView(SwiftUI.GeometryReader { info in
+                    ElementView(
+                        element: ConstrainedSize(
+                            width: .atMost(info.size.width),
+                            height: .atMost(info.size.height),
+                            wrapping: element
+                        )
                     )
-                )
+                })
             }
         }
     }
