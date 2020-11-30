@@ -16,7 +16,7 @@ struct TestElement : ProxyElement {
             $0.verticalUnderflow = .justifyToStart
             
             for index in 1...12 {
-                $0.add(child: Label(text: "Hello, World") {
+                $0.add(child: Label(text: "Hello, World!") {
                     $0.font = .boldSystemFont(ofSize: 10.0 + CGFloat(index * 4))
                     $0.color = .init(
                         red: CGFloat.random(in: 0...1),
@@ -37,7 +37,7 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct TestingView_Preview: PreviewProvider {
     static var previews: some View {
-        ElementPreview(with: .thatFits(padding: 20)) {
+        ElementPreview(with: .thatFits(padding: 5)) {
             TestElement()
         }
     }
