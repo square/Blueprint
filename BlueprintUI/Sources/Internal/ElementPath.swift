@@ -49,7 +49,7 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
         hasher.combine(identifiersHash)
     }
     
-    var resolved : ElementPath {
+    func filteredToViewBacked() -> ElementPath {
         ElementPath(identifiers: self.identifiers.filter { $0.isViewBacked })
     }
     
