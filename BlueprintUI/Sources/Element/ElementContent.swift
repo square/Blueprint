@@ -279,7 +279,7 @@ extension ElementContent {
                 let identifier = identifierFactory.nextIdentifier(
                     for: type(of: currentChild.element),
                     key: currentChild.key,
-                    isViewBacked: currentChild.element.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
+                    isViewBacked: currentChild.element.isViewBacked(with: resultNode.layoutAttributes)
                 )
 
                 result.append((identifier: identifier, node: resultNode))
@@ -327,7 +327,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             elementType: type(of: child),
             key: nil,
             count: 1,
-            isViewBacked: child.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
+            isViewBacked: child.isViewBacked(with: childAttributes)
         )
 
         let node = LayoutResultNode(
@@ -372,7 +372,7 @@ private struct LazyStorage: ContentStorage {
             elementType: type(of: child),
             key: nil,
             count: 1,
-            isViewBacked: child.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
+            isViewBacked: child.isViewBacked(with: childAttributes)
         )
 
         let node = LayoutResultNode(
@@ -448,4 +448,14 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 
+}
+
+
+fileprivate extension Element {
+    func isViewBacked(with attributes : LayoutAttributes) -> Bool {
+        self.backingViewDescription(
+            bounds: attributes.bounds,
+            subtreeExtent: nil
+        ) != nil
+    }
 }

@@ -62,9 +62,9 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     
     var debugDescription: String {
         if let key = self.key {
-            return "\(self.elementType).\(String(describing: key)).\(self.count)"
+            return "\(self.elementType).\(String(describing: key)).\(self.count).\(self.isViewBacked ? "true" : "false")"
         } else {
-            return "\(self.elementType).\(self.count)"
+            return "\(self.elementType).\(self.count).\(self.isViewBacked ? "true" : "false")"
         }
     }
     
