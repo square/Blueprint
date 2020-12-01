@@ -278,7 +278,8 @@ extension ElementContent {
 
                 let identifier = identifierFactory.nextIdentifier(
                     for: type(of: currentChild.element),
-                    key: currentChild.key
+                    key: currentChild.key,
+                    isViewBacked: currentChild.element.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
                 )
 
                 result.append((identifier: identifier, node: resultNode))
@@ -322,7 +323,12 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(
+            elementType: type(of: child),
+            key: nil,
+            count: 1,
+            isViewBacked: child.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
+        )
 
         let node = LayoutResultNode(
             element: child,
@@ -362,7 +368,12 @@ private struct LazyStorage: ContentStorage {
         let child = buildChild(in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(
+            elementType: type(of: child),
+            key: nil,
+            count: 1,
+            isViewBacked: child.backingViewDescription(bounds: .zero, subtreeExtent: nil) != nil
+        )
 
         let node = LayoutResultNode(
             element: child,

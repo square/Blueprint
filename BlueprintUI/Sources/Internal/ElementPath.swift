@@ -4,7 +4,7 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
     
     private var identifiersHash : Int? = nil
 
-    private(set) var identifiers: [ElementIdentifier] = []
+    private(set) var identifiers: [ElementIdentifier]
     
     private mutating func setIdentifiersHash()
     {
@@ -12,6 +12,10 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
         hasher.combine(identifiers)
         
         identifiersHash = hasher.finalize()
+    }
+    
+    init(identifiers : [ElementIdentifier] = []) {
+        self.identifiers = identifiers
     }
     
     mutating func prepend(identifier: ElementIdentifier) {
@@ -43,6 +47,10 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(identifiersHash)
+    }
+    
+    var resolved : ElementPath {
+        ElementPath(identifiers: self.identifiers.filter { $0.isViewBacked })
     }
     
     // MARK: CustomDebugStringConvertible

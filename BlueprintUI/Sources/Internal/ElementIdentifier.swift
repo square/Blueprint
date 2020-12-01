@@ -47,13 +47,17 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     let key : AnyHashable?
 
     let count : Int
+    
+    let isViewBacked : Bool
 
-    init(elementType : Element.Type, key : AnyHashable?, count : Int) {
+    init(elementType : Element.Type, key : AnyHashable?, count : Int, isViewBacked : Bool) {
         
         self.elementType = ObjectIdentifier(elementType)
         self.key = key
         
         self.count = count
+        
+        self.isViewBacked = isViewBacked
     }
     
     var debugDescription: String {
@@ -73,14 +77,15 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
             self.countsByKey = Dictionary(minimumCapacity: elementCount)
         }
                 
-        mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?) -> ElementIdentifier {
+        mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?, isViewBacked : Bool) -> ElementIdentifier {
             
             let count = self.nextCount(for: type, key: key)
             
             return ElementIdentifier(
                 elementType: type,
                 key: key,
-                count: count
+                count: count,
+                isViewBacked: isViewBacked
             )
         }
         

@@ -302,7 +302,7 @@ extension BlueprintView {
             var newChildren: [(path: ElementPath, node: NativeViewController)] = []
             newChildren.reserveCapacity(node.children.count)
             
-            let newPaths : [ElementPath] = node.children.map { $0.path }
+            let newPaths : [ElementPath] = node.children.map { $0.path.resolved }
             
             var usedKeys: Set<ElementPath> = []
             usedKeys.reserveCapacity(node.children.count)
