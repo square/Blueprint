@@ -43,28 +43,37 @@
  */
 struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     
-    let elementType : ObjectIdentifier
+    let elementType : ObjectIdentifier?
     let key : AnyHashable?
 
     let count : Int
-    
-    let isViewBacked : Bool
 
-    init(elementType : Element.Type, key : AnyHashable?, count : Int, isViewBacked : Bool) {
+    init(elementType : Element.Type?, key : AnyHashable?, count : Int) {
         
-        self.elementType = ObjectIdentifier(elementType)
+        if let type = elementType {
+            self.elementType = ObjectIdentifier(type)
+        } else {
+            self.elementType = nil
+        }
+        
         self.key = key
         
         self.count = count
-        
-        self.isViewBacked = isViewBacked
+    }
+    
+    static func rootIdentifier(with element : Element?) -> Self {
+        if let element = element {
+            return ElementIdentifier(elementType: type(of: element), key: nil, count: 1)
+        } else {
+            return ElementIdentifier(elementType: nil, key: nil, count: 1)
+        }
     }
     
     var debugDescription: String {
         if let key = self.key {
-            return "\(self.elementType).\(String(describing: key)).\(self.count).\(self.isViewBacked ? "true" : "false")"
+            return "\(String(describing: self.elementType)).\(String(describing: key)).\(self.count)"
         } else {
-            return "\(self.elementType).\(self.count).\(self.isViewBacked ? "true" : "false")"
+            return "\(String(describing: self.elementType)).\(self.count)"
         }
     }
     
@@ -77,15 +86,14 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
             self.countsByKey = Dictionary(minimumCapacity: elementCount)
         }
                 
-        mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?, isViewBacked : Bool) -> ElementIdentifier {
+        mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?) -> ElementIdentifier {
             
             let count = self.nextCount(for: type, key: key)
             
             return ElementIdentifier(
                 elementType: type,
                 key: key,
-                count: count,
-                isViewBacked: isViewBacked
+                count: count
             )
         }
         

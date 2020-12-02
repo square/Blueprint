@@ -46,7 +46,7 @@ public struct ElementContent {
         return storage.childCount
     }
 
-    func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    func performLayout(attributes: LayoutAttributes, environment: Environment) -> [LayoutResultNode] {
         return storage.performLayout(attributes: attributes, environment: environment)
     }
 }
@@ -205,7 +205,7 @@ fileprivate protocol ContentStorage {
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    ) -> [LayoutResultNode]
 }
 
 
@@ -251,7 +251,7 @@ extension ElementContent {
             attributes: LayoutAttributes,
             environment: Environment
         )
-            -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+            -> [LayoutResultNode]
         {
             guard self.children.isEmpty == false else {
                 return []
@@ -260,7 +260,7 @@ extension ElementContent {
             let layoutItems = self.layoutItems(in: environment)
             let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
-            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+            var result: [LayoutResultNode] = []
             result.reserveCapacity(children.count)
             
             var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
@@ -268,21 +268,21 @@ extension ElementContent {
             for index in 0..<children.count {
                 let currentChildLayoutAttributes = childAttributes[index]
                 let currentChild = children[index]
+                
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: currentChild.element),
+                    key: currentChild.key
+                )
 
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
+                    identifier: identifier,
                     layoutAttributes: currentChildLayoutAttributes,
                     content: currentChild.content,
                     environment: environment
                 )
 
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
-                    key: currentChild.key,
-                    isViewBacked: currentChild.element.isViewBacked(with: resultNode.layoutAttributes)
-                )
-
-                result.append((identifier: identifier, node: resultNode))
+                result.append(resultNode)
             }
 
             return result
@@ -317,7 +317,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment)
-        -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        -> [LayoutResultNode]
     {
         let environment = adapted(environment: environment)
 
@@ -326,17 +326,18 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         let identifier = ElementIdentifier(
             elementType: type(of: child),
             key: nil,
-            count: 1,
-            isViewBacked: child.isViewBacked(with: childAttributes)
+            count: 1
         )
 
         let node = LayoutResultNode(
             element: child,
+            identifier: identifier,
             layoutAttributes: childAttributes,
             content: child.content,
-            environment: environment)
+            environment: environment
+        )
 
-        return [(identifier, node)]
+        return [node]
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
@@ -362,7 +363,7 @@ private struct LazyStorage: ContentStorage {
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment)
-        -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        -> [LayoutResultNode]
     {
         let constraint = SizeConstraint(attributes.bounds.size)
         let child = buildChild(in: constraint, environment: environment)
@@ -371,17 +372,17 @@ private struct LazyStorage: ContentStorage {
         let identifier = ElementIdentifier(
             elementType: type(of: child),
             key: nil,
-            count: 1,
-            isViewBacked: child.isViewBacked(with: childAttributes)
+            count: 1
         )
 
         let node = LayoutResultNode(
             element: child,
+            identifier: identifier,
             layoutAttributes: childAttributes,
             content: child.content,
             environment: environment)
 
-        return [(identifier, node)]
+        return [node]
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
@@ -448,14 +449,4 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 
-}
-
-
-fileprivate extension Element {
-    func isViewBacked(with attributes : LayoutAttributes) -> Bool {
-        self.backingViewDescription(
-            bounds: attributes.bounds,
-            subtreeExtent: nil
-        ) != nil
-    }
 }

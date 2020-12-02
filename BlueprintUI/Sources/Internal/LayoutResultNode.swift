@@ -9,12 +9,14 @@ extension Element {
     ///   root element.
     ///
     /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
+    func layout(identifier : ElementIdentifier, layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
         return LayoutResultNode(
             element: self,
+            identifier: identifier,
             layoutAttributes: layoutAttributes,
             content: content,
-            environment: environment)
+            environment: environment
+        )
     }
 
 }
@@ -25,6 +27,8 @@ struct LayoutResultNode {
     /// The element that was laid out
     var element: Element
     
+    var identifier : ElementIdentifier
+    
     /// Diagnostic information about the layout process.
     var diagnosticInfo: DiagnosticInfo
     
@@ -32,11 +36,12 @@ struct LayoutResultNode {
     var layoutAttributes: LayoutAttributes
 
     /// The element's children.
-    var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    var children: [LayoutResultNode]
     
-    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent, environment: Environment) {
+    init(element: Element, identifier : ElementIdentifier, layoutAttributes: LayoutAttributes, content: ElementContent, environment: Environment) {
 
         self.element = element
+        self.identifier = identifier
         self.layoutAttributes = layoutAttributes
 
         let layoutBeginTime = DispatchTime.now()
@@ -44,7 +49,6 @@ struct LayoutResultNode {
         let layoutEndTime = DispatchTime.now()
         let layoutDuration = layoutEndTime.uptimeNanoseconds - layoutBeginTime.uptimeNanoseconds
         diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)
-
     }
 
 }
@@ -66,20 +70,19 @@ extension LayoutResultNode {
 
     /// Returns the flattened tree of view descriptions (any element that does not return
     /// a view description will be skipped).
-    func resolve() -> [(path: ElementPath, node: NativeViewNode)] {
+    func resolve() -> [NativeViewNode] {
 
-        let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
-            .flatMap { identifier, layoutResultNode in
+        let resolvedChildContent: [NativeViewNode] = children
+            .flatMap { layoutResultNode in
 
                 return layoutResultNode
                     .resolve()
-                    .map { path, viewDescriptionNode in
-                        return (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
+                    .map { viewDescriptionNode in
+                        return viewDescriptionNode
                     }
         }
 
         let subtreeExtent: CGRect? = children
-            .map { $0.node }
             .reduce(into: nil) { (rect, node) in
                 rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
             }
@@ -90,15 +93,18 @@ extension LayoutResultNode {
 
         if let viewDescription = viewDescription {
             let node = NativeViewNode(
+                identifier: identifier,
                 content: viewDescription,
                 layoutAttributes: layoutAttributes,
-                children: resolvedChildContent)
-            return [(path: .empty, node: node)]
+                children: resolvedChildContent
+            )
+            
+            return [node]
         } else {
-            return resolvedChildContent.map { (path, node) -> (path: ElementPath, node: NativeViewNode) in
+            return resolvedChildContent.map { node in
                 var transformedNode = node
                 transformedNode.layoutAttributes = transformedNode.layoutAttributes.within(layoutAttributes)
-                return (path, transformedNode)
+                return transformedNode
             }
         }
 

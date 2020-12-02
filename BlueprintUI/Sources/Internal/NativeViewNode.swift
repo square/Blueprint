@@ -23,18 +23,22 @@ struct NativeViewNode {
     /// The view description returned by this node
     var viewDescription: ViewDescription
     
+    var identifier : ElementIdentifier
+    
     /// The layout attributes for this content (relative to the parent's layout
     /// attributes).
     var layoutAttributes: LayoutAttributes
 
     /// The children of this node.
-    var children: [(path: ElementPath, node: NativeViewNode)]
+    var children: [NativeViewNode]
     
     init(
+        identifier : ElementIdentifier,
         content: ViewDescription,
         layoutAttributes: LayoutAttributes,
-        children: [(path: ElementPath, node: NativeViewNode)]) {
-        
+        children: [NativeViewNode]
+    ) {
+        self.identifier = identifier
         self.viewDescription = content
         self.layoutAttributes = layoutAttributes
         self.children = children
@@ -65,7 +69,7 @@ struct NativeViewNode {
         let childOrigin = origin + layoutAttributes.frame.origin
 
         for i in children.indices {
-            children[i].node.round(from: childOrigin, correction: childCorrection, scale: scale)
+            children[i].round(from: childOrigin, correction: childCorrection, scale: scale)
         }
     }
 }
