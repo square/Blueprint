@@ -309,20 +309,12 @@ extension BlueprintView {
             newChildren.reserveCapacity(node.children.count)
             
             let newPaths : [ElementIdentifier] = node.children.map(\.identifier)
-                        
-            var usedKeys: Set<ElementIdentifier> = []
-            usedKeys.reserveCapacity(node.children.count)
             
             let pathsChanged = oldPaths != newPaths
             
             for index in node.children.indices {
                 let child = node.children[index]
                 let path = child.identifier
-
-                guard usedKeys.contains(path) == false else {
-                    fatalError("Duplicate view identifier")
-                }
-                usedKeys.insert(path)
 
                 let contentView = node.viewDescription.contentView(in: self.view)
 
