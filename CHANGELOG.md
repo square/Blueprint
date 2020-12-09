@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `AccessibilityContainer.identifier` ([#180])
 
+- [Add `LayoutWriter`](https://github.com/square/Blueprint/pull/187), which makes creating custom / arbitrary layouts much simpler. You no longer need to define a custom `Layout` type; instead, you can just utilize `LayoutWriter` and configure and place your children within its builder initializer.
+
 ### Removed
 
 ### Changed
