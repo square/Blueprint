@@ -1,7 +1,7 @@
 PODS:
-  - BlueprintUI (0.17.1)
-  - BlueprintUI/Tests (0.17.1)
-  - BlueprintUICommonControls (0.17.1):
+  - BlueprintUI (0.18.0)
+  - BlueprintUI/Tests (0.18.0)
+  - BlueprintUICommonControls (0.18.0):
     - BlueprintUI
 
 DEPENDENCIES:
@@ -16,8 +16,8 @@ EXTERNAL SOURCES:
     :path: "../BlueprintUICommonControls.podspec"
 
 SPEC CHECKSUMS:
-  BlueprintUI: dbe77d86e3a703ce49824b7a24cfde71fb05b6b4
-  BlueprintUICommonControls: 71e000642ff802279c8ea9afb94d31723172dbe2
+  BlueprintUI: 37ca3e65ce6612d2ecc5aa0e41d14e1b6b108f7d
+  BlueprintUICommonControls: a865330491ed79f149d34006f28d91fd62a854cf
 
 PODFILE CHECKSUM: a01a59366bcd21b6f7030cb454d88867c7b2cf25
 
