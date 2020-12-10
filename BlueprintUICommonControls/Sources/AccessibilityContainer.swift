@@ -15,10 +15,13 @@ import UIKit
 /// and the search down that branch is also terminated.
 public struct AccessibilityContainer: Element {
 
+    /// An optional `accessibilityIdentifier` to give the container. Defaults to `nil`.
+    public var identifier: String?
     public var wrapped: Element
 
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
-    public init(wrapping element: Element) {
+    public init(identifier: String? = nil, wrapping element: Element) {
+        self.identifier = identifier
         self.wrapped = element
     }
 
@@ -31,7 +34,9 @@ public struct AccessibilityContainer: Element {
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        AccessibilityContainerView.describe { _ in }
+        AccessibilityContainerView.describe { config in
+            config[\.accessibilityIdentifier] = identifier
+        }
     }
 }
 
@@ -39,8 +44,8 @@ public extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    func accessibilityContainer() -> Element {
-        AccessibilityContainer(wrapping: self)
+    func accessibilityContainer(identifier: String? = nil) -> Element {
+        AccessibilityContainer(identifier: identifier, wrapping: self)
     }
 }
 

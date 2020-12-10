@@ -96,6 +96,26 @@ public extension Element {
     {
         ConstrainedSize(width: width, height: height, wrapping: self)
     }
+    
+    /// Constrains the measured size of the element to the provided `SizeConstraint`.
+    func constrained(to sizeConstraint : SizeConstraint) -> ConstrainedSize
+    {
+        ConstrainedSize(
+            width: {
+                switch sizeConstraint.width {
+                case .atMost(let value): return .atMost(value)
+                case .unconstrained: return .unconstrained
+                }
+            }(),
+            height: {
+                switch sizeConstraint.height {
+                case .atMost(let value): return .atMost(value)
+                case .unconstrained: return .unconstrained
+                }
+            }(),
+            wrapping: self
+        )
+    }
 }
 
 

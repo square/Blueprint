@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Introduce `DecorateBackground`](https://github.com/square/Blueprint/pull/178) to allow placing a background behind an `Element`, without affecting its layout. This is useful for rendering tap or selection states which should overflow the natural bounds of the `Element`, similar to a shadow.
 
+- [Add `LayoutWriter`](https://github.com/square/Blueprint/pull/187), which makes creating custom / arbitrary layouts much simpler. You no longer need to define a custom `Layout` type; instead, you can just utilize `LayoutWriter` and configure and place your children within its builder initializer.
+
 ### Removed
 
 ### Changed
@@ -26,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.18.0] - 2020-12-08
+
+### Added
+
+- Add `AccessibilityContainer.identifier` ([#180])
 
 ## [0.17.1] - 2020-10-30
 
@@ -460,7 +468,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.17.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.18.0...HEAD
+[0.18.0]: https://github.com/square/Blueprint/compare/0.17.1...0.18.0
 [0.17.1]: https://github.com/square/Blueprint/compare/0.17.0...0.17.1
 [0.17.0]: https://github.com/square/Blueprint/compare/0.16.0...0.17.0
 [0.16.0]: https://github.com/square/Blueprint/compare/0.15.1...0.16.0

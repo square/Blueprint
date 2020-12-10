@@ -125,7 +125,9 @@ public final class BlueprintView: UIView {
     /// Returns the size of the element bound to the current width (mimicking
     /// UILabel’s `intrinsicContentSize` behavior)
     public override var intrinsicContentSize: CGSize {
+        
         guard let element = element else { return .zero }
+        
         let constraint: SizeConstraint
 
         // Use unconstrained when
