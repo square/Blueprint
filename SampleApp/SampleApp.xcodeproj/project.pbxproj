@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A2EDD20258962B5003C8670 /* ControlViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2EDD1F258962B5003C8670 /* ControlViewController.swift */; };
 		0A50E8DB24A685DA0049705B /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A50E8DA24A685DA0049705B /* RootViewController.swift */; };
 		0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */; };
 		0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0A2EDD1F258962B5003C8670 /* ControlViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlViewController.swift; sourceTree = "<group>"; };
 		0A50E8DA24A685DA0049705B /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewKeyboardViewController.swift; sourceTree = "<group>"; };
 		0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XcodePreviewDemo.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 				97545510223C12E9003E353F /* PostsViewController.swift */,
 				7A4B688324DB3BE300E10D7A /* ResponsiveViewController.swift */,
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
+				0A2EDD1F258962B5003C8670 /* ControlViewController.swift */,
 				97545511223C12E9003E353F /* AppDelegate.swift */,
 				0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */,
 			);
@@ -586,6 +589,7 @@
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
 				7A4B688424DB3BE300E10D7A /* ResponsiveViewController.swift in Sources */,
 				0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */,
+				0A2EDD20258962B5003C8670 /* ControlViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

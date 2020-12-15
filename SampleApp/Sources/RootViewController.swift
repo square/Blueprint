@@ -27,6 +27,9 @@ final class RootViewController : UIViewController
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             }),
+            DemoItem(title: "Control Demo", onTap: { [weak self] in
+                self?.push(ControlViewController())
+            })
         ]
     }
     
