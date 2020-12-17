@@ -15,10 +15,12 @@ public struct AttributedLabel: Element, Hashable {
 
     public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
         self.attributedText = attributedText
-        
+                
         configure(&self)
     }
-
+    
+    //private var cachingKey : ReferenceKey = .init()
+    
     public var content: ElementContent {
         struct Measurer: Measurable {
             private static let prototypeLabel = LabelView()
@@ -48,6 +50,24 @@ public struct AttributedLabel: Element, Hashable {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return LabelView.describe { (config) in
             config.apply(update)
+        }
+    }
+}
+
+extension AttributedLabel {
+    
+    final class ReferenceKey : Hashable {
+        
+        init() {
+            print("Init'd: \(ObjectIdentifier(self))")
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(ObjectIdentifier(self))
+        }
+        
+        static func == (lhs : ReferenceKey, rhs : ReferenceKey) -> Bool {
+            lhs === rhs
         }
     }
 }

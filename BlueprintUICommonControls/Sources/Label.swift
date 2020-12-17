@@ -76,6 +76,20 @@ public struct Label: ProxyElement {
     }
 }
 
+public struct BasicLabel: ProxyElement {
+
+    /// The text to be displayed.
+    public var text: String
+
+    public init(text: String) {
+        self.text = text
+    }
+    
+    public var elementRepresentation: Element {
+        AttributedLabel(attributedText: NSAttributedString(string: self.text))
+    }
+}
+
 extension Label {
     public enum LineHeight: Equatable {
         public enum Alignment: Equatable {

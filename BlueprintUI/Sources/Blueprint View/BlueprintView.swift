@@ -225,10 +225,8 @@ public final class BlueprintView: UIView {
         return rootController.children
     }
     
-    private var measurementCache = MeasurementCache()
-    
     private func makeEnvironment() -> Environment {
-        var environment = Environment(measurementCache: self.measurementCache)
+        var environment = Environment.empty
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale
