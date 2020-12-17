@@ -6,21 +6,22 @@
 //
 
 import XCTest
-@testable import BlueprintUI
+import BlueprintUI
+import BlueprintUICommonControls
 
 
 class PerformancePlayground : XCTestCase
 {
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
     }
     
     func test_repeated_layouts()
     {
         let element = Column { col in
             for index in 1...1000 {
-                col.add(child: TestLabel(text: "This is test label number #\(index)"))
+                col.add(child: Label(text: "This is test label number #\(index)"))
             }
         }
         
@@ -35,14 +36,14 @@ class PerformancePlayground : XCTestCase
     func test_deep_element_hierarchy()
     {
         let elements = [
-            TestLabel(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-            TestLabel(text: "Integer molestie et felis at sodales."),
-            TestLabel(text: "Donec varius, orci vel suscipit hendrerit, risus massa ornare dui, at gravida elit sapien at lorem."),
-            TestLabel(text: "Nunc in ipsum porttitor, tincidunt est eu, euismod odio."),
-            TestLabel(text: "Duis posuere nunc sed mi auctor, in dictum elit iaculis."),
-            TestLabel(text: "Ut vel varius est. Duis efficitur vel lorem quis tempor."),
-            TestLabel(text: "Nulla porttitor, mi nec posuere bibendum, turpis ipsum ultrices tortor, a placerat sapien augue quis sem."),
-            TestLabel(text: "Cras volutpat nisl vitae elit convallis, quis tempor massa faucibus."),
+            Label(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
+            Label(text: "Integer molestie et felis at sodales."),
+            Label(text: "Donec varius, orci vel suscipit hendrerit, risus massa ornare dui, at gravida elit sapien at lorem."),
+            Label(text: "Nunc in ipsum porttitor, tincidunt est eu, euismod odio."),
+            Label(text: "Duis posuere nunc sed mi auctor, in dictum elit iaculis."),
+            Label(text: "Ut vel varius est. Duis efficitur vel lorem quis tempor."),
+            Label(text: "Nulla porttitor, mi nec posuere bibendum, turpis ipsum ultrices tortor, a placerat sapien augue quis sem."),
+            Label(text: "Cras volutpat nisl vitae elit convallis, quis tempor massa faucibus."),
         ]
         
         let stack = Column { col in
@@ -95,28 +96,5 @@ class PerformancePlayground : XCTestCase
         let average = duration / TimeInterval(iterations)
         
         print("Iterations: \(iterations), Average Time: \(average)")
-    }
-}
-
-
-fileprivate struct TestLabel : UIViewElement
-{
-    var text : String
-    
-    // MARK: UIViewElement
-    
-    typealias UIViewType = UILabel
-    
-    static func makeUIView() ->  UILabel {
-        UILabel()
-    }
-    
-    var measurementCacheKey: AnyHashable? {
-        self.text
-    }
-    
-    func updateUIView(_ view:  UILabel) {
-        view.numberOfLines = 0
-        view.text = self.text
     }
 }

@@ -38,7 +38,7 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment(measurementCache: .init())
 
-    private init(measurementCache : MeasurementCache) {
+    init(measurementCache : MeasurementCache) {
         self.measurementCache = measurementCache
     }
 
