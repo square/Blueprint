@@ -14,7 +14,7 @@ class LayoutWriterTests : XCTestCase {
     
     func test_measurement() {
         
-        /// `.unionOfChildren`
+        /// `.unionOfChildren`, positive frames.
         
         do {
             let writer = LayoutWriter { context, layout in
@@ -25,6 +25,20 @@ class LayoutWriterTests : XCTestCase {
             }
             
             XCTAssertEqual(writer.content.measure(in: .unconstrained), CGSize(width: 60, height: 110))
+        }
+        
+        /// `.unionOfChildren`, positive & negative frames.
+        
+        do {
+            let writer = LayoutWriter { context, layout in
+                layout.add(with: CGRect(x: -10, y: -10, width: 50, height: 50), child: TestElement())
+                layout.add(with: CGRect(x: -20, y: 50, width: 20, height: 60), child: TestElement())
+                layout.add(with: CGRect(x: 50, y: 25, width: 50, height: 60), child: TestElement())
+                
+                layout.sizing = .unionOfChildren
+            }
+            
+            XCTAssertEqual(writer.content.measure(in: .unconstrained), CGSize(width: 100, height: 110))
         }
         
         
