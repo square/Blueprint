@@ -35,6 +35,8 @@ import Foundation
 ///     }
 public struct Environment {
     
+    static let cache = MeasurementCache()
+    
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static var empty : Environment {
@@ -44,7 +46,7 @@ public struct Environment {
         /// we want to ensure that each new environment that we ask for has a new `measurementCache` to avoid "leaking" / retaining
         /// all the contained keys for the lifetime of the application, as a `static let` would cause.
         
-        Environment(measurementCache: .init())
+        Environment(measurementCache: Self.cache)
     }
 
     private init(measurementCache : MeasurementCache) {
