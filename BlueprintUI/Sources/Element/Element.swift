@@ -38,7 +38,7 @@ import UIKit
 /// }
 /// ```
 ///
-public protocol Element {
+public protocol Element : _Blueprint_Elements_Should_Be_Value_Types {
 
     /// Returns the content of this element.
     ///
@@ -63,4 +63,39 @@ public protocol Element {
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
 
+}
+
+
+//
+// MARK: Value Type Validation
+//
+
+
+///
+/// This protocol exists to enforce at compile time that your `Element` are value types like `struct` or `enum`.
+///
+/// It is very very unusual and usually an error to make an `Element` a `class` type. Blueprint's internal
+/// implementation relies on the fact that passed in `Element` respect value semantics and are owned by the framework.
+///
+/// Notes
+/// -----
+/// You should really not make your `Element` be a `class`. If for some reason you really really want to do this,
+/// (you should not do this unless you have a good reason, which you probably do not), then override the
+/// `elements_should_be_value_types_by_overriding_this_method_i_acknowledge_i_am_in_hard_mode()`
+/// method in your `Element` to opt out of this validation – but you probably shouldn't. If you must do this,
+/// please ensure that your `Element` is either entirely immutable, or respects value semantics.
+///
+public protocol _Blueprint_Elements_Should_Be_Value_Types {
+    func elements_should_be_value_types_by_overriding_this_method_i_acknowledge_i_am_in_hard_mode()
+}
+
+
+public extension _Blueprint_Elements_Should_Be_Value_Types {
+    func elements_should_be_value_types_by_overriding_this_method_i_acknowledge_i_am_in_hard_mode() {}
+}
+
+
+public extension _Blueprint_Elements_Should_Be_Value_Types where Self : AnyObject {
+    @available(*, unavailable, message: "Blueprint Elements should be value types, not classes.")
+    func elements_should_be_value_types_by_overriding_this_method_i_acknowledge_i_am_in_hard_mode() {}
 }
