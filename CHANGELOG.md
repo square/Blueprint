@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [Ensure that `Element`s are a value type](https://github.com/square/Blueprint/pull/190). This is generally assumed by Blueprint, but was previously not validated. This is only validated in `DEBUG` builds, to avoid otherwise affecting performance.
-
 ### Added
-
-- [Add `LayoutWriter`](https://github.com/square/Blueprint/pull/187), which makes creating custom / arbitrary layouts much simpler. You no longer need to define a custom `Layout` type; instead, you can just utilize `LayoutWriter` and configure and place your children within its builder initializer.
 
 ### Removed
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.19.0] - 2021-01-05
+
+### Fixed
+
+- [Ensure that `Element`s are a value type](https://github.com/square/Blueprint/pull/190). This is generally assumed by Blueprint, but was previously not validated. This is only validated in `DEBUG` builds, to avoid otherwise affecting performance.
+
+### Added
+
+- [Add `LayoutWriter`](https://github.com/square/Blueprint/pull/187), which makes creating custom / arbitrary layouts much simpler. You no longer need to define a custom `Layout` type; instead, you can just utilize `LayoutWriter` and configure and place your children within its builder initializer.
 
 ## [0.18.0] - 2020-12-08
 
@@ -468,7 +474,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.18.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.19.0...HEAD
+[0.19.0]: https://github.com/square/Blueprint/compare/0.18.0...0.19.0
 [0.18.0]: https://github.com/square/Blueprint/compare/0.17.1...0.18.0
 [0.17.1]: https://github.com/square/Blueprint/compare/0.17.0...0.17.1
 [0.17.0]: https://github.com/square/Blueprint/compare/0.16.0...0.17.0
