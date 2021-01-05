@@ -12,6 +12,28 @@ import UIKit
 
 class LayoutWriterTests : XCTestCase {
     
+    func test_buildCount() {
+        
+        // Performance – should only build the layout once during a layout pass.
+        
+        var buildCount : Int = 0
+        
+        let writer = LayoutWriter { _, layout in
+            buildCount += 1
+        }
+        
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        
+        view.element = writer.centered()
+        
+        XCTAssertEqual(buildCount, 0)
+        
+        view.layoutIfNeeded()
+        
+        // Two calls: Once for measurement, and once for layout.
+        XCTAssertEqual(buildCount, 2)
+    }
+    
     func test_measurement() {
         
         /// `.unionOfChildren`, positive frames.

@@ -50,7 +50,8 @@ public struct LayoutWriter : Element {
         ElementContent { size, env in
             var builder = Builder()
             self.build(Context(size: size), &builder)
-            return InnerElement(builder: builder)
+            
+            return Content(builder: builder)
         }
     }
     
@@ -190,7 +191,7 @@ extension LayoutWriter {
 
 extension LayoutWriter {
     
-    private struct InnerElement : Element {
+    private struct Content : Element {
         var builder : Builder
         
         // MARK: Element
