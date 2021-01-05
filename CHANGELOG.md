@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [Ensure that `Element`s are a value type](https://github.com/square/Blueprint/pull/190). This is generally assumed by Blueprint, but was previously not validated. This is only validated in `DEBUG` builds, to avoid otherwise affecting performance.
+
 ### Added
 
 - [Add `LayoutWriter`](https://github.com/square/Blueprint/pull/187), which makes creating custom / arbitrary layouts much simpler. You no longer need to define a custom `Layout` type; instead, you can just utilize `LayoutWriter` and configure and place your children within its builder initializer.
