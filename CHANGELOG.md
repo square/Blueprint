@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- [Remove compile time validation](https://github.com/square/Blueprint/pull/192) from `Element`s, since it caused compile-time errors in certain cases when extensions and `where` clauses were used.
+
 ### Changed
 
 ### Deprecated
@@ -29,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- [Ensure that `Element`s are a value type](https://github.com/square/Blueprint/pull/190). This is generally assumed by Blueprint, but was previously not validated. This is only validated in `DEBUG` builds, to avoid otherwise affecting performance.
+- ~~[Ensure that `Element`s are a value type](https://github.com/square/Blueprint/pull/190). This is generally assumed by Blueprint, but was previously not validated. This is only validated in `DEBUG` builds, to avoid otherwise affecting performance.~~
 
 ### Added
 
