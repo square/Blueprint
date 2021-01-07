@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- [Remove compile time validation](https://github.com/square/Blueprint/pull/192) from `Element`s, since it caused compile-time errors in certain cases when extensions and `where` clauses were used.
-
 ### Changed
 
 ### Deprecated
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.19.1] - 2021-01-06
+
+### Removed
+
+- [Remove compile time validation](https://github.com/square/Blueprint/pull/192) from `Element`s, since it caused compile-time errors in certain cases when extensions and `where` clauses were used.
 
 ## [0.19.0] - 2021-01-05
 
@@ -476,7 +480,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.19.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.19.1...HEAD
+[0.19.1]: https://github.com/square/Blueprint/compare/0.19.0...0.19.1
 [0.19.0]: https://github.com/square/Blueprint/compare/0.18.0...0.19.0
 [0.18.0]: https://github.com/square/Blueprint/compare/0.17.1...0.18.0
 [0.17.1]: https://github.com/square/Blueprint/compare/0.17.0...0.17.1
