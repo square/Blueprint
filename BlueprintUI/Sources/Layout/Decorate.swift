@@ -64,31 +64,33 @@ public struct Decorate : ProxyElement {
     // MARK: ProxyElement
     
     public var elementRepresentation: Element {
-        LayoutWriter { context, layout in
-            
-            let contentSize = self.wrapped.content.measure(
-                in: context.size,
-                environment: context.environment
-            )
-            
-            let contentFrame = CGRect(origin: .zero, size: contentSize)
-            
-            let decorationFrame = self.position.frame(
-                with: contentFrame,
-                decoration: self.decoration,
-                environment: context.environment
-            )
-            
-            layout.sizing = .fixed(contentSize)
-            
-            switch self.layering {
-            case .above:
-                layout.add(with: contentFrame, child: self.wrapped)
-                layout.add(with: decorationFrame, child: self.decoration)
+        EnvironmentReader { environment in
+            LayoutWriter { context, layout in
                 
-            case .below:
-                layout.add(with: decorationFrame, child: self.decoration)
-                layout.add(with: contentFrame, child: self.wrapped)
+                let contentSize = self.wrapped.content.measure(
+                    in: context.size,
+                    environment: environment
+                )
+                
+                let contentFrame = CGRect(origin: .zero, size: contentSize)
+                
+                let decorationFrame = self.position.frame(
+                    with: contentFrame,
+                    decoration: self.decoration,
+                    environment: environment
+                )
+                
+                layout.sizing = .fixed(contentSize)
+                
+                switch self.layering {
+                case .above:
+                    layout.add(with: contentFrame, child: self.wrapped)
+                    layout.add(with: decorationFrame, child: self.decoration)
+                    
+                case .below:
+                    layout.add(with: decorationFrame, child: self.decoration)
+                    layout.add(with: contentFrame, child: self.wrapped)
+                }
             }
         }
     }
