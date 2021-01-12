@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [Add `Transformed` element](https://github.com/square/Blueprint/pull/195) to apply a `CATransform3D` to a wrapped element.
-
 ### Removed
 
 ### Changed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.20.0] - 2021-01-12
+
+### Added
+
+- [Add `Transformed` element](https://github.com/square/Blueprint/pull/195) to apply a `CATransform3D` to a wrapped element.
 
 ## [0.19.1] - 2021-01-06
 
@@ -482,7 +486,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.19.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.20.0...HEAD
+[0.20.0]: https://github.com/square/Blueprint/compare/0.19.1...0.20.0
 [0.19.1]: https://github.com/square/Blueprint/compare/0.19.0...0.19.1
 [0.19.0]: https://github.com/square/Blueprint/compare/0.18.0...0.19.0
 [0.18.0]: https://github.com/square/Blueprint/compare/0.17.1...0.18.0
