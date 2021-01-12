@@ -5,6 +5,8 @@
 //  Created by Kyle Van Essen on 10/7/20.
 //
 
+import UIKit
+
 
 /// A parent element which allows arbitrary, custom layout and positioning of its children.
 ///
@@ -47,8 +49,9 @@ public struct LayoutWriter : Element {
     public var content: ElementContent {
         ElementContent { size, env in
             var builder = Builder()
-            self.build(Context(size: size, environment: env), &builder)
-            return InnerElement(builder: builder)
+            self.build(Context(size: size), &builder)
+            
+            return Content(builder: builder)
         }
     }
     
@@ -96,25 +99,6 @@ extension LayoutWriter {
             self.children.append(.init(frame: frame, element: child))
         }
         
-        /// Adds a new child element to the layout with the provided frame.
-        /// The frame is passed to the child provider.
-        public mutating func add(
-            with frame: CGRect,
-            child : (CGRect) -> Element
-        ) {
-            self.add(with: frame, child: child(frame))
-        }
-        
-        /// Adds a new child element to the layout with the provided frame.
-        /// The frame is passed to the child provider.
-        public mutating func add(
-            with frame: () -> CGRect,
-            child : (CGRect) -> Element
-        ) {
-            let frame = frame()
-            self.add(with: frame, child: child(frame))
-        }
-        
         /// Adds a new child element to the layout.
         /// Using this method is helpful if you need to calculate both the frame and the element content in a single pass.
         public mutating func add(_ child : () -> (CGRect, Element)) {
@@ -138,19 +122,50 @@ extension LayoutWriter {
         
         /// The size constraint the layout is occurring in.
         public var size : SizeConstraint
-        
-        /// The environment the layout is occurring in.
-        public var environment : Environment
     }
     
     /// Controls the sizing calculation of the custom layout.
     public enum Sizing : Equatable {
         
         /// Ensures that the final size of element is large enough to fit all children, starting from (0,0).
+        ///
+        /// Negative origins of rects are not considered in this calculation. If you have the following layout:
+        /// ```
+        ///  ┌──────┐
+        ///  │      ├─────────┐
+        ///  │      │*********│
+        ///  └─┬────┘**┌──────┤
+        ///    │*******│      │
+        ///    │*******│      │
+        /// ┌──┴───┐***│      │
+        /// │      │***│      │
+        /// │      │***└──────┤
+        /// └──────┴──────────┘
+        /// ```
+        /// The large rect will be the calculated size / bounds of the layout, starting at (0,0). Any rects with
+        /// negative origins will overhang the layout to the top or left, respectively.
         case unionOfChildren
         
-        /// Fixes the layout size to the provided size.
+        /// Fixes the layout size to the provided size. Children are positioned within this size, starting at (0,0)
+        /// Any rects with negative origins will overhang the layout to the top or left, respectively.
         case fixed(CGSize)
+        
+        /// Measures the size of the content within the builder.
+        func measure(with builder : Builder) -> CGSize {
+            switch self {
+            case .unionOfChildren:
+                return CGSize(
+                    width: builder.children.reduce(0.0) { width, child in
+                        max(width, child.frame.maxX)
+                    },
+                    height: builder.children.reduce(0.0) { height, child in
+                        max(height, child.frame.maxY)
+                    }
+                )
+            case .fixed(let size):
+                return size
+            }
+        }
     }
     
     /// A child of the custom layout, providing its frame and element.
@@ -176,8 +191,7 @@ extension LayoutWriter {
 
 extension LayoutWriter {
     
-    /// We bounce to an inner element so we can provide the environment.
-    private struct InnerElement : Element {
+    private struct Content : Element {
         var builder : Builder
         
         // MARK: Element
@@ -200,15 +214,7 @@ extension LayoutWriter {
             var builder : Builder
             
             func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-                switch builder.sizing {
-                case .unionOfChildren:
-                    return builder.children.reduce(CGRect.zero) { rect, child in
-                        rect.union(child.frame)
-                    }.size
-                    
-                case .fixed(let size):
-                    return size
-                }
+                self.builder.sizing.measure(with: self.builder)
             }
             
             func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
@@ -219,3 +225,4 @@ extension LayoutWriter {
         }
     }
 }
+

@@ -97,22 +97,44 @@ public extension Element {
         ConstrainedSize(width: width, height: height, wrapping: self)
     }
     
+    /// Constrains the measured size of the element to the provided width and height.
+    func constrainedTo(
+        width: CGFloat,
+        height: CGFloat
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(
+            width: .absolute(width),
+            height: .absolute(height),
+            wrapping: self
+        )
+    }
+    
+    /// Constrains the measured size of the element to the provided size.
+    func constrainedTo(
+        size : CGSize
+    ) -> ConstrainedSize
+    {
+        ConstrainedSize(
+            width: .absolute(size.width),
+            height: .absolute(size.height),
+            wrapping: self
+        )
+    }
+    
     /// Constrains the measured size of the element to the provided `SizeConstraint`.
     func constrained(to sizeConstraint : SizeConstraint) -> ConstrainedSize
     {
-        ConstrainedSize(
-            width: {
-                switch sizeConstraint.width {
-                case .atMost(let value): return .atMost(value)
-                case .unconstrained: return .unconstrained
-                }
-            }(),
-            height: {
-                switch sizeConstraint.height {
-                case .atMost(let value): return .atMost(value)
-                case .unconstrained: return .unconstrained
-                }
-            }(),
+        func toConstrainedSize(_ axis : SizeConstraint.Axis) -> ConstrainedSize.Constraint {
+            switch axis {
+            case .atMost(let value): return .atMost(value)
+            case .unconstrained: return .unconstrained
+            }
+        }
+        
+        return ConstrainedSize(
+            width: toConstrainedSize(sizeConstraint.width),
+            height: toConstrainedSize(sizeConstraint.height),
             wrapping: self
         )
     }
