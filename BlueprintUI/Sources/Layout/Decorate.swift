@@ -50,15 +50,15 @@ public struct Decorate : ProxyElement {
     public init(
         layering : Layering,
         position: Position,
-        wrapping: () -> Element,
-        decoration: () -> Element
+        wrapping: Element,
+        decoration: Element
     ) {
         self.layering = layering
         
-        self.wrapped = wrapping()
+        self.wrapped = wrapping
         
         self.position = position
-        self.decoration = decoration()
+        self.decoration = decoration
     }
     
     // MARK: ProxyElement
@@ -217,8 +217,8 @@ extension Element {
         Decorate(
             layering: layering,
             position: position,
-            wrapping: { self },
-            decoration: decoration
+            wrapping: self,
+            decoration: decoration()
         )
     }
 }
