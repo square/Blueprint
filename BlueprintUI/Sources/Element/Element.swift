@@ -40,6 +40,10 @@ import UIKit
 ///
 public protocol Element {
 
+    //
+    // MARK: Element v1
+    //
+    
     /// Returns the content of this element.
     ///
     /// Elements generally fall into two types:
@@ -63,4 +67,33 @@ public protocol Element {
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
 
+    //
+    // MARK: Element v2
+    //
+    
+    var elementBody : ElementBody { get }
+    
+    var view : ViewDescription? { get }
+}
+
+extension Element {
+    
+    public var elementBody : ElementBody { fatalError() }
+    
+    public var view : ViewDescription? { nil }
+}
+
+
+public struct ElementBody {
+    
+    var children : Element
+    
+    init(_ builder : (inout Builder) -> ()) {
+        
+    }
+    
+    
+    public struct Builder {
+        var children : Element = []
+    }
 }
