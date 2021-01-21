@@ -42,6 +42,10 @@ public struct Opacity: Element {
             attributes.alpha = opacity
             return attributes
         }
+        
+        func elementType(for child: Measurable) -> Any.Type {
+            type(of: child)
+        }
     }
 }
 

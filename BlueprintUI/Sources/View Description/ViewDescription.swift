@@ -92,17 +92,23 @@ public struct ViewDescription {
     }
     
     public var viewType: UIView.Type {
-        return _viewType
+        _viewType
     }
     
     public func build() -> UIView {
-        SignpostLogger.log(log: .blueprintView, name: "Create View", for: self) {
+        SignpostLogger.log(
+            name: "Create View",
+            info: .init(type: _viewType)
+        ) {
             _build()
         }
     }
     
     public func apply(to view: UIView) {
-        SignpostLogger.log(log: .blueprintView, name: "Update View", for: self) {
+        SignpostLogger.log(
+            name: "Update View",
+            info: .init(type: _viewType)
+        ) {
             _apply(view)
         }
     }
@@ -125,15 +131,6 @@ public struct ViewDescription {
     
 }
 
-extension ViewDescription : SignpostLoggable {
-    
-    var signpostInfo: SignpostLoggingInfo {
-        .init(
-            identifiers: [String(describing: self.viewType)]
-        )
-    }
-    
-}
 
 extension ViewDescription {
 

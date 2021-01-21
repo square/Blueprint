@@ -105,6 +105,10 @@ public struct Aligned: Element {
 
             return attributes
         }
+        
+        func elementType(for child: Measurable) -> Any.Type {
+            type(of: child)
+        }
     }
 }
 

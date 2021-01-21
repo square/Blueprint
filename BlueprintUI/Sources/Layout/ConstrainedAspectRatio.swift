@@ -75,6 +75,10 @@ public struct ConstrainedAspectRatio: Element {
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             return LayoutAttributes(size: size)
         }
+        
+        func elementType(for child: Measurable) -> Any.Type {
+            type(of: child)
+        }
     }
 }
 

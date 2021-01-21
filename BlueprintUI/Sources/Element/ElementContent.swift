@@ -37,12 +37,9 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        SignpostLogger.log(log: .blueprintView, name: "Measure Element", for: self) {
-            environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
-                self.storage.measure(in: constraint, environment: environment)
-            }
+        environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
+            self.storage.measure(in: constraint, environment: environment)
         }
-
     }
 
     public var childCount: Int {
@@ -50,16 +47,7 @@ public struct ElementContent {
     }
 
     func performLayout(attributes: LayoutAttributes, environment: Environment) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        SignpostLogger.log(log: .blueprintView, name: "Layout Element", for: self) {
-            storage.performLayout(attributes: attributes, environment: environment)
-        }
-    }
-}
-
-
-extension ElementContent : SignpostLoggable {
-    var signpostInfo : SignpostLoggingInfo {
-        self.storage.signpostInfo
+        storage.performLayout(attributes: attributes, environment: environment)
     }
 }
 
@@ -209,7 +197,7 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage : SignpostLoggable {
+fileprivate protocol ContentStorage {
     var childCount: Int { get }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize
@@ -250,19 +238,18 @@ extension ElementContent {
         
         // MARK: ContentStorage
         
-        var signpostInfo: SignpostLoggingInfo {
-            .init(
-                identifiers: [String(describing: LayoutType.self)]
-            )
-        }
-        
         var childCount: Int {
             return children.count
         }
 
         func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-            let layoutItems = self.layoutItems(in: environment)
-            return layout.measure(in: constraint, items: layoutItems)
+            let items = self.layoutItems(in: environment)
+            SignpostLogger.log(
+                name: "Layout Element",
+                info: layout.loggingInfo(with: <#T##Measurable#>)
+            ) {
+                layout.measure(in: constraint, items: items)
+            }
         }
 
         func performLayout(
@@ -275,38 +262,43 @@ extension ElementContent {
                 return []
             }
             
-            let layoutItems = self.layoutItems(in: environment)
-            let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
+            return SignpostLogger.log(
+                name: "Layout Element",
+                info: .init(type: type(of: LayoutType.self))
+            ) {
+                let layoutItems = self.layoutItems(in: environment)
+                let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
-            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
-            result.reserveCapacity(children.count)
-            
-            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+                var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+                result.reserveCapacity(children.count)
+                
+                var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-            for index in 0..<children.count {
-                let currentChildLayoutAttributes = childAttributes[index]
-                let currentChild = children[index]
+                for index in 0..<children.count {
+                    let currentChildLayoutAttributes = childAttributes[index]
+                    let currentChild = children[index]
 
-                let resultNode = LayoutResultNode(
-                    element: currentChild.element,
-                    layoutAttributes: currentChildLayoutAttributes,
-                    content: currentChild.content,
-                    environment: environment
-                )
+                    let resultNode = LayoutResultNode(
+                        element: currentChild.element,
+                        layoutAttributes: currentChildLayoutAttributes,
+                        content: currentChild.content,
+                        environment: environment
+                    )
 
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
-                    key: currentChild.key
-                )
+                    let identifier = identifierFactory.nextIdentifier(
+                        for: type(of: currentChild.element),
+                        key: currentChild.key
+                    )
 
-                result.append((identifier: identifier, node: resultNode))
+                    result.append((identifier: identifier, node: resultNode))
+                }
+
+                return result
             }
-
-            return result
         }
 
         private func layoutItems(in environment: Environment) -> [(LayoutType.Traits, Measurable)] {
-            return children.map { ($0.traits, $0.content.measurable(in: environment)) }
+            children.map { ($0.traits, $0.content.measurable(in: environment)) }
         }
         
         fileprivate struct Child {
@@ -323,12 +315,6 @@ extension ElementContent {
 
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
-    
-    var signpostInfo: SignpostLoggingInfo {
-        .init(
-            identifiers: [String(describing: type(of: child))]
-        )
-    }
 
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
@@ -342,25 +328,36 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         environment: Environment)
         -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
-        let environment = adapted(environment: environment)
+        SignpostLogger.log(
+            name: "Layout Element",
+            info: .init(type: type(of: child))
+        ) {
+            let environment = adapted(environment: environment)
 
-        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
+            let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
-        let node = LayoutResultNode(
-            element: child,
-            layoutAttributes: childAttributes,
-            content: child.content,
-            environment: environment)
+            let node = LayoutResultNode(
+                element: child,
+                layoutAttributes: childAttributes,
+                content: child.content,
+                environment: environment)
 
-        return [(identifier, node)]
+            return [(identifier, node)]
+        }
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        let environment = adapted(environment: environment)
+        
+        SignpostLogger.log(
+            name: "Measure Element 2",
+            info: .init(type: type(of: child))
+        ) {
+            let environment = adapted(environment: environment)
 
-        return child.content.measure(in: constraint, environment: environment)
+            return child.content.measure(in: constraint, environment: environment)
+        }
     }
 
     private func adapted(environment: Environment) -> Environment {
@@ -376,10 +373,6 @@ private struct LazyStorage: ContentStorage {
     let childCount = 1
 
     var builder: (SizeConstraint, Environment) -> Element
-    
-    var signpostInfo: SignpostLoggingInfo {
-        .init(identifiers: ["LazyStorage"])
-    }
 
     func performLayout(
         attributes: LayoutAttributes,
@@ -388,22 +381,36 @@ private struct LazyStorage: ContentStorage {
     {
         let constraint = SizeConstraint(attributes.bounds.size)
         let child = buildChild(in: constraint, environment: environment)
-        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
+        
+        return SignpostLogger.log(
+            name: "Layout Element",
+            info: .init(type: type(of: child))
+        ) {
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let node = LayoutResultNode(
-            element: child,
-            layoutAttributes: childAttributes,
-            content: child.content,
-            environment: environment)
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
-        return [(identifier, node)]
+            let node = LayoutResultNode(
+                element: child,
+                layoutAttributes: childAttributes,
+                content: child.content,
+                environment: environment)
+
+            return [(identifier, node)]
+        }
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+        
         let child = buildChild(in: constraint, environment: environment)
-        return child.content.measure(in: constraint, environment: environment)
+        
+        return SignpostLogger.log(
+            name: "Measure Element 3",
+            info: .init(type: type(of: child))
+        ) {
+            child.content.measure(in: constraint, environment: environment)
+        }
     }
 
     private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
@@ -424,14 +431,18 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
     func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
         precondition(items.count == 1)
-        return wrapped.measure(in: constraint, child: items.map { $0.content }.first!)
+        return wrapped.measure(in: constraint, child: items.first!.content)
     }
 
     func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
         precondition(items.count == 1)
         return [
-            wrapped.layout(size: size, child: items.map { $0.content }.first!)
+            wrapped.layout(size: size, child: items.first!.content)
         ]
+    }
+    
+    func assString() -> SignpostLogger.Info {
+         .init(type: wrapped.childElementType)
     }
 }
 
@@ -447,6 +458,9 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
         return LayoutAttributes(size: size)
     }
 
+    func elementType(for child: Measurable) -> Any.Type {
+        type(of: child)
+    }
 }
 
 

@@ -152,5 +152,9 @@ extension Inset {
             frame.size.height -= top + bottom
             return LayoutAttributes(frame: frame)
         }
+        
+        func elementType(for child: Measurable) -> Any.Type {
+            type(of: child)
+        }
     }
 }

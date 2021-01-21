@@ -8,26 +8,6 @@
 import os.signpost
 
 
-/// Log types available within Listable.
-extension OSLog {
-    static let blueprintView = OSLog(
-        subsystem: "com.square.BlueprintUI",
-        category: "Blueprint View Update"
-    )
-}
-
-
-/// An object which can be logged to `SignpostLogger`.
-protocol SignpostLoggable {
-    var signpostInfo : SignpostLoggingInfo { get }
-}
-
-
-/// The info logged to `SignpostLogger` from a `SignpostLoggable`.
-struct SignpostLoggingInfo {
-    var identifiers : [String]
-}
-
 
 ///
 /// Signpost logging is logging visible in Instruments.app
@@ -41,7 +21,7 @@ struct SignpostLoggingInfo {
 ///  WWDC 2019: https://developer.apple.com/wwdc20/10168
 ///  Swift By Sundell: https://www.swiftbysundell.com/wwdc2018/getting-started-with-signposts/
 ///
-struct SignpostLogger {
+public struct SignpostLogger {
     
     #if DEBUG
     /// You may temporarily set this param to `false` to disable os_signpost logging,
@@ -54,43 +34,74 @@ struct SignpostLogger {
     static let isLoggingEnabled = false
     #endif
     
-    static func log<Output>(log : OSLog, name: StaticString, for loggable : SignpostLoggable? = nil, _ output : () -> Output) -> Output
+    static func log<Output>(name: StaticString, info : Info? = nil, _ output : () -> Output) -> Output
     {
         guard self.isLoggingEnabled else {
             return output()
         }
         
-        self.log(.begin, log: log, name: name, for: loggable)
+        self.log(.begin, name: name, info: info)
         
         let output = output()
         
-        self.log(.end, log: log, name: name, for: loggable)
+        self.log(.end, name: name, info: info)
         
         return output
     }
     
-    static func log(_ type : EventType, log : OSLog, name: StaticString, for loggable : SignpostLoggable? = nil)
+    static func log(_ type : EventType, name: StaticString, info: Info? = nil)
     {
         guard self.isLoggingEnabled else {
             return
         }
         
         if #available(iOS 12.0, *) {
-            if let loggable = loggable {
+            if let info = info {
                 os_signpost(
                     type.toSignpostType,
-                    log: log,
+                    log: .blueprint,
                     name: name,
                     "%{public}s",
-                    Self.debuggingIdentifier(for: loggable)
+                    info.stringValue
                 )
             } else {
                 os_signpost(
                     type.toSignpostType,
-                    log: log,
+                    log: .blueprint,
                     name: name
                 )
             }
+        }
+    }
+    
+    /// The info logged to `SignpostLogger` from a `SignpostLoggable`.
+    public struct Info {
+        
+        private var typeString : () -> String
+        private var components : () -> [String]
+        
+        public init(
+            type valueType : @escaping @autoclosure () -> Any,
+            components: @escaping @autoclosure () -> [String] = [String]()
+        ) {
+            self.typeString = { String(describing: valueType()) }
+            self.components = components
+        }
+        
+        var stringValue : String {
+
+            var string = ""
+            
+            string += self.typeString()
+            
+            let components = self.components()
+            
+            if components.isEmpty == false {
+                string += ": "
+                string += components.joined(separator: ", ")
+            }
+            
+            return string
         }
     }
     
@@ -108,11 +119,12 @@ struct SignpostLogger {
             }
         }
     }
-    
-    private static func debuggingIdentifier(for loggable : SignpostLoggable) -> String {
-        
-        let info = loggable.signpostInfo
-        
-        return info.identifiers.joined(separator: " ")
-    }
+}
+
+
+fileprivate extension OSLog {
+    static let blueprint = OSLog(
+        subsystem: "com.square.BlueprintUI",
+        category: "BlueprintUI"
+    )
 }
