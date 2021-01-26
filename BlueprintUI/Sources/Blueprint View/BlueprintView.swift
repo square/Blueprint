@@ -31,8 +31,15 @@ public final class BlueprintView: UIView {
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
 
-    /// Used to detect reentrant updates
-    private var isInsideUpdate: Bool = false
+    /// Used to detect and manage re-entrant updates.
+    private var isUpdatingViewHierarchy : Bool = false
+    private var needsViewHierarchyUpdateForReEntrantChange : Bool = false
+    
+    private enum UpdateState {
+        case settled
+        case updating
+        case queuing
+    }
 
     private let rootController: NativeViewController
 
@@ -163,17 +170,14 @@ public final class BlueprintView: UIView {
     
     override public func layoutSubviews() {
         super.layoutSubviews()
+        
         invalidateIntrinsicContentSize()
-        performUpdate()
+        updateViewHierarchyIfNeeded()
     }
 
     public override func didMoveToWindow() {
         super.didMoveToWindow()
         setNeedsViewHierarchyUpdate()
-    }
-    
-    private func performUpdate() {
-        updateViewHierarchyIfNeeded()
     }
     
     private func setNeedsViewHierarchyUpdate() {
@@ -186,9 +190,13 @@ public final class BlueprintView: UIView {
     
     private func updateViewHierarchyIfNeeded() {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
-
-        assert(!isInsideUpdate, "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates.")
-        isInsideUpdate = true
+        
+        if self.isUpdatingViewHierarchy {
+            self.needsViewHierarchyUpdateForReEntrantChange = true
+            return
+        } else {
+            self.isUpdatingViewHierarchy = true
+        }
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
@@ -211,8 +219,13 @@ public final class BlueprintView: UIView {
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         hasUpdatedViewHierarchy = true
-
-        isInsideUpdate = false
+        
+        if self.needsViewHierarchyUpdateForReEntrantChange {
+            self.setNeedsViewHierarchyUpdate()
+        }
+        
+        self.isUpdatingViewHierarchy = false
+        self.needsViewHierarchyUpdateForReEntrantChange = false
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {

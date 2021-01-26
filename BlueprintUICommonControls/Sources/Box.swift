@@ -42,7 +42,7 @@ public struct Box: Element {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return BoxView.describe { config in
 
-            config.apply({ (view) in
+            config.apply { view in
 
                 if self.backgroundColor != view.backgroundColor {
                     view.backgroundColor = self.backgroundColor
@@ -59,13 +59,17 @@ public struct Box: Element {
                 if self.borderStyle.width != view.layer.borderWidth {
                     view.layer.borderWidth = self.borderStyle.width
                 }
+                
+                var needsShadowPathUpdate = false
 
                 if self.shadowStyle.radius != view.layer.shadowRadius {
                     view.layer.shadowRadius = self.shadowStyle.radius
+                    needsShadowPathUpdate = true
                 }
 
                 if self.shadowStyle.offset != view.layer.shadowOffset {
                     view.layer.shadowOffset = self.shadowStyle.offset
+                    needsShadowPathUpdate = true
                 }
 
                 if self.shadowStyle.color?.cgColor != view.layer.shadowColor {
@@ -75,9 +79,12 @@ public struct Box: Element {
                 if self.shadowStyle.opacity != CGFloat(view.layer.shadowOpacity) {
                     view.layer.shadowOpacity = Float(self.shadowStyle.opacity)
                 }
+                
+                if needsShadowPathUpdate {
+                    view.updateShadowPath()
+                }
 
-                /// `.contentView` is used for clipping, make sure the corner radius
-                /// matches.
+                /// `.contentView` is used for clipping, make sure the corner radius matches.
 
                 if self.clipsContent != view.contentView.clipsToBounds {
                     view.contentView.clipsToBounds = self.clipsContent
@@ -86,14 +93,11 @@ public struct Box: Element {
                 if self.cornerStyle.radius(for: bounds) != view.contentView.layer.cornerRadius {
                     view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
                 }
-
-            })
-
+            }
 
             config.contentView = { view in
                 return view.contentView
             }
-
         }
     }
 }
@@ -232,16 +236,48 @@ fileprivate final class BoxView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        contentView.frame = bounds
-
-        if layer.shadowColor != nil {
-            layer.shadowPath = UIBezierPath(
-                roundedRect: bounds,
-                cornerRadius: layer.cornerRadius
-            ).cgPath
+    override var bounds: CGRect {
+        didSet {
+            guard oldValue != self.bounds else {
+                return
+            }
+            
+            self.didSetFrame()
         }
     }
     
+    override var frame: CGRect {
+        didSet {
+            guard oldValue != self.frame else {
+                return
+            }
+            
+            self.didSetFrame()
+        }
+    }
+    
+    private func didSetFrame() {
+        /// Perform these changes in `frame.didSet` instead of in `layoutSubviews`
+        /// to ensure that they are contained inside any animation blocks that we are implicitly
+        /// part of, to ensure that the `contentView.frame` and shadow are updated with animations.
+        
+        contentView.frame = bounds
+        
+        self.updateShadowPath()
+    }
+    
+    fileprivate func updateShadowPath() {
+        
+        layer.animateAlongsideUIView { animator in
+            
+            animator.addAnimation(
+                for: #keyPath(CALayer.shadowPath),
+                with: UIBezierPath(
+                    roundedRect: bounds,
+                    cornerRadius: layer.cornerRadius
+                ).cgPath,
+                on: layer
+            )
+        }
+    }
 }
