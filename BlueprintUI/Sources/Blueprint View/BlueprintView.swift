@@ -222,10 +222,15 @@ public final class BlueprintView: UIView {
         
         if self.needsViewHierarchyUpdateForReEntrantChange {
             self.setNeedsViewHierarchyUpdate()
+            
+            self.isUpdatingViewHierarchy = false
+            self.needsViewHierarchyUpdateForReEntrantChange = false
+            
+            self.layoutIfNeeded()
+        } else {
+            self.isUpdatingViewHierarchy = false
+            self.needsViewHierarchyUpdateForReEntrantChange = false
         }
-        
-        self.isUpdatingViewHierarchy = false
-        self.needsViewHierarchyUpdateForReEntrantChange = false
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
