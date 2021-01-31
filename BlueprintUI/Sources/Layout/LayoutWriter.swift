@@ -49,7 +49,10 @@ public struct LayoutWriter : Element {
     public var content: ElementContent {
         ElementContent { size, env in
             var builder = Builder()
-            self.build(Context(size: size), &builder)
+            
+            if size.maximum.width > 0 && size.maximum.height > 0 {
+                self.build(Context(size: size), &builder)
+            }
             
             return Content(builder: builder)
         }

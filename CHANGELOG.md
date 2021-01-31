@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- [When `LayoutWriter` receives an empty frame, skip the layout process](https://github.com/square/Blueprint/pull/199). This avoids likely calculations against 0, which can easily result in NaN later on in the layout pass. 
+
 ### Added
 
 ### Removed

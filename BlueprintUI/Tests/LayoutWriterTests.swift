@@ -34,6 +34,42 @@ class LayoutWriterTests : XCTestCase {
         XCTAssertEqual(buildCount, 2)
     }
     
+    func test_zeroSize_does_no_layout() {
+        
+        // Trying to perform a layout with a zero size doesn't really mean anything.
+        // In these cases, we should skip the layout to avoid NaN calculations
+        // and other otherwise weird edge cases.
+        
+        var callCount : Int = 0
+        
+        let writer = LayoutWriter { _, layout in
+            callCount += 1
+        }
+        
+        let view = BlueprintView(element: writer)
+        
+        XCTAssertEqual(callCount, 0)
+        
+        view.layoutIfNeeded()
+        
+        XCTAssertEqual(callCount, 0)
+        
+        view.frame.size = CGSize(width: 0, height: 100)
+        view.layoutIfNeeded()
+        
+        XCTAssertEqual(callCount, 0)
+        
+        view.frame.size = CGSize(width: 100, height: 0)
+        view.layoutIfNeeded()
+        
+        XCTAssertEqual(callCount, 0)
+        
+        view.frame.size = CGSize(width: 100, height: 100)
+        view.layoutIfNeeded()
+        
+        XCTAssertEqual(callCount, 1)
+    }
+    
     func test_measurement() {
         
         /// `.unionOfChildren`, positive frames.
