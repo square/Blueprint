@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce conditionals on `Element`](https://github.com/square/Blueprint/pull/198) to allow you to perform inline checks like `if`, `if let`, and `map` when building `Element` trees.
+
 ### Removed
 
 ### Changed
