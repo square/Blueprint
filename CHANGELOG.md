@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [Introduce additional APIs on `Overlay`](https://github.com/square/Blueprint/pull/201) to ease conditional construction the `Overlay` elements.
+
 ### Deprecated
 
 ### Security
