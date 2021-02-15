@@ -19,22 +19,17 @@ public struct AttributedLabel: Element, Hashable {
         configure(&self)
     }
 
+    private static let measurementLabel = LabelView()
+    
     public var content: ElementContent {
-        struct Measurer: Measurable {
-            private static let prototypeLabel = LabelView()
-
-            var model: AttributedLabel
-
-            func measure(in constraint: SizeConstraint) -> CGSize {
-                let label = Self.prototypeLabel
-                model.update(label: label)
+                
+        ElementContent(
+            measurementCachingKey: .init(type: Self.self, input: self),
+            measureFunction: { constraint in
+                let label = Self.measurementLabel
+                self.update(label: label)
                 return label.sizeThatFits(constraint.maximum)
             }
-        }
-
-        return ElementContent(
-            measurable: Measurer(model: self),
-            measurementCachingKey: .init(type: Self.self, input: self)
         )
     }
 

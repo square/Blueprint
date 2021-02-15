@@ -4,7 +4,7 @@ project 'SampleApp.xcodeproj'
 
 def blueprint_pods
   pod 'BlueprintUI', :path => '../BlueprintUI.podspec', :testspecs => ['Tests'] 
-  pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec' #, :testspecs => ['Tests'] # Uncomment to run these tests locally with Cocoapods
+  pod 'BlueprintUICommonControls', :path => '../BlueprintUICommonControls.podspec', :testspecs => ['Tests'] # Uncomment to run these tests locally with Cocoapods
 end
 
 target 'SampleApp' do
