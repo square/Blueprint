@@ -29,6 +29,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [0.21.0] - 2021-02-17
+
+### Added
+
+- [Introduce conditionals on `Element`](https://github.com/square/Blueprint/pull/198) to allow you to perform inline checks like `if`, `if let`, and `map` when building `Element` trees.
+
+### Changed
+
+- [Introduce additional APIs on `Overlay`](https://github.com/square/Blueprint/pull/201) to ease conditional construction the `Overlay` elements.
+
 ## [0.20.0] - 2021-01-12
 
 ### Added
@@ -491,6 +501,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First stable release.
 
 [main]: https://github.com/square/Blueprint/compare/0.20.0...HEAD
+[0.21.0]: https://github.com/square/Blueprint/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/square/Blueprint/compare/0.19.1...0.20.0
 [0.19.1]: https://github.com/square/Blueprint/compare/0.19.0...0.19.1
 [0.19.0]: https://github.com/square/Blueprint/compare/0.18.0...0.19.0
