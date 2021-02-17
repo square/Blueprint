@@ -5,15 +5,28 @@ import UIKit
 /// During a layout pass, measurement is calculated as the max size (in both x and y dimensions)
 /// produced by measuring all of the child elements.
 ///
-/// View-backed descendents will be z-ordered from back to front in the order of this element's
+/// View-backed descendants will be z-ordered from back to front in the order of this element's
 /// children.
 public struct Overlay: Element {
 
+    /// All elements displayed in the overlay.
     public var elements: [Element]
 
-    public init(elements: [Element]) {
+    /// Creates a new overlay with the provided elements.
+    public init(
+        elements: [Element] = [],
+        configure : (inout Overlay) -> () = { _ in}
+    ) {
         self.elements = elements
+        configure(&self)
     }
+    
+    /// Adds the provided element to the overlay.
+    public mutating func add(_ element : Element) {
+        self.elements.append(element)
+    }
+    
+    // MARK: Element
 
     public var content: ElementContent {
         return ElementContent(layout: OverlayLayout()) {
@@ -26,7 +39,6 @@ public struct Overlay: Element {
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return nil
     }
-
 }
 
 /// A layout implementation that places all children on top of each other with
@@ -44,7 +56,8 @@ fileprivate struct OverlayLayout: Layout {
     func layout(size: CGSize, items: [(traits: Void, content: Measurable)]) -> [LayoutAttributes] {
         return Array(
             repeating: LayoutAttributes(size: size),
-            count: items.count)
+            count: items.count
+        )
     }
 
 }
