@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Introduce conditionals on `Element`](https://github.com/square/Blueprint/pull/198) to allow you to perform inline checks like `if`, `if let`, and `map` when building `Element` trees.
 
+- [Introduce `Decorate`](https://github.com/square/Blueprint/pull/178) to allow placing a decoration element in front or behind of an `Element`, without affecting its layout. This is useful for rendering tap or selection states which should overflow the natural bounds of the `Element`, similar to a shadow, or useful for adding a badge to an `Element`.
+
 ### Removed
 
 ### Changed
