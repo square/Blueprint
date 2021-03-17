@@ -18,19 +18,11 @@ final class UserInteractionEnabledTests: XCTestCase {
         XCTAssertFalse(try view(from: disabled).isUserInteractionEnabled)
     }
 
-    func test_disabled() throws {
-        let enabled = Box().disabled(false)
+    func test_convenience() throws {
+        let enabled = Box().userInteractionEnabled()
         XCTAssertTrue(try view(from: enabled).isUserInteractionEnabled)
 
-        let disabled = Box().disabled()
-        XCTAssertFalse(try view(from: disabled).isUserInteractionEnabled)
-    }
-
-    func test_enabled() throws {
-        let enabled = Box().enabled()
-        XCTAssertTrue(try view(from: enabled).isUserInteractionEnabled)
-
-        let disabled =  Box().enabled(false)
+        let disabled = Box().userInteractionEnabled(false)
         XCTAssertFalse(try view(from: disabled).isUserInteractionEnabled)
     }
 
