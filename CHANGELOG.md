@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce `UserInteractionEnabled`](https://github.com/square/Blueprint/pull/203), an element which conditionally enables user interaction of wrapped elements.
+
+```swift
+searchField
+    .userInteractionEnabled(canBeginSearch)
+```
+
 ### Removed
 
 ### Changed
