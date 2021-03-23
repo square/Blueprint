@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce `UserInteractionEnabled`](https://github.com/square/Blueprint/pull/203), an element which conditionally enables user interaction of wrapped elements.
+
+```swift
+searchField
+    .userInteractionEnabled(canBeginSearch)
+```
+
 ### Removed
 
 ### Changed
@@ -24,6 +31,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.22.0] - 2021-03-15
+
+### Added
+
+- [Introduce `Decorate`](https://github.com/square/Blueprint/pull/178) to allow placing a decoration element in front or behind of an `Element`, without affecting its layout. This is useful for rendering tap or selection states which should overflow the natural bounds of the `Element`, similar to a shadow, or useful for adding a badge to an `Element`.
+
+## [0.21.0] - 2021-02-17
+
+### Added
+
+- [Introduce conditionals on `Element`](https://github.com/square/Blueprint/pull/198) to allow you to perform inline checks like `if`, `if let`, and `map` when building `Element` trees.
+
+### Changed
+
+- [Introduce additional APIs on `Overlay`](https://github.com/square/Blueprint/pull/201) to ease conditional construction the `Overlay` elements.
 
 ## [0.20.0] - 2021-01-12
 
@@ -486,7 +509,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.20.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.22.0...HEAD
+[0.22.0]: https://github.com/square/Blueprint/compare/0.21.0...0.22.0
+[0.21.0]: https://github.com/square/Blueprint/compare/0.20.0...0.21.0
 [0.20.0]: https://github.com/square/Blueprint/compare/0.19.1...0.20.0
 [0.19.1]: https://github.com/square/Blueprint/compare/0.19.0...0.19.1
 [0.19.0]: https://github.com/square/Blueprint/compare/0.18.0...0.19.0

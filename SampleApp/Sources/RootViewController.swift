@@ -18,7 +18,7 @@ final class RootViewController : UIViewController
 {
     fileprivate var demos : [DemoItem] {
         [
-            DemoItem(title: "Post List", onTap: { [weak self] in
+            DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
             }),
             DemoItem(title: "Keyboard Scrolling", onTap: { [weak self] in
@@ -64,25 +64,43 @@ final class RootViewController : UIViewController
 fileprivate struct DemoItem : ProxyElement
 {
     var title : String
+    var badgeText : String?
+    
     var onTap : () -> ()
 
     var elementRepresentation: Element {
-         Label(text: self.title) { label in
+        
+        Label(text: self.title) { label in
             label.font = .systemFont(ofSize: 18.0, weight: .semibold)
         }
         .inset(uniform: 20.0)
         .box(
             background: .white,
-            corners: .rounded(radius: 20.0),
+            corners: .rounded(radius: 15.0),
             shadow: .simple(
-                radius: 6.0,
-                opacity: 0.2,
-                offset: .init(width: 0, height: 3.0),
+                radius: 5.0,
+                opacity: 0.3,
+                offset: .init(width: 0, height: 2.0),
                 color: .black
             )
         )
         .tappable {
             self.onTap()
+        }
+        .decorate(layering: .below, position: .inset(5)) {
+            Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
+        }
+        .decorate(layering: .above, position: .corner(.topLeft)) {
+            guard let badge = self.badgeText else {
+                return Empty()
+            }
+            
+            return Label(text: badge) {
+                $0.font = .systemFont(ofSize: 22.0, weight: .bold)
+                $0.color = .white
+            }
+            .inset(uniform: 7.0)
+            .box(background: .systemRed, corners: .capsule)
         }
     }
 }
