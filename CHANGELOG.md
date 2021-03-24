@@ -22,6 +22,8 @@ searchField
 
 ### Changed
 
+- [Change backing view of `TransitionContainer`](https://github.com/square/Blueprint/pull/205) to not directly receive touches while still allowing subviews to do so.
+
 ### Deprecated
 
 ### Security
