@@ -19,7 +19,7 @@ public struct AccessibilityBlocker: Element {
     //
 
     public var content: ElementContent {
-        return ElementContent(child: wrapped)
+        wrapped.content
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

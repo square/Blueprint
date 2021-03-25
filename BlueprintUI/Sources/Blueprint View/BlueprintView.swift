@@ -48,6 +48,9 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// Provides performance metrics about the duration of layouts, updates, etc.
+    public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
 
     /// Instantiates a view with the given element
     ///
@@ -192,11 +195,15 @@ public final class BlueprintView: UIView {
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
+        
+        let start = Date()
 
         /// Grab view descriptions
         let viewNodes = element?
             .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
             .resolve() ?? []
+        
+        let measurementEndDate = Date()
         
         rootController.view.frame = bounds
         
@@ -210,9 +217,21 @@ public final class BlueprintView: UIView {
         rootNode.round(from: .zero, correction: .zero, scale: scale)
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
+        
+        let viewUpdateEndDate = Date()
+        
         hasUpdatedViewHierarchy = true
 
         isInsideUpdate = false
+        
+        self.metricsDelegate?.blueprintView(
+            self,
+            completedUpdateWith: .init(
+                totalDuration: viewUpdateEndDate.timeIntervalSince(start),
+                measureDuration: measurementEndDate.timeIntervalSince(start),
+                viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
+            )
+        )
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
@@ -244,6 +263,26 @@ public final class BlueprintView: UIView {
         return environment
     }
 }
+
+
+/// Provides performance information for blueprint measurements and updates.
+public protocol BlueprintViewMetricsDelegate : AnyObject {
+    
+    func blueprintView(_ view : BlueprintView, completedUpdateWith metrics : BlueprintViewUpdateMetrics)
+    
+}
+
+
+public struct BlueprintViewUpdateMetrics {
+    
+    /// The total time it took to apply a new element.
+    public var totalDuration : TimeInterval
+    /// The time it took to lay out and measure the new element.
+    public var measureDuration : TimeInterval
+    /// The time it took to update the on-screen views for the element.
+    public var viewUpdateDuration : TimeInterval
+}
+
 
 extension BlueprintView {
     

@@ -95,7 +95,7 @@ public struct AccessibilityElement: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        wrappedElement.content
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
