@@ -59,7 +59,7 @@ public struct TransitionContainer: Element {
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        return UIView.describe { config in
+        return PassthroughView.describe { config in
             config.appearingTransition = appearingTransition
             config.disappearingTransition = disappearingTransition
             config.layoutTransition = layoutTransition
