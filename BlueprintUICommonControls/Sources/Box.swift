@@ -33,7 +33,7 @@ public struct Box: Element {
 
     public var content: ElementContent {
         if let wrappedElement = wrappedElement {
-            return wrappedElement.content
+            return ElementContent(child: wrappedElement)
         } else {
             return ElementContent(intrinsicSize: .zero)
         }

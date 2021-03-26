@@ -30,7 +30,7 @@ public struct AccessibilityContainer: Element {
     //
 
     public var content: ElementContent {
-        wrapped.content
+        ElementContent(child: wrapped)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

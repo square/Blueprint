@@ -21,7 +21,7 @@ public struct UserInteractionEnabled: Element {
     }
 
     public var content: ElementContent {
-        wrappedElement.content
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {

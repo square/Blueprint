@@ -18,7 +18,7 @@ public struct Button: Element {
     }
 
     public var content: ElementContent {
-        wrappedElement.content
+        return ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
