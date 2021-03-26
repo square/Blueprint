@@ -24,6 +24,8 @@ searchField
 
 - [Change `ProxyElement` to directly return the content of a child](https://github.com/square/Blueprint/pull/206). This significantly speeds up deeper element hierarchies that are made up of proxy elements, by reducing the duplicate calculation work that needs to be done to layout an element tree.
 
+- [Change backing view of `TransitionContainer`](https://github.com/square/Blueprint/pull/205) to not directly receive touches while still allowing subviews to do so.
+
 ### Deprecated
 
 ### Security
