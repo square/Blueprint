@@ -1,4 +1,5 @@
 import UIKit
+import os.log
 
 /// Represents the content of an element.
 public struct ElementContent {
@@ -439,4 +440,29 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 
+}
+extension ContentStorage {
+    func logMeasureStart(object: AnyObject, description: String) {
+        if #available(iOS 12.0, *) {
+            os_signpost(
+                .begin,
+                log: .blueprint,
+                name: "Measuring",
+                signpostID: OSSignpostID(log: .blueprint, object: object),
+                "%{public}s",
+                description
+            )
+        }
+    }
+
+    func logMeasureEnd(object: AnyObject) {
+        if #available(iOS 12.0, *) {
+            os_signpost(
+                .end,
+                log: .blueprint,
+                name: "Measuring",
+                signpostID: OSSignpostID(log: .blueprint, object: object)
+            )
+        }
+    }
 }
