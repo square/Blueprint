@@ -11,6 +11,17 @@ import XCTest
 
 class PerformancePlayground : XCTestCase
 {
+    let lipsumStrings = [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "Integer molestie et felis at sodales.",
+        "Donec varius, orci vel suscipit hendrerit, risus massa ornare dui, at gravida elit sapien at lorem.",
+        "Nunc in ipsum porttitor, tincidunt est eu, euismod odio.",
+        "Duis posuere nunc sed mi auctor, in dictum elit iaculis.",
+        "Ut vel varius est. Duis efficitur vel lorem quis tempor.",
+        "Nulla porttitor, mi nec posuere bibendum, turpis ipsum ultrices tortor, a placerat sapien augue quis sem.",
+        "Cras volutpat nisl vitae elit convallis, quis tempor massa faucibus.",
+    ]
+
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
         // super.invokeTest()
@@ -34,17 +45,8 @@ class PerformancePlayground : XCTestCase
     
     func test_deep_element_hierarchy()
     {
-        let elements = [
-            TestLabel(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."),
-            TestLabel(text: "Integer molestie et felis at sodales."),
-            TestLabel(text: "Donec varius, orci vel suscipit hendrerit, risus massa ornare dui, at gravida elit sapien at lorem."),
-            TestLabel(text: "Nunc in ipsum porttitor, tincidunt est eu, euismod odio."),
-            TestLabel(text: "Duis posuere nunc sed mi auctor, in dictum elit iaculis."),
-            TestLabel(text: "Ut vel varius est. Duis efficitur vel lorem quis tempor."),
-            TestLabel(text: "Nulla porttitor, mi nec posuere bibendum, turpis ipsum ultrices tortor, a placerat sapien augue quis sem."),
-            TestLabel(text: "Cras volutpat nisl vitae elit convallis, quis tempor massa faucibus."),
-        ]
-        
+        let elements = lipsumStrings.map(TestLabel.init)
+
         let stack = Column { col in
             let row = Row { row in
                 let col = Column { col in
@@ -68,6 +70,46 @@ class PerformancePlayground : XCTestCase
                 
         self.determineAverage(for: 10.0) {
             view.element = stack
+            view.layoutIfNeeded()
+        }
+    }
+
+    // Test the performance of deeply nested stacks with leaves that do not have a measurement key.
+    func test_deep_stacks() {
+        let leafLabelCount = 4
+        let stackDepth = 5
+        let branchCount = 2
+        let runCount = 1
+
+        var labelCount = 0
+        func element(depth: Int) -> Element {
+            if depth > 0 {
+                var stack: StackElement = depth % 2 == 1 ? Row() : Column()
+
+                for _ in 1...branchCount {
+                    stack.add(child: element(depth: depth - 1))
+                }
+
+                return stack
+            } else {
+                return Column { column in
+                    for string in lipsumStrings[0..<leafLabelCount] {
+                        labelCount += 1
+                        column.add(child: NonCachingLabel(text: string))
+                    }
+                }
+            }
+        }
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 1000, height: 10000)
+
+        let tree = element(depth: stackDepth)
+        print("layout depth: \(stackDepth) contains \(labelCount) labels")
+
+        for i in 1...runCount {
+            print("run \(i) of \(runCount)")
+            view.element = tree
             view.layoutIfNeeded()
         }
     }
@@ -98,6 +140,18 @@ class PerformancePlayground : XCTestCase
     }
 }
 
+private struct NonCachingLabel: UIViewElement {
+    var text: String
+
+    static func makeUIView() -> UILabel {
+        UILabel()
+    }
+
+    func updateUIView(_ view: UILabel) {
+        view.numberOfLines = 0
+        view.text = text
+    }
+}
 
 fileprivate struct TestLabel : UIViewElement
 {

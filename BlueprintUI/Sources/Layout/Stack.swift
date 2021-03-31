@@ -172,7 +172,7 @@ extension StackElement {
 }
 
 
-/// A layout implementation that linearly lays out an array of children along either the horizontal or vertial axis.
+/// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
 public struct StackLayout: Layout {
 
     /// The default traits for a child contained within a stack layout
@@ -205,7 +205,7 @@ public struct StackLayout: Layout {
         ///
         public var growPriority: CGFloat
 
-        /// Controls the amount of space allowd for this dhild during overflow.
+        /// Controls the amount of space allowed for this child during overflow.
         ///
         /// See `StackElement.add(...)` for details.
         ///
@@ -270,7 +270,7 @@ extension StackLayout {
     /// Determines the on-axis layout when there is extra free space available.
     public enum UnderflowDistribution {
 
-        /// Additional space will be evenly devided into the spacing between items.
+        /// Additional space will be evenly divided into the spacing between items.
         case spaceEvenly
 
         /// Additional space will be divided proportionally by the measured size of each child.
@@ -429,7 +429,7 @@ extension StackLayout {
     ///
     /// - Parameters:
     ///   - for: The items to measure.
-    ///   - in: The contraint for all measurements.
+    ///   - in: The constraint for all measurements.
     /// - Returns: The axis measurements as segments.
     private func _axisSegments(
         for items: [(traits: Traits, content: Measurable)],
@@ -660,22 +660,24 @@ extension StackLayout {
     /// - Parameters:
     ///   - for: The items to measure.
     ///   - axisConstraints: The axis components of the constraint for each measurement.
-    ///   - crossConstraint: The cross component of the contraint for all measurements.
+    ///   - crossConstraint: The cross component of the constraint for all measurements.
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
         for items: [(traits: Traits, content: Measurable)],
         axisConstraints: [CGFloat],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
-        // First, measure cross magnitudes based on axis constraints
-        let crossMagnitudes = zip(items, axisConstraints).map { (item, axisConstraint) -> CGFloat in
-            let vector = VectorConstraint(
-                axis: .atMost(axisConstraint),
-                cross: crossConstraint)
-            let constraint = vector.constraint(axis: axis)
-            let measuredSize = item.content.measure(in: constraint)
+        // Measures cross magnitudes based on axis constraints
+        func measureMagnitudes() -> [CGFloat] {
+            zip(items, axisConstraints).map { (item, axisConstraint) -> CGFloat in
+                let vector = VectorConstraint(
+                    axis: .atMost(axisConstraint),
+                    cross: crossConstraint)
+                let constraint = vector.constraint(axis: axis)
+                let measuredSize = item.content.measure(in: constraint)
 
-            return measuredSize.cross(on: axis)
+                return measuredSize.cross(on: axis)
+            }
         }
 
         func fillSegments() -> [Segment] {
@@ -683,10 +685,12 @@ extension StackLayout {
             let availableCross: CGFloat
             switch crossConstraint {
             case .unconstrained:
+                let crossMagnitudes = measureMagnitudes()
                 availableCross = crossMagnitudes.reduce(0, max)
             case .exactly(let exactConstraint):
                 availableCross = exactConstraint
             case .atMost(let maxConstraint):
+                let crossMagnitudes = measureMagnitudes()
                 let maxMagnitude = crossMagnitudes.reduce(0, max)
                 availableCross = min(maxConstraint, maxMagnitude)
             }
@@ -701,6 +705,8 @@ extension StackLayout {
         }
 
         func alignSegments(to alignment: AlignmentID.Type) -> [Segment] {
+            let crossMagnitudes = measureMagnitudes()
+
             // Get the alignment values for each child
             let alignmentValues = items.indices.map { i -> CGFloat in
                 let measuredCross = crossMagnitudes[i]
