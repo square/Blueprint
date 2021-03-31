@@ -22,4 +22,14 @@ extension ElementContent {
     func measure(in constraint: SizeConstraint) -> CGSize {
         return measure(in: constraint, environment: .empty)
     }
+
+    /// A convenience wrapper to perform layout during testing, using an default `Environment` and
+    /// a new cache.
+    func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        self.performLayout(
+            attributes: attributes,
+            environment: .empty,
+            cache: CacheFactory.makeCache(name: "test")
+        )
+    }
 }

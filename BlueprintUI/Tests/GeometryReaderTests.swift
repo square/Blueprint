@@ -51,6 +51,42 @@ final class GeometryReaderTests: XCTestCase {
         let frame = leafChildFrame(in: layoutResultNode)
         XCTAssertEqual(frame, CGRect(x: 50, y: 50, width: 50, height: 50))
     }
+
+    func test_nestedMeasuring() {
+
+        enum TestKey: EnvironmentKey {
+            static let defaultValue: CGFloat = 10
+        }
+
+        let layoutExpectation = expectation(description: "layout performed")
+
+        let element = GeometryReader { geometry in
+
+            let adaptiveElement = EnvironmentReader { environment in
+                Spacer(environment[TestKey.self])
+            }
+
+            XCTAssertEqual(
+                geometry.measure(element: adaptiveElement),
+                CGSize(width: 10, height: 10)
+            )
+
+            XCTAssertEqual(
+                geometry.measure(
+                    element: adaptiveElement.adaptedEnvironment(key: TestKey.self, value: 5)
+                ),
+                CGSize(width: 5, height: 5)
+            )
+
+            layoutExpectation.fulfill()
+
+            return Empty()
+        }
+
+        _ = element.layout(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
+
+        wait(for: [layoutExpectation], timeout: 5)
+    }
 }
 
 private extension SizeConstraint.Axis {

@@ -44,6 +44,8 @@ public final class BlueprintView: UIView {
             if oldValue == nil && self.element == nil {
                 return
             }
+
+            logElementAssigned()
             
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
@@ -125,7 +127,8 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: measurementConstraint(with: size),
-            environment: self.makeEnvironment()
+            environment: self.makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
     }
 
@@ -151,7 +154,8 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: constraint,
-            environment: self.makeEnvironment()
+            environment: self.makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
 
@@ -473,6 +477,19 @@ extension BlueprintView {
                 log: .blueprint,
                 name: "View Update",
                 signpostID: OSSignpostID(log: .blueprint, object: self)
+            )
+        }
+    }
+
+    private func logElementAssigned() {
+        if #available(iOS 12.0, *) {
+            os_signpost(
+                .event,
+                log: .blueprint,
+                name: "Element assigned",
+                signpostID: OSSignpostID(log: .blueprint, object: self),
+                "Element assigned to %{public}s",
+                name ?? "BlueprintView"
             )
         }
     }
