@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Add `Keyed` element](https://github.com/square/Blueprint/pull/210), which can be used to help differentiate elements during the diff and update process, eg to assist with proper animation transitions.
+
 ### Removed
 
 ### Changed
