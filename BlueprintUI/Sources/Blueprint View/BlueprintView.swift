@@ -57,6 +57,12 @@ public final class BlueprintView: UIView {
     
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
+    
+    #if DEBUG
+    public static var signpostLoggingEnabled : Bool = true
+    #else
+    public static var signpostLoggingEnabled : Bool = false
+    #endif
 
     /// Instantiates a view with the given element
     ///
@@ -434,6 +440,11 @@ extension BlueprintView {
 
 extension BlueprintView {
     private func logLayoutStart() {
+        
+        guard Self.signpostLoggingEnabled else {
+            return
+        }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
@@ -447,6 +458,10 @@ extension BlueprintView {
     }
 
     private func logLayoutEnd() {
+        guard Self.signpostLoggingEnabled else {
+            return
+        }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
@@ -458,6 +473,10 @@ extension BlueprintView {
     }
 
     private func logViewUpdateStart() {
+        guard Self.signpostLoggingEnabled else {
+            return
+        }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
@@ -471,6 +490,10 @@ extension BlueprintView {
     }
 
     private func logViewUpdateEnd() {
+        guard Self.signpostLoggingEnabled else {
+            return
+        }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
@@ -482,6 +505,10 @@ extension BlueprintView {
     }
 
     private func logElementAssigned() {
+        guard Self.signpostLoggingEnabled else {
+            return
+        }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .event,

@@ -24,7 +24,7 @@ class PerformancePlayground : XCTestCase
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
     }
     
     func test_repeated_layouts()
@@ -39,6 +39,81 @@ class PerformancePlayground : XCTestCase
         
         self.determineAverage(for: 10.0) {
             view.element = element
+            view.layoutIfNeeded()
+        }
+    }
+    
+    func test_shallow_single_element_hierarchy() {
+
+        let stack = Column { col in
+            col.add(child: Column { col in
+                col.add(child: Column { col in
+                    col.add(child: TestLabel(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."))
+                })
+            })
+        }
+        .centered()
+        
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 1000.0, height: 10000)
+                
+        view.element = stack
+        view.layoutIfNeeded()
+    }
+    
+    func test_shallow_single_element_hierarchy_2() {
+
+        let element =  TestLabel(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+            .constrainedTo(width: .atMost(400), height: .atMost(100))
+            .constrainedTo(width: .atMost(400), height: .atMost(100))
+            .centered()
+        
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 1000.0, height: 10000)
+                
+        view.element = element
+        view.layoutIfNeeded()
+    }
+    
+    func test_really_deep_single_element_hierarchy() {
+
+        let stack = Column { col in
+            col.add(child: Column { col in
+                col.add(child: Column { col in
+                    col.add(child: Column { col in
+                        col.add(child: Column { col in
+                            col.add(child: Column { col in
+                                col.add(child: Column { col in
+                                    col.add(child: Column { col in
+                                        col.add(child: Column { col in
+                                            col.add(child: Column { col in
+                                                col.add(child: Column { col in
+                                                    col.add(child: Column { col in
+                                                        col.add(child: Column { col in
+                                                            col.add(child: Column { col in
+                                                                col.add(child: Column { col in
+                                                                    col.add(child: TestLabel(text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."))
+                                                                })
+                                                            })
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        }
+        
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 1000.0, height: 10000)
+                
+        self.determineAverage(for: 10.0) {
+            view.element = stack
             view.layoutIfNeeded()
         }
     }
@@ -161,12 +236,12 @@ fileprivate struct TestLabel : UIViewElement
     
     typealias UIViewType = UILabel
     
+//    var measurementCacheKey: AnyHashable? {
+//        self.text
+//    }
+    
     static func makeUIView() ->  UILabel {
         UILabel()
-    }
-    
-    var measurementCacheKey: AnyHashable? {
-        self.text
     }
     
     func updateUIView(_ view:  UILabel) {

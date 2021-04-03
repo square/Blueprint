@@ -19,4 +19,8 @@ final class FakeCache: CacheTree {
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
         return FakeCache(name: name(), signpostRef: signpostRef)
     }
+    
+    var debugDescription: String {
+        "<FakeCache: Not Caching Any Values>"
+    }
 }

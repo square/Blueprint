@@ -2,7 +2,7 @@ import CoreGraphics
 import os.log
 
 /// A size cache that also holds subcaches.
-protocol CacheTree: AnyObject {
+protocol CacheTree: AnyObject, CustomDebugStringConvertible {
 
     /// The name of this cache
     var name: String { get }
@@ -18,9 +18,6 @@ protocol CacheTree: AnyObject {
 }
 
 struct SubcacheKey: RawRepresentable, Hashable {
-    /// A key indicating that this will be the only subcache
-    static let singleton = SubcacheKey(rawValue: -1)
-
     let rawValue: Int
 }
 
@@ -41,12 +38,10 @@ extension CacheTree {
     }
 
     /// Gets a subcache for an element.
-    func subcache(key: SubcacheKey = .singleton, element: Element) -> CacheTree {
+    func subcache(key: SubcacheKey, element: Element) -> CacheTree {
         subcache(
             key: key,
-            name: key == .singleton
-                ? "\(self.name).\(type(of: element))"
-                : "\(self.name)[\(key.rawValue)].\(type(of: element))"
+            name: "\(self.name)[\(key.rawValue)].\(type(of: element))"
         )
     }
 }
