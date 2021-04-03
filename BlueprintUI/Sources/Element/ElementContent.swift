@@ -301,7 +301,10 @@ extension ElementContent {
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
 
-            return zip(children.indices, children).map { index, child in
+            var items = [(LayoutType.Traits, Measurable)]()
+            items.reserveCapacity(children.count)
+            
+            for (index, child) in children.enumerated() {
                 let childCache = cache.subcache(
                     key: SubcacheKey(rawValue: index),
                     element: child.element
@@ -315,8 +318,10 @@ extension ElementContent {
                     )
                 }
 
-                return (child.traits, measurable)
+                items.append((child.traits, measurable))
             }
+            
+            return items
         }
         
         fileprivate struct Child {

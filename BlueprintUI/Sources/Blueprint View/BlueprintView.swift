@@ -59,7 +59,7 @@ public final class BlueprintView: UIView {
     public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
     
     #if DEBUG
-    public static var signpostLoggingEnabled : Bool = true
+    public static var signpostLoggingEnabled : Bool = false
     #else
     public static var signpostLoggingEnabled : Bool = false
     #endif

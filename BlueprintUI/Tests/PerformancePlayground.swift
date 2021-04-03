@@ -141,7 +141,8 @@ class PerformancePlayground : XCTestCase
         }
         
         let view = BlueprintView()
-        view.frame.size = CGSize(width: 1000.0, height: 10000)
+        view.element = stack
+        view.frame.size = view.sizeThatFits(CGSize(width: 1000, height: 0))
                 
         self.determineAverage(for: 10.0) {
             view.element = stack
@@ -236,9 +237,9 @@ fileprivate struct TestLabel : UIViewElement
     
     typealias UIViewType = UILabel
     
-//    var measurementCacheKey: AnyHashable? {
-//        self.text
-//    }
+    var measurementCacheKey: AnyHashable? {
+        self.text
+    }
     
     static func makeUIView() ->  UILabel {
         UILabel()
