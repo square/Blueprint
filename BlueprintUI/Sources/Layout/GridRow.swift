@@ -104,12 +104,12 @@ public extension GridRow {
         /// take proportional shares of the available layout width.
         ///
         /// ## Example:
-        ///     Layout width: 100
+        ///     Available layout width: 100
         ///     Child A: .proportional(1)  -> 25 (100 * 1/4)
         ///     Child B: .proportional(3) -> 75 (100 * 3/4)
         ///
         /// ## Example:
-        ///     Layout width: 100
+        ///     Available layout width: 100
         ///     Child A: .proportional(0.25)  -> 25 (100 * 1/4)
         ///     Child B: .proportional(0.75) -> 75 (100 * 3/4)
         case proportional(CGFloat)
@@ -233,16 +233,19 @@ extension GridRow {
 
         /// When the layout width is defined, allot the children a portion of the available space.
         ///
-        /// Determine the scale (points per portion) of a portion to the available width, then
-        /// apply it to each child.
+        /// Determine the scale of a portion (points per portion), then use it to apply a width to each child.
         func constrainedProportionalItemSizes(
             in constraint: SizeConstraint,
             availableWidth: CGFloat,
             items: [IndexedProportionalItem]
         ) -> [IndexedSize] {
-            let portionCount = items.map { $0.proportion }.reduce(0, +)
-            guard portionCount != 0 else { return [] }
-            let scale = availableWidth / portionCount
+            guard items.count > 0 else {
+                return []
+            }
+
+            let portionSum = items.map { $0.proportion }.reduce(0, +)
+            precondition(portionSum > 0, "Proportions of a GridRow must sum to a positive number. Found sum: \(portionSum).")
+            let scale = availableWidth / portionSum
 
             return items.map { (index, proportion, content) in
                 let width = scale * proportion
@@ -255,7 +258,7 @@ extension GridRow {
         /// When the layout width is undefined, size children relative to each other.
         ///
         /// Measure each child's width to find the maximum scale (points per portion). The maximum scale
-        /// can be applied to each child to provide widths which both satisfy the proportional requirements
+        /// can be applied to each child to provide widths which satisfy the proportional requirements
         /// between children and provide enough space to layout each child.
         ///
         /// ## Example:
