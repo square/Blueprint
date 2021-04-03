@@ -274,11 +274,9 @@ extension ElementContent {
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
 
-            let isSingleton = children.count == 1
-
             return zip(children.indices, children).map { index, child in
                 let childCache = cache.subcache(
-                    key: isSingleton ? .singleton : SubcacheKey(rawValue: index),
+                    key: SubcacheKey(rawValue: index),
                     element: child.element
                 )
                 let childContent = child.content
@@ -333,7 +331,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(index: 0, element: child)
             )
         )
 
@@ -346,7 +344,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(index: 0, element: child)
             )
         }
     }
@@ -381,7 +379,7 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(index: 0, element: child)
             )
         )
 
@@ -394,7 +392,7 @@ private struct LazyStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(index: 0, element: child)
             )
         }
     }
