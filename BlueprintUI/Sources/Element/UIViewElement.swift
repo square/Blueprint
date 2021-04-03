@@ -131,9 +131,9 @@ private final class UIViewElementMeasurer {
         
         element.updateUIView(view)
         
-        if constraint == SizeConstraint(width: .atMost(420.3333333333333), height: .atMost(20.333333333333332)) {
-            print("Measuring in \(constraint)...")
-        }
+//        if constraint == SizeConstraint(width: .atMost(420.3333333333333), height: .atMost(20.333333333333332)) {
+//            print("Measuring in \(constraint)...")
+//        }
         
         return element.size(bounds.size, thatFits: view)
     }
