@@ -2,7 +2,7 @@ import CoreGraphics
 import os.log
 
 /// A size cache that also holds subcaches.
-protocol CacheTree: AnyObject {
+protocol CacheTree: AnyObject, CustomDebugStringConvertible {
 
     /// The name of this cache
     var name: String { get }

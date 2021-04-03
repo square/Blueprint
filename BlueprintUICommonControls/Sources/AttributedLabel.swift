@@ -33,8 +33,7 @@ public struct AttributedLabel: Element, Hashable {
         }
 
         return ElementContent(
-            measurable: Measurer(model: self),
-            measurementCachingKey: .init(type: Self.self, input: self)
+            measurable: Measurer(model: self)
         )
     }
 
