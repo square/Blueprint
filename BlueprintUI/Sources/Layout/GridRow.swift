@@ -17,7 +17,7 @@ import UIKit
 ///   row.spacing = 8.0
 ///   row.add(child: .proportional(0.75, name))
 ///   row.add(child: .proportional(0.25, number))
-///   row.add(child: .absolute(50, status))
+///   row.add(child: .absolute(100, status))
 /// }
 /// ```
 ///
