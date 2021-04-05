@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- [Introduce `GridRow`](https://github.com/square/Blueprint/pull/208), a `Row` alternative suited for columnar layout. `GridRow` supports the following:
+
+- spacing
+- vertical alignment
+- children with fixed widths
+- children with proportional widths¹
+
+¹Proportional width in this case always means "a proportion of available layout space, after spacing and fixed-width children are laid out."
+
+Example:
+
+```swift
+GridRow { row in
+  row.spacing = 8
+  row.verticalAlignment = .center
+  row.add(child: .absolute(authorLabel, 50))
+  row.add(child: .proportional(bodyLabel, 0.75))
+  row.add(child: .proportional(dateLabel, 0.25))
+}
+```
+
+
 ### Removed
 
 ### Changed
