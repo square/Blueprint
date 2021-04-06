@@ -17,12 +17,7 @@ protocol CacheTree: AnyObject {
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree
 }
 
-struct SubcacheKey: RawRepresentable, Hashable {
-    /// A key indicating that this will be the only subcache
-    static let singleton = SubcacheKey(rawValue: -1)
-
-    let rawValue: Int
-}
+typealias SubcacheKey = Int
 
 extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
@@ -36,17 +31,17 @@ extension CacheTree {
     }
 
     /// Gets a subcache for an element with siblings.
-    func subcache(index: Int, element: Element) -> CacheTree {
-        subcache(key: SubcacheKey(rawValue: index), element: element)
+    func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
+        return subcache(
+            key: index,
+            name: childCount == 1
+                ? "\(self.name).\(type(of: element))"
+                : "\(self.name)[\(index)].\(type(of: element))"
+        )
     }
 
-    /// Gets a subcache for an element.
-    func subcache(key: SubcacheKey = .singleton, element: Element) -> CacheTree {
-        subcache(
-            key: key,
-            name: key == .singleton
-                ? "\(self.name).\(type(of: element))"
-                : "\(self.name)[\(key.rawValue)].\(type(of: element))"
-        )
+    /// Gets a subcache for an element with no siblings.
+    func subcache(element: Element) -> CacheTree {
+        subcache(index: 0, of: 1, element: element)
     }
 }

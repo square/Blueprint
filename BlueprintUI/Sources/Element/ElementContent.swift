@@ -276,6 +276,11 @@ extension ElementContent {
             for index in 0..<children.count {
                 let currentChildLayoutAttributes = childAttributes[index]
                 let currentChild = children[index]
+                let currentChildCache = cache.subcache(
+                    index: index,
+                    of: children.count,
+                    element: currentChild.element
+                )
 
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
@@ -283,7 +288,7 @@ extension ElementContent {
                     children: currentChild.content.performLayout(
                         attributes: currentChildLayoutAttributes,
                         environment: environment,
-                        cache: cache.subcache(index: index, element: currentChild.element)
+                        cache: currentChildCache
                     )
                 )
 
@@ -302,15 +307,13 @@ extension ElementContent {
             in environment: Environment,
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
-
-            let isSingleton = children.count == 1
-
             return zip(children.indices, children).map { index, child in
+                let childContent = child.content
                 let childCache = cache.subcache(
-                    key: isSingleton ? .singleton : SubcacheKey(rawValue: index),
+                    index: index,
+                    of: children.count,
                     element: child.element
                 )
-                let childContent = child.content
                 let measurable = Measurer { (constraint) -> CGSize in
                     childContent.measure(
                         in: constraint,
