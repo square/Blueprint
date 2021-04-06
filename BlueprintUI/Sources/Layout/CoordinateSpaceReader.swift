@@ -64,13 +64,12 @@ public struct CoordinateSpaceReader : Element {
     }
     
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        nil
-//        PassthroughView.describe { config in
-//            config.coordinateSpace = .init(
-//                isTracking: self.isReading,
-//                onChange: self.onCoordinateSpaceChanged
-//            )
-//        }
+        PassthroughView.describe { config in
+            config.coordinateSpace = .init(
+                isTracking: self.isReading,
+                onChange: self.onCoordinateSpaceChanged
+            )
+        }
     }
 }
 

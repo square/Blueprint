@@ -325,6 +325,8 @@ extension BlueprintView {
                 self.coordinateSpaceController = nil
             }
             
+            self.coordinateSpaceController?.sendOnCoordinateSpaceChangedIfNeeded()
+            
             for (_, child) in self.children {
                 child.updateCoordinateSpaceController(in: view)
             }
@@ -475,7 +477,7 @@ fileprivate extension BlueprintView.NativeViewController {
             
             self.displayLink = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
             
-            self.displayLink?.add(to: .current, forMode: .default)
+            self.displayLink?.add(to: .current, forMode: .common)
         }
         
         func stop() {
@@ -485,7 +487,7 @@ fileprivate extension BlueprintView.NativeViewController {
         
         private var lastCoordinateSpaceFrame : CGRect? = nil
         
-        func sendOnCoordinateSpaceChanged() {
+        func sendOnCoordinateSpaceChangedIfNeeded() {
             
             let frame = self.view.convert(view.bounds, to: self.blueprintView.window)
             
@@ -496,7 +498,7 @@ fileprivate extension BlueprintView.NativeViewController {
         }
         
         @objc private func onDisplayLinkFired() {
-            
+            self.sendOnCoordinateSpaceChangedIfNeeded()
         }
     }
 }
