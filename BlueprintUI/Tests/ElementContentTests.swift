@@ -70,7 +70,80 @@ class ElementContentTests: XCTestCase {
             container.measure(in: SizeConstraint(CGSize.zero), environment: .empty),
             CGSize(width: 600, height: 800))
     }
-    
+
+    func test_cacheTree() {
+        let size1 = CGSize(width: 10, height: 15)
+        let size2 = CGSize(width: 20, height: 25)
+
+        let containerSize = CGSize(width: 600, height: 800)
+        let halfSize = CGSize(width: 300, height: 400)
+
+        func layout(sizes: [CGSize]) -> TestCache {
+            let container = ElementContent(layout: HalfLayout()) { builder in
+                for size in sizes {
+                    builder.add(element: Spacer(size: size))
+                }
+            }
+            let cache = TestCache(name: "test")
+
+            _ = container
+                .performLayout(
+                    attributes: LayoutAttributes(size: containerSize),
+                    environment: .empty,
+                    cache: cache
+                )
+                .map { $0.node }
+
+            _ = container.measure(
+                in: SizeConstraint(containerSize),
+                environment: .empty,
+                cache: cache
+            )
+
+            return cache
+        }
+
+        // Multiple children
+        do {
+            let cache = layout(sizes: [size1, size2])
+
+            XCTAssertEqual(
+                cache.measurements,
+                [SizeConstraint(containerSize): CGSize(width: 30, height: 40)]
+            )
+
+            XCTAssertEqual(cache.subcaches.count, 2)
+            XCTAssertEqual(
+                cache.subcaches[0]!.measurements,
+                [SizeConstraint(halfSize): size1]
+            )
+            XCTAssertEqual(
+                cache.subcaches[1]!.measurements,
+                [SizeConstraint(halfSize): size2]
+            )
+
+            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
+            XCTAssertTrue(cache.subcaches[1]!.subcaches.isEmpty)
+        }
+
+        // Single child
+        do {
+            let cache = layout(sizes: [size1])
+
+            XCTAssertEqual(
+                cache.measurements,
+                [SizeConstraint(containerSize): size1]
+            )
+
+            XCTAssertEqual(cache.subcaches.count, 1)
+            XCTAssertEqual(
+                cache.subcaches[0]!.measurements,
+                [SizeConstraint(halfSize): size1]
+            )
+
+            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
+        }
+    }
 }
 
 fileprivate struct MeasurableElement : Element {
@@ -119,6 +192,54 @@ fileprivate struct FrameLayout: Layout {
 
     static var defaultTraits: CGRect {
         return CGRect.zero
+    }
+
+}
+
+private struct HalfLayout: Layout {
+    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+        let halfConstraint = SizeConstraint(
+            width: constraint.width / 2,
+            height: constraint.height / 2
+        )
+        let measurements = items.map { $1.measure(in: halfConstraint) }
+        return CGSize(
+            width: measurements.map(\.width).reduce(0, +),
+            height: measurements.map(\.height).reduce(0, +)
+        )
+    }
+
+    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+        let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
+        return items.map {
+            LayoutAttributes(size: $1.measure(in: halfConstraint))
+        }
+    }
+}
+
+private class TestCache: CacheTree {
+    var name: String
+    var signpostRef: AnyObject { self }
+
+    var measurements: [SizeConstraint: CGSize] = [:]
+    var subcaches: [SubcacheKey: TestCache] = [:]
+
+    init(name: String) {
+        self.name = name
+    }
+
+    subscript(constraint: SizeConstraint) -> CGSize? {
+        get { measurements[constraint] }
+        set { measurements[constraint] = newValue }
+    }
+
+    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
+        if let subcache = subcaches[key] {
+            return subcache
+        }
+        let subcache = TestCache(name: "\(self.name).\(name())")
+        subcaches[key] = subcache
+        return subcache
     }
 
 }
