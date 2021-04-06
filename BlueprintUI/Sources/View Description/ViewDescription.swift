@@ -48,6 +48,8 @@ public struct ViewDescription {
     private let _layoutTransition: LayoutTransition
     private let _appearingTransition: VisibilityTransition?
     private let _disappearingTransition: VisibilityTransition?
+    
+    let onCoordinateSpaceChanged : ((UICoordinateSpace) -> ())?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -89,6 +91,8 @@ public struct ViewDescription {
         _layoutTransition = configuration.layoutTransition
         _appearingTransition = configuration.appearingTransition
         _disappearingTransition = configuration.disappearingTransition
+        
+        self.onCoordinateSpaceChanged = configuration.onCoordinateSpaceChanged
     }
     
     public var viewType: UIView.Type {
@@ -135,6 +139,9 @@ extension ViewDescription {
         /// A closure that is responsible for instantiating an instance of the native view.
         /// The default value instantiates the view using `init(frame:)`.
         public var builder: () -> View
+        
+        /// Called when the position of the element changes on screen.
+        public var onCoordinateSpaceChanged : ((UICoordinateSpace) -> ())? = nil
 
         /// An array of update closures.
         public var updates: [Update]

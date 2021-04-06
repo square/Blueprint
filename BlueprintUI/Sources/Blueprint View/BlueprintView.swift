@@ -218,6 +218,8 @@ public final class BlueprintView: UIView {
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         
+        rootController.sendOnCoordinateSpaceChanged(in: self)
+        
         let viewUpdateEndDate = Date()
         
         hasUpdatedViewHierarchy = true
@@ -301,6 +303,26 @@ extension BlueprintView {
             self.layoutAttributes = node.layoutAttributes
             self.children = []
             self.view = node.viewDescription.build()
+        }
+                
+        private var lastCoordinateSpaceFrame : CGRect? = nil
+        
+        func sendOnCoordinateSpaceChanged(in view : BlueprintView) {
+            
+            if let onChanged = self.viewDescription.onCoordinateSpaceChanged {
+                let frame = view.convert(self.view.bounds, from: self.view)
+                
+                if self.lastCoordinateSpaceFrame != frame {
+                    self.lastCoordinateSpaceFrame = frame
+                    onChanged(self.view)
+                }
+            } else {
+                self.lastCoordinateSpaceFrame = nil
+            }
+            
+            for (_, child) in self.children {
+                child.sendOnCoordinateSpaceChanged(in: view)
+            }
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
