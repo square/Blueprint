@@ -218,7 +218,7 @@ public final class BlueprintView: UIView {
         
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
         
-        rootController.sendOnCoordinateSpaceChanged(in: self)
+        rootController.updateCoordinateSpaceController(in: self)
         
         let viewUpdateEndDate = Date()
         
@@ -305,23 +305,28 @@ extension BlueprintView {
             self.view = node.viewDescription.build()
         }
                 
-        private var lastCoordinateSpaceFrame : CGRect? = nil
+        private var coordinateSpaceController : CoordinateSpaceController? = nil
         
-        func sendOnCoordinateSpaceChanged(in view : BlueprintView) {
+        func updateCoordinateSpaceController(in view : BlueprintView) {
             
-            if let onChanged = self.viewDescription.onCoordinateSpaceChanged {
-                let frame = view.convert(self.view.bounds, from: self.view)
+            if let info = self.viewDescription.coordinateSpace, info.isTracking {
                 
-                if self.lastCoordinateSpaceFrame != frame {
-                    self.lastCoordinateSpaceFrame = frame
-                    onChanged(self.view)
+                if self.coordinateSpaceController == nil {
+                    self.coordinateSpaceController = .init(
+                        with: self.view,
+                        in: view,
+                        onCoordinateSpaceChanged: info.onChange
+                    )
+                    
+                    self.coordinateSpaceController?.start()
                 }
             } else {
-                self.lastCoordinateSpaceFrame = nil
+                self.coordinateSpaceController?.stop()
+                self.coordinateSpaceController = nil
             }
             
             for (_, child) in self.children {
-                child.sendOnCoordinateSpaceChanged(in: view)
+                child.updateCoordinateSpaceController(in: view)
             }
         }
 
@@ -441,3 +446,57 @@ extension BlueprintView {
     }
 }
 
+
+fileprivate extension BlueprintView.NativeViewController {
+    
+    final class CoordinateSpaceController {
+        
+        var onCoordinateSpaceChanged : (UICoordinateSpace) -> ()
+        
+        let view : UIView
+        let blueprintView : BlueprintView
+        
+        init(
+            with view : UIView,
+            in blueprintView : BlueprintView,
+            onCoordinateSpaceChanged : @escaping (UICoordinateSpace) -> ()
+        ) {
+            self.view = view
+            self.blueprintView = blueprintView
+            self.onCoordinateSpaceChanged = onCoordinateSpaceChanged
+        }
+        
+        private var displayLink : CADisplayLink?
+        
+        func start() {
+            guard self.displayLink == nil else {
+                fatalError()
+            }
+            
+            self.displayLink = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
+            
+            self.displayLink?.add(to: .current, forMode: .default)
+        }
+        
+        func stop() {
+            self.displayLink?.invalidate()
+            self.displayLink = nil
+        }
+        
+        private var lastCoordinateSpaceFrame : CGRect? = nil
+        
+        func sendOnCoordinateSpaceChanged() {
+            
+            let frame = self.view.convert(view.bounds, to: self.blueprintView.window)
+            
+            if self.lastCoordinateSpaceFrame != frame {
+                self.lastCoordinateSpaceFrame = frame
+                self.onCoordinateSpaceChanged(view)
+            }
+        }
+        
+        @objc private func onDisplayLinkFired() {
+            
+        }
+    }
+}
