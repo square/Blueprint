@@ -75,15 +75,17 @@ extension ElementContent {
     /// Initializes a new `ElementContent` with the given element and layout.
     ///
     /// - parameter element: The single child element.
+    /// - parameter key: The key to use to unique the element during updates.
     /// - parameter layout: The layout that will be used.
     /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init(
         child: Element,
+        key : AnyHashable? = nil,
         layout: SingleChildLayout,
         measurementCachingKey : MeasurementCachingKey? = nil
     ) {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout), measurementCachingKey: measurementCachingKey) {
-            $0.add(element: child)
+            $0.add(key: key, element: child)
         }
     }
 
