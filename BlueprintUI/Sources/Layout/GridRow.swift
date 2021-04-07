@@ -243,6 +243,11 @@ extension GridRow {
                 return []
             }
 
+            guard availableWidth > 0 else {
+                // There's no room to layout so there's no need to perform any measurement.
+                return items.map { (index, _, _) in (index, .zero) }
+            }
+
             let portionSum = items.map { $0.proportion }.reduce(0, +)
             precondition(portionSum > 0, "Proportions of a GridRow must sum to a positive number. Found sum: \(portionSum).")
             let scale = availableWidth / portionSum

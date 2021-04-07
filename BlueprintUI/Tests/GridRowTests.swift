@@ -201,6 +201,60 @@ class GridRowTests: XCTestCase {
             XCTAssertEqual(frames, expected)
         }
     }
+
+    func test_layout_edgeCases() {
+        do {
+            // #1: A `GridRow` with only absolute children justifies those childen to the start
+            let gridRow = GridRow { row in
+                row.add(child: .absolute(10, TestElement()))
+                row.add(child: .absolute(15, TestElement()))
+            }
+
+            let frames = gridRow.frames(in: CGSize(width: 40, height: 20))
+
+            let expected = [
+                CGRect(x: 0, y: 0, width: 10, height: 20),
+                CGRect(x: 10, y: 0, width: 15, height: 20),
+            ]
+
+            XCTAssertEqual(frames, expected)
+        }
+
+        do {
+            // #2: A child with a proportion of 0 gets a width of 0
+            let gridRow = GridRow { row in
+                row.add(child: .proportional(1, TestElement()))
+                row.add(child: .proportional(0, TestElement()))
+            }
+
+            let frames = gridRow.frames(in: CGSize(width: 40, height: 20))
+
+            let expected = [
+                CGRect(x: 0, y: 0, width: 40, height: 20),
+                CGRect(x: 40, y: 0, width: 0, height: 20),
+            ]
+
+            XCTAssertEqual(frames, expected)
+        }
+
+        do {
+            // #3: Absolute children can overlflow layout. Proportional children are sized to a width of 0 in these
+            // cases.
+            let gridRow = GridRow { row in
+                row.add(child: .absolute(50, TestElement()))
+                row.add(child: .proportional(1, TestElement()))
+            }
+
+            let frames = gridRow.frames(in: CGSize(width: 40, height: 20))
+
+            let expected = [
+                CGRect(x: 0, y: 0, width: 50, height: 20),
+                CGRect(x: 50, y: 0, width: 0, height: 20),
+            ]
+
+            XCTAssertEqual(frames, expected)
+        }
+    }
 }
 
 private extension GridRow {
