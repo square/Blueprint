@@ -13,6 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [Add `Keyed` element](https://github.com/square/Blueprint/pull/210), which can be used to help differentiate elements during the diff and update process, eg to assist with proper animation transitions.
 
+- [Introduce `GridRow`](https://github.com/square/Blueprint/pull/208), a `Row` alternative suited for columnar layout. `GridRow` supports the following:
+
+  - spacing
+  - vertical alignment
+  - children with absolutely-sized widths
+  - children with proportionally-sized widths¹
+  
+  ¹Proportional width in this case always means "a proportion of available layout space after spacing and absolutely-sized children are laid out."
+  
+  Example:
+  
+  ```swift
+  GridRow { row in
+    row.spacing = 8
+    row.verticalAlignment = .center
+    row.add(width: .absolute(50), child: authorLabel)
+    row.add(width: .proportional(0.75), child: bodyLabel)
+    row.add(width: .proportional(0.25), child: dateLabel)
+  }
+  ```
+
 ### Removed
 
 ### Changed
