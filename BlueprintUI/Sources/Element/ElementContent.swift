@@ -1,5 +1,4 @@
 import UIKit
-import os.log
 
 /// Represents the content of an element.
 public struct ElementContent {
@@ -248,8 +247,12 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             return cache.get(constraint) { (constraint) -> CGSize in
-                logMeasureStart(object: cache.signpostRef, description: cache.name, constraint: constraint)
-                defer { logMeasureEnd(object: cache.signpostRef) }
+                Logger.logMeasureStart(
+                    object: cache.signpostRef,
+                    description: cache.name,
+                    constraint: constraint
+                )
+                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
                 let layoutItems = self.layoutItems(in: environment, cache: cache)
                 return layout.measure(in: constraint, items: layoutItems)
@@ -496,34 +499,5 @@ struct Measurer: Measurable {
     var _measure: (SizeConstraint) -> CGSize
     func measure(in constraint: SizeConstraint) -> CGSize {
         return _measure(constraint)
-    }
-}
-
-extension ContentStorage {
-    func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .begin,
-                log: .blueprint,
-                name: "Measuring",
-                signpostID: OSSignpostID(log: .blueprint, object: object),
-                // nb: os_signpost seems to ignore precision specifiers
-                "%{public}s in %.1f×%.1f",
-                description,
-                constraint.width.constrainedValue ?? .infinity,
-                constraint.height.constrainedValue ?? .infinity
-            )
-        }
-    }
-
-    func logMeasureEnd(object: AnyObject) {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .end,
-                log: .blueprint,
-                name: "Measuring",
-                signpostID: OSSignpostID(log: .blueprint, object: object)
-            )
-        }
     }
 }

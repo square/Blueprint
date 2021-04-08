@@ -45,7 +45,7 @@ public final class BlueprintView: UIView {
                 return
             }
 
-            logElementAssigned()
+            Logger.logElementAssigned(view: self)
             
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
@@ -205,7 +205,7 @@ public final class BlueprintView: UIView {
         lastViewHierarchyUpdateBounds = bounds
         
         let start = Date()
-        logLayoutStart()
+        Logger.logLayoutStart(view: self)
 
         /// Grab view descriptions
         let viewNodes = element?
@@ -213,7 +213,7 @@ public final class BlueprintView: UIView {
             .resolve() ?? []
         
         let measurementEndDate = Date()
-        logLayoutEnd()
+        Logger.logLayoutEnd(view: self)
 
         rootController.view.frame = bounds
         
@@ -226,11 +226,11 @@ public final class BlueprintView: UIView {
         let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: .zero, correction: .zero, scale: scale)
 
-        logViewUpdateStart()
+        Logger.logViewUpdateStart(view: self)
 
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
 
-        logViewUpdateEnd()
+        Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
         
         hasUpdatedViewHierarchy = true
@@ -428,69 +428,6 @@ extension BlueprintView {
             }
             
             children = newChildren
-        }
-    }
-}
-
-extension BlueprintView {
-    private func logLayoutStart() {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .begin,
-                log: .blueprint,
-                name: "Layout",
-                signpostID: OSSignpostID(log: .blueprint, object: self),
-                "%{public}s",
-                name ?? "BlueprintView"
-            )
-        }
-    }
-
-    private func logLayoutEnd() {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .end,
-                log: .blueprint,
-                name: "Layout",
-                signpostID: OSSignpostID(log: .blueprint, object: self)
-            )
-        }
-    }
-
-    private func logViewUpdateStart() {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .begin,
-                log: .blueprint,
-                name: "View Update",
-                signpostID: OSSignpostID(log: .blueprint, object: self),
-                "%{public}s",
-                name ?? "BlueprintView"
-            )
-        }
-    }
-
-    private func logViewUpdateEnd() {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .end,
-                log: .blueprint,
-                name: "View Update",
-                signpostID: OSSignpostID(log: .blueprint, object: self)
-            )
-        }
-    }
-
-    private func logElementAssigned() {
-        if #available(iOS 12.0, *) {
-            os_signpost(
-                .event,
-                log: .blueprint,
-                name: "Element assigned",
-                signpostID: OSSignpostID(log: .blueprint, object: self),
-                "Element assigned to %{public}s",
-                name ?? "BlueprintView"
-            )
         }
     }
 }
