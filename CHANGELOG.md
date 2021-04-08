@@ -36,9 +36,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
   - [Added support to `LayoutWriter` to allow specifying keys for child `Element`s](https://github.com/square/Blueprint/pull/216).
 
+- Blueprint now emits [signpost logs](https://developer.apple.com/documentation/os/logging/recording_performance_data) during its render pass, which you use for performance tuning. ([#209])
+
 ### Removed
 
 ### Changed
+
+- The layout system now uses a caching system to improve performance by eliminating redundant measurements. ([#209])
 
 ### Deprecated
 
@@ -576,6 +580,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#209]: https://github.com/square/Blueprint/pull/209
 [#176]: https://github.com/square/Blueprint/pull/176
 [#175]: https://github.com/square/Blueprint/pull/175
 [#158]: https://github.com/square/Blueprint/pull/158
