@@ -4,6 +4,8 @@ import os.log
 /// A size cache that also holds subcaches.
 protocol CacheTree: AnyObject {
 
+    typealias SubcacheKey = Int
+
     /// The name of this cache
     var name: String { get }
 
@@ -16,8 +18,6 @@ protocol CacheTree: AnyObject {
     /// Gets a subcache identified by the given key, or creates a new one.
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree
 }
-
-typealias SubcacheKey = Int
 
 extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.

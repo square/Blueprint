@@ -52,7 +52,7 @@ public final class BlueprintView: UIView {
         }
     }
 
-    /// A name to help identify this view when profiling or debugging
+    /// An optional name to help identify this view
     public var name: String?
     
     /// Provides performance metrics about the duration of layouts, updates, etc.

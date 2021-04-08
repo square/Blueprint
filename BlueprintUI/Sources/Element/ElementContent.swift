@@ -310,7 +310,7 @@ extension ElementContent {
             in environment: Environment,
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
-            return zip(children.indices, children).map { index, child in
+            return children.enumerated().map { index, child in
                 let childContent = child.content
                 let childCache = cache.subcache(
                     index: index,
