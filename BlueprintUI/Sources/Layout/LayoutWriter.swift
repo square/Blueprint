@@ -91,19 +91,18 @@ extension LayoutWriter {
         ///
         public var children : [Child] = []
         
-        /// Adds a new child element to the layout with the provided frame.
+        /// Adds a new child element to the layout with the provided frame and optional key.
         public mutating func add(
             with frame: CGRect,
+            key : AnyHashable? = nil,
             child : Element
         ) {
-            self.children.append(.init(frame: frame, element: child))
+            self.children.append(.init(frame: frame, key: key, element: child))
         }
         
         /// Adds a new child element to the layout.
-        /// Using this method is helpful if you need to calculate both the frame and the element content in a single pass.
-        public mutating func add(_ child : () -> (CGRect, Element)) {
-            let result = child()
-            self.add(with: result.0, child: result.1)
+        public mutating func add(_ child : Child) {
+            self.children.append(child)
         }
         
         /// Enumerates each of the children, allowing you to modify them in place,
@@ -174,15 +173,20 @@ extension LayoutWriter {
         /// The frame of the element in the coordinate space of the custom layout.
         public var frame : CGRect
         
+        /// The key to use to disambiguate this element.
+        public var key : AnyHashable?
+        
         /// The element to be displayed.
         public var element : Element
         
         /// Creates a new child element.
         public init(
             frame : CGRect,
+            key : AnyHashable? = nil,
             element : Element
         ) {
             self.frame = frame
+            self.key = key
             self.element = element
         }
     }
@@ -199,7 +203,7 @@ extension LayoutWriter {
         var content: ElementContent {
             ElementContent(layout: Layout(builder: self.builder)) { builder in
                 for child in self.builder.children {
-                    builder.add(element: child.element)
+                    builder.add(key: child.key, element: child.element)
                 }
             }
         }

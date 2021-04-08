@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     row.add(width: .proportional(0.25), child: dateLabel)
   }
   ```
+  
+  - [Added support to `LayoutWriter` to allow specifying keys for child `Element`s](https://github.com/square/Blueprint/pull/216).
 
 ### Removed
 
