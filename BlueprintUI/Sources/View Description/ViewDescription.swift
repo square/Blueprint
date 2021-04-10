@@ -40,14 +40,11 @@ extension NativeView where Self: UIView {
 /// contains functionality for creating, updating, and animating view instances.
 public struct ViewDescription {
     
-    private let _viewType: UIView.Type
-    private let _build: () -> UIView
-    private let _apply: (UIView) -> Void
-    private let _contentView: (UIView) -> UIView
-    
-    private let _layoutTransition: LayoutTransition
-    private let _appearingTransition: VisibilityTransition?
-    private let _disappearingTransition: VisibilityTransition?
+    public let viewType: UIView.Type
+    public let layoutTransition: LayoutTransition
+    public let appearingTransition: VisibilityTransition?
+    public let disappearingTransition: VisibilityTransition?
+    public let coordinateSpace : CoordinateSpaceTracking?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -67,7 +64,7 @@ public struct ViewDescription {
     /// Generates a view description with the given configuration object.
     /// - parameter configuration: The configuration object.
     private init<View>(configuration: Configuration<View>) {
-        _viewType = View.self
+        viewType = View.self
         
         _build = configuration.builder
         
@@ -86,43 +83,34 @@ public struct ViewDescription {
             return configuration.contentView(typedView)
         }
         
-        _layoutTransition = configuration.layoutTransition
-        _appearingTransition = configuration.appearingTransition
-        _disappearingTransition = configuration.disappearingTransition
+        layoutTransition = configuration.layoutTransition
+        appearingTransition = configuration.appearingTransition
+        disappearingTransition = configuration.disappearingTransition
+        
+        self.coordinateSpace = configuration.coordinateSpace
     }
     
-    public var viewType: UIView.Type {
-        return _viewType
-    }
-    
+    private let _build: () -> UIView
+
     public func build() -> UIView {
         return _build()
     }
+    
+    private let _apply: (UIView) -> Void
     
     public func apply(to view: UIView) {
         _apply(view)
     }
     
+    private let _contentView: (UIView) -> UIView
+    
     public func contentView(in view: UIView) -> UIView {
         return _contentView(view)
     }
-
-    public var layoutTransition: LayoutTransition {
-        return _layoutTransition
-    }
-    
-    public var appearingTransition: VisibilityTransition? {
-        return _appearingTransition
-    }
-    
-    public var disappearingTransition: VisibilityTransition? {
-        return _disappearingTransition
-    }
-    
 }
 
 extension ViewDescription {
-
+    
     /// Represents the configuration of a specific UIView type.
     public struct Configuration<View: UIView> {
 
@@ -135,6 +123,9 @@ extension ViewDescription {
         /// A closure that is responsible for instantiating an instance of the native view.
         /// The default value instantiates the view using `init(frame:)`.
         public var builder: () -> View
+        
+        /// Allows tracking of the on-screen position of the element.
+        public var coordinateSpace : CoordinateSpaceTracking? = nil
 
         /// An array of update closures.
         public var updates: [Update]

@@ -16,7 +16,7 @@ import BlueprintUICommonControls
 
 final class RootViewController : UIViewController
 {
-    fileprivate var demos : [DemoItem] {
+    fileprivate var demos : [Element] {
         [
             DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
@@ -26,7 +26,10 @@ final class RootViewController : UIViewController
             }),
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
-            }),
+            })
+            .readCoordinateSpace { coordinateSpace in
+                print(coordinateSpace.convert(coordinateSpace.bounds, to: self.view))
+            },
         ]
     }
     
