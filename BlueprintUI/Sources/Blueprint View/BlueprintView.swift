@@ -43,11 +43,16 @@ public final class BlueprintView: UIView {
             if oldValue == nil && self.element == nil {
                 return
             }
+
+            Logger.logElementAssigned(view: self)
             
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
         }
     }
+
+    /// An optional name to help identify this view
+    public var name: String?
     
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
@@ -121,7 +126,8 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: measurementConstraint(with: size),
-            environment: self.makeEnvironment()
+            environment: self.makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
     }
 
@@ -147,7 +153,8 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: constraint,
-            environment: self.makeEnvironment()
+            environment: self.makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
 
@@ -197,6 +204,7 @@ public final class BlueprintView: UIView {
         lastViewHierarchyUpdateBounds = bounds
         
         let start = Date()
+        Logger.logLayoutStart(view: self)
 
         /// Grab view descriptions
         let viewNodes = element?
@@ -204,7 +212,8 @@ public final class BlueprintView: UIView {
             .resolve() ?? []
         
         let measurementEndDate = Date()
-        
+        Logger.logLayoutEnd(view: self)
+
         rootController.view.frame = bounds
         
         var rootNode = NativeViewNode(
@@ -215,9 +224,12 @@ public final class BlueprintView: UIView {
 
         let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: .zero, correction: .zero, scale: scale)
-        
+
+        Logger.logViewUpdateStart(view: self)
+
         rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
-        
+
+        Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
         
         hasUpdatedViewHierarchy = true
@@ -418,4 +430,3 @@ extension BlueprintView {
         }
     }
 }
-

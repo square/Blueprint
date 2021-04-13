@@ -157,6 +157,11 @@ extension ConstrainedSize {
         var height: Constraint
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+
+            // If both height & width are absolute, we can avoid measuring entirely.
+            if case let .absolute(width) = width, case let .absolute(height) = height {
+                return CGSize(width: width, height: height)
+            }
                         
             /// 1) Measure how big the element should be by constraining the passed in
             /// `SizeConstraint` to not be larger than our maximum size. This ensures

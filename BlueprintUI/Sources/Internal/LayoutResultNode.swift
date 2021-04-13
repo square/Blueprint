@@ -11,10 +11,10 @@ extension Element {
     /// - Returns: A layout result
     func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
         return LayoutResultNode(
-            element: self,
+            root: self,
             layoutAttributes: layoutAttributes,
-            content: content,
-            environment: environment)
+            environment: environment
+        )
     }
 
 }
@@ -24,43 +24,34 @@ struct LayoutResultNode {
     
     /// The element that was laid out
     var element: Element
-    
-    /// Diagnostic information about the layout process.
-    var diagnosticInfo: DiagnosticInfo
-    
+
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
-    
-    init(element: Element, layoutAttributes: LayoutAttributes, content: ElementContent, environment: Environment) {
 
+    init(element: Element, layoutAttributes: LayoutAttributes, children: [(identifier: ElementIdentifier, node: LayoutResultNode)]) {
         self.element = element
         self.layoutAttributes = layoutAttributes
+        self.children = children
+    }
 
-        let layoutBeginTime = DispatchTime.now()
-        children = content.performLayout(attributes: layoutAttributes, environment: environment)
-        let layoutEndTime = DispatchTime.now()
-        let layoutDuration = layoutEndTime.uptimeNanoseconds - layoutBeginTime.uptimeNanoseconds
-        diagnosticInfo = LayoutResultNode.DiagnosticInfo(layoutDuration: layoutDuration)
-
+    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
+        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+        self.init(
+            element: root,
+            layoutAttributes: layoutAttributes,
+            children: root.content.performLayout(
+                attributes: layoutAttributes,
+                environment: environment,
+                cache: cache
+            )
+        )
     }
 
 }
 
-extension LayoutResultNode {
-    
-    struct DiagnosticInfo {
-        
-        var layoutDuration: UInt64
-        
-        init(layoutDuration: UInt64) {
-            self.layoutDuration = layoutDuration
-        }
-    }
-    
-}
 
 extension LayoutResultNode {
 
