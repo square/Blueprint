@@ -10,9 +10,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
-                log: .blueprint,
+                log: .active,
                 name: "Layout",
-                signpostID: OSSignpostID(log: .blueprint, object: view),
+                signpostID: OSSignpostID(log: .active, object: view),
                 "%{public}s",
                 view.name ?? "BlueprintView"
             )
@@ -23,9 +23,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
-                log: .blueprint,
+                log: .active,
                 name: "Layout",
-                signpostID: OSSignpostID(log: .blueprint, object: view)
+                signpostID: OSSignpostID(log: .active, object: view)
             )
         }
     }
@@ -34,9 +34,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
-                log: .blueprint,
+                log: .active,
                 name: "View Update",
-                signpostID: OSSignpostID(log: .blueprint, object: view),
+                signpostID: OSSignpostID(log: .active, object: view),
                 "%{public}s",
                 view.name ?? "BlueprintView"
             )
@@ -47,9 +47,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
-                log: .blueprint,
+                log: .active,
                 name: "View Update",
-                signpostID: OSSignpostID(log: .blueprint, object: view)
+                signpostID: OSSignpostID(log: .active, object: view)
             )
         }
     }
@@ -58,9 +58,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .event,
-                log: .blueprint,
+                log: .active,
                 name: "Element assigned",
-                signpostID: OSSignpostID(log: .blueprint, object: view),
+                signpostID: OSSignpostID(log: .active, object: view),
                 "Element assigned to %{public}s",
                 view.name ?? "BlueprintView"
             )
@@ -74,9 +74,9 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
-                log: .blueprint,
+                log: .active,
                 name: "Measuring",
-                signpostID: OSSignpostID(log: .blueprint, object: object),
+                signpostID: OSSignpostID(log: .active, object: object),
                 // nb: os_signpost seems to ignore precision specifiers
                 "%{public}s in %.1f×%.1f",
                 description,
@@ -90,11 +90,10 @@ extension Logger {
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
-                log: .blueprint,
+                log: .active,
                 name: "Measuring",
-                signpostID: OSSignpostID(log: .blueprint, object: object)
+                signpostID: OSSignpostID(log: .active, object: object)
             )
         }
     }
 }
-

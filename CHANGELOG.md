@@ -36,7 +36,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
   - [Added support to `LayoutWriter` to allow specifying keys for child `Element`s](https://github.com/square/Blueprint/pull/216).
 
-- Blueprint now emits [signpost logs](https://developer.apple.com/documentation/os/logging/recording_performance_data) during its render pass, which you use for performance tuning. ([#209])
+- Blueprint can now emit [signpost logs](https://developer.apple.com/documentation/os/logging/recording_performance_data) during its render pass, which you can use for performance tuning. ([#209])
+  
+  Signpost logs are disabled by default. To enable them, set `BlueprintLogging.enabled = true`.
 
 ### Removed
 

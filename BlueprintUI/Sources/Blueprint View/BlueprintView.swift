@@ -1,5 +1,4 @@
 import UIKit
-import os.log
 
 /// A view that is responsible for displaying an `Element` hierarchy.
 ///
