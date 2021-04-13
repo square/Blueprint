@@ -78,10 +78,13 @@ class ElementContentTests: XCTestCase {
         let containerSize = CGSize(width: 600, height: 800)
         let halfSize = CGSize(width: 300, height: 400)
 
-        func layout(sizes: [CGSize]) -> TestCache {
-            let container = ElementContent(layout: HalfLayout()) { builder in
+        func layout(sizes: [CGSize]) -> (TestCache, TestCounter) {
+            let counts = TestCounter()
+            let layout = MeasureCountingLayout(counts: counts, layout: HalfLayout())
+
+            let container = ElementContent(layout: layout) { builder in
                 for size in sizes {
-                    builder.add(element: Spacer(size: size))
+                    builder.add(element: MeasureCountingSpacer(size: size, counts: counts))
                 }
             }
             let cache = TestCache(name: "test")
@@ -100,12 +103,12 @@ class ElementContentTests: XCTestCase {
                 cache: cache
             )
 
-            return cache
+            return (cache, counts)
         }
 
         // Multiple children
         do {
-            let cache = layout(sizes: [size1, size2])
+            let (cache, counts) = layout(sizes: [size1, size2])
 
             XCTAssertEqual(
                 cache.measurements,
@@ -124,11 +127,13 @@ class ElementContentTests: XCTestCase {
 
             XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
             XCTAssertTrue(cache.subcaches[1]!.subcaches.isEmpty)
+
+            XCTAssertEqual(counts.measures, 3)
         }
 
         // Single child
         do {
-            let cache = layout(sizes: [size1])
+            let (cache, counts) = layout(sizes: [size1])
 
             XCTAssertEqual(
                 cache.measurements,
@@ -142,6 +147,8 @@ class ElementContentTests: XCTestCase {
             )
 
             XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
+
+            XCTAssertEqual(counts.measures, 2)
         }
     }
 }
@@ -213,6 +220,55 @@ private struct HalfLayout: Layout {
         let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
         return items.map {
             LayoutAttributes(size: $1.measure(in: halfConstraint))
+        }
+    }
+}
+
+private class TestCounter {
+    var measures: Int = 0
+}
+
+private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout: Layout {
+    static var defaultTraits: Traits { WrappedLayout.defaultTraits }
+
+    typealias Traits = WrappedLayout.Traits
+
+    var counts: TestCounter
+    var layout: WrappedLayout
+
+    func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
+        counts.measures += 1
+        return layout.measure(in: constraint, items: items)
+    }
+
+    func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
+        return layout.layout(size: size, items: items)
+    }
+}
+
+private struct MeasureCountingSpacer: Element {
+    var size: CGSize
+    var counts: TestCounter
+
+    var content: ElementContent {
+        ElementContent(
+            layout: MeasureCountingLayout(counts: counts, layout: FixedLayout(size: size))
+        )
+    }
+
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        nil
+    }
+
+    struct FixedLayout: Layout {
+        var size: CGSize
+
+        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+            size
+        }
+
+        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+            []
         }
     }
 }
