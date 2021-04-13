@@ -238,7 +238,7 @@ class GridRowTests: XCTestCase {
         }
 
         do {
-            // #3: Absolutely-sized children can overlflow. In these cases, proportionally-sized children are sized
+            // #3: Absolutely-sized children can overflow. In these cases, proportionally-sized children are sized
             // to a width of 0.
             let gridRow = GridRow { row in
                 row.add(width: .absolute(50), child: TestElement())

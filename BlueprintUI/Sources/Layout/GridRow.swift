@@ -275,16 +275,19 @@ extension GridRow {
             items: [IndexedProportionalItem]
         ) -> [IndexedSize] {
             var scale: CGFloat = 0
+            var measuredSizes: [CGSize] = []
+
             items.forEach { (_, proportion, content) in
-                let width = content.measure(in: constraint).width
-                scale = max(scale, width / proportion)
+                let size = content.measure(in: constraint)
+                measuredSizes.append(size)
+                scale = max(scale, size.width / proportion)
             }
 
-            return items.map { (index, proportion, content) in
-                let width = scale * proportion
-                let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
-                let size = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
-                return (index, size)
+            return zip(items, measuredSizes).map { (item, measuredSize) in
+                let width = scale * item.proportion
+                // As this width is at least as wide as the one measured above,
+                // the height requirement should not change.
+                return (item.index, CGSize(width: width, height: measuredSize.height))
             }
         }
 
