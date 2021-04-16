@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.24.0] - 2021-04-16
+
+### Added
+
 - [Add `Keyed` element](https://github.com/square/Blueprint/pull/210), which can be used to help differentiate elements during the diff and update process, eg to assist with proper animation transitions.
 
 - [Introduce `GridRow`](https://github.com/square/Blueprint/pull/208), a `Row` alternative suited for columnar layout. `GridRow` supports the following:
@@ -40,21 +58,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
   Signpost logs are disabled by default. To enable them, set `BlueprintLogging.enabled = true`.
 
-### Removed
-
 ### Changed
 
 - The layout system now uses a caching system to improve performance by eliminating redundant measurements. ([#209])
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.23.0] - 2021-03-26
 
@@ -549,8 +555,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-
-[main]: https://github.com/square/Blueprint/compare/0.23.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.24.0...HEAD
+[0.23.0]: https://github.com/square/Blueprint/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/square/Blueprint/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/square/Blueprint/compare/0.21.0...0.22.0
 [0.21.0]: https://github.com/square/Blueprint/compare/0.20.0...0.21.0
