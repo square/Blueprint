@@ -4,7 +4,7 @@
 /// The initializer will check every child to see if it can be type cast to a `GridRowChildElement`
 /// and then pull of the given width and key and then apply those to the row.
 public struct GridRowChildElement: ProxyElement {
-    private let wrappedElement: Element
+    private let wrapped: Element
     public var width: GridRow.Width
     public let key: AnyHashable?
     
@@ -18,13 +18,13 @@ public struct GridRowChildElement: ProxyElement {
         key: AnyHashable? = nil,
         width: GridRow.Width
     ) {
-        self.wrappedElement = wrappedElement
+        self.wrapped = wrappedElement
         self.key = key
         self.width = width
     }
     
     // Simply wraps the given element.
-    public var elementRepresentation: Element { wrappedElement }
+    public var elementRepresentation: Element { wrapped }
 }
 
 extension Element {

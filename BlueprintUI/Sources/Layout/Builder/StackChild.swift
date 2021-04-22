@@ -6,16 +6,16 @@ import UIKit
 /// `@StackElementBuilder` will check every child to see if it can be type cast to a `StackChild`
 /// and then pull of the given traits and key and then apply those to the stack
 public struct StackChild: ProxyElement {
+    private let wrapped: Element
     public var traits: StackLayout.Traits
     public var key: AnyHashable?
-    private let wrappedElement: Element
 
     public init(
         wrappedElement: Element,
         traits: StackLayout.Traits = .init(),
         key: AnyHashable? = nil
     ) {
-        self.wrappedElement = wrappedElement
+        self.wrapped = wrappedElement
         self.traits = traits
         self.key = key
     }
@@ -39,7 +39,7 @@ public struct StackChild: ProxyElement {
     }
 
     // Simply wraps the given element.
-    public var elementRepresentation: Element { wrappedElement }
+    public var elementRepresentation: Element { wrapped }
 }
 
 extension Element {
