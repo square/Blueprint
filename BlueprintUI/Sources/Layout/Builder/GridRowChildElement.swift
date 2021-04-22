@@ -37,19 +37,3 @@ extension Element {
         .init(self, key: key, width: width)
     }
 }
-
-extension GridRow {
-    /// Initializer using result builder to declaritively build up a grid row.
-    /// - Parameter elements: A block containing all elements to be included in the row.
-    /// - Parameter configure: A closure used to modify the stack.
-    public init(@Builder<Element> _ elements: () -> [Element], configure: (inout Self) -> Void = { _ in }) {
-        self.children = elements().map { element in
-            if let gridRowElement = element as? GridRowChildElement {
-                return GridRow.Child(width: gridRowElement.width, key: gridRowElement.key, element: element)
-            } else {
-                return GridRow.Child(width: .proportional(1), element: element)
-            }
-        }
-        configure(&self)
-    }
-}
