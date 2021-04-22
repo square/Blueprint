@@ -442,7 +442,7 @@ class StackTests: XCTestCase {
             do {
                 let row = Row(items) { item in
                     TestElement(size: CGSize(width: item.measuredLength, height: 100))
-                        .stackChild(growPriority: item.growPriority)
+                        .stackChild(sizing: .init(growPriority: item.growPriority))
                 } configure: {
                     $0.horizontalUnderflow = underflow
                 }
@@ -476,7 +476,7 @@ class StackTests: XCTestCase {
             do {
                 let column = Column(items) { item in
                     TestElement(size: CGSize(width: 100, height: item.measuredLength))
-                        .stackChild(growPriority: item.growPriority)
+                        .stackChild(sizing: .init(growPriority: item.growPriority))
                 } configure: {
                     $0.verticalUnderflow = underflow
                 }
@@ -850,7 +850,7 @@ class StackTests: XCTestCase {
             do {
                 let row = Row(items) { item in
                     TestElement(size: CGSize(width: item.measuredLength, height: 100))
-                        .stackChild(shrinkPriority: item.shrinkPriority)
+                        .stackChild(sizing: .init(shrinkPriority: item.shrinkPriority))
                 } configure: {
                     $0.horizontalOverflow = overflow
                 }
@@ -883,7 +883,7 @@ class StackTests: XCTestCase {
             do {
                 let column = Column(items) { item in
                     TestElement(size: CGSize(width: 100, height: item.measuredLength))
-                        .stackChild(shrinkPriority: item.shrinkPriority)
+                        .stackChild(sizing: .init(shrinkPriority: item.shrinkPriority))
                 } configure: {
                     $0.verticalOverflow = overflow
                 }
@@ -1064,8 +1064,7 @@ class StackTests: XCTestCase {
             do {
                 let row = Row(items) { pair in
                     pair.item.element(on: .horizontal).stackChild(
-                        growPriority: pair.priority,
-                        shrinkPriority: pair.priority
+                        sizing: .init(growPriority: pair.priority, shrinkPriority: pair.priority)
                     )
                 } configure: {
                     $0.horizontalOverflow = .condenseUniformly
@@ -1090,8 +1089,7 @@ class StackTests: XCTestCase {
             do {
                 let column = Column(items) { pair in
                     pair.item.element(on: .vertical).stackChild(
-                        growPriority: pair.priority,
-                        shrinkPriority: pair.priority
+                        sizing: .init(growPriority: pair.priority, shrinkPriority: pair.priority)
                     )
                 } configure: {
                     $0.verticalOverflow = .condenseUniformly
