@@ -9,6 +9,19 @@ public struct StackChild: ProxyElement {
     private let wrapped: Element
     public var traits: StackLayout.Traits
     public var key: AnyHashable?
+    
+    public struct Sizing {
+        public static let fixed: Self = .init(growPriority: 0, shrinkPriority: 0)
+        public static let flexible: Self = .init(growPriority: 1, shrinkPriority: 1)
+
+        public var growPriority: CGFloat
+        public var shrinkPriority: CGFloat
+        
+        public init(growPriority: CGFloat = 1, shrinkPriority: CGFloat = 1) {
+            self.growPriority = growPriority
+            self.shrinkPriority = shrinkPriority
+        }
+    }
 
     public init(
         wrappedElement: Element,
@@ -22,16 +35,15 @@ public struct StackChild: ProxyElement {
     
     public init(
         wrappedElement: Element,
-        growPriority: CGFloat = 1.0,
-        shrinkPriority: CGFloat = 1.0,
+        sizing: Sizing = .flexible,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
         key: AnyHashable? = nil
     ) {
         self.init(
             wrappedElement: wrappedElement,
             traits: .init(
-                growPriority: growPriority,
-                shrinkPriority: shrinkPriority,
+                growPriority: sizing.growPriority,
+                shrinkPriority: sizing.shrinkPriority,
                 alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init)
             ),
             key: key
@@ -46,22 +58,19 @@ extension Element {
     
     /// Wraps an element with a `StackChild` in order to customize `StackLayout.Traits` and the key.
     /// - Parameters:
-    ///   - growPriority: Controls the amount of extra space distributed to this child during underflow.
-    ///   - shrinkPriority: Controls the amount of space allowed for this child during overflow.
+    ///   - sizing: Controls the amount of extra space distributed to this child during underflow and overflow
     ///   - alignmentGuide: Allows for custom alignment of a child along the cross axis.
     ///   - key: A key used to disambiguate children between subsequent updates of the view
     ///     hierarchy.
     /// - Returns: A wrapped element with additional layout information for the `StackElement`.
     public func stackChild(
-        growPriority: CGFloat = 1.0,
-        shrinkPriority: CGFloat = 1.0,
+        sizing: StackChild.Sizing = .flexible,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
         key: AnyHashable? = nil
     ) -> StackChild {
         .init(
             wrappedElement: self,
-            growPriority: growPriority,
-            shrinkPriority: shrinkPriority,
+            sizing: sizing,
             alignmentGuide: alignmentGuide, key: key
         )
     }
