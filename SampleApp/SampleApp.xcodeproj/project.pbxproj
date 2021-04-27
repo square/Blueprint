@@ -41,6 +41,7 @@
 		979F49EE224D1BD300A3C5D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97545514223C12E9003E353F /* LaunchScreen.storyboard */; };
 		979F49F4224D1BF200A3C5D4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 979F49E4224D1B6C00A3C5D4 /* AppDelegate.swift */; };
 		A7611DAC06D59DA383B1870E /* libPods-Tutorial 1 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B42C382728D022D1B556802 /* libPods-Tutorial 1 (Completed).a */; };
+		C2D401B526373F8500C6C739 /* BlueprintScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D401B426373F8500C6C739 /* BlueprintScrollViewController.swift */; };
 		D72C504447FA36584122770B /* libPods-Tutorial 2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FCF8B77DD126D724029EB47 /* libPods-Tutorial 2.a */; };
 /* End PBXBuildFile section */
 
@@ -88,6 +89,7 @@
 		979F49F2224D1BD300A3C5D4 /* Tutorial 1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Tutorial 1.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D59D92E955A10C9F7EF0730 /* Pods-Tutorial 2 (Completed).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2 (Completed).release.xcconfig"; path = "Target Support Files/Pods-Tutorial 2 (Completed)/Pods-Tutorial 2 (Completed).release.xcconfig"; sourceTree = "<group>"; };
 		ADDB22E4D9B4379A15C5AF69 /* libPods-SampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C2D401B426373F8500C6C739 /* BlueprintScrollViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlueprintScrollViewController.swift; sourceTree = "<group>"; };
 		CC5FC85BE57034BE39916388 /* Pods-Tutorial 1 (Completed).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1 (Completed).debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 1 (Completed)/Pods-Tutorial 1 (Completed).debug.xcconfig"; sourceTree = "<group>"; };
 		F211AAFE0FF4DC614FC65630 /* Pods-Tutorial 1 (Completed).release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1 (Completed).release.xcconfig"; path = "Target Support Files/Pods-Tutorial 1 (Completed)/Pods-Tutorial 1 (Completed).release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -179,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				0A50E8DA24A685DA0049705B /* RootViewController.swift */,
+				C2D401B426373F8500C6C739 /* BlueprintScrollViewController.swift */,
 				97545510223C12E9003E353F /* PostsViewController.swift */,
 				7A4B688324DB3BE300E10D7A /* ResponsiveViewController.swift */,
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
@@ -583,6 +586,7 @@
 				0A50E8DB24A685DA0049705B /* RootViewController.swift in Sources */,
 				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
 				97545519223C12E9003E353F /* PostsViewController.swift in Sources */,
+				C2D401B526373F8500C6C739 /* BlueprintScrollViewController.swift in Sources */,
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
 				7A4B688424DB3BE300E10D7A /* ResponsiveViewController.swift in Sources */,
 				0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */,
