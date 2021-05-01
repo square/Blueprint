@@ -456,7 +456,7 @@ fileprivate extension BlueprintView.NativeViewController {
         var onCoordinateSpaceChanged : (UICoordinateSpace) -> ()
         
         let view : UIView
-        let blueprintView : BlueprintView
+        weak var blueprintView : BlueprintView?
         
         init(
             with view : UIView,
@@ -489,7 +489,11 @@ fileprivate extension BlueprintView.NativeViewController {
         
         func sendOnCoordinateSpaceChangedIfNeeded() {
             
-            let frame = self.view.convert(view.bounds, to: self.blueprintView.window)
+            guard let blueprintView = self.blueprintView else {
+                return
+            }
+            
+            let frame = self.view.convert(view.bounds, to: blueprintView.window)
             
             if self.lastCoordinateSpaceFrame != frame {
                 self.lastCoordinateSpaceFrame = frame
