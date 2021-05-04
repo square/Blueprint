@@ -27,6 +27,7 @@ public struct ScrollView: Element {
     public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
     
     public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
+    public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior = .automatic
     public var keyboardAdjustmentMode: KeyboardAdjustmentMode = .adjustsWhenVisible
 
     public var delaysContentTouches: Bool = true
@@ -323,6 +324,10 @@ fileprivate final class ScrollerWrapperView: UIView {
 
         if self.scrollView.delaysContentTouches != scrollView.delaysContentTouches {
             self.scrollView.delaysContentTouches = scrollView.delaysContentTouches
+        }
+
+        if self.scrollView.contentInsetAdjustmentBehavior != scrollView.contentInsetAdjustmentBehavior {
+            self.scrollView.contentInsetAdjustmentBehavior = scrollView.contentInsetAdjustmentBehavior
         }
 
         self.applyContentInset(with: scrollView)
