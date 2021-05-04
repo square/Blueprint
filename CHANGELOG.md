@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [Expose `contentInsetAdjustmentBehavior`](https://github.com/square/Blueprint/pull/222) on `ScrollView`.
+
 ### Deprecated
 
 ### Security
