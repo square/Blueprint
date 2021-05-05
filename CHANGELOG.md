@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- [Expose `contentInsetAdjustmentBehavior`](https://github.com/square/Blueprint/pull/222) on `ScrollView`.
-
 ### Deprecated
 
 ### Security
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.25.0] - 2021-05-5
+
+### Changed
+
+- [Expose `contentInsetAdjustmentBehavior`](https://github.com/square/Blueprint/pull/222) on `ScrollView`.
 
 ## [0.24.0] - 2021-04-16
 
@@ -557,8 +561,10 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/0.24.0...HEAD
-[0.23.0]: https://github.com/square/Blueprint/compare/0.23.0...0.24.0
+
+[main]: https://github.com/square/Blueprint/compare/0.25.0...HEAD
+[0.25.0]: https://github.com/square/Blueprint/compare/0.24.0...0.25.0
+[0.24.0]: https://github.com/square/Blueprint/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/square/Blueprint/compare/0.22.0...0.23.0
 [0.22.0]: https://github.com/square/Blueprint/compare/0.21.0...0.22.0
 [0.21.0]: https://github.com/square/Blueprint/compare/0.20.0...0.21.0
