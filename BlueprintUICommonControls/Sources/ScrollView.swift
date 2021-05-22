@@ -20,6 +20,7 @@ public struct ScrollView: Element {
      the on-screen `UIScrollView`s `contentInset.bottom` to make space for the keyboard.
      */
     public var contentInset: UIEdgeInsets = .zero
+    public var scrollIndicatorInsets: UIEdgeInsets = .zero
     
     public var centersUnderflow: Bool = false
     public var showsHorizontalScrollIndicator: Bool = true
@@ -328,6 +329,10 @@ fileprivate final class ScrollerWrapperView: UIView {
 
         if self.scrollView.contentInsetAdjustmentBehavior != scrollView.contentInsetAdjustmentBehavior {
             self.scrollView.contentInsetAdjustmentBehavior = scrollView.contentInsetAdjustmentBehavior
+        }
+
+        if self.scrollView.scrollIndicatorInsets != scrollView.scrollIndicatorInsets {
+            self.scrollView.scrollIndicatorInsets = scrollView.scrollIndicatorInsets
         }
 
         self.applyContentInset(with: scrollView)
