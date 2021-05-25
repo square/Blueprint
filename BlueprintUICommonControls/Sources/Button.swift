@@ -9,7 +9,7 @@ public struct Button: Element {
     public var wrappedElement: Element
     public var isEnabled: Bool
     public var onTap: () -> Void
-    public var minumumTappableSize: CGSize = CGSize(width: 44, height: 44)
+    public var minimumTappableSize: CGSize = CGSize(width: 44, height: 44)
 
     public init(isEnabled: Bool = true, onTap: @escaping () -> Void = {}, wrapping element: Element) {
         self.wrappedElement = element
@@ -26,7 +26,7 @@ public struct Button: Element {
             config.contentView = { $0.contentView }
             config[\.isEnabled] = isEnabled
             config[\.onTap] = onTap
-            config[\.minumumTappableSize] = minumumTappableSize
+            config[\.minimumTappableSize] = minimumTappableSize
         }
     }
 
@@ -37,7 +37,7 @@ extension Button {
     fileprivate final class NativeButton: UIControl {
         internal let contentView = UIView()
         internal var onTap: (() -> Void)? = nil
-        internal var minumumTappableSize: CGSize = CGSize(width: 44, height: 44)
+        internal var minimumTappableSize: CGSize = CGSize(width: 44, height: 44)
 
 
         override init(frame: CGRect) {
@@ -57,8 +57,8 @@ extension Button {
         private var tappableRect: CGRect {
             return bounds
                 .insetBy(
-                    dx: min(0, bounds.width - minumumTappableSize.width),
-                    dy: min(0, bounds.height - minumumTappableSize.height))
+                    dx: min(0, bounds.width - minimumTappableSize.width),
+                    dy: min(0, bounds.height - minimumTappableSize.height))
 
         }
 
