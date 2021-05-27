@@ -32,6 +32,7 @@ public struct ScrollView: Element {
 
     public var delaysContentTouches: Bool = true
 
+    public var contentOffsetTrigger: ScrollTrigger?
 
     public init(
         _ contentSize: ContentSize = .fittingHeight,
@@ -233,6 +234,22 @@ fileprivate final class ScrollerWrapperView: UIView {
     }
 
     private var refreshAction: () -> Void = { }
+    
+    private var contentOffsetTrigger: ScrollView.ScrollTrigger? {
+        didSet {
+            oldValue?.action = { (_, _) in }
+            contentOffsetTrigger?.action = { [weak self] (offset, animated) in
+                guard let self = self else { return }
+                
+                let context = ScrollView.ContentOffset.ScrollingContext(
+                    contentSize: self.scrollView.contentSize,
+                    scrollViewBounds: self.scrollView.bounds,
+                    contentInsets: self.scrollView.contentInset
+                )
+                self.scrollView.setContentOffset(offset.provider(context), animated: animated)
+            }
+        }
+    }
 
     init(frame: CGRect, representedElement : ScrollView) {
         
@@ -329,6 +346,8 @@ fileprivate final class ScrollerWrapperView: UIView {
         if self.scrollView.contentInsetAdjustmentBehavior != scrollView.contentInsetAdjustmentBehavior {
             self.scrollView.contentInsetAdjustmentBehavior = scrollView.contentInsetAdjustmentBehavior
         }
+        
+        self.contentOffsetTrigger = scrollView.contentOffsetTrigger
 
         self.applyContentInset(with: scrollView)
     }
@@ -485,3 +504,41 @@ extension ScrollerWrapperView : KeyboardObserverDelegate {
     }
 }
 
+
+extension ScrollView {
+
+    final public class ScrollTrigger {
+
+        var action: (ContentOffset, Bool) -> Void
+
+        public init() {
+            action = { (_, _) in }
+        }
+
+        public func scroll(to: ContentOffset, animated: Bool) {
+            action(to, animated)
+        }
+    }
+    
+    public struct ContentOffset {
+        
+        public struct ScrollingContext {
+            public var contentSize: CGSize
+            public var scrollViewBounds: CGRect
+            public var contentInsets: UIEdgeInsets
+        }
+
+        public typealias Provider = (ScrollingContext) -> CGPoint
+
+        public static let top = ContentOffset { _ in .zero }
+        public static let bottom = ContentOffset { context in
+            CGPoint(x: 0, y: context.contentSize.height - context.scrollViewBounds.size.height + context.contentInsets.bottom)
+        }
+
+        var provider: Provider
+
+        public init(provider: @escaping Provider) {
+            self.provider = provider
+        }
+    }
+}
