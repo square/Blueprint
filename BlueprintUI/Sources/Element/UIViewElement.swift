@@ -33,7 +33,7 @@ import UIKit
 ///         UISwitch()
 ///     }
 ///
-///     func updateUIView(_ view: UISwitch) {
+///     func updateUIView(_ view: UISwitch, with context: UIViewElementContext) {
 ///         view.isOn = self.isOn
 ///     }
 /// }
@@ -52,7 +52,8 @@ public protocol UIViewElement : Element {
     /// are reused for sizing and measurement.
     static func makeUIView() -> UIViewType
 
-    /// Update the view instance with the content from the element.
+    /// Update the view instance with the content from the element. The context provides additional
+    /// information, such as whether the update is for the measuring instance.
     ///
     /// Example
     /// -------
@@ -60,11 +61,11 @@ public protocol UIViewElement : Element {
     /// your update method would look like this:
     /// 
     /// ```
-    /// func updateUIView(_ view: UISwitch) {
+    /// func updateUIView(_ view: UISwitch, with context: UIViewElementContext) {
     ///    view.isOn = self.isOn
     /// }
     /// ```
-    func updateUIView(_ view: UIViewType)
+    func updateUIView(_ view: UIViewType, with context: UIViewElementContext)
     
     /// A key which is used to cache measurement results of the `UIViewElement`.
     /// If your element is made of values which can be easily combined to cache its sizing,
@@ -122,12 +123,18 @@ public extension UIViewElement {
             }
             
             config.apply { view in
-                self.updateUIView(view)
+                self.updateUIView(view, with: .init(isMeasuring: false))
             }
         }
     }
 }
 
+/// Context object passed into `updateUIView`.
+public struct UIViewElementContext {
+    /// This bool indicates whether the view being updated is the static measuring instance. You may
+    /// not want to perform certain updates if it is (such as updating field trigger references).
+    public var isMeasuring: Bool
+}
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
 private final class UIViewElementMeasurer {
@@ -142,7 +149,7 @@ private final class UIViewElementMeasurer {
         
         let view = self.measurementView(for: element)
         
-        element.updateUIView(view)
+        element.updateUIView(view, with: .init(isMeasuring: true))
         
         return element.size(bounds.size, thatFits: view)
     }

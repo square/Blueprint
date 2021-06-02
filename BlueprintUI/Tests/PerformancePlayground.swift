@@ -147,7 +147,7 @@ private struct NonCachingLabel: UIViewElement {
         UILabel()
     }
 
-    func updateUIView(_ view: UILabel) {
+    func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
         view.numberOfLines = 0
         view.text = text
     }
@@ -169,7 +169,7 @@ fileprivate struct TestLabel : UIViewElement
         self.text
     }
     
-    func updateUIView(_ view:  UILabel) {
+    func updateUIView(_ view:  UILabel, with context: UIViewElementContext) {
         view.numberOfLines = 0
         view.text = self.text
     }
