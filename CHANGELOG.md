@@ -11,9 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [Add `ScrollTrigger`](https://github.com/square/Blueprint/pull/224), which adds the ability set the content offset of a `ScrollView`
-- [Add `UIViewElementContext`](https://github.com/square/Blueprint/pull/228) to `UIViewElement.updateUIView`. The context currently has one property, `isMeasuring`, which tells you if the view being updated is the static measuring instance.
-
 ### Removed
 
 ### Changed
@@ -27,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.26.0] - 2021-06-02
+
+### Added
+
+- [Add `ScrollTrigger`](https://github.com/square/Blueprint/pull/224), which adds the ability set the content offset of a `ScrollView`
+- [Add `UIViewElementContext`](https://github.com/square/Blueprint/pull/228) to `UIViewElement.updateUIView`. The context currently has one property, `isMeasuring`, which tells you if the view being updated is the static measuring instance.
 
 ## [0.25.0] - 2021-05-5
 
@@ -565,7 +569,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.25.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.26.0...HEAD
+[0.26.0]: https://github.com/square/Blueprint/compare/0.25.0...0.26.0
 [0.25.0]: https://github.com/square/Blueprint/compare/0.24.0...0.25.0
 [0.24.0]: https://github.com/square/Blueprint/compare/0.23.0...0.24.0
 [0.23.0]: https://github.com/square/Blueprint/compare/0.22.0...0.23.0
