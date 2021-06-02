@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - [Add `ScrollTrigger`](https://github.com/square/Blueprint/pull/224), which adds the ability set the content offset of a `ScrollView`
+- [Add `UIViewElementContext`](https://github.com/square/Blueprint/pull/228) to `UIViewElement.updateUIView`. The context currently has one property, `isMeasuring`, which tells you if the view being updated is the static measuring instance.
 
 ### Removed
 
