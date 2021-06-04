@@ -8,31 +8,31 @@ public struct ConstrainedAspectRatio: Element {
         /// The content will be sized to fill its parents largest dimension, while maintaining the
         /// specified aspect ratio.
         ///
-        /// If the parent has unconstrained dimensions, the content size will be used for that
-        /// dimension. This means that in an unconstrained measurement, this is equivalent to
-        /// `fitContent`.
+        /// If the parent is unconstrained in all dimensions, the content size will be used for
+        /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
+        /// dimension, the element will fill the constrained dimension.
         case fillParent
 
         /// The content will be sized to fit its parents smallest dimension, while maintaining the
         /// specified aspect ratio.
         ///
-        /// If the parent has unconstrained dimensions, the content size will be used for that
-        /// dimension. This means that in an unconstrained measurement, this is equivalent to
-        /// `shrinkContent`.
+        /// If the parent is unconstrained in all dimensions, the content size will be used for
+        /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
+        /// dimension, the element will fit the constrained dimension.
         case fitParent
 
         /// The content will grow in whichever dimension is needed to maintain the aspect ratio,
         /// while ensuring the content still fits.
         ///
-        /// This mode does not take the parent into account, so the layout may not end up with the
-        /// specified aspect ratio.
+        /// This mode does not take the parents applied size constraint into account, so the parent
+        /// may ultimately layout the element without the constrained aspect ratio.
         case fitContent
 
         /// The content will shrink in whichever dimension is needed to maintain the aspect ratio,
         /// meaning it may be smaller in one dimension than the measured size.
         ///
-        /// This mode does not take the parent into account, so the layout may not end up with the
-        /// specified aspect ratio.
+        /// This mode does not take the parents applied size constraint into account, so the parent
+        /// may ultimately layout the element without the constrained aspect ratio.
         case shrinkContent
 
         func constrain(
@@ -40,7 +40,76 @@ public struct ConstrainedAspectRatio: Element {
             in constraint: SizeConstraint,
             to aspectRatio: AspectRatio
         ) -> CGSize {
-            return .zero
+            let availableHeight: CGFloat
+            let availableWidth: CGFloat
+
+            switch self {
+            case .fillParent,
+                 .fitParent:
+                availableHeight = constraint.height.constrainedValue ?? contentSize.height
+                availableWidth = constraint.width.constrainedValue ?? contentSize.width
+            case .fitContent,
+                 .shrinkContent:
+                availableHeight = contentSize.height
+                availableWidth = contentSize.width
+            }
+
+            let constrainedHeight = aspectRatio.height(forWidth: availableWidth)
+            let constrainedWidth = aspectRatio.width(forHeight: availableHeight)
+
+            switch self {
+            case .fillParent:
+                if constraint.width.constrainedValue == nil &&
+                    constraint.height.constrainedValue == nil {
+                    if constrainedWidth > availableWidth {
+                        return aspectRatio.size(forWidth: constrainedWidth)
+                    } else if constrainedHeight > availableHeight {
+                        return aspectRatio.size(forHeight: constrainedHeight)
+                    }
+                } else if constraint.width.constrainedValue == nil {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                } else if constraint.height.constrainedValue == nil {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                } else if constrainedWidth < availableWidth {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                } else if constrainedHeight < availableHeight {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                }
+
+            case .fitParent:
+                if constraint.width.constrainedValue == nil &&
+                    constraint.height.constrainedValue == nil {
+                    if constrainedWidth > availableWidth {
+                        return aspectRatio.size(forWidth: constrainedWidth)
+                    } else if constrainedHeight > availableHeight {
+                        return aspectRatio.size(forHeight: constrainedHeight)
+                    }
+                } else if constraint.width.constrainedValue == nil {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                } else if constraint.height.constrainedValue == nil {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                } else if constrainedWidth > availableWidth {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                } else if constrainedHeight > availableHeight {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                }
+
+            case .fitContent:
+                if constrainedWidth > availableWidth {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                } else if constrainedHeight > availableHeight {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                }
+
+            case .shrinkContent:
+                if constrainedWidth < availableWidth {
+                    return aspectRatio.size(forWidth: constrainedWidth)
+                } else if constrainedHeight < availableHeight {
+                    return aspectRatio.size(forHeight: constrainedHeight)
+                }
+            }
+
+            return contentSize
         }
     }
 

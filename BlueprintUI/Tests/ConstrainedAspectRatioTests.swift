@@ -81,7 +81,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
         let size = element.content.measure(
             in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 200, height: 400))
+        XCTAssertEqual(size, CGSize(width: 300, height: 150))
     }
 
     func test_expandTallFillParent() {
@@ -92,7 +92,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
         let size = element.content.measure(
             in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 400, height: 800))
+        XCTAssertEqual(size, CGSize(width: 300, height: 600))
     }
 
     func test_expandTallFitParent() {
@@ -145,7 +145,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             wrapping: TestElement())
 
         let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 120, height: 60))
+        XCTAssertEqual(size, CGSize(width: 200, height: 100))
     }
 
     func test_unconstrainedHeightFillLargerParent() {
@@ -165,7 +165,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             wrapping: TestElement())
 
         let size = element.content.measure(in: SizeConstraint(width: 50))
-        XCTAssertEqual(size, CGSize(width: 200, height: 100))
+        XCTAssertEqual(size, CGSize(width: 50, height: 25))
     }
 
     func test_unconstrainedHeightFitLargerParent() {
@@ -205,7 +205,7 @@ class ConstrainedAspectRatioTests: XCTestCase {
             wrapping: TestElement())
 
         let size = element.content.measure(in: SizeConstraint(height: 50))
-        XCTAssertEqual(size, CGSize(width: 200, height: 100))
+        XCTAssertEqual(size, CGSize(width: 100, height: 50))
     }
 
     func test_unconstrainedWidthFitLargerParent() {
