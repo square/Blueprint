@@ -124,10 +124,9 @@ public struct ConstrainedAspectRatio: Element {
     ///
     /// - parameters:
     ///   - aspectRatio: The aspect ratio that the content size should match.
-    ///   - contentMode: Whether the aspect ratio should be reached by expanding the content
-    ///     element's size to fill its parent or shrinking it to fit.
+    ///   - contentMode: How the content should size itself relative to its parent.
     ///   - wrapping: The content element.
-    public init(aspectRatio: AspectRatio, contentMode: ContentMode = .fitParent, wrapping wrappedElement: Element) {
+    public init(aspectRatio: AspectRatio, contentMode: ContentMode = .fitContent, wrapping wrappedElement: Element) {
         self.aspectRatio = aspectRatio
         self.contentMode = contentMode
         self.wrappedElement = wrappedElement
@@ -171,7 +170,7 @@ public extension Element {
     ///
     func constrainedTo(
         aspectRatio: AspectRatio,
-        contentMode: ConstrainedAspectRatio.ContentMode = .fitParent
+        contentMode: ConstrainedAspectRatio.ContentMode = .fitContent
     ) -> ConstrainedAspectRatio
     {
         ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
