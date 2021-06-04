@@ -5,32 +5,42 @@ public struct ConstrainedAspectRatio: Element {
     /// Represents whether the content element's size should be expanded to fill its parent
     /// or shrunk to fit it.
     public enum ContentMode: Equatable {
-        /// Expand the content to fill its parent.
-        case fill
-        /// Shrink the content to fit within its parent.
-        case fit
+        /// The content will be sized to fill its parents largest dimension, while maintaining the
+        /// specified aspect ratio.
+        ///
+        /// If the parent has unconstrained dimensions, the content size will be used for that
+        /// dimension. This means that in an unconstrained measurement, this is equivalent to
+        /// `fitContent`.
+        case fillParent
 
-        func constrain(size: CGSize, to aspectRatio: AspectRatio) -> CGSize {
-            let constrainedHeight = aspectRatio.height(forWidth: size.width)
-            let constrainedWidth = aspectRatio.width(forHeight: size.height)
+        /// The content will be sized to fit its parents smallest dimension, while maintaining the
+        /// specified aspect ratio.
+        ///
+        /// If the parent has unconstrained dimensions, the content size will be used for that
+        /// dimension. This means that in an unconstrained measurement, this is equivalent to
+        /// `shrinkContent`.
+        case fitParent
 
-            switch self {
-            case .fill:
-                if constrainedWidth > size.width {
-                    return CGSize(width: constrainedWidth, height: size.height)
-                } else if constrainedHeight > size.height {
-                    return CGSize(width: size.width, height: constrainedHeight)
-                }
+        /// The content will grow in whichever dimension is needed to maintain the aspect ratio,
+        /// while ensuring the content still fits.
+        ///
+        /// This mode does not take the parent into account, so the layout may not end up with the
+        /// specified aspect ratio.
+        case fitContent
 
-            case .fit:
-                if constrainedWidth < size.width {
-                    return CGSize(width: constrainedWidth, height: size.height)
-                } else if constrainedHeight < size.height {
-                    return CGSize(width: size.width, height: constrainedHeight)
-                }
-            }
+        /// The content will shrink in whichever dimension is needed to maintain the aspect ratio,
+        /// meaning it may be smaller in one dimension than the measured size.
+        ///
+        /// This mode does not take the parent into account, so the layout may not end up with the
+        /// specified aspect ratio.
+        case shrinkContent
 
-            return size
+        func constrain(
+            contentSize: CGSize,
+            in constraint: SizeConstraint,
+            to aspectRatio: AspectRatio
+        ) -> CGSize {
+            return .zero
         }
     }
 
@@ -49,7 +59,7 @@ public struct ConstrainedAspectRatio: Element {
     ///   - contentMode: Whether the aspect ratio should be reached by expanding the content
     ///     element's size to fill its parent or shrinking it to fit.
     ///   - wrapping: The content element.
-    public init(aspectRatio: AspectRatio, contentMode: ContentMode = .fill, wrapping wrappedElement: Element) {
+    public init(aspectRatio: AspectRatio, contentMode: ContentMode = .fitParent, wrapping wrappedElement: Element) {
         self.aspectRatio = aspectRatio
         self.contentMode = contentMode
         self.wrappedElement = wrappedElement
@@ -68,8 +78,12 @@ public struct ConstrainedAspectRatio: Element {
         var contentMode: ContentMode
 
         func measure(in sizeConstraint: SizeConstraint, child: Measurable) -> CGSize {
-            let size = child.measure(in: sizeConstraint)
-            return contentMode.constrain(size: size, to: aspectRatio)
+            let contentSize = child.measure(in: sizeConstraint)
+            return contentMode.constrain(
+                contentSize: contentSize,
+                in: sizeConstraint,
+                to: aspectRatio
+            )
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
@@ -90,7 +104,7 @@ public extension Element {
     ///
     func constrainedTo(
         aspectRatio: AspectRatio,
-        contentMode: ConstrainedAspectRatio.ContentMode = .fill
+        contentMode: ConstrainedAspectRatio.ContentMode = .fitParent
     ) -> ConstrainedAspectRatio
     {
         ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
