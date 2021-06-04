@@ -2,19 +2,18 @@ import UIKit
 
 /// Constrains the size of the content element to an aspect ratio.
 public struct ConstrainedAspectRatio: Element {
-    /// Represents whether the content element's size should be expanded to fill its parent
-    /// or shrunk to fit it.
+    /// Represents how the content should size itself relative to its parent.
     public enum ContentMode: Equatable {
-        /// The content will be sized to fill its parents largest dimension, while maintaining the
-        /// specified aspect ratio.
+        /// The content will be sized to fill its parent while maintaining the specified aspect
+        /// ratio.
         ///
         /// If the parent is unconstrained in all dimensions, the content size will be used for
         /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
         /// dimension, the element will fill the constrained dimension.
         case fillParent
 
-        /// The content will be sized to fit its parents smallest dimension, while maintaining the
-        /// specified aspect ratio.
+        /// The content will be sized to fit within its parent while maintaining the specified
+        /// aspect ratio.
         ///
         /// If the parent is unconstrained in all dimensions, the content size will be used for
         /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
@@ -168,8 +167,7 @@ public extension Element {
     ///
     /// - parameters:
     ///   - aspectRatio: The aspect ratio that the content size should match.
-    ///   - contentMode: Whether the aspect ratio should be reached by expanding the content
-    ///     element's size to fill its parent or shrinking it to fit.
+    ///   - contentMode: How the content should size itself relative to its parent.
     ///
     func constrainedTo(
         aspectRatio: AspectRatio,
