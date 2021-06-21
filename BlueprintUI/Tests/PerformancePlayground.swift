@@ -24,7 +24,19 @@ class PerformancePlayground : XCTestCase
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
+    }
+    
+    func test_viewdescription() {
+     
+        let label = TestLabel(text: "This is test label number")
+        
+        let view = UILabel(frame: .init(x: 0, y: 0, width: 500, height: 30))
+        
+        self.determineAverage(for: 10.0) {
+            label.backingViewDescription(bounds: view.bounds, subtreeExtent: nil)?.apply(to: view)
+        }
+        
     }
     
     func test_repeated_layouts()
@@ -116,26 +128,28 @@ class PerformancePlayground : XCTestCase
     
     func determineAverage(for seconds : TimeInterval, using block : () -> ()) {
         let start = Date()
-        
+
         var iterations : Int = 0
         
+        var lastUpdateDate = Date()
+
         repeat {
-            let iterationStart = Date()
             block()
-            let iterationEnd = Date()
-            let duration = iterationEnd.timeIntervalSince(iterationStart)
             
             iterations += 1
-
-            print("Iteration: \(iterations), Duration : \(duration)")
             
+            if Date().timeIntervalSince(lastUpdateDate) >= 1 {
+                lastUpdateDate = Date()
+                print("Continuing Test: \(iterations) Iterations...")
+            }
+
         } while Date() < start + seconds
-        
+
         let end = Date()
-        
+
         let duration = end.timeIntervalSince(start)
         let average = duration / TimeInterval(iterations)
-        
+
         print("Iterations: \(iterations), Average Time: \(average)")
     }
 }
@@ -153,7 +167,7 @@ private struct NonCachingLabel: UIViewElement {
     }
 }
 
-fileprivate struct TestLabel : UIViewElement
+fileprivate struct TestLabel : Element
 {
     var text : String
     
@@ -161,16 +175,14 @@ fileprivate struct TestLabel : UIViewElement
     
     typealias UIViewType = UILabel
     
-    static func makeUIView() ->  UILabel {
-        UILabel()
+    var content: ElementContent {
+        ElementContent(intrinsicSize: .init(width: 300, height: 20))
     }
     
-    var measurementCacheKey: AnyHashable? {
-        self.text
-    }
-    
-    func updateUIView(_ view:  UILabel, with context: UIViewElementContext) {
-        view.numberOfLines = 0
-        view.text = self.text
+    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        UILabel.describe { config in
+            config[\.text] = self.text
+            config[\.numberOfLines] = 0
+        }
     }
 }
