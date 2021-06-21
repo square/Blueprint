@@ -20,35 +20,21 @@ extension BlueprintView.NativeViewController {
     ///
     final class CoordinateSpaceController {
         
-        var onChange : CoordinateSpaceTracking.Callback
-        
         let view : UIView
-        weak var blueprintView : BlueprintView?
+        private(set) weak var blueprintView : BlueprintView?
+        
+        private(set) var tracking : CoordinateSpaceTracking?
         
         init(
             with view : UIView,
-            in blueprintView : BlueprintView,
-            onChange : @escaping CoordinateSpaceTracking.Callback
+            in blueprintView : BlueprintView
         ) {
             self.view = view
             self.blueprintView = blueprintView
-            self.onChange = onChange
         }
         
         deinit {
             self.displayLink?.invalidate()
-        }
-        
-        private var displayLink : CADisplayLink?
-        
-        func start() {
-            guard self.displayLink == nil else {
-                fatalError()
-            }
-            
-            self.displayLink = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
-            
-            self.displayLink?.add(to: .current, forMode: .common)
         }
         
         func stop() {
@@ -56,9 +42,31 @@ extension BlueprintView.NativeViewController {
             self.displayLink = nil
         }
         
+        private var displayLink : CADisplayLink?
+        
+        func apply(_ tracking : CoordinateSpaceTracking) {
+            
+            self.tracking = tracking
+            
+            if self.displayLink == nil {
+                let link = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
+                link.isPaused = true
+                link.add(to: .current, forMode: .common)
+                
+                self.displayLink = link
+            }
+            
+            self.displayLink?.isPaused = tracking.isActive
+            
+        }
+        
         private var lastCoordinateSpaceFrame : CGRect? = nil
         
         func sendOnCoordinateSpaceChangedIfNeeded() {
+            
+            guard let tracking = self.tracking else {
+                return
+            }
             
             guard let blueprintView = self.blueprintView else {
                 return
@@ -71,8 +79,10 @@ extension BlueprintView.NativeViewController {
             let frame = self.view.convert(view.bounds, to: parent)
             
             if self.lastCoordinateSpaceFrame != frame {
+                
                 self.lastCoordinateSpaceFrame = frame
-                self.onChange(
+                
+                tracking.onChange(
                     .init(
                         element: view.coordinateSpace,
                         blueprintView: blueprintView.coordinateSpace,
