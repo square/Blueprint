@@ -27,8 +27,8 @@ final class RootViewController : UIViewController
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             })
-            .readCoordinateSpace { coordinateSpace in
-                print(coordinateSpace.convert(coordinateSpace.bounds, to: self.view))
+            .readCoordinateSpace(isActive: true) { position in
+                print(position.convert(position.bounds, to: self.view))
             },
         ]
     }

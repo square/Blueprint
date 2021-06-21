@@ -14,29 +14,37 @@ import Foundation
 /// position another view outside of the Blueprint hierarchy on top of this view, such as
 /// a tooltip, popover, or other element.
 ///
-/// **Note**: You can receive a callback even without updating the element hierarchy.
+/// **Note**  – You can receive a callback even without updating the element hierarchy.
 /// This could happen by resizing the `BlueprintView` either explicitly,
 /// or during a device rotation. You will also receive callbacks if the `BlueprintView`
-/// is within a `ScrollView`, and the frame relative to the view's window changes.
+/// is within a `ScrollView`, and the frame relative to the view's window changes, for example.
 ///
-/// **Note**: Creating a `CoordinateSpaceReader` is expensive: It creates an
-/// underlying `CADisplayLink` to track the view's position to account for the `BlueprintView`
-/// potentially being inside a `UIScrollView` or other view whose bounds may change during
-/// a layout. Because of this, please utilize the `isReading` property, passing no when you do not
-/// need to track the position of the `Element` on screen.
+/// ### Performance Considerations
+/// Creating a `CoordinateSpaceReader` creates a  `CADisplayLink` to
+/// track the view's position to account for the `BlueprintView` potentially being
+/// inside a `UIScrollView` or other view whose bounds may change during a layout in
+/// a way that does not cause the `frame`, `center`, or `bounds` of the tracked view to change.
 ///
-/// ```
-/// func myElement() {
+/// Because of this, please utilize the `isActive` property, passing `false` when you
+/// do not need to track the position of the `Element` on screen. For example, if using the
+/// ``CoordinateSpaceReader`` to track the position of an element to show a tooltip for a tutorial,
+/// pass `false` when not showing the tooltip, and `true` when the tooltip is to be shown.
 ///
+/// ```swift
+/// var elementRepresentation : Element {
+///     MyButton(title: "Add Item", onTap: ...)
+///     .aligned(horizontally: .trailing)
+///     .readCoordinateSpace(isActive: true) { position in
+///          // Send the provided coordinate space along..
+///     }
 /// }
 /// ```
-///
 public struct CoordinateSpaceReader : Element {
     
     // MARK: Properties
     
     /// Is reading / tracking of the coordinate space enabled.
-    public var isReading : Bool
+    public var isActive : Bool
     
     /// The wrapped element.
     public var wrapping : Element
@@ -48,11 +56,11 @@ public struct CoordinateSpaceReader : Element {
     
     /// Creates a new instance of the reader.
     public init(
-        isReading : Bool = true,
+        isActive : Bool,
         wrapping : Element,
         onCoordinateSpaceChanged : @escaping (UICoordinateSpace) -> ()
     ) {
-        self.isReading = true
+        self.isActive = true
         self.wrapping = wrapping
         self.onCoordinateSpaceChanged = onCoordinateSpaceChanged
     }
@@ -64,9 +72,9 @@ public struct CoordinateSpaceReader : Element {
     }
     
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        PassthroughView.describe { config in
-            config.coordinateSpace = .init(
-                isTracking: self.isReading,
+        TouchPassthroughView.describe { config in
+            config.coordinateSpaceTracking = .init(
+                isActive: self.isActive,
                 onChange: self.onCoordinateSpaceChanged
             )
         }
@@ -82,17 +90,37 @@ extension Element {
     /// position another view outside of the Blueprint hierarchy on top of this view, such as
     /// a tooltip, popover, or other element.
     ///
-    /// Note: You can receive a callback even without updating the element hierarchy.
+    /// **Note**  – You can receive a callback even without updating the element hierarchy.
     /// This could happen by resizing the `BlueprintView` either explicitly,
     /// or during a device rotation. You will also receive callbacks if the `BlueprintView`
-    /// is within a `ScrollView`, and the frame relative to the view's window changes.
+    /// is within a `ScrollView`, and the frame relative to the view's window changes, for example.
     ///
+    /// ### Performance Considerations
+    /// Creating a `CoordinateSpaceReader` creates a  `CADisplayLink` to
+    /// track the view's position to account for the `BlueprintView` potentially being
+    /// inside a `UIScrollView` or other view whose bounds may change during a layout in
+    /// a way that does not cause the `frame`, `center`, or `bounds` of the tracked view to change.
+    ///
+    /// Because of this, please utilize the `isActive` property, passing `false` when you
+    /// do not need to track the position of the `Element` on screen. For example, if using the
+    /// ``CoordinateSpaceReader`` to track the position of an element to show a tooltip for a tutorial,
+    /// pass `false` when not showing the tooltip, and `true` when the tooltip is to be shown.
+    ///
+    /// ```swift
+    /// var elementRepresentation : Element {
+    ///     MyButton(title: "Add Item", onTap: ...)
+    ///     .aligned(horizontally: .trailing)
+    ///     .readCoordinateSpace(isActive: true) { position in
+    ///          // Send the provided coordinate space along..
+    ///     }
+    /// }
+    /// ```
     public func readCoordinateSpace(
-        isReading : Bool = true,
+        isActive : Bool,
         onChange : @escaping (UICoordinateSpace) -> ()
     ) -> CoordinateSpaceReader
     {
-        CoordinateSpaceReader(isReading: isReading, wrapping: self, onCoordinateSpaceChanged: onChange)
+        CoordinateSpaceReader(isActive: isActive, wrapping: self, onCoordinateSpaceChanged: onChange)
     }
 }
 
@@ -104,17 +132,17 @@ public struct CoordinateSpaceTracking {
     
     /// Should tracking be enabled.
     /// Useful if you'd like to conditionally based on some internal state like showing a tutorial or popover.
-    public var isTracking : Bool
+    public var isActive : Bool
     
     /// Called when the position of the element changes on screen.
     public var onChange : (UICoordinateSpace) -> ()
     
     /// Creates a new `CoordinateSpace` instance to track the displayed view.
     public init(
-        isTracking: Bool = true,
+        isActive: Bool,
         onChange: @escaping (UICoordinateSpace) -> ()
     ) {
-        self.isTracking = isTracking
+        self.isActive = isActive
         self.onChange = onChange
     }
 }
