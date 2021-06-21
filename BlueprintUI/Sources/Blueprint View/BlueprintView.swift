@@ -309,16 +309,18 @@ extension BlueprintView {
         
         func updateCoordinateSpaceController(in view : BlueprintView) {
             
-            if let info = self.viewDescription.coordinateSpaceTracking, info.isActive {
-                
+            if let info = self.viewDescription.coordinateSpaceTracking, info.isActive
+            {
                 if self.coordinateSpaceController == nil {
                     self.coordinateSpaceController = .init(
                         with: self.view,
                         in: view,
-                        onCoordinateSpaceChanged: info.onChange
+                        onChange: info.onChange
                     )
                     
                     self.coordinateSpaceController?.start()
+                } else {
+                    self.coordinateSpaceController?.onChange = info.onChange
                 }
             } else {
                 self.coordinateSpaceController?.stop()
@@ -444,65 +446,6 @@ extension BlueprintView {
             }
             
             children = newChildren
-        }
-    }
-}
-
-
-fileprivate extension BlueprintView.NativeViewController {
-    
-    final class CoordinateSpaceController {
-        
-        var onCoordinateSpaceChanged : (UICoordinateSpace) -> ()
-        
-        let view : UIView
-        weak var blueprintView : BlueprintView?
-        
-        init(
-            with view : UIView,
-            in blueprintView : BlueprintView,
-            onCoordinateSpaceChanged : @escaping (UICoordinateSpace) -> ()
-        ) {
-            self.view = view
-            self.blueprintView = blueprintView
-            self.onCoordinateSpaceChanged = onCoordinateSpaceChanged
-        }
-        
-        private var displayLink : CADisplayLink?
-        
-        func start() {
-            guard self.displayLink == nil else {
-                fatalError()
-            }
-            
-            self.displayLink = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
-            
-            self.displayLink?.add(to: .current, forMode: .common)
-        }
-        
-        func stop() {
-            self.displayLink?.invalidate()
-            self.displayLink = nil
-        }
-        
-        private var lastCoordinateSpaceFrame : CGRect? = nil
-        
-        func sendOnCoordinateSpaceChangedIfNeeded() {
-            
-            guard let blueprintView = self.blueprintView else {
-                return
-            }
-            
-            let frame = self.view.convert(view.bounds, to: blueprintView.window)
-            
-            if self.lastCoordinateSpaceFrame != frame {
-                self.lastCoordinateSpaceFrame = frame
-                self.onCoordinateSpaceChanged(view)
-            }
-        }
-        
-        @objc private func onDisplayLinkFired() {
-            self.sendOnCoordinateSpaceChangedIfNeeded()
         }
     }
 }
