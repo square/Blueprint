@@ -73,7 +73,7 @@ public struct CoordinateSpaceReader : Element {
     
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         TouchPassthroughView.describe { config in
-            config.coordinateSpaceTracking = .init(
+            config.trackPosition = .init(
                 isActive: self.isActive,
                 onChange: self.onCoordinateSpaceChanged
             )

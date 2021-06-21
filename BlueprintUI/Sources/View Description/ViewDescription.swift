@@ -44,7 +44,7 @@ public struct ViewDescription {
     public let layoutTransition: LayoutTransition
     public let appearingTransition: VisibilityTransition?
     public let disappearingTransition: VisibilityTransition?
-    public let coordinateSpaceTracking : CoordinateSpaceTracking?
+    public let trackPosition : CoordinateSpaceTracking?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -87,7 +87,7 @@ public struct ViewDescription {
         appearingTransition = configuration.appearingTransition
         disappearingTransition = configuration.disappearingTransition
         
-        coordinateSpaceTracking = configuration.coordinateSpaceTracking
+        trackPosition = configuration.trackPosition
     }
     
     private let _build: () -> UIView
@@ -125,7 +125,7 @@ extension ViewDescription {
         public var builder: () -> View
         
         /// Allows tracking of the on-screen position of the element.
-        public var coordinateSpaceTracking : CoordinateSpaceTracking? = nil
+        public var trackPosition : CoordinateSpaceTracking? = nil
 
         /// An array of update closures.
         public var updates: [Update]

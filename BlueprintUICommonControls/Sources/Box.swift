@@ -11,6 +11,8 @@ public struct Box: Element {
     public var borderStyle: BorderStyle
     public var shadowStyle: ShadowStyle
     public var clipsContent: Bool
+    
+    public var trackPosition : CoordinateSpaceTracking?
 
     public var wrappedElement: Element?
 
@@ -20,7 +22,8 @@ public struct Box: Element {
         borderStyle: BorderStyle = .none,
         shadowStyle: ShadowStyle = .none,
         clipsContent: Bool = false,
-        wrapping element: Element? = nil
+        wrapping element: Element? = nil,
+        configure: (inout Self) -> () = { _ in }
     ) {
         self.backgroundColor = backgroundColor
         self.cornerStyle = cornerStyle
@@ -29,6 +32,8 @@ public struct Box: Element {
         self.clipsContent = clipsContent
         
         self.wrappedElement = element
+        
+        configure(&self)
     }
 
     public var content: ElementContent {
@@ -41,8 +46,10 @@ public struct Box: Element {
 
     public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
         return BoxView.describe { config in
+            
+            config.trackPosition = self.trackPosition
 
-            config.apply({ (view) in
+            config.apply { view in
 
                 if self.backgroundColor != view.backgroundColor {
                     view.backgroundColor = self.backgroundColor
@@ -86,14 +93,11 @@ public struct Box: Element {
                 if self.cornerStyle.radius(for: bounds) != view.contentView.layer.cornerRadius {
                     view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
                 }
-
-            })
-
-
-            config.contentView = { view in
-                return view.contentView
             }
 
+            config.contentView = { view in
+                view.contentView
+            }
         }
     }
 }
