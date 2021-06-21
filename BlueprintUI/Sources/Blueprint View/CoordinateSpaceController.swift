@@ -74,9 +74,10 @@ extension BlueprintView.NativeViewController {
                 self.lastCoordinateSpaceFrame = frame
                 self.onChange(
                     .init(
-                        element: view,
-                        blueprintView: blueprintView,
-                        top: parent
+                        element: view.coordinateSpace,
+                        blueprintView: blueprintView.coordinateSpace,
+                        top: parent.coordinateSpace,
+                        window: view.window?.coordinateSpace
                     )
                 )
             }
