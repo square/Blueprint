@@ -34,7 +34,7 @@ import Foundation
 /// var elementRepresentation : Element {
 ///     MyButton(title: "Add Item", onTap: ...)
 ///     .aligned(horizontally: .trailing)
-///     .readCoordinateSpace(isActive: true) { position in
+///     .readCoordinateSpace(isActive: true) { context in
 ///          // Send the provided coordinate space along..
 ///     }
 /// }
@@ -50,7 +50,7 @@ public struct CoordinateSpaceReader : Element {
     public var wrapping : Element
     
     /// Called when the coordinate space changes.
-    public var onCoordinateSpaceChanged : (CoordinateSpaceTracking.Context) -> ()
+    public var onChange : (CoordinateSpaceTracking.Context) -> ()
     
     // MARK: Initialization
     
@@ -58,11 +58,11 @@ public struct CoordinateSpaceReader : Element {
     public init(
         isActive : Bool,
         wrapping : Element,
-        onCoordinateSpaceChanged : @escaping (CoordinateSpaceTracking.Context) -> ()
+        onChange : @escaping (CoordinateSpaceTracking.Context) -> ()
     ) {
         self.isActive = true
         self.wrapping = wrapping
-        self.onCoordinateSpaceChanged = onCoordinateSpaceChanged
+        self.onChange = onChange
     }
     
     // MARK: Element
@@ -75,7 +75,7 @@ public struct CoordinateSpaceReader : Element {
         TouchPassthroughView.describe { config in
             config.trackPosition = .init(
                 isActive: self.isActive,
-                onChange: self.onCoordinateSpaceChanged
+                onChange: self.onChange
             )
         }
     }
@@ -110,7 +110,7 @@ extension Element {
     /// var elementRepresentation : Element {
     ///     MyButton(title: "Add Item", onTap: ...)
     ///     .aligned(horizontally: .trailing)
-    ///     .readCoordinateSpace(isActive: true) { position in
+    ///     .readCoordinateSpace(isActive: true) { context in
     ///          // Send the provided coordinate space along..
     ///     }
     /// }
@@ -120,6 +120,10 @@ extension Element {
         onChange : @escaping CoordinateSpaceTracking.Callback
     ) -> CoordinateSpaceReader
     {
-        CoordinateSpaceReader(isActive: isActive, wrapping: self, onCoordinateSpaceChanged: onChange)
+        .init(
+            isActive: isActive,
+            wrapping: self,
+            onChange: onChange
+        )
     }
 }
