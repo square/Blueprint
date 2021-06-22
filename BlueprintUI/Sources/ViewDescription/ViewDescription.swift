@@ -189,15 +189,12 @@ extension ViewDescription.Configuration {
     /// - If `nil` is provided, no value will be applied to the view (any previous assignment will be cleared).
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value>) -> Value? {
         get {
-            if let binding = bindings[keyPath] as? ValueBinding<Value> {
-                return binding.value
-            } else {
-                return nil
-            }
+            bindings[keyPath]?.value as? Value
         }
         set {
             if let value = newValue {
                 bindings[keyPath] = ValueBinding(keyPath: keyPath, value: value)
+                    .asAnyValueBinding()
             } else {
                 bindings[keyPath] = nil
             }
@@ -217,36 +214,43 @@ extension ViewDescription.Configuration {
     ///   be called on the next update.
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value?>) -> Value? {
         get {
-            if let binding = bindings[keyPath] as? ValueBinding<Value> {
-                return binding.value
-            } else {
-                return nil
-            }
+            bindings[keyPath]?.value as? Value
         }
         set {
             bindings[keyPath] = ValueBinding(keyPath: keyPath, value: newValue)
+                .asAnyValueBinding()
         }
     }
     
 }
 
 
-fileprivate protocol AnyValueBinding {
-    
-    func apply(to view: UIView)
-}
-
-
 extension ViewDescription.Configuration {
+
+    fileprivate struct AnyValueBinding {
+
+        let application: (View) -> ()
+        let value: Any
+
+        init<Value>(_ binding: ValueBinding<Value>) {
+            application = { binding.apply(to: $0) }
+            value = binding.value
+        }
+
+        func apply(to view: View) {
+            application(view)
+        }
+    }
     
-    fileprivate struct ValueBinding<Value> : AnyValueBinding {
+    fileprivate struct ValueBinding<Value> {
         
         let keyPath: ReferenceWritableKeyPath<View, Value>
         let value: Value
 
-        func apply(to anyView: UIView) {
-            let view = anyView as! View
+        func apply(to view: View) {
             view[keyPath: keyPath] = value
         }
+
+        func asAnyValueBinding() -> AnyValueBinding { .init(self) }
     }
 }
