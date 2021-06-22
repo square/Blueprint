@@ -31,7 +31,7 @@ public struct Spacer: Element {
         return ElementContent(intrinsicSize: size)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

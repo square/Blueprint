@@ -62,7 +62,7 @@ public struct Aligned: Element {
         return ElementContent(child: wrappedElement, layout: layout)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

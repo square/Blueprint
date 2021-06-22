@@ -33,7 +33,7 @@ public struct AccessibilityContainer: Element {
         ElementContent(child: wrapped)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityContainerView.describe { config in
             config[\.accessibilityIdentifier] = identifier
         }

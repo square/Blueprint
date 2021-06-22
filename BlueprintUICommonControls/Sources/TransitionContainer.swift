@@ -58,7 +58,7 @@ public struct TransitionContainer: Element {
         return ElementContent(child: wrappedElement)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return PassthroughView.describe { config in
             config.appearingTransition = appearingTransition
             config.disappearingTransition = disappearingTransition

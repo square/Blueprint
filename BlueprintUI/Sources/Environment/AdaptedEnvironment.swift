@@ -44,7 +44,7 @@ public struct AdaptedEnvironment: Element {
         return ElementContent(child: wrappedElement, environment: environmentAdapter)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 }

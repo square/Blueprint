@@ -169,7 +169,7 @@ class BlueprintViewTests: XCTestCase {
                 ElementContent(intrinsicSize: .zero)
             }
 
-            func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
                 TestView.describe { (config) in
                     config.apply { (view) in
                         // make sure UIKit knows we want a chance for layout
@@ -196,6 +196,49 @@ class BlueprintViewTests: XCTestCase {
 
         XCTAssertTrue(layoutRecursed)
     }
+
+    func test_baseEnvironment() {
+        enum TestValue {
+            case defaultValue
+            case right
+        }
+
+        struct TestKey: EnvironmentKey {
+            static var defaultValue: TestValue = .defaultValue
+        }
+
+        let view = BlueprintView()
+
+        var environment = Environment.empty
+        environment[TestKey.self] = .right
+        view.environment = environment
+
+        var value: TestValue = .defaultValue
+
+        func updateValue(new: TestValue) {
+            value = new
+        }
+
+        struct TestElement: Element {
+            var updateValue: (TestValue) -> Void
+
+            var content: ElementContent {
+                ElementContent(intrinsicSize: .zero)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                updateValue(context.environment[TestKey.self])
+                return nil
+            }
+        }
+
+        view.element = TestElement(updateValue: updateValue)
+
+        // trigger a layout pass
+        _ = view.currentNativeViewControllers
+
+        XCTAssertEqual(value, .right)
+    }
 }
 
 fileprivate struct MeasurableElement : Element {
@@ -208,7 +251,7 @@ fileprivate struct MeasurableElement : Element {
         }
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 }
@@ -221,7 +264,7 @@ fileprivate struct SimpleViewElement: Element {
         return ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { config in
             config[\.backgroundColor] = color
         }
@@ -236,7 +279,7 @@ private struct TestElement1: Element {
         return ElementContent(intrinsicSize: .zero)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { (config) in
             config[\.tag] = tag
         }
@@ -250,7 +293,7 @@ private struct TestElement2: Element {
         return ElementContent(intrinsicSize: .zero)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { (config) in
             config[\.tag] = tag
         }
@@ -268,7 +311,7 @@ private struct TestContainer: Element {
         }
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

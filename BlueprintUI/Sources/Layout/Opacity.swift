@@ -26,7 +26,7 @@ public struct Opacity: Element {
         return ElementContent(child: wrappedElement, layout: Layout(opacity: opacity))
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

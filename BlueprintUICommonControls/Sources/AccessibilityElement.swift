@@ -98,7 +98,7 @@ public struct AccessibilityElement: Element {
         return ElementContent(child: wrappedElement)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return AccessibilityView.describe { config in
             config[\.accessibilityLabel] = label
             config[\.accessibilityValue] = value

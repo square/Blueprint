@@ -116,7 +116,7 @@ public extension UIViewElement {
     }
     
     /// Provide the view for the element.
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIViewType.describe { config in
             config.builder = {
                 Self.makeUIView()

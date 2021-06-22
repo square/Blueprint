@@ -36,6 +36,15 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
+    /// A base environment to render elements with.
+    /// Some keys may be overriden based on the traits of the view itself.
+    public var environment: Environment {
+        didSet {
+            setNeedsViewHierarchyUpdate()
+            invalidateIntrinsicContentSize()
+        }
+    }
+
     /// The root element that is displayed within the view.
     public var element: Element? {
         didSet {
@@ -60,9 +69,11 @@ public final class BlueprintView: UIView {
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
-    public required init(element: Element?) {
-        
+    /// - parameter environment: A base environment to render elements with. Defaults to `.empty`.
+    public required init(element: Element?, environment: Environment = .empty) {
+
         self.element = element
+        self.environment = environment
         
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -257,7 +268,7 @@ public final class BlueprintView: UIView {
     }
     
     private func makeEnvironment() -> Environment {
-        var environment = Environment.empty
+        var environment = self.environment
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale

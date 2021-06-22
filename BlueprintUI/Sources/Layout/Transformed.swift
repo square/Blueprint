@@ -40,7 +40,7 @@ public struct Transformed: Element {
         return ElementContent(child: wrappedElement, layout: Layout(transform: transform))
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

@@ -38,7 +38,7 @@ fileprivate struct A: Element {
         return ElementContent(intrinsicSize: .zero)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 
@@ -50,7 +50,7 @@ fileprivate struct B: Element {
         return ElementContent(intrinsicSize: .zero)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
     

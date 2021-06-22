@@ -1143,7 +1143,7 @@ class StackTests: XCTestCase {
             }
         }
 
-        func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
             return nil
         }
     }
@@ -1170,7 +1170,7 @@ fileprivate struct TestElement: Element {
         return ElementContent(intrinsicSize: size)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

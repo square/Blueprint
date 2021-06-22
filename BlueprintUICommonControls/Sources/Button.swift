@@ -21,7 +21,7 @@ public struct Button: Element {
         return ElementContent(child: wrappedElement)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return Button.NativeButton.describe { config in
             config.contentView = { $0.contentView }
             config[\.isEnabled] = isEnabled

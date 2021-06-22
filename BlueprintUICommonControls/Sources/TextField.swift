@@ -36,7 +36,7 @@ public struct TextField: Element {
         configure(&self)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return CallbackTextField.describe({ (configuration) in
             configuration[\.backgroundColor] = .clear
 
