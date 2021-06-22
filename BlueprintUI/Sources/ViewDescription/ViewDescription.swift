@@ -11,8 +11,8 @@ extension NativeView where Self: UIView {
     /// Example:
     /// ```
     /// let viewDescription = UILabel.describe { config in
-    ///     config.bind("Hello, world", to: \.text)
-    ///     config.bind(UIColor.orange, to: \.textColor)
+    ///     config[\.text] = "Hello, world"
+    ///     config[\.textColor] = UIColor.orange
     /// }
     /// ```
     /// - parameter configuring: A closure that is responsible for populating a configuration object.
@@ -21,7 +21,6 @@ extension NativeView where Self: UIView {
     public static func describe(_ configuring: (inout ViewDescription.Configuration<Self>) -> Void) -> ViewDescription {
         return ViewDescription.init(Self.self, configuring: configuring)
     }
-    
 }
 
 /// Contains a _description_ of a UIView instance. A description includes
@@ -76,8 +75,8 @@ public struct ViewDescription {
             for update in configuration.updates {
                 update(typedView)
             }
-            for binding in configuration.bindings.values {
-                binding.apply(to: typedView)
+            for binding in configuration.bindings {
+                binding.value.apply(to: typedView)
             }
         }
         
@@ -126,7 +125,7 @@ extension ViewDescription {
     /// Represents the configuration of a specific UIView type.
     public struct Configuration<View: UIView> {
 
-        fileprivate var bindings: [AnyHashable:AnyValueBinding] = [:]
+        fileprivate var bindings: [PartialKeyPath<View>:AnyValueBinding] = [:]
 
         /// A closure that is applied to the native view instance during an update cycle.
         /// - parameter view: The native view instance.
@@ -190,19 +189,17 @@ extension ViewDescription.Configuration {
     /// - If `nil` is provided, no value will be applied to the view (any previous assignment will be cleared).
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value>) -> Value? {
         get {
-            let key = AnyHashable(keyPath)
-            if let binding = bindings[key] as? ValueBinding<Value> {
+            if let binding = bindings[keyPath] as? ValueBinding<Value> {
                 return binding.value
             } else {
                 return nil
             }
         }
         set {
-            let key = AnyHashable(keyPath)
             if let value = newValue {
-                bindings[key] = ValueBinding(keyPath: keyPath, value: value)
+                bindings[keyPath] = ValueBinding(keyPath: keyPath, value: value)
             } else {
-                bindings[key] = nil
+                bindings[keyPath] = nil
             }
         }
     }
@@ -220,39 +217,36 @@ extension ViewDescription.Configuration {
     ///   be called on the next update.
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value?>) -> Value? {
         get {
-            let key = AnyHashable(keyPath)
-            if let binding = bindings[key] as? ValueBinding<Value> {
+            if let binding = bindings[keyPath] as? ValueBinding<Value> {
                 return binding.value
             } else {
                 return nil
             }
         }
         set {
-            let key = AnyHashable(keyPath)
-            bindings[key] = ValueBinding(keyPath: keyPath, value: newValue)
+            bindings[keyPath] = ValueBinding(keyPath: keyPath, value: newValue)
         }
     }
     
 }
 
+
+fileprivate protocol AnyValueBinding {
+    
+    func apply(to view: UIView)
+}
+
+
 extension ViewDescription.Configuration {
+    
+    fileprivate struct ValueBinding<Value> : AnyValueBinding {
+        
+        let keyPath: ReferenceWritableKeyPath<View, Value>
+        let value: Value
 
-    fileprivate class AnyValueBinding {
-        func apply(to view: View) { fatalError() }
-    }
-
-    fileprivate final class ValueBinding<Value>: AnyValueBinding {
-        var value: Value
-        var keyPath: ReferenceWritableKeyPath<View, Value>
-
-        init(keyPath: ReferenceWritableKeyPath<View, Value>, value: Value) {
-            self.value = value
-            self.keyPath = keyPath
-        }
-
-        override func apply(to view: View) {
+        func apply(to anyView: UIView) {
+            let view = anyView as! View
             view[keyPath: keyPath] = value
         }
     }
-
 }
