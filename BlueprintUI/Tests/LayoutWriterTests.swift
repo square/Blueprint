@@ -106,7 +106,7 @@ fileprivate struct TestElement : Element {
         ElementContent { $0.maximum }
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { _ in }
     }
     

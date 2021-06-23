@@ -3,7 +3,7 @@
 ```swift
 public protocol Element {
     var content: ElementContent { get }
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
 }
 ```
 
@@ -19,7 +19,7 @@ struct BlueSquare: Element {
         return ElementContent(intrinsicSize: CGSize(width: 90.0, height: 90.0))
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { config in
             config[\.backgroundColor] = .blue
         }
@@ -31,26 +31,29 @@ struct BlueSquare: Element {
 
 ---
 
-## `backingViewDescription(bounds:subtreeExtent:)`
+## `backingViewDescription(in context:)`
 
 If the element is view-backed, it should return a view description from this method.
 
-This method is called after layout is complete, and the passed in parameters provide information about the layout:
+This method is called after layout is complete, and the passed in context provides information about the layout:
 
-*`bounds`*
+*`context.bounds`*
 Contains the extent of the element after the layout is calculated *in the element's local coordinate space*.
 
-*`subtreeExtent`*
+*`context.subtreeExtent`*
 A rectangle, given within the element's local coordinate space, that completely contains all of the element's children. `nil` will be provided if the element has no children.
 
 Most view-backed elements will not need to care about the bounds or subtree extent, but they are provided for the rare cases when they are needed.
+
+*`context.environment`*
+The Environment the element is rendered with.
 
 ```swift
 struct MyElement: Element {
 
     // ...
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIImageView.describe { config in
             config[\.image] = UIImage(named: "cat")
             config[\.contentMode] = .scaleAspectFill

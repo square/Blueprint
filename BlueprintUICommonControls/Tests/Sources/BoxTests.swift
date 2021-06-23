@@ -106,7 +106,7 @@ private struct InsettingElement: Element {
 
     var box: Box = Box()
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

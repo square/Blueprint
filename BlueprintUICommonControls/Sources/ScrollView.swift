@@ -49,16 +49,16 @@ public struct ScrollView: Element {
         return ElementContent(child: wrappedElement, layout: layout)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return ScrollerWrapperView.describe { config in
             config.builder = {
-                ScrollerWrapperView(frame: bounds, representedElement: self)
+                ScrollerWrapperView(frame: context.bounds, representedElement: self)
             }
             
             config.contentView = { $0.scrollView }
             
             config.apply {
-                $0.apply(scrollView: self, contentFrame: subtreeExtent ?? .zero)
+                $0.apply(scrollView: self, contentFrame: context.subtreeExtent ?? .zero)
             }
         }
     }

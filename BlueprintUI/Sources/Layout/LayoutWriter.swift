@@ -55,7 +55,7 @@ public struct LayoutWriter : Element {
         }
     }
     
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
 }
@@ -208,7 +208,7 @@ extension LayoutWriter {
             }
         }
         
-        func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
             nil
         }
         

@@ -28,7 +28,13 @@ final class UserInteractionEnabledTests: XCTestCase {
 
     // MARK: - helpers -
     func view(from element: UserInteractionEnabled) throws -> UIView {
-        let description = try XCTUnwrap(element.backingViewDescription(bounds: .zero, subtreeExtent: nil))
+        let description = try XCTUnwrap(element.backingViewDescription(
+            with: .init(
+                bounds: .zero,
+                subtreeExtent: nil,
+                environment: .empty
+            )
+        ))
         let view = UIView()
         view.isUserInteractionEnabled = !element.isEnabled
         description.apply(to: view)

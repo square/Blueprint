@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The signature of `Element.backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?` has changed to `backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?` (https://github.com/square/Blueprint/pull/231). This is a large breaking change, but is worth it as it allows us to pass additional context to `backingViewDescription` in the future in a non-breaking way. The `ViewDescriptionContext` contains the `bounds` and `subtreeExtent`, as well as the `Environment` the element is rendered in.
+
 ### Deprecated
 
 ### Security

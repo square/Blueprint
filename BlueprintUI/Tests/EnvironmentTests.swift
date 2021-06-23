@@ -79,6 +79,67 @@ class EnvironmentTests: XCTestCase {
         XCTAssertEqual(view.testValue, testValue)
     }
 
+    func test_viewBackedAdapted() {
+        let rightElement = AdaptedEnvironment(
+            key: TestKey.self,
+            value: .right,
+            wrapping: TestViewBackedElement())
+
+        let rightLayoutResultNode = rightElement.layout(frame: .zero)
+        let rightViewDescription = leafViewDescription(
+            in: NativeViewNode(
+                content: UIView.describe { _ in },
+                layoutAttributes: LayoutAttributes(frame: .zero),
+                children: rightLayoutResultNode.resolve()))
+
+        let view = TestView()
+
+        rightViewDescription.apply(to: view)
+
+        XCTAssertEqual(view.testValue, .right)
+
+        // Ensure updating the environment works
+
+        let wrongElement = AdaptedEnvironment(
+            key: TestKey.self,
+            value: .wrong,
+            wrapping: TestViewBackedElement())
+
+        let wrongLayoutResultNode = wrongElement.layout(frame: .zero)
+        let wrongViewDescription = leafViewDescription(
+            in: NativeViewNode(
+                content: UIView.describe { _ in },
+                layoutAttributes: LayoutAttributes(frame: .zero),
+                children: wrongLayoutResultNode.resolve()))
+
+        wrongViewDescription.apply(to: view)
+
+        XCTAssertEqual(view.testValue, .wrong)
+    }
+
+    func test_viewBackedNestedAdapter() {
+        let testValue = TestValue.right
+        let element = AdaptedEnvironment(
+            key: TestKey.self,
+            value: .wrong,
+            wrapping: AdaptedEnvironment(
+                key: TestKey.self,
+                value: testValue,
+                wrapping: TestViewBackedElement()))
+
+        let view = TestView()
+        let layoutResultNode = element.layout(frame: .zero)
+        let viewDescription = leafViewDescription(
+            in: NativeViewNode(
+                content: UIView.describe { _ in },
+                layoutAttributes: LayoutAttributes(frame: .zero),
+                children: layoutResultNode.resolve()))
+
+        viewDescription.apply(to: view)
+
+        XCTAssertEqual(view.testValue, testValue)
+    }
+
     func leafAttributes(in node: LayoutResultNode) -> LayoutAttributes {
         if let childNode = node.children.first?.node {
             return leafAttributes(in: childNode)
@@ -127,9 +188,21 @@ private struct TestElement: Element {
         }
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return TestView.describe { config in
             config[\.testValue] = self.value
+        }
+    }
+}
+
+private class TestViewBackedElement: Element {
+    var content: ElementContent {
+        ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        return TestView.describe { config in
+            config[\.testValue] = context.environment[TestKey.self]
         }
     }
 }

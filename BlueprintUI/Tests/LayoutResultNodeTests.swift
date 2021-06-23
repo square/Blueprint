@@ -37,7 +37,7 @@ fileprivate struct AbstractElement: Element {
         self.wrappedElement = wrappedElement
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 
@@ -59,7 +59,7 @@ fileprivate struct AbstractElement: Element {
 
 fileprivate struct ConcreteElement: Element {
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { _ in }
     }
 
