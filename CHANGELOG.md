@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The signature of `Element.backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?` has changed to `backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?` (https://github.com/square/Blueprint/pull/231). This is a large breaking change, but is worth it as it allows us to pass additional context to `backingViewDescription` in the future in a non-breaking way. The `ViewDescriptionContext` contains the `bounds` and `subtreeExtent`, as well as the `Environment` the element is rendered in.
-
 ### Deprecated
 
 ### Security
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.27.0] - 2021-06-22
+
+### Changed
+
+- The signature of `Element.backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?` has changed to `backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?` (https://github.com/square/Blueprint/pull/231). This is a large breaking change, but is worth it as it allows us to pass additional context to `backingViewDescription` in the future in a non-breaking way. The `ViewDescriptionContext` contains the `bounds` and `subtreeExtent`, as well as the `Environment` the element is rendered in.
 
 ## [0.26.0] - 2021-06-02
 
@@ -571,7 +575,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.26.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.27.0...HEAD
+[0.27.0]: https://github.com/square/Blueprint/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/square/Blueprint/compare/0.25.0...0.26.0
 [0.25.0]: https://github.com/square/Blueprint/compare/0.24.0...0.25.0
 [0.24.0]: https://github.com/square/Blueprint/compare/0.23.0...0.24.0
