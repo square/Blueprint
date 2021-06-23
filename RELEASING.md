@@ -15,7 +15,7 @@
 
 1. Create a branch off `main` to update the version numbers and `Podfile.lock`. An example name would be `your-username/release-0.1.0`.
 
-1. Update the library version in both `BlueprintUI.podspec` and `BlueprintUICommonControls.podspec` if it has not already been updated (it should match the version number that you are about to release).
+1. Update the library version in `version.rb` if it has not already been updated (it should match the version number that you are about to release).
 
 1. Update `CHANGELOG.md` (in the root of the repo), moving current changes under `Main` to a new section under `Past Releases` for the version you are releasing.
   
