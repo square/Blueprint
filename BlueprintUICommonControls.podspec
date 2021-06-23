@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
 
   s.source_files = 'BlueprintUICommonControls/Sources/**/*.swift'
 
-  s.dependency 'BlueprintUI'
+  s.dependency 'BlueprintUI', BLUEPRINT_VERSION
 end
