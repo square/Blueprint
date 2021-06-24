@@ -451,8 +451,6 @@ extension BlueprintView {
                 }
             }
             
-            // TODO: Need to traverse the hierarchy to send these as well.
-            
             for controller in oldChildren.values {
                 if let transition = controller.viewDescription.disappearingTransition {
                     transition.performDisappearing(
