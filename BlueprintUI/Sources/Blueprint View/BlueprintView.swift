@@ -321,8 +321,7 @@ extension BlueprintView {
                 
                 self.coordinateSpaceController?.tracking = tracking
                 
-                self.coordinateSpaceController?.startTrackingIfNeeded()
-                
+                //self.coordinateSpaceController?.startTrackingIfNeeded()
             } else {
                 self.coordinateSpaceController?.stopTrackingIfNeeded()
                 self.coordinateSpaceController = nil
@@ -400,6 +399,7 @@ extension BlueprintView {
                     } else {
                         layoutTransition = .inherited
                     }
+                    
                     layoutTransition.perform {
                         child.layoutAttributes.apply(to: controller.view)
 
@@ -411,12 +411,14 @@ extension BlueprintView {
                         }
 
                         controller.update(node: child, appearanceTransitionsEnabled: true)
+                        
+                        self.coordinateSpaceController?.sendOnChangeIfNeeded()
                     }
                 } else {
                     var controller: NativeViewController!
 
                     // Building the view and applying the initial layout and update need to be wrapped in
-                    // performWithoutAnimation so they're not caught up inside an occuring transition.
+                    // performWithoutAnimation so they're not caught up inside an occurring transition.
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
                         child.layoutAttributes.apply(to: controller.view)
@@ -429,17 +431,30 @@ extension BlueprintView {
                     newChildren.append((path: path, node: controller))
 
                     if appearanceTransitionsEnabled {
-                        child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
+                        child.viewDescription.appearingTransition?.performAppearing(
+                            view: controller.view,
+                            layoutAttributes: child.layoutAttributes,
+                            additional: { self.coordinateSpaceController?.startTrackingIfNeeded() },
+                            completion: {}
+                        )
+                    } else {
+                        self.coordinateSpaceController?.startTrackingIfNeeded()
                     }
                 }
             }
             
             for controller in oldChildren.values {
                 if let transition = controller.viewDescription.disappearingTransition {
-                    transition.performDisappearing(view: controller.view, layoutAttributes: controller.layoutAttributes, completion: {
-                        controller.view.removeFromSuperview()
-                    })
+                    transition.performDisappearing(
+                        view: controller.view,
+                        layoutAttributes: controller.layoutAttributes,
+                        additional: { self.coordinateSpaceController?.stopTrackingIfNeeded() },
+                        completion: {
+                            controller.view.removeFromSuperview()
+                        }
+                    )
                 } else {
+                    self.coordinateSpaceController?.stopTrackingIfNeeded()
                     controller.view.removeFromSuperview()
                 }
             }

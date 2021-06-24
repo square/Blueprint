@@ -45,26 +45,38 @@ public struct VisibilityTransition {
 
 extension VisibilityTransition {
 
-    func performAppearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping ()->Void) {
-
+    func performAppearing(
+        view: UIView,
+        layoutAttributes: LayoutAttributes,
+        additional : @escaping () -> (),
+        completion: @escaping ()->Void
+    ) {
         UIView.performWithoutAnimation {
             self.getInvisibleAttributesFor(layoutAttributes: layoutAttributes).apply(to: view)
         }
 
         attributes.perform(
-            animations: { layoutAttributes.apply(to: view) },
-            completion: completion)
-
-
+            animations: {
+                layoutAttributes.apply(to: view)
+                additional()
+            },
+            completion: completion
+        )
     }
 
-    func performDisappearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping ()->Void) {
-
+    func performDisappearing(
+        view: UIView,
+        layoutAttributes: LayoutAttributes,
+        additional : @escaping () -> (),
+        completion: @escaping ()->Void
+    ) {
         attributes.perform(
             animations: {
                 self.getInvisibleAttributesFor(layoutAttributes: layoutAttributes).apply(to: view)
+                additional()
             },
-            completion: completion)
+            completion: completion
+        )
 
     }
 

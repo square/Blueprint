@@ -64,6 +64,14 @@ extension BlueprintView.NativeViewController {
             self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking.onAppear)
         }
         
+        func sendOnChangeIfNeeded() {
+            guard case .tracking = self.state else {
+                return
+            }
+            
+            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking.onChange)
+        }
+        
         func stopTrackingIfNeeded() {
             guard case let .tracking(tracking) = self.state else {
                 return
@@ -78,7 +86,7 @@ extension BlueprintView.NativeViewController {
         
         private var lastCoordinateSpaceFrame : CGRect? = nil
         
-        func sendOnCoordinateSpaceChangedIfNeeded(to callback : CoordinateSpaceTracking.Callback) {
+        private func sendOnCoordinateSpaceChangedIfNeeded(to callback : CoordinateSpaceTracking.Callback) {
             
             guard
                 case .tracking = self.state,
@@ -129,7 +137,7 @@ extension BlueprintView.NativeViewController {
         }
         
         @objc private func onDisplayLinkFired() {
-            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking.onChange)
+            self.sendOnChangeIfNeeded()
         }
     }
 }
