@@ -309,7 +309,7 @@ extension BlueprintView {
         
         func updateCoordinateSpaceController(in view : BlueprintView) {
             
-            if let tracking = self.viewDescription.trackPosition
+            if let tracking = self.viewDescription.trackPosition, tracking.isActive
             {
                 if self.coordinateSpaceController == nil {
                     self.coordinateSpaceController = .init(
@@ -318,11 +318,12 @@ extension BlueprintView {
                     )
                 }
                 
-                self.coordinateSpaceController?.apply(tracking)
-                self.coordinateSpaceController?.sendOnCoordinateSpaceChangedIfNeeded()
+                self.coordinateSpaceController?.tracking = tracking
+                
+                self.coordinateSpaceController?.startTrackingIfNeeded()
                 
             } else {
-                self.coordinateSpaceController?.stop()
+                self.coordinateSpaceController?.stopTrackingIfNeeded()
                 self.coordinateSpaceController = nil
             }
                         

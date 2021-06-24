@@ -49,8 +49,9 @@ public struct CoordinateSpaceReader : Element {
     /// The wrapped element.
     public var wrapping : Element
     
-    /// Called when the coordinate space changes.
-    public var onChange : (CoordinateSpaceTracking.Context) -> ()
+    public var onAppear : CoordinateSpaceTracking.Callback
+    public var onChange : CoordinateSpaceTracking.Callback
+    public var onDisappear : CoordinateSpaceTracking.DisappearCallback
     
     // MARK: Initialization
     
@@ -58,11 +59,16 @@ public struct CoordinateSpaceReader : Element {
     public init(
         isActive : Bool,
         wrapping : Element,
-        onChange : @escaping (CoordinateSpaceTracking.Context) -> ()
+        onAppear : @escaping CoordinateSpaceTracking.Callback,
+        onChange : @escaping CoordinateSpaceTracking.Callback,
+        onDisappear : @escaping CoordinateSpaceTracking.DisappearCallback
     ) {
         self.isActive = true
         self.wrapping = wrapping
+        
+        self.onAppear = onAppear
         self.onChange = onChange
+        self.onDisappear = onDisappear
     }
     
     // MARK: Element
@@ -75,7 +81,9 @@ public struct CoordinateSpaceReader : Element {
         TouchPassthroughView.describe { config in
             config.trackPosition = .init(
                 isActive: self.isActive,
-                onChange: self.onChange
+                onAppear: self.onAppear,
+                onChange: self.onChange,
+                onDisappear: self.onDisappear
             )
         }
     }
@@ -117,13 +125,17 @@ extension Element {
     /// ```
     public func readCoordinateSpace(
         isActive : Bool,
-        onChange : @escaping CoordinateSpaceTracking.Callback
+        onAppear : @escaping CoordinateSpaceTracking.Callback,
+        onChange : @escaping CoordinateSpaceTracking.Callback,
+        onDisappear : @escaping CoordinateSpaceTracking.DisappearCallback
     ) -> CoordinateSpaceReader
     {
         .init(
             isActive: isActive,
             wrapping: self,
-            onChange: onChange
+            onAppear: onAppear,
+            onChange: onChange,
+            onDisappear: onDisappear
         )
     }
 }

@@ -23,7 +23,7 @@ extension BlueprintView.NativeViewController {
         let view : UIView
         private(set) weak var blueprintView : BlueprintView?
         
-        private(set) var tracking : CoordinateSpaceTracking?
+        var tracking : CoordinateSpaceTracking?
         
         init(
             with view : UIView,
@@ -34,37 +34,55 @@ extension BlueprintView.NativeViewController {
         }
         
         deinit {
-            self.displayLink?.invalidate()
+            self.stopTrackingIfNeeded()
         }
         
-        func stop() {
-            self.displayLink?.invalidate()
-            self.displayLink = nil
+        private var state : State = .created
+        
+        private enum State {
+            case created
+            case tracking(Tracking)
+            case complete
+            
+            struct Tracking {
+                let displayLink : CADisplayLink
+            }
         }
         
-        private var displayLink : CADisplayLink?
-        
-        func apply(_ tracking : CoordinateSpaceTracking) {
-            
-            self.tracking = tracking
-            
-            if self.displayLink == nil {
-                let link = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
-                link.isPaused = true
-                link.add(to: .current, forMode: .common)
-                
-                self.displayLink = link
+        func startTrackingIfNeeded() {
+            guard case .created = self.state else {
+                return
             }
             
-            self.displayLink?.isPaused = tracking.isActive
+            let link = CADisplayLink(target: self, selector: #selector(onDisplayLinkFired))
+            link.add(to: .current, forMode: .common)
             
+            self.state = .tracking(.init(displayLink: link))
+            
+            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking?.onAppear)
+        }
+        
+        func stopTrackingIfNeeded() {
+            guard case let .tracking(tracking) = self.state else {
+                return
+            }
+            
+            tracking.displayLink.invalidate()
+            
+            self.tracking?.onDisappear()
+            
+            self.state = .complete
         }
         
         private var lastCoordinateSpaceFrame : CGRect? = nil
         
-        func sendOnCoordinateSpaceChangedIfNeeded() {
+        func sendOnCoordinateSpaceChangedIfNeeded(to callback : CoordinateSpaceTracking.Callback?) {
             
-            guard let tracking = self.tracking else {
+            guard case .tracking = self.state else {
+                return
+            }
+            
+            guard let callback = callback else {
                 return
             }
             
@@ -79,17 +97,17 @@ extension BlueprintView.NativeViewController {
             let frame = self.view.convert(view.bounds, to: parent)
             
             if self.lastCoordinateSpaceFrame != frame {
-                
+                                
                 self.lastCoordinateSpaceFrame = frame
                 
-                tracking.onChange(
-                    .init(
-                        element: view.coordinateSpace,
-                        blueprintView: blueprintView.coordinateSpace,
-                        top: parent.coordinateSpace,
-                        window: view.window?.coordinateSpace
-                    )
+                let context = CoordinateSpaceTracking.Context(
+                    element: view.coordinateSpace,
+                    blueprintView: blueprintView.coordinateSpace,
+                    top: parent.coordinateSpace,
+                    window: view.window?.coordinateSpace
                 )
+                
+                callback(context)
             }
         }
         
@@ -116,7 +134,7 @@ extension BlueprintView.NativeViewController {
         }
         
         @objc private func onDisplayLinkFired() {
-            self.sendOnCoordinateSpaceChangedIfNeeded()
+            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking?.onChange)
         }
     }
 }

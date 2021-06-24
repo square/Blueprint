@@ -14,16 +14,22 @@ public struct CoordinateSpaceTracking {
     /// Useful if you'd like to conditionally based on some internal state like showing a tutorial or popover.
     public var isActive : Bool
     
-    /// Called when the position of the element changes on screen.
+    public var onAppear : Callback
     public var onChange : Callback
+    public var onDisappear : DisappearCallback
     
     /// Creates a new `CoordinateSpace` instance to track the displayed view.
     public init(
         isActive: Bool,
-        onChange: @escaping Callback
+        onAppear : @escaping Callback,
+        onChange: @escaping Callback,
+        onDisappear : @escaping DisappearCallback
     ) {
         self.isActive = isActive
+        
+        self.onAppear = onAppear
         self.onChange = onChange
+        self.onDisappear = onDisappear
     }
 }
 
@@ -34,8 +40,11 @@ extension CoordinateSpaceTracking {
     /// then position of the element changes.
     public typealias Callback = (Context) -> ()
     
+    public typealias DisappearCallback = () -> ()
+    
     /// Info passed to the listeners of an element's coordinate space.
     public struct Context {
+        
         /// The coordinate space of the element.
         public var element : UICoordinateSpace
         

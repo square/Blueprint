@@ -27,9 +27,16 @@ final class RootViewController : UIViewController
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             })
-            .readCoordinateSpace(isActive: true) { context in
-                print(context.element.convert(context.element.bounds, to: context.top))
-            },
+            .readCoordinateSpace(
+                isActive: true,
+                onAppear: { context in
+                    print("Appear: \(context.element.convert(context.element.bounds, to: context.top))")
+                }, onChange: { context in
+                    print("Change: \(context.element.convert(context.element.bounds, to: context.top))")
+                }, onDisappear: {
+                    print("Disappear")
+                }
+            )
         ]
     }
     
