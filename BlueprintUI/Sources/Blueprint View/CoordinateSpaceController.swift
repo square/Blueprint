@@ -20,15 +20,17 @@ extension BlueprintView.NativeViewController {
     ///
     final class CoordinateSpaceController {
         
-        let view : UIView
+        private(set) weak var view : UIView?
         private(set) weak var blueprintView : BlueprintView?
         
-        var tracking : CoordinateSpaceTracking?
+        var tracking : CoordinateSpaceTracking
         
         init(
-            with view : UIView,
+            tracking : CoordinateSpaceTracking,
+            view : UIView,
             in blueprintView : BlueprintView
         ) {
+            self.tracking = tracking
             self.view = view
             self.blueprintView = blueprintView
         }
@@ -59,7 +61,7 @@ extension BlueprintView.NativeViewController {
             
             self.state = .tracking(.init(displayLink: link))
             
-            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking?.onAppear)
+            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking.onAppear)
         }
         
         func stopTrackingIfNeeded() {
@@ -69,45 +71,38 @@ extension BlueprintView.NativeViewController {
             
             tracking.displayLink.invalidate()
             
-            self.tracking?.onDisappear()
+            self.tracking.onDisappear()
             
             self.state = .complete
         }
         
         private var lastCoordinateSpaceFrame : CGRect? = nil
         
-        func sendOnCoordinateSpaceChangedIfNeeded(to callback : CoordinateSpaceTracking.Callback?) {
+        func sendOnCoordinateSpaceChangedIfNeeded(to callback : CoordinateSpaceTracking.Callback) {
             
-            guard case .tracking = self.state else {
+            guard
+                case .tracking = self.state,
+                
+                let view = self.view,
+                let blueprintView = self.blueprintView,
+                
+                let parent = self.findHighestParent(for: view)
+            else {
                 return
             }
             
-            guard let callback = callback else {
-                return
-            }
-            
-            guard let blueprintView = self.blueprintView else {
-                return
-            }
-            
-            guard let parent = self.findHighestParent(for: self.view) else {
-                return
-            }
-            
-            let frame = self.view.convert(view.bounds, to: parent)
+            let frame = view.convert(view.bounds, to: parent)
             
             if self.lastCoordinateSpaceFrame != frame {
                                 
                 self.lastCoordinateSpaceFrame = frame
-                
-                let context = CoordinateSpaceTracking.Context(
+                                
+                callback(.init(
                     element: view.coordinateSpace,
                     blueprintView: blueprintView.coordinateSpace,
                     top: parent.coordinateSpace,
                     window: view.window?.coordinateSpace
-                )
-                
-                callback(context)
+                ))
             }
         }
         
@@ -134,7 +129,7 @@ extension BlueprintView.NativeViewController {
         }
         
         @objc private func onDisplayLinkFired() {
-            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking?.onChange)
+            self.sendOnCoordinateSpaceChangedIfNeeded(to: self.tracking.onChange)
         }
     }
 }

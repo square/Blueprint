@@ -313,7 +313,8 @@ extension BlueprintView {
             {
                 if self.coordinateSpaceController == nil {
                     self.coordinateSpaceController = .init(
-                        with: self.view,
+                        tracking: tracking,
+                        view: self.view,
                         in: view
                     )
                 }
