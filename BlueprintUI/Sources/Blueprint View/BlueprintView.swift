@@ -331,6 +331,14 @@ extension BlueprintView {
                 child.updateCoordinateSpaceController(in: view)
             }
         }
+        
+        func stopCoordinateSpaceTracking() {
+            self.coordinateSpaceController?.stopTrackingIfNeeded()
+            
+            for (_, child) in self.children {
+                child.stopCoordinateSpaceTracking()
+            }
+        }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
             return node.viewDescription.viewType == type(of: view)
@@ -443,18 +451,20 @@ extension BlueprintView {
                 }
             }
             
+            // TODO: Need to traverse the hierarchy to send these as well.
+            
             for controller in oldChildren.values {
                 if let transition = controller.viewDescription.disappearingTransition {
                     transition.performDisappearing(
                         view: controller.view,
                         layoutAttributes: controller.layoutAttributes,
-                        additional: { self.coordinateSpaceController?.stopTrackingIfNeeded() },
+                        additional: { self.stopCoordinateSpaceTracking() },
                         completion: {
                             controller.view.removeFromSuperview()
                         }
                     )
                 } else {
-                    self.coordinateSpaceController?.stopTrackingIfNeeded()
+                    self.stopCoordinateSpaceTracking()
                     controller.view.removeFromSuperview()
                 }
             }
