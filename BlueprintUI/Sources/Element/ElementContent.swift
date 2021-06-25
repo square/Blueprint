@@ -218,7 +218,6 @@ fileprivate protocol ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
-        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize
 
@@ -268,7 +267,6 @@ extension ElementContent {
             in constraint: SizeConstraint,
             environment: Environment,
             cache: CacheTree,
-            identifier: ElementIdentifier,
             states : ElementStateTree
         ) -> CGSize {
             return cache.get(constraint) { (constraint) -> CGSize in
@@ -428,13 +426,13 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
-        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize
     {
         cache.get(constraint) { (constraint) -> CGSize in
             let environment = adapted(environment: environment)
-            let childState = states.state(for: child, with: identifier) // TODO where do I get this?
+            // TODO is this the right key?
+            let childState = states.state(for: child, with: ElementIdentifier(elementType: type(of: self.child), key: nil, count: 1))
 
             return child.content.measure(
                 in: constraint,
@@ -492,12 +490,11 @@ private struct LazyStorage: ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
-        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize {
         cache.get(constraint) { (constraint) -> CGSize in
             let child = buildChild(in: constraint, environment: environment)
-            let childState = states.state(for: child, with: identifier)
+            let childState = states.state(for: child, with: ElementIdentifier(elementType: type(of: child), key: nil, count: 1))
             
             return child.content.measure(
                 in: constraint,
