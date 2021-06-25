@@ -35,6 +35,8 @@ public final class BlueprintView: UIView {
     private var isInsideUpdate: Bool = false
 
     private let rootController: NativeViewController
+    
+    private let rootStates : ElementStateTree
 
     /// A base environment to render elements with.
     /// Some keys may be overriden based on the traits of the view itself.
@@ -79,7 +81,11 @@ public final class BlueprintView: UIView {
             node: NativeViewNode(
                 content: UIView.describe() { _ in },
                 layoutAttributes: LayoutAttributes(),
-                children: []))
+                children: []
+            )
+        )
+        
+        rootStates = ElementStateTree()
     
         super.init(frame: CGRect.zero)
         
@@ -138,7 +144,8 @@ public final class BlueprintView: UIView {
         return element.content.measure(
             in: measurementConstraint(with: size),
             environment: self.makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))"),
+            states: ElementStateTree()
         )
     }
 
@@ -165,7 +172,8 @@ public final class BlueprintView: UIView {
         return element.content.measure(
             in: constraint,
             environment: self.makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))"),
+            states: ElementStateTree()
         )
     }
 
@@ -219,7 +227,7 @@ public final class BlueprintView: UIView {
 
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
+            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment(), states: self.rootStates)
             .resolve() ?? []
         
         let measurementEndDate = Date()

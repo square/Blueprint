@@ -8,16 +8,40 @@
 import Foundation
 
 
-final class ElementStateTree {
+public final class ElementStateTree {
     
-    var states : [ElementIdentifier:ElementState] = [:]
+    private var states : [ElementIdentifier:ElementState] = [:]
     
-    func state(for identifier : ElementIdentifier) -> ElementState {
-        fatalError()
+    func state(for element : Element, with identifier : ElementIdentifier) -> ElementState {
+        if let existing = self.states[identifier] {
+            return existing
+        } else {
+            let new = ElementState(element: element)
+            new.setup()
+            
+            self.states[identifier] = new
+            return new
+        }
     }
     
-    func state(for path : ElementPath) -> ElementState {
-        fatalError()
+    func removedOldStates(keeping liveIdentifiers : Set<ElementIdentifier>) {
+        
+        let removed = Set(self.states.keys).subtracting(liveIdentifiers)
+        
+        removed.forEach {
+            let state = self.states[$0]
+            
+            // Ensures that all of the child states which are going away are removed as well.
+            state?.children.removeAll()
+            
+            state?.teardown()
+            
+            self.states.removeValue(forKey: $0)
+        }
+    }
+    
+    func removeAll() {
+        self.removedOldStates(keeping: [])
     }
 }
 
@@ -26,9 +50,20 @@ extension ElementStateTree {
     
     final class ElementState {
         
-        var state : Any
+        var state : Any? = nil
         
-        var children : ElementStateTree
+        var children : ElementStateTree = .init()
         
+        init(element : Element) {
+            
+        }
+        
+        func setup() {
+            
+        }
+        
+        func teardown() {
+            
+        }
     }
 }

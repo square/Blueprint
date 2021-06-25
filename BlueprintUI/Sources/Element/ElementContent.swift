@@ -44,7 +44,9 @@ public struct ElementContent {
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent"),
-            
+            // TODO: This should not pass an empty tree all the time,
+            // eg when we're measuring a non-top-level element. Figure out how to do that somehow.
+            states: ElementStateTree()
         )
     }
 
@@ -216,6 +218,7 @@ fileprivate protocol ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
+        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize
 
@@ -265,6 +268,7 @@ extension ElementContent {
             in constraint: SizeConstraint,
             environment: Environment,
             cache: CacheTree,
+            identifier: ElementIdentifier,
             states : ElementStateTree
         ) -> CGSize {
             return cache.get(constraint) { (constraint) -> CGSize in
@@ -275,7 +279,8 @@ extension ElementContent {
                 )
                 defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-                let layoutItems = self.layoutItems(in: environment, cache: cache)
+                let layoutItems = self.layoutItems(in: environment, cache: cache, states: states)
+                
                 return layout.measure(in: constraint, items: layoutItems)
             }
         }
@@ -290,7 +295,7 @@ extension ElementContent {
                 return []
             }
             
-            let layoutItems = self.layoutItems(in: environment, cache: cache)
+            let layoutItems = self.layoutItems(in: environment, cache: cache, states: states)
             let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
@@ -306,6 +311,13 @@ extension ElementContent {
                     of: children.count,
                     element: currentChild.element
                 )
+                
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: currentChild.element),
+                    key: currentChild.key
+                )
+                
+                let childState = states.state(for: currentChild.element, with: identifier)
 
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
@@ -314,13 +326,9 @@ extension ElementContent {
                     children: currentChild.content.performLayout(
                         attributes: currentChildLayoutAttributes,
                         environment: environment,
-                        cache: currentChildCache
+                        cache: currentChildCache,
+                        states: childState.children
                     )
-                )
-
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
-                    key: currentChild.key
                 )
 
                 result.append((identifier: identifier, node: resultNode))
@@ -331,8 +339,11 @@ extension ElementContent {
 
         private func layoutItems(
             in environment: Environment,
-            cache: CacheTree
+            cache: CacheTree,
+            states: ElementStateTree
         ) -> [(LayoutType.Traits, Measurable)] {
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+
             return children.enumerated().map { index, child in
                 let childContent = child.content
                 let childCache = cache.subcache(
@@ -340,11 +351,20 @@ extension ElementContent {
                     of: children.count,
                     element: child.element
                 )
+                
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: child.element),
+                    key: child.key
+                )
+                
+                let childState = states.state(for: child.element, with: identifier)
+                                
                 let measurable = Measurer { (constraint) -> CGSize in
                     childContent.measure(
                         in: constraint,
                         environment: environment,
-                        cache: childCache
+                        cache: childCache,
+                        states: childState.children
                     )
                 }
 
@@ -387,6 +407,8 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
+        let childState = states.state(for: child, with: identifier)
+        
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
@@ -394,7 +416,8 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: childState.children
             )
         )
 
@@ -405,15 +428,19 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
+        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize
     {
         cache.get(constraint) { (constraint) -> CGSize in
             let environment = adapted(environment: environment)
+            let childState = states.state(for: child, with: identifier) // TODO where do I get this?
+
             return child.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: childState.children
             )
         }
     }
@@ -444,6 +471,8 @@ private struct LazyStorage: ContentStorage {
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
+        let childState = states.state(for: child, with: identifier)
+        
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
@@ -451,7 +480,8 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: childState.children
             )
         )
 
@@ -462,14 +492,18 @@ private struct LazyStorage: ContentStorage {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
+        identifier: ElementIdentifier,
         states : ElementStateTree
     ) -> CGSize {
         cache.get(constraint) { (constraint) -> CGSize in
             let child = buildChild(in: constraint, environment: environment)
+            let childState = states.state(for: child, with: identifier)
+            
             return child.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: childState.children
             )
         }
     }
