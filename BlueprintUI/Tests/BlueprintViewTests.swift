@@ -239,6 +239,131 @@ class BlueprintViewTests: XCTestCase {
 
         XCTAssertEqual(value, .right)
     }
+    
+    func test_inheritedEnvironment_propagation() {
+        
+        /// This test sets up a nested element structure which contains nested Blueprint views;
+        /// which have their own element hierarchies that they manage. By setting up this
+        /// configuration, we check to see if `Environment` propagation works properly
+        /// through multiple layers of nested blueprint views and environment customization.
+        ///
+        /// The final view and element structure we will have is:
+        ///
+        /// ```
+        /// BlueprintView()
+        ///     AdaptedEnvironment("root element")
+        ///         TestElement(view: nil)
+        ///             TestElement(view: view1)
+        ///                 ViewWrappingBlueprintView()
+        ///                     ---- End of Managed Blueprint Views ----
+        ///
+        ///                      BlueprintView()
+        ///                          EnvironmentReader()
+        ///                             AdaptedEnvironment("inner blueprint view")
+        ///                                 TestElement(view: view2)
+        ///                                     ViewWrappingBlueprintView()
+        ///                                         ---- End of Managed Blueprint Views ----
+        ///
+        ///                                         BlueprintView()
+        ///                                             EnvironmentReader()
+        ///                                                 Empty()
+        /// ```
+        
+        let view = BlueprintView()
+        
+        var readEnvironment1 : Environment = .empty
+        var readEnvironment2 : Environment = .empty
+        
+        let view1 = ViewWrappingBlueprintView(frame: .zero)
+        let view2 = ViewWrappingBlueprintView(frame: .zero)
+        
+        view1.blueprintView.element = EnvironmentReader { env in
+            readEnvironment1 = env
+            
+            return TestElement(
+                view: { view2 },
+                child: nil
+            )
+            .adaptedEnvironment(key: InnerBlueprintViewKey.self, value: "inner blueprint view")
+        }
+        
+        view2.blueprintView.element = EnvironmentReader { env in
+            readEnvironment2 = env
+            
+            return Empty()
+        }
+
+        view.environment[ViewKey.self] = "view level environment"
+        
+        view.element = TestElement(
+            view: nil,
+            child: TestElement(
+                view: { view1 },
+                child: nil
+            )
+        )
+        .adaptedEnvironment(key: RootElementKey.self, value: "root element")
+        
+        /// Force a layout of the element in the outer view.
+        view.layoutIfNeeded()
+        
+        /// Now we can verify that the environment was propagated correctly.
+        /// We will check both the `inheritedEnvironment` and an environment read
+        /// off of an `EnvironmentReader` to ensure end to end consistency.
+        
+        XCTAssertEqual(view1.inheritedBlueprintEnvironment?[ViewKey.self], "view level environment")
+        XCTAssertEqual(view1.inheritedBlueprintEnvironment?[RootElementKey.self], "root element")
+        XCTAssertEqual(view1.inheritedBlueprintEnvironment?[InnerBlueprintViewKey.self], nil)
+        XCTAssertEqual(readEnvironment1[ViewKey.self], "view level environment")
+        XCTAssertEqual(readEnvironment1[RootElementKey.self], "root element")
+        XCTAssertEqual(readEnvironment1[InnerBlueprintViewKey.self], nil)
+        
+        XCTAssertEqual(view2.inheritedBlueprintEnvironment?[ViewKey.self], "view level environment")
+        XCTAssertEqual(view2.inheritedBlueprintEnvironment?[RootElementKey.self], "root element")
+        XCTAssertEqual(view2.inheritedBlueprintEnvironment?[InnerBlueprintViewKey.self], "inner blueprint view")
+        XCTAssertEqual(readEnvironment2[ViewKey.self], "view level environment")
+        XCTAssertEqual(readEnvironment2[RootElementKey.self], "root element")
+        XCTAssertEqual(readEnvironment2[InnerBlueprintViewKey.self], "inner blueprint view")
+        
+        enum ViewKey : EnvironmentKey { static let defaultValue : String? = nil }
+        enum RootElementKey : EnvironmentKey { static let defaultValue : String? = nil }
+        enum InnerBlueprintViewKey : EnvironmentKey { static let defaultValue : String? = nil }
+        
+        final class ViewWrappingBlueprintView : UIView {
+            let blueprintView = BlueprintView()
+            
+            override init(frame: CGRect) {
+                super.init(frame: frame)
+                self.addSubview(self.blueprintView)
+            }
+            
+            required init?(coder: NSCoder) { fatalError() }
+        }
+        
+        struct TestElement<View:UIView> : Element {
+            
+            var view : (() -> View)?
+            var child : Element?
+            
+            var content: ElementContent {
+                if let child = self.child {
+                    return .init(child: child)
+                } else {
+                    return .init(intrinsicSize: .zero)
+                }
+            }
+            
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                guard let view = self.view else {
+                    return nil
+                }
+                
+                return ViewDescription(View.self) { config in
+                    config.builder = view
+                }
+            }
+        }
+    }
 }
 
 fileprivate struct MeasurableElement : Element {
