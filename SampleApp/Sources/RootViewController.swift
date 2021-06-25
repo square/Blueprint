@@ -21,11 +21,28 @@ final class RootViewController : UIViewController
             DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
             }),
+            
             DemoItem(title: "Keyboard Scrolling", onTap: { [weak self] in
                 self?.push(ScrollViewKeyboardViewController())
             }),
+            
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
+            }),
+            
+            DemoItem(title: "Pointer Interactions", onTap: { [weak self] in
+                
+                if #available(iOS 13.4, *) {
+                    self?.push(PointerInteractionViewController())
+                } else {
+                    let alert = UIAlertController(
+                        title: "Pointer Interactions Unavailable",
+                        message: "UIPointerInteraction is only available on iOS 13.4 and later.",
+                        preferredStyle: .alert
+                    )
+                    
+                    self?.show(alert, sender: nil)
+                }
             }),
         ]
     }
