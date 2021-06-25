@@ -60,8 +60,13 @@ public protocol Element {
     ///
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
-
 }
+
+
+public extension Element {
+    dynamic static var stateKeyPaths : [PartialKeyPath<Self>] { [] }
+}
+
 
 /// The context passing to the `backingViewDescription` of an Element.
 public struct ViewDescriptionContext {

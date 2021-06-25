@@ -61,8 +61,14 @@ final class RootViewController : UIViewController
 }
 
 
-fileprivate struct DemoItem : ProxyElement
+fileprivate struct DemoItem : ProxyElement, StatefulElement
 {
+    @ElementState var state = State()
+    
+    struct State : Equatable {
+        var isPressed : Bool = false
+    }
+    
     var title : String
     var badgeText : String?
     
@@ -85,6 +91,7 @@ fileprivate struct DemoItem : ProxyElement
             )
         )
         .tappable {
+            self.state.isPressed = true
             self.onTap()
         }
         .decorate(layering: .below, position: .inset(5)) {

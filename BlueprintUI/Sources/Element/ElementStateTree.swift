@@ -75,6 +75,10 @@ extension ElementStateTree {
         init(identifier : ElementIdentifier, element : Element) {
             self.identifier = identifier
             self.element = element
+            
+            if let stateful = element as? StatefulElement {
+                stateful.allStateProperties()
+            }
         }
         
         func setup() {

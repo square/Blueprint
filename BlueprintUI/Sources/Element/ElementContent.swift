@@ -288,7 +288,8 @@ extension ElementContent {
             environment: Environment,
             cache: CacheTree,
             states : ElementStateTree
-        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        {
             guard self.children.isEmpty == false else {
                 return []
             }
@@ -331,6 +332,8 @@ extension ElementContent {
 
                 result.append((identifier: identifier, node: resultNode))
             }
+            
+            states.removedOldStates(keeping: Set(result.map { $0.identifier }))
 
             return result
         }
