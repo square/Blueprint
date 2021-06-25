@@ -36,33 +36,51 @@ public struct ElementContent {
     ///   - constraint: The size constraint.
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
-    public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        return measure(
+    public func measure(
+        in constraint: SizeConstraint,
+        environment: Environment
+    ) -> CGSize {
+        self.measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent")
+            cache: CacheFactory.makeCache(name: "ElementContent"),
+            
         )
     }
 
-    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> CGSize
+    {
         environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, environment: environment, cache: cache)
+            self.storage.measure(
+                in: constraint,
+                environment: environment,
+                cache: cache,
+                states: states
+            )
         }
     }
 
     public var childCount: Int {
-        return storage.childCount
+        return self.storage.childCount
     }
 
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment,
-        cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        return storage.performLayout(
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    {
+        self.storage.performLayout(
             attributes: attributes,
             environment: environment,
-            cache: cache
+            cache: cache,
+            states: states
         )
     }
 }
@@ -197,13 +215,15 @@ fileprivate protocol ContentStorage {
     func measure(
         in constraint: SizeConstraint,
         environment: Environment,
-        cache: CacheTree
+        cache: CacheTree,
+        states : ElementStateTree
     ) -> CGSize
 
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment,
-        cache: CacheTree
+        cache: CacheTree,
+        states : ElementStateTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
@@ -244,7 +264,8 @@ extension ElementContent {
         func measure(
             in constraint: SizeConstraint,
             environment: Environment,
-            cache: CacheTree
+            cache: CacheTree,
+            states : ElementStateTree
         ) -> CGSize {
             return cache.get(constraint) { (constraint) -> CGSize in
                 Logger.logMeasureStart(
@@ -262,7 +283,8 @@ extension ElementContent {
         func performLayout(
             attributes: LayoutAttributes,
             environment: Environment,
-            cache: CacheTree
+            cache: CacheTree,
+            states : ElementStateTree
         ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
             guard self.children.isEmpty == false else {
                 return []
@@ -355,8 +377,10 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment,
-        cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    {
         let environment = adapted(environment: environment)
 
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
@@ -377,7 +401,13 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         return [(identifier, node)]
     }
 
-    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> CGSize
+    {
         cache.get(constraint) { (constraint) -> CGSize in
             let environment = adapted(environment: environment)
             return child.content.measure(
@@ -404,8 +434,10 @@ private struct LazyStorage: ContentStorage {
     func performLayout(
         attributes: LayoutAttributes,
         environment: Environment,
-        cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    {
         let constraint = SizeConstraint(attributes.bounds.size)
         let child = buildChild(in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
@@ -426,7 +458,12 @@ private struct LazyStorage: ContentStorage {
         return [(identifier, node)]
     }
 
-    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree,
+        states : ElementStateTree
+    ) -> CGSize {
         cache.get(constraint) { (constraint) -> CGSize in
             let child = buildChild(in: constraint, environment: environment)
             return child.content.measure(

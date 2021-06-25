@@ -9,11 +9,17 @@ extension Element {
     ///   root element.
     ///
     /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        return LayoutResultNode(
+    func layout(
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        states : ElementStateTree
+    ) -> LayoutResultNode
+    {
+        LayoutResultNode(
             root: self,
             layoutAttributes: layoutAttributes,
-            environment: environment
+            environment: environment,
+            states: states
         )
     }
 
@@ -45,8 +51,14 @@ struct LayoutResultNode {
         self.children = children
     }
 
-    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
+    init(
+        root: Element,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        states : ElementStateTree
+    ) {
         let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+        
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
@@ -54,7 +66,8 @@ struct LayoutResultNode {
             children: root.content.performLayout(
                 attributes: layoutAttributes,
                 environment: environment,
-                cache: cache
+                cache: cache,
+                states: states
             )
         )
     }
