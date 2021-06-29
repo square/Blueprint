@@ -134,6 +134,8 @@ public struct UIViewElementContext {
     /// This bool indicates whether the view being updated is the static measuring instance. You may
     /// not want to perform certain updates if it is (such as updating field trigger references).
     public var isMeasuring: Bool
+    
+    // TODO: Include VDC and Environment
 }
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
