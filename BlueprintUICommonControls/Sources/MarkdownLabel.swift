@@ -24,12 +24,12 @@ public struct MarkdownLabel : UIViewElement {
 
 extension UILabel {
 
-    func set(markdown string : String, with style : Any) {
+    func set(markdown string : String, with style : Markdown.Style) {
         guard self.rawMarkdown != string else {
             return
         }
         
-        
+        // TODO...
     }
 
     private static var rawMarkdownKey = NSObject()
@@ -40,6 +40,8 @@ extension UILabel {
     }
 }
 
+/// https://github.com/syntax-tree/mdast
+/// https://daringfireball.net/projects/markdown/syntax
 public struct Markdown {
     
     var contents : [Element]
@@ -71,6 +73,35 @@ extension Markdown {
             case bold
             case italic
             case link
+            case header
+            case paragraph
+            case linebreak
+        }
+    }
+}
+
+
+protocol MarkdownElementParser {
+    
+    static var kind : Markdown.Element.Kind { get }
+    
+    static func parse(from : Scanner) -> Any
+    
+}
+
+
+extension Markdown {
+    
+    struct BoldParser {
+        static func parse(from : Scanner) -> Any {
+            
+        }
+    }
+    
+    final class Parser {
+        
+        init(_ string : String) {
+            
         }
     }
 }
