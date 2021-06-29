@@ -6,8 +6,8 @@
 //  Copyright © 2020 Square. All rights reserved.
 //
 
-import BlueprintUI
-import BlueprintUICommonControls
+@testable import BlueprintUI
+@testable import BlueprintUICommonControls
 
 
 struct TestElement : ProxyElement {
@@ -36,9 +36,27 @@ import SwiftUI
 
 @available(iOS 13.0, *)
 struct TestingView_Preview: PreviewProvider {
+    
+    static var attributedText : NSAttributedString {
+        //return NSAttributedString()
+        
+        let parsed = try? HTMLParser(
+            html: "The <b>quick</b> brown fox jumps over the <i>lazy dog</i>"
+        ).parse()
+        
+        let format = HTML.Format(
+            rootAttributes: .init(pointSize: 18.0, weight: .regular),
+            tagFormats: [
+                [HTML.Format.TagName(name: "b", synonyms: [])]: HTML.Tag.Format([.font : .init(UIFont.systemFont(ofSize: 20.0, weight: .bold))])
+            ]
+        )
+        
+        return parsed?.toAttributed(with: format) ?? NSAttributedString()
+    }
+    
     static var previews: some View {
-        ElementPreview(with: .thatFits(padding: 5)) {
-            TestElement()
+        ElementPreview(with: .fixed(width: 300, height: 200)) {
+            AttributedLabel(attributedText: Self.attributedText)
         }
     }
 }

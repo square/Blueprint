@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import BlueprintUI
 
 
 struct HTML : Equatable {
@@ -20,7 +21,7 @@ extension HTML {
         
         init(
             name: String,
-            attributes: [String : String]? = nil,
+            attributes: [String : String] = [:],
             children: [HTML.Tag.Child] = []
         ) {
             self.name = name
@@ -29,7 +30,7 @@ extension HTML {
         }
         
         var name : String
-        var attributes : [String:String]?
+        var attributes : [String:String]
         
         var children : [Child]
                 
@@ -62,7 +63,7 @@ extension HTML.Tag {
 extension HTML  {
     struct Format : Equatable {
         var rootAttributes : RootFontAttributes
-        var tagFormats : [Set<TagName> : Format]
+        var tagFormats : [Set<TagName> : Tag.Format]
         
         struct TagName : Hashable {
             
@@ -95,7 +96,6 @@ extension HTML.Tag {
         init(_ attributes : [NSAttributedString.Key:AnyEquatable]) {
             self.attributes = attributes
             self.fontAttributes = .init() // TODO
-            fatalError()
         }
         
         func toStringAttributes() -> [NSAttributedString.Key:Any] {

@@ -1,5 +1,5 @@
 //
-//  ParserTests.swift
+//  HTMLParserTests.swift
 //  HTMLLabel
 //
 //  Created by Kyle Van Essen on 12/25/20.
@@ -10,14 +10,30 @@ import XCTest
 @testable import BlueprintUICommonControls
 
 
-class ParserTests : XCTestCase {
+class HTMLParserTests : XCTestCase {
     
-    func test_parse() {
+    func test_parse() throws {
         
-        try? self.testcase("Valid HTML") {
+        try self.testcase {
+            
+            let parsed = try? HTMLParser(
+                html: "The <b>quick</b> brown fox jumps over the <i>lazy dog</i>"
+            ).parse()
+            
+            let format = HTML.Format(
+                rootAttributes: .init(pointSize: 18.0, weight: .regular),
+                tagFormats: [
+                    [HTML.Format.TagName(name: "b", synonyms: [])]: HTML.Tag.Format([.font : .init(UIFont.systemFont(ofSize: 20.0, weight: .bold))])
+                ]
+            )
+            
+            parsed?.toAttributed(with: format)
+        }
+        
+        try self.testcase("Valid HTML") {
             
             XCTAssertEqual(
-                try Parser.parse(html: "<b>Hello, world!</b>"),
+                try HTMLParser.parse(html: "<b>Hello, world!</b>"),
 
                 HTML.Tag.root {
                     HTML.Tag(name: "b", children: [
@@ -27,7 +43,7 @@ class ParserTests : XCTestCase {
             )
 
             XCTAssertEqual(
-                try Parser.parse(html: "<b><i>Hello, world!</i></b>"),
+                try HTMLParser.parse(html: "<b><i>Hello, world!</i></b>"),
 
                 HTML.Tag.root {
                     HTML.Tag(name: "b", children: [
@@ -39,7 +55,7 @@ class ParserTests : XCTestCase {
             )
 
             XCTAssertEqual(
-                try Parser.parse(html: "<a href='https://google.com'>Hello, world!</a>"),
+                try HTMLParser.parse(html: "<a href='https://google.com'>Hello, world!</a>"),
 
                 HTML.Tag.root {
                     HTML.Tag(name: "a", attributes: ["href" : "https://google.com"], children: [
@@ -51,7 +67,7 @@ class ParserTests : XCTestCase {
             // We should still consider multiple provided root-level tags as valid; since we wrap them in our own root tag.
             
             XCTAssertEqual(
-                try Parser.parse(html: "<b>Hello,</b> <i>world!</i>"),
+                try HTMLParser.parse(html: "<b>Hello,</b> <i>world!</i>"),
                 
                 HTML.Tag.root {
                     [

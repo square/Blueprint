@@ -17,6 +17,7 @@ public struct HTMLLabel : UIViewElement {
     }
     
     public func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
-        view.set(html: self.text, with: <#T##Any#>)
+        fatalError()
+        //view.set(html: self.text, with: <#T##Any#>)
     }
 }
