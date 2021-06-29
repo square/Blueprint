@@ -234,7 +234,7 @@ private struct TestElement: Element {
         return ElementContent(intrinsicSize: CGSize(width: 120, height: 100))
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 }

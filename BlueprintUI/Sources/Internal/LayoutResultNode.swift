@@ -28,12 +28,20 @@ struct LayoutResultNode {
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
+    var environment: Environment
+
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
 
-    init(element: Element, layoutAttributes: LayoutAttributes, children: [(identifier: ElementIdentifier, node: LayoutResultNode)]) {
+    init(
+        element: Element,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    ) {
         self.element = element
         self.layoutAttributes = layoutAttributes
+        self.environment = environment
         self.children = children
     }
 
@@ -42,6 +50,7 @@ struct LayoutResultNode {
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
+            environment: environment,
             children: root.content.performLayout(
                 attributes: layoutAttributes,
                 environment: environment,
@@ -76,8 +85,12 @@ extension LayoutResultNode {
             }
 
         let viewDescription = element.backingViewDescription(
-            bounds: layoutAttributes.bounds,
-            subtreeExtent: subtreeExtent)
+            with: .init(
+                bounds: layoutAttributes.bounds,
+                subtreeExtent: subtreeExtent,
+                environment: environment
+            )
+        )
 
         if let viewDescription = viewDescription {
             let node = NativeViewNode(

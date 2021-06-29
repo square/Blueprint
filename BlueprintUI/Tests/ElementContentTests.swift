@@ -164,7 +164,7 @@ fileprivate struct MeasurableElement : Element {
         }
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { _ in }
     }
 }
@@ -175,7 +175,7 @@ fileprivate struct SimpleElement: Element {
         return ElementContent(intrinsicSize: .zero)
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 
@@ -256,7 +256,7 @@ private struct MeasureCountingSpacer: Element {
         )
     }
 
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
 

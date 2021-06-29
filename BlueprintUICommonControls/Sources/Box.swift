@@ -39,7 +39,7 @@ public struct Box: Element {
         }
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return BoxView.describe { config in
 
             config.apply({ (view) in
@@ -48,8 +48,8 @@ public struct Box: Element {
                     view.backgroundColor = self.backgroundColor
                 }
 
-                if self.cornerStyle.radius(for: bounds) != view.layer.cornerRadius {
-                    view.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
+                if self.cornerStyle.radius(for: context.bounds) != view.layer.cornerRadius {
+                    view.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
                 if self.borderStyle.color?.cgColor != view.layer.borderColor {
@@ -83,8 +83,8 @@ public struct Box: Element {
                     view.contentView.clipsToBounds = self.clipsContent
                 }
 
-                if self.cornerStyle.radius(for: bounds) != view.contentView.layer.cornerRadius {
-                    view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: bounds)
+                if self.cornerStyle.radius(for: context.bounds) != view.contentView.layer.cornerRadius {
+                    view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
             })

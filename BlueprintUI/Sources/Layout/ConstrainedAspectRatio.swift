@@ -136,7 +136,7 @@ public struct ConstrainedAspectRatio: Element {
         return ElementContent(child: wrappedElement, layout: Layout(aspectRatio: aspectRatio, contentMode: contentMode))
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
 

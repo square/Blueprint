@@ -33,7 +33,7 @@ public struct SegmentedControl: Element, Measurable {
         })
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return SegmentedControlView.describe { config in
             config[\.element] = self
         }

@@ -105,7 +105,7 @@ fileprivate struct A : Element
         return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return View.describe { _ in}
     }
     
@@ -119,7 +119,7 @@ fileprivate struct B : Element
         return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         
         return View.describe { _ in}
     }
@@ -134,7 +134,7 @@ fileprivate struct C : Element
         return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         
         return View.describe { _ in}
     }
@@ -149,7 +149,7 @@ fileprivate struct D : Element
         return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         
         return View.describe { _ in}
     }

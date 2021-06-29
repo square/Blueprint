@@ -45,7 +45,7 @@ public struct AttributedLabel: Element, Hashable {
         label.textRectOffset = textRectOffset
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return LabelView.describe { (config) in
             config.apply(update)
         }

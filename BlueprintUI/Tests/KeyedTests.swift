@@ -57,7 +57,7 @@ fileprivate struct TestElement : Element {
         ElementContent(intrinsicSize: CGSize(width: 100, height: 110))
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         View.describe { _ in }
     }
     

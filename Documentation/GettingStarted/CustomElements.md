@@ -19,7 +19,7 @@ public protocol ProxyElement: Element {
 /// `ProxyElement` provides default implementations of the `Element` API that delegate to the element returned by `elementRepresentation`.
 extension ProxyElement {
     public var content: ElementContent { get }
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
 }
 ```
 
@@ -57,7 +57,7 @@ For more information, please see [`Element` reference](../Reference/Element.md).
 ```swift
 public protocol Element {
     var content: ElementContent { get }
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
 }
 ```
 
@@ -69,7 +69,7 @@ To implement the `Element` protocol, your custom type must implement two methods
 - Containers, or elements that have children.
 - Leaves: elements that have no children, but often have some intrinsic size (a label is a good example of this).
 
-#### `func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?`
+#### `func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?`
 
 If a [`ViewDescription`](../Reference/ViewDescription.md) is returned, the element will be view-backed.
 

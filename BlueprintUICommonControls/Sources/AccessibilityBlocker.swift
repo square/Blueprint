@@ -22,7 +22,7 @@ public struct AccessibilityBlocker: Element {
         return ElementContent(child: wrapped)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIView.describe { config in
             config[\.isAccessibilityElement] = false
             config[\.accessibilityElementsHidden] = true

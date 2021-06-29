@@ -288,6 +288,7 @@ extension ElementContent {
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
                     layoutAttributes: currentChildLayoutAttributes,
+                    environment: environment,
                     children: currentChild.content.performLayout(
                         attributes: currentChildLayoutAttributes,
                         environment: environment,
@@ -365,6 +366,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
+            environment: environment,
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
@@ -413,6 +415,7 @@ private struct LazyStorage: ContentStorage {
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
+            environment: environment,
             children: child.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,

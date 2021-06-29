@@ -17,7 +17,7 @@ public struct Tappable: Element {
         return ElementContent(child: wrappedElement)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return TappableView.describe { config in
             config[\.onTap] = onTap
         }

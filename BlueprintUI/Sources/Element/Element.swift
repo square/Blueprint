@@ -29,9 +29,9 @@ import UIKit
 ///
 ///     // Providing a view description means that this element will be
 ///     // backed by a UIView instance when displayed in a `BlueprintView`.
-///     func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+///     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 ///         return UIView.describe { config in
-///             config.bind(backgroundColor, to: \.backgrouncColor)
+///             config.bind(backgroundColor, to: \.backgroundColor)
 ///         }
 ///     }
 ///
@@ -56,11 +56,29 @@ public protocol Element {
     /// In Blueprint, elements that are displayed using a live `UIView` instance are referred to as "view-backed".
     /// Elements become view-backed by returning a `ViewDescription` value from this method.
     ///
-    /// - Parameter bounds: The bounds of this element after layout is complete.
-    /// - Parameter subtreeExtent: A rectangle in the local coordinate space that contains any children.
-    ///                            `subtreeExtent` will be nil if there are no children.
+    /// - Parameter context: The context this element is rendered in.
     ///
     /// - Returns: An optional `ViewDescription`.
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription?
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
 
+}
+
+/// The context passing to the `backingViewDescription` of an Element.
+public struct ViewDescriptionContext {
+
+    /// The bounds of this element after layout is complete.
+    public var bounds: CGRect
+
+    /// A rectangle in the local coordinate space that contains any children.
+    /// This will be nil if there are no children.
+    public var subtreeExtent: CGRect?
+
+    /// The environment the element is rendered in.
+    public var environment: Environment
+
+    public init(bounds: CGRect, subtreeExtent: CGRect?, environment: Environment) {
+        self.bounds = bounds
+        self.subtreeExtent = subtreeExtent
+        self.environment = environment
+    }
 }

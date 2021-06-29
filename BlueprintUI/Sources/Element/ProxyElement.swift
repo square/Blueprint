@@ -18,8 +18,8 @@ extension ProxyElement {
         elementRepresentation.content
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
-        elementRepresentation.backingViewDescription(bounds: bounds, subtreeExtent: subtreeExtent)
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        elementRepresentation.backingViewDescription(with: context)
     }
 
 }

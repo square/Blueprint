@@ -69,7 +69,7 @@ fileprivate struct DecorationElement : Element {
         ElementContent { _ in CGSize(width: 10, height: 15) }
     }
     
-    func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { _ in }
     }
 }

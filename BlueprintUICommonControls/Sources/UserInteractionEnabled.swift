@@ -24,7 +24,7 @@ public struct UserInteractionEnabled: Element {
         ElementContent(child: wrappedElement)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { config in
             config[\.isUserInteractionEnabled] = isEnabled
         }

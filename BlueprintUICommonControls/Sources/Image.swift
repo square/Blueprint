@@ -31,7 +31,7 @@ public struct Image: Element {
         return ElementContent(measurable: measurer)
     }
 
-    public func backingViewDescription(bounds: CGRect, subtreeExtent: CGRect?) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return UIImageView.describe { config in
             config[\.image] = image
             config[\.contentMode] = contentMode.uiViewContentMode
