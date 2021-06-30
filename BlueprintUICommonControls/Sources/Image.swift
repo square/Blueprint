@@ -101,7 +101,11 @@ extension Image {
         var contentMode: ContentMode
         var imageSize: CGSize?
 
-        func measure(in constraint: SizeConstraint) -> CGSize {
+        func measure(
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
             guard let imageSize = imageSize else { return .zero }
 
             enum Mode {
@@ -111,12 +115,15 @@ extension Image {
             }
 
             let mode: Mode
-
+            
             switch contentMode {
             case .center, .stretch:
                 mode = .useImageSize
             case .aspectFit, .aspectFill:
-                if case .atMost(let width) = constraint.width, case .atMost(let height) = constraint.height {
+                if
+                    case .atMost(let width) = constraint.width,
+                    case .atMost(let height) = constraint.height
+                {
                     if CGSize(width: width, height: height).aspectRatio > imageSize.aspectRatio {
                         mode = .fitWidth(width)
                     } else {

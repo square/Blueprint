@@ -46,11 +46,22 @@ fileprivate struct AbstractElement: Element {
     }
 
     private struct Layout: SingleChildLayout {
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return .zero
+        func measure(
+            child: Measurable,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
+            .zero
         }
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 10, dy: 10))
+        
+        func layout(
+            child: Measurable,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> LayoutAttributes
+        {
+            LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 10, dy: 10))
         }
     }
 

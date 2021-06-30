@@ -3,7 +3,7 @@ import BlueprintUI
 
 
 /// Allows users to pick from an array of options.
-public struct SegmentedControl: Element, Measurable {
+public struct SegmentedControl: Element {
 
     public var items: [Item]
 
@@ -21,16 +21,16 @@ public struct SegmentedControl: Element, Measurable {
     }
 
     public var content: ElementContent {
-        return ElementContent(measurable: self)
-    }
-
-    public func measure(in constraint: SizeConstraint) -> CGSize {
-        return items.reduce(CGSize.zero, { (current, item) -> CGSize in
-            let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
-            return CGSize(
-                width: itemSize.width + current.width,
-                height: max(itemSize.height, current.height))
-        })
+        ElementContent { constraint, context in
+            items.reduce(CGSize.zero) { (current, item) -> CGSize in
+                let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
+                
+                return CGSize(
+                    width: itemSize.width + current.width,
+                    height: max(itemSize.height, current.height)
+                )
+            }
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -42,7 +42,6 @@ public struct SegmentedControl: Element, Measurable {
     fileprivate var titleTextAttributes: [NSAttributedString.Key:Any] {
         return [NSAttributedString.Key.font: font]
     }
-
 }
 
 extension SegmentedControl {

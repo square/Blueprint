@@ -13,13 +13,11 @@ import UIKit
 /// provides its own sizing via `sizeThatFits`. An instance of the view is used for
 /// sizing and measurement, so that you do not need to re-implement your own measurement.
 ///
-/// Note
-/// ----
-/// The sizing and measurement prototype view is kept alive for the lifetime of the containing application.
+/// ### Note
+/// The sizing and measurement prototype view is kept alive for the lifetime of the containing `BlueprintView`.
 /// Do not pass anything to the initializer of this type that you expect to be quickly released.
 ///
-/// Example
-/// -------
+/// ### Example
 /// If you were implementing a very basic `Switch` element, your implementation would look something
 /// like this:
 /// ```
@@ -110,8 +108,10 @@ public extension UIViewElement {
             MeasurementCachingKey(type: Self.self, input: $0)
         }
         
-        return ElementContent(measurementCachingKey: key) {
-            UIViewElementMeasurer.shared.measure(element: self, in: $0)
+        return ElementContent(measurementCachingKey: key) { constraint, context -> CGSize in
+            context.measure(self, using: Self.makeUIView()) { view in
+                self.measure(using: view, in: constraint, with: context)
+            }
         }
     }
     
@@ -123,9 +123,17 @@ public extension UIViewElement {
             }
             
             config.apply { view in
-                self.updateUIView(view, with: .init(isMeasuring: false))
+                self.updateUIView(view, with: .init(isMeasuring: false, environment: context.environment))
             }
         }
+    }
+    
+    /// Provides the size for the provided element by using a cached measurement view.
+    private func measure(using view : UIViewType, in constraint : SizeConstraint, with context : LayoutContext) -> CGSize {
+        
+        self.updateUIView(view, with: .init(isMeasuring: true, environment: context.environment))
+        
+        return self.size(constraint.maximum, thatFits: view)
     }
 }
 
@@ -134,45 +142,8 @@ public struct UIViewElementContext {
     /// This bool indicates whether the view being updated is the static measuring instance. You may
     /// not want to perform certain updates if it is (such as updating field trigger references).
     public var isMeasuring: Bool
-}
-
-/// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
-private final class UIViewElementMeasurer {
     
-    /// The standard shared cache.
-    static let shared = UIViewElementMeasurer()
-        
-    /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement:UIViewElement>(element : ViewElement, in constraint : SizeConstraint) -> CGSize {
-        
-        let bounds = CGRect(origin: .zero, size: constraint.maximum)
-        
-        let view = self.measurementView(for: element)
-        
-        element.updateUIView(view, with: .init(isMeasuring: true))
-        
-        return element.size(bounds.size, thatFits: view)
-    }
-    
-    func measurementView<ViewElement:UIViewElement>(for element : ViewElement) -> ViewElement.UIViewType
-    {
-        let key = Key(
-            elementType: ObjectIdentifier(ViewElement.self)
-        )
-        
-        if let existing = self.views[key] {
-            return existing as! ViewElement.UIViewType
-        } else {
-            let new = ViewElement.makeUIView()
-            self.views[key] = new
-            return new
-        }
-    }
-    
-    private var views : [Key:UIView] = [:]
-    
-    private struct Key : Hashable {
-        let elementType : ObjectIdentifier
-    }
+    /// The environment this element is contained in.
+    public var environment : Environment
 }
 

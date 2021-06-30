@@ -371,7 +371,7 @@ fileprivate struct MeasurableElement : Element {
     var validate : (SizeConstraint) -> CGSize
     
     var content: ElementContent {
-        ElementContent { constraint -> CGSize in
+        ElementContent { constraint, _ -> CGSize in
             self.validate(constraint)
         }
     }
@@ -440,13 +440,25 @@ private struct TestContainer: Element {
         return nil
     }
 
-    private class TestLayout: Layout {
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            return .zero
+    private struct TestLayout: Layout {
+        
+        func measure(
+            items: LayoutItems<Void>,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+            
+        ) -> CGSize
+        {
+            .zero
         }
 
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            return Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        func layout(
+            items: LayoutItems<Void>,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> [LayoutAttributes]
+        {
+            Array(repeating: LayoutAttributes(size: .zero), count: items.count)
         }
     }
 }

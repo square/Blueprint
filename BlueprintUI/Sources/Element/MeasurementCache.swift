@@ -18,7 +18,7 @@ final class MeasurementCache
     
     func measurement(
         with key : MeasurementCachingKey?,
-        in sizeConstraint : SizeConstraint,
+        in constraint : SizeConstraint,
         measure : () -> CGSize
     ) -> CGSize
     {
@@ -28,7 +28,7 @@ final class MeasurementCache
         
         let innerKey = Key(
             key: key,
-            sizeConstraint: sizeConstraint
+            sizeConstraint: constraint
         )
         
         if let existing = self.measurements[innerKey] {

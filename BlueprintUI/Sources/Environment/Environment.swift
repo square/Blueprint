@@ -39,17 +39,7 @@ public struct Environment {
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static var empty : Environment {
-        
-        /// Intentionally a derived value instead of a `static let empty = ...`. because `MeasurementCache`
-        /// is a `class` type (needed due to implementation constraints – the `MeasurementCache` is passed around during layout),
-        /// we want to ensure that each new environment that we ask for has a new `measurementCache` to avoid "leaking" / retaining
-        /// all the contained keys for the lifetime of the application, as a `static let` would cause.
-        
-        Environment(measurementCache: MeasurementCache())
-    }
-
-    private init(measurementCache : MeasurementCache) {
-        self.measurementCache = measurementCache
+        .init()
     }
 
     private var values: [ObjectIdentifier: Any] = [:]
@@ -78,11 +68,6 @@ public struct Environment {
         merged.values.merge(other.values) { $1 }
         return merged
     }
-        
-    /// Cache used to speed up measurements during a layout pass.
-    /// This is declared on the `Environment` directly, because access to the `measurementCache` is a hot path
-    /// which we can optimize by not needing the usual `env.values[...]` lookup.
-    var measurementCache : MeasurementCache
 }
 
 

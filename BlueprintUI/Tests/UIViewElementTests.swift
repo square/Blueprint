@@ -42,9 +42,11 @@ class UIViewElementTests : XCTestCase {
                 view.sizeThatFits = self.size
             }
         }
+        
+        let context = LayoutContext.rootContext()
 
         XCTAssertEqual(
-            TestElement(size: CGSize(width: 20.0, height: 30.0)).content.measure(in: .unconstrained),
+            TestElement(size: CGSize(width: 20.0, height: 30.0)).content.measure(in: .unconstrained, with: context),
             CGSize(width: 20.0, height: 30.0)
         )
 
@@ -54,7 +56,7 @@ class UIViewElementTests : XCTestCase {
         XCTAssertEqual(TestElement.updateUIView_count, 1)
 
         XCTAssertEqual(
-            TestElement(size: CGSize(width: 40.0, height: 60.0)).content.measure(in: .unconstrained),
+            TestElement(size: CGSize(width: 40.0, height: 60.0)).content.measure(in: .unconstrained, with: context),
             CGSize(width: 40.0, height: 60.0)
         )
 

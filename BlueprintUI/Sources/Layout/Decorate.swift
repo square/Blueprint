@@ -65,19 +65,19 @@ public struct Decorate : ProxyElement {
     
     public var elementRepresentation: Element {
         EnvironmentReader { environment in
-            LayoutWriter { context, layout in
+            LayoutWriter { constraint, context, layout in
                 
                 let contentSize = self.wrapped.content.measure(
-                    in: context.size,
-                    environment: environment
-                )
+                    in: constraint,
+                    with: context
+                ) // TODO: This doesn't pass caching through...
                 
                 let contentFrame = CGRect(origin: .zero, size: contentSize)
                 
                 let decorationFrame = self.position.frame(
                     with: contentFrame,
                     decoration: self.decoration,
-                    environment: environment
+                    context: context
                 )
                 
                 layout.sizing = .fixed(contentSize)
@@ -152,14 +152,14 @@ extension Decorate {
             /// The frame of the content element within the `Decorate` element.
             public var contentFrame : CGRect
             
-            /// The environment the element is being rendered in.
-            public var environment : Environment
+            /// The context the element is being rendered in.
+            public var context : LayoutContext
         }
         
         func frame(
             with contentFrame : CGRect,
             decoration : Element,
-            environment : Environment
+            context : LayoutContext
         ) -> CGRect {
             
             switch self {
@@ -168,7 +168,7 @@ extension Decorate {
                 
             case .corner(let corner, let offset):
                 
-                let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
+                let size = decoration.content.measure(in: .init(contentFrame.size), with: context)
                 
                 let center : CGPoint = {
                     switch corner {
@@ -194,7 +194,7 @@ extension Decorate {
                 )
                 
             case .custom(let provider):
-                return provider(.init(contentFrame: contentFrame, environment: environment))
+                return provider(.init(contentFrame: contentFrame, context: context))
             }
         }
     }

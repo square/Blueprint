@@ -4,18 +4,18 @@ import XCTest
 class ElementContentTests: XCTestCase {
 
     func test_measurement_caching() {
-        
-        let environment = Environment.empty
-        
+                
         let element = MeasurableElement()
         
-        _ = element.content.measure(in: .unconstrained, environment: environment)
+        let context = LayoutContext.rootContext()
+        
+        _ = element.content.measure(in: .unconstrained, with: context)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
         
-        _ = element.content.measure(in: .unconstrained, environment: environment)
+        _ = element.content.measure(in: .unconstrained, with: context)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
         
-        _ = element.content.measure(in: .unconstrained, environment: environment)
+        _ = element.content.measure(in: .unconstrained, with: context)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
     }
     
@@ -35,7 +35,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .testLayout(attributes: LayoutAttributes(frame: .zero))
+            .testLayout(in: .zero)
             .map { $0.node }
 
         XCTAssertEqual(children.count, 1)
@@ -58,7 +58,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .testLayout(attributes: LayoutAttributes(frame: .zero))
+            .testLayout(in: .zero)
             .map { $0.node }
 
         XCTAssertEqual(children.count, 2)
@@ -91,17 +91,17 @@ class ElementContentTests: XCTestCase {
 
             _ = container
                 .performLayout(
-                    attributes: LayoutAttributes(size: containerSize),
-                    environment: .empty,
+                    in: containerSize,
+                    with: .rootContext(),
                     cache: cache
                 )
                 .map { $0.node }
 
             _ = container.measure(
-                in: SizeConstraint(containerSize),
-                environment: .empty,
-                cache: cache
-            )
+                    in: SizeConstraint(containerSize),
+                    with: .rootContext(),
+                    cache: cache
+                )
 
             return (cache, counts)
         }
@@ -158,7 +158,7 @@ fileprivate struct MeasurableElement : Element {
     static var measureCount : Int = 0
     
     var content: ElementContent {
-        ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint -> CGSize in
+        ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint, context -> CGSize in
             Self.measureCount += 1
             return .init(width: 20.0, height: 20.0)
         }
@@ -185,16 +185,26 @@ fileprivate struct SimpleElement: Element {
 fileprivate struct FrameLayout: Layout {
 
     typealias Traits = CGRect
-
-    func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero, { (result, item) in
+    
+    func measure(
+        items: LayoutItems<Traits>,
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
+    {
+        items.all.reduce(into: CGSize.zero, { (result, item) in
             result.width = max(result.width, item.traits.maxX)
             result.height = max(result.height, item.traits.maxY)
         })
     }
 
-    func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {
-        return items.map { LayoutAttributes(frame: $0.traits) }
+    func layout(
+        items: LayoutItems<Traits>,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> [LayoutAttributes]
+    {
+        items.all.map { LayoutAttributes(frame: $0.traits) }
     }
 
     static var defaultTraits: CGRect {
@@ -204,22 +214,36 @@ fileprivate struct FrameLayout: Layout {
 }
 
 private struct HalfLayout: Layout {
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    
+    func measure(
+        items: LayoutItems<Void>,
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
+    {
         let halfConstraint = SizeConstraint(
             width: constraint.width / 2,
             height: constraint.height / 2
         )
-        let measurements = items.map { $1.measure(in: halfConstraint) }
+        
+        let measurements = items.all.map { $0.content.measure(in: halfConstraint, with: context) }
+        
         return CGSize(
             width: measurements.map(\.width).reduce(0, +),
             height: measurements.map(\.height).reduce(0, +)
         )
     }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+    func layout(
+        items: LayoutItems<Void>,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> [LayoutAttributes]
+    {
         let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
-        return items.map {
-            LayoutAttributes(size: $1.measure(in: halfConstraint))
+        
+        return items.all.map {
+            LayoutAttributes(size: $0.content.measure(in: halfConstraint, with: context))
         }
     }
 }
@@ -229,6 +253,7 @@ private class TestCounter {
 }
 
 private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout: Layout {
+    
     static var defaultTraits: Traits { WrappedLayout.defaultTraits }
 
     typealias Traits = WrappedLayout.Traits
@@ -236,13 +261,23 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
     var counts: TestCounter
     var layout: WrappedLayout
 
-    func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
+    func measure(
+        items: LayoutItems<Traits>,
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
+    {
         counts.measures += 1
-        return layout.measure(in: constraint, items: items)
+        return layout.measure(items: items, in: constraint, with: context)
     }
 
-    func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return layout.layout(size: size, items: items)
+    func layout(
+        items: LayoutItems<Traits>,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> [LayoutAttributes]
+    {
+        layout.layout(items: items, in: size, with: context)
     }
 }
 
@@ -261,13 +296,24 @@ private struct MeasureCountingSpacer: Element {
     }
 
     struct FixedLayout: Layout {
+
         var size: CGSize
 
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+        func measure(
+            items: LayoutItems<Void>,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
             size
         }
 
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+        func layout(
+            items: LayoutItems<Void>,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> [LayoutAttributes]
+        {
             []
         }
     }

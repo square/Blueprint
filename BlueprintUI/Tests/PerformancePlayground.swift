@@ -95,7 +95,8 @@ class PerformancePlayground : XCTestCase
                 return Column { column in
                     for string in lipsumStrings[0..<leafLabelCount] {
                         labelCount += 1
-                        column.add(child: NonCachingLabel(text: string))
+                        //column.add(child: NonCachingLabel(text: string))
+                        column.add(child: NoOpElement())
                     }
                 }
             }
@@ -107,8 +108,7 @@ class PerformancePlayground : XCTestCase
         let tree = element(depth: stackDepth)
         print("layout depth: \(stackDepth) contains \(labelCount) labels")
 
-        for i in 1...runCount {
-            print("run \(i) of \(runCount)")
+        self.determineAverage(for: 10.0) {
             view.element = tree
             view.layoutIfNeeded()
         }
@@ -116,27 +116,40 @@ class PerformancePlayground : XCTestCase
     
     func determineAverage(for seconds : TimeInterval, using block : () -> ()) {
         let start = Date()
-        
+
         var iterations : Int = 0
         
+        var lastUpdateDate = Date()
+
         repeat {
-            let iterationStart = Date()
             block()
-            let iterationEnd = Date()
-            let duration = iterationEnd.timeIntervalSince(iterationStart)
             
             iterations += 1
-
-            print("Iteration: \(iterations), Duration : \(duration)")
             
+            if Date().timeIntervalSince(lastUpdateDate) >= 1 {
+                lastUpdateDate = Date()
+                print("Continuing Test: \(iterations) Iterations...")
+            }
+
         } while Date() < start + seconds
-        
+
         let end = Date()
-        
+
         let duration = end.timeIntervalSince(start)
         let average = duration / TimeInterval(iterations)
-        
+
         print("Iterations: \(iterations), Average Time: \(average)")
+    }
+}
+
+
+private struct NoOpElement : Element {
+    var content: ElementContent {
+        ElementContent.init(intrinsicSize: CGSize(width: 100, height: 20))
+    }
+    
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        nil
     }
 }
 

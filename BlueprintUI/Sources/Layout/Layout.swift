@@ -15,7 +15,11 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: The measured size for the given array of items.
-    func measure(in constraint: SizeConstraint, items: [(traits: Self.Traits, content: Measurable)]) -> CGSize
+    func measure(
+        items: LayoutItems<Self.Traits>,
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
 
     /// Generates layout attributes for the given items.
     ///
@@ -26,17 +30,46 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: Layout attributes for the given array of items.
-    func layout(size: CGSize, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
+    func layout(
+        items: LayoutItems<Self.Traits>,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> [LayoutAttributes]
     
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
     
 }
 
+
 extension Layout where Traits == () {
     
     public static var defaultTraits: () {
         return ()
     }
-    
 }
+
+
+public final class LayoutItems<Traits> {
+    
+    public let all : [Item]
+    
+    public let count : Int
+    
+    init(with all : [Item]) {
+        self.all = all
+        self.count = self.all.count
+    }
+    
+    public struct Item {
+        
+        public let traits : Traits
+        public let content : Measurable
+        
+        init(traits: Traits, content: Measurable) {
+            self.traits = traits
+            self.content = content
+        }
+    }
+}
+

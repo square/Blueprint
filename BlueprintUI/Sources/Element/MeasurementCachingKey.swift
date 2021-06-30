@@ -19,9 +19,8 @@ import Foundation
 ///
 /// Caching is only done on a per-layout pass. Caches are not reused between layout passes.
 ///
-/// Example
-/// -------
-/// Below is a simplified version of a `MeasurementCachingKey` in action, in this case for Blueprint's `Label` type.
+/// ### Example
+/// Below is a simplified version of a `MeasurementCachingKey` in action.
 /// ```
 /// struct Label : UIViewElement {
 ///
@@ -42,17 +41,14 @@ import Foundation
 ///     }
 ///
 ///     var measurementCacheKey : AnyHashable? {
-///         MeasurementCachingKey(
-///             type: Self.self,
-///             input: Key(
-///               text: self.text,
-///               font: self.font,
-///               numberOfLines: self.numberOfLines
-///             )
+///         MyKey(
+///             text: self.text,
+///             font: self.font,
+///             numberOfLines: self.numberOfLines
 ///         )
 ///     }
 ///
-///     struct Key : Hashable {
+///     struct MyKey : Hashable {
 ///         var text : String
 ///         var font : UIFont
 ///         var numberOfLines : Int
@@ -82,9 +78,7 @@ import Foundation
 ///     }
 ///
 ///     var measurementCacheKey : AnyHashable? {
-///         MeasurementCachingKey(
-///         type: Self.self,
-///         input: self
+///         self
 ///     }
 /// }
 /// ```
