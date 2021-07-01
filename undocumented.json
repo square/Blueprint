@@ -1,0 +1,1713 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 122,
+      "symbol": "BlueprintView.init(frame:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 202,
+      "symbol": "BlueprintView.semanticContentAttribute",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 210,
+      "symbol": "BlueprintView.safeAreaInsetsDidChange()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 215,
+      "symbol": "BlueprintView.layoutSubviews()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 221,
+      "symbol": "BlueprintView.didMoveToWindow()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 344,
+      "symbol": "BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/BlueprintView.swift",
+      "line": 349,
+      "symbol": "BlueprintViewUpdateMetrics",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 187,
+      "symbol": "ElementPreview.PreviewType.identifier",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 195,
+      "symbol": "ElementPreview.PreviewType.previewView(with:for:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 267,
+      "symbol": "PreviewDevice.iPhone7Plus",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 272,
+      "symbol": "PreviewDevice.iPhone8Plus",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 285,
+      "symbol": "PreviewDevice.iPhoneSE_2",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 293,
+      "symbol": "PreviewDevice.iPhoneXs",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 294,
+      "symbol": "PreviewDevice.iPhoneXsMax",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 303,
+      "symbol": "PreviewDevice.iPadMini_5",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 308,
+      "symbol": "PreviewDevice.iPadAir_3",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 313,
+      "symbol": "PreviewDevice.iPad_6",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 319,
+      "symbol": "PreviewDevice.iPadPro_10_5",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 321,
+      "symbol": "PreviewDevice.iPadPro_11_1",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 322,
+      "symbol": "PreviewDevice.iPadPro_11_2",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 324,
+      "symbol": "PreviewDevice.iPadPro_12_9_1",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 325,
+      "symbol": "PreviewDevice.iPadPro_12_9_2",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/BlueprintView/ElementPreview.swift",
+      "line": 326,
+      "symbol": "PreviewDevice.iPadPro_12_9_3",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Element/Element.swift",
+      "line": 79,
+      "symbol": "ViewDescriptionContext.init(bounds:subtreeExtent:environment:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Element/ElementContent.swift",
+      "line": 53,
+      "symbol": "ElementContent.childCount",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Element/ElementContent.swift",
+      "line": 213,
+      "symbol": "ElementContent.Builder",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Element/MeasurementCachingKey.swift",
+      "line": 96,
+      "symbol": "MeasurementCachingKey.init(type:input:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Environment/EnvironmentReader.swift",
+      "line": 22,
+      "symbol": "EnvironmentReader.init(elementRepresentation:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Environment/Keys/LayoutDirectionKey.swift",
+      "line": 4,
+      "symbol": "Environment.LayoutDirection",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Environment/Keys/LayoutDirectionKey.swift",
+      "line": 5,
+      "symbol": "Environment.LayoutDirection.leftToRight",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Environment/Keys/LayoutDirectionKey.swift",
+      "line": 6,
+      "symbol": "Environment.LayoutDirection.rightToLeft",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 44,
+      "symbol": "Column.children",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 46,
+      "symbol": "Column.layout",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 51,
+      "symbol": "Column.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 53,
+      "symbol": "Column.verticalUnderflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 58,
+      "symbol": "Column.verticalOverflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Column.swift",
+      "line": 73,
+      "symbol": "Column.minimumVerticalSpacing",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Decorate.swift",
+      "line": 114,
+      "symbol": "Decorate.Corner.topLeft",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Decorate.swift",
+      "line": 115,
+      "symbol": "Decorate.Corner.topRight",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Decorate.swift",
+      "line": 116,
+      "symbol": "Decorate.Corner.bottomRight",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Decorate.swift",
+      "line": 117,
+      "symbol": "Decorate.Corner.bottomLeft",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Empty.swift",
+      "line": 16,
+      "symbol": "Empty.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/EqualStack.swift",
+      "line": 45,
+      "symbol": "EqualStack.add(child:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/EqualStack.swift",
+      "line": 53,
+      "symbol": "EqualStack.Direction",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/EqualStack.swift",
+      "line": 54,
+      "symbol": "EqualStack.Direction.vertical",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/EqualStack.swift",
+      "line": 55,
+      "symbol": "EqualStack.Direction.horizontal",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/GeometryReader.swift",
+      "line": 29,
+      "symbol": "GeometryReader.init(elementRepresentation:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/GridRow.swift",
+      "line": 47,
+      "symbol": "GridRow.init(configure:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/GridRow.swift",
+      "line": 52,
+      "symbol": "GridRow.add(width:key:child:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/GridRow.swift",
+      "line": 80,
+      "symbol": "GridRow.Child.width",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/GridRow.swift",
+      "line": 83,
+      "symbol": "GridRow.Child.init(width:key:element:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 14,
+      "symbol": "Inset.bottom",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 15,
+      "symbol": "Inset.left",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 16,
+      "symbol": "Inset.right",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 18,
+      "symbol": "Inset.init(top:bottom:left:right:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 26,
+      "symbol": "Inset.init(uniformInset:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 34,
+      "symbol": "Inset.init(insets:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 42,
+      "symbol": "Inset.init(sideInsets:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Inset.swift",
+      "line": 53,
+      "symbol": "Inset.init(vertical:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/LayoutAttributes.swift",
+      "line": 26,
+      "symbol": "LayoutAttributes.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/LayoutAttributes.swift",
+      "line": 30,
+      "symbol": "LayoutAttributes.init(frame:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/LayoutAttributes.swift",
+      "line": 37,
+      "symbol": "LayoutAttributes.init(size:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/LayoutAttributes.swift",
+      "line": 41,
+      "symbol": "LayoutAttributes.init(center:bounds:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/LayoutAttributes.swift",
+      "line": 53,
+      "symbol": "LayoutAttributes.frame",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 52,
+      "symbol": "Row.children",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 54,
+      "symbol": "Row.layout",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 59,
+      "symbol": "Row.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 61,
+      "symbol": "Row.horizontalUnderflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 66,
+      "symbol": "Row.horizontalOverflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Row.swift",
+      "line": 81,
+      "symbol": "Row.minimumHorizontalSpacing",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 8,
+      "symbol": "StackElement.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 9,
+      "symbol": "StackElement.layout",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 10,
+      "symbol": "StackElement.children",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 31,
+      "symbol": "StackElement.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 238,
+      "symbol": "StackLayout.axis",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 240,
+      "symbol": "StackLayout.underflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 241,
+      "symbol": "StackLayout.overflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 242,
+      "symbol": "StackLayout.alignment",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 243,
+      "symbol": "StackLayout.minimumSpacing",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 246,
+      "symbol": "StackLayout.init(axis:alignment:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 266,
+      "symbol": "StackLayout.Axis.horizontal",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Layout/Stack.swift",
+      "line": 267,
+      "symbol": "StackLayout.Axis.vertical",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 15,
+      "symbol": "SizeConstraint.init(width:height:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 23,
+      "symbol": "SizeConstraint.unconstrained",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 27,
+      "symbol": "SizeConstraint.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 31,
+      "symbol": "SizeConstraint.init(width:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 35,
+      "symbol": "SizeConstraint.init(height:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 39,
+      "symbol": "SizeConstraint.minimum",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 43,
+      "symbol": "SizeConstraint.maximum",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/Measuring/SizeConstraint.swift",
+      "line": 47,
+      "symbol": "SizeConstraint.inset(width:height:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/AnimationAttributes.swift",
+      "line": 15,
+      "symbol": "AnimationAttributes.init(duration:curve:allowUserInteraction:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 93,
+      "symbol": "ViewDescription.viewType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 97,
+      "symbol": "ViewDescription.build()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 101,
+      "symbol": "ViewDescription.apply(to:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 105,
+      "symbol": "ViewDescription.contentView(in:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 109,
+      "symbol": "ViewDescription.layoutTransition",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 113,
+      "symbol": "ViewDescription.appearingTransition",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/ViewDescription.swift",
+      "line": 117,
+      "symbol": "ViewDescription.disappearingTransition",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUI/Sources/ViewDescription/VisibilityTransition.swift",
+      "line": 15,
+      "symbol": "VisibilityTransition.init(alpha:transform:attributes:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityBlocker.swift",
+      "line": 10,
+      "symbol": "AccessibilityBlocker.wrapped",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityContainer.swift",
+      "line": 20,
+      "symbol": "AccessibilityContainer.wrapped",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 4,
+      "symbol": "AccessibilityElement",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 6,
+      "symbol": "AccessibilityElement.Trait",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 7,
+      "symbol": "AccessibilityElement.Trait.button",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 8,
+      "symbol": "AccessibilityElement.Trait.link",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 9,
+      "symbol": "AccessibilityElement.Trait.header",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 10,
+      "symbol": "AccessibilityElement.Trait.searchField",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 11,
+      "symbol": "AccessibilityElement.Trait.image",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 12,
+      "symbol": "AccessibilityElement.Trait.selected",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 13,
+      "symbol": "AccessibilityElement.Trait.playsSound",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 14,
+      "symbol": "AccessibilityElement.Trait.keyboardKey",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 15,
+      "symbol": "AccessibilityElement.Trait.staticText",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 16,
+      "symbol": "AccessibilityElement.Trait.summaryElement",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 17,
+      "symbol": "AccessibilityElement.Trait.notEnabled",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 18,
+      "symbol": "AccessibilityElement.Trait.updatesFrequently",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 19,
+      "symbol": "AccessibilityElement.Trait.startsMediaSession",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 20,
+      "symbol": "AccessibilityElement.Trait.adjustable",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 21,
+      "symbol": "AccessibilityElement.Trait.allowsDirectInteraction",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 22,
+      "symbol": "AccessibilityElement.Trait.causesPageTurn",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 23,
+      "symbol": "AccessibilityElement.Trait.tabBar",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 26,
+      "symbol": "AccessibilityElement.label",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 27,
+      "symbol": "AccessibilityElement.value",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 28,
+      "symbol": "AccessibilityElement.hint",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 29,
+      "symbol": "AccessibilityElement.identifier",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 30,
+      "symbol": "AccessibilityElement.traits",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 31,
+      "symbol": "AccessibilityElement.accessibilityFrameSize",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 32,
+      "symbol": "AccessibilityElement.wrappedElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AccessibilityElement.swift",
+      "line": 34,
+      "symbol": "AccessibilityElement.init(label:value:hint:identifier:traits:accessibilityFrameSize:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AttributedLabel.swift",
+      "line": 4,
+      "symbol": "AttributedLabel",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AttributedLabel.swift",
+      "line": 6,
+      "symbol": "AttributedLabel.attributedText",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AttributedLabel.swift",
+      "line": 7,
+      "symbol": "AttributedLabel.numberOfLines",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AttributedLabel.swift",
+      "line": 8,
+      "symbol": "AttributedLabel.isAccessibilityElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/AttributedLabel.swift",
+      "line": 16,
+      "symbol": "AttributedLabel.init(attributedText:configure:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 9,
+      "symbol": "Box.backgroundColor",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 10,
+      "symbol": "Box.cornerStyle",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 11,
+      "symbol": "Box.borderStyle",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 12,
+      "symbol": "Box.shadowStyle",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 13,
+      "symbol": "Box.clipsContent",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 15,
+      "symbol": "Box.wrappedElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 17,
+      "symbol": "Box.init(backgroundColor:cornerStyle:borderStyle:shadowStyle:clipsContent:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 103,
+      "symbol": "Box.CornerStyle",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 104,
+      "symbol": "Box.CornerStyle.square",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 105,
+      "symbol": "Box.CornerStyle.capsule",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 106,
+      "symbol": "Box.CornerStyle.rounded(radius:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 109,
+      "symbol": "Box.BorderStyle",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 110,
+      "symbol": "Box.BorderStyle.none",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 111,
+      "symbol": "Box.BorderStyle.solid(color:width:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 114,
+      "symbol": "Box.ShadowStyle",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 115,
+      "symbol": "Box.ShadowStyle.none",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Box.swift",
+      "line": 116,
+      "symbol": "Box.ShadowStyle.simple(radius:opacity:offset:color:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Button.swift",
+      "line": 9,
+      "symbol": "Button.wrappedElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Button.swift",
+      "line": 10,
+      "symbol": "Button.isEnabled",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Button.swift",
+      "line": 11,
+      "symbol": "Button.onTap",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Button.swift",
+      "line": 12,
+      "symbol": "Button.minimumTappableSize",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Button.swift",
+      "line": 14,
+      "symbol": "Button.init(isEnabled:onTap:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 11,
+      "symbol": "Label.font",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 12,
+      "symbol": "Label.color",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 13,
+      "symbol": "Label.alignment",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 14,
+      "symbol": "Label.numberOfLines",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 15,
+      "symbol": "Label.lineBreakMode",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 16,
+      "symbol": "Label.lineHeight",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 17,
+      "symbol": "Label.isAccessibilityElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 19,
+      "symbol": "Label.init(text:configure:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 80,
+      "symbol": "Label.LineHeight",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Label.swift",
+      "line": 81,
+      "symbol": "Label.LineHeight.Alignment",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 13,
+      "symbol": "ScrollView.alwaysBounceVertical",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 14,
+      "symbol": "ScrollView.alwaysBounceHorizontal",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 24,
+      "symbol": "ScrollView.centersUnderflow",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 25,
+      "symbol": "ScrollView.showsHorizontalScrollIndicator",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 26,
+      "symbol": "ScrollView.showsVerticalScrollIndicator",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 27,
+      "symbol": "ScrollView.pullToRefreshBehavior",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 29,
+      "symbol": "ScrollView.keyboardDismissMode",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 30,
+      "symbol": "ScrollView.contentInsetAdjustmentBehavior",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 31,
+      "symbol": "ScrollView.keyboardAdjustmentMode",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 33,
+      "symbol": "ScrollView.delaysContentTouches",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 35,
+      "symbol": "ScrollView.contentOffsetTrigger",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 37,
+      "symbol": "ScrollView.init(_:wrapping:configure:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 171,
+      "symbol": "ScrollView.KeyboardAdjustmentMode",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 172,
+      "symbol": "ScrollView.KeyboardAdjustmentMode.none",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 173,
+      "symbol": "ScrollView.KeyboardAdjustmentMode.adjustsWhenVisible",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 176,
+      "symbol": "ScrollView.ContentSize",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 192,
+      "symbol": "ScrollView.PullToRefreshBehavior",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 194,
+      "symbol": "ScrollView.PullToRefreshBehavior.disabled",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 195,
+      "symbol": "ScrollView.PullToRefreshBehavior.enabled(action:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 196,
+      "symbol": "ScrollView.PullToRefreshBehavior.refreshing",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 510,
+      "symbol": "ScrollView.ScrollTrigger",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 514,
+      "symbol": "ScrollView.ScrollTrigger.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 518,
+      "symbol": "ScrollView.ScrollTrigger.scroll(to:animated:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 523,
+      "symbol": "ScrollView.ContentOffset",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 525,
+      "symbol": "ScrollView.ContentOffset.ScrollingContext",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 526,
+      "symbol": "ScrollView.ContentOffset.ScrollingContext.contentSize",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 527,
+      "symbol": "ScrollView.ContentOffset.ScrollingContext.scrollViewBounds",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 528,
+      "symbol": "ScrollView.ContentOffset.ScrollingContext.contentInsets",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 531,
+      "symbol": "ScrollView.ContentOffset.Provider",
+      "symbol_kind": "source.lang.swift.decl.typealias",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 533,
+      "symbol": "ScrollView.ContentOffset.top",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 534,
+      "symbol": "ScrollView.ContentOffset.bottom",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/ScrollView.swift",
+      "line": 540,
+      "symbol": "ScrollView.ContentOffset.init(provider:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 8,
+      "symbol": "SegmentedControl.items",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 10,
+      "symbol": "SegmentedControl.selection",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 12,
+      "symbol": "SegmentedControl.font",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 13,
+      "symbol": "SegmentedControl.roundingScale",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 15,
+      "symbol": "SegmentedControl.init(items:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 19,
+      "symbol": "SegmentedControl.appendItem(title:width:onSelect:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 50,
+      "symbol": "SegmentedControl.Selection",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 51,
+      "symbol": "SegmentedControl.Selection.none",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 52,
+      "symbol": "SegmentedControl.Selection.index(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 64,
+      "symbol": "SegmentedControl.Item",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 66,
+      "symbol": "SegmentedControl.Item.title",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 68,
+      "symbol": "SegmentedControl.Item.width",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 70,
+      "symbol": "SegmentedControl.Item.onSelect",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 82,
+      "symbol": "SegmentedControl.Item",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 84,
+      "symbol": "SegmentedControl.Item.Width",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 85,
+      "symbol": "SegmentedControl.Item.Width.automatic",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/SegmentedControl.swift",
+      "line": 86,
+      "symbol": "SegmentedControl.Item.Width.specific(_:)",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Tappable.swift",
+      "line": 8,
+      "symbol": "Tappable.wrappedElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Tappable.swift",
+      "line": 9,
+      "symbol": "Tappable.onTap",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/Tappable.swift",
+      "line": 11,
+      "symbol": "Tappable.init(onTap:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 8,
+      "symbol": "TextField.text",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 9,
+      "symbol": "TextField.placeholder",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 10,
+      "symbol": "TextField.onChange",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 11,
+      "symbol": "TextField.secure",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 12,
+      "symbol": "TextField.isEnabled",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 13,
+      "symbol": "TextField.textAlignment",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 14,
+      "symbol": "TextField.font",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 15,
+      "symbol": "TextField.textColor",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 17,
+      "symbol": "TextField.clearButtonMode",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 19,
+      "symbol": "TextField.keyboardType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 20,
+      "symbol": "TextField.keyboardAppearance",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 22,
+      "symbol": "TextField.autocapitalizationType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 23,
+      "symbol": "TextField.autocorrectionType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 24,
+      "symbol": "TextField.spellCheckingType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 25,
+      "symbol": "TextField.textContentType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 27,
+      "symbol": "TextField.onReturn",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 28,
+      "symbol": "TextField.returnKeyType",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 29,
+      "symbol": "TextField.enablesReturnKeyAutomatically",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 31,
+      "symbol": "TextField.becomeActiveTrigger",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 32,
+      "symbol": "TextField.resignActiveTrigger",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 34,
+      "symbol": "TextField.init(text:configure:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 83,
+      "symbol": "TextField.Trigger",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 87,
+      "symbol": "TextField.Trigger.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/TextField.swift",
+      "line": 91,
+      "symbol": "TextField.Trigger.fire()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/UserInteractionEnabled.swift",
+      "line": 15,
+      "symbol": "UserInteractionEnabled.isEnabled",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/UserInteractionEnabled.swift",
+      "line": 16,
+      "symbol": "UserInteractionEnabled.wrappedElement",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/Blueprint/Blueprint/BlueprintUICommonControls/Sources/UserInteractionEnabled.swift",
+      "line": 18,
+      "symbol": "UserInteractionEnabled.init(_:wrapping:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/runner/work/Blueprint/Blueprint"
+}
