@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 /// Environment is a container for values to be passed down an element tree.
 ///
@@ -69,8 +70,50 @@ public struct Environment {
         }
     }
     
+    /// Returns a new `Environment` by merging the values from `self` and the
+    /// provided environment; keeping values from the provided environment when there
+    /// are key overlaps between the two environments.
+    func merged(prioritizing other : Environment) -> Environment {
+        var merged = self
+        merged.values.merge(other.values) { $1 }
+        return merged
+    }
+        
     /// Cache used to speed up measurements during a layout pass.
     /// This is declared on the `Environment` directly, because access to the `measurementCache` is a hot path
     /// which we can optimize by not needing the usual `env.values[...]` lookup.
     var measurementCache : MeasurementCache
+}
+
+
+extension UIView {
+    
+    /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree,
+    /// or if the view is not explicitly managed by Blueprint, the ``Environment`` of
+    /// the nearest superview that is managed by Blueprint.
+    ///
+    /// If no views in the superview hierarchy are managed by Blueprint, this property returns nil.
+    var inheritedBlueprintEnvironment : Environment? {
+        if let environment = self.nativeViewNodeBlueprintEnvironment {
+            return environment
+        } else if let superview = self.superview {
+            return superview.inheritedBlueprintEnvironment
+        } else {
+            return nil
+        }
+    }
+    
+    /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree.
+    ///
+    /// If this view is not managed by Blueprint, this property returns nil.
+    var nativeViewNodeBlueprintEnvironment : Environment? {
+        get {
+            objc_getAssociatedObject(self, &UIView.environmentKey) as? Environment ?? nil
+        }
+        set {
+            objc_setAssociatedObject(self, &UIView.environmentKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
+    private static var environmentKey = NSObject()
 }

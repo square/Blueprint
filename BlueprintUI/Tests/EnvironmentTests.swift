@@ -16,6 +16,7 @@ class EnvironmentTests: XCTestCase {
         let viewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: layoutResultNode.resolve()))
 
@@ -41,6 +42,7 @@ class EnvironmentTests: XCTestCase {
         let viewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: layoutResultNode.resolve()))
 
@@ -69,6 +71,7 @@ class EnvironmentTests: XCTestCase {
         let viewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: layoutResultNode.resolve()))
 
@@ -89,6 +92,7 @@ class EnvironmentTests: XCTestCase {
         let rightViewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: rightLayoutResultNode.resolve()))
 
@@ -109,6 +113,7 @@ class EnvironmentTests: XCTestCase {
         let wrongViewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: wrongLayoutResultNode.resolve()))
 
@@ -132,12 +137,33 @@ class EnvironmentTests: XCTestCase {
         let viewDescription = leafViewDescription(
             in: NativeViewNode(
                 content: UIView.describe { _ in },
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
                 children: layoutResultNode.resolve()))
 
         viewDescription.apply(to: view)
 
         XCTAssertEqual(view.testValue, testValue)
+    }
+    
+    func test_merged() {
+        var lhs = Environment.empty
+        lhs[TestKey] = .wrong
+        lhs[LHSTestKey] = 2
+        
+        
+        var rhs = Environment.empty
+        rhs[TestKey] = .right
+        rhs[RHSTestKey] = 3
+        
+        let output = lhs.merged(prioritizing: rhs)
+        
+        XCTAssertEqual(output[TestKey], .right)
+        XCTAssertEqual(output[LHSTestKey], 2)
+        XCTAssertEqual(output[RHSTestKey], 3)
+        
+        enum LHSTestKey : EnvironmentKey { static let defaultValue: Int? = nil }
+        enum RHSTestKey : EnvironmentKey { static let defaultValue: Int? = nil }
     }
 
     func leafAttributes(in node: LayoutResultNode) -> LayoutAttributes {
@@ -160,6 +186,47 @@ class EnvironmentTests: XCTestCase {
                 return TestElement(value: environment.testValue)
             }
         }
+    }
+}
+
+
+class Environment_UIView_Tests : XCTestCase {
+    
+    func test_inheritedBlueprintEnvironment() {
+        
+        var environment = Environment.empty
+        environment[TestingKey1.self] = 1
+        
+        let first = View(subview: View(subview: View(subview: nil)))
+        let second = first.subviews[0]
+        let third = second.subviews[0]
+        
+        first.nativeViewNodeBlueprintEnvironment = environment
+        
+        XCTAssertEqual(first.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
+        XCTAssertEqual(second.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
+        XCTAssertEqual(third.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
+        
+        first.nativeViewNodeBlueprintEnvironment = nil
+        
+        XCTAssertEqual(first.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
+        XCTAssertEqual(second.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
+        XCTAssertEqual(third.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
+    }
+    
+    enum TestingKey1 : EnvironmentKey { static let defaultValue: Int? = nil }
+    
+    private final class View : UIView {
+        
+        init(subview : UIView?) {
+            super.init(frame: .zero)
+            
+            if let subview = subview {
+                self.addSubview(subview)
+            }
+        }
+        
+        required init?(coder: NSCoder) { fatalError() }
     }
 }
 

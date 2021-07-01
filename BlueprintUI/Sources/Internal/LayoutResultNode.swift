@@ -95,8 +95,11 @@ extension LayoutResultNode {
         if let viewDescription = viewDescription {
             let node = NativeViewNode(
                 content: viewDescription,
+                environment: environment,
                 layoutAttributes: layoutAttributes,
-                children: resolvedChildContent)
+                children: resolvedChildContent
+            )
+            
             return [(path: .empty, node: node)]
         } else {
             return resolvedChildContent.map { (path, node) -> (path: ElementPath, node: NativeViewNode) in

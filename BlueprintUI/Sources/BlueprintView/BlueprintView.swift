@@ -36,9 +36,34 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
-    /// A base environment to render elements with.
-    /// Some keys may be overriden based on the traits of the view itself.
+    /// A base environment used when laying out and rendering the element tree.
+    ///
+    /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
+    ///
+    /// If this blueprint view is within another blueprint view, the environment of the parent view
+    /// will be inherited by this view if `automaticallyInheritsEnvironmentFromContainingBlueprintViews`
+    /// is enabled. In the case of matching keys in both the inherited environment and the provided
+    /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
+        didSet {
+            setNeedsViewHierarchyUpdate()
+            invalidateIntrinsicContentSize()
+        }
+    }
+    
+    ///
+    /// If `true`, then Blueprint will automatically inherit the  ``Environment`` from the nearest
+    /// parent ``BlueprintView`` in the view hierarchy.
+    ///
+    /// If `false`, then only the values from ``BlueprintView/environment`` will be used to
+    /// seed the environment passed to the element hierarchy.
+    ///
+    /// This property is recursive – if the nearest parent ``BlueprintView`` also sets this property to
+    /// true, then you will inherit the ``Environment`` from that view's parent ``BlueprintView``, and so on.
+    ///
+    /// Defaults to `true`.
+    ///
+    public var automaticallyInheritsEnvironmentFromContainingBlueprintViews : Bool = true {
         didSet {
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
@@ -78,8 +103,13 @@ public final class BlueprintView: UIView {
         rootController = NativeViewController(
             node: NativeViewNode(
                 content: UIView.describe() { _ in },
+                // Because no layout update occurs here, passing an empty environment is fine;
+                // the correct environment will be passed during update.
+                environment: .empty,
                 layoutAttributes: LayoutAttributes(),
-                children: []))
+                children: []
+            )
+        )
     
         super.init(frame: CGRect.zero)
         
@@ -216,10 +246,12 @@ public final class BlueprintView: UIView {
         
         let start = Date()
         Logger.logLayoutStart(view: self)
+        
+        let environment = self.makeEnvironment()
 
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: makeEnvironment())
+            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment)
             .resolve() ?? []
         
         let measurementEndDate = Date()
@@ -229,6 +261,7 @@ public final class BlueprintView: UIView {
         
         var rootNode = NativeViewNode(
             content: UIView.describe() { _ in },
+            environment: environment,
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes
         )
@@ -238,7 +271,12 @@ public final class BlueprintView: UIView {
 
         Logger.logViewUpdateStart(view: self)
 
-        rootController.update(node: rootNode, appearanceTransitionsEnabled: hasUpdatedViewHierarchy)
+        rootController.update(
+            node: rootNode,
+            context: .init(
+                appearanceTransitionsEnabled: hasUpdatedViewHierarchy
+            )
+        )
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
@@ -268,7 +306,19 @@ public final class BlueprintView: UIView {
     }
     
     private func makeEnvironment() -> Environment {
-        var environment = self.environment
+                
+        let inherited : Environment = {
+            if
+                self.automaticallyInheritsEnvironmentFromContainingBlueprintViews,
+                let inherited = self.inheritedBlueprintEnvironment
+            {
+                return inherited
+            } else {
+                return .empty
+            }
+        }()
+        
+        var environment = inherited.merged(prioritizing: self.environment)
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale
@@ -312,7 +362,6 @@ extension BlueprintView {
     final class NativeViewController {
 
         private var viewDescription: ViewDescription
-
         private var layoutAttributes: LayoutAttributes
         
         private (set) var children: [(ElementPath, NativeViewController)]
@@ -323,19 +372,27 @@ extension BlueprintView {
             self.viewDescription = node.viewDescription
             self.layoutAttributes = node.layoutAttributes
             self.children = []
+            
             self.view = node.viewDescription.build()
+            self.view.nativeViewNodeBlueprintEnvironment = node.environment
+        }
+        
+        deinit {
+            self.view.nativeViewNodeBlueprintEnvironment = nil
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
             return node.viewDescription.viewType == type(of: view)
         }
-
-        fileprivate func update(node: NativeViewNode, appearanceTransitionsEnabled: Bool) {
-            
+        
+        fileprivate func update(node: NativeViewNode, context : UpdateContext) {
+                        
             assert(node.viewDescription.viewType == type(of: view))
 
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
+            
+            view.nativeViewNodeBlueprintEnvironment = node.environment
             
             viewDescription.apply(to: view)
 
@@ -403,7 +460,7 @@ extension BlueprintView {
                             contentView.insertSubview(controller.view, at: index)
                         }
 
-                        controller.update(node: child, appearanceTransitionsEnabled: true)
+                        controller.update(node: child, context: context)
                     }
                 } else {
                     var controller: NativeViewController!
@@ -416,12 +473,14 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        controller.update(node: child, appearanceTransitionsEnabled: false)
+                        controller.update(node: child, context: context.modified {
+                            $0.appearanceTransitionsEnabled = false
+                        })
                     }
 
                     newChildren.append((path: path, node: controller))
 
-                    if appearanceTransitionsEnabled {
+                    if context.appearanceTransitionsEnabled {
                         child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
                     }
                 }
@@ -438,6 +497,24 @@ extension BlueprintView {
             }
             
             children = newChildren
+        }
+    }
+}
+
+extension BlueprintView.NativeViewController {
+    
+    /// A context value passed to the ``BlueprintView/NativeViewController`` instance as the view tree is updated by blueprint.
+    /// Contains information relevant to the correct construction and management of the view tree.
+    struct UpdateContext {
+        
+        /// If appearance transitions are enabled for insertions and removals.
+        var appearanceTransitionsEnabled : Bool
+        
+        /// Returns a copy of the update context, modified by the changes provided.
+        func modified(_ modify: (inout Self) -> ()) -> Self {
+            var modified = self
+            modify(&modified)
+            return modified
         }
     }
 }

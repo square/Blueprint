@@ -10,6 +10,7 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
             children: layoutResultNode.resolve())
 
@@ -36,6 +37,7 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
             children: layoutResultNode.resolve())
 
@@ -62,6 +64,7 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
             children: layoutResultNode.resolve())
 
@@ -88,6 +91,7 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
             children: layoutResultNode.resolve())
 
@@ -114,6 +118,7 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
             children: layoutResultNode.resolve())
 
