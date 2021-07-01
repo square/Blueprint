@@ -8,7 +8,7 @@
 import Foundation
 
 
-public final class ElementStateTree : CustomDebugStringConvertible {
+public final class ElementStateTree {
     
     private var states : [ElementIdentifier:ElementState] = [:]
     
@@ -17,7 +17,6 @@ public final class ElementStateTree : CustomDebugStringConvertible {
             return existing
         } else {
             let new = ElementState(identifier: identifier, element: element)
-            new.setup()
             
             self.states[identifier] = new
             return new
@@ -43,6 +42,51 @@ public final class ElementStateTree : CustomDebugStringConvertible {
     func removeAll() {
         self.removedOldStates(keeping: [])
     }
+}
+
+
+extension ElementStateTree {
+    
+    final class ElementState {
+        
+        let identifier : ElementIdentifier
+        var element : Element
+        
+        private(set) var liveState : [AnyElementStateLiveState] = []
+        
+        var children : ElementStateTree = .init()
+        
+        init(identifier : ElementIdentifier, element : Element) {
+            self.identifier = identifier
+            self.element = element
+            
+            if let stateful = element as? StatefulElement {
+                stateful.bind(to: self)
+            }
+        }
+        
+        func setup(with properties : [AnyElementState]) {
+            self.liveState = properties.map { $0.makeAndBindLiveState() }
+        }
+        
+        func teardown() {
+            
+        }
+    }
+}
+
+
+
+
+
+
+
+//
+// MARK: CustomDebugStringConvertible
+//
+
+
+extension ElementStateTree : CustomDebugStringConvertible {
     
     public var debugDescription: String {
         
@@ -61,46 +105,20 @@ public final class ElementStateTree : CustomDebugStringConvertible {
 }
 
 
-extension ElementStateTree {
+extension ElementStateTree.ElementState {
     
-    final class ElementState {
+    
+    func appendDebugDescriptions(to : inout [DebugRepresentation], at depth: Int) {
+        to.append(DebugRepresentation(depth: depth, identifier: self.identifier, element:self.element))
         
-        var state : Any? = nil
-        
+        self.children.states.values.forEach { child in
+            child.appendDebugDescriptions(to: &to, at: depth + 1)
+        }
+    }
+    
+    struct DebugRepresentation {
+        var depth : Int
         var identifier : ElementIdentifier
         var element : Element
-        
-        var children : ElementStateTree = .init()
-        
-        init(identifier : ElementIdentifier, element : Element) {
-            self.identifier = identifier
-            self.element = element
-            
-            if let stateful = element as? StatefulElement {
-                stateful.allStateProperties()
-            }
-        }
-        
-        func setup() {
-            
-        }
-        
-        func teardown() {
-            
-        }
-        
-        func appendDebugDescriptions(to : inout [DebugRepresentation], at depth: Int) {
-            to.append(DebugRepresentation(depth: depth, identifier: self.identifier, element:self.element))
-            
-            self.children.states.values.forEach { child in
-                child.appendDebugDescriptions(to: &to, at: depth + 1)
-            }
-        }
-        
-        struct DebugRepresentation {
-            var depth : Int
-            var identifier : ElementIdentifier
-            var element : Element
-        }
     }
 }

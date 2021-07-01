@@ -10,7 +10,7 @@ import Foundation
 
 protocol AnyElementState {
     
-    var anyLive : AnyElementStateLiveState? { get }
+    func makeAndBindLiveState() -> AnyElementStateLiveState
     
 }
 
@@ -22,25 +22,43 @@ protocol AnyElementStateLiveState : AnyObject {
     
     public var wrappedValue : State {
         get {
-            self.live?.current ?? self.original
+            self.live.value?.current ?? self.original
         }
         
         nonmutating set {
-            self.live?.current = newValue
+            self.live.value?.current = newValue
         }
     }
     
+    public var projectedValue : Binding {
+        Binding(live: self.live.value!)
+    }
+    
     let original : State
-    let live : LiveState? = nil
+    let live : Box<LiveState?> = Box(nil)
     
     public init(wrappedValue : State) {
         self.original = wrappedValue
     }
     
+    public struct Binding {
+        var live : LiveState
+        
+        public var value : State {
+            get {
+                live.current
+            }
+            
+            nonmutating set {
+                live.current = newValue
+            }
+        }
+    }
+    
     final class LiveState : AnyElementStateLiveState {
         var current : State {
             didSet {
-                
+                print("Did set \(self.current)")
             }
         }
         
@@ -51,8 +69,20 @@ protocol AnyElementStateLiveState : AnyObject {
     
     // MARK: AnyElementState
     
-    var anyLive: AnyElementStateLiveState? {
-        self.live
+    func makeAndBindLiveState() -> AnyElementStateLiveState {
+        let live = LiveState(current: self.original)
+        self.live.value = live
+        
+        return live
+    }
+}
+
+
+final class Box<Value> {
+    var value : Value
+    
+    init(_ value : Value) {
+        self.value = value
     }
 }
 
@@ -60,46 +90,20 @@ protocol AnyElementStateLiveState : AnyObject {
 public protocol StatefulElement : Element {}
 
 
-public struct Stateful<State> : StatefulElement {
-    
-    @ElementState public var state : State
-    
-    public typealias ElementProvider = (State) -> Element
-    
-    public let initial : () -> State
-    public let provider : ElementProvider
-    
-    public init(_ initial : @escaping @autoclosure () -> State, provider : @escaping ElementProvider) {
-        _state = .init(wrappedValue: initial())
-        
-        self.initial = initial
-        self.provider = provider
-    }
-    
-    public var content: ElementContent {
-        fatalError()
-    }
-    
-    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        View.describe { _ in }
-    }
-    
-    private final class View : UIView {
-        
-        
-    }
-}
-
 extension StatefulElement {
     
-    func allStateProperties() {
+    func bind(to state : ElementStateTree.ElementState) {
+        
         let mirror = Mirror(reflecting: self)
         
-        for property in mirror.children {
-            if let state = property.value as? AnyElementState {
-                print("Found stateful property \(property.label ?? "[No Name]"): \(property.value )")
+        let properties : [AnyElementState] = mirror.children.compactMap { property in
+            guard let state = property.value as? AnyElementState else {
+                return nil
             }
+            
+            return state
         }
+        
+        state.setup(with: properties)
     }
-    
 }

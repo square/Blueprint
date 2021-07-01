@@ -26,6 +26,14 @@ public struct Spacer: Element {
             size: CGSize(width: value, height: value)
         )
     }
+    
+    public static var horizontal : Spacer {
+        .init(width: 1.0, height: 0)
+    }
+    
+    public static var vertical : Spacer {
+        .init(width: 0.0, height: 1.0)
+    }
 
     public var content: ElementContent {
         return ElementContent(intrinsicSize: size)
