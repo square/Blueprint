@@ -77,11 +77,11 @@ extension BlueprintView.NativeViewController {
                 return
             }
             
+            self.state = .complete
+            
             tracking.displayLink.invalidate()
             
             self.tracking.onDisappear()
-            
-            self.state = .complete
         }
         
         private var lastCoordinateSpaceFrame : CGRect? = nil
