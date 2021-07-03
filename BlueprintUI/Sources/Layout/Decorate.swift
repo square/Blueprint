@@ -67,7 +67,7 @@ public struct Decorate : ProxyElement {
         EnvironmentReader { environment in
             LayoutWriter { constraint, context, layout in
                 
-                let contentSize = self.wrapped.content.measure(
+                let contentSize = self.wrapped.measure(
                     in: constraint,
                     with: context
                 ) // TODO: This doesn't pass caching through...
@@ -168,7 +168,7 @@ extension Decorate {
                 
             case .corner(let corner, let offset):
                 
-                let size = decoration.content.measure(in: .init(contentFrame.size), with: context)
+                let size = decoration.measure(in: .init(contentFrame.size), with: context)
                 
                 let center : CGPoint = {
                     switch corner {

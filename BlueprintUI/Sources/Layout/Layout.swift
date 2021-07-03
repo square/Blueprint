@@ -71,6 +71,7 @@ public final class LayoutItems<Traits> {
         init(traits: Traits, content: Measurable, identifier : ElementIdentifier) {
             self.traits = traits
             self.content = content
+            self.identifier = identifier
         }
     }
 }

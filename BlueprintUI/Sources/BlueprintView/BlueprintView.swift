@@ -42,7 +42,7 @@ public final class BlueprintView: UIView {
     private let measurementViews : LayoutContext.MeasurementViews = .init()
     
     /// The live, tracked state for each element in the element tree.
-    private let rootState : ElementState?
+    private let rootState : RootElementState = .init()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -118,8 +118,6 @@ public final class BlueprintView: UIView {
                 children: []
             )
         )
-        
-        self.rootState = nil
     
         super.init(frame: CGRect.zero)
         
@@ -175,6 +173,9 @@ public final class BlueprintView: UIView {
             )
         }
         
+        let root = RootElementState()
+        root.update(with: element)
+        
         return element.content.measure(
             in: measurementConstraint(with: size),
             with: .init(
@@ -182,7 +183,8 @@ public final class BlueprintView: UIView {
                 measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))"),
+            states: root.root!
         )
     }
 
@@ -206,6 +208,9 @@ public final class BlueprintView: UIView {
             constraint = SizeConstraint(width: bounds.width)
         }
         
+        let root = RootElementState()
+        root.update(with: element)
+        
         return element.content.measure(
             in: constraint,
             with: .init(
@@ -213,7 +218,8 @@ public final class BlueprintView: UIView {
                 measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))"),
+            states: root.root!
         )
     }
 
@@ -267,8 +273,7 @@ public final class BlueprintView: UIView {
         
         let environment = self.makeEnvironment()
 
-        /// Grab view descriptions
-        let viewNodes = self.calculateNativeViewNodes(in: environment)
+        let viewNodes = self.calculateNativeViewNodes(in: environment, states: self.rootState)
         
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -314,14 +319,21 @@ public final class BlueprintView: UIView {
     /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
     /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
     /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
-    private func calculateNativeViewNodes(in environment : Environment, states : ElementState) -> [(path: ElementPath, node: NativeViewNode)] {
+    private func calculateNativeViewNodes(
+        in environment : Environment,
+        states : RootElementState
+    ) -> [(path: ElementPath, node: NativeViewNode)]
+    {
         guard let element = self.element else { return [] }
+        
+        states.update(with: element)
         
         let laidOutNodes = LayoutResultNode(
             root: element,
             layoutAttributes: .init(frame: self.bounds),
             environment: environment,
-            measurementViews: self.measurementViews
+            measurementViews: self.measurementViews,
+            states: states.root!
         )
         
         return laidOutNodes.resolve()

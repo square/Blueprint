@@ -28,30 +28,6 @@ public struct ElementContent {
         self.storage = builder
         self.measurementCachingKey = measurementCachingKey
     }
-    
-    // MARK: Measurement & Children
-    
-    /// Measures the size needed to display the element within the provided size constraint.
-    ///
-    /// ### Usage
-    /// You usually call this method from within the `measure` method of a `Layout`, or within the
-    /// measurement function you provide to an `ElementContent` instance. In either of these cases,
-    /// you should pass through the `LayoutContext` provided to you to ensure the measured elements
-    /// downstream have full access to their measurement caches, environment, etc.
-    /// ```
-    /// public var content: ElementContent {
-    ///     ElementContent { constraint, context -> CGSize in
-    ///         self.wrapped.content.measure(in: constraint, with: context)
-    ///     }
-    /// }
-    /// ```
-    public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
-        measure(
-            in: constraint,
-            with: context,
-            cache: CacheFactory.makeCache(name: "ElementContent")
-        )
-    }
 
     func measure(
         in constraint : SizeConstraint,
@@ -84,6 +60,40 @@ public struct ElementContent {
         )
     }
 }
+
+
+ extension Element {
+    
+    // MARK: Measurement & Children
+    
+    /// Measures the size needed to display the element within the provided size constraint.
+    ///
+    /// ### Usage
+    /// You usually call this method from within the `measure` method of a `Layout`, or within the
+    /// measurement function you provide to an `ElementContent` instance. In either of these cases,
+    /// you should pass through the `LayoutContext` provided to you to ensure the measured elements
+    /// downstream have full access to their measurement caches, environment, etc.
+    /// ```
+    /// public var content: ElementContent {
+    ///     ElementContent { constraint, context -> CGSize in
+    ///         self.wrapped.measure(in: constraint, with: context)
+    ///     }
+    /// }
+    /// ```
+    public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
+        
+        let root = RootElementState()
+        root.update(with: self)
+        
+        return self.content.measure(
+            in: constraint,
+            with: context,
+            cache: CacheFactory.makeCache(name: "ElementContent"),
+            states: root.root!
+        )
+    }
+}
+
 
 extension ElementContent {
     

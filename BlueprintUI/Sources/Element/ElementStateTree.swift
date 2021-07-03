@@ -8,6 +8,36 @@
 import Foundation
 
 
+final class RootElementState {
+    
+    private(set) var root : ElementState?
+    
+    func update(with element : Element?) {
+        
+        if self.root == nil, let element = element {
+            self.root = ElementState(
+                identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                element: element
+            )
+        } else if let root = self.root, element == nil {
+            root.teardown()
+            self.root = nil
+        } else if let root = self.root, let element = element {
+            if type(of: root) == type(of: element) {
+                root.update(with: element, identifier: root.identifier)
+            } else {
+                root.teardown()
+                
+                self.root = ElementState(
+                    identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                    element: element
+                )
+            }
+        }
+    }
+}
+
+
 final class ElementState {
     
     let identifier : ElementIdentifier
@@ -36,7 +66,9 @@ final class ElementState {
     }
     
     func teardown() {
+        // TODO
         
+        self.removeAll()
     }
     
     private var measurements: [SizeConstraint: CGSize] = [:]

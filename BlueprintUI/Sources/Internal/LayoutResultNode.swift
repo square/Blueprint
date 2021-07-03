@@ -48,7 +48,8 @@ struct LayoutResultNode {
                     measurementCache: measurementCache,
                     measurementViews: measurementViews
                 ),
-                cache: cache
+                cache: cache,
+                states: states
             )
         )
     }
