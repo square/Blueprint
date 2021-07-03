@@ -53,9 +53,15 @@ public struct ElementContent {
         )
     }
 
-    func measure(in constraint : SizeConstraint, with context: LayoutContext, cache: CacheTree) -> CGSize {
+    func measure(
+        in constraint : SizeConstraint,
+        with context: LayoutContext,
+        cache: CacheTree,
+        states: ElementState
+    ) -> CGSize
+    {
         context.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, with: context, cache: cache)
+            self.storage.measure(in: constraint, with: context, cache: cache, states: states)
         }
     }
 
@@ -66,13 +72,15 @@ public struct ElementContent {
     func performLayout(
         in size: CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states : ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
     {
         storage.performLayout(
             in: size,
             with: context,
-            cache: cache
+            cache: cache,
+            states: states
         )
     }
 }
@@ -218,13 +226,15 @@ fileprivate protocol ContentStorage {
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> CGSize
 
     func performLayout(
         in size: CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
@@ -265,7 +275,8 @@ extension ElementContent {
         func measure(
             in constraint : SizeConstraint,
             with context : LayoutContext,
-            cache: CacheTree
+            cache: CacheTree,
+            states: ElementState
         ) -> CGSize
         {
             cache.get(constraint) { (constraint) -> CGSize in
@@ -276,7 +287,7 @@ extension ElementContent {
                 )
                 defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-                let layoutItems = self.layoutItems(cache: cache)
+                let layoutItems = self.layoutItems(cache: cache, states: states)
                 
                 return layout.measure(
                     items: layoutItems,
@@ -289,14 +300,15 @@ extension ElementContent {
         func performLayout(
             in size : CGSize,
             with context : LayoutContext,
-            cache: CacheTree
+            cache: CacheTree,
+            states: ElementState
         ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
         {
             guard self.children.isEmpty == false else {
                 return []
             }
             
-            let layoutItems = self.layoutItems(cache: cache)
+            let layoutItems = self.layoutItems(cache: cache, states: states)
             
             let childAttributes = layout.layout(
                 items: layoutItems,
@@ -307,16 +319,17 @@ extension ElementContent {
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
             result.reserveCapacity(children.count)
             
-            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
-
             for index in 0..<children.count {
                 let currentChildLayoutAttributes = childAttributes[index]
                 let currentChild = children[index]
+                
                 let currentChildCache = cache.subcache(
                     index: index,
                     of: children.count,
                     element: currentChild.element
                 )
+                
+                let identifier = layoutItems.all[index].identifier
 
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
@@ -325,13 +338,9 @@ extension ElementContent {
                     children: currentChild.content.performLayout(
                         in: currentChildLayoutAttributes.frame.size,
                         with: context,
-                        cache: currentChildCache
+                        cache: currentChildCache,
+                        states: states.subState(for: currentChild.element, with: identifier)
                     )
-                )
-
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
-                    key: currentChild.key
                 )
 
                 result.append((identifier: identifier, node: resultNode))
@@ -341,7 +350,8 @@ extension ElementContent {
         }
 
         private func layoutItems(
-            cache: CacheTree
+            cache: CacheTree,
+            states : ElementState
         ) -> LayoutItems<LayoutType.Traits>
         {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
@@ -349,8 +359,12 @@ extension ElementContent {
             /// is an extremely hot codepath; this additional performance matters, so we will
             /// keep track of the index ourselves.
             
-            LayoutItems(with: children.indexedMap { index, child in
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+            
+            return LayoutItems(with: children.indexedMap { index, child in
                 let childContent = child.content
+                
+                let identifier = identifierFactory.nextIdentifier(for: type(of: child.element), key: child.key)
                 
                 let childCache = cache.subcache(
                     index: index,
@@ -362,11 +376,16 @@ extension ElementContent {
                     childContent.measure(
                         in: constraint,
                         with: context,
-                        cache: childCache
+                        cache: childCache,
+                        states: states.subState(for: child.element, with: identifier)
                     )
                 }
                 
-                return LayoutItems.Item(traits: child.traits, content: measurable)
+                return LayoutItems.Item(
+                    traits: child.traits,
+                    content: measurable,
+                    identifier: identifier
+                )
             })
         }
         
@@ -396,7 +415,8 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func performLayout(
         in size : CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         let environment = adapted(environment: context.environment)
@@ -412,7 +432,8 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context.setting(\.environment, to: environment),
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: states.subState(for: child, with: identifier)
             )
         )
 
@@ -422,15 +443,20 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> CGSize
     {
         cache.get(constraint) { (constraint) -> CGSize in
             let environment = adapted(environment: context.environment)
+            
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            
             return child.content.measure(
                 in: constraint,
                 with: context.setting(\.environment, to: environment),
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: states.subState(for: child, with: identifier)
             )
         }
     }
@@ -451,16 +477,20 @@ private struct LazyStorage: ContentStorage {
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> CGSize
     {
         cache.get(constraint) { (constraint) -> CGSize in
             let child = builder(constraint, context)
             
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            
             return child.content.measure(
                 in: constraint,
                 with: context,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: states.subState(for: child, with: identifier)
             )
         }
     }
@@ -468,7 +498,8 @@ private struct LazyStorage: ContentStorage {
     func performLayout(
         in size: CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        cache: CacheTree,
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         let child = builder(SizeConstraint(size), context)
@@ -484,7 +515,8 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context,
-                cache: cache.subcache(element: child)
+                cache: cache.subcache(element: child),
+                states: states.subState(for: child, with: identifier)
             )
         )
 

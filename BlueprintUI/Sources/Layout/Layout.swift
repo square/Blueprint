@@ -66,7 +66,9 @@ public final class LayoutItems<Traits> {
         public let traits : Traits
         public let content : Measurable
         
-        init(traits: Traits, content: Measurable) {
+        let identifier : ElementIdentifier
+        
+        init(traits: Traits, content: Measurable, identifier : ElementIdentifier) {
             self.traits = traits
             self.content = content
         }

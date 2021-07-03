@@ -40,6 +40,9 @@ public final class BlueprintView: UIView {
     /// A cache passed to elements which they can use to request a prototype view for measuring
     /// their contents. See ``LayoutContext/measure(_:using:measure:)`` for more.
     private let measurementViews : LayoutContext.MeasurementViews = .init()
+    
+    /// The live, tracked state for each element in the element tree.
+    private let rootState : ElementState?
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -115,6 +118,8 @@ public final class BlueprintView: UIView {
                 children: []
             )
         )
+        
+        self.rootState = nil
     
         super.init(frame: CGRect.zero)
         
@@ -309,7 +314,7 @@ public final class BlueprintView: UIView {
     /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
     /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
     /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
-    private func calculateNativeViewNodes(in environment : Environment) -> [(path: ElementPath, node: NativeViewNode)] {
+    private func calculateNativeViewNodes(in environment : Environment, states : ElementState) -> [(path: ElementPath, node: NativeViewNode)] {
         guard let element = self.element else { return [] }
         
         let laidOutNodes = LayoutResultNode(
