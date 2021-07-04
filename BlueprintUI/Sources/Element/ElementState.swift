@@ -32,7 +32,7 @@ final class RootElementState {
             root.teardown()
             self.root = nil
         } else if let root = self.root, let element = element {
-            if type(of: root) == type(of: element) {
+            if type(of: root.element) == type(of: element) {
                 root.update(with: element, identifier: root.identifier)
             } else {
                 root.teardown()
@@ -59,6 +59,7 @@ final class ElementState {
     let name : String
     
     private(set) var wasVisited : Bool = false
+    private(set) var hasUpdatedInCurrentCycle : Bool = false
                     
     init(
         identifier : ElementIdentifier,
@@ -66,16 +67,12 @@ final class ElementState {
         signpostRef : AnyObject,
         name : String
     ) {
+        print("Making new for \(type(of:element))")
+        
         self.identifier = identifier
         self.element = element
         self.signpostRef = signpostRef
         self.name = name
-    }
-    
-    deinit {
-        if self.name == "BlueprintView" {
-            print("Removed")
-        }
     }
     
     func update(with newElement : Element, identifier : ElementIdentifier) {
@@ -85,6 +82,11 @@ final class ElementState {
         let isEquivalent = self.element.checkIsEquivalentTo(other: newElement)
         
         if isEquivalent == false {
+            
+//            if String(describing: type(of:self.element)) == "Label" {
+//                print("")
+//            }
+            
             self.measurements = [:]
         }
         
@@ -104,16 +106,15 @@ final class ElementState {
     func measure(in constraint : SizeConstraint, using measurer : () -> CGSize) -> CGSize {
         
         if let existing = self.measurements[constraint] {
-            print("Pulling from cache: \(existing), \(self.identifier)")
             return existing
         }
+        
+        print("Measuring new for \(type(of:self.element))")
         
         let new = measurer()
         
         self.measurements[constraint] = new
-        
-        print("Writing to \(self.name) (\(ObjectIdentifier(self)): \(type(of:self.element)) #\(self.identifier.count)")
-        
+                
         return new
     }
     
@@ -122,7 +123,13 @@ final class ElementState {
     func subState(for child : Element, with identifier : ElementIdentifier) -> ElementState {
         if let existing = self.children[identifier] {
             existing.wasVisited = true
-            //existing.update(with: child, identifier: identifier)
+            
+            // TODO: Is this right? Or should we restrict to measurement only?
+            if self.hasUpdatedInCurrentCycle == false {
+                existing.update(with: child, identifier: identifier)
+                self.hasUpdatedInCurrentCycle = true
+            }
+            
             return existing
         } else {
             let new = ElementState(
@@ -143,6 +150,7 @@ final class ElementState {
     func prepareForLayout() {
         
         self.wasVisited = false
+        self.hasUpdatedInCurrentCycle = false
         
         self.children.forEach { _, state in
             state.prepareForLayout()
@@ -222,7 +230,7 @@ extension ElementState {
             depth: depth,
             identifier: self.identifier,
             element:self.element,
-            cachedMeasurementsCount: self.measurements.count
+            measurements: self.measurements
         )
         
         to.append(info)
@@ -237,10 +245,10 @@ extension ElementState {
         var depth : Int
         var identifier : ElementIdentifier
         var element : Element
-        var cachedMeasurementsCount : Int
+        var measurements : [SizeConstraint:CGSize]
         
         var debugDescription : String {
-            "\(self.objectIdentifier)) \(type(of:self.element)) #\(self.identifier.count): \(self.cachedMeasurementsCount) Measurements"
+            "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements"
         }
     }
 }

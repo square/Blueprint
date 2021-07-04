@@ -1,0 +1,102 @@
+//
+//  ElementStateViewController.swift
+//  SampleApp
+//
+//  Created by Kyle Van Essen on 7/3/21.
+//  Copyright © 2021 Square. All rights reserved.
+//
+
+import UIKit
+import BlueprintUI
+import BlueprintUICommonControls
+
+
+final class ElementStateViewController: UIViewController {
+    
+    let blueprintView = BlueprintView()
+
+    override func loadView() {
+        blueprintView.backgroundColor = .white
+        self.view = blueprintView
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        update()
+        
+        self.navigationItem.rightBarButtonItem = .init(title: "Reload", style: .plain, target: self, action: #selector(update))
+    }
+
+    @objc func update() {
+        self.blueprintView.element = element
+    }
+
+    var element: Element {
+        Column { column in
+            column.horizontalAlignment = .fill
+            column.verticalUnderflow = .growUniformly
+            
+            column.addFixed(
+                child: TestPost(
+                    title: "This is a test post",
+                    detail: "This is some detail in the post."
+                )
+            )
+            
+            column.addFixed(
+                child: TestPost(
+                    title: "This is a test post",
+                    detail: "This is some detail in the post."
+                )
+            )
+            
+            column.addFixed(
+                child: TestPost(
+                    title: "This is a test post",
+                    detail: "This is some detail in the post."
+                )
+            )
+        }
+        .scrollable {
+            $0.alwaysBounceVertical = true
+        }
+    }
+}
+
+
+fileprivate struct TestPost : ProxyElement {
+    
+    var title : String
+    var detail : String
+    
+    var elementRepresentation: Element {
+        Row { row in
+            row.verticalAlignment = .center
+            row.horizontalUnderflow = .growUniformly
+            row.minimumHorizontalSpacing = 10
+            
+            row.addFixed(
+                child: Box(backgroundColor: .systemGray, cornerStyle: .rounded(radius: 4.0))
+                    .constrainedTo(width: 70, height: 70)
+            )
+            
+            row.addFlexible(child: Column { col in
+                col.minimumVerticalSpacing = 10.0
+                
+                col.addFixed(
+                    child: Label(text: self.title) {
+                        $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                    }
+                )
+                
+                col.addFixed(
+                    child: Label(text: self.detail) {
+                        $0.font = .systemFont(ofSize: 16.0, weight: .regular)
+                    }
+                )
+            })
+        }
+        .inset(uniform: 15.0)
+    }
+    
+}
