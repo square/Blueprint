@@ -65,11 +65,11 @@ public struct ElementContent {
     /// ```
     /// public var content: ElementContent {
     ///     ElementContent { constraint, context -> CGSize in
-    ///         self.wrapped.measure(in: constraint, with: context)
+    ///         self.wrapped.detachedMeasure(in: constraint, with: context)
     ///     }
     /// }
     /// ```
-    public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
+    public func detachedMeasure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
         
         let root = RootElementState(name: "\(type(of:self)).measure")
         root.update(with: self, in: context.environment)

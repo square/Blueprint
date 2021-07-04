@@ -25,6 +25,7 @@ final class RootElementState {
             self.root = ElementState(
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
+                depth: 0,
                 environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name
@@ -41,6 +42,7 @@ final class RootElementState {
                 self.root = ElementState(
                     identifier: .init(elementType: type(of: element), key: nil, count: 1),
                     element: element,
+                    depth: 0,
                     environment: environment,
                     signpostRef: self.signpostRef,
                     name: self.name
@@ -54,8 +56,11 @@ final class RootElementState {
 final class ElementState {
     
     let identifier : ElementIdentifier
+    let depth : Int
     
     private(set) var element : Element
+    
+    
     private(set) var environment : Environment
     
     let signpostRef : AnyObject
@@ -67,12 +72,14 @@ final class ElementState {
     init(
         identifier : ElementIdentifier,
         element : Element,
+        depth : Int,
         environment : Environment,
         signpostRef : AnyObject,
         name : String
     ) {
         self.identifier = identifier
         self.element = element
+        self.depth = depth
         self.environment = environment
         self.signpostRef = signpostRef
         self.name = name
@@ -106,6 +113,11 @@ final class ElementState {
     }
     
     private var measurements: [SizeConstraint: CGSize] = [:]
+    
+    private struct CachedMeasurement {
+        var size : CGSize
+        var readFromEnvironment : Bool
+    }
 
     func measure(in constraint : SizeConstraint, using measurer : () -> CGSize) -> CGSize {
         
@@ -122,8 +134,15 @@ final class ElementState {
     
     typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
     
+    // TODO: Cache all of them, or just the most few recent / most recent?
     private var layouts : [CGSize:LayoutResult] = [:]
     
+    private struct CachedLayoutResult {
+        var result : LayoutResult
+        var readFromEnvironment : Bool
+    }
+    
+    // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
     func layout(in size : CGSize, using layout : () -> LayoutResult) -> LayoutResult {
         
         if let existing = self.layouts[size] {
@@ -154,6 +173,7 @@ final class ElementState {
             let new = ElementState(
                 identifier: identifier,
                 element: child,
+                depth: self.depth + 1,
                 environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name

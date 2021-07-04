@@ -135,7 +135,7 @@ extension UIView {
 
 extension Environment {
     
-    struct StorageKey : Hashable, CustomDebugStringConvertible {
+    struct StorageKey : Hashable {
         
         fileprivate let identifier : ObjectIdentifier
                 
