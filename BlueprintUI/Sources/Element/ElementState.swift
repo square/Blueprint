@@ -77,7 +77,7 @@ final class ElementState {
         
         precondition(self.identifier == identifier)
         
-        let isEquivalent = self.element.checkIsEquivalentTo(other: newElement)
+        let isEquivalent = Self.checkElementEquivalency(self.element, newElement)
         
         if isEquivalent == false {
             self.measurements = [:]
@@ -176,15 +176,16 @@ final class ElementState {
 private final class SignpostToken {}
 
 
-fileprivate extension Element {
+fileprivate extension ElementState {
     
-    func checkIsEquivalentTo(other : Element) -> Bool {
+    static func checkElementEquivalency(_ lhs : Element, _ rhs : Element) -> Bool {
         
-        guard let self = self as? AnyEquatableElement else { return false }
-        guard let other = other as? AnyEquatableElement else { return false }
+        guard let lhs = lhs as? AnyEquatableElement else { return false }
+        guard let rhs = rhs as? AnyEquatableElement else { return false }
         
-        return self.anyIsEquivalentTo(other: other)
+        return lhs.anyIsEquivalentTo(other: rhs)
     }
+
 }
 
 
