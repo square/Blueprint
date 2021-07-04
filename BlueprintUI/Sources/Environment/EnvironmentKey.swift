@@ -26,4 +26,31 @@ public protocol EnvironmentKey {
     /// The default value that will be vended by an `Environment` for this key if no other value
     /// has been set.
     static var defaultValue: Self.Value { get }
+    
+    static func equals(_ lhs : Value, _ rhs : Value) -> Bool
 }
+
+
+public extension EnvironmentKey where Value:Equatable {
+    
+    static func equals(_ lhs : Value, _ rhs : Value) -> Bool {
+        lhs == rhs
+    }
+}
+
+
+public extension EnvironmentKey where Value:AnyObject {
+    
+    static func equals(_ lhs : Value, _ rhs : Value) -> Bool {
+        lhs === rhs
+    }
+}
+
+public extension EnvironmentKey where Value:NSObject {
+    
+    static func equals(_ lhs : Value, _ rhs : Value) -> Bool {
+        lhs.isEqual(rhs)
+    }
+}
+
+

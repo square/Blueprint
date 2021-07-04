@@ -29,7 +29,7 @@ extension StackElement {
 extension StackElement {
     
     public func isEquivalent(to other : Self) -> Bool {
-                
+           
         // TODO: Is this actually any faster? Or do the comparisons make it too slow?
         
         guard self.layout.allElementsEquatable else { return false }

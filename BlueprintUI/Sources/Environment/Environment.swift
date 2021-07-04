@@ -34,7 +34,7 @@ import UIKit
 ///             }
 ///         }
 ///     }
-public struct Environment {
+public struct Environment : Equatable {
     
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
@@ -42,22 +42,36 @@ public struct Environment {
         .init()
     }
 
-    private var values: [ObjectIdentifier: Any] = [:]
+    private var values: [StorageKey: Any] = [:]
 
     /// Gets or sets an environment value by its key.
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+    public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
-            let objectId = ObjectIdentifier(key)
+            let storageKey = StorageKey(key)
 
-            if let value = values[objectId] {
-                return value as! Key.Value
+            if let value = values[storageKey] {
+                return value as! KeyType.Value
             }
 
             return key.defaultValue
         }
         set {
-            values[ObjectIdentifier(key)] = newValue
+            let storageKey = StorageKey(key)
+            values[storageKey] = newValue
         }
+    }
+    
+    public static func == (lhs : Environment, rhs : Environment) -> Bool {
+        
+        guard lhs.values.count == rhs.values.count else { return false }
+        
+        for (key, value) in lhs.values {
+            if key.valuesEqual(value, rhs.values[key]) == false {
+                return false
+            }
+        }
+        
+        return true
     }
     
     /// Returns a new `Environment` by merging the values from `self` and the
@@ -67,6 +81,45 @@ public struct Environment {
         var merged = self
         merged.values.merge(other.values) { $1 }
         return merged
+    }
+}
+
+
+private extension Environment {
+    
+    struct StorageKey : Hashable {
+        
+        let identifier : ObjectIdentifier
+        
+        private let isEqual : (Any, Any?) -> Bool
+        
+        init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
+            self.identifier = ObjectIdentifier(key)
+            
+            self.isEqual = { lhs, rhs in
+                
+                guard
+                    let lhs = lhs as? KeyType.Value,
+                    let rhs = rhs as? KeyType.Value
+                else {
+                    return false
+                }
+                
+                return KeyType.equals(lhs, rhs)
+            }
+        }
+        
+        func valuesEqual(_ lhs : Any, _ rhs : Any?) -> Bool {
+            self.isEqual(lhs, rhs)
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.identifier == rhs.identifier
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(self.identifier)
+        }
     }
 }
 

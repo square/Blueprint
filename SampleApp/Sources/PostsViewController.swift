@@ -74,6 +74,7 @@ final class PostsViewController: UIViewController {
     }
 }
 
+
 extension Environment {
     private enum FeedThemeKey: EnvironmentKey {
         static let defaultValue = FeedTheme(authorColor: .black)
@@ -85,9 +86,11 @@ extension Environment {
     }
 }
 
-struct FeedTheme {
+
+struct FeedTheme : Equatable {
     var authorColor: UIColor
 }
+
 
 fileprivate struct MainView: ProxyElement {
     
