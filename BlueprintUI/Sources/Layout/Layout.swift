@@ -6,8 +6,6 @@ public protocol Layout {
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()
     
-    var isPassthroughLayout : Bool { get }
-
     /// Computes the size that this layout requires in a layout, given an array
     /// of chidren and accompanying layout traits.
     ///
@@ -41,12 +39,6 @@ public protocol Layout {
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
     
-}
-
-
-extension Layout {
-    
-    public var isPassthroughLayout : Bool { false }
 }
 
 
