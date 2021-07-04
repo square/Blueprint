@@ -41,7 +41,11 @@ public struct ElementContent {
     }
 
     public var childCount: Int {
-        return storage.childCount
+        storage.childCount
+    }
+    
+    public var isPassthroughLayout : Bool {
+        storage.isPassthroughLayout
     }
 
     func performLayout(
@@ -228,6 +232,8 @@ extension ElementContent {
 fileprivate protocol ContentStorage {
     
     var childCount: Int { get }
+    
+    var isPassthroughLayout : Bool { get }
 
     func measure(
         in constraint : SizeConstraint,
@@ -274,6 +280,10 @@ extension ElementContent {
         
         var childCount: Int {
             return children.count
+        }
+        
+        var isPassthroughLayout: Bool {
+            self.layout.isPassthroughLayout
         }
 
         func measure(
@@ -393,6 +403,8 @@ extension ElementContent {
 private struct EnvironmentAdaptingStorage: ContentStorage {
     
     let childCount = 1
+    
+    let isPassthroughLayout: Bool = false
 
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
@@ -455,7 +467,9 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
 /// Content storage that defers creation of its child until measurement or layout time.
 private struct LazyStorage: ContentStorage {
+    
     let childCount = 1
+    let isPassthroughLayout: Bool = false
 
     var builder: (SizeConstraint, LayoutContext) -> Element
     
@@ -515,6 +529,12 @@ fileprivate struct SingleChildLayoutHost: Layout {
     init(wrapping layout: SingleChildLayout) {
         self.wrapped = layout
     }
+    
+    // MARK: Layout
+    
+    var isPassthroughLayout: Bool {
+        self.wrapped.isPassthroughLayout
+    }
 
     func measure(
         items: LayoutItems<Void>,
@@ -546,6 +566,8 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
 // Used for elements with a single child that requires no custom layout
 fileprivate struct PassthroughLayout: SingleChildLayout {
+    
+    var isPassthroughLayout: Bool { true }
     
     func measure(
         child: Measurable,

@@ -3,6 +3,8 @@ import UIKit
 /// Conforming types can calculate layout attributes for an array of children.
 public protocol SingleChildLayout {
 
+    var isPassthroughLayout : Bool { get }
+    
     /// Computes the size that this layout requires
     ///
     /// - parameter constraint: The size constraint in which measuring should occur.
@@ -27,4 +29,12 @@ public protocol SingleChildLayout {
         in size : CGSize,
         with context : LayoutContext
     ) -> LayoutAttributes
+}
+
+
+public extension SingleChildLayout {
+    
+    var isPassthroughLayout : Bool {
+        false
+    }
 }
