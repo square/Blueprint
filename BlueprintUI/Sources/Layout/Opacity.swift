@@ -1,10 +1,10 @@
 import UIKit
 
 /// Changes the opacity of the wrapped element.
-public struct Opacity: Element {
+public struct Opacity<Wrapped:Element>: Element {
 
     /// The content element whose opacity is being affected.
-    public var wrappedElement: Element
+    public var wrapped: Wrapped
 
     /// The opacity of the wrapped element.
     public var opacity: CGFloat
@@ -16,14 +16,14 @@ public struct Opacity: Element {
     ///   - wrapping: The content element to be made transparent.
     public init(
         opacity: CGFloat,
-        wrapping wrappedElement: Element
+        wrapping wrapped: Wrapped
     ) {
         self.opacity = opacity
-        self.wrappedElement = wrappedElement
+        self.wrapped = wrapped
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(opacity: opacity))
+        return ElementContent(child: wrapped, layout: Layout(opacity: opacity))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -57,13 +57,19 @@ public struct Opacity: Element {
     }
 }
 
+
+extension Opacity:Equatable where Wrapped:Equatable {}
+extension Opacity:AnyEquatableElement where Wrapped:Equatable {}
+extension Opacity:EquatableElement where Wrapped:Equatable {}
+
+
 public extension Element {
     /// Wraps the element in an `Opacity` element with the provided opacity.
     ///
     /// - parameters:
     ///   - opacity: The opacity to be applied.
     ///
-    func opacity(_ opacity: CGFloat) -> Opacity {
+    func opacity(_ opacity: CGFloat) -> Opacity<Self> {
         return Opacity(
             opacity: opacity,
             wrapping: self

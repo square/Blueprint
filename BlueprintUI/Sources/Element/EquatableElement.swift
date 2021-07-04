@@ -11,7 +11,6 @@ import Foundation
 
 public protocol EquatableElement : AnyEquatableElement {
     
-    
     func isEquivalent(to other : Self) -> Bool
     
 }
