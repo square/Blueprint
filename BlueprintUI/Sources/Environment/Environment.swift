@@ -43,12 +43,16 @@ public struct Environment : Equatable {
     }
 
     private var values: [StorageKey: Any] = [:]
+    
+    internal var onDidRead : (StorageKey) -> () = { _ in }
 
     /// Gets or sets an environment value by its key.
     public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
 
+            self.onDidRead(storageKey)
+            
             if let value = values[storageKey] {
                 return value as! KeyType.Value
             }
@@ -59,6 +63,17 @@ public struct Environment : Equatable {
             let storageKey = StorageKey(key)
             values[storageKey] = newValue
         }
+    }
+    
+    func isEqual(to other : Environment, comparing keys : [StorageKey] = []) -> Bool {
+        
+        for key in keys {
+            if key.valuesEqual(self.values[key], other.values[key]) == false {
+                return false
+            }
+        }
+        
+        return true
     }
     
     public static func == (lhs : Environment, rhs : Environment) -> Bool {
@@ -118,19 +133,21 @@ extension UIView {
 }
 
 
-private extension Environment {
+extension Environment {
     
     struct StorageKey : Hashable, CustomDebugStringConvertible {
         
-        let identifier : ObjectIdentifier
+        fileprivate let identifier : ObjectIdentifier
                 
-        private let isEqual : (Any, Any?) -> Bool
+        private let isEqual : (Any?, Any?) -> Bool
         private let keyTypeName : () -> String
         
-        init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
+        fileprivate init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
             self.identifier = ObjectIdentifier(key)
             
             self.isEqual = { lhs, rhs in
+                
+                if lhs == nil && rhs == nil { return true }
                 
                 guard
                     let lhs = lhs as? KeyType.Value,
@@ -147,7 +164,7 @@ private extension Environment {
             }
         }
         
-        func valuesEqual(_ lhs : Any, _ rhs : Any?) -> Bool {
+        fileprivate func valuesEqual(_ lhs : Any?, _ rhs : Any?) -> Bool {
             self.isEqual(lhs, rhs)
         }
         
