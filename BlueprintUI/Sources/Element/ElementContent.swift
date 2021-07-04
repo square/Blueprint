@@ -244,7 +244,7 @@ extension ElementContent {
             states: ElementState
         ) -> CGSize
         {
-            states.measure(in: constraint) {
+            states.measure(in: constraint, with: context.environment) { environment in
                 
                 Logger.logMeasureStart(
                     object: states.signpostRef,
@@ -254,12 +254,12 @@ extension ElementContent {
                 
                 defer { Logger.logMeasureEnd(object: states.signpostRef) }
 
-                let layoutItems = self.layoutItems(states: states, environment: context.environment)
+                let layoutItems = self.layoutItems(states: states, environment: environment)
                 
                 return layout.measure(
                     items: layoutItems,
                     in: constraint,
-                    with: context
+                    with: context.setting(\.environment, to: environment)
                 )
             }
         }
@@ -406,9 +406,9 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         states: ElementState
     ) -> CGSize
     {
-        states.measure(in: constraint) {
-            let environment = adapted(environment: context.environment)
+        states.measure(in: constraint, with: context.environment) { environment in
             
+            let environment = adapted(environment: environment)
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             
             return child.content.measure(
@@ -439,9 +439,10 @@ private struct LazyStorage: ContentStorage {
         states: ElementState
     ) -> CGSize
     {
-        states.measure(in: constraint) {
-            let child = builder(constraint, context)
+        states.measure(in: constraint, with: context.environment) { environment in
             
+            let context = context.setting(\.environment, to: environment)
+            let child = builder(constraint, context)
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             
             return child.content.measure(

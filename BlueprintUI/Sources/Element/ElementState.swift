@@ -112,24 +112,41 @@ final class ElementState {
         
     }
     
-    private var measurements: [SizeConstraint: CGSize] = [:]
+    private var measurements: [SizeConstraint:CachedMeasurement] = [:]
     
     private struct CachedMeasurement {
         var size : CGSize
         var readFromEnvironment : Bool
     }
 
-    func measure(in constraint : SizeConstraint, using measurer : () -> CGSize) -> CGSize {
-        
+    func measure(
+        in constraint : SizeConstraint,
+        with environment : Environment,
+        using measurer : (Environment) -> CGSize
+    ) -> CGSize
+    {
         if let existing = self.measurements[constraint] {
-            return existing
+            return existing.size
+        }
+        
+        var environment = environment
+        var readFromEnvironment : Bool = false
+        
+        environment.onDidRead = { key in
+            print(key.debugDescription)
+            readFromEnvironment = true
         }
                 
-        let new = measurer()
+        let size = measurer(environment)
         
-        self.measurements[constraint] = new
+        environment.onDidRead = nil
+        
+        self.measurements[constraint] = .init(
+            size: size,
+            readFromEnvironment: readFromEnvironment
+        )
                 
-        return new
+        return size
     }
     
     typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
@@ -273,7 +290,7 @@ extension ElementState : CustomDebugStringConvertible {
 
 extension ElementState {
     
-    func appendDebugDescriptions(to : inout [DebugRepresentation], at depth: Int) {
+    private func appendDebugDescriptions(to : inout [DebugRepresentation], at depth: Int) {
         
         let info = DebugRepresentation(
             objectIdentifier: ObjectIdentifier(self),
@@ -291,12 +308,12 @@ extension ElementState {
         }
     }
     
-    struct DebugRepresentation : CustomDebugStringConvertible{
+    private struct DebugRepresentation : CustomDebugStringConvertible{
         var objectIdentifier : ObjectIdentifier
         var depth : Int
         var identifier : ElementIdentifier
         var element : Element
-        var measurements : [SizeConstraint:CGSize]
+        var measurements : [SizeConstraint:CachedMeasurement]
         var layouts : [CGSize:LayoutResult]
         
         var debugDescription : String {

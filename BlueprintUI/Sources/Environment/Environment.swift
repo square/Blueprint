@@ -44,14 +44,15 @@ public struct Environment : Equatable {
 
     private var values: [StorageKey: Any] = [:]
     
-    internal var onDidRead : (StorageKey) -> () = { _ in }
+    typealias OnDidRead = (StorageKey) -> ()
+    internal var onDidRead : OnDidRead? = nil
 
     /// Gets or sets an environment value by its key.
     public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
 
-            self.onDidRead(storageKey)
+            self.onDidRead?(storageKey)
             
             if let value = values[storageKey] {
                 return value as! KeyType.Value

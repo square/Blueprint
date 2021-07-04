@@ -76,33 +76,37 @@ fileprivate struct TestPost : ProxyElement, Equatable, EquatableElement {
     var detail : String
     
     var elementRepresentation: Element {
-        Row { row in
-            row.verticalAlignment = .center
-            row.horizontalUnderflow = .growUniformly
-            row.minimumHorizontalSpacing = 10
+        EnvironmentReader { env in
             
-            row.addFixed(
-                child: Box(backgroundColor: .systemGray, cornerStyle: .rounded(radius: 4.0))
-                    .constrainedTo(width: 70, height: 70)
-            )
+            _ = env.safeAreaInsets
             
-            row.addFlexible(child: Column { col in
-                col.minimumVerticalSpacing = 10.0
+            return Row { row in
+                row.verticalAlignment = .center
+                row.horizontalUnderflow = .growUniformly
+                row.minimumHorizontalSpacing = 10
                 
-                col.addFixed(
-                    child: Label(text: self.title) {
-                        $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
-                    }
+                row.addFixed(
+                    child: Box(backgroundColor: .systemGray, cornerStyle: .rounded(radius: 4.0))
+                        .constrainedTo(width: 70, height: 70)
                 )
                 
-                col.addFixed(
-                    child: Label(text: self.detail) {
-                        $0.font = .systemFont(ofSize: 16.0, weight: .regular)
-                    }
-                )
-            })
+                row.addFlexible(child: Column { col in
+                    col.minimumVerticalSpacing = 10.0
+                    
+                    col.addFixed(
+                        child: Label(text: self.title) {
+                            $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                        }
+                    )
+                    
+                    col.addFixed(
+                        child: Label(text: self.detail) {
+                            $0.font = .systemFont(ofSize: 16.0, weight: .regular)
+                        }
+                    )
+                })
+            }
+            .inset(uniform: 15.0)
         }
-        .inset(uniform: 15.0)
     }
-    
 }
