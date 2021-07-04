@@ -68,9 +68,8 @@ extension LayoutResultNode {
         }
 
         let subtreeExtent: CGRect? = children
-            .map { $0.node }
-            .reduce(into: nil) { (rect, node) in
-                rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
+            .reduce(into: nil) { (rect, child) in
+                rect = rect?.union(child.node.layoutAttributes.frame) ?? child.node.layoutAttributes.frame
             }
 
         let viewDescription = element.backingViewDescription(
