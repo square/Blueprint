@@ -85,45 +85,6 @@ public struct Environment : Equatable {
 }
 
 
-private extension Environment {
-    
-    struct StorageKey : Hashable {
-        
-        let identifier : ObjectIdentifier
-        
-        private let isEqual : (Any, Any?) -> Bool
-        
-        init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
-            self.identifier = ObjectIdentifier(key)
-            
-            self.isEqual = { lhs, rhs in
-                
-                guard
-                    let lhs = lhs as? KeyType.Value,
-                    let rhs = rhs as? KeyType.Value
-                else {
-                    return false
-                }
-                
-                return KeyType.equals(lhs, rhs)
-            }
-        }
-        
-        func valuesEqual(_ lhs : Any, _ rhs : Any?) -> Bool {
-            self.isEqual(lhs, rhs)
-        }
-        
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.identifier == rhs.identifier
-        }
-        
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(self.identifier)
-        }
-    }
-}
-
-
 extension UIView {
     
     /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree,
@@ -154,4 +115,52 @@ extension UIView {
     }
     
     private static var environmentKey = NSObject()
+}
+
+
+private extension Environment {
+    
+    struct StorageKey : Hashable, CustomDebugStringConvertible {
+        
+        let identifier : ObjectIdentifier
+                
+        private let isEqual : (Any, Any?) -> Bool
+        private let keyTypeName : () -> String
+        
+        init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
+            self.identifier = ObjectIdentifier(key)
+            
+            self.isEqual = { lhs, rhs in
+                
+                guard
+                    let lhs = lhs as? KeyType.Value,
+                    let rhs = rhs as? KeyType.Value
+                else {
+                    return false
+                }
+                
+                return KeyType.equals(lhs, rhs)
+            }
+            
+            self.keyTypeName = {
+                String(describing: type(of: KeyType.self))
+            }
+        }
+        
+        func valuesEqual(_ lhs : Any, _ rhs : Any?) -> Bool {
+            self.isEqual(lhs, rhs)
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.identifier == rhs.identifier
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(self.identifier)
+        }
+        
+        var debugDescription: String {
+            self.keyTypeName()
+        }
+    }
 }

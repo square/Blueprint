@@ -88,7 +88,7 @@ final class ElementState {
     ) {
         precondition(self.identifier == identifier)
         
-        if Self.checkElementEquivalency(self.element, newElement) == false || self.environment != newEnvironment {
+        if Self.elementsEquivalent(self.element, newElement) == false || self.environment != newEnvironment {
             self.measurements = [:]
             self.layouts = [:]
         }
@@ -216,7 +216,7 @@ private final class SignpostToken {}
 
 fileprivate extension ElementState {
     
-    static func checkElementEquivalency(_ lhs : Element, _ rhs : Element) -> Bool {
+    static func elementsEquivalent(_ lhs : Element, _ rhs : Element) -> Bool {
         
         guard let lhs = lhs as? AnyEquatableElement else { return false }
         guard let rhs = rhs as? AnyEquatableElement else { return false }
