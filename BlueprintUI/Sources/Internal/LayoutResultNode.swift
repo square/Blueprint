@@ -34,7 +34,6 @@ struct LayoutResultNode {
         measurementViews: LayoutContext.MeasurementViews,
         states : ElementState
     ) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
         let measurementCache = MeasurementCache()
         
         self.init(
@@ -48,7 +47,6 @@ struct LayoutResultNode {
                     measurementCache: measurementCache,
                     measurementViews: measurementViews
                 ),
-                cache: cache,
                 states: states
             )
         )

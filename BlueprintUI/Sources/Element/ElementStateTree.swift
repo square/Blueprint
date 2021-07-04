@@ -12,12 +12,21 @@ final class RootElementState {
     
     private(set) var root : ElementState?
     
+    private let signpostRef : SignpostToken = .init()
+    let name : String
+    
+    init(name : String) {
+        self.name = name
+    }
+    
     func update(with element : Element?) {
         
         if self.root == nil, let element = element {
             self.root = ElementState(
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
-                element: element
+                element: element,
+                signpostRef: self.signpostRef,
+                name: self.name
             )
         } else if let root = self.root, element == nil {
             root.teardown()
@@ -30,7 +39,9 @@ final class RootElementState {
                 
                 self.root = ElementState(
                     identifier: .init(elementType: type(of: element), key: nil, count: 1),
-                    element: element
+                    element: element,
+                    signpostRef: self.signpostRef,
+                    name: self.name
                 )
             }
         }
@@ -41,11 +52,22 @@ final class RootElementState {
 final class ElementState {
     
     let identifier : ElementIdentifier
+    
     var element : Element
+    
+    let signpostRef : AnyObject
+    let name : String
                     
-    init(identifier : ElementIdentifier, element : Element) {
+    init(
+        identifier : ElementIdentifier,
+        element : Element,
+        signpostRef : AnyObject,
+        name : String
+    ) {
         self.identifier = identifier
         self.element = element
+        self.signpostRef = signpostRef
+        self.name = name
     }
     
     func update(with newElement : Element, identifier : ElementIdentifier) {
@@ -88,9 +110,15 @@ final class ElementState {
     
     func subState(for child : Element, with identifier : ElementIdentifier) -> ElementState {
         if let existing = self.children[identifier] {
+            existing.update(with: child, identifier: identifier)
             return existing
         } else {
-            let new = ElementState(identifier: identifier, element: child)
+            let new = ElementState(
+                identifier: identifier,
+                element: child,
+                signpostRef: self.signpostRef,
+                name: self.name
+            )
             
             self.children[identifier] = new
             
@@ -98,6 +126,7 @@ final class ElementState {
         }
     }
     
+    // TODO: Call me!!
     func removeOldChildren(keeping liveIdentifiers : Set<ElementIdentifier>) {
         
         let removed = Set(self.children.keys).subtracting(liveIdentifiers)
@@ -118,6 +147,9 @@ final class ElementState {
         self.removeOldChildren(keeping: [])
     }
 }
+
+/// A token reference type that can be used to group associated signpost logs using `OSSignpostID`.
+private final class SignpostToken {}
 
 
 fileprivate extension Element {

@@ -42,7 +42,7 @@ public final class BlueprintView: UIView {
     private let measurementViews : LayoutContext.MeasurementViews = .init()
     
     /// The live, tracked state for each element in the element tree.
-    private let rootState : RootElementState = .init()
+    private let rootState : RootElementState = .init(name: "") // TODO Fixme name
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -173,7 +173,7 @@ public final class BlueprintView: UIView {
             )
         }
         
-        let root = RootElementState()
+        let root = RootElementState(name: "BlueprintView<\(type(of:element))>.sizeThatFits")
         root.update(with: element)
         
         return element.content.measure(
@@ -183,7 +183,6 @@ public final class BlueprintView: UIView {
                 measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))"),
             states: root.root!
         )
     }
@@ -208,7 +207,7 @@ public final class BlueprintView: UIView {
             constraint = SizeConstraint(width: bounds.width)
         }
         
-        let root = RootElementState()
+        let root = RootElementState(name: "BlueprintView<\(type(of:element))>.intrinsicContentSize")
         root.update(with: element)
         
         return element.content.measure(
@@ -218,7 +217,6 @@ public final class BlueprintView: UIView {
                 measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))"),
             states: root.root!
         )
     }
