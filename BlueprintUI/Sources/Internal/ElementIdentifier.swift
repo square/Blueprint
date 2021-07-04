@@ -47,6 +47,8 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     let key : AnyHashable?
 
     let count : Int
+    
+    private let hash : Int
 
     init(elementType : Element.Type, key : AnyHashable?, count : Int) {
         
@@ -54,6 +56,12 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         self.key = key
         
         self.count = count
+        
+        var hasher = Hasher()
+        hasher.combine(self.elementType)
+        hasher.combine(self.key)
+        hasher.combine(self.count)
+        self.hash = hasher.finalize()
     }
     
     var debugDescription: String {
@@ -62,6 +70,10 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         } else {
             return "\(self.elementType).\(self.count)"
         }
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(self.hash)
     }
     
     /**

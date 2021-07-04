@@ -312,38 +312,40 @@ extension ElementContent {
                 return []
             }
             
-            let layoutItems = self.layoutItems(states: states)
-            
-            let childAttributes = layout.layout(
-                items: layoutItems,
-                in: size,
-                with: context
-            )
-
-            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
-            result.reserveCapacity(children.count)
-            
-            for index in 0..<children.count {
-                let currentChildLayoutAttributes = childAttributes[index]
-                let currentChild = children[index]
-
-                let identifier = layoutItems.all[index].identifier
-
-                let resultNode = LayoutResultNode(
-                    element: currentChild.element,
-                    layoutAttributes: currentChildLayoutAttributes,
-                    environment: context.environment,
-                    children: currentChild.content.performLayout(
-                        in: currentChildLayoutAttributes.frame.size,
-                        with: context,
-                        states: states.subState(for: currentChild.element, with: identifier)
-                    )
+            return states.layout(in: size) {
+                let layoutItems = self.layoutItems(states: states)
+                
+                let childAttributes = layout.layout(
+                    items: layoutItems,
+                    in: size,
+                    with: context
                 )
 
-                result.append((identifier: identifier, node: resultNode))
-            }
+                var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+                result.reserveCapacity(children.count)
+                
+                for index in 0..<children.count {
+                    let currentChildLayoutAttributes = childAttributes[index]
+                    let currentChild = children[index]
 
-            return result
+                    let identifier = layoutItems.all[index].identifier
+
+                    let resultNode = LayoutResultNode(
+                        element: currentChild.element,
+                        layoutAttributes: currentChildLayoutAttributes,
+                        environment: context.environment,
+                        children: currentChild.content.performLayout(
+                            in: currentChildLayoutAttributes.frame.size,
+                            with: context,
+                            states: states.subState(for: currentChild.element, with: identifier)
+                        )
+                    )
+
+                    result.append((identifier: identifier, node: resultNode))
+                }
+
+                return result
+            }
         }
 
         private func layoutItems(

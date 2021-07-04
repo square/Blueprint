@@ -81,6 +81,7 @@ final class ElementState {
         
         if isEquivalent == false {
             self.measurements = [:]
+            self.layouts = [:]
         }
         
         self.element = newElement
@@ -105,6 +106,23 @@ final class ElementState {
         let new = measurer()
         
         self.measurements[constraint] = new
+                
+        return new
+    }
+    
+    typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    
+    private var layouts : [CGSize:LayoutResult] = [:]
+    
+    func layout(in size : CGSize, using layout : () -> LayoutResult) -> LayoutResult {
+        
+        if let existing = self.layouts[size] {
+            return existing
+        }
+                
+        let new = layout()
+        
+        self.layouts[size] = new
                 
         return new
     }
@@ -171,6 +189,15 @@ final class ElementState {
         }
     }
 }
+
+
+extension CGSize : Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.width)
+        hasher.combine(self.height)
+    }
+}
+
 
 /// A token reference type that can be used to group associated signpost logs using `OSSignpostID`.
 private final class SignpostToken {}
