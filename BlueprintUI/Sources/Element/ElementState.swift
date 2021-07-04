@@ -71,6 +71,9 @@ final class ElementState {
         self.element = element
         self.signpostRef = signpostRef
         self.name = name
+        
+        self.wasVisited = true
+        self.hasUpdatedInCurrentCycle = true
     }
     
     func update(with newElement : Element, identifier : ElementIdentifier) {

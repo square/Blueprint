@@ -14,7 +14,7 @@ extension Array {
     ///
     /// This method is more performant than calling `array.enumerated().map(...)` by up
     /// to 25% for large collections, so prefer it when needing an indexed `map` in areas where performance is critical.
-    @inlinable func indexedMap<Mapped>(_ map : (Int, Element) -> Mapped) -> [Mapped] {
+    @inline(__always) func indexedMap<Mapped>(_ map : (Int, Element) -> Mapped) -> [Mapped] {
         
         let count = self.count
         
@@ -32,7 +32,7 @@ extension Array {
     ///
     /// This method is more performant than calling `array.enumerated().forEac(...)` by up
     /// to 25% for large collections, so prefer it when needing an indexed `forEach` in areas where performance is critical.
-    @inlinable func indexedForEach(_ each : (Int, Element) -> Void) {
+    @inline(__always) func indexedForEach(_ each : (Int, Element) -> Void) {
         
         let count = self.count
 

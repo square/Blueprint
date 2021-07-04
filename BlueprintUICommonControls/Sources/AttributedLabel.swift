@@ -30,9 +30,18 @@ public struct AttributedLabel: Equatable, EquatableElement {
 
     private func update(label: LabelView) {
         label.attributedText = attributedText
-        label.numberOfLines = numberOfLines
-        label.isAccessibilityElement = isAccessibilityElement
-        label.textRectOffset = textRectOffset
+        
+        if label.numberOfLines != numberOfLines {
+            label.numberOfLines = numberOfLines
+        }
+        
+        if label.isAccessibilityElement != isAccessibilityElement {
+            label.isAccessibilityElement = isAccessibilityElement
+        }
+        
+        if label.textRectOffset != textRectOffset {
+            label.textRectOffset = textRectOffset
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

@@ -59,7 +59,7 @@ final class ElementStateViewController: UIViewController {
 }
 
 
-fileprivate struct TestPost : ProxyElement {
+fileprivate struct TestPost : ProxyElement, Equatable, EquatableElement {
     
     var title : String
     var detail : String

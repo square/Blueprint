@@ -4,7 +4,7 @@ import UIKit
 ///
 /// This protocol should only be used by Row and Column elements (you should never add conformance to other custom
 /// types).
-public protocol StackElement: Element {
+public protocol StackElement : EquatableElement {
     init()
     var layout: StackLayout { get }
     var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
@@ -24,6 +24,41 @@ extension StackElement {
         return nil
     }
 
+}
+
+extension StackElement {
+    
+    public func isEquivalent(to other : Self) -> Bool {
+                
+        guard self.layout == other.layout else { return false }
+        
+        guard self.children.count == other.children.count else { return false }
+        
+        for index in 0..<self.children.count {
+            let lhs = self.children[index]
+            let rhs = self.children[index]
+            
+            guard
+                lhs.traits == rhs.traits,
+                lhs.key == rhs.key
+            else {
+                return false
+            }
+                
+            guard
+                let lhs = lhs.element as? AnyEquatableElement,
+                let rhs = rhs.element as? AnyEquatableElement
+            else {
+                return false
+            }
+            
+            if lhs.anyIsEquivalentTo(other: rhs) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
 }
 
 extension StackElement {
@@ -173,7 +208,7 @@ extension StackElement {
 
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
-public struct StackLayout: Layout {
+public struct StackLayout: Layout, Equatable {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
@@ -194,7 +229,7 @@ public struct StackLayout: Layout {
     /// # In Xcode
     /// [StackElement.add()](x-source-tag://StackElement.add)
     ///
-    public struct Traits {
+    public struct Traits : Equatable {
 
         /// Controls the amount of extra space distributed to this child during underflow.
         ///
@@ -231,7 +266,17 @@ public struct StackLayout: Layout {
         ) {
             self.growPriority = growPriority
             self.shrinkPriority = shrinkPriority
+            
             self.alignmentGuide = alignmentGuide
+        }
+        
+        public static func == (lhs : Self, rhs : Self) -> Bool {
+            
+            lhs.growPriority == rhs.growPriority &&
+            lhs.shrinkPriority == rhs.shrinkPriority &&
+            lhs.alignmentGuide == nil &&
+            rhs.alignmentGuide == nil
+            
         }
     }
 
@@ -265,8 +310,8 @@ public struct StackLayout: Layout {
     {
         _layout(in: size, with: context, items: items)
     }
-
 }
+
 
 extension StackLayout {
 
@@ -309,12 +354,21 @@ extension StackLayout {
     }
 
     /// Determines the cross-axis layout (height for a horizontal stack, width for a vertical stack).
-    public enum Alignment {
+    public enum Alignment : Equatable {
+        
         /// Children will be stretched to the size of the stack.
         case fill
         /// Children will be aligned relatively to each other, and then all the contents will be
         /// aligned to the stack's bounding box, according to the specified alignment.
         case align(to: AlignmentID.Type)
+        
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case (.fill, .fill): return true
+            case (.align(let lhs), .align(let rhs)): return lhs == rhs
+            default: return false
+            }
+        }
     }
 
 }
