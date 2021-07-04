@@ -72,7 +72,7 @@ public struct ElementContent {
     public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
         
         let root = RootElementState(name: "\(type(of:self)).measure")
-        root.update(with: self, environment: context.environment)
+        root.update(with: self, in: context.environment)
         
         return self.content.measure(
             in: constraint,
@@ -301,7 +301,7 @@ extension ElementContent {
                             with: context,
                             states: states.subState(
                                 for: currentChild.element,
-                                   environment: context.environment,
+                                   in: context.environment,
                                    with: identifier
                             )
                         )
@@ -337,8 +337,8 @@ extension ElementContent {
                         with: context,
                         states: states.subState(
                             for: child.element,
-                               environment: environment,
-                               with: identifier
+                            in: environment,
+                            with: identifier
                         )
                     )
                 }
@@ -393,7 +393,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, environment: environment, with: identifier)
+                states: states.subState(for: child, in: environment, with: identifier)
             )
         )
 
@@ -414,7 +414,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, environment: environment, with: identifier)
+                states: states.subState(for: child, in: environment, with: identifier)
             )
         }
     }
@@ -447,7 +447,7 @@ private struct LazyStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context,
-                states: states.subState(for: child, environment: context.environment, with: identifier)
+                states: states.subState(for: child, in: context.environment, with: identifier)
             )
         }
     }
@@ -471,7 +471,7 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context,
-                states: states.subState(for: child, environment: context.environment, with: identifier)
+                states: states.subState(for: child, in: context.environment, with: identifier)
             )
         )
 

@@ -19,7 +19,7 @@ final class RootElementState {
         self.name = name
     }
     
-    func update(with element : Element?, environment : Environment) {
+    func update(with element : Element?, in environment : Environment) {
         
         if self.root == nil, let element = element {
             self.root = ElementState(
@@ -34,7 +34,7 @@ final class RootElementState {
             self.root = nil
         } else if let root = self.root, let element = element {
             if type(of: root.element) == type(of: element) {
-                root.update(with: element, environment: environment, identifier: root.identifier)
+                root.update(with: element, in: environment, identifier: root.identifier)
             } else {
                 root.teardown()
                 
@@ -83,19 +83,18 @@ final class ElementState {
     
     func update(
         with newElement : Element,
-        environment newEnvironment : Environment,
+        in newEnvironment : Environment,
         identifier : ElementIdentifier
     ) {
         precondition(self.identifier == identifier)
         
-        let isEquivalent = Self.checkElementEquivalency(self.element, newElement)
-        
-        if isEquivalent == false {
+        if Self.checkElementEquivalency(self.element, newElement) == false || self.environment != newEnvironment {
             self.measurements = [:]
             self.layouts = [:]
         }
         
         self.element = newElement
+        self.environment = newEnvironment
     }
     
     func setup() {
@@ -140,13 +139,13 @@ final class ElementState {
     
     private var children : [ElementIdentifier:ElementState] = [:]
     
-    func subState(for child : Element, environment : Environment, with identifier : ElementIdentifier) -> ElementState {
+    func subState(for child : Element, in environment : Environment, with identifier : ElementIdentifier) -> ElementState {
         if let existing = self.children[identifier] {
             existing.wasVisited = true
             
             // TODO: Is this right? Or should we restrict to measurement only?
             if self.hasUpdatedInCurrentCycle == false {
-                existing.update(with: child, environment: environment, identifier: identifier)
+                existing.update(with: child, in: environment, identifier: identifier)
                 self.hasUpdatedInCurrentCycle = true
             }
             
