@@ -564,7 +564,6 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
     {
         LayoutAttributes(size: size)
     }
-
 }
 
 

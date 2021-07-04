@@ -42,7 +42,7 @@ public final class BlueprintView: UIView {
     private let measurementViews : LayoutContext.MeasurementViews = .init()
     
     /// The live, tracked state for each element in the element tree.
-    private let rootState : RootElementState = .init(name: "") // TODO Fixme name
+    private let rootState : RootElementState = .init(name: "BlueprintView")
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -270,7 +270,7 @@ public final class BlueprintView: UIView {
         Logger.logLayoutStart(view: self)
         
         let environment = self.makeEnvironment()
-
+        
         let viewNodes = self.calculateNativeViewNodes(in: environment, states: self.rootState)
         
         let measurementEndDate = Date()
@@ -323,6 +323,13 @@ public final class BlueprintView: UIView {
     ) -> [(path: ElementPath, node: NativeViewNode)]
     {
         guard let element = self.element else { return [] }
+        
+        self.rootState.root?.prepareForLayout()
+        
+        defer {
+            // TODO: Call this here? Do nodes need to retain their states longer
+            self.rootState.root?.finishedLayout()
+        }
         
         states.update(with: element)
         

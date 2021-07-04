@@ -1,5 +1,5 @@
 //
-//  ElementStateTree.swift
+//  ElementState.swift
 //  BlueprintUI
 //
 //  Created by Kyle Van Essen on 6/24/21.
@@ -57,6 +57,8 @@ final class ElementState {
     
     let signpostRef : AnyObject
     let name : String
+    
+    private(set) var wasVisited : Bool = false
                     
     init(
         identifier : ElementIdentifier,
@@ -68,6 +70,12 @@ final class ElementState {
         self.element = element
         self.signpostRef = signpostRef
         self.name = name
+    }
+    
+    deinit {
+        if self.name == "BlueprintView" {
+            print("Removed")
+        }
     }
     
     func update(with newElement : Element, identifier : ElementIdentifier) {
@@ -88,20 +96,23 @@ final class ElementState {
     }
     
     func teardown() {
-        // TODO
         
-        self.removeAll()
     }
     
     private var measurements: [SizeConstraint: CGSize] = [:]
 
     func measure(in constraint : SizeConstraint, using measurer : () -> CGSize) -> CGSize {
         
-        if let existing = self.measurements[constraint] { return existing }
+        if let existing = self.measurements[constraint] {
+            print("Pulling from cache: \(existing), \(self.identifier)")
+            return existing
+        }
         
         let new = measurer()
         
         self.measurements[constraint] = new
+        
+        print("Writing to \(self.name) (\(ObjectIdentifier(self)): \(type(of:self.element)) #\(self.identifier.count)")
         
         return new
     }
@@ -110,7 +121,8 @@ final class ElementState {
     
     func subState(for child : Element, with identifier : ElementIdentifier) -> ElementState {
         if let existing = self.children[identifier] {
-            existing.update(with: child, identifier: identifier)
+            existing.wasVisited = true
+            //existing.update(with: child, identifier: identifier)
             return existing
         } else {
             let new = ElementState(
@@ -120,31 +132,44 @@ final class ElementState {
                 name: self.name
             )
             
+            new.wasVisited = true
+            
             self.children[identifier] = new
             
             return new
         }
     }
     
-    // TODO: Call me!!
-    func removeOldChildren(keeping liveIdentifiers : Set<ElementIdentifier>) {
+    func prepareForLayout() {
         
-        let removed = Set(self.children.keys).subtracting(liveIdentifiers)
+        self.wasVisited = false
         
-        removed.forEach {
-            let state = self.children[$0]
-            
-            // Ensures that all of the child states which are going away are removed as well.
-            state?.children.removeAll()
-            
-            state?.teardown()
-            
-            self.children.removeValue(forKey: $0)
+        self.children.forEach { _, state in
+            state.prepareForLayout()
         }
     }
     
-    func removeAll() {
-        self.removeOldChildren(keeping: [])
+    func finishedLayout() {
+        
+        self.removeOldChildren()
+    }
+    
+    private func removeOldChildren() {
+        let old : [ElementIdentifier] = self.children.compactMap { id, state in
+            state.wasVisited ? nil : id
+        }
+        
+        old.forEach {
+            guard let state = self.children[$0] else { fatalError() }
+            
+            state.teardown()
+            
+            self.children.removeValue(forKey: $0)
+        }
+        
+        self.children.forEach { _, state in
+            state.removeOldChildren()
+        }
     }
 }
 
@@ -180,7 +205,7 @@ extension ElementState : CustomDebugStringConvertible {
         }
         
         let strings : [String] = debugRepresentations.map { child in
-            Array(repeating: "  ", count: child.depth).joined() + "\(type(of:child.element)) #\(child.identifier.count)"
+            Array(repeating: "  ", count: child.depth).joined() + child.debugDescription
         }
         
         return strings.joined(separator: "\n")
@@ -191,16 +216,31 @@ extension ElementState : CustomDebugStringConvertible {
 extension ElementState {
     
     func appendDebugDescriptions(to : inout [DebugRepresentation], at depth: Int) {
-        to.append(DebugRepresentation(depth: depth, identifier: self.identifier, element:self.element))
+        
+        let info = DebugRepresentation(
+            objectIdentifier: ObjectIdentifier(self),
+            depth: depth,
+            identifier: self.identifier,
+            element:self.element,
+            cachedMeasurementsCount: self.measurements.count
+        )
+        
+        to.append(info)
         
         self.children.values.forEach { child in
             child.appendDebugDescriptions(to: &to, at: depth + 1)
         }
     }
     
-    struct DebugRepresentation {
+    struct DebugRepresentation : CustomDebugStringConvertible{
+        var objectIdentifier : ObjectIdentifier
         var depth : Int
         var identifier : ElementIdentifier
         var element : Element
+        var cachedMeasurementsCount : Int
+        
+        var debugDescription : String {
+            "\(self.objectIdentifier)) \(type(of:self.element)) #\(self.identifier.count): \(self.cachedMeasurementsCount) Measurements"
+        }
     }
 }
