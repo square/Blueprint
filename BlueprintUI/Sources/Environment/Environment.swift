@@ -66,7 +66,7 @@ public struct Environment : Equatable {
         }
     }
     
-    func isEqual(to other : Environment, comparing keys : [StorageKey] = []) -> Bool {
+    func isEqual(to other : Environment, comparing keys : Set<StorageKey> = []) -> Bool {
         
         for key in keys {
             if key.valuesEqual(self.values[key], other.values[key]) == false {

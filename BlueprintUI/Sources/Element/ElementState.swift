@@ -26,7 +26,6 @@ final class RootElementState {
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
                 depth: 0,
-                environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name
             )
@@ -43,7 +42,6 @@ final class RootElementState {
                     identifier: .init(elementType: type(of: element), key: nil, count: 1),
                     element: element,
                     depth: 0,
-                    environment: environment,
                     signpostRef: self.signpostRef,
                     name: self.name
                 )
@@ -61,7 +59,6 @@ final class ElementState {
     let name : String
     
     private(set) var element : Element
-    private(set) var environment : Environment
     
     private(set) var wasVisited : Bool = false
     private(set) var hasUpdatedInCurrentCycle : Bool = false
@@ -70,14 +67,12 @@ final class ElementState {
         identifier : ElementIdentifier,
         element : Element,
         depth : Int,
-        environment : Environment,
         signpostRef : AnyObject,
         name : String
     ) {
         self.identifier = identifier
         self.element = element
         self.depth = depth
-        self.environment = environment
         self.signpostRef = signpostRef
         self.name = name
         
@@ -92,13 +87,26 @@ final class ElementState {
     ) {
         precondition(self.identifier == identifier)
         
-        if Self.elementsEquivalent(self.element, newElement) == false || self.environment != newEnvironment {
+        if Self.elementsEquivalent(self.element, newElement) == false {
             self.measurements = [:]
             self.layouts = [:]
+        } else {
+            for (_, result) in self.measurements {
+                if result.environmentDependency.trackedKeysEqual(to: newEnvironment) == false {
+                    self.measurements.removeAll()
+                    break
+                }
+            }
+            
+            for (_, result) in self.measurements {
+                if result.environmentDependency.trackedKeysEqual(to: newEnvironment) == false {
+                    self.measurements.removeAll()
+                    break
+                }
+            }
         }
         
         self.element = newElement
-        self.environment = newEnvironment
     }
     
     func setup() {
@@ -148,25 +156,41 @@ final class ElementState {
     typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
     
     // TODO: Cache all of them, or just the most few recent / most recent?
-    private var layouts : [CGSize:LayoutResult] = [:]
+    private var layouts : [CGSize:CachedLayoutResult] = [:]
     
     private struct CachedLayoutResult {
         var result : LayoutResult
-        // TODO...
+        var environmentDependency : Environment.LayoutDependency
     }
     
     // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
-    func layout(in size : CGSize, using layout : () -> LayoutResult) -> LayoutResult {
+    func layout(
+        in size : CGSize,
+        with environment : Environment,
+        using layout : (Environment) -> LayoutResult
+    ) -> LayoutResult {
         
         if let existing = self.layouts[size] {
-            return existing
+            return existing.result
+        }
+        
+        var environment = environment
+        var readEnvironmentKeys = Set<Environment.StorageKey>()
+        
+        environment.onDidRead = { key in
+            readEnvironmentKeys.insert(key)
         }
                 
-        let new = layout()
+        let result = layout(environment)
         
-        self.layouts[size] = new
+        environment.onDidRead = nil
+        
+        self.layouts[size] = .init(
+            result: result,
+            environmentDependency: .init(environment, keys: readEnvironmentKeys)
+        )
                 
-        return new
+        return result
     }
     
     private var children : [ElementIdentifier:ElementState] = [:]
@@ -186,7 +210,6 @@ final class ElementState {
                 identifier: identifier,
                 element: child,
                 depth: self.depth + 1,
-                environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name
             )
@@ -243,6 +266,15 @@ extension Environment {
                 self = .none
             } else {
                 self = .dependency(environment, keys)
+            }
+        }
+        
+        func trackedKeysEqual(to other : Environment) -> Bool {
+            switch self {
+            case .none:
+                return true
+            case .dependency(let environment, let keys):
+                return environment.isEqual(to: other, comparing: keys)
             }
         }
     }
@@ -324,7 +356,7 @@ extension ElementState {
         var identifier : ElementIdentifier
         var element : Element
         var measurements : [SizeConstraint:CachedMeasurement]
-        var layouts : [CGSize:LayoutResult]
+        var layouts : [CGSize:CachedLayoutResult]
         
         var debugDescription : String {
             "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements, \(self.layouts.count) Layouts"

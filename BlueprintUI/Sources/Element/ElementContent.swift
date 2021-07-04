@@ -274,7 +274,9 @@ extension ElementContent {
                 return []
             }
             
-            return states.layout(in: size) {
+            return states.layout(in: size, with: context.environment) { environment in
+                
+                let context = context.setting(\.environment, to: environment)
                 let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 let childAttributes = layout.layout(
