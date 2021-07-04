@@ -173,13 +173,15 @@ public final class BlueprintView: UIView {
             )
         }
         
+        let environment = self.makeEnvironment()
+        
         let root = RootElementState(name: "BlueprintView<\(type(of:element))>.sizeThatFits")
-        root.update(with: element)
+        root.update(with: element, environment: environment)
         
         return element.content.measure(
             in: measurementConstraint(with: size),
             with: .init(
-                environment: self.makeEnvironment(),
+                environment: environment,
                 measurementViews: self.measurementViews
             ),
             states: root.root!
@@ -206,13 +208,15 @@ public final class BlueprintView: UIView {
             constraint = SizeConstraint(width: bounds.width)
         }
         
+        let environment = self.makeEnvironment()
+        
         let root = RootElementState(name: "BlueprintView<\(type(of:element))>.intrinsicContentSize")
-        root.update(with: element)
+        root.update(with: element, environment: environment)
         
         return element.content.measure(
             in: constraint,
             with: .init(
-                environment: self.makeEnvironment(),
+                environment: environment,
                 measurementViews: self.measurementViews
             ),
             states: root.root!
@@ -329,7 +333,7 @@ public final class BlueprintView: UIView {
             self.rootState.root?.finishedLayout()
         }
         
-        states.update(with: element)
+        states.update(with: element, environment: environment)
         
         let laidOutNodes = LayoutResultNode(
             root: element,

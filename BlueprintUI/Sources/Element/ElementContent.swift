@@ -72,7 +72,7 @@ public struct ElementContent {
     public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
         
         let root = RootElementState(name: "\(type(of:self)).measure")
-        root.update(with: self)
+        root.update(with: self, environment: context.environment)
         
         return self.content.measure(
             in: constraint,
@@ -254,7 +254,7 @@ extension ElementContent {
                 
                 defer { Logger.logMeasureEnd(object: states.signpostRef) }
 
-                let layoutItems = self.layoutItems(states: states)
+                let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 return layout.measure(
                     items: layoutItems,
@@ -275,7 +275,7 @@ extension ElementContent {
             }
             
             return states.layout(in: size) {
-                let layoutItems = self.layoutItems(states: states)
+                let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 let childAttributes = layout.layout(
                     items: layoutItems,
@@ -299,7 +299,11 @@ extension ElementContent {
                         children: currentChild.content.performLayout(
                             in: currentChildLayoutAttributes.frame.size,
                             with: context,
-                            states: states.subState(for: currentChild.element, with: identifier)
+                            states: states.subState(
+                                for: currentChild.element,
+                                   environment: context.environment,
+                                   with: identifier
+                            )
                         )
                     )
 
@@ -311,7 +315,8 @@ extension ElementContent {
         }
 
         private func layoutItems(
-            states : ElementState
+            states : ElementState,
+            environment : Environment
         ) -> LayoutItems<LayoutType.Traits>
         {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
@@ -330,7 +335,11 @@ extension ElementContent {
                     childContent.measure(
                         in: constraint,
                         with: context,
-                        states: states.subState(for: child.element, with: identifier)
+                        states: states.subState(
+                            for: child.element,
+                               environment: environment,
+                               with: identifier
+                        )
                     )
                 }
                 
@@ -384,7 +393,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, with: identifier)
+                states: states.subState(for: child, environment: environment, with: identifier)
             )
         )
 
@@ -405,7 +414,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, with: identifier)
+                states: states.subState(for: child, environment: environment, with: identifier)
             )
         }
     }
@@ -438,7 +447,7 @@ private struct LazyStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context,
-                states: states.subState(for: child, with: identifier)
+                states: states.subState(for: child, environment: context.environment, with: identifier)
             )
         }
     }
@@ -462,7 +471,7 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context,
-                states: states.subState(for: child, with: identifier)
+                states: states.subState(for: child, environment: context.environment, with: identifier)
             )
         )
 

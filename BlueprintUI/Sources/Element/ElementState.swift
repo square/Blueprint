@@ -19,12 +19,13 @@ final class RootElementState {
         self.name = name
     }
     
-    func update(with element : Element?) {
+    func update(with element : Element?, environment : Environment) {
         
         if self.root == nil, let element = element {
             self.root = ElementState(
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
+                environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name
             )
@@ -33,13 +34,14 @@ final class RootElementState {
             self.root = nil
         } else if let root = self.root, let element = element {
             if type(of: root.element) == type(of: element) {
-                root.update(with: element, identifier: root.identifier)
+                root.update(with: element, environment: environment, identifier: root.identifier)
             } else {
                 root.teardown()
                 
                 self.root = ElementState(
                     identifier: .init(elementType: type(of: element), key: nil, count: 1),
                     element: element,
+                    environment: environment,
                     signpostRef: self.signpostRef,
                     name: self.name
                 )
@@ -53,7 +55,8 @@ final class ElementState {
     
     let identifier : ElementIdentifier
     
-    var element : Element
+    private(set) var element : Element
+    private(set) var environment : Environment
     
     let signpostRef : AnyObject
     let name : String
@@ -64,11 +67,13 @@ final class ElementState {
     init(
         identifier : ElementIdentifier,
         element : Element,
+        environment : Environment,
         signpostRef : AnyObject,
         name : String
     ) {
         self.identifier = identifier
         self.element = element
+        self.environment = environment
         self.signpostRef = signpostRef
         self.name = name
         
@@ -76,8 +81,11 @@ final class ElementState {
         self.hasUpdatedInCurrentCycle = true
     }
     
-    func update(with newElement : Element, identifier : ElementIdentifier) {
-        
+    func update(
+        with newElement : Element,
+        environment newEnvironment : Environment,
+        identifier : ElementIdentifier
+    ) {
         precondition(self.identifier == identifier)
         
         let isEquivalent = Self.checkElementEquivalency(self.element, newElement)
@@ -132,13 +140,13 @@ final class ElementState {
     
     private var children : [ElementIdentifier:ElementState] = [:]
     
-    func subState(for child : Element, with identifier : ElementIdentifier) -> ElementState {
+    func subState(for child : Element, environment : Environment, with identifier : ElementIdentifier) -> ElementState {
         if let existing = self.children[identifier] {
             existing.wasVisited = true
             
             // TODO: Is this right? Or should we restrict to measurement only?
             if self.hasUpdatedInCurrentCycle == false {
-                existing.update(with: child, identifier: identifier)
+                existing.update(with: child, environment: environment, identifier: identifier)
                 self.hasUpdatedInCurrentCycle = true
             }
             
@@ -147,6 +155,7 @@ final class ElementState {
             let new = ElementState(
                 identifier: identifier,
                 element: child,
+                environment: environment,
                 signpostRef: self.signpostRef,
                 name: self.name
             )
