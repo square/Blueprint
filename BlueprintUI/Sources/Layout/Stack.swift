@@ -6,7 +6,7 @@ import UIKit
 /// types).
 public protocol StackElement : EquatableElement {
     init()
-    var layout: StackLayout { get }
+    var layout: StackLayout { get set }
     var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
 }
 
@@ -30,6 +30,11 @@ extension StackElement {
     
     public func isEquivalent(to other : Self) -> Bool {
                 
+        // TODO: Is this actually any faster? Or do the comparisons make it too slow?
+        
+        guard self.layout.allElementsEquatable else { return false }
+        guard other.layout.allElementsEquatable else { return false }
+                
         guard self.layout == other.layout else { return false }
         
         guard self.children.count == other.children.count else { return false }
@@ -44,7 +49,7 @@ extension StackElement {
             else {
                 return false
             }
-                
+            
             guard
                 let lhs = lhs.element as? AnyEquatableElement,
                 let rhs = rhs.element as? AnyEquatableElement
@@ -146,6 +151,8 @@ extension StackElement {
             ),
             key: key
         ))
+        
+        self.layout.allElementsEquatable = self.layout.allElementsEquatable && child is AnyEquatableElement
     }
 
 
@@ -286,6 +293,8 @@ public struct StackLayout: Layout, Equatable {
     public var overflow = OverflowDistribution.condenseProportionally
     public var alignment: Alignment
     public var minimumSpacing: CGFloat = 0
+    
+    var allElementsEquatable : Bool = true
 
 
     public init(axis: Axis, alignment: Alignment) {

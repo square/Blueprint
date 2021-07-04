@@ -97,7 +97,5 @@ extension LayoutResultNode {
                 return (path, transformedNode)
             }
         }
-
     }
-    
 }

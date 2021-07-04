@@ -24,7 +24,18 @@ final class ElementStateViewController: UIViewController {
         super.viewDidLoad()
         update()
         
-        self.navigationItem.rightBarButtonItem = .init(title: "Reload", style: .plain, target: self, action: #selector(update))
+        self.navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(title: "Reload", style: .plain, target: self, action: #selector(update)),
+            UIBarButtonItem(title: "Reload Loop", style: .plain, target: self, action: #selector(updateLoop))
+        ]
+    }
+    
+    @objc func updateLoop() {
+        for _ in 0...100 {
+            autoreleasepool {
+                self.update()
+            }
+        }
     }
 
     @objc func update() {
