@@ -28,7 +28,14 @@ final class ElementStateViewController: UIViewController {
     }
 
     @objc func update() {
+        
+        let start = Date()
+        
         self.blueprintView.element = element
+        self.blueprintView.layoutIfNeeded()
+        
+        let end = Date()
+        print("Layout Time: \(end.timeIntervalSince(start))")
     }
 
     var element: Element {
@@ -36,26 +43,14 @@ final class ElementStateViewController: UIViewController {
             column.horizontalAlignment = .fill
             column.verticalUnderflow = .growUniformly
             
-            column.addFixed(
-                child: TestPost(
-                    title: "This is a test post",
-                    detail: "This is some detail in the post."
+            for _ in 1...200 {
+                column.addFixed(
+                    child: TestPost(
+                        title: "This is a test post",
+                        detail: "This is some detail in the post."
+                    )
                 )
-            )
-            
-            column.addFixed(
-                child: TestPost(
-                    title: "This is a test post",
-                    detail: "This is some detail in the post."
-                )
-            )
-            
-            column.addFixed(
-                child: TestPost(
-                    title: "This is a test post",
-                    detail: "This is some detail in the post."
-                )
-            )
+            }
         }
         .scrollable {
             $0.alwaysBounceVertical = true

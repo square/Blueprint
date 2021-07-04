@@ -67,8 +67,6 @@ final class ElementState {
         signpostRef : AnyObject,
         name : String
     ) {
-        print("Making new for \(type(of:element))")
-        
         self.identifier = identifier
         self.element = element
         self.signpostRef = signpostRef
@@ -82,11 +80,6 @@ final class ElementState {
         let isEquivalent = self.element.checkIsEquivalentTo(other: newElement)
         
         if isEquivalent == false {
-            
-//            if String(describing: type(of:self.element)) == "Label" {
-//                print("")
-//            }
-            
             self.measurements = [:]
         }
         
@@ -108,9 +101,7 @@ final class ElementState {
         if let existing = self.measurements[constraint] {
             return existing
         }
-        
-        print("Measuring new for \(type(of:self.element))")
-        
+                
         let new = measurer()
         
         self.measurements[constraint] = new
