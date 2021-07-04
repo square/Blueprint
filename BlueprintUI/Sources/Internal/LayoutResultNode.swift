@@ -34,8 +34,6 @@ struct LayoutResultNode {
         measurementViews: LayoutContext.MeasurementViews,
         states : ElementState
     ) {
-        let measurementCache = MeasurementCache()
-        
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
@@ -44,7 +42,6 @@ struct LayoutResultNode {
                 in: layoutAttributes.frame.size,
                 with: .init(
                     environment: environment,
-                    measurementCache: measurementCache,
                     measurementViews: measurementViews
                 ),
                 states: states

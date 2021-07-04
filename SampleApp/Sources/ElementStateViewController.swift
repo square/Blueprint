@@ -43,7 +43,7 @@ final class ElementStateViewController: UIViewController {
             column.horizontalAlignment = .fill
             column.verticalUnderflow = .growUniformly
             
-            for _ in 1...200 {
+            for _ in 1...300 {
                 column.addFixed(
                     child: TestPost(
                         title: "This is a test post",

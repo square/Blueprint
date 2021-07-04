@@ -28,7 +28,6 @@ public struct LayoutContext {
     public static func rootContext(with environment : Environment = .empty) -> Self {
         Self(
             environment: environment,
-            measurementCache: .init(),
             measurementViews: .init()
         )
     }
@@ -85,7 +84,6 @@ public struct LayoutContext {
     
     // MARK: Internal
     
-    let measurementCache : MeasurementCache
     let measurementViews : MeasurementViews
 }
 

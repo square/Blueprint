@@ -180,7 +180,6 @@ public final class BlueprintView: UIView {
             in: measurementConstraint(with: size),
             with: .init(
                 environment: self.makeEnvironment(),
-                measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
             states: root.root!
@@ -214,7 +213,6 @@ public final class BlueprintView: UIView {
             in: constraint,
             with: .init(
                 environment: self.makeEnvironment(),
-                measurementCache: .init(),
                 measurementViews: self.measurementViews
             ),
             states: root.root!
