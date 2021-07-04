@@ -260,7 +260,8 @@ extension ElementState {
             depth: depth,
             identifier: self.identifier,
             element:self.element,
-            measurements: self.measurements
+            measurements: self.measurements,
+            layouts: self.layouts
         )
         
         to.append(info)
@@ -276,9 +277,10 @@ extension ElementState {
         var identifier : ElementIdentifier
         var element : Element
         var measurements : [SizeConstraint:CGSize]
+        var layouts : [CGSize:LayoutResult]
         
         var debugDescription : String {
-            "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements"
+            "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements, \(self.layouts.count) Layouts"
         }
     }
 }
