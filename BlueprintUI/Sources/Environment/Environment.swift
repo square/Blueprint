@@ -146,23 +146,8 @@ extension Environment {
         fileprivate init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
             self.identifier = ObjectIdentifier(key)
             
-            self.isEqual = { lhs, rhs in
-                
-                if lhs == nil && rhs == nil { return true }
-                
-                guard
-                    let lhs = lhs as? KeyType.Value,
-                    let rhs = rhs as? KeyType.Value
-                else {
-                    return false
-                }
-                
-                return KeyType.equals(lhs, rhs)
-            }
-            
-            self.keyTypeName = {
-                String(describing: type(of: KeyType.self))
-            }
+            self.isEqual = { KeyType.anyEquals($0, $1) }
+            self.keyTypeName = { String(describing: type(of: KeyType.self)) }
         }
         
         fileprivate func valuesEqual(_ lhs : Any?, _ rhs : Any?) -> Bool {

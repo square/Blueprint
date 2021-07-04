@@ -19,7 +19,7 @@
 ///             set { self[WidgetCountKey.self] = newValue }
 ///         }
 ///     }
-public protocol EnvironmentKey {
+public protocol EnvironmentKey : AnyEnvironmentKey {
     /// The type of value stored by this key.
     associatedtype Value
 
@@ -54,3 +54,26 @@ public extension EnvironmentKey where Value:NSObject {
 }
 
 
+public protocol AnyEnvironmentKey {
+    
+    static func anyEquals(_ lhs : Any?, _ rhs : Any?) -> Bool
+    
+}
+
+
+public extension EnvironmentKey  {
+    
+    static func anyEquals(_ lhs : Any?, _ rhs : Any?) -> Bool {
+        
+        if lhs == nil && rhs == nil { return true }
+        
+        guard
+            let lhs = lhs as? Value,
+            let rhs = rhs as? Value
+        else {
+            return false
+        }
+        
+        return Self.equals(lhs, rhs)
+    }
+}

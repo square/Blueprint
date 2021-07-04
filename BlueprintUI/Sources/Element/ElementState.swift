@@ -57,14 +57,11 @@ final class ElementState {
     
     let identifier : ElementIdentifier
     let depth : Int
-    
-    private(set) var element : Element
-    
-    
-    private(set) var environment : Environment
-    
     let signpostRef : AnyObject
     let name : String
+    
+    private(set) var element : Element
+    private(set) var environment : Environment
     
     private(set) var wasVisited : Bool = false
     private(set) var hasUpdatedInCurrentCycle : Bool = false
@@ -116,7 +113,7 @@ final class ElementState {
     
     private struct CachedMeasurement {
         var size : CGSize
-        var readFromEnvironment : Bool
+        var environmentDependency : Environment.LayoutDependency
     }
 
     func measure(
@@ -130,11 +127,10 @@ final class ElementState {
         }
         
         var environment = environment
-        var readFromEnvironment : Bool = false
+        var readEnvironmentKeys = Set<Environment.StorageKey>()
         
         environment.onDidRead = { key in
-            print(key.debugDescription)
-            readFromEnvironment = true
+            readEnvironmentKeys.insert(key)
         }
                 
         let size = measurer(environment)
@@ -143,7 +139,7 @@ final class ElementState {
         
         self.measurements[constraint] = .init(
             size: size,
-            readFromEnvironment: readFromEnvironment
+            environmentDependency: .init(environment, keys: readEnvironmentKeys)
         )
                 
         return size
@@ -156,7 +152,7 @@ final class ElementState {
     
     private struct CachedLayoutResult {
         var result : LayoutResult
-        var readFromEnvironment : Bool
+        // TODO...
     }
     
     // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
@@ -179,7 +175,6 @@ final class ElementState {
         if let existing = self.children[identifier] {
             existing.wasVisited = true
             
-            // TODO: Is this right? Or should we restrict to measurement only?
             if self.hasUpdatedInCurrentCycle == false {
                 existing.update(with: child, in: environment, identifier: identifier)
                 self.hasUpdatedInCurrentCycle = true
@@ -195,8 +190,6 @@ final class ElementState {
                 signpostRef: self.signpostRef,
                 name: self.name
             )
-            
-            new.wasVisited = true
             
             self.children[identifier] = new
             
@@ -234,6 +227,23 @@ final class ElementState {
         
         self.children.forEach { _, state in
             state.removeOldChildren()
+        }
+    }
+}
+
+
+extension Environment {
+    
+    fileprivate enum LayoutDependency {
+        case none
+        case dependency(Environment, Set<Environment.StorageKey>)
+        
+        init(_ environment : Environment, keys : Set<Environment.StorageKey>) {
+            if keys.isEmpty {
+                self = .none
+            } else {
+                self = .dependency(environment, keys)
+            }
         }
     }
 }
