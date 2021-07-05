@@ -45,7 +45,7 @@ public struct Environment : Equatable {
     private var values: [StorageKey: Any] = [:]
     
     typealias OnDidRead = (StorageKey) -> ()
-    internal var onDidRead : OnDidRead? = nil
+    var onDidRead : OnDidRead? = nil
 
     /// Gets or sets an environment value by its key.
     public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
@@ -79,10 +79,10 @@ public struct Environment : Equatable {
         return true
     }
     
-    func isEqual(to other : Environment, comparing keys : Set<StorageKey> = []) -> Bool {
+    func isEqual(to subset : Environment.Subset) -> Bool {
         
-        for key in keys {
-            if key.valuesEqual(self.values[key], other.values[key]) == false {
+        for (key, value) in subset.values {
+            if key.valuesEqual(value, self.values[key]) == false {
                 return false
             }
         }
@@ -90,13 +90,17 @@ public struct Environment : Equatable {
         return true
     }
     
-    func subset(keeping keys : Set<StorageKey>) -> Environment {
-        Environment(
-            values: self.values.filter { key, _ in
-                keys.contains(key)
-            },
-            onDidRead: nil
-        )
+    func subset(keeping keys : Set<StorageKey>) -> Environment.Subset {
+        var subset = Subset()
+        subset.values.reserveCapacity(keys.count)
+        
+        for key in keys {
+            if let value = self.values[key] {
+                subset.values[key] = value
+            }
+        }
+        
+        return subset
     }
     
     /// Returns a new `Environment` by merging the values from `self` and the
@@ -144,6 +148,10 @@ extension UIView {
 
 
 extension Environment {
+    
+    struct Subset {
+        fileprivate var values : [StorageKey:Any] = [:]
+    }
 
     struct StorageKey : Hashable {
         
@@ -155,7 +163,7 @@ extension Environment {
         fileprivate init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
             self.identifier = ObjectIdentifier(key)
             
-            self.isEqual = { KeyType.anyEquals($0, $1) }
+            self.isEqual = KeyType.anyEquals
             self.keyTypeName = { String(describing: type(of: KeyType.self)) }
         }
         

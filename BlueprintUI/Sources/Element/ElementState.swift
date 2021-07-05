@@ -124,6 +124,8 @@ final class ElementState {
         var environmentDependency : Environment.LayoutDependency
     }
 
+    // TODO: I think because we also cache layout; we can remove every one here but the one(s) used by cached layouts?
+    // TODO: cont'd: this will help save a lot of in-memory space for caches, since deep elements can be measured 10 times (or more) during a layout.
     func measure(
         in constraint : SizeConstraint,
         with environment : Environment,
@@ -147,7 +149,7 @@ final class ElementState {
         
         self.measurements[constraint] = .init(
             size: size,
-            environmentDependency: .init(environment, keys: readEnvironmentKeys)
+            environmentDependency: .init(from: environment, keys: readEnvironmentKeys)
         )
                 
         return size
@@ -187,7 +189,7 @@ final class ElementState {
         
         self.layouts[size] = .init(
             result: result,
-            environmentDependency: .init(environment, keys: readEnvironmentKeys)
+            environmentDependency: .init(from: environment, keys: readEnvironmentKeys)
         )
                 
         return result
@@ -259,22 +261,22 @@ extension Environment {
     
     fileprivate enum LayoutDependency {
         case none
-        case dependency(Environment, Set<Environment.StorageKey>)
+        case dependency(Environment.Subset)
         
-        init(_ environment : Environment, keys : Set<Environment.StorageKey>) {
+        init(from environment : Environment, keys : Set<Environment.StorageKey>) {
             if keys.isEmpty {
                 self = .none
             } else {
-                self = .dependency(environment.subset(keeping: keys), keys)
+                self = .dependency(environment.subset(keeping: keys))
             }
         }
         
-        func trackedKeysEqual(to other : Environment) -> Bool {
+        func trackedKeysEqual(to environment : Environment) -> Bool {
             switch self {
             case .none:
                 return true
-            case .dependency(let environment, let keys):
-                return environment.isEqual(to: other, comparing: keys)
+            case .dependency(let subset):
+                return environment.isEqual(to: subset)
             }
         }
     }
