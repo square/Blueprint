@@ -136,7 +136,7 @@ final class ElementState {
         
         var environment = environment
         var readEnvironmentKeys = Set<Environment.StorageKey>()
-        
+
         environment.onDidRead = { key in
             readEnvironmentKeys.insert(key)
         }
@@ -265,7 +265,7 @@ extension Environment {
             if keys.isEmpty {
                 self = .none
             } else {
-                self = .dependency(environment, keys)
+                self = .dependency(environment.subset(keeping: keys), keys)
             }
         }
         

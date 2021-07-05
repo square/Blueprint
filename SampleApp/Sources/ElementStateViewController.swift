@@ -70,43 +70,38 @@ final class ElementStateViewController: UIViewController {
 }
 
 
-fileprivate struct TestPost : ProxyElement, Equatable, EquatableElement {
+fileprivate struct TestPost : EnvironmentElement, Equatable, EquatableElement {
     
     var title : String
     var detail : String
     
-    var elementRepresentation: Element {
-        EnvironmentReader { env in
+    func content(in size: SizeConstraint, with environment: Environment) -> Element {
+        Row { row in
+            row.verticalAlignment = .center
+            row.horizontalUnderflow = .growUniformly
+            row.minimumHorizontalSpacing = 10
             
-            _ = env.safeAreaInsets
+            row.addFixed(
+                child: Box(backgroundColor: .systemGray, cornerStyle: .rounded(radius: 4.0))
+                    .constrainedTo(width: 70, height: 70)
+            )
             
-            return Row { row in
-                row.verticalAlignment = .center
-                row.horizontalUnderflow = .growUniformly
-                row.minimumHorizontalSpacing = 10
+            row.addFlexible(child: Column { col in
+                col.minimumVerticalSpacing = 10.0
                 
-                row.addFixed(
-                    child: Box(backgroundColor: .systemGray, cornerStyle: .rounded(radius: 4.0))
-                        .constrainedTo(width: 70, height: 70)
+                col.addFixed(
+                    child: Label(text: self.title) {
+                        $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
+                    }
                 )
                 
-                row.addFlexible(child: Column { col in
-                    col.minimumVerticalSpacing = 10.0
-                    
-                    col.addFixed(
-                        child: Label(text: self.title) {
-                            $0.font = .systemFont(ofSize: 18.0, weight: .semibold)
-                        }
-                    )
-                    
-                    col.addFixed(
-                        child: Label(text: self.detail) {
-                            $0.font = .systemFont(ofSize: 16.0, weight: .regular)
-                        }
-                    )
-                })
-            }
-            .inset(uniform: 15.0)
+                col.addFixed(
+                    child: Label(text: self.detail) {
+                        $0.font = .systemFont(ofSize: 16.0, weight: .regular)
+                    }
+                )
+            })
         }
+        .inset(uniform: 15.0)
     }
 }

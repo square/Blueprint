@@ -51,30 +51,19 @@ public struct Environment : Equatable {
     public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
-
+            
             self.onDidRead?(storageKey)
             
             if let value = values[storageKey] {
                 return value as! KeyType.Value
+            } else {
+                return key.defaultValue
             }
-
-            return key.defaultValue
         }
         set {
             let storageKey = StorageKey(key)
             values[storageKey] = newValue
         }
-    }
-    
-    func isEqual(to other : Environment, comparing keys : Set<StorageKey> = []) -> Bool {
-        
-        for key in keys {
-            if key.valuesEqual(self.values[key], other.values[key]) == false {
-                return false
-            }
-        }
-        
-        return true
     }
     
     public static func == (lhs : Environment, rhs : Environment) -> Bool {
@@ -88,6 +77,26 @@ public struct Environment : Equatable {
         }
         
         return true
+    }
+    
+    func isEqual(to other : Environment, comparing keys : Set<StorageKey> = []) -> Bool {
+        
+        for key in keys {
+            if key.valuesEqual(self.values[key], other.values[key]) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func subset(keeping keys : Set<StorageKey>) -> Environment {
+        Environment(
+            values: self.values.filter { key, _ in
+                keys.contains(key)
+            },
+            onDidRead: nil
+        )
     }
     
     /// Returns a new `Environment` by merging the values from `self` and the
@@ -135,11 +144,11 @@ extension UIView {
 
 
 extension Environment {
-    
+
     struct StorageKey : Hashable {
         
-        fileprivate let identifier : ObjectIdentifier
-                
+        private let identifier : ObjectIdentifier
+        
         private let isEqual : (Any?, Any?) -> Bool
         private let keyTypeName : () -> String
         
