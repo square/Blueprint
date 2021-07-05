@@ -14,7 +14,7 @@ final class RootElementState {
     
     private let signpostRef : SignpostToken = .init()
     let name : String
-    
+        
     init(name : String) {
         self.name = name
     }
@@ -51,6 +51,8 @@ final class RootElementState {
 }
 
 
+// TODO: Using Allocations instrument; during initial setup, NSFastEnumerator is using >20mb of something. Probably need an autoreleasepool somewhere...
+
 final class ElementState {
     
     let identifier : ElementIdentifier
@@ -59,6 +61,10 @@ final class ElementState {
     let name : String
     
     private(set) var element : Element
+    
+    var elementIsEquatable : Bool {
+        self.element is AnyEquatableElement
+    }
     
     private(set) var wasVisited : Bool = false
     private(set) var hasUpdatedInCurrentCycle : Bool = false
@@ -92,14 +98,14 @@ final class ElementState {
             self.layouts = [:]
         } else {
             for (_, result) in self.measurements {
-                if result.environmentDependency.trackedKeysEqual(to: newEnvironment) == false {
+                if result.environmentDependency?.trackedKeysEqual(to: newEnvironment) == false {
                     self.measurements.removeAll()
                     break
                 }
             }
             
             for (_, result) in self.measurements {
-                if result.environmentDependency.trackedKeysEqual(to: newEnvironment) == false {
+                if result.environmentDependency?.trackedKeysEqual(to: newEnvironment) == false {
                     self.measurements.removeAll()
                     break
                 }
@@ -121,7 +127,7 @@ final class ElementState {
     
     private struct CachedMeasurement {
         var size : CGSize
-        var environmentDependency : Environment.LayoutDependency
+        var environmentDependency : EnvironmentDependency?
     }
 
     // TODO: I think because we also cache layout; we can remove every one here but the one(s) used by cached layouts?
@@ -162,7 +168,7 @@ final class ElementState {
     
     private struct CachedLayoutResult {
         var result : LayoutResult
-        var environmentDependency : Environment.LayoutDependency
+        var environmentDependency : EnvironmentDependency?
     }
     
     // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
@@ -233,8 +239,8 @@ final class ElementState {
     }
     
     func finishedLayout() {
-        
         self.removeOldChildren()
+        self.clearNonPersistentCaches()
     }
     
     private func removeOldChildren() {
@@ -254,30 +260,36 @@ final class ElementState {
             state.removeOldChildren()
         }
     }
+    
+    private func clearNonPersistentCaches() {
+        
+        if self.elementIsEquatable == false {
+            self.measurements.removeAll()
+            self.layouts.removeAll()
+        }
+        
+        self.children.forEach { _, state in
+            state.clearNonPersistentCaches()
+        }
+    }
 }
 
 
-extension Environment {
+extension ElementState {
     
-    fileprivate enum LayoutDependency {
-        case none
-        case dependency(Environment.Subset)
+    fileprivate struct EnvironmentDependency {
+        var dependencies : Environment.Subset
         
-        init(from environment : Environment, keys : Set<Environment.StorageKey>) {
+        init?(from environment : Environment, keys : Set<Environment.StorageKey>) {
             if keys.isEmpty {
-                self = .none
+                return nil
             } else {
-                self = .dependency(environment.subset(keeping: keys))
+                self.dependencies = environment.subset(keeping: keys)
             }
         }
         
         func trackedKeysEqual(to environment : Environment) -> Bool {
-            switch self {
-            case .none:
-                return true
-            case .dependency(let subset):
-                return environment.isEqual(to: subset)
-            }
+            environment.isEqual(to: self.dependencies)
         }
     }
 }

@@ -29,7 +29,9 @@ public struct ElementContent {
         states: ElementState
     ) -> CGSize
     {
-        self.storage.measure(in: constraint, with: context, states: states)
+        autoreleasepool {
+            self.storage.measure(in: constraint, with: context, states: states)
+        }
     }
 
     public var childCount: Int {
@@ -42,11 +44,13 @@ public struct ElementContent {
         states : ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
     {
-        storage.performLayout(
-            in: size,
-            with: context,
-            states: states
-        )
+        autoreleasepool {
+            storage.performLayout(
+                in: size,
+                with: context,
+                states: states
+            )
+        }
     }
 }
 
@@ -70,15 +74,16 @@ public struct ElementContent {
     /// }
     /// ```
     public func detachedMeasure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
-        
-        let root = RootElementState(name: "\(type(of:self)).measure")
-        root.update(with: self, in: context.environment)
-        
-        return self.content.measure(
-            in: constraint,
-            with: context,
-            states: root.root!
-        )
+        autoreleasepool {
+            let root = RootElementState(name: "\(type(of:self)).measure")
+            root.update(with: self, in: context.environment)
+            
+            return self.content.measure(
+                in: constraint,
+                with: context,
+                states: root.root!
+            )
+        }
     }
 }
 
@@ -582,6 +587,8 @@ struct Measurer: Measurable {
         with context : LayoutContext
     ) -> CGSize
     {
-        self.provider(constraint, context)
+        autoreleasepool {
+            self.provider(constraint, context)
+        }
     }
 }

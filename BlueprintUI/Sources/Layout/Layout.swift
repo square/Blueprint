@@ -38,7 +38,6 @@ public protocol Layout {
     
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
-    
 }
 
 
