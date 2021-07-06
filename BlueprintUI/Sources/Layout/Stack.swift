@@ -10,6 +10,7 @@ public protocol StackElement : EquatableElement {
     var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
 }
 
+
 extension StackElement {
 
     public var content: ElementContent {
@@ -23,14 +24,12 @@ extension StackElement {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
-
 }
+
 
 extension StackElement {
     
     public func isEquivalent(to other : Self) -> Bool {
-           
-        // TODO: Is this actually any faster? Or do the comparisons make it too slow?
         
         guard self.layout.allElementsEquatable else { return false }
         guard other.layout.allElementsEquatable else { return false }
@@ -294,8 +293,7 @@ public struct StackLayout: Layout, Equatable {
     public var alignment: Alignment
     public var minimumSpacing: CGFloat = 0
     
-    var allElementsEquatable : Bool = true
-
+    fileprivate(set) var allElementsEquatable : Bool = true
 
     public init(axis: Axis, alignment: Alignment) {
         self.axis = axis

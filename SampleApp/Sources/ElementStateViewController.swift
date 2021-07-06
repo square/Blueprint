@@ -91,7 +91,7 @@ fileprivate struct Tweet : EnvironmentElement, Equatable, EquatableElement {
             )
             
             row.addFlexible(child: Column { col in
-                col.minimumVerticalSpacing = 10.0
+                col.minimumVerticalSpacing = 5.0
                 
                 col.horizontalAlignment = .fill
                 

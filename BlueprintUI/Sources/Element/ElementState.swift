@@ -21,7 +21,7 @@ final class RootElementState {
     
     func update(with element : Element?, in environment : Environment) {
         
-        if self.root == nil, let element = element {
+        func makeRoot(with element : Element) {
             self.root = ElementState(
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
@@ -29,6 +29,10 @@ final class RootElementState {
                 signpostRef: self.signpostRef,
                 name: self.name
             )
+        }
+        
+        if self.root == nil, let element = element {
+            makeRoot(with: element)
         } else if let root = self.root, element == nil {
             root.teardown()
             self.root = nil
@@ -37,14 +41,7 @@ final class RootElementState {
                 root.update(with: element, in: environment, identifier: root.identifier)
             } else {
                 root.teardown()
-                
-                self.root = ElementState(
-                    identifier: .init(elementType: type(of: element), key: nil, count: 1),
-                    element: element,
-                    depth: 0,
-                    signpostRef: self.signpostRef,
-                    name: self.name
-                )
+                makeRoot(with: element)
             }
         }
     }
@@ -98,15 +95,17 @@ final class ElementState {
             self.layouts = [:]
         } else {
             for (_, result) in self.measurements {
-                if result.environmentDependency?.trackedKeysEqual(to: newEnvironment) == false {
+                guard let dependency = result.environmentDependency else { continue }
+                if dependency.trackedKeysEqual(to: newEnvironment) == false {
                     self.measurements.removeAll()
                     break
                 }
             }
             
-            for (_, result) in self.measurements {
-                if result.environmentDependency?.trackedKeysEqual(to: newEnvironment) == false {
-                    self.measurements.removeAll()
+            for (_, result) in self.layouts {
+                guard let dependency = result.environmentDependency else { continue }
+                if dependency.trackedKeysEqual(to: newEnvironment) == false {
+                    self.layouts.removeAll()
                     break
                 }
             }
@@ -151,8 +150,6 @@ final class ElementState {
                 
         let size = measurer(environment)
         
-        environment.onDidRead = nil
-        
         self.measurements[constraint] = .init(
             size: size,
             environmentDependency: .init(from: environment, keys: readEnvironmentKeys)
@@ -190,8 +187,6 @@ final class ElementState {
         }
                 
         let result = layout(environment)
-        
-        environment.onDidRead = nil
         
         self.layouts[size] = .init(
             result: result,
@@ -278,7 +273,7 @@ final class ElementState {
 extension ElementState {
     
     fileprivate struct EnvironmentDependency {
-        var dependencies : Environment.Subset
+        let dependencies : Environment.Subset
         
         init?(from environment : Environment, keys : Set<Environment.StorageKey>) {
             if keys.isEmpty {
