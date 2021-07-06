@@ -45,10 +45,13 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     
     let elementType : ObjectIdentifier
     let key : AnyHashable?
-
     let count : Int
     
     private let hash : Int
+    
+    init(element : Element, key : AnyHashable?, count : Int) {
+        self.init(elementType: type(of: element), key: key, count: count)
+    }
 
     init(elementType : Element.Type, key : AnyHashable?, count : Int) {
         
@@ -76,17 +79,19 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         hasher.combine(self.hash)
     }
     
-    /**
-     Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
-     */
+    /// Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
     struct Factory {
         
         init(elementCount : Int) {
             self.countsByKey = Dictionary(minimumCapacity: elementCount)
         }
+        
+        mutating func nextIdentifier(for element : Element, key : AnyHashable?) -> ElementIdentifier {
+            self.nextIdentifier(for: type(of: element), key: key)
+        }
                 
         mutating func nextIdentifier(for type : Element.Type, key : AnyHashable?) -> ElementIdentifier {
-            
+                        
             let count = self.nextCount(for: type, key: key)
             
             return ElementIdentifier(
@@ -113,7 +118,6 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         }
         
         private struct Key : Hashable {
-            
             let elementType : ObjectIdentifier
             let key : AnyHashable?
         }

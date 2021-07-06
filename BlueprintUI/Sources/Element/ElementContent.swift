@@ -335,7 +335,7 @@ extension ElementContent {
             return LayoutItems(with: children.indexedMap { index, child in
                 let childContent = child.content
                 
-                let identifier = identifierFactory.nextIdentifier(for: type(of: child.element), key: child.key)
+                let identifier = identifierFactory.nextIdentifier(for: child.element, key: child.key)
                 
                 let measurable = Measurer { constraint, context in
                     childContent.measure(
@@ -390,7 +390,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -415,7 +415,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         states.measure(in: constraint, with: context) { context in
             
             let environment = self.adapted(environment: context.environment)
-            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
             
             return child.content.measure(
                 in: constraint,
@@ -455,7 +455,7 @@ private struct LazyStorage: ContentStorage {
         states.measure(in: constraint, with: context) { context in
             
             let child = builder(constraint, context)
-            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
             
             return child.content.measure(
                 in: constraint,
@@ -475,7 +475,7 @@ private struct LazyStorage: ContentStorage {
         
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,

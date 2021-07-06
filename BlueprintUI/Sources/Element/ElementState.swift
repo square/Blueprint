@@ -23,7 +23,7 @@ final class RootElementState {
         
         func makeRoot(with element : Element) {
             self.root = ElementState(
-                identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                identifier: .init(element: element, key: nil, count: 1),
                 element: element,
                 depth: 0,
                 signpostRef: self.signpostRef,
@@ -47,8 +47,6 @@ final class RootElementState {
     }
 }
 
-
-// TODO: Using Allocations instrument; during initial setup, NSFastEnumerator is using >20mb of something. Probably need an autoreleasepool somewhere...
 
 final class ElementState {
     
@@ -96,6 +94,7 @@ final class ElementState {
         } else {
             for (_, result) in self.measurements {
                 guard let dependency = result.environmentDependency else { continue }
+                
                 if dependency.trackedKeysEqual(to: newEnvironment) == false {
                     self.measurements.removeAll()
                     break
@@ -104,6 +103,7 @@ final class ElementState {
             
             for (_, result) in self.layouts {
                 guard let dependency = result.environmentDependency else { continue }
+                
                 if dependency.trackedKeysEqual(to: newEnvironment) == false {
                     self.layouts.removeAll()
                     break
