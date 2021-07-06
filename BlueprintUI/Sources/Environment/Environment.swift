@@ -53,7 +53,7 @@ public struct Environment : Equatable {
             let storageKey = StorageKey(key)
             
             self.onDidRead?(storageKey)
-            
+
             if let value = values[storageKey] {
                 return value as! KeyType.Value
             } else {

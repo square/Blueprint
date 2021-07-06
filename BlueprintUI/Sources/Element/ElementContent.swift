@@ -249,7 +249,7 @@ extension ElementContent {
             states: ElementState
         ) -> CGSize
         {
-            states.measure(in: constraint, with: context.environment) { environment in
+            states.measure(in: constraint, with: context) { context in
                 
                 Logger.logMeasureStart(
                     object: states.signpostRef,
@@ -259,12 +259,12 @@ extension ElementContent {
                 
                 defer { Logger.logMeasureEnd(object: states.signpostRef) }
 
-                let layoutItems = self.layoutItems(states: states, environment: environment)
+                let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 return layout.measure(
                     items: layoutItems,
                     in: constraint,
-                    with: context.setting(\.environment, to: environment)
+                    with: context
                 )
             }
         }
@@ -279,9 +279,8 @@ extension ElementContent {
                 return []
             }
             
-            return states.layout(in: size, with: context.environment) { environment in
+            return states.layout(in: size, with: context) { context in
                 
-                let context = context.setting(\.environment, to: environment)
                 let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 let childAttributes = layout.layout(
@@ -413,9 +412,9 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         states: ElementState
     ) -> CGSize
     {
-        states.measure(in: constraint, with: context.environment) { environment in
+        states.measure(in: constraint, with: context) { context in
             
-            let environment = adapted(environment: environment)
+            let environment = self.adapted(environment: context.environment)
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             
             return child.content.measure(
@@ -428,7 +427,14 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
     private func adapted(environment: Environment) -> Environment {
         var environment = environment
-        adapter(&environment)
+        
+        let onDidRead = environment.onDidRead
+        environment.onDidRead = nil
+        
+        self.adapter(&environment)
+        
+        environment.onDidRead = onDidRead
+        
         return environment
     }
 }
@@ -446,9 +452,8 @@ private struct LazyStorage: ContentStorage {
         states: ElementState
     ) -> CGSize
     {
-        states.measure(in: constraint, with: context.environment) { environment in
+        states.measure(in: constraint, with: context) { context in
             
-            let context = context.setting(\.environment, to: environment)
             let child = builder(constraint, context)
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             

@@ -133,26 +133,26 @@ final class ElementState {
     // TODO: cont'd: this will help save a lot of in-memory space for caches, since deep elements can be measured 10 times (or more) during a layout.
     func measure(
         in constraint : SizeConstraint,
-        with environment : Environment,
-        using measurer : (Environment) -> CGSize
+        with context : LayoutContext,
+        using measurer : (LayoutContext) -> CGSize
     ) -> CGSize
     {
         if let existing = self.measurements[constraint] {
             return existing.size
         }
         
-        var environment = environment
+        var context = context
         var readEnvironmentKeys = Set<Environment.StorageKey>()
 
-        environment.onDidRead = { key in
+        context.environment.onDidRead = { key in
             readEnvironmentKeys.insert(key)
         }
-                
-        let size = measurer(environment)
+            
+        let size = measurer(context)
         
         self.measurements[constraint] = .init(
             size: size,
-            environmentDependency: .init(from: environment, keys: readEnvironmentKeys)
+            environmentDependency: .init(from: context.environment, keys: readEnvironmentKeys)
         )
                 
         return size
@@ -171,26 +171,26 @@ final class ElementState {
     // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
     func layout(
         in size : CGSize,
-        with environment : Environment,
-        using layout : (Environment) -> LayoutResult
+        with context : LayoutContext,
+        using layout : (LayoutContext) -> LayoutResult
     ) -> LayoutResult {
         
         if let existing = self.layouts[size] {
             return existing.result
         }
         
-        var environment = environment
+        var context = context
         var readEnvironmentKeys = Set<Environment.StorageKey>()
         
-        environment.onDidRead = { key in
+        context.environment.onDidRead = { key in
             readEnvironmentKeys.insert(key)
         }
                 
-        let result = layout(environment)
+        let result = layout(context)
         
         self.layouts[size] = .init(
             result: result,
-            environmentDependency: .init(from: environment, keys: readEnvironmentKeys)
+            environmentDependency: .init(from: context.environment, keys: readEnvironmentKeys)
         )
                 
         return result
