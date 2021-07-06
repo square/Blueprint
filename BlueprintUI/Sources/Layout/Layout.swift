@@ -5,7 +5,7 @@ public protocol Layout {
     
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()
-
+    
     /// Computes the size that this layout requires in a layout, given an array
     /// of chidren and accompanying layout traits.
     ///
@@ -38,7 +38,6 @@ public protocol Layout {
     
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
-    
 }
 
 
@@ -66,9 +65,12 @@ public final class LayoutItems<Traits> {
         public let traits : Traits
         public let content : Measurable
         
-        init(traits: Traits, content: Measurable) {
+        let identifier : ElementIdentifier
+        
+        init(traits: Traits, content: Measurable, identifier : ElementIdentifier) {
             self.traits = traits
             self.content = content
+            self.identifier = identifier
         }
     }
 }

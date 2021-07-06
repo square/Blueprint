@@ -5,9 +5,6 @@ public struct ElementContent {
 
     private let storage: ContentStorage
     
-    /// The key to use to cache measurement values.
-    private let measurementCachingKey : MeasurementCachingKey?
-    
     //
     // MARK: Initialization
     //
@@ -15,19 +12,50 @@ public struct ElementContent {
     /// Initializes a new `ElementContent` with the given layout and children.
     ///
     /// - parameter layout: The layout to use.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter configure: A closure that configures the layout and adds children to the container.
     public init<LayoutType: Layout>(
         layout: LayoutType,
-        measurementCachingKey : MeasurementCachingKey? = nil,
         configure: (inout Builder<LayoutType>) -> Void = { _ in }
     ) {
         var builder = Builder(layout: layout)
         configure(&builder)
         
         self.storage = builder
-        self.measurementCachingKey = measurementCachingKey
     }
+
+    func measure(
+        in constraint : SizeConstraint,
+        with context: LayoutContext,
+        states: ElementState
+    ) -> CGSize
+    {
+        autoreleasepool {
+            self.storage.measure(in: constraint, with: context, states: states)
+        }
+    }
+
+    public var childCount: Int {
+        storage.childCount
+    }
+
+    func performLayout(
+        in size: CGSize,
+        with context : LayoutContext,
+        states : ElementState
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
+    {
+        autoreleasepool {
+            storage.performLayout(
+                in: size,
+                with: context,
+                states: states
+            )
+        }
+    }
+}
+
+
+ extension Element {
     
     // MARK: Measurement & Children
     
@@ -41,56 +69,35 @@ public struct ElementContent {
     /// ```
     /// public var content: ElementContent {
     ///     ElementContent { constraint, context -> CGSize in
-    ///         self.wrapped.content.measure(in: constraint, with: context)
+    ///         self.wrapped.detachedMeasure(in: constraint, with: context)
     ///     }
     /// }
     /// ```
-    public func measure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
-        measure(
-            in: constraint,
-            with: context,
-            cache: CacheFactory.makeCache(name: "ElementContent")
-        )
-    }
-
-    func measure(in constraint : SizeConstraint, with context: LayoutContext, cache: CacheTree) -> CGSize {
-        context.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, with: context, cache: cache)
+    public func detachedMeasure(in constraint : SizeConstraint, with context: LayoutContext) -> CGSize {
+        autoreleasepool {
+            let root = RootElementState(name: "\(type(of:self)).measure")
+            root.update(with: self, in: context.environment)
+            
+            return self.content.measure(
+                in: constraint,
+                with: context,
+                states: root.root!
+            )
         }
     }
-
-    public var childCount: Int {
-        return storage.childCount
-    }
-
-    func performLayout(
-        in size: CGSize,
-        with context : LayoutContext,
-        cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
-    {
-        storage.performLayout(
-            in: size,
-            with: context,
-            cache: cache
-        )
-    }
 }
+
 
 extension ElementContent {
     
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey`
-    ///     documentation for more.
     /// - parameter builder: A closure that provides the content `Element` based on the provided `SizeConstraint`
     ///     and `LayoutContext`.
     public init(
-        measurementCachingKey : MeasurementCachingKey? = nil,
         build builder: @escaping (SizeConstraint, LayoutContext) -> Element
     ) {
-        self.measurementCachingKey = measurementCachingKey
         self.storage = LazyStorage(builder: builder)
     }
 }
@@ -102,17 +109,12 @@ extension ElementContent {
     /// - parameter element: The single child element.
     /// - parameter key: The key to use to unique the element during updates.
     /// - parameter layout: The layout that will be used.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init(
         child: Element,
         key : AnyHashable? = nil,
-        layout: SingleChildLayout,
-        measurementCachingKey : MeasurementCachingKey? = nil
+        layout: SingleChildLayout
     ) {
-        self = ElementContent(
-            layout: SingleChildLayoutHost(wrapping: layout),
-            measurementCachingKey: measurementCachingKey
-        ) {
+        self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
         }
     }
@@ -122,45 +124,30 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init(
-        child: Element,
-        measurementCachingKey : MeasurementCachingKey? = nil
+        child: Element
     ) {
         self = ElementContent(
             child: child,
-            layout: PassthroughLayout(),
-            measurementCachingKey: measurementCachingKey
+            layout: PassthroughLayout()
         )
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
     ///
     /// - parameter measurable: How to measure the `ElementContent`.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
-    public init(
-        measurable: Measurable,
-        measurementCachingKey : MeasurementCachingKey? = nil
-    ) {
+    public init(measurable: Measurable) {
         self = ElementContent(
             layout: MeasurableLayout(measurable: measurable),
-            measurementCachingKey: measurementCachingKey,
             configure: { _ in }
         )
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `LayoutContext`.
-    public init(
-        measurementCachingKey : MeasurementCachingKey? = nil,
-        measureFunction: @escaping (SizeConstraint, LayoutContext) -> CGSize
-    ) {
-        self = ElementContent(
-            measurable: Measurer(provider: measureFunction),
-            measurementCachingKey: measurementCachingKey
-        )
+    public init(measureFunction: @escaping (SizeConstraint, LayoutContext) -> CGSize) {
+        self = ElementContent(measurable: Measurer(provider: measureFunction))
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
@@ -175,15 +162,11 @@ extension ElementContent {
     /// which allows adapting the environment to affect the element, plus elements further down the tree.
     ///
     /// - parameter child: The child element to display.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter environmentAdapter: How to adapt the `Environment` for the child and elements further down the tree.
     public init(
         child: Element,
-        measurementCachingKey : MeasurementCachingKey? = nil,
         environment adapter: @escaping (inout Environment) -> Void
     ) {
-        self.measurementCachingKey = measurementCachingKey
-        
         self.storage = EnvironmentAdaptingStorage(
             adapter: adapter,
             child: child
@@ -196,15 +179,13 @@ extension ElementContent {
     /// - parameter child: The child element to display.
     /// - parameter key: The key to set in the `Environment`.
     /// - parameter value: The value to set in the `Environment` for the given key.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init<Key>(
         child: Element,
         key: Key.Type,
-        value: Key.Value,
-        measurementCachingKey : MeasurementCachingKey? = nil
-    ) where Key: EnvironmentKey {
-        
-        self.init(child: child, measurementCachingKey: measurementCachingKey) { environment in
+        value: Key.Value
+    ) where Key: EnvironmentKey
+    {
+        self.init(child: child) { environment in
             environment[key] = value
         }
     }
@@ -214,17 +195,17 @@ extension ElementContent {
 fileprivate protocol ContentStorage {
     
     var childCount: Int { get }
-
+    
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> CGSize
 
     func performLayout(
         in size: CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
@@ -265,18 +246,20 @@ extension ElementContent {
         func measure(
             in constraint : SizeConstraint,
             with context : LayoutContext,
-            cache: CacheTree
+            states: ElementState
         ) -> CGSize
         {
-            cache.get(constraint) { (constraint) -> CGSize in
+            states.measure(in: constraint, with: context) { context in
+                
                 Logger.logMeasureStart(
-                    object: cache.signpostRef,
-                    description: cache.name,
+                    object: states.signpostRef,
+                    description: states.name,
                     constraint: constraint
                 )
-                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+                
+                defer { Logger.logMeasureEnd(object: states.signpostRef) }
 
-                let layoutItems = self.layoutItems(cache: cache)
+                let layoutItems = self.layoutItems(states: states, environment: context.environment)
                 
                 return layout.measure(
                     items: layoutItems,
@@ -289,59 +272,57 @@ extension ElementContent {
         func performLayout(
             in size : CGSize,
             with context : LayoutContext,
-            cache: CacheTree
+            states: ElementState
         ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
         {
             guard self.children.isEmpty == false else {
                 return []
             }
             
-            let layoutItems = self.layoutItems(cache: cache)
-            
-            let childAttributes = layout.layout(
-                items: layoutItems,
-                in: size,
-                with: context
-            )
-
-            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
-            result.reserveCapacity(children.count)
-            
-            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
-
-            for index in 0..<children.count {
-                let currentChildLayoutAttributes = childAttributes[index]
-                let currentChild = children[index]
-                let currentChildCache = cache.subcache(
-                    index: index,
-                    of: children.count,
-                    element: currentChild.element
+            return states.layout(in: size, with: context) { context in
+                
+                let layoutItems = self.layoutItems(states: states, environment: context.environment)
+                
+                let childAttributes = layout.layout(
+                    items: layoutItems,
+                    in: size,
+                    with: context
                 )
 
-                let resultNode = LayoutResultNode(
-                    element: currentChild.element,
-                    layoutAttributes: currentChildLayoutAttributes,
-                    environment: context.environment,
-                    children: currentChild.content.performLayout(
-                        in: currentChildLayoutAttributes.frame.size,
-                        with: context,
-                        cache: currentChildCache
+                var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+                result.reserveCapacity(children.count)
+                
+                for index in 0..<children.count {
+                    let currentChildLayoutAttributes = childAttributes[index]
+                    let currentChild = children[index]
+
+                    let identifier = layoutItems.all[index].identifier
+
+                    let resultNode = LayoutResultNode(
+                        element: currentChild.element,
+                        layoutAttributes: currentChildLayoutAttributes,
+                        environment: context.environment,
+                        children: currentChild.content.performLayout(
+                            in: currentChildLayoutAttributes.frame.size,
+                            with: context,
+                            states: states.subState(
+                                for: currentChild.element,
+                                   in: context.environment,
+                                   with: identifier
+                            )
+                        )
                     )
-                )
 
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
-                    key: currentChild.key
-                )
+                    result.append((identifier: identifier, node: resultNode))
+                }
 
-                result.append((identifier: identifier, node: resultNode))
+                return result
             }
-
-            return result
         }
 
         private func layoutItems(
-            cache: CacheTree
+            states : ElementState,
+            environment : Environment
         ) -> LayoutItems<LayoutType.Traits>
         {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
@@ -349,24 +330,30 @@ extension ElementContent {
             /// is an extremely hot codepath; this additional performance matters, so we will
             /// keep track of the index ourselves.
             
-            LayoutItems(with: children.indexedMap { index, child in
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+            
+            return LayoutItems(with: children.indexedMap { index, child in
                 let childContent = child.content
                 
-                let childCache = cache.subcache(
-                    index: index,
-                    of: children.count,
-                    element: child.element
-                )
+                let identifier = identifierFactory.nextIdentifier(for: child.element, key: child.key)
                 
                 let measurable = Measurer { constraint, context in
                     childContent.measure(
                         in: constraint,
                         with: context,
-                        cache: childCache
+                        states: states.subState(
+                            for: child.element,
+                            in: environment,
+                            with: identifier
+                        )
                     )
                 }
                 
-                return LayoutItems.Item(traits: child.traits, content: measurable)
+                return LayoutItems.Item(
+                    traits: child.traits,
+                    content: measurable,
+                    identifier: identifier
+                )
             })
         }
         
@@ -385,7 +372,7 @@ extension ElementContent {
 private struct EnvironmentAdaptingStorage: ContentStorage {
     
     let childCount = 1
-
+    
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it
     ///
@@ -396,14 +383,14 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func performLayout(
         in size : CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         let environment = adapted(environment: context.environment)
 
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -412,7 +399,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context.setting(\.environment, to: environment),
-                cache: cache.subcache(element: child)
+                states: states.subState(for: child, in: environment, with: identifier)
             )
         )
 
@@ -422,28 +409,36 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> CGSize
     {
-        cache.get(constraint) { (constraint) -> CGSize in
-            let environment = adapted(environment: context.environment)
+        states.measure(in: constraint, with: context) { context in
+            
+            let environment = self.adapted(environment: context.environment)
+            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
+            
             return child.content.measure(
                 in: constraint,
                 with: context.setting(\.environment, to: environment),
-                cache: cache.subcache(element: child)
+                states: states.subState(for: child, in: environment, with: identifier)
             )
         }
     }
 
     private func adapted(environment: Environment) -> Environment {
         var environment = environment
-        adapter(&environment)
+        
+        environment.readNotificationsEnabled = false
+        self.adapter(&environment)
+        environment.readNotificationsEnabled = true
+        
         return environment
     }
 }
 
 /// Content storage that defers creation of its child until measurement or layout time.
 private struct LazyStorage: ContentStorage {
+    
     let childCount = 1
 
     var builder: (SizeConstraint, LayoutContext) -> Element
@@ -451,16 +446,18 @@ private struct LazyStorage: ContentStorage {
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> CGSize
     {
-        cache.get(constraint) { (constraint) -> CGSize in
+        states.measure(in: constraint, with: context) { context in
+            
             let child = builder(constraint, context)
+            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
             
             return child.content.measure(
                 in: constraint,
                 with: context,
-                cache: cache.subcache(element: child)
+                states: states.subState(for: child, in: context.environment, with: identifier)
             )
         }
     }
@@ -468,14 +465,14 @@ private struct LazyStorage: ContentStorage {
     func performLayout(
         in size: CGSize,
         with context : LayoutContext,
-        cache: CacheTree
+        states: ElementState
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         let child = builder(SizeConstraint(size), context)
         
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -484,7 +481,7 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context,
-                cache: cache.subcache(element: child)
+                states: states.subState(for: child, in: context.environment, with: identifier)
             )
         )
 
@@ -502,7 +499,9 @@ fileprivate struct SingleChildLayoutHost: Layout {
     init(wrapping layout: SingleChildLayout) {
         self.wrapped = layout
     }
-
+    
+    // MARK: Layout
+    
     func measure(
         items: LayoutItems<Void>,
         in constraint : SizeConstraint,
@@ -533,7 +532,7 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
 // Used for elements with a single child that requires no custom layout
 fileprivate struct PassthroughLayout: SingleChildLayout {
-    
+        
     func measure(
         child: Measurable,
         in constraint : SizeConstraint,
@@ -551,7 +550,6 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
     {
         LayoutAttributes(size: size)
     }
-
 }
 
 
@@ -591,6 +589,8 @@ struct Measurer: Measurable {
         with context : LayoutContext
     ) -> CGSize
     {
-        self.provider(constraint, context)
+        autoreleasepool {
+            self.provider(constraint, context)
+        }
     }
 }

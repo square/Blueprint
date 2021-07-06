@@ -35,16 +35,16 @@ import UIKit
 ///     }
 /// }
 /// ```
-public struct Keyed: Element {
+public struct Keyed<Wrapped:Element>: Element {
     
     /// The key used to differentiate the element.
     public var key : AnyHashable?
     
     /// The wrapped element.
-    public var wrapped : Element
+    public var wrapped : Wrapped
     
     /// Creates a new `Keyed` element with the provided key and wrapped element.
-    public init(key: AnyHashable?, wrapping: Element) {
+    public init(key: AnyHashable?, wrapping: Wrapped) {
         self.key = key
         self.wrapped = wrapping
     }
@@ -84,6 +84,11 @@ public struct Keyed: Element {
 }
 
 
+extension Keyed:Equatable where Wrapped:Equatable {}
+extension Keyed:AnyEquatableElement where Wrapped:Equatable {}
+extension Keyed:EquatableElement where Wrapped:Equatable {}
+
+
 extension Element {
     
     ///
@@ -113,7 +118,7 @@ extension Element {
     ///     }
     /// }
     /// ```
-    public func keyed(_ key : AnyHashable) -> Keyed {
+    public func keyed(_ key : AnyHashable) -> Keyed<Self> {
         Keyed(key: key, wrapping: self)
     }
 }

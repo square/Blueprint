@@ -40,6 +40,9 @@ public final class BlueprintView: UIView {
     /// A cache passed to elements which they can use to request a prototype view for measuring
     /// their contents. See ``LayoutContext/measure(_:using:measure:)`` for more.
     private let measurementViews : LayoutContext.MeasurementViews = .init()
+    
+    /// The live, tracked state for each element in the element tree.
+    private let rootState : RootElementState = .init(name: "BlueprintView")
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -170,14 +173,18 @@ public final class BlueprintView: UIView {
             )
         }
         
+        let environment = self.makeEnvironment()
+        
+        let root = RootElementState(name: "BlueprintView<\(type(of:element))>.sizeThatFits")
+        root.update(with: element, in: environment)
+        
         return element.content.measure(
             in: measurementConstraint(with: size),
             with: .init(
-                environment: self.makeEnvironment(),
-                measurementCache: .init(),
+                environment: environment,
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            states: root.root!
         )
     }
 
@@ -201,14 +208,18 @@ public final class BlueprintView: UIView {
             constraint = SizeConstraint(width: bounds.width)
         }
         
+        let environment = self.makeEnvironment()
+        
+        let root = RootElementState(name: "BlueprintView<\(type(of:element))>.intrinsicContentSize")
+        root.update(with: element, in: environment)
+        
         return element.content.measure(
             in: constraint,
             with: .init(
-                environment: self.makeEnvironment(),
-                measurementCache: .init(),
+                environment: environment,
                 measurementViews: self.measurementViews
             ),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
+            states: root.root!
         )
     }
 
@@ -254,6 +265,8 @@ public final class BlueprintView: UIView {
         assert(!isInsideUpdate, "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates.")
         isInsideUpdate = true
 
+        self.rootState.root?.viewSizeChanged(from: lastViewHierarchyUpdateBounds.size, to: bounds.size)
+        
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
         
@@ -261,9 +274,8 @@ public final class BlueprintView: UIView {
         Logger.logLayoutStart(view: self)
         
         let environment = self.makeEnvironment()
-
-        /// Grab view descriptions
-        let viewNodes = self.calculateNativeViewNodes(in: environment)
+        
+        let viewNodes = self.calculateNativeViewNodes(in: environment, states: self.rootState)
         
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -309,14 +321,28 @@ public final class BlueprintView: UIView {
     /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
     /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
     /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
-    private func calculateNativeViewNodes(in environment : Environment) -> [(path: ElementPath, node: NativeViewNode)] {
+    private func calculateNativeViewNodes(
+        in environment : Environment,
+        states : RootElementState
+    ) -> [(path: ElementPath, node: NativeViewNode)]
+    {
         guard let element = self.element else { return [] }
+        
+        self.rootState.root?.prepareForLayout()
+        
+        defer {
+            // TODO: Call this here? Do nodes need to retain their states longer
+            self.rootState.root?.finishedLayout()
+        }
+        
+        states.update(with: element, in: environment)
         
         let laidOutNodes = LayoutResultNode(
             root: element,
             layoutAttributes: .init(frame: self.bounds),
             environment: environment,
-            measurementViews: self.measurementViews
+            measurementViews: self.measurementViews,
+            states: states.root!
         )
         
         return laidOutNodes.resolve()

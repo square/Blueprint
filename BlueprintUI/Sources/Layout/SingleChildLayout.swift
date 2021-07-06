@@ -2,7 +2,7 @@ import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
 public protocol SingleChildLayout {
-
+    
     /// Computes the size that this layout requires
     ///
     /// - parameter constraint: The size constraint in which measuring should occur.

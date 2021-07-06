@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-public struct AttributedLabel: Element, Hashable {
+public struct AttributedLabel: Equatable, EquatableElement {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
@@ -22,9 +22,7 @@ public struct AttributedLabel: Element, Hashable {
     private static let measurementLabel = LabelView()
     
     public var content: ElementContent {
-        let key = MeasurementCachingKey(type: Self.self, input: self)
-        
-        return ElementContent(measurementCachingKey: key) { constraint, context -> CGSize in
+        ElementContent { constraint, context -> CGSize in
             self.update(label: Self.measurementLabel)
             return Self.measurementLabel.sizeThatFits(constraint.maximum)
         }
@@ -32,9 +30,18 @@ public struct AttributedLabel: Element, Hashable {
 
     private func update(label: LabelView) {
         label.attributedText = attributedText
-        label.numberOfLines = numberOfLines
-        label.isAccessibilityElement = isAccessibilityElement
-        label.textRectOffset = textRectOffset
+        
+        if label.numberOfLines != numberOfLines {
+            label.numberOfLines = numberOfLines
+        }
+        
+        if label.isAccessibilityElement != isAccessibilityElement {
+            label.isAccessibilityElement = isAccessibilityElement
+        }
+        
+        if label.textRectOffset != textRectOffset {
+            label.textRectOffset = textRectOffset
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -60,9 +67,3 @@ extension AttributedLabel {
     }
 }
 
-extension UIOffset: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(horizontal)
-        hasher.combine(vertical)
-    }
-}

@@ -100,18 +100,18 @@ public struct Box: Element {
 
 extension Box {
 
-    public enum CornerStyle {
+    public enum CornerStyle : Equatable {
         case square
         case capsule
         case rounded(radius: CGFloat)
     }
 
-    public enum BorderStyle {
+    public enum BorderStyle : Equatable {
         case none
         case solid(color: UIColor, width: CGFloat)
     }
 
-    public enum ShadowStyle {
+    public enum ShadowStyle : Equatable {
         case none
         case simple(radius: CGFloat, opacity: CGFloat, offset: CGSize, color: UIColor)
     }

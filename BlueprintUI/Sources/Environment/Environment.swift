@@ -34,7 +34,7 @@ import UIKit
 ///             }
 ///         }
 ///     }
-public struct Environment {
+public struct Environment : Equatable {
     
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
@@ -42,22 +42,69 @@ public struct Environment {
         .init()
     }
 
-    private var values: [ObjectIdentifier: Any] = [:]
+    private var values: [StorageKey: Any] = [:]
+    
+    typealias OnDidRead = (StorageKey) -> ()
+    var onDidRead : OnDidRead? = nil
+    
+    var readNotificationsEnabled : Bool = true
 
     /// Gets or sets an environment value by its key.
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+    public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
-            let objectId = ObjectIdentifier(key)
-
-            if let value = values[objectId] {
-                return value as! Key.Value
+            let storageKey = StorageKey(key)
+            
+            if self.readNotificationsEnabled {
+                self.onDidRead?(storageKey)
             }
 
-            return key.defaultValue
+            if let value = values[storageKey] {
+                return value as! KeyType.Value
+            } else {
+                return key.defaultValue
+            }
         }
         set {
-            values[ObjectIdentifier(key)] = newValue
+            let storageKey = StorageKey(key)
+            values[storageKey] = newValue
         }
+    }
+    
+    public static func == (lhs : Environment, rhs : Environment) -> Bool {
+        
+        guard lhs.values.count == rhs.values.count else { return false }
+        
+        for (key, value) in lhs.values {
+            if key.valuesEqual(value, rhs.values[key]) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func isEqual(to subset : Environment.Subset) -> Bool {
+        
+        for (key, value) in subset.values {
+            if key.valuesEqual(value, self.values[key]) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    func subset(keeping keys : Set<StorageKey>) -> Environment.Subset {
+        var subset = Subset()
+        subset.values.reserveCapacity(keys.count)
+        
+        for key in keys {
+            if let value = self.values[key] {
+                subset.values[key] = value
+            }
+        }
+        
+        return subset
     }
     
     /// Returns a new `Environment` by merging the values from `self` and the
@@ -101,4 +148,43 @@ extension UIView {
     }
     
     private static var environmentKey = NSObject()
+}
+
+
+extension Environment {
+    
+    struct Subset {
+        fileprivate var values : [StorageKey:Any] = [:]
+    }
+
+    struct StorageKey : Hashable {
+        
+        private let identifier : ObjectIdentifier
+        
+        private let isEqual : (Any?, Any?) -> Bool
+        private let keyTypeName : () -> String
+        
+        fileprivate init<KeyType:EnvironmentKey>(_ key : KeyType.Type) {
+            self.identifier = ObjectIdentifier(key)
+            
+            self.isEqual = KeyType.anyEquals
+            self.keyTypeName = { String(describing: type(of: KeyType.self)) }
+        }
+        
+        fileprivate func valuesEqual(_ lhs : Any?, _ rhs : Any?) -> Bool {
+            self.isEqual(lhs, rhs)
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.identifier == rhs.identifier
+        }
+        
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(self.identifier)
+        }
+        
+        var debugDescription: String {
+            self.keyTypeName()
+        }
+    }
 }

@@ -31,11 +31,9 @@ struct LayoutResultNode {
         root: Element,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
-        measurementViews: LayoutContext.MeasurementViews
+        measurementViews: LayoutContext.MeasurementViews,
+        states : ElementState
     ) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
-        let measurementCache = MeasurementCache()
-        
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
@@ -44,10 +42,9 @@ struct LayoutResultNode {
                 in: layoutAttributes.frame.size,
                 with: .init(
                     environment: environment,
-                    measurementCache: measurementCache,
                     measurementViews: measurementViews
                 ),
-                cache: cache
+                states: states
             )
         )
     }
@@ -71,9 +68,8 @@ extension LayoutResultNode {
         }
 
         let subtreeExtent: CGRect? = children
-            .map { $0.node }
-            .reduce(into: nil) { (rect, node) in
-                rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
+            .reduce(into: nil) { (rect, child) in
+                rect = rect?.union(child.node.layoutAttributes.frame) ?? child.node.layoutAttributes.frame
             }
 
         let viewDescription = element.backingViewDescription(
@@ -100,7 +96,5 @@ extension LayoutResultNode {
                 return (path, transformedNode)
             }
         }
-
     }
-    
 }

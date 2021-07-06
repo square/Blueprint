@@ -61,7 +61,7 @@ final class RootViewController : UIViewController
 }
 
 
-fileprivate struct DemoItem : ProxyElement
+fileprivate struct DemoItem : ProxyElement, EquatableElement
 {
     var title : String
     var badgeText : String?
@@ -102,5 +102,10 @@ fileprivate struct DemoItem : ProxyElement
             .inset(uniform: 7.0)
             .box(background: .systemRed, corners: .capsule)
         }
+    }
+    
+    func isEquivalent(to other: DemoItem) -> Bool {
+        self.title == other.title &&
+        self.badgeText == other.badgeText
     }
 }
