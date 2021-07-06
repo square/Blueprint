@@ -428,12 +428,9 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     private func adapted(environment: Environment) -> Environment {
         var environment = environment
         
-        let onDidRead = environment.onDidRead
-        environment.onDidRead = nil
-        
+        environment.readNotificationsEnabled = false
         self.adapter(&environment)
-        
-        environment.onDidRead = onDidRead
+        environment.readNotificationsEnabled = true
         
         return environment
     }

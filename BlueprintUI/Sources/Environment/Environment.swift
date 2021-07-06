@@ -46,13 +46,17 @@ public struct Environment : Equatable {
     
     typealias OnDidRead = (StorageKey) -> ()
     var onDidRead : OnDidRead? = nil
+    
+    var readNotificationsEnabled : Bool = true
 
     /// Gets or sets an environment value by its key.
     public subscript<KeyType:EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
             
-            self.onDidRead?(storageKey)
+            if self.readNotificationsEnabled {
+                self.onDidRead?(storageKey)
+            }
 
             if let value = values[storageKey] {
                 return value as! KeyType.Value
