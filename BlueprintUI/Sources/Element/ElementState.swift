@@ -223,6 +223,26 @@ final class ElementState {
         }
     }
     
+    func viewSizeChanged(from : CGSize, to : CGSize) {
+        
+        func clearCaches() {
+            self.measurements.removeAll()
+            self.layouts.removeAll()
+        }
+        
+        if let element = self.element as? LayoutCacheClearingElement {
+            if element.shouldClearLayoutCacheForSizeChange(from: from, to: to) {
+                clearCaches()
+            }
+        } else {
+            clearCaches()
+        }
+        
+        self.children.forEach { _, value in
+            value.viewSizeChanged(from: from, to: to)
+        }
+    }
+    
     func prepareForLayout() {
         
         self.wasVisited = false
@@ -371,4 +391,10 @@ extension ElementState {
             "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements, \(self.layouts.count) Layouts"
         }
     }
+}
+
+
+protocol LayoutCacheClearingElement : Element {
+    
+    func shouldClearLayoutCacheForSizeChange(from : CGSize, to : CGSize) -> Bool
 }

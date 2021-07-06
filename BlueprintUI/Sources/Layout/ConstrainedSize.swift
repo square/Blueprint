@@ -50,7 +50,7 @@ public struct ConstrainedSize: Element {
 extension ConstrainedSize {
 
     /// The available ways to constrain the measurement of a given axis within a `ConstrainedSize` element.
-    public enum Constraint {
+    public enum Constraint : Equatable {
         /// There is no constraint for this axis – the natural size of the element will be used.
         case unconstrained
         
@@ -201,5 +201,21 @@ extension ConstrainedSize {
             LayoutAttributes(size: size)
         }
     }
+}
 
+
+extension ConstrainedSize : LayoutCacheClearingElement {
+    
+    func shouldClearLayoutCacheForSizeChange(from: CGSize, to: CGSize) -> Bool {
+        
+        if self.width.applied(to: from.width) != self.width.applied(to: to.width) {
+            return true
+        }
+        
+        if self.height.applied(to: from.height) != self.height.applied(to: to.height) {
+            return true
+        }
+        
+        return false
+    }
 }
