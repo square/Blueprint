@@ -446,7 +446,6 @@ private struct TestContainer: Element {
             items: LayoutItems<Void>,
             in constraint : SizeConstraint,
             with context: LayoutContext
-            
         ) -> CGSize
         {
             .zero

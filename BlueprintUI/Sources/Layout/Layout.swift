@@ -50,10 +50,15 @@ extension Layout where Traits == () {
 }
 
 
+/// Provides a list of items to measure or position during the element layout and measurement pass.
+/// You can measure each item by calling `content.measure(in:with:)`, passing the
+/// desired size and ``LayoutContent`` to propagate the ``Environment``, etc.
 public final class LayoutItems<Traits> {
     
+    /// The items to be measured or laid out.
     public let all : [Item]
     
+    /// The count of the items to be measured or laid out.
     public let count : Int
     
     init(with all : [Item]) {
@@ -61,9 +66,14 @@ public final class LayoutItems<Traits> {
         self.count = self.all.count
     }
     
+    /// An individual item to layout or measure.
     public struct Item {
         
+        /// The traits associated with the item, from its containing `Layout`. For most layouts, the `Traits`
+        /// are `()`, or `Void`.
         public let traits : Traits
+        
+        /// The content of the layout item to be measured.
         public let content : Measurable
         
         init(traits: Traits, content: Measurable) {

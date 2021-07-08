@@ -70,7 +70,7 @@ public struct Decorate : ProxyElement {
                 let contentSize = self.wrapped.content.measure(
                     in: constraint,
                     with: context
-                ) // TODO: This doesn't pass caching through...
+                )
                 
                 let contentFrame = CGRect(origin: .zero, size: contentSize)
                 

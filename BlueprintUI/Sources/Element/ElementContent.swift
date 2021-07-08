@@ -67,7 +67,7 @@ public struct ElementContent {
         in size: CGSize,
         with context : LayoutContext,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
     {
         storage.performLayout(
             in: size,

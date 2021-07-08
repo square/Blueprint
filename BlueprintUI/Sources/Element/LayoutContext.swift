@@ -5,11 +5,24 @@
 //  Created by Kyle Van Essen on 7/2/21.
 //
 
-import Foundation
+import UIKit
 
 
 ///
+/// The ``LayoutContext`` is an object that is passed through the element hierarchy during
+/// layout and measurement passes, to give easy access to the ``Environment``, measurement
+/// views, etc.
 ///
+/// You usually do not create a ``LayoutContext`` yourself outside of testing contexts. Instead,
+/// utilize the ``LayoutContext`` passed to your ``ElementContent`` to correctly measure
+/// your content in the right environment and context:
+/// ```
+/// var content : ElementContent {
+///     ElementContent { size, context -> CGSize in
+///         self.wrapped.content.measure(in: size, with: context)
+///     }
+/// }
+/// ```
 public struct LayoutContext {
     
     // MARK: Environment
@@ -43,13 +56,13 @@ public struct LayoutContext {
     /// BlueprintView, or if measuring an element outside of a BlueprintView, for the length of the measurement cycle.
     ///
     /// The view passed to the method is wrapped in an `@autoclosure`; it will only be created once
-    /// per element for the lifetime of the containing Blueprint view / measurement cycle.
+    /// per element for the lifetime of the containing Blueprint view or measurement cycle.
     ///
     /// ```
     /// ElementContent { constraint, context -> CGSize in
     ///     context.measure(self, using: MyView()) { view in
     ///         view.configure(with: self)
-    ///         view.sizeThatFits(constraint.maximum)
+    ///         return view.sizeThatFits(constraint.maximum)
     ///     }
     /// }
     /// ```
@@ -73,7 +86,7 @@ public struct LayoutContext {
     // MARK: Mutating The Context
     
     /// Returns a new instance of the context by setting the provided key path to the provided value.
-    public func setting<Value>(
+    func setting<Value>(
         _ keyPath : WritableKeyPath<Self, Value>,
         to value : Value
     ) -> Self
