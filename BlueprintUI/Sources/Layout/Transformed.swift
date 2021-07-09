@@ -47,8 +47,8 @@ public struct Transformed<Wrapped:Element>: Element {
 
 
 extension Transformed:Equatable where Wrapped:Equatable {}
-extension Transformed:AnyEquatableElement where Wrapped:Equatable {}
-extension Transformed:EquatableElement where Wrapped:Equatable {}
+extension Transformed:AnyComparableElement where Wrapped:Equatable {}
+extension Transformed:ComparableElement where Wrapped:Equatable {}
 
 
 public extension Element {

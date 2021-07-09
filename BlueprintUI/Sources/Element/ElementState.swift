@@ -58,7 +58,7 @@ final class ElementState {
     private(set) var element : Element
     
     var elementIsEquatable : Bool {
-        self.element is AnyEquatableElement
+        self.element is AnyComparableElement
     }
     
     private(set) var wasVisited : Bool = false
@@ -225,13 +225,15 @@ final class ElementState {
     
     func viewSizeChanged(from : CGSize, to : CGSize) {
         
+        if from == to { return }
+        
         func clearCaches() {
             self.measurements.removeAll()
             self.layouts.removeAll()
         }
         
-        if let element = self.element as? LayoutCacheClearingElement {
-            if element.shouldClearLayoutCacheForSizeChange(from: from, to: to) {
+        if let element = self.element as? AnyComparableElement {
+            if element.willSizeChangeAffectLayout(from: from, to: to) {
                 clearCaches()
             }
         } else {
@@ -326,8 +328,8 @@ fileprivate extension ElementState {
     
     static func elementsEquivalent(_ lhs : Element, _ rhs : Element) -> Bool {
         
-        guard let lhs = lhs as? AnyEquatableElement else { return false }
-        guard let rhs = rhs as? AnyEquatableElement else { return false }
+        guard let lhs = lhs as? AnyComparableElement else { return false }
+        guard let rhs = rhs as? AnyComparableElement else { return false }
         
         return lhs.anyIsEquivalentTo(other: rhs)
     }
@@ -393,8 +395,3 @@ extension ElementState {
     }
 }
 
-
-protocol LayoutCacheClearingElement : Element {
-    
-    func shouldClearLayoutCacheForSizeChange(from : CGSize, to : CGSize) -> Bool
-}

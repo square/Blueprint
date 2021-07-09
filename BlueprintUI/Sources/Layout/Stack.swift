@@ -4,7 +4,7 @@ import UIKit
 ///
 /// This protocol should only be used by Row and Column elements (you should never add conformance to other custom
 /// types).
-public protocol StackElement : EquatableElement {
+public protocol StackElement : ComparableElement {
     init()
     var layout: StackLayout { get set }
     var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
@@ -50,8 +50,8 @@ extension StackElement {
             }
             
             guard
-                let lhs = lhs.element as? AnyEquatableElement,
-                let rhs = rhs.element as? AnyEquatableElement
+                let lhs = lhs.element as? AnyComparableElement,
+                let rhs = rhs.element as? AnyComparableElement
             else {
                 return false
             }
@@ -151,7 +151,7 @@ extension StackElement {
             key: key
         ))
         
-        self.layout.allElementsEquatable = self.layout.allElementsEquatable && child is AnyEquatableElement
+        self.layout.allElementsEquatable = self.layout.allElementsEquatable && child is AnyComparableElement
     }
 
 

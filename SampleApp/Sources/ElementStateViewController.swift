@@ -71,7 +71,7 @@ final class ElementStateViewController: UIViewController {
 }
 
 
-fileprivate struct Tweet : EnvironmentElement, Equatable, EquatableElement {
+fileprivate struct Tweet : EnvironmentElement, Equatable, ComparableElement {
     
     var fullName : String
     var userName : String

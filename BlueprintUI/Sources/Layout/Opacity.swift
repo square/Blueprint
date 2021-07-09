@@ -59,8 +59,8 @@ public struct Opacity<Wrapped:Element>: Element {
 
 
 extension Opacity:Equatable where Wrapped:Equatable {}
-extension Opacity:AnyEquatableElement where Wrapped:Equatable {}
-extension Opacity:EquatableElement where Wrapped:Equatable {}
+extension Opacity:AnyComparableElement where Wrapped:Equatable {}
+extension Opacity:ComparableElement where Wrapped:Equatable {}
 
 
 public extension Element {

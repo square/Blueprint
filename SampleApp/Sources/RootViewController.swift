@@ -61,7 +61,7 @@ final class RootViewController : UIViewController
 }
 
 
-fileprivate struct DemoItem : ProxyElement, EquatableElement
+fileprivate struct DemoItem : ProxyElement, ComparableElement
 {
     var title : String
     var badgeText : String?

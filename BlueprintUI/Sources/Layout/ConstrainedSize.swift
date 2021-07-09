@@ -204,7 +204,7 @@ extension ConstrainedSize {
 }
 
 
-extension ConstrainedSize : LayoutCacheClearingElement {
+extension ConstrainedSize {
     
     func shouldClearLayoutCacheForSizeChange(from: CGSize, to: CGSize) -> Bool {
         

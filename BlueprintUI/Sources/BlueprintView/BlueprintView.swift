@@ -331,7 +331,6 @@ public final class BlueprintView: UIView {
         self.rootState.root?.prepareForLayout()
         
         defer {
-            // TODO: Call this here? Do nodes need to retain their states longer
             self.rootState.root?.finishedLayout()
         }
         

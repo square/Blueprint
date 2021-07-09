@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Displays text content.
-public struct Label: ProxyElement, Equatable, EquatableElement {
+public struct Label: ProxyElement, Equatable, ComparableElement {
 
     /// The text to be displayed.
     public var text: String

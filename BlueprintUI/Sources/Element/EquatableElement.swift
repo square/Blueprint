@@ -1,5 +1,5 @@
 //
-//  EquatableElement.swift
+//  ComparableElement.swift
 //  BlueprintUI
 //
 //  Created by Kyle Van Essen on 7/3/21.
@@ -8,14 +8,14 @@
 import Foundation
 
 
-/// An `EquatableElement` is an element which can cache its
+/// An `ComparableElement` is an element which can cache its
 /// measurements and layouts across layout passes in order to dramatically improve
 /// performance of repeated layouts.
 ///
-/// Many element types within Blueprint already conform to `EquatableElement`.
+/// Many element types within Blueprint already conform to `ComparableElement`.
 /// If your element can be easily compared for equality, consider making your
-/// it conform to `EquatableElement` for improved performance across layouts.
-public protocol EquatableElement : AnyEquatableElement {
+/// it conform to `ComparableElement` for improved performance across layouts.
+public protocol ComparableElement : AnyComparableElement {
     
     ///
     /// Indicates if the element is equivalent to the other provided element.
@@ -31,7 +31,19 @@ public protocol EquatableElement : AnyEquatableElement {
 }
 
 
-public extension EquatableElement where Self:Equatable {
+/// A type-erased version of `ComparableElement`, allowing the comparison
+/// of two arbitrary elements, and allowing direct access to methods, without self or associated type constraints.
+public protocol AnyComparableElement : Element {
+ 
+    /// Returns true if the two elements are the same type, and are equivalent.
+    func anyIsEquivalentTo(other : AnyComparableElement) -> Bool
+    
+    /// Return true if the layout and measurement caches should be cleared from the given size change.
+    func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool
+}
+
+
+public extension ComparableElement where Self:Equatable {
     
     func isEquivalent(to other : Self) -> Bool {
         self == other
@@ -39,20 +51,15 @@ public extension EquatableElement where Self:Equatable {
 }
 
 
-/// A type-erased version of `EquatableElement`, allowing the comparison of two arbitrary elements.
-public protocol AnyEquatableElement : Element {
- 
-    /// Returns true if the two elements are the same type, and are equivalent.
-    func anyIsEquivalentTo(other : AnyEquatableElement) -> Bool
+public extension ComparableElement {
     
-}
-
-
-public extension EquatableElement {
-    
-    func anyIsEquivalentTo(other: AnyEquatableElement) -> Bool {
+    func anyIsEquivalentTo(other: AnyComparableElement) -> Bool {
         guard let other = other as? Self else { return false }
         
         return self.isEquivalent(to: other)
+    }
+    
+    func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool {
+        true
     }
 }

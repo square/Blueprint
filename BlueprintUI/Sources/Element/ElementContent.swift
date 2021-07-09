@@ -259,7 +259,7 @@ extension ElementContent {
                 
                 defer { Logger.logMeasureEnd(object: states.signpostRef) }
 
-                let layoutItems = self.layoutItems(states: states, environment: context.environment)
+                let layoutItems = self.layoutItems(states: states, context: context)
                 
                 return layout.measure(
                     items: layoutItems,
@@ -281,7 +281,7 @@ extension ElementContent {
             
             return states.layout(in: size, with: context) { context in
                 
-                let layoutItems = self.layoutItems(states: states, environment: context.environment)
+                let layoutItems = self.layoutItems(states: states, context: context)
                 
                 let childAttributes = layout.layout(
                     items: layoutItems,
@@ -322,7 +322,7 @@ extension ElementContent {
 
         private func layoutItems(
             states : ElementState,
-            environment : Environment
+            context : LayoutContext
         ) -> LayoutItems<LayoutType.Traits>
         {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
@@ -343,7 +343,7 @@ extension ElementContent {
                         with: context,
                         states: states.subState(
                             for: child.element,
-                            in: environment,
+                            in: context.environment,
                             with: identifier
                         )
                     )

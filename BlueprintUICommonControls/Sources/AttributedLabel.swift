@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-public struct AttributedLabel: Equatable, EquatableElement {
+public struct AttributedLabel: Equatable, ComparableElement {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0

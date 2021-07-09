@@ -123,8 +123,8 @@ public extension Element {
 
 
 extension Inset:Equatable where Wrapped:Equatable {}
-extension Inset:AnyEquatableElement where Wrapped:Equatable {}
-extension Inset:EquatableElement where Wrapped:Equatable {}
+extension Inset:AnyComparableElement where Wrapped:Equatable {}
+extension Inset:ComparableElement where Wrapped:Equatable {}
 
 
 extension Inset {

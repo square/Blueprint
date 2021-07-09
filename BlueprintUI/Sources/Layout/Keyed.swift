@@ -85,8 +85,8 @@ public struct Keyed<Wrapped:Element>: Element {
 
 
 extension Keyed:Equatable where Wrapped:Equatable {}
-extension Keyed:AnyEquatableElement where Wrapped:Equatable {}
-extension Keyed:EquatableElement where Wrapped:Equatable {}
+extension Keyed:AnyComparableElement where Wrapped:Equatable {}
+extension Keyed:ComparableElement where Wrapped:Equatable {}
 
 
 extension Element {

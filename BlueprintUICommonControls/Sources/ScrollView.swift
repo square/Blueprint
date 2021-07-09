@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Wraps a content element and makes it scrollable.
-public struct ScrollView: Element {
+public struct ScrollView: Element, ComparableElement {
 
     /// The content to be scrolled.
     public var wrappedElement: Element
@@ -86,6 +86,19 @@ public extension Element {
             wrapping: self,
             configure: configure
         )
+    }
+}
+
+extension ScrollView {
+    
+    public func isEquivalent(to other: ScrollView) -> Bool {
+        // TODO: Support this properly...
+        return false
+    }
+    
+    public func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool {
+        // TODO: Return false if only height changes but width remains same.
+        return true
     }
 }
 
