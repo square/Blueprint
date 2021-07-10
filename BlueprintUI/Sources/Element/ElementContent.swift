@@ -211,6 +211,55 @@ extension ElementContent {
 }
 
 
+extension ElementContent {
+    
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    public init(
+        byMeasuring child : Element,
+        measurementCachingKey : MeasurementCachingKey? = nil
+    ) {
+        self.storage = ElementMeasuringStorage(child: child)
+        self.measurementCachingKey = measurementCachingKey
+    }
+    
+    fileprivate struct ElementMeasuringStorage : ContentStorage {
+        
+        let child : Element
+        let childCount: Int = 1
+        
+        func measure(
+            in constraint: SizeConstraint,
+            with context: LayoutContext,
+            cache: CacheTree
+        ) -> CGSize
+        {
+            cache.get(constraint) { constraint in
+                child.content.measure(
+                    in: constraint,
+                    with: context,
+                    cache: cache.subcache(element: child)
+                )
+            }
+        }
+        
+        func performLayout(
+            in size: CGSize,
+            with context: LayoutContext,
+            cache: CacheTree
+        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        {
+            // Because this storage only uses the child to measure
+            // the content, we can return nothing from here.
+            []
+        }
+    }
+}
+
+
 fileprivate protocol ContentStorage {
     
     var childCount: Int { get }
