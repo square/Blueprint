@@ -17,9 +17,11 @@ class Decorate_Position_Tests : XCTestCase {
         
         // .inset
         
+        let context = LayoutContext.rootContext()
+        
         let inset = Decorate.Position.inset(UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
         XCTAssertEqual(
-            inset.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            inset.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: 0, y: 0, width: 70, height: 50)
         )
         
@@ -27,25 +29,25 @@ class Decorate_Position_Tests : XCTestCase {
         
         let topLeft = Decorate.Position.corner(.topLeft, .init(horizontal: 1, vertical: 2))
         XCTAssertEqual(
-            topLeft.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            topLeft.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: -4, y: -5.5, width: 10, height: 15)
         )
         
         let topRight = Decorate.Position.corner(.topRight, .init(horizontal: 1, vertical: 2))
         XCTAssertEqual(
-            topRight.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            topRight.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: 56, y: -5.5, width: 10, height: 15)
         )
         
         let bottomRight = Decorate.Position.corner(.bottomRight, .init(horizontal: 1, vertical: 2))
         XCTAssertEqual(
-            bottomRight.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            bottomRight.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: 56, y: 34.5, width: 10, height: 15)
         )
         
         let bottomLeft = Decorate.Position.corner(.bottomLeft, .init(horizontal: 1, vertical: 2))
         XCTAssertEqual(
-            bottomLeft.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            bottomLeft.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: -4, y: 34.5, width: 10, height: 15)
         )
         
@@ -56,7 +58,7 @@ class Decorate_Position_Tests : XCTestCase {
         })
         
         XCTAssertEqual(
-            custom.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            custom.frame(with: contentFrame, decoration: DecorationElement(), context: context),
             CGRect(x: 10, y: 15, width: 20, height: 30)
         )
     }
@@ -66,7 +68,7 @@ class Decorate_Position_Tests : XCTestCase {
 fileprivate struct DecorationElement : Element {
     
     var content: ElementContent {
-        ElementContent { _ in CGSize(width: 10, height: 15) }
+        ElementContent { _, _ in CGSize(width: 10, height: 15) }
     }
     
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

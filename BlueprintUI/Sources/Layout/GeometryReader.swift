@@ -31,8 +31,8 @@ public struct GeometryReader: Element {
     }
 
     public var content: ElementContent {
-        ElementContent { (constraint, environment) -> Element in
-            self.elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
+        ElementContent { constraint, context in
+            self.elementRepresentation(GeometryProxy(constraint: constraint, context: context))
         }
     }
 
@@ -43,13 +43,19 @@ public struct GeometryReader: Element {
 
 /// Contains information about the current layout being measured by GeometryReader
 public struct GeometryProxy {
-    var environment: Environment
-
+    
     /// The size constraint of the element being laid out.
     public var constraint: SizeConstraint
+    
+    /// The environment the element is being laid out in.
+    public var environment: Environment {
+        context.environment
+    }
+    
+    var context : LayoutContext
 
     /// Measure the given element, using this proxy's constraint and the current environment.
-    public func measure(element: Element) -> CGSize {
-        element.content.measure(in: constraint, environment: environment)
+    public func size(for element: Element) -> CGSize {
+        element.content.measure(in: constraint, with: context)
     }
 }

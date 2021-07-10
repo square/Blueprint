@@ -34,7 +34,12 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
+    /// The controller which manages updates for the root node in the element tree.
     private let rootController: NativeViewController
+    
+    /// A cache passed to elements which they can use to request a prototype view for measuring
+    /// their contents. See ``LayoutContext/measure(_:using:measure:)`` for more.
+    private let measurementViews : LayoutContext.MeasurementViews = .init()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -167,7 +172,11 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: measurementConstraint(with: size),
-            environment: self.makeEnvironment(),
+            with: .init(
+                environment: self.makeEnvironment(),
+                measurementCache: .init(),
+                measurementViews: self.measurementViews
+            ),
             cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
     }
@@ -194,7 +203,11 @@ public final class BlueprintView: UIView {
         
         return element.content.measure(
             in: constraint,
-            environment: self.makeEnvironment(),
+            with: .init(
+                environment: self.makeEnvironment(),
+                measurementCache: .init(),
+                measurementViews: self.measurementViews
+            ),
             cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
@@ -250,9 +263,7 @@ public final class BlueprintView: UIView {
         let environment = self.makeEnvironment()
 
         /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment)
-            .resolve() ?? []
+        let viewNodes = self.calculateNativeViewNodes(in: environment)
         
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -293,6 +304,22 @@ public final class BlueprintView: UIView {
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
         )
+    }
+    
+    /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
+    /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
+    /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
+    private func calculateNativeViewNodes(in environment : Environment) -> [(path: ElementPath, node: NativeViewNode)] {
+        guard let element = self.element else { return [] }
+        
+        let laidOutNodes = LayoutResultNode(
+            root: element,
+            layoutAttributes: .init(frame: self.bounds),
+            environment: environment,
+            measurementViews: self.measurementViews
+        )
+        
+        return laidOutNodes.resolve()
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {

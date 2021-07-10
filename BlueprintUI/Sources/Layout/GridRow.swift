@@ -120,12 +120,17 @@ extension GridRow {
             .absolute(0)
         }
 
-        func measure(in constraint: SizeConstraint, items: [(traits: Width, content: Measurable)]) -> CGSize {
-            guard items.count > 0 else {
+        func measure(
+            items: LayoutItems<Width>,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
+            guard items.all.isEmpty == false else {
                 return .zero
             }
 
-            let frames = _frames(in: constraint, items: items)
+            let frames = _frames(in: constraint, with: context, items: items)
 
             // Measure the the row to be as wide as the sum of its children and as tall as its tallest child.
             let size = frames.reduce(.zero) { size, frame in
@@ -135,12 +140,22 @@ extension GridRow {
             return size
         }
 
-        func layout(size: CGSize, items: [(traits: Width, content: Measurable)]) -> [LayoutAttributes] {
-            guard items.count > 0 else {
+        func layout(
+            items: LayoutItems<Width>,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> [LayoutAttributes]
+        {
+            guard items.all.isEmpty == false else {
                 return []
             }
 
-            let frames = _frames(in: SizeConstraint(size), isExactConstraint: true, items: items)
+            let frames = _frames(
+                in: SizeConstraint(size),
+                with: context,
+                isExactConstraint: true,
+                items: items
+            )
             let attributes = frames.map(LayoutAttributes.init)
 
             return attributes
@@ -161,16 +176,18 @@ extension GridRow {
         /// This shadows `Stack.VectorConstraint.exactly` conceptually without introducing the greater complexity of
         /// this type, which would go mostly unused here.
         private func _frames(
-            in constraint: SizeConstraint,
+            in constraint : SizeConstraint,
+            with context : LayoutContext,
             isExactConstraint: Bool = false,
-            items: [(traits: Width, content: Measurable)]
+            items: LayoutItems<Width>
         ) -> [CGRect] {
             var sizes: [CGSize] = Array(repeating: .zero, count: items.count)
 
             // Group children by their sizing. Maintain child order by also storing index.
             var absolutelySized: [(index: Int, width: CGFloat, content: Measurable)] = []
             var proportionallySized: [(index: Int, proportion: CGFloat, content: Measurable)] = []
-            items.enumerated().forEach { (index, item) in
+            
+            items.all.indexedForEach { index, item in
                 switch item.traits {
                 case .absolute(let width):
                     absolutelySized.append((index, width, item.content))
@@ -178,11 +195,11 @@ extension GridRow {
                     proportionallySized.append((index, proportion, item.content))
                 }
             }
-
+            
             // Measure absolutely-sized children.
             absolutelySized.forEach { (index, width, content) in
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
-                sizes[index] = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
+                sizes[index] = CGSize(width: width, height: content.measure(in: fixedWidthConstraint, with: context).height)
             }
 
             // Measure proportionally-sized children.
@@ -192,6 +209,7 @@ extension GridRow {
                 let availableWidth = width - absoluteItemWidth - spacing * CGFloat(items.count - 1)
                 constrainedProportionalItemSizes(
                     in: constraint,
+                    with: context,
                     availableWidth: availableWidth,
                     items: proportionallySized
                 )
@@ -201,6 +219,7 @@ extension GridRow {
             case .unconstrained:
                 unconstrainedProportionalItemSizes(
                     in: constraint,
+                    with: context,
                     items: proportionallySized
                 )
                 .forEach { (index, size) in
@@ -233,7 +252,8 @@ extension GridRow {
         ///
         /// Determine the scale of a portion (points per portion), then use it to apply a width to each child.
         func constrainedProportionalItemSizes(
-            in constraint: SizeConstraint,
+            in constraint : SizeConstraint,
+            with context : LayoutContext,
             availableWidth: CGFloat,
             items: [IndexedProportionalItem]
         ) -> [IndexedSize] {
@@ -253,7 +273,7 @@ extension GridRow {
             return items.map { (index, proportion, content) in
                 let width = scale * proportion
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
-                let size = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
+                let size = CGSize(width: width, height: content.measure(in: fixedWidthConstraint, with: context).height)
                 return (index, size)
             }
         }
@@ -271,14 +291,15 @@ extension GridRow {
         ///      - max scale:        12.5
         ///      - widths:           12.5,  25,    37.5
         private func unconstrainedProportionalItemSizes(
-            in constraint: SizeConstraint,
+            in constraint : SizeConstraint,
+            with context : LayoutContext,
             items: [IndexedProportionalItem]
         ) -> [IndexedSize] {
             var scale: CGFloat = 0
             var measuredSizes: [CGSize] = []
 
             items.forEach { (_, proportion, content) in
-                let size = content.measure(in: constraint)
+                let size = content.measure(in: constraint, with: context)
                 measuredSizes.append(size)
                 scale = max(scale, size.width / proportion)
             }

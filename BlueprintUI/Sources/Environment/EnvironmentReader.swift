@@ -24,12 +24,12 @@ public struct EnvironmentReader: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent { (_, environment) in
-            self.elementRepresentation(environment)
+        ElementContent { _, context in
+            self.elementRepresentation(context.environment)
         }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }

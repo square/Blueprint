@@ -45,19 +45,29 @@ public struct Overlay: Element {
 /// the same frame (filling the container’s bounds).
 fileprivate struct OverlayLayout: Layout {
 
-    func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero, { (result, item) in
-            let measuredSize = item.content.measure(in: constraint)
+    func measure(
+        items: LayoutItems<Void>,
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
+    {
+        items.all.reduce(into: CGSize.zero) { result, item in
+            let measuredSize = item.content.measure(in: constraint, with: context)
+            
             result.width = max(result.width, measuredSize.width)
             result.height = max(result.height, measuredSize.height)
-        })
+        }
     }
 
-    func layout(size: CGSize, items: [(traits: Void, content: Measurable)]) -> [LayoutAttributes] {
-        return Array(
+    func layout(
+        items: LayoutItems<Void>,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> [LayoutAttributes]
+    {
+        Array(
             repeating: LayoutAttributes(size: size),
             count: items.count
         )
     }
-
 }

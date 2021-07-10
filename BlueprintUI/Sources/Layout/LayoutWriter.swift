@@ -14,7 +14,7 @@ import UIKit
 /// this element to create a customized layout in a more lightweight way.
 ///
 /// ```
-/// LayoutWriter { context, layout in
+/// LayoutWriter { constraint, context, layout in
 ///     layout.add(with: myFrame, child: myElement)
 ///     layout.add(with: myOtherFrame, child: myOtherElement)
 ///
@@ -37,7 +37,7 @@ public struct LayoutWriter : Element {
     }
     
     /// The builder type passed to the `LayoutWriter` initializer.
-    public typealias Build = (Context, inout Builder) -> ()
+    public typealias Build = (SizeConstraint, LayoutContext, inout Builder) -> ()
     
     /// The builder used to create the custom layout.
     public let build : Build
@@ -47,9 +47,9 @@ public struct LayoutWriter : Element {
     //
     
     public var content: ElementContent {
-        ElementContent { size, env in
+        ElementContent { constraint, context -> Element in
             var builder = Builder()
-            self.build(Context(size: size), &builder)
+            self.build(constraint, context, &builder)
             
             return Content(builder: builder)
         }
@@ -114,13 +114,6 @@ extension LayoutWriter {
                 return updated
             }
         }
-    }
-    
-    /// Provides the relevant information about the context in which the layout is occurring.
-    public struct Context {
-        
-        /// The size constraint the layout is occurring in.
-        public var size : SizeConstraint
     }
     
     /// Controls the sizing calculation of the custom layout.
@@ -217,11 +210,21 @@ extension LayoutWriter {
         private struct Layout : BlueprintUI.Layout {
             var builder : Builder
             
-            func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+            func measure(
+                items: LayoutItems<Void>,
+                in constraint : SizeConstraint,
+                with context: LayoutContext
+            ) -> CGSize
+            {
                 self.builder.sizing.measure(with: self.builder)
             }
             
-            func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+            func layout(
+                items: LayoutItems<Void>,
+                in size : CGSize,
+                with context : LayoutContext
+            ) -> [LayoutAttributes]
+            {
                 self.builder.children.map { child in
                     .init(frame: child.frame)
                 }

@@ -62,11 +62,22 @@ public struct Keyed: Element {
     }
     
     private struct KeyedLayout: SingleChildLayout {
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
+
+        func measure(
+            child: Measurable,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
+            child.measure(in: constraint, with: context)
         }
         
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+        func layout(
+            child: Measurable,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> LayoutAttributes
+        {
             LayoutAttributes(size: size)
         }
     }

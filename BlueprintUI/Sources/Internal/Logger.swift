@@ -7,6 +7,9 @@ enum Logger { }
 /// BlueprintView signposts
 extension Logger {
     static func logLayoutStart(view: BlueprintView) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
@@ -20,6 +23,9 @@ extension Logger {
     }
 
     static func logLayoutEnd(view: BlueprintView) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
@@ -31,6 +37,9 @@ extension Logger {
     }
 
     static func logViewUpdateStart(view: BlueprintView) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
@@ -44,6 +53,9 @@ extension Logger {
     }
 
     static func logViewUpdateEnd(view: BlueprintView) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,
@@ -55,6 +67,9 @@ extension Logger {
     }
 
     static func logElementAssigned(view: BlueprintView) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .event,
@@ -71,6 +86,9 @@ extension Logger {
 /// Measuring signposts
 extension Logger {
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .begin,
@@ -87,6 +105,9 @@ extension Logger {
     }
 
     static func logMeasureEnd(object: AnyObject) {
+        
+        guard BlueprintLogging.enabled else { return }
+        
         if #available(iOS 12.0, *) {
             os_signpost(
                 .end,

@@ -67,13 +67,13 @@ final class GeometryReaderTests: XCTestCase {
             }
 
             XCTAssertEqual(
-                geometry.measure(element: adaptiveElement),
+                geometry.size(for: adaptiveElement),
                 CGSize(width: 10, height: 10)
             )
 
             XCTAssertEqual(
-                geometry.measure(
-                    element: adaptiveElement.adaptedEnvironment(key: TestKey.self, value: 5)
+                geometry.size(
+                    for: adaptiveElement.adaptedEnvironment(key: TestKey.self, value: 5)
                 ),
                 CGSize(width: 5, height: 5)
             )

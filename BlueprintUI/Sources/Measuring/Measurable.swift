@@ -5,8 +5,12 @@ public protocol Measurable {
 
     /// Measures the required size of the receiver.
     ///
-    /// - parameter constraint: The size constraint.
+    /// - parameter context: The context describing the layout environment.
     ///
     /// - returns: The layout size needed by the receiver.
-    func measure(in constraint: SizeConstraint) -> CGSize
+    func measure(
+        in constraint : SizeConstraint,
+        with context: LayoutContext
+    ) -> CGSize
 }
+

@@ -156,8 +156,12 @@ extension ConstrainedSize {
         var width: Constraint
         var height: Constraint
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-
+        func measure(
+            child: Measurable,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
             // If both height & width are absolute, we can avoid measuring entirely.
             if case let .absolute(width) = width, case let .absolute(height) = height {
                 return CGSize(width: width, height: height)
@@ -175,7 +179,7 @@ extension ConstrainedSize {
                 height: .init(self.height.applied(to: constraint.height.maximum))
             )
             
-            let measurement = child.measure(in: maximumConstraint)
+            let measurement = child.measure(in: maximumConstraint, with: context)
             
             /// 2) If our returned size needs to be larger than the measured size,
             /// eg: the element did not take up all the space during measurement,
@@ -187,9 +191,14 @@ extension ConstrainedSize {
                 height: height.applied(to: measurement.height)
             )
         }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(size: size)
+        
+        func layout(
+            child: Measurable,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> LayoutAttributes
+        {
+            LayoutAttributes(size: size)
         }
     }
 

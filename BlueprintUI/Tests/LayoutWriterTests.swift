@@ -18,7 +18,7 @@ class LayoutWriterTests : XCTestCase {
         
         var buildCount : Int = 0
         
-        let writer = LayoutWriter { _, layout in
+        let writer = LayoutWriter { _, _, layout in
             buildCount += 1
         }
         
@@ -39,7 +39,7 @@ class LayoutWriterTests : XCTestCase {
         /// `.unionOfChildren`, positive frames.
         
         do {
-            let writer = LayoutWriter { context, layout in
+            let writer = LayoutWriter { constraint, context, layout in
                 layout.add(with: CGRect(x: 10, y: 20, width: 50, height: 50), child: TestElement())
                 layout.add(with: CGRect(x: 20, y: 10, width: 20, height: 100), child: TestElement())
                 
@@ -52,7 +52,7 @@ class LayoutWriterTests : XCTestCase {
         /// `.unionOfChildren`, positive & negative frames.
         
         do {
-            let writer = LayoutWriter { context, layout in
+            let writer = LayoutWriter { constraint, context, layout in
                 layout.add(with: CGRect(x: -10, y: -10, width: 50, height: 50), child: TestElement())
                 layout.add(with: CGRect(x: -20, y: 50, width: 20, height: 60), child: TestElement())
                 layout.add(with: CGRect(x: 50, y: 25, width: 50, height: 60), child: TestElement())
@@ -67,7 +67,7 @@ class LayoutWriterTests : XCTestCase {
         /// `.fixed`
         
         do {
-            let writer = LayoutWriter { context, layout in
+            let writer = LayoutWriter { constraint, context, layout in
                 layout.add(with: CGRect(x: 10, y: 20, width: 50, height: 50), child: TestElement())
                 
                 layout.sizing = .fixed(CGSize(width: 100, height: 100))
@@ -79,12 +79,12 @@ class LayoutWriterTests : XCTestCase {
     }
     
     func test_layout() {
-        let writer = LayoutWriter { context, layout in
+        let writer = LayoutWriter { constraint, context, layout in
             layout.add(with: CGRect(x: 10, y: 20, width: 50, height: 50), child: TestElement())
             layout.add(with: CGRect(x: 20, y: 10, width: 20, height: 100), child: TestElement())
         }
     
-        let layoutResult = writer.content.testLayout(attributes: LayoutAttributes(size: CGSize(width: 100, height: 100)))
+        let layoutResult = writer.content.testLayout(in: CGSize(width: 100, height: 100))
         let innerElement = layoutResult[0]
         
         let nodes = innerElement.node.children.map(\.node)
@@ -103,11 +103,11 @@ class LayoutWriterTests : XCTestCase {
 fileprivate struct TestElement : Element {
     
     var content: ElementContent {
-        ElementContent { $0.maximum }
+        ElementContent { constraint, _ in constraint.maximum }
     }
     
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { _ in }
     }
-    
+
 }

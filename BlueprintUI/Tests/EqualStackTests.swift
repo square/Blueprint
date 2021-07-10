@@ -250,7 +250,7 @@ fileprivate struct AreaElement: Element {
     }
 
     var content: ElementContent {
-        return ElementContent { [area] constraint in
+        ElementContent { [area] constraint, context -> CGSize in
             if case .atMost(let maxWidth) = constraint.width {
                 return CGSize(
                     width: maxWidth,

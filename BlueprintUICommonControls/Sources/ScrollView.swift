@@ -97,34 +97,50 @@ extension ScrollView {
         var contentSize: ContentSize
         var centersUnderflow: Bool
 
-        func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+        func fittedSize(
+            for child: Measurable,
+            in constraint: SizeConstraint,
+            with context : LayoutContext
+        ) -> CGSize {
             switch contentSize {
             case .custom(let size):
                 return size
 
             case .fittingContent:
-                return child.measure(in: .unconstrained)
+                return child.measure(in: .unconstrained, with: context)
 
             case .fittingHeight:
                 return child.measure(
                     in: SizeConstraint(
                         width: constraint.width,
-                        height: .unconstrained))
+                        height: .unconstrained
+                    ),
+                    with: context
+                )
 
             case .fittingWidth:
                 return child.measure(
                     in: SizeConstraint(
                         width: .unconstrained,
-                        height: constraint.height))
+                        height: constraint.height
+                     ),
+                    with: context
+                )
             }
         }
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+        func measure(
+            child: Measurable,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
             let adjustedConstraint = constraint.inset(
                 width: contentInset.left + contentInset.right,
-                height: contentInset.top + contentInset.bottom)
+                height: contentInset.top + contentInset.bottom
+            )
 
-            var result = fittedSize(in: adjustedConstraint, child: child)
+            var result = fittedSize(for: child, in: adjustedConstraint, with: context)
 
             result.width += contentInset.left + contentInset.right
             result.height += contentInset.top + contentInset.bottom
@@ -135,13 +151,22 @@ extension ScrollView {
             return result
         }
 
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-
+        func layout(
+            child: Measurable,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> LayoutAttributes
+        {
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right
             insetSize.height -= contentInset.top + contentInset.bottom
 
-            var itemSize = fittedSize(in: SizeConstraint(insetSize), child: child)
+            var itemSize = fittedSize(
+                for: child,
+                in: .init(insetSize),
+                with: context
+            )
+            
             if self.contentSize == .fittingHeight {
                 itemSize.width = insetSize.width
             } else if self.contentSize == .fittingWidth {
@@ -159,11 +184,10 @@ extension ScrollView {
                     contentAttributes.center.y = size.height / 2.0
                 }
             }
+            
             return contentAttributes
         }
-
     }
-
 }
 
 extension ScrollView {

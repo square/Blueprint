@@ -1,23 +1,5 @@
 import UIKit
 
-extension Element {
-
-    /// Build a fully laid out element tree with complete layout attributes
-    /// for each element.
-    ///
-    /// - Parameter layoutAttributes: The layout attributes to assign to the
-    ///   root element.
-    ///
-    /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        return LayoutResultNode(
-            root: self,
-            layoutAttributes: layoutAttributes,
-            environment: environment
-        )
-    }
-
-}
 
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
@@ -45,20 +27,30 @@ struct LayoutResultNode {
         self.children = children
     }
 
-    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
+    init(
+        root: Element,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        measurementViews: LayoutContext.MeasurementViews
+    ) {
         let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+        let measurementCache = MeasurementCache()
+        
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
             environment: environment,
             children: root.content.performLayout(
-                attributes: layoutAttributes,
-                environment: environment,
+                in: layoutAttributes.frame.size,
+                with: .init(
+                    environment: environment,
+                    measurementCache: measurementCache,
+                    measurementViews: measurementViews
+                ),
                 cache: cache
             )
         )
     }
-
 }
 
 

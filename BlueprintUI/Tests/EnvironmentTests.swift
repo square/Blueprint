@@ -246,12 +246,22 @@ private struct TestElement: Element {
     struct TestLayout: Layout {
         var value: TestValue
 
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            return value.size
+        func measure(
+            items: LayoutItems<Void>,
+            in constraint : SizeConstraint,
+            with context: LayoutContext
+        ) -> CGSize
+        {
+            value.size
         }
 
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            return [value.layoutAttributes]
+        func layout(
+            items: LayoutItems<Void>,
+            in size : CGSize,
+            with context : LayoutContext
+        ) -> [LayoutAttributes]
+        {
+            [value.layoutAttributes]
         }
     }
 

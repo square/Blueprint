@@ -43,7 +43,7 @@ struct ResponsiveLabel: ProxyElement {
                 label.numberOfLines = 1
             }
 
-            let labelWidth = geometry.measure(element: label).width
+            let labelWidth = geometry.size(for: label).width
 
             // If the label does not fit within this constraint, replace it with "..."
             if let maxWidth = geometry.constraint.width.constrainedValue, labelWidth > maxWidth {

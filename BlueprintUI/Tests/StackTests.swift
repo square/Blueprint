@@ -1121,7 +1121,7 @@ class StackTests: XCTestCase {
         var axis: StackLayout.Axis
 
         var content: ElementContent {
-            ElementContent { constraint -> CGSize in
+            ElementContent { constraint, context -> CGSize in
                 switch self.axis {
                 case .horizontal:
                     let itemsPerLine = max(1, Int(constraint.width.maximum / self.itemSize.width))
