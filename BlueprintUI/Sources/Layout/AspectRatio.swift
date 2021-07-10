@@ -1,7 +1,7 @@
 import UIKit
 
 /// Represents an a proportional relationship between width and height.
-public struct AspectRatio {
+public struct AspectRatio : Equatable {
     /// A 1:1 aspect ratio.
     public static let square = AspectRatio(ratio: 1)
 

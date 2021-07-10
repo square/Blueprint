@@ -28,3 +28,17 @@ public protocol SingleChildLayout {
         with context : LayoutContext
     ) -> LayoutAttributes
 }
+
+
+extension SingleChildLayout {
+    
+    /// The default implementation simply passes through the measured size of the layout.
+    public func layout(
+        child: Measurable,
+        in size : CGSize,
+        with context : LayoutContext
+    ) -> LayoutAttributes
+    {
+        LayoutAttributes(size: size)
+    }
+}

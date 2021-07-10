@@ -7,7 +7,7 @@ import UIKit
 /// - Note: A stack measures itself by determining its largest child in each axis, and
 ///         in the case of the primary axis, multiplying by `children.count` (accounting
 ///         for `spacing` as necessary).
-public struct EqualStack: Element {
+public struct EqualStack: Element, ComparableElement {
 
     /// The direction in which this element will stack its children.
     public var direction: Direction
@@ -45,7 +45,16 @@ public struct EqualStack: Element {
     public mutating func add(child: Element) {
         children.append(child)
     }
-
+    
+    public func isEquivalent(to other: EqualStack) -> Bool {
+        
+        guard self.children.count == other.children.count else { return false }
+        
+        guard self.direction == other.direction else { return false }
+        guard self.spacing == other.spacing else { return false }
+                
+        return self.children.isEquivalent(to: other.children)
+    }
 }
 
 extension EqualStack {

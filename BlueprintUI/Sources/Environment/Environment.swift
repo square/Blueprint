@@ -42,7 +42,7 @@ public struct Environment : Equatable {
         .init()
     }
 
-    private var values: [StorageKey: Any] = [:]
+    private var values: [StorageKey: ValueBox] = [:]
     
     typealias OnDidRead = (StorageKey) -> ()
     var onDidRead : OnDidRead? = nil
@@ -59,14 +59,14 @@ public struct Environment : Equatable {
             }
 
             if let value = values[storageKey] {
-                return value as! KeyType.Value
+                return value.base as! KeyType.Value
             } else {
                 return key.defaultValue
             }
         }
         set {
             let storageKey = StorageKey(key)
-            values[storageKey] = newValue
+            values[storageKey] = ValueBox(newValue)
         }
     }
     
@@ -75,7 +75,7 @@ public struct Environment : Equatable {
         guard lhs.values.count == rhs.values.count else { return false }
         
         for (key, value) in lhs.values {
-            if key.valuesEqual(value, rhs.values[key]) == false {
+            if key.valuesEqual(value.base, rhs.values[key]?.base) == false {
                 return false
             }
         }
@@ -83,10 +83,12 @@ public struct Environment : Equatable {
         return true
     }
     
-    func isEqual(to subset : Environment.Subset) -> Bool {
+    func valuesEqual(to subset : Environment.Subset?) -> Bool {
+        
+        guard let subset = subset else { return true }
         
         for (key, value) in subset.values {
-            if key.valuesEqual(value, self.values[key]) == false {
+            if key.valuesEqual(value.base, self.values[key]?.base) == false {
                 return false
             }
         }
@@ -94,7 +96,10 @@ public struct Environment : Equatable {
         return true
     }
     
-    func subset(keeping keys : Set<StorageKey>) -> Environment.Subset {
+    func subset(with keys : Set<StorageKey>) -> Environment.Subset? {
+        
+        if keys.isEmpty { return nil }
+        
         var subset = Subset()
         subset.values.reserveCapacity(keys.count)
         
@@ -154,7 +159,17 @@ extension UIView {
 extension Environment {
     
     struct Subset {
-        fileprivate var values : [StorageKey:Any] = [:]
+        fileprivate var values : [StorageKey:ValueBox] = [:]
+    }
+    
+    /// Place values in the environment into a reference box, so that their storage is only allocated once
+    /// even when placed into an environment subset for change tracking.
+    final class ValueBox {
+        let base : Any
+        
+        init(_ base : Any) {
+            self.base = base
+        }
     }
 
     struct StorageKey : Hashable {

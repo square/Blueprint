@@ -57,9 +57,7 @@ final class ElementState {
     
     private(set) var element : Element
     
-    var elementIsEquatable : Bool {
-        self.element is AnyComparableElement
-    }
+    let isElementComparable : Bool
     
     private(set) var wasVisited : Bool = false
     private(set) var hasUpdatedInCurrentCycle : Bool = false
@@ -73,6 +71,8 @@ final class ElementState {
     ) {
         self.identifier = identifier
         self.element = element
+        self.isElementComparable = self.element is AnyComparableElement
+        
         self.depth = depth
         self.signpostRef = signpostRef
         self.name = name
@@ -89,25 +89,14 @@ final class ElementState {
         precondition(self.identifier == identifier)
         
         if Self.elementsEquivalent(self.element, newElement) == false {
-            self.measurements = [:]
-            self.layouts = [:]
+            self.clearAllCachedData()
         } else {
-            for (_, result) in self.measurements {
-                guard let dependency = result.environmentDependency else { continue }
-                
-                if dependency.trackedKeysEqual(to: newEnvironment) == false {
-                    self.measurements.removeAll()
-                    break
-                }
+            self.measurements.removeAll { _, measurement in
+                newEnvironment.valuesEqual(to: measurement.dependencies) == false
             }
             
-            for (_, result) in self.layouts {
-                guard let dependency = result.environmentDependency else { continue }
-                
-                if dependency.trackedKeysEqual(to: newEnvironment) == false {
-                    self.layouts.removeAll()
-                    break
-                }
+            self.layouts.removeAll { _, layout in
+                newEnvironment.valuesEqual(to: layout.dependencies) == false
             }
         }
         
@@ -126,11 +115,9 @@ final class ElementState {
     
     private struct CachedMeasurement {
         var size : CGSize
-        var environmentDependency : EnvironmentDependency?
+        var dependencies : Environment.Subset?
     }
 
-    // TODO: I think because we also cache layout; we can remove every one here but the one(s) used by cached layouts?
-    // TODO: cont'd: this will help save a lot of in-memory space for caches, since deep elements can be measured 10 times (or more) during a layout.
     func measure(
         in constraint : SizeConstraint,
         with context : LayoutContext,
@@ -141,18 +128,11 @@ final class ElementState {
             return existing.size
         }
         
-        var context = context
-        var readEnvironmentKeys = Set<Environment.StorageKey>()
-
-        context.environment.onDidRead = { key in
-            readEnvironmentKeys.insert(key)
-        }
-            
-        let size = measurer(context)
+        let (size, dependencies) = self.trackEnvironmentReads(with: context, in: measurer)
         
         self.measurements[constraint] = .init(
             size: size,
-            environmentDependency: .init(from: context.environment, keys: readEnvironmentKeys)
+            dependencies: dependencies
         )
                 
         return size
@@ -160,15 +140,13 @@ final class ElementState {
     
     typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
     
-    // TODO: Cache all of them, or just the most few recent / most recent?
     private var layouts : [CGSize:CachedLayoutResult] = [:]
     
     private struct CachedLayoutResult {
         var result : LayoutResult
-        var environmentDependency : EnvironmentDependency?
+        var dependencies : Environment.Subset?
     }
     
-    // TODO: Does this get multiplicatively expensive with deep trees? Does it matter?
     func layout(
         in size : CGSize,
         with context : LayoutContext,
@@ -178,22 +156,32 @@ final class ElementState {
         if let existing = self.layouts[size] {
             return existing.result
         }
-        
-        var context = context
-        var readEnvironmentKeys = Set<Environment.StorageKey>()
-        
-        context.environment.onDidRead = { key in
-            readEnvironmentKeys.insert(key)
-        }
                 
-        let result = layout(context)
+        let (result, dependencies) = self.trackEnvironmentReads(with: context, in: layout)
         
         self.layouts[size] = .init(
             result: result,
-            environmentDependency: .init(from: context.environment, keys: readEnvironmentKeys)
+            dependencies: dependencies
         )
                 
         return result
+    }
+    
+    private func trackEnvironmentReads<Output>(
+        with context : LayoutContext,
+        in toTrack : (LayoutContext) -> Output
+    ) -> (Output, Environment.Subset?)
+    {
+        var context = context
+        var observedKeys = Set<Environment.StorageKey>()
+        
+        context.environment.onDidRead = { key in
+            observedKeys.insert(key)
+        }
+                
+        let output = toTrack(context)
+        
+        return (output, context.environment.subset(with: observedKeys))
     }
     
     private var children : [ElementIdentifier:ElementState] = [:]
@@ -227,17 +215,12 @@ final class ElementState {
         
         if from == to { return }
         
-        func clearCaches() {
-            self.measurements.removeAll()
-            self.layouts.removeAll()
-        }
-        
         if let element = self.element as? AnyComparableElement {
             if element.willSizeChangeAffectLayout(from: from, to: to) {
-                clearCaches()
+                self.clearAllCachedData()
             }
         } else {
-            clearCaches()
+            self.clearAllCachedData()
         }
         
         self.children.forEach { _, value in
@@ -261,16 +244,14 @@ final class ElementState {
     }
     
     private func removeOldChildren() {
-        let old : [ElementIdentifier] = self.children.compactMap { id, state in
-            state.wasVisited ? nil : id
-        }
         
-        old.forEach {
-            guard let state = self.children[$0] else { fatalError() }
+        for (key, state) in self.children {
+            
+            if state.wasVisited { continue }
             
             state.teardown()
             
-            self.children.removeValue(forKey: $0)
+            self.children.removeValue(forKey: key)
         }
         
         self.children.forEach { _, state in
@@ -278,35 +259,19 @@ final class ElementState {
         }
     }
     
+    private func clearAllCachedData() {
+        self.measurements.removeAll()
+        self.layouts.removeAll()
+    }
+    
     private func clearNonPersistentCaches() {
         
-        if self.elementIsEquatable == false {
-            self.measurements.removeAll()
-            self.layouts.removeAll()
+        if self.isElementComparable == false {
+            self.clearAllCachedData()
         }
         
         self.children.forEach { _, state in
             state.clearNonPersistentCaches()
-        }
-    }
-}
-
-
-extension ElementState {
-    
-    fileprivate struct EnvironmentDependency {
-        let dependencies : Environment.Subset
-        
-        init?(from environment : Environment, keys : Set<Environment.StorageKey>) {
-            if keys.isEmpty {
-                return nil
-            } else {
-                self.dependencies = environment.subset(keeping: keys)
-            }
-        }
-        
-        func trackedKeysEqual(to environment : Environment) -> Bool {
-            environment.isEqual(to: self.dependencies)
         }
     }
 }
@@ -334,6 +299,19 @@ fileprivate extension ElementState {
         return lhs.anyIsEquivalentTo(other: rhs)
     }
 
+}
+
+
+fileprivate extension Dictionary {
+    
+    mutating func removeAll(where shouldRemove : (Key, Value) -> Bool) {
+        
+        for (key, value) in self {
+            if shouldRemove(key, value) {
+                self.removeValue(forKey: key)
+            }
+        }
+    }
 }
 
 

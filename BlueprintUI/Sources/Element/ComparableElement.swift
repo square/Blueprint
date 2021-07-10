@@ -22,7 +22,7 @@ public protocol ComparableElement : AnyComparableElement {
     /// Return true if the elements are the same, or return false if something about
     /// the element changed, such as its content or measurement attributes.
     ///
-    /// Note that even if this method returns true, the `ViewDescription` (if any)
+    /// Note that even if this method returns true, the `ViewDescription`
     /// backing the element will still be re-applied to the on-screen view.
     ///
     /// If your element conforms to `Equatable`, this method is synthesized automatically.
@@ -61,5 +61,32 @@ public extension ComparableElement {
     
     func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool {
         true
+    }
+}
+
+
+public extension Array where Self.Element == BlueprintUI.Element {
+    
+    func isEquivalent(to other : Self) -> Bool {
+        
+        guard self.count == other.count else { return false }
+        
+        for index in 0..<self.count {
+            let lhs = self[index]
+            let rhs = other[index]
+            
+            guard
+                let lhs = lhs as? AnyComparableElement,
+                let rhs = rhs as? AnyComparableElement
+            else {
+                return false
+            }
+            
+            if lhs.anyIsEquivalentTo(other: rhs) == false {
+                return false
+            }
+        }
+        
+        return true
     }
 }

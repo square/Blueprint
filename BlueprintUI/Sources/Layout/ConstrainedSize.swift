@@ -191,15 +191,6 @@ extension ConstrainedSize {
                 height: height.applied(to: measurement.height)
             )
         }
-        
-        func layout(
-            child: Measurable,
-            in size : CGSize,
-            with context : LayoutContext
-        ) -> LayoutAttributes
-        {
-            LayoutAttributes(size: size)
-        }
     }
 }
 
