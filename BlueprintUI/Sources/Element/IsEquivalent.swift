@@ -16,7 +16,9 @@ public struct IsEquivalent<Value> {
     
     public func compare(_ lhs : Value, _ rhs : Value) -> Bool {
         for comparison in self.comparisons {
-            comparison(lhs, rhs)
+            if comparison(lhs, rhs) == false {
+                return false
+            }
         }
         
         return true
