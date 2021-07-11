@@ -4,13 +4,13 @@
 /// the content element – even if that size is larger than the wrapping `Centered`
 /// element.
 ///
-public struct Centered<Wrapped:Element> : ProxyElement {
+public struct Centered : ProxyElement, ComparableElement {
 
     /// The content element to be centered.
-    public var wrapped: Wrapped
+    public var wrapped: Element
 
     /// Initializes a `Centered` element with the given content element.
-    public init(_ wrapped: Wrapped) {
+    public init(_ wrapped: Element) {
         self.wrapped = wrapped
     }
 
@@ -21,18 +21,21 @@ public struct Centered<Wrapped:Element> : ProxyElement {
             wrapping: wrapped
         )
     }
+    
+    private static let isEquivalent = IsEquivalent<Centered> {
+        $0.add(\.wrapped)
+    }
+    
+    public func isEquivalent(to other: Centered) -> Bool {
+        Self.isEquivalent.compare(self, other)
+    }
 }
-
-
-extension Centered:Equatable where Wrapped:Equatable {}
-extension Centered:AnyComparableElement where Wrapped:Equatable {}
-extension Centered:ComparableElement where Wrapped:Equatable {}
 
 
 public extension Element {
     
     /// Wraps the element in a `Centered` element to center it within its parent.
-    func centered() -> Centered<Self> {
+    func centered() -> Centered {
         Centered(self)
     }
 }

@@ -88,6 +88,28 @@ public struct LayoutContext {
 }
 
 
+///
+public struct LayoutContextReader : Element {
+    
+    /// Return the contents of this element in the given context.
+    var elementRepresentation: (LayoutContext) -> Element
+
+    public init(elementRepresentation: @escaping (_ context: LayoutContext) -> Element) {
+        self.elementRepresentation = elementRepresentation
+    }
+
+    public var content: ElementContent {
+        ElementContent { _, context in
+            self.elementRepresentation(context)
+        }
+    }
+
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        nil
+    }
+}
+
+
 extension LayoutContext {
     
     /// Internal cache used to retain prototype views for measurement operations.

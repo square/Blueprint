@@ -1,10 +1,10 @@
 import UIKit
 
 /// Changes the transform of the wrapped element.
-public struct Transformed<Wrapped:Element>: Element {
+public struct Transformed: Element, ComparableElement {
 
     /// The content element whose transform is being affected.
-    public var wrapped: Wrapped
+    public var wrapped: Element
 
     /// The transform of the wrapped element.
     public var transform: CATransform3D
@@ -16,7 +16,7 @@ public struct Transformed<Wrapped:Element>: Element {
     ///   - wrapping: The content element to be made transparent.
     public init(
         transform: CATransform3D,
-        wrapping wrapped: Wrapped
+        wrapping wrapped: Element
     ) {
         self.transform = transform
         self.wrapped = wrapped
@@ -29,7 +29,7 @@ public struct Transformed<Wrapped:Element>: Element {
     ///   - wrapping: The content element to be made transparent.
     public init(
         transform: CGAffineTransform,
-        wrapping wrapped: Wrapped
+        wrapping wrapped: Element
     ) {
         self.transform = CATransform3DMakeAffineTransform(transform)
         self.wrapped = wrapped
@@ -43,12 +43,16 @@ public struct Transformed<Wrapped:Element>: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
+    
+    private static let isEquivalent = IsEquivalent<Transformed> {
+        $0.add(\.transform)
+        $0.add(\.wrapped)
+    }
+    
+    public func isEquivalent(to other: Transformed) -> Bool {
+        Self.isEquivalent.compare(self, other)
+    }
 }
-
-
-extension Transformed:Equatable where Wrapped:Equatable {}
-extension Transformed:AnyComparableElement where Wrapped:Equatable {}
-extension Transformed:ComparableElement where Wrapped:Equatable {}
 
 
 public extension Element {
@@ -57,7 +61,7 @@ public extension Element {
     /// - parameters:
     ///   - transform: The 3D transform to be applied.
     ///
-    func transformed(_ transform: CATransform3D) -> Transformed<Self> {
+    func transformed(_ transform: CATransform3D) -> Transformed {
         Transformed(
             transform: transform,
             wrapping: self
@@ -69,7 +73,7 @@ public extension Element {
     /// - parameters:
     ///   - transform: The 2D transform to be applied.
     ///
-    func transformed(_ transform: CGAffineTransform) -> Transformed<Self> {
+    func transformed(_ transform: CGAffineTransform) -> Transformed {
         Transformed(
             transform: transform,
             wrapping: self
@@ -87,7 +91,7 @@ public extension Element {
         translateX: CGFloat = 0,
         translateY: CGFloat = 0,
         translateZ: CGFloat = 0
-    ) -> Transformed<Self>
+    ) -> Transformed
     {
         Transformed(
             transform: CATransform3DMakeTranslation(translateX, translateY, translateZ),
@@ -100,7 +104,7 @@ public extension Element {
     /// - parameters:
     ///   - rotate: The angle measurement to rotate the receiver by.
     ///
-    func rotated(by rotationAngle: Measurement<UnitAngle>) -> Transformed<Self> {
+    func rotated(by rotationAngle: Measurement<UnitAngle>) -> Transformed {
         Transformed(
             transform: CGAffineTransform(
                 rotationAngle: CGFloat(rotationAngle.converted(to: .radians).value)
@@ -118,7 +122,7 @@ public extension Element {
     func scaled(
         scaleX: CGFloat = 1,
         scaleY: CGFloat = 1
-    ) -> Transformed<Self>
+    ) -> Transformed
     {
         Transformed(
             transform: CGAffineTransform(scaleX: scaleX, y: scaleY),

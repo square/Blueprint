@@ -35,16 +35,16 @@ import UIKit
 ///     }
 /// }
 /// ```
-public struct Keyed<Wrapped:Element>: Element {
+public struct Keyed : Element, ComparableElement {
     
     /// The key used to differentiate the element.
     public var key : AnyHashable?
     
     /// The wrapped element.
-    public var wrapped : Wrapped
+    public var wrapped : Element
     
     /// Creates a new `Keyed` element with the provided key and wrapped element.
-    public init(key: AnyHashable?, wrapping: Wrapped) {
+    public init(key: AnyHashable?, wrapping: Element) {
         self.key = key
         self.wrapped = wrapping
     }
@@ -59,6 +59,15 @@ public struct Keyed<Wrapped:Element>: Element {
     
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
+    }
+    
+    static let isEquivalent = IsEquivalent<Keyed> {
+        $0.add(\.key)
+        $0.add(\.wrapped)
+    }
+    
+    public func isEquivalent(to other: Keyed) -> Bool {
+        Self.isEquivalent.compare(self, other)
     }
     
     private struct KeyedLayout: SingleChildLayout {
@@ -82,11 +91,6 @@ public struct Keyed<Wrapped:Element>: Element {
         }
     }
 }
-
-
-extension Keyed:Equatable where Wrapped:Equatable {}
-extension Keyed:AnyComparableElement where Wrapped:Equatable {}
-extension Keyed:ComparableElement where Wrapped:Equatable {}
 
 
 extension Element {
@@ -118,7 +122,7 @@ extension Element {
     ///     }
     /// }
     /// ```
-    public func keyed(_ key : AnyHashable) -> Keyed<Self> {
+    public func keyed(_ key : AnyHashable) -> Keyed {
         Keyed(key: key, wrapping: self)
     }
 }

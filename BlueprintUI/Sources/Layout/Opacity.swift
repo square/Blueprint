@@ -1,10 +1,10 @@
 import UIKit
 
 /// Changes the opacity of the wrapped element.
-public struct Opacity<Wrapped:Element>: Element {
+public struct Opacity: Element, ComparableElement {
 
     /// The content element whose opacity is being affected.
-    public var wrapped: Wrapped
+    public var wrapped: Element
 
     /// The opacity of the wrapped element.
     public var opacity: CGFloat
@@ -16,7 +16,7 @@ public struct Opacity<Wrapped:Element>: Element {
     ///   - wrapping: The content element to be made transparent.
     public init(
         opacity: CGFloat,
-        wrapping wrapped: Wrapped
+        wrapping wrapped: Element
     ) {
         self.opacity = opacity
         self.wrapped = wrapped
@@ -28,6 +28,15 @@ public struct Opacity<Wrapped:Element>: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
+    }
+    
+    static let isEquivalent = IsEquivalent<Opacity> {
+        $0.add(\.opacity)
+        $0.add(\.wrapped)
+    }
+    
+    public func isEquivalent(to other: Opacity) -> Bool {
+        Self.isEquivalent.compare(self, other)
     }
 
     private struct Layout: SingleChildLayout {
@@ -58,18 +67,13 @@ public struct Opacity<Wrapped:Element>: Element {
 }
 
 
-extension Opacity:Equatable where Wrapped:Equatable {}
-extension Opacity:AnyComparableElement where Wrapped:Equatable {}
-extension Opacity:ComparableElement where Wrapped:Equatable {}
-
-
 public extension Element {
     /// Wraps the element in an `Opacity` element with the provided opacity.
     ///
     /// - parameters:
     ///   - opacity: The opacity to be applied.
     ///
-    func opacity(_ opacity: CGFloat) -> Opacity<Self> {
+    func opacity(_ opacity: CGFloat) -> Opacity {
         return Opacity(
             opacity: opacity,
             wrapping: self

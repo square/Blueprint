@@ -4,10 +4,10 @@ import UIKit
 ///
 /// Commonly used to add padding around another element when displayed within a container.
 ///
-public struct Inset<Wrapped:Element> : Element {
+public struct Inset : Element, ComparableElement {
 
     /// The wrapped element to be inset.
-    public var wrapped: Wrapped
+    public var wrapped: Element
 
     /// The amount to inset the content element.
     public var top: CGFloat
@@ -15,7 +15,7 @@ public struct Inset<Wrapped:Element> : Element {
     public var left: CGFloat
     public var right: CGFloat
     
-    public init(top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0, wrapping element: Wrapped) {
+    public init(top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0, wrapping element: Element) {
         self.wrapped = element
         self.top = top
         self.bottom = bottom
@@ -23,7 +23,7 @@ public struct Inset<Wrapped:Element> : Element {
         self.right = right
     }
     
-    public init(uniformInset: CGFloat, wrapping element: Wrapped) {
+    public init(uniformInset: CGFloat, wrapping element: Element) {
         self.wrapped = element
         self.top = uniformInset
         self.bottom = uniformInset
@@ -31,7 +31,7 @@ public struct Inset<Wrapped:Element> : Element {
         self.right = uniformInset
     }
     
-    public init(insets: UIEdgeInsets, wrapping element: Wrapped) {
+    public init(insets: UIEdgeInsets, wrapping element: Element) {
         self.wrapped = element
         self.top = insets.top
         self.bottom = insets.bottom
@@ -39,7 +39,7 @@ public struct Inset<Wrapped:Element> : Element {
         self.right = insets.right
     }
     
-    public init(sideInsets: CGFloat, wrapping element: Wrapped) {
+    public init(sideInsets: CGFloat, wrapping element: Element) {
         self.init(
             insets: UIEdgeInsets(
                 top: 0.0,
@@ -50,7 +50,7 @@ public struct Inset<Wrapped:Element> : Element {
         )
     }
     
-    public init(vertical: CGFloat, wrapping element: Wrapped) {
+    public init(vertical: CGFloat, wrapping element: Element) {
         self.init(
             top: vertical,
             bottom: vertical,
@@ -73,6 +73,18 @@ public struct Inset<Wrapped:Element> : Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
+    
+    private static let isEquivalent = IsEquivalent<Inset> {
+        $0.add(\.top)
+        $0.add(\.bottom)
+        $0.add(\.left)
+        $0.add(\.right)
+        $0.add(\.wrapped)
+    }
+    
+    public func isEquivalent(to other: Inset) -> Bool {
+        Self.isEquivalent.compare(self, other)
+    }
 }
 
 
@@ -84,7 +96,7 @@ public extension Element {
         bottom: CGFloat = 0.0,
         left: CGFloat = 0.0,
         right: CGFloat = 0.0
-    ) -> Inset<Self>
+    ) -> Inset
     {
         Inset(
             top: top,
@@ -96,12 +108,12 @@ public extension Element {
     }
     
     /// Insets the element by the given amount on each side.
-    func inset(by edgeInsets : UIEdgeInsets) -> Inset<Self> {
+    func inset(by edgeInsets : UIEdgeInsets) -> Inset {
         Inset(insets: edgeInsets, wrapping: self)
     }
     
     /// Insets the element by the given amount on each side.
-    func inset(uniform : CGFloat) -> Inset<Self> {
+    func inset(uniform : CGFloat) -> Inset {
         Inset(uniformInset: uniform, wrapping: self)
     }
     
@@ -109,7 +121,7 @@ public extension Element {
     func inset(
         horizontal : CGFloat = 0.0,
         vertical : CGFloat = 0.0
-    ) -> Inset<Self>
+    ) -> Inset
     {
         Inset(
             top: vertical,
@@ -120,11 +132,6 @@ public extension Element {
         )
     }
 }
-
-
-extension Inset:Equatable where Wrapped:Equatable {}
-extension Inset:AnyComparableElement where Wrapped:Equatable {}
-extension Inset:ComparableElement where Wrapped:Equatable {}
 
 
 extension Inset {
