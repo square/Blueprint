@@ -81,7 +81,7 @@ final class ElementState {
         self.hasUpdatedInCurrentCycle = true
     }
     
-    func update(
+    fileprivate func update(
         with newElement : Element,
         in newEnvironment : Environment,
         identifier : ElementIdentifier
@@ -186,7 +186,12 @@ final class ElementState {
     
     private var children : [ElementIdentifier:ElementState] = [:]
     
-    func subState(for child : Element, in environment : Environment, with identifier : ElementIdentifier) -> ElementState {
+    func childState(
+        for child : Element,
+        in environment : Environment,
+        with identifier : ElementIdentifier
+    ) -> ElementState
+    {
         if let existing = self.children[identifier] {
             existing.wasVisited = true
             
@@ -229,21 +234,31 @@ final class ElementState {
     }
     
     func prepareForLayout() {
-        
-        self.wasVisited = false
-        self.hasUpdatedInCurrentCycle = false
-        
-        self.children.forEach { _, state in
-            state.prepareForLayout()
+        self.recursiveForEach {
+            $0.wasVisited = false
+            $0.hasUpdatedInCurrentCycle = false
         }
     }
     
     func finishedLayout() {
-        self.removeOldChildren()
-        self.clearNonPersistentCaches()
+        self.recursiveRemoveOldChildren()
+        self.recursiveClearNonComparableElementCaches()
     }
     
-    private func removeOldChildren() {
+    private func clearAllCachedData() {
+        self.measurements.removeAll()
+        self.layouts.removeAll()
+    }
+    
+    func recursiveForEach(_ perform : (ElementState) -> ()) {
+        perform(self)
+        
+        self.children.forEach { _, child in
+            child.recursiveForEach(perform)
+        }
+    }
+    
+    private func recursiveRemoveOldChildren() {
         
         for (key, state) in self.children {
             
@@ -255,23 +270,21 @@ final class ElementState {
         }
         
         self.children.forEach { _, state in
-            state.removeOldChildren()
+            state.recursiveRemoveOldChildren()
         }
     }
     
-    private func clearAllCachedData() {
-        self.measurements.removeAll()
-        self.layouts.removeAll()
+    func recursiveClearAllCachedData() {
+        self.recursiveForEach {
+            $0.clearAllCachedData()
+        }
     }
     
-    private func clearNonPersistentCaches() {
-        
-        if self.isElementComparable == false {
-            self.clearAllCachedData()
-        }
-        
-        self.children.forEach { _, state in
-            state.clearNonPersistentCaches()
+    private func recursiveClearNonComparableElementCaches() {
+        self.recursiveForEach {
+            if $0.isElementComparable == false {
+                $0.clearAllCachedData()
+            }
         }
     }
 }
@@ -289,16 +302,17 @@ extension CGSize : Hashable {
 private final class SignpostToken {}
 
 
-fileprivate extension ElementState {
+extension ElementState {
     
-    static func elementsEquivalent(_ lhs : Element, _ rhs : Element) -> Bool {
+    static func elementsEquivalent(_ lhs : Element?, _ rhs : Element?) -> Bool {
+        
+        if lhs == nil && rhs == nil { return true }
         
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
         
-        return lhs.anyIsEquivalentTo(other: rhs)
+        return lhs.anyIsEquivalent(to: rhs)
     }
-
 }
 
 

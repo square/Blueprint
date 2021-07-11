@@ -54,6 +54,8 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
+            guard oldValue != self.environment else { return }
+            
             setNeedsViewHierarchyUpdate()
             invalidateIntrinsicContentSize()
         }
@@ -77,11 +79,21 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// If cross-layout path measurement and layout caching is enabled.
+    /// This value defaults to `true`. You should usually leave this property enabled.
+    ///
+    /// The only time you should disable it is if your `BlueprintView` is being used
+    /// as a prototype/measurement view, where caching layout related information
+    /// longer than needed may result in undesirable outcomes, such as objects being
+    /// retained longer than expected.
+    public var isLayoutCachingEnabled : Bool = true
 
     /// The root element that is displayed within the view.
     public var element: Element? {
         didSet {
-            // Minor performance optimization: We do not need to update anything if the element remains nil.
+            // Minor performance optimization:
+            // We do not need to update anything if the element remains nil.
             if oldValue == nil && self.element == nil {
                 return
             }
@@ -303,6 +315,10 @@ public final class BlueprintView: UIView {
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
+        
+        if self.isLayoutCachingEnabled == false {
+            self.rootState.root?.recursiveClearAllCachedData()
+        }
         
         hasUpdatedViewHierarchy = true
 

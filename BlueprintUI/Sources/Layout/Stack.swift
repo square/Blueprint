@@ -56,7 +56,7 @@ extension StackElement {
                 return false
             }
             
-            if lhs.anyIsEquivalentTo(other: rhs) == false {
+            if lhs.anyIsEquivalent(to: rhs) == false {
                 return false
             }
         }

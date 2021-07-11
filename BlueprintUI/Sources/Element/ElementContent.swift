@@ -305,7 +305,7 @@ extension ElementContent {
                         children: currentChild.content.performLayout(
                             in: currentChildLayoutAttributes.frame.size,
                             with: context,
-                            states: states.subState(
+                            states: states.childState(
                                 for: currentChild.element,
                                    in: context.environment,
                                    with: identifier
@@ -341,7 +341,7 @@ extension ElementContent {
                     childContent.measure(
                         in: constraint,
                         with: context,
-                        states: states.subState(
+                        states: states.childState(
                             for: child.element,
                             in: context.environment,
                             with: identifier
@@ -399,7 +399,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, in: environment, with: identifier)
+                states: states.childState(for: child, in: environment, with: identifier)
             )
         )
 
@@ -420,7 +420,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context.setting(\.environment, to: environment),
-                states: states.subState(for: child, in: environment, with: identifier)
+                states: states.childState(for: child, in: environment, with: identifier)
             )
         }
     }
@@ -457,7 +457,7 @@ private struct LazyStorage: ContentStorage {
             return child.content.measure(
                 in: constraint,
                 with: context,
-                states: states.subState(for: child, in: context.environment, with: identifier)
+                states: states.childState(for: child, in: context.environment, with: identifier)
             )
         }
     }
@@ -481,7 +481,7 @@ private struct LazyStorage: ContentStorage {
             children: child.content.performLayout(
                 in: size,
                 with: context,
-                states: states.subState(for: child, in: context.environment, with: identifier)
+                states: states.childState(for: child, in: context.environment, with: identifier)
             )
         )
 
