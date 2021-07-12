@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-public struct AccessibilityElement: Element {
+public struct AccessibilityElement: Element, KeyPathComparableElement {
 
     public enum Trait: Hashable {
         case button
@@ -108,6 +108,11 @@ public struct AccessibilityElement: Element {
             config[\.isAccessibilityElement] = true
             config[\.accessibilityFrameSize] = accessibilityFrameSize
         }
+    }
+    
+    public static let isEquivalent = IsEquivalent<AccessibilityElement> {
+        $0.add(\.accessibilityFrameSize)
+        $0.add(\.wrappedElement)
     }
 
     private final class AccessibilityView: UIView {

@@ -4,7 +4,7 @@ import BlueprintUI
 
 /// A simple element that wraps a child element and adds visual styling including
 /// background color.
-public struct Box: Element, ComparableElement {
+public struct Box: Element, KeyPathComparableElement {
     
     public var backgroundColor: UIColor
     public var cornerStyle: CornerStyle
@@ -89,7 +89,6 @@ public struct Box: Element, ComparableElement {
 
             })
 
-
             config.contentView = { view in
                 return view.contentView
             }
@@ -97,17 +96,8 @@ public struct Box: Element, ComparableElement {
         }
     }
     
-    private static let isEquivalent = IsEquivalent<Box> {
-        $0.add(\.backgroundColor)
-        $0.add(\.cornerStyle)
-        $0.add(\.borderStyle)
-        $0.add(\.shadowStyle)
-        $0.add(\.clipsContent)
+    public static let isEquivalent = IsEquivalent<Box> {
         $0.add(\.wrappedElement)
-    }
-    
-    public func isEquivalent(to other: Box) throws -> Bool {
-        try Self.isEquivalent.compare(self, other)
     }
 }
 

@@ -4,7 +4,7 @@ import UIKit
 
 /// Wraps a content element and adds transitions when the element appears,
 /// disappears, or changes layout.
-public struct TransitionContainer: Element {
+public struct TransitionContainer: Element, KeyPathComparableElement {
 
     /// The transition to apply when the wrapped element is appearing.
     public var appearingTransition: VisibilityTransition?
@@ -66,6 +66,9 @@ public struct TransitionContainer: Element {
         }
     }
 
+    public static let isEquivalent = IsEquivalent<TransitionContainer> {
+        $0.add(\.wrappedElement)
+    }
 }
 
 public extension Element {

@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Wraps a content element and calls the provided closure when tapped.
-public struct Tappable: Element {
+public struct Tappable: Element, KeyPathComparableElement {
 
     public var wrappedElement: Element
     public var onTap: () -> Void
@@ -23,6 +23,9 @@ public struct Tappable: Element {
         }
     }
 
+    public static let isEquivalent = IsEquivalent<Tappable> {
+        $0.add(\.wrappedElement)
+    }
 }
 
 

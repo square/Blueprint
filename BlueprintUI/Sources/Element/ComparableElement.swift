@@ -37,6 +37,12 @@ public protocol ComparableElement : AnyComparableElement {
 }
 
 
+public protocol KeyPathComparableElement : ComparableElement {
+    
+    static var isEquivalent : IsEquivalent<Self> { get }
+}
+
+
 /// A type-erased version of `ComparableElement`, allowing the comparison
 /// of two arbitrary elements, and allowing direct access to methods, without self or associated type constraints.
 public protocol AnyComparableElement : Element {
@@ -49,12 +55,6 @@ public protocol AnyComparableElement : Element {
     
     ///
     var appliesViewDescriptionIfEquivalent : Bool { get }
-}
-
-
-public protocol KeyPathComparableElement : ComparableElement {
-    
-    static var isEquivalent : IsEquivalent<Self> { get }
 }
 
 
@@ -96,6 +96,25 @@ public enum ComparableElementNotEquivalent : Error {
     case nonEquivalentValue(Any, Any, AnyKeyPath)
 }
 
+
+public extension Array {
+    
+    func isEquivalent(to other : Self, using compare : (Element, Element) throws -> Bool) rethrows -> Bool {
+        
+        guard self.count == other.count else { return false }
+        
+        for index in 0..<self.count {
+            let lhs = self[index]
+            let rhs = other[index]
+            
+            if try compare(lhs, rhs) == false {
+                return false
+            }
+        }
+        
+        return true
+    }
+}
 
 public extension Array where Self.Element == BlueprintUI.Element {
     

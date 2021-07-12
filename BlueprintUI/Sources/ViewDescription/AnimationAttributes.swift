@@ -1,7 +1,7 @@
 import UIKit
 
 /// UIView animation configuration values.
-public struct AnimationAttributes {
+public struct AnimationAttributes : Equatable {
 
     /// The duration of the animation.
     public var duration: TimeInterval

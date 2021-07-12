@@ -7,7 +7,7 @@ import UIKit
 /// For other modes, the size of the content element is determined by calling `measure(in:)`
 /// on the content element – even if that size is larger than the wrapping element.
 ///
-public struct Aligned: Element {
+public struct Aligned: Element, KeyPathComparableElement {
     /// The possible vertical alignment values.
     public enum VerticalAlignment {
         /// Aligns the content to the top edge of the containing element.
@@ -64,6 +64,12 @@ public struct Aligned: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
+    }
+    
+    public static let isEquivalent = IsEquivalent<Aligned> {
+        $0.add(\.wrappedElement)
+        $0.add(\.verticalAlignment)
+        $0.add(\.horizontalAlignment)
     }
 
     private struct Layout: SingleChildLayout {

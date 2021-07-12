@@ -1,7 +1,7 @@
 import UIKit
 
 /// The transition used when a view is inserted or removed during an update cycle.
-public struct VisibilityTransition {
+public struct VisibilityTransition : Equatable {
 
     /// The alpha of the view in the hidden state (initial for appearing, final for disappearing).
     public var alpha: CGFloat

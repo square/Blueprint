@@ -1,7 +1,7 @@
 import UIKit
 
 /// Changes the opacity of the wrapped element.
-public struct Opacity: Element, ComparableElement {
+public struct Opacity: Element, KeyPathComparableElement {
 
     /// The content element whose opacity is being affected.
     public var wrapped: Element
@@ -30,13 +30,9 @@ public struct Opacity: Element, ComparableElement {
         return nil
     }
     
-    static let isEquivalent = IsEquivalent<Opacity> {
+    public static let isEquivalent = IsEquivalent<Opacity> {
         $0.add(\.opacity)
         $0.add(\.wrapped)
-    }
-    
-    public func isEquivalent(to other: Opacity) throws -> Bool {
-        try Self.isEquivalent.compare(self, other)
     }
 
     private struct Layout: SingleChildLayout {

@@ -13,7 +13,7 @@ import UIKit
 /// and terminate the search down that branch. If a container is found,
 /// the elements returned from the container are added to the `accessibilityElements`
 /// and the search down that branch is also terminated.
-public struct AccessibilityContainer: Element {
+public struct AccessibilityContainer: Element, KeyPathComparableElement {
 
     /// An optional `accessibilityIdentifier` to give the container. Defaults to `nil`.
     public var identifier: String?
@@ -37,6 +37,10 @@ public struct AccessibilityContainer: Element {
         AccessibilityContainerView.describe { config in
             config[\.accessibilityIdentifier] = identifier
         }
+    }
+    
+    public static let isEquivalent = IsEquivalent<AccessibilityContainer> {
+        $0.add(\.wrapped)
     }
 }
 

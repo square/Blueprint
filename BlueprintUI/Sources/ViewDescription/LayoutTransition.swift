@@ -15,7 +15,7 @@ import UIKit
 ///   animation.
 /// - If no ancestor is found that specifies a layout transition, but the containing `BlueprintView` has the `element`
 ///   property assigned from within a `UIKit` animation block, that animation will be used as the inherited animation.
-public enum LayoutTransition {
+public enum LayoutTransition : Equatable {
 
     /// The view will never animate layout changes.
     case none

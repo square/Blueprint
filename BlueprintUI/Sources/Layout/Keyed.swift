@@ -35,7 +35,7 @@ import UIKit
 ///     }
 /// }
 /// ```
-public struct Keyed : Element, ComparableElement {
+public struct Keyed : Element, KeyPathComparableElement {
     
     /// The key used to differentiate the element.
     public var key : AnyHashable?
@@ -61,13 +61,9 @@ public struct Keyed : Element, ComparableElement {
         nil
     }
     
-    static let isEquivalent = IsEquivalent<Keyed> {
+    public static let isEquivalent = IsEquivalent<Keyed> {
         $0.add(\.key)
         $0.add(\.wrapped)
-    }
-    
-    public func isEquivalent(to other: Keyed) throws -> Bool {
-        try Self.isEquivalent.compare(self, other)
     }
     
     private struct KeyedLayout: SingleChildLayout {

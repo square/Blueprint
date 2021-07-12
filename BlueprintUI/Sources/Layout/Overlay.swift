@@ -7,7 +7,7 @@ import UIKit
 ///
 /// View-backed descendants will be z-ordered from back to front in the order of this element's
 /// children.
-public struct Overlay: Element {
+public struct Overlay: Element, ComparableElement {
 
     /// All elements displayed in the overlay.
     public var elements: [Element]
@@ -38,6 +38,10 @@ public struct Overlay: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
+    }
+    
+    public func isEquivalent(to other: Overlay) throws -> Bool {
+        try self.elements.isEquivalent(to: other.elements)
     }
 }
 

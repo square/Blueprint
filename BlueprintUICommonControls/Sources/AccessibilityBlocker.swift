@@ -5,7 +5,7 @@ import UIKit
 /// Blocks all accessibility on the element, so that it is
 /// is no longer an accessibility element, and its children are
 /// hidden from the accessibility system.
-public struct AccessibilityBlocker: Element {
+public struct AccessibilityBlocker: Element, KeyPathComparableElement {
 
     public var wrapped: Element
 
@@ -27,6 +27,10 @@ public struct AccessibilityBlocker: Element {
             config[\.isAccessibilityElement] = false
             config[\.accessibilityElementsHidden] = true
         }
+    }
+    
+    public static let isEquivalent = IsEquivalent<AccessibilityBlocker> {
+        $0.add(\.wrapped)
     }
 }
 

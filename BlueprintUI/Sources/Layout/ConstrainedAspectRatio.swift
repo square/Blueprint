@@ -1,7 +1,7 @@
 import UIKit
 
 /// Constrains the size of the content element to an aspect ratio.
-public struct ConstrainedAspectRatio: Element {
+public struct ConstrainedAspectRatio: Element, KeyPathComparableElement {
     /// Represents whether the content element's size should be expanded to fill its parent
     /// or shrunk to fit it.
     public enum ContentMode: Equatable {
@@ -61,6 +61,12 @@ public struct ConstrainedAspectRatio: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
+    }
+    
+    public static let isEquivalent = IsEquivalent<ConstrainedAspectRatio> {
+        $0.add(\.wrappedElement)
+        $0.add(\.aspectRatio)
+        $0.add(\.contentMode)
     }
 
     private struct Layout: SingleChildLayout {

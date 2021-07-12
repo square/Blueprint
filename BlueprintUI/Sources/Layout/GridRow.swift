@@ -32,7 +32,7 @@ import UIKit
 /// └────────────────────────────┴─┴────────┴─┴──────────────────┘
 /// ●──────────────────────────── 316 ───────────────────────────●
 /// ```
-public struct GridRow: Element {
+public struct GridRow: ComparableElement {
     // MARK: - properties -
     /// How children are aligned vertically. By default, `.fill`.
     public var verticalAlignment: Row.RowAlignment = .fill
@@ -65,6 +65,15 @@ public struct GridRow: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
+    
+    public func isEquivalent(to other: GridRow) throws -> Bool {
+        if self.verticalAlignment != other.verticalAlignment { return false }
+        if self.spacing != other.spacing { return false }
+        
+        return try self.children.isEquivalent(to: other.children) { lhs, rhs in
+            try lhs.isEquivalent(to: rhs)
+        }
+    }
 }
 
 // MARK: - child modeling -
@@ -84,6 +93,16 @@ public extension GridRow {
             self.element = element
             self.key = key
             self.width = width
+        }
+        
+        private static let isEquivalent = IsEquivalent<Self> {
+            $0.add(\.width)
+            $0.add(\.key)
+            $0.add(\.element)
+        }
+        
+        fileprivate func isEquivalent(to other : Child) throws -> Bool {
+            try Self.isEquivalent.compare(self, other)
         }
     }
 

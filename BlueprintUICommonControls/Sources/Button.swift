@@ -4,7 +4,7 @@ import UIKit
 
 /// An element that wraps a child element in a button that mimics a UIButton with the .system style. That is, when
 /// highlighted (or disabled), it fades its contents to partial alpha.
-public struct Button: Element {
+public struct Button: Element, KeyPathComparableElement {
 
     public var wrappedElement: Element
     public var isEnabled: Bool
@@ -29,7 +29,10 @@ public struct Button: Element {
             config[\.minimumTappableSize] = minimumTappableSize
         }
     }
-
+    
+    public static let isEquivalent = IsEquivalent<Button> {
+        $0.add(\.wrappedElement)
+    }
 }
 
 extension Button {

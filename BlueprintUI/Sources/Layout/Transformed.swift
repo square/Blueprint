@@ -1,7 +1,7 @@
 import UIKit
 
 /// Changes the transform of the wrapped element.
-public struct Transformed: Element, ComparableElement {
+public struct Transformed: Element, KeyPathComparableElement {
 
     /// The content element whose transform is being affected.
     public var wrapped: Element
@@ -44,7 +44,7 @@ public struct Transformed: Element, ComparableElement {
         return nil
     }
     
-    private static let isEquivalent = IsEquivalent<Transformed> {
+    public static let isEquivalent = IsEquivalent<Transformed> {
         $0.add(\.transform)
         $0.add(\.wrapped)
     }

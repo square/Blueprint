@@ -4,7 +4,7 @@ import UIKit
 ///
 /// Commonly used to add padding around another element when displayed within a container.
 ///
-public struct Inset : Element, ComparableElement {
+public struct Inset : Element, KeyPathComparableElement {
 
     /// The wrapped element to be inset.
     public var wrapped: Element
@@ -74,16 +74,12 @@ public struct Inset : Element, ComparableElement {
         return nil
     }
     
-    private static let isEquivalent = IsEquivalent<Inset> {
+    public static let isEquivalent = IsEquivalent<Inset> {
         $0.add(\.top)
         $0.add(\.bottom)
         $0.add(\.left)
         $0.add(\.right)
         $0.add(\.wrapped)
-    }
-    
-    public func isEquivalent(to other: Inset) throws -> Bool {
-        try Self.isEquivalent.compare(self, other)
     }
 }
 
