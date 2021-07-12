@@ -27,10 +27,13 @@ public protocol ComparableElement : AnyComparableElement {
     ///
     /// If your element conforms to `Equatable`, this method is synthesized automatically.
     ///
-    func isEquivalent(to other : Self) -> Bool
+    func isEquivalent(to other : Self) throws -> Bool
     
     /// Return true if the layout and measurement caches should be cleared from the given size change.
     func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool
+    
+    ///
+    var appliesViewDescriptionIfEquivalent : Bool { get }
 }
 
 
@@ -39,10 +42,19 @@ public protocol ComparableElement : AnyComparableElement {
 public protocol AnyComparableElement : Element {
  
     /// Returns true if the two elements are the same type, and are equivalent.
-    func anyIsEquivalent(to other : AnyComparableElement) -> Bool
+    func anyIsEquivalent(to other : AnyComparableElement) throws -> Bool
     
     /// Return true if the layout and measurement caches should be cleared from the given size change.
     func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool
+    
+    ///
+    var appliesViewDescriptionIfEquivalent : Bool { get }
+}
+
+
+public protocol KeyPathComparableElement : ComparableElement {
+    
+    static var isEquivalent : IsEquivalent<Self> { get }
 }
 
 
@@ -54,23 +66,40 @@ public extension ComparableElement where Self:Equatable {
 }
 
 
+public extension ComparableElement where Self:KeyPathComparableElement {
+    
+    func isEquivalent(to other: Self) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
+    }
+}
+
+
 public extension ComparableElement {
     
-    func anyIsEquivalent(to other: AnyComparableElement) -> Bool {
+    func anyIsEquivalent(to other: AnyComparableElement) throws -> Bool {
         guard let other = other as? Self else { return false }
         
-        return self.isEquivalent(to: other)
+        return try self.isEquivalent(to: other)
     }
     
     func willSizeChangeAffectLayout(from : CGSize, to : CGSize) -> Bool {
         true
     }
+    
+    var appliesViewDescriptionIfEquivalent : Bool {
+        true
+    }
+}
+
+
+public enum ComparableElementNotEquivalent : Error {
+    case nonEquivalentValue(Any, Any, AnyKeyPath)
 }
 
 
 public extension Array where Self.Element == BlueprintUI.Element {
     
-    func isEquivalent(to other : Self) -> Bool {
+    func isEquivalent(to other : Self) throws -> Bool {
         
         guard self.count == other.count else { return false }
         
@@ -85,7 +114,8 @@ public extension Array where Self.Element == BlueprintUI.Element {
                 return false
             }
             
-            if lhs.anyIsEquivalent(to: rhs) == false {
+            
+            if try lhs.anyIsEquivalent(to: rhs) == false {
                 return false
             }
         }

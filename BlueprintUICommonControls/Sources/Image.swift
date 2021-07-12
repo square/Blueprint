@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Displays an image within an element hierarchy.
-public struct Image: Element {
+public struct Image: Element, ComparableElement, Equatable {
 
     /// The image to be displayed
     public var image: UIImage?
@@ -39,14 +39,13 @@ public struct Image: Element {
             config[\.tintColor] = tintColor
         }
     }
-
 }
 
 extension Image {
 
     /// The content mode determines the layout of the image when its size does
     /// not precisely match the size that the element is assigned.
-    public enum ContentMode {
+    public enum ContentMode : Equatable {
 
         /// The image is not scaled, and is simply centered within the `Image`
         /// element.

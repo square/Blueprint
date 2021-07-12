@@ -49,6 +49,10 @@ public struct AttributedLabel: Equatable, ComparableElement {
             config.apply(update)
         }
     }
+    
+    public var appliesViewDescriptionIfEquivalent: Bool {
+        false
+    }
 }
 
 extension AttributedLabel {

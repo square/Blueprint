@@ -12,7 +12,7 @@ import UIKit
 /// a `SizeConstraint` that is at most 100 points wide, the returned measurement will still be 300 points. The same goes for the
 /// height of the `ConstrainedSize`.
 ///
-public struct ConstrainedSize: Element {
+public struct ConstrainedSize: Element, ComparableElement {
 
     /// The element whose measurement will be constrained by the `ConstrainedSize`.
     public var wrapped: Element
@@ -44,7 +44,16 @@ public struct ConstrainedSize: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
+    
+    private static let isEquivalent = IsEquivalent<Self> {
+        $0.add(\.width)
+        $0.add(\.height)
+        $0.add(\.wrapped)
+    }
 
+    public func isEquivalent(to other: ConstrainedSize) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
+    }
 }
 
 extension ConstrainedSize {

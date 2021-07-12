@@ -88,15 +88,24 @@ final class ElementState {
     ) {
         precondition(self.identifier == identifier)
         
-        if Self.elementsEquivalent(self.element, newElement) == false {
+        let isEquivalent : Bool = {
+            do {
+                return try Self.elementsEquivalent(self.element, newElement)
+            } catch {
+                guard error is ComparableElementNotEquivalent else {
+                    fatalError("Can only throw `ComparableElementNotEquivalent` from `isEquivalent`.")
+                }
+                
+                return false
+            }
+        }()
+        
+        if isEquivalent == false {
+            // TODO: Log / enable-able debugging in here for determining what is being invalidated. Use signposts too?
             self.clearAllCachedData()
         } else {
             self.measurements.removeAll { _, measurement in
                 newEnvironment.valuesEqual(to: measurement.dependencies) == false
-            }
-            
-            self.layouts.removeAll { _, layout in
-                newEnvironment.valuesEqual(to: layout.dependencies) == false
             }
         }
         
@@ -136,35 +145,6 @@ final class ElementState {
         )
                 
         return size
-    }
-    
-    typealias LayoutResult = [(identifier: ElementIdentifier, node: LayoutResultNode)]
-    
-    private var layouts : [CGSize:CachedLayoutResult] = [:]
-    
-    private struct CachedLayoutResult {
-        var result : LayoutResult
-        var dependencies : Environment.Subset?
-    }
-    
-    func layout(
-        in size : CGSize,
-        with context : LayoutContext,
-        using layout : (LayoutContext) -> LayoutResult
-    ) -> LayoutResult {
-        
-        if let existing = self.layouts[size] {
-            return existing.result
-        }
-                
-        let (result, dependencies) = self.trackEnvironmentReads(with: context, in: layout)
-        
-        self.layouts[size] = .init(
-            result: result,
-            dependencies: dependencies
-        )
-                
-        return result
     }
     
     private func trackEnvironmentReads<Output>(
@@ -247,7 +227,6 @@ final class ElementState {
     
     private func clearAllCachedData() {
         self.measurements.removeAll()
-        self.layouts.removeAll()
     }
     
     func recursiveForEach(_ perform : (ElementState) -> ()) {
@@ -304,14 +283,14 @@ private final class SignpostToken {}
 
 extension ElementState {
     
-    static func elementsEquivalent(_ lhs : Element?, _ rhs : Element?) -> Bool {
+    static func elementsEquivalent(_ lhs : Element?, _ rhs : Element?) throws -> Bool {
         
         if lhs == nil && rhs == nil { return true }
         
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
         
-        return lhs.anyIsEquivalent(to: rhs)
+        return try lhs.anyIsEquivalent(to: rhs)
     }
 }
 
@@ -362,8 +341,7 @@ extension ElementState {
             depth: depth,
             identifier: self.identifier,
             element:self.element,
-            measurements: self.measurements,
-            layouts: self.layouts
+            measurements: self.measurements
         )
         
         to.append(info)
@@ -379,10 +357,9 @@ extension ElementState {
         var identifier : ElementIdentifier
         var element : Element
         var measurements : [SizeConstraint:CachedMeasurement]
-        var layouts : [CGSize:CachedLayoutResult]
         
         var debugDescription : String {
-            "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements, \(self.layouts.count) Layouts"
+            "\(type(of:self.element)) #\(self.identifier.count): \(self.measurements.count) Measurements"
         }
     }
 }

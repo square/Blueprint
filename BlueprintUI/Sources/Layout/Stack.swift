@@ -29,7 +29,7 @@ extension StackElement {
 
 extension StackElement {
     
-    public func isEquivalent(to other : Self) -> Bool {
+    public func isEquivalent(to other : Self) throws -> Bool {
         
         guard self.layout.allElementsEquatable else { return false }
         guard other.layout.allElementsEquatable else { return false }
@@ -56,7 +56,7 @@ extension StackElement {
                 return false
             }
             
-            if lhs.anyIsEquivalent(to: rhs) == false {
+            if try lhs.anyIsEquivalent(to: rhs) == false {
                 return false
             }
         }

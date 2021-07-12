@@ -82,8 +82,8 @@ public struct Inset : Element, ComparableElement {
         $0.add(\.wrapped)
     }
     
-    public func isEquivalent(to other: Inset) -> Bool {
-        Self.isEquivalent.compare(self, other)
+    public func isEquivalent(to other: Inset) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
     }
 }
 

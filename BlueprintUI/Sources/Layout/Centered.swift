@@ -26,8 +26,8 @@ public struct Centered : ProxyElement, ComparableElement {
         $0.add(\.wrapped)
     }
     
-    public func isEquivalent(to other: Centered) -> Bool {
-        Self.isEquivalent.compare(self, other)
+    public func isEquivalent(to other: Centered) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
     }
 }
 

@@ -66,8 +66,8 @@ public struct Keyed : Element, ComparableElement {
         $0.add(\.wrapped)
     }
     
-    public func isEquivalent(to other: Keyed) -> Bool {
-        Self.isEquivalent.compare(self, other)
+    public func isEquivalent(to other: Keyed) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
     }
     
     private struct KeyedLayout: SingleChildLayout {

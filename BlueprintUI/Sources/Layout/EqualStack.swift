@@ -46,14 +46,14 @@ public struct EqualStack: Element, ComparableElement {
         children.append(child)
     }
     
-    public func isEquivalent(to other: EqualStack) -> Bool {
+    public func isEquivalent(to other: EqualStack) throws -> Bool {
         
         guard self.children.count == other.children.count else { return false }
         
         guard self.direction == other.direction else { return false }
         guard self.spacing == other.spacing else { return false }
                 
-        return self.children.isEquivalent(to: other.children)
+        return try self.children.isEquivalent(to: other.children)
     }
 }
 

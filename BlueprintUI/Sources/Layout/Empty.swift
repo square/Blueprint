@@ -11,7 +11,7 @@ import UIKit
 ///
 /// An empty `Element` which has no size and draws no content.
 ///
-public struct Empty : Element {
+public struct Empty : Element, ComparableElement, Equatable {
     
     public init() {}
     

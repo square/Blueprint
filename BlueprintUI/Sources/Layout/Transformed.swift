@@ -49,8 +49,8 @@ public struct Transformed: Element, ComparableElement {
         $0.add(\.wrapped)
     }
     
-    public func isEquivalent(to other: Transformed) -> Bool {
-        Self.isEquivalent.compare(self, other)
+    public func isEquivalent(to other: Transformed) throws -> Bool {
+        try Self.isEquivalent.compare(self, other)
     }
 }
 
