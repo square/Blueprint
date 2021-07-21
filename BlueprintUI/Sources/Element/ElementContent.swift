@@ -4,10 +4,10 @@ import UIKit
 public struct ElementContent {
 
     private let storage: ContentStorage
-    
+
     /// The key to use to cache measurement values.
     private let measurementCachingKey : MeasurementCachingKey?
-    
+
     //
     // MARK: Initialization
     //
@@ -24,11 +24,11 @@ public struct ElementContent {
     ) {
         var builder = Builder(layout: layout)
         configure(&builder)
-        
+
         self.storage = builder
         self.measurementCachingKey = measurementCachingKey
     }
-    
+
     // MARK: Measurement & Children
 
     /// Measures the required size of this element's content.
@@ -68,7 +68,7 @@ public struct ElementContent {
 }
 
 extension ElementContent {
-    
+
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.
     ///
@@ -143,6 +143,31 @@ extension ElementContent {
         self = ElementContent(measurable: Measurer(_measure: measureFunction), measurementCachingKey: measurementCachingKey)
     }
 
+    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
+    ///
+    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
+    /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint`.
+    public init(
+        child: Element,
+        measurementCachingKey : MeasurementCachingKey? = nil,
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+    ) {
+        self.storage = EnvironmentMeasuringStorage(child: child, measure: measureFunction)
+        self.measurementCachingKey = measurementCachingKey
+    }
+
+    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
+    ///
+    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
+    /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint`.
+    public init(
+        measurementCachingKey : MeasurementCachingKey? = nil,
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+    ) {
+        self.storage = EnvironmentMeasuringStorage(child: Empty(), measure: measureFunction)
+        self.measurementCachingKey = measurementCachingKey
+    }
+
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
     public init(intrinsicSize: CGSize) {
         self = ElementContent(measureFunction: { _ in intrinsicSize })
@@ -150,7 +175,7 @@ extension ElementContent {
 }
 
 extension ElementContent {
-    
+
     /// Initializes a new `ElementContent` with the given child element, measurement caching key, and environment adapter,
     /// which allows adapting the environment to affect the element, plus elements further down the tree.
     ///
@@ -163,7 +188,7 @@ extension ElementContent {
         environment environmentAdapter: @escaping (inout Environment) -> Void
     ) {
         self.measurementCachingKey = measurementCachingKey
-        
+
         self.storage = EnvironmentAdaptingStorage(
             adapter: environmentAdapter,
             child: child
@@ -183,7 +208,7 @@ extension ElementContent {
         value: Key.Value,
         measurementCachingKey : MeasurementCachingKey? = nil
     ) where Key: EnvironmentKey {
-        
+
         self.init(child: child, measurementCachingKey: measurementCachingKey) { environment in
             environment[key] = value
         }
@@ -231,12 +256,12 @@ extension ElementContent {
                 content: element.content,
                 element: element
             )
-            
+
             children.append(child)
         }
-        
+
         // MARK: ContentStorage
-        
+
         var childCount: Int {
             return children.count
         }
@@ -267,13 +292,13 @@ extension ElementContent {
             guard self.children.isEmpty == false else {
                 return []
             }
-            
+
             let layoutItems = self.layoutItems(in: environment, cache: cache)
             let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
             result.reserveCapacity(children.count)
-            
+
             var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
             for index in 0..<children.count {
@@ -329,7 +354,7 @@ extension ElementContent {
                 return (child.traits, measurable)
             }
         }
-        
+
         fileprivate struct Child {
 
             var traits: LayoutType.Traits
@@ -392,6 +417,40 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         var environment = environment
         adapter(&environment)
         return environment
+    }
+}
+
+private struct EnvironmentMeasuringStorage: ContentStorage {
+    let childCount = 1
+
+    var child: Element
+    var measure: (SizeConstraint, Environment) -> CGSize
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment,
+        cache: CacheTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performLayout(attributes: attributes, environment: environment, cache: cache)
+        )
+
+        return [(identifier, node)]
+    }
+
+    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+        cache.get(constraint) { (constraint) -> CGSize in
+            return measure(
+                constraint,
+                environment
+            )
+        }
     }
 }
 

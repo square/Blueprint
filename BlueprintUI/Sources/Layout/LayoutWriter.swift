@@ -47,12 +47,12 @@ public struct LayoutWriter : Element {
     //
     
     public var content: ElementContent {
-        ElementContent { size, env in
+        ElementContent(build: { size, env in
             var builder = Builder()
             self.build(Context(size: size), &builder)
             
             return Content(builder: builder)
-        }
+        })
     }
     
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
