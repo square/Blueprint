@@ -11,6 +11,8 @@ public struct AttributedLabel: Element, Hashable {
     /// This can be used to adjust the positioning of text within each line's frame, such as adjusting
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
+    
+    public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
         self.attributedText = attributedText
@@ -41,6 +43,9 @@ public struct AttributedLabel: Element, Hashable {
         label.attributedText = attributedText
         label.numberOfLines = numberOfLines
         label.textRectOffset = textRectOffset
+        if let traits = accessibilityTraits {
+            label.accessibilityTraits.formUnion(UIAccessibilityTraits(withSet: traits))
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

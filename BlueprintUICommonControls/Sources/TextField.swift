@@ -30,6 +30,7 @@ public struct TextField: Element {
 
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
+    public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     public init(text: String, configure: (inout TextField) -> Void = { _ in }) {
         self.text = text
@@ -65,6 +66,14 @@ public struct TextField: Element {
 
             configuration[\.becomeActiveTrigger] = becomeActiveTrigger
             configuration[\.resignActiveTrigger] = resignActiveTrigger
+            if let traits = accessibilityTraits {
+                if let existing = configuration[\.accessibilityTraits] {
+                    configuration[\.accessibilityTraits] = existing.union(UIAccessibilityTraits(withSet: traits))
+                }
+                else{
+                    configuration[\.accessibilityTraits] = UIAccessibilityTraits(withSet: traits)
+                }
+            }
         }
     }
 
