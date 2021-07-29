@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an issue where `Label` and `AttributedLabel` were not accessibility elements.
+- Fixed an [issue](https://github.com/square/Blueprint/pull/241) where `Label` and `AttributedLabel` were not accessibility elements.
 
 ### Added
 
