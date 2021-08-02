@@ -16,7 +16,9 @@ let package = Package(
             name: "BlueprintUICommonControls",
             targets: ["BlueprintUICommonControls"]),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.48.11"),
+    ],
     targets: [
         .target(
             name: "BlueprintUI",
