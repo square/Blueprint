@@ -19,7 +19,7 @@ extension NativeView where Self: UIView {
     ///
     /// - returns: The resulting view description.
     public static func describe(_ configuring: (inout ViewDescription.Configuration<Self>) -> Void) -> ViewDescription {
-        return ViewDescription.init(Self.self, configuring: configuring)
+        return ViewDescription(Self.self, configuring: configuring)
     }
 }
 
@@ -38,12 +38,12 @@ extension NativeView where Self: UIView {
 /// A view description does **not** contain a concrete view instance. It simply
 /// contains functionality for creating, updating, and animating view instances.
 public struct ViewDescription {
-    
+
     private let _viewType: UIView.Type
     private let _build: () -> UIView
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
-    
+
     private let _layoutTransition: LayoutTransition
     private let _appearingTransition: VisibilityTransition?
     private let _disappearingTransition: VisibilityTransition?
@@ -57,7 +57,7 @@ public struct ViewDescription {
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
     /// - parameter configuring: A closure that is responsible for populating a configuration object.
-    public init<View>(_ type: View.Type, configuring: (inout Configuration<View>)->Void) {
+    public init<View>(_ type: View.Type, configuring: (inout Configuration<View>) -> Void) {
         var configuration = Configuration<View>()
         configuring(&configuration)
         self.init(configuration: configuration)
@@ -67,9 +67,9 @@ public struct ViewDescription {
     /// - parameter configuration: The configuration object.
     private init<View>(configuration: Configuration<View>) {
         _viewType = View.self
-        
+
         _build = configuration.builder
-        
+
         _apply = { view in
             let typedView = configuration.typeChecked(view: view)
             for update in configuration.updates {
@@ -79,29 +79,29 @@ public struct ViewDescription {
                 binding.value.apply(to: typedView)
             }
         }
-        
-        _contentView = { (view) in
+
+        _contentView = { view in
             let typedView = configuration.typeChecked(view: view)
             return configuration.contentView(typedView)
         }
-        
+
         _layoutTransition = configuration.layoutTransition
         _appearingTransition = configuration.appearingTransition
         _disappearingTransition = configuration.disappearingTransition
     }
-    
+
     public var viewType: UIView.Type {
         return _viewType
     }
-    
+
     public func build() -> UIView {
         return _build()
     }
-    
+
     public func apply(to view: UIView) {
         _apply(view)
     }
-    
+
     public func contentView(in view: UIView) -> UIView {
         return _contentView(view)
     }
@@ -109,15 +109,15 @@ public struct ViewDescription {
     public var layoutTransition: LayoutTransition {
         return _layoutTransition
     }
-    
+
     public var appearingTransition: VisibilityTransition? {
         return _appearingTransition
     }
-    
+
     public var disappearingTransition: VisibilityTransition? {
         return _disappearingTransition
     }
-    
+
 }
 
 extension ViewDescription {
@@ -125,7 +125,7 @@ extension ViewDescription {
     /// Represents the configuration of a specific UIView type.
     public struct Configuration<View: UIView> {
 
-        fileprivate var bindings: [PartialKeyPath<View>:AnyValueBinding] = [:]
+        fileprivate var bindings: [PartialKeyPath<View>: AnyValueBinding] = [:]
 
         /// A closure that is applied to the native view instance during an update cycle.
         /// - parameter view: The native view instance.
@@ -154,20 +154,20 @@ extension ViewDescription {
 
         /// Initializes a default configuration object.
         public init() {
-            builder = { View.init(frame: .zero) }
+            builder = { View(frame: .zero) }
             updates = []
             contentView = { $0 }
         }
-        
+
         fileprivate func typeChecked(view: UIView) -> View {
             guard let typedView = view as? View else {
                 fatalError("A view of type \(type(of: view)) was used with a ViewDescription instance that expects views of type \(View.self)")
             }
             return typedView
         }
-        
+
     }
-    
+
 }
 
 extension ViewDescription.Configuration {
@@ -227,20 +227,20 @@ extension ViewDescription.Configuration {
             bindings[keyPath] = ValueBinding(keyPath: keyPath, value: newValue)
         }
     }
-    
+
 }
 
 
 fileprivate protocol AnyValueBinding {
-    
+
     func apply(to view: UIView)
 }
 
 
 extension ViewDescription.Configuration {
-    
-    fileprivate struct ValueBinding<Value> : AnyValueBinding {
-        
+
+    fileprivate struct ValueBinding<Value>: AnyValueBinding {
+
         let keyPath: ReferenceWritableKeyPath<View, Value>
         let value: Value
 

@@ -21,7 +21,7 @@ extension Element {
 
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
-    
+
     /// The element that was laid out
     var element: Element
 
@@ -76,11 +76,11 @@ extension LayoutResultNode {
                     .map { path, viewDescriptionNode in
                         return (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
                     }
-        }
+            }
 
         let subtreeExtent: CGRect? = children
             .map { $0.node }
-            .reduce(into: nil) { (rect, node) in
+            .reduce(into: nil) { rect, node in
                 rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
             }
 
@@ -99,10 +99,10 @@ extension LayoutResultNode {
                 layoutAttributes: layoutAttributes,
                 children: resolvedChildContent
             )
-            
+
             return [(path: .empty, node: node)]
         } else {
-            return resolvedChildContent.map { (path, node) -> (path: ElementPath, node: NativeViewNode) in
+            return resolvedChildContent.map { path, node -> (path: ElementPath, node: NativeViewNode) in
                 var transformedNode = node
                 transformedNode.layoutAttributes = transformedNode.layoutAttributes.within(layoutAttributes)
                 return (path, transformedNode)
@@ -110,5 +110,5 @@ extension LayoutResultNode {
         }
 
     }
-    
+
 }

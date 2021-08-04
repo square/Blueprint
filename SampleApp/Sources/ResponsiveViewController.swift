@@ -1,6 +1,6 @@
-import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
+import UIKit
 
 final class ResponsiveViewController: UIViewController {
     let blueprintView = BlueprintView()
@@ -38,7 +38,7 @@ struct ResponsiveLabel: ProxyElement {
     var text: String
 
     var elementRepresentation: Element {
-        GeometryReader { (geometry) -> Element in
+        GeometryReader { geometry -> Element in
             let label = Label(text: self.text) { label in
                 label.numberOfLines = 1
             }

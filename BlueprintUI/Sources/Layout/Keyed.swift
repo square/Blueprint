@@ -36,19 +36,19 @@ import UIKit
 /// }
 /// ```
 public struct Keyed: Element {
-    
+
     /// The key used to differentiate the element.
-    public var key : AnyHashable?
-    
+    public var key: AnyHashable?
+
     /// The wrapped element.
-    public var wrapped : Element
-    
+    public var wrapped: Element
+
     /// Creates a new `Keyed` element with the provided key and wrapped element.
     public init(key: AnyHashable?, wrapping: Element) {
         self.key = key
         self.wrapped = wrapping
     }
-    
+
     public var content: ElementContent {
         ElementContent(
             child: self.wrapped,
@@ -56,16 +56,16 @@ public struct Keyed: Element {
             layout: KeyedLayout()
         )
     }
-    
+
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
-    
+
     private struct KeyedLayout: SingleChildLayout {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             child.measure(in: constraint)
         }
-        
+
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
         }
@@ -74,7 +74,7 @@ public struct Keyed: Element {
 
 
 extension Element {
-    
+
     ///
     /// `Keyed` allows providing a `Hashable` value which is used
     /// during view updates to uniquely identify content during the diff process
@@ -102,7 +102,7 @@ extension Element {
     ///     }
     /// }
     /// ```
-    public func keyed(_ key : AnyHashable) -> Keyed {
+    public func keyed(_ key: AnyHashable) -> Keyed {
         Keyed(key: key, wrapping: self)
     }
 }

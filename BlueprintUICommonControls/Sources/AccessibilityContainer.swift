@@ -40,11 +40,11 @@ public struct AccessibilityContainer: Element {
     }
 }
 
-public extension Element {
+extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    func accessibilityContainer(identifier: String? = nil) -> Element {
+    public func accessibilityContainer(identifier: String? = nil) -> Element {
         AccessibilityContainer(identifier: identifier, wrapping: self)
     }
 }

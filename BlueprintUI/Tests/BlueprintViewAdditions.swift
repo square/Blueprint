@@ -12,15 +12,14 @@ import UIKit
 /**
  Testing additions to help verify native view construction and management.
  */
-extension BlueprintView
-{
-    internal var rootNativeElementViews : [UIView] {
-        
+extension BlueprintView {
+    internal var rootNativeElementViews: [UIView] {
+
         /**
          Note: Assumes the `BlueprintView` has exactly one
          subview (root view-backed element provided by the view itself),
          which then contains all root view-backed elements. Eg:
-         
+
          ```
            BlueprintView
                UIView
@@ -30,7 +29,7 @@ extension BlueprintView
                    ...
          ```
          */
-        
+
         self.subviews.first?.subviews ?? []
     }
 }

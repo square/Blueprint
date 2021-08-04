@@ -1,11 +1,11 @@
-import UIKit
 import BlueprintUI
+import UIKit
 
 
 /// A simple element that wraps a child element and adds visual styling including
 /// background color.
 public struct Box: Element {
-    
+
     public var backgroundColor: UIColor
     public var cornerStyle: CornerStyle
     public var borderStyle: BorderStyle
@@ -27,7 +27,7 @@ public struct Box: Element {
         self.borderStyle = borderStyle
         self.shadowStyle = shadowStyle
         self.clipsContent = clipsContent
-        
+
         self.wrappedElement = element
     }
 
@@ -42,7 +42,7 @@ public struct Box: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return BoxView.describe { config in
 
-            config.apply({ (view) in
+            config.apply { view in
 
                 if self.backgroundColor != view.backgroundColor {
                     view.backgroundColor = self.backgroundColor
@@ -87,7 +87,7 @@ public struct Box: Element {
                     view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
-            })
+            }
 
 
             config.contentView = { view in
@@ -117,17 +117,16 @@ extension Box {
     }
 }
 
-public extension Element {
-    
+extension Element {
+
     /// Wraps the element in a box to provide basic styling.
-    func box(
+    public func box(
         background: UIColor = .clear,
         corners: Box.CornerStyle = .square,
         borders: Box.BorderStyle = .none,
         shadow: Box.ShadowStyle = .none,
         clipsContent: Bool = false
-    ) -> Box
-    {
+    ) -> Box {
         Box(
             backgroundColor: background,
             cornerStyle: corners,
@@ -156,7 +155,7 @@ extension Box.CornerStyle {
 }
 
 extension Box.BorderStyle {
-    
+
     fileprivate var width: CGFloat {
         switch self {
         case .none:
@@ -165,7 +164,7 @@ extension Box.BorderStyle {
             return width
         }
     }
-    
+
     fileprivate var color: UIColor? {
         switch self {
         case .none:
@@ -174,11 +173,11 @@ extension Box.BorderStyle {
             return color
         }
     }
-    
+
 }
 
 extension Box.ShadowStyle {
-    
+
     fileprivate var radius: CGFloat {
         switch self {
         case .none:
@@ -187,7 +186,7 @@ extension Box.ShadowStyle {
             return radius
         }
     }
-    
+
     fileprivate var opacity: CGFloat {
         switch self {
         case .none:
@@ -196,7 +195,7 @@ extension Box.ShadowStyle {
             return opacity
         }
     }
-    
+
     fileprivate var offset: CGSize {
         switch self {
         case .none:
@@ -205,7 +204,7 @@ extension Box.ShadowStyle {
             return offset
         }
     }
-    
+
     fileprivate var color: UIColor? {
         switch self {
         case .none:
@@ -214,24 +213,24 @@ extension Box.ShadowStyle {
             return color
         }
     }
-    
-    
+
+
 }
 
 fileprivate final class BoxView: UIView {
-    
+
     let contentView = UIView()
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.frame = bounds
         addSubview(contentView)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.frame = bounds
@@ -243,5 +242,5 @@ fileprivate final class BoxView: UIView {
             ).cgPath
         }
     }
-    
+
 }

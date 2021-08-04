@@ -1,5 +1,5 @@
-@testable import BlueprintUI
 import QuartzCore
+@testable import BlueprintUI
 
 extension Element {
     /// Build a fully laid out element tree with complete layout attributes

@@ -14,15 +14,21 @@ public struct Inset: Element {
     public var bottom: CGFloat
     public var left: CGFloat
     public var right: CGFloat
-    
-    public init(top: CGFloat = 0.0, bottom: CGFloat = 0.0, left: CGFloat = 0.0, right: CGFloat = 0.0, wrapping element: Element) {
+
+    public init(
+        top: CGFloat = 0.0,
+        bottom: CGFloat = 0.0,
+        left: CGFloat = 0.0,
+        right: CGFloat = 0.0,
+        wrapping element: Element
+    ) {
         self.wrappedElement = element
         self.top = top
         self.bottom = bottom
         self.left = left
         self.right = right
     }
-    
+
     public init(uniformInset: CGFloat, wrapping element: Element) {
         self.wrappedElement = element
         self.top = uniformInset
@@ -30,7 +36,7 @@ public struct Inset: Element {
         self.left = uniformInset
         self.right = uniformInset
     }
-    
+
     public init(insets: UIEdgeInsets, wrapping element: Element) {
         self.wrappedElement = element
         self.top = insets.top
@@ -38,18 +44,19 @@ public struct Inset: Element {
         self.left = insets.left
         self.right = insets.right
     }
-    
+
     public init(sideInsets: CGFloat, wrapping element: Element) {
         self.init(
             insets: UIEdgeInsets(
                 top: 0.0,
                 left: sideInsets,
                 bottom: 0.0,
-                right: sideInsets),
+                right: sideInsets
+            ),
             wrapping: element
         )
     }
-    
+
     public init(vertical: CGFloat, wrapping element: Element) {
         self.init(
             top: vertical,
@@ -76,16 +83,15 @@ public struct Inset: Element {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Insets the element by the given amount on each side.
-    func inset(
+    public func inset(
         top: CGFloat = 0.0,
         bottom: CGFloat = 0.0,
         left: CGFloat = 0.0,
         right: CGFloat = 0.0
-    ) -> Inset
-    {
+    ) -> Inset {
         Inset(
             top: top,
             bottom: bottom,
@@ -94,23 +100,22 @@ public extension Element {
             wrapping: self
         )
     }
-    
+
     /// Insets the element by the given amount on each side.
-    func inset(by edgeInsets : UIEdgeInsets) -> Inset {
+    public func inset(by edgeInsets: UIEdgeInsets) -> Inset {
         Inset(insets: edgeInsets, wrapping: self)
     }
-    
+
     /// Insets the element by the given amount on each side.
-    func inset(uniform : CGFloat) -> Inset {
+    public func inset(uniform: CGFloat) -> Inset {
         Inset(uniformInset: uniform, wrapping: self)
     }
-    
+
     /// Insets the element by the given amount on each side.
-    func inset(
-        horizontal : CGFloat = 0.0,
-        vertical : CGFloat = 0.0
-    ) -> Inset
-    {
+    public func inset(
+        horizontal: CGFloat = 0.0,
+        vertical: CGFloat = 0.0
+    ) -> Inset {
         Inset(
             top: vertical,
             bottom: vertical,
@@ -134,7 +139,8 @@ extension Inset {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             let insetConstraint = constraint.inset(
                 width: left + right,
-                height: top + bottom)
+                height: top + bottom
+            )
 
             var size = child.measure(in: insetConstraint)
 

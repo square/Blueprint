@@ -1,12 +1,12 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
 class ImageTests: XCTestCase {
 
     private let image: UIImage = {
-        
+
         func getImageURL(file: StaticString = #file) -> URL {
             if let url = Bundle(for: ImageTests.self).url(forResource: "test-image", withExtension: "jpg") {
                 return url
@@ -19,7 +19,7 @@ class ImageTests: XCTestCase {
                 return URL(fileURLWithPath: path as String)
             }
         }
-        
+
         let imageURL = getImageURL()
         return UIImage(contentsOfFile: imageURL.path)!
     }()

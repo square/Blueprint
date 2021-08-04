@@ -7,7 +7,7 @@ extension NSLineBreakMode: CustomStringConvertible {
         .byTruncatingHead,
         .byTruncatingMiddle,
         .byTruncatingTail,
-        .byWordWrapping
+        .byWordWrapping,
     ]
 
     public var description: String {

@@ -9,8 +9,7 @@ import XCTest
 @testable import BlueprintUI
 
 
-class PerformancePlayground : XCTestCase
-{
+class PerformancePlayground: XCTestCase {
     let lipsumStrings = [
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         "Integer molestie et felis at sodales.",
@@ -26,25 +25,23 @@ class PerformancePlayground : XCTestCase
         // Uncomment this line to run performance metrics, eg in Instruments.app.
         // super.invokeTest()
     }
-    
-    func test_repeated_layouts()
-    {
+
+    func test_repeated_layouts() {
         let element = Column { col in
             for index in 1...1000 {
                 col.add(child: TestLabel(text: "This is test label number #\(index)"))
             }
         }
-        
+
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
-        
+
         self.determineAverage(for: 10.0) {
             view.element = element
             view.layoutIfNeeded()
         }
     }
-    
-    func test_deep_element_hierarchy()
-    {
+
+    func test_deep_element_hierarchy() {
         let elements = lipsumStrings.map(TestLabel.init)
 
         let stack = Column { col in
@@ -54,20 +51,20 @@ class PerformancePlayground : XCTestCase
                         col.add(child: $0)
                     }
                 }
-                
+
                 for _ in 1...10 {
                     row.add(child: col)
                 }
             }
-            
+
             for _ in 1...10 {
                 col.add(child: row)
             }
         }
-        
+
         let view = BlueprintView()
         view.frame.size = CGSize(width: 1000.0, height: 10000)
-                
+
         self.determineAverage(for: 10.0) {
             view.element = stack
             view.layoutIfNeeded()
@@ -113,29 +110,29 @@ class PerformancePlayground : XCTestCase
             view.layoutIfNeeded()
         }
     }
-    
-    func determineAverage(for seconds : TimeInterval, using block : () -> ()) {
+
+    func determineAverage(for seconds: TimeInterval, using block: () -> Void) {
         let start = Date()
-        
-        var iterations : Int = 0
-        
+
+        var iterations: Int = 0
+
         repeat {
             let iterationStart = Date()
             block()
             let iterationEnd = Date()
             let duration = iterationEnd.timeIntervalSince(iterationStart)
-            
+
             iterations += 1
 
             print("Iteration: \(iterations), Duration : \(duration)")
-            
+
         } while Date() < start + seconds
-        
+
         let end = Date()
-        
+
         let duration = end.timeIntervalSince(start)
         let average = duration / TimeInterval(iterations)
-        
+
         print("Iterations: \(iterations), Average Time: \(average)")
     }
 }
@@ -153,23 +150,22 @@ private struct NonCachingLabel: UIViewElement {
     }
 }
 
-fileprivate struct TestLabel : UIViewElement
-{
-    var text : String
-    
+fileprivate struct TestLabel: UIViewElement {
+    var text: String
+
     // MARK: UIViewElement
-    
+
     typealias UIViewType = UILabel
-    
-    static func makeUIView() ->  UILabel {
+
+    static func makeUIView() -> UILabel {
         UILabel()
     }
-    
+
     var measurementCacheKey: AnyHashable? {
         self.text
     }
-    
-    func updateUIView(_ view:  UILabel, with context: UIViewElementContext) {
+
+    func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
         view.numberOfLines = 0
         view.text = self.text
     }

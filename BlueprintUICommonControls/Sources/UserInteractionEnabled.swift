@@ -31,11 +31,11 @@ public struct UserInteractionEnabled: Element {
     }
 }
 
-public extension Element {
+extension Element {
     /// Conditionally enable user interaction of the wrapped element.
     ///
     /// - Note: When user interaction is disabled, any elements within the wrapped element will become non-interactive.
-    func userInteractionEnabled(_ enabled: Bool = true) -> UserInteractionEnabled {
+    public func userInteractionEnabled(_ enabled: Bool = true) -> UserInteractionEnabled {
         UserInteractionEnabled(enabled, wrapping: self)
     }
 }

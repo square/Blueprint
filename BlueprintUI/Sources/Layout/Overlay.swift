@@ -15,17 +15,17 @@ public struct Overlay: Element {
     /// Creates a new overlay with the provided elements.
     public init(
         elements: [Element] = [],
-        configure : (inout Overlay) -> () = { _ in}
+        configure: (inout Overlay) -> Void = { _ in }
     ) {
         self.elements = elements
         configure(&self)
     }
-    
+
     /// Adds the provided element to the overlay.
-    public mutating func add(_ element : Element) {
+    public mutating func add(_ element: Element) {
         self.elements.append(element)
     }
-    
+
     // MARK: Element
 
     public var content: ElementContent {
@@ -46,11 +46,11 @@ public struct Overlay: Element {
 fileprivate struct OverlayLayout: Layout {
 
     func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero, { (result, item) in
+        return items.reduce(into: CGSize.zero) { result, item in
             let measuredSize = item.content.measure(in: constraint)
             result.width = max(result.width, measuredSize.width)
             result.height = max(result.height, measuredSize.height)
-        })
+        }
     }
 
     func layout(size: CGSize, items: [(traits: Void, content: Measurable)]) -> [LayoutAttributes] {

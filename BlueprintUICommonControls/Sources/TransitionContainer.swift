@@ -68,7 +68,7 @@ public struct TransitionContainer: Element {
 
 }
 
-public extension Element {
+extension Element {
 
     /// Wraps the element in a transition container to provide an animated transition.
     ///
@@ -78,7 +78,7 @@ public extension Element {
     ///   - onLayout: The transition to use when the element's layout changes. The default value is
     ///     `.inherited`, which means the element will participate in the same transition as its
     ///     nearest ancestor with a specified transition.
-    func transition(
+    public func transition(
         onAppear: VisibilityTransition? = nil,
         onDisappear: VisibilityTransition? = nil,
         onLayout: LayoutTransition = .inherited
@@ -95,7 +95,7 @@ public extension Element {
     ///
     /// - Parameters:
     ///   - onAppearOrDisappear: The transition to use when the element appears or disappears.
-    func transition(_ onAppearOrDisappear: VisibilityTransition) -> TransitionContainer {
+    public func transition(_ onAppearOrDisappear: VisibilityTransition) -> TransitionContainer {
         TransitionContainer(
             appearingTransition: onAppearOrDisappear,
             disappearingTransition: onAppearOrDisappear,

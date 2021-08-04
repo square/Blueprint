@@ -4,7 +4,7 @@ import UIKit
 
 /// Displays a text field.
 public struct TextField: Element {
-    
+
     public var text: String
     public var placeholder: String = ""
     public var onChange: ((String) -> Void)? = nil
@@ -31,13 +31,13 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
-    public init(text: String, configure : (inout TextField) -> () = { _ in }) {
+    public init(text: String, configure: (inout TextField) -> Void = { _ in }) {
         self.text = text
         configure(&self)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return CallbackTextField.describe({ (configuration) in
+        return CallbackTextField.describe { configuration in
             configuration[\.backgroundColor] = .clear
 
             configuration[\.text] = text
@@ -65,27 +65,28 @@ public struct TextField: Element {
 
             configuration[\.becomeActiveTrigger] = becomeActiveTrigger
             configuration[\.resignActiveTrigger] = resignActiveTrigger
-        })
+        }
     }
 
     public var content: ElementContent {
         ElementContent { constraint -> CGSize in
             return CGSize(
                 width: max(constraint.maximum.width, 44),
-                height: 44.0)
+                height: 44.0
+            )
         }
     }
-    
+
 }
 
 extension TextField {
 
-    final public class Trigger {
+    public final class Trigger {
 
         var action: () -> Void
 
         public init() {
-            action = { }
+            action = {}
         }
 
         public func fire() {
@@ -98,20 +99,20 @@ extension TextField {
 
 
 fileprivate final class CallbackTextField: UITextField, UITextFieldDelegate {
-    
+
     var onChange: ((String) -> Void)? = nil
     var onReturn: (() -> Void)? = nil
 
     var becomeActiveTrigger: TextField.Trigger? {
         didSet {
-            oldValue?.action = { }
+            oldValue?.action = {}
             becomeActiveTrigger?.action = { [weak self] in self?.becomeFirstResponder() }
         }
     }
 
     var resignActiveTrigger: TextField.Trigger? {
         didSet {
-            oldValue?.action = { }
+            oldValue?.action = {}
             resignActiveTrigger?.action = { [weak self] in self?.resignFirstResponder() }
         }
     }
@@ -126,7 +127,7 @@ fileprivate final class CallbackTextField: UITextField, UITextFieldDelegate {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     @objc private func textDidChange() {
         onChange?(text ?? "")
     }

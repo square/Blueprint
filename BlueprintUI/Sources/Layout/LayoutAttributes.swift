@@ -22,22 +22,22 @@ public struct LayoutAttributes {
     public var alpha: CGFloat {
         didSet { validateAlpha() }
     }
-    
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
-    
+
     public init(frame: CGRect) {
         self.init(
             center: CGPoint(x: frame.midX, y: frame.midY),
             bounds: CGRect(origin: .zero, size: frame.size)
         )
     }
-    
+
     public init(size: CGSize) {
         self.init(frame: CGRect(origin: .zero, size: size))
     }
-    
+
     public init(center: CGPoint, bounds: CGRect) {
         self.center = center
         self.bounds = bounds
@@ -49,13 +49,13 @@ public struct LayoutAttributes {
         validateTransform()
         validateAlpha()
     }
-    
+
     public var frame: CGRect {
         get {
             var f = CGRect.zero
             f.size = bounds.size
-            f.origin.x = center.x - f.size.width/2.0
-            f.origin.y = center.y - f.size.height/2.0
+            f.origin.x = center.x - f.size.width / 2.0
+            f.origin.y = center.y - f.size.height / 2.0
             return f
         }
         set {
@@ -116,8 +116,8 @@ public struct LayoutAttributes {
     ///
     /// - returns: The resulting combined layout attributes object.
     public func within(_ layoutAttributes: LayoutAttributes) -> LayoutAttributes {
-        
-        var t : CATransform3D = CATransform3DIdentity
+
+        var t: CATransform3D = CATransform3DIdentity
         t = CATransform3DTranslate(t, -layoutAttributes.bounds.midX, -layoutAttributes.bounds.midY, 0.0)
         t = CATransform3DConcat(
             t,
@@ -130,11 +130,12 @@ public struct LayoutAttributes {
 
         var result = LayoutAttributes(
             center: center.applying(t),
-            bounds: bounds)
-        
+            bounds: bounds
+        )
+
         result.transform = CATransform3DConcat(transform, t.untranslated)
         result.alpha = alpha * layoutAttributes.alpha
-        
+
         return result
     }
 
@@ -185,7 +186,7 @@ public struct LayoutAttributes {
 
 extension LayoutAttributes: Equatable {
 
-    public static func ==(lhs: LayoutAttributes, rhs: LayoutAttributes) -> Bool {
+    public static func == (lhs: LayoutAttributes, rhs: LayoutAttributes) -> Bool {
         return lhs.center == rhs.center
             && lhs.bounds == rhs.bounds
             && CATransform3DEqualToTransform(lhs.transform, rhs.transform)
@@ -218,17 +219,17 @@ extension CATransform3D {
             && m12.isFinite
             && m13.isFinite
             && m14.isFinite
-            
+
             && m21.isFinite
             && m22.isFinite
             && m23.isFinite
             && m24.isFinite
-            
+
             && m31.isFinite
             && m32.isFinite
             && m33.isFinite
             && m34.isFinite
-            
+
             && m41.isFinite
             && m42.isFinite
             && m43.isFinite
