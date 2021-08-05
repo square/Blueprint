@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [The `Environment` is now automatically propagated through to nested `BlueprintViews` within a displayed `Element` hierarchy](https://github.com/square/Blueprint/pull/234). This means that if your view-backed `Elements` themselves contain a `BlueprintView` (eg to manage their own state), that nested view will now automatically receive the correct `Environment` across `BlueprintView` boundaries. If you were previously manually propagating `Environment` values you may remove this code. If you would like to opt-out of this behavior; you can set `view.automaticallyInheritsEnvironmentFromContainingBlueprintViews = false` on your `BlueprintView`.
 
+- [Lifecycle hooks][#244]. You can hook into 4 lifecycle events:
+  - `onMount` occurs when a backing view has been created and attached to its hosting view's view hierarchy
+  - `onAppear` occurs when a mounted element becomes visible
+  - `onDisappear` occurs when a visible element is no longer visible
+  - `onUnmount` occurs when a mounted element is removed from the hosting view's view hierarchy
+
+  Each hook is can be added with a modifier of the same name:
+
+  ```swift
+  element.onAppear { ... }
+  ```
+
 ### Removed
 
 - [Removed support for / deprecated iOS 11](https://github.com/square/Blueprint/pull/250).
@@ -617,6 +629,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#244]: https://github.com/square/Blueprint/pull/244
 [#209]: https://github.com/square/Blueprint/pull/209
 [#176]: https://github.com/square/Blueprint/pull/176
 [#175]: https://github.com/square/Blueprint/pull/175
