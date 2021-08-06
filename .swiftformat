@@ -30,6 +30,10 @@
 --rules redundantGet # https://google.github.io/swift/#properties-1
 --rules redundantInit # https://google.github.io/swift/#initializers-1
 --rules redundantParens # https://google.github.io/swift/#parentheses, https://google.github.io/swift/#enum-cases, https://google.github.io/swift/#trailing-closures
+# This is a style choice on top of the Google guide
+--rules redundantReturn
+# Also a style choice
+--rules redundantSelf
 --rules redundantVoidReturnType # https://google.github.io/swift/#types-with-shorthand-names
 --rules semicolons # https://google.github.io/swift/#semicolons
 --rules sortedImports # https://google.github.io/swift/#import-statements

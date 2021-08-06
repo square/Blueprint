@@ -41,8 +41,8 @@ public struct LayoutAttributes {
     public init(center: CGPoint, bounds: CGRect) {
         self.center = center
         self.bounds = bounds
-        self.transform = CATransform3DIdentity
-        self.alpha = 1.0
+        transform = CATransform3DIdentity
+        alpha = 1.0
 
         validateBounds()
         validateCenter()
@@ -165,7 +165,7 @@ public struct LayoutAttributes {
     ///   - scale: The screen scale to use when rounding.
     mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) -> CGPoint {
         // Apply origin offset and rounding correction
-        let correctedFrame = self.frame
+        let correctedFrame = frame
             .offset(by: origin)
             .offset(by: correction)
 
@@ -177,7 +177,7 @@ public struct LayoutAttributes {
         let roundingCorrection = correctedFrame.origin - roundedFrame.origin
 
         // Reverse origin offset and set new frame
-        self.frame = roundedFrame
+        frame = roundedFrame
             .offset(by: -origin)
 
         return roundingCorrection

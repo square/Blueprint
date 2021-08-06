@@ -7,7 +7,7 @@ final class ResponsiveViewController: UIViewController {
 
     override func loadView() {
         blueprintView.backgroundColor = .white
-        self.view = blueprintView
+        view = blueprintView
     }
 
     override func viewDidLoad() {

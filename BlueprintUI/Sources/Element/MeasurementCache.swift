@@ -29,13 +29,13 @@ final class MeasurementCache {
             sizeConstraint: sizeConstraint
         )
 
-        if let existing = self.measurements[innerKey] {
+        if let existing = measurements[innerKey] {
             return existing
         }
 
         let size = measure()
 
-        self.measurements[innerKey] = size
+        measurements[innerKey] = size
 
         return size
     }
@@ -53,13 +53,13 @@ final class MeasurementCache {
             var hasher = Hasher()
             hasher.combine(self.key)
             hasher.combine(self.sizeConstraint)
-            self.hash = hasher.finalize()
+            hash = hasher.finalize()
         }
 
         func hash(into hasher: inout Hasher) {
             // We pre-compute the hash above to avoid potentially expensive work here.
             // Computing the hash repeatedly for `input` may be slow (especially for strings).
-            hasher.combine(self.hash)
+            hasher.combine(hash)
         }
     }
 }

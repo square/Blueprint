@@ -187,7 +187,7 @@ class PixelBoundaryTests: XCTestCase {
         var wrappedElement: Element?
 
         init(wrapping: Element?) {
-            self.wrappedElement = wrapping
+            wrappedElement = wrapping
         }
 
         var content: ElementContent {

@@ -101,7 +101,7 @@ final class KeyboardObserver {
             return nil
         }
 
-        guard let notification = self.latestNotification else {
+        guard let notification = latestNotification else {
             return nil
         }
 
@@ -120,9 +120,9 @@ final class KeyboardObserver {
 
     private func receivedUpdatedKeyboardInfo(_ new: NotificationInfo) {
 
-        let old = self.latestNotification
+        let old = latestNotification
 
-        self.latestNotification = new
+        latestNotification = new
 
         /// Only communicate a frame change to the delegate if the frame actually changed.
 
@@ -138,7 +138,7 @@ final class KeyboardObserver {
          */
         let animationOptions = UIView.AnimationOptions(rawValue: new.animationCurve << 16)
 
-        self.delegate?.keyboardFrameWillChange(
+        delegate?.keyboardFrameWillChange(
             for: self,
             animationDuration: new.animationDuration,
             options: animationOptions
@@ -153,7 +153,7 @@ final class KeyboardObserver {
 
         do {
             let info = try NotificationInfo(with: notification)
-            self.receivedUpdatedKeyboardInfo(info)
+            receivedUpdatedKeyboardInfo(info)
         } catch {
             assertionFailure("Blueprint could not read system keyboard notification. This error needs to be fixed in Blueprint. Error: \(error)")
         }

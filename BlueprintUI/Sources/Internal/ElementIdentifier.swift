@@ -58,9 +58,9 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
     var debugDescription: String {
         if let key = self.key {
-            return "\(self.elementType).\(String(describing: key)).\(self.count)"
+            return "\(elementType).\(String(describing: key)).\(count)"
         } else {
-            return "\(self.elementType).\(self.count)"
+            return "\(elementType).\(count)"
         }
     }
 
@@ -70,12 +70,12 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     struct Factory {
 
         init(elementCount: Int) {
-            self.countsByKey = Dictionary(minimumCapacity: elementCount)
+            countsByKey = Dictionary(minimumCapacity: elementCount)
         }
 
         mutating func nextIdentifier(for type: Element.Type, key: AnyHashable?) -> ElementIdentifier {
 
-            let count = self.nextCount(for: type, key: key)
+            let count = nextCount(for: type, key: key)
 
             return ElementIdentifier(
                 elementType: type,
@@ -93,9 +93,9 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
                 key: key
             )
 
-            let current = self.countsByKey[key, default: 1]
+            let current = countsByKey[key, default: 1]
 
-            self.countsByKey[key] = (current + 1)
+            countsByKey[key] = (current + 1)
 
             return current
         }

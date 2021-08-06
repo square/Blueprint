@@ -11,7 +11,7 @@ public struct AccessibilityBlocker: Element {
 
     /// Creates a new `AccessibilityBlocker` wrapping the provided element.
     public init(wrapping element: Element) {
-        self.wrapped = element
+        wrapped = element
     }
 
     //

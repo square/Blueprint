@@ -93,7 +93,7 @@ public struct MeasurementCachingKey: Hashable {
     private let input: AnyHashable
 
     public init<ElementType: Element, Input: Hashable>(type: ElementType.Type, input: Input) {
-        self.elementType = ObjectIdentifier(type)
+        elementType = ObjectIdentifier(type)
         self.input = input
     }
 }

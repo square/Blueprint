@@ -40,7 +40,7 @@ struct NativeViewNode {
         children: [(path: ElementPath, node: NativeViewNode)]
     ) {
 
-        self.viewDescription = content
+        viewDescription = content
         self.environment = environment
         self.layoutAttributes = layoutAttributes
         self.children = children

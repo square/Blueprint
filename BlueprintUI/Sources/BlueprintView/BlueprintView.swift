@@ -74,7 +74,7 @@ public final class BlueprintView: UIView {
     public var element: Element? {
         didSet {
             // Minor performance optimization: We do not need to update anything if the element remains nil.
-            if oldValue == nil && self.element == nil {
+            if oldValue == nil && element == nil {
                 return
             }
 
@@ -113,7 +113,7 @@ public final class BlueprintView: UIView {
 
         super.init(frame: CGRect.zero)
 
-        self.backgroundColor = .white
+        backgroundColor = .white
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -167,7 +167,7 @@ public final class BlueprintView: UIView {
 
         return element.content.measure(
             in: measurementConstraint(with: size),
-            environment: self.makeEnvironment(),
+            environment: makeEnvironment(),
             cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
     }
@@ -194,7 +194,7 @@ public final class BlueprintView: UIView {
 
         return element.content.measure(
             in: constraint,
-            environment: self.makeEnvironment(),
+            environment: makeEnvironment(),
             cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
@@ -250,7 +250,7 @@ public final class BlueprintView: UIView {
         let start = Date()
         Logger.logLayoutStart(view: self)
 
-        let environment = self.makeEnvironment()
+        let environment = makeEnvironment()
 
         /// Grab view descriptions
         let viewNodes = element?
@@ -288,7 +288,7 @@ public final class BlueprintView: UIView {
 
         isInsideUpdate = false
 
-        self.metricsDelegate?.blueprintView(
+        metricsDelegate?.blueprintView(
             self,
             completedUpdateWith: .init(
                 totalDuration: viewUpdateEndDate.timeIntervalSince(start),
@@ -372,12 +372,12 @@ extension BlueprintView {
         let view: UIView
 
         init(node: NativeViewNode) {
-            self.viewDescription = node.viewDescription
-            self.layoutAttributes = node.layoutAttributes
-            self.children = []
+            viewDescription = node.viewDescription
+            layoutAttributes = node.layoutAttributes
+            children = []
 
-            self.view = node.viewDescription.build()
-            self.view.nativeViewNodeBlueprintEnvironment = node.environment
+            view = node.viewDescription.build()
+            view.nativeViewNodeBlueprintEnvironment = node.environment
         }
 
         deinit {
@@ -408,7 +408,7 @@ extension BlueprintView {
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update
             // pass is otherwise expensive to perform for empty elements.
-            if self.children.isEmpty && node.children.isEmpty {
+            if children.isEmpty && node.children.isEmpty {
                 return
             }
 
@@ -439,7 +439,7 @@ extension BlueprintView {
                 }
                 usedKeys.insert(path)
 
-                let contentView = node.viewDescription.contentView(in: self.view)
+                let contentView = node.viewDescription.contentView(in: view)
 
                 if let controller = oldChildren[path], controller.canUpdateFrom(node: child) {
 

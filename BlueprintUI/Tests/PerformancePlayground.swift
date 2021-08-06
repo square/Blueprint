@@ -35,7 +35,7 @@ class PerformancePlayground: XCTestCase {
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
 
-        self.determineAverage(for: 10.0) {
+        determineAverage(for: 10.0) {
             view.element = element
             view.layoutIfNeeded()
         }
@@ -65,7 +65,7 @@ class PerformancePlayground: XCTestCase {
         let view = BlueprintView()
         view.frame.size = CGSize(width: 1000.0, height: 10000)
 
-        self.determineAverage(for: 10.0) {
+        determineAverage(for: 10.0) {
             view.element = stack
             view.layoutIfNeeded()
         }
@@ -162,11 +162,11 @@ fileprivate struct TestLabel: UIViewElement {
     }
 
     var measurementCacheKey: AnyHashable? {
-        self.text
+        text
     }
 
     func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
         view.numberOfLines = 0
-        view.text = self.text
+        view.text = text
     }
 }

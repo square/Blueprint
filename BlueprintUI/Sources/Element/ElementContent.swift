@@ -25,7 +25,7 @@ public struct ElementContent {
         var builder = Builder(layout: layout)
         configure(&builder)
 
-        self.storage = builder
+        storage = builder
         self.measurementCachingKey = measurementCachingKey
     }
 
@@ -45,7 +45,7 @@ public struct ElementContent {
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
-        environment.measurementCache.measurement(with: self.measurementCachingKey, in: constraint) {
+        environment.measurementCache.measurement(with: measurementCachingKey, in: constraint) {
             self.storage.measure(in: constraint, environment: environment, cache: cache)
         }
     }
@@ -81,7 +81,7 @@ extension ElementContent {
         build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
         self.measurementCachingKey = measurementCachingKey
-        self.storage = LazyStorage(builder: builder)
+        storage = LazyStorage(builder: builder)
     }
 }
 
@@ -170,7 +170,7 @@ extension ElementContent {
     ) {
         self.measurementCachingKey = measurementCachingKey
 
-        self.storage = EnvironmentAdaptingStorage(
+        storage = EnvironmentAdaptingStorage(
             adapter: environmentAdapter,
             child: child
         )
@@ -274,7 +274,7 @@ extension ElementContent {
             environment: Environment,
             cache: CacheTree
         ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-            guard self.children.isEmpty == false else {
+            guard children.isEmpty == false else {
                 return []
             }
 
@@ -460,7 +460,7 @@ fileprivate struct SingleChildLayoutHost: Layout {
     private var wrapped: SingleChildLayout
 
     init(wrapping layout: SingleChildLayout) {
-        self.wrapped = layout
+        wrapped = layout
     }
 
     func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {

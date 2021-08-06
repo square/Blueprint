@@ -17,7 +17,7 @@ public struct UserInteractionEnabled: Element {
 
     public init(_ isEnabled: Bool, wrapping element: Element) {
         self.isEnabled = isEnabled
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     public var content: ElementContent {

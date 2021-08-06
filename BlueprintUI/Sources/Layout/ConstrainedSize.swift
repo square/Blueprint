@@ -31,7 +31,7 @@ public struct ConstrainedSize: Element {
     ) {
         self.width = width
         self.height = height
-        self.wrapped = element
+        wrapped = element
     }
 
     public var content: ElementContent {
@@ -167,8 +167,8 @@ extension ConstrainedSize {
             /// or any other elements type which reflows its content.
 
             let maximumConstraint = SizeConstraint(
-                width: .init(self.width.applied(to: constraint.width.maximum)),
-                height: .init(self.height.applied(to: constraint.height.maximum))
+                width: .init(width.applied(to: constraint.width.maximum)),
+                height: .init(height.applied(to: constraint.height.maximum))
             )
 
             let measurement = child.measure(in: maximumConstraint)

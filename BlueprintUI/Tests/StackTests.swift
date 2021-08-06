@@ -1087,7 +1087,7 @@ class StackTests: XCTestCase {
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
                     .children
                     .map { child -> CGSize in
-                        return child.node.layoutAttributes.frame.size.rounded()
+                        child.node.layoutAttributes.frame.size.rounded()
                     }
 
                 XCTAssertEqual(
@@ -1115,7 +1115,7 @@ class StackTests: XCTestCase {
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
                     .children
                     .map { child -> CGSize in
-                        return child.node.layoutAttributes.frame.size.rounded()
+                        child.node.layoutAttributes.frame.size.rounded()
                     }
 
                 XCTAssertEqual(

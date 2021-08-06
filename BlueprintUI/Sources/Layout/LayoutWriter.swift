@@ -97,18 +97,18 @@ extension LayoutWriter {
             key: AnyHashable? = nil,
             child: Element
         ) {
-            self.children.append(.init(frame: frame, key: key, element: child))
+            children.append(.init(frame: frame, key: key, element: child))
         }
 
         /// Adds a new child element to the layout.
         public mutating func add(_ child: Child) {
-            self.children.append(child)
+            children.append(child)
         }
 
         /// Enumerates each of the children, allowing you to modify them in place,
         /// eg to align them all along a common alignment axis or to set a uniform size.
         public mutating func modifyEach(using change: (inout Child) -> Void) {
-            self.children = children.map {
+            children = children.map {
                 var updated = $0
                 change(&updated)
                 return updated
@@ -201,7 +201,7 @@ extension LayoutWriter {
         // MARK: Element
 
         var content: ElementContent {
-            ElementContent(layout: Layout(builder: self.builder)) { builder in
+            ElementContent(layout: Layout(builder: builder)) { builder in
                 for child in self.builder.children {
                     builder.add(key: child.key, element: child.element)
                 }
@@ -218,11 +218,11 @@ extension LayoutWriter {
             var builder: Builder
 
             func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-                self.builder.sizing.measure(with: self.builder)
+                builder.sizing.measure(with: builder)
             }
 
             func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-                self.builder.children.map { child in
+                builder.children.map { child in
                     .init(frame: child.frame)
                 }
             }

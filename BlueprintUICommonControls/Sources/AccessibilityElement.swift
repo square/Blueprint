@@ -46,7 +46,7 @@ public struct AccessibilityElement: Element {
         self.identifier = identifier
         self.traits = traits
         self.accessibilityFrameSize = accessibilityFrameSize
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {

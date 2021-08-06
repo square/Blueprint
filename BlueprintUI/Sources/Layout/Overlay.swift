@@ -23,7 +23,7 @@ public struct Overlay: Element {
 
     /// Adds the provided element to the overlay.
     public mutating func add(_ element: Element) {
-        self.elements.append(element)
+        elements.append(element)
     }
 
     // MARK: Element

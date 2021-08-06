@@ -71,10 +71,10 @@ extension LayoutResultNode {
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
             .flatMap { identifier, layoutResultNode in
 
-                return layoutResultNode
+                layoutResultNode
                     .resolve()
                     .map { path, viewDescriptionNode in
-                        return (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
+                        (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
                     }
             }
 

@@ -39,7 +39,7 @@ class UIViewElementTests: XCTestCase {
                     Self.updateUIView_isMeasuring_count += 1
                 }
 
-                view.sizeThatFits = self.size
+                view.sizeThatFits = size
             }
         }
 
@@ -91,7 +91,7 @@ class UIViewElementTests: XCTestCase {
                     Self.updateUIView_isMeasuring_count += 1
                 }
 
-                view.sizeThatFits = self.size
+                view.sizeThatFits = size
             }
         }
 
@@ -119,6 +119,6 @@ fileprivate final class TestView: UIView {
     var sizeThatFits: CGSize = .zero
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
-        self.sizeThatFits
+        sizeThatFits
     }
 }

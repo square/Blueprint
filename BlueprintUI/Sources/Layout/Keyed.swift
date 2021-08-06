@@ -46,13 +46,13 @@ public struct Keyed: Element {
     /// Creates a new `Keyed` element with the provided key and wrapped element.
     public init(key: AnyHashable?, wrapping: Element) {
         self.key = key
-        self.wrapped = wrapping
+        wrapped = wrapping
     }
 
     public var content: ElementContent {
         ElementContent(
-            child: self.wrapped,
-            key: self.key,
+            child: wrapped,
+            key: key,
             layout: KeyedLayout()
         )
     }

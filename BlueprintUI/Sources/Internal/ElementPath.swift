@@ -15,13 +15,13 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
 
     mutating func prepend(identifier: ElementIdentifier) {
         identifiers.insert(identifier, at: 0)
-        self.setIdentifiersHash()
+        setIdentifiersHash()
 
     }
 
     mutating func append(identifier: ElementIdentifier) {
         identifiers.append(identifier)
-        self.setIdentifiersHash()
+        setIdentifiersHash()
     }
 
     func prepending(identifier: ElementIdentifier) -> ElementPath {
@@ -47,7 +47,7 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
     // MARK: CustomDebugStringConvertible
 
     var debugDescription: String {
-        return self.identifiers.map { $0.debugDescription }.joined()
+        return identifiers.map { $0.debugDescription }.joined()
     }
 }
 

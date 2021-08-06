@@ -364,7 +364,7 @@ class BlueprintViewTests: XCTestCase {
 
             override init(frame: CGRect) {
                 super.init(frame: frame)
-                self.addSubview(self.blueprintView)
+                addSubview(blueprintView)
             }
 
             required init?(coder: NSCoder) { fatalError() }

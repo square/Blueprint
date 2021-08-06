@@ -22,7 +22,7 @@ public struct AccessibilityContainer: Element {
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
     public init(identifier: String? = nil, wrapping element: Element) {
         self.identifier = identifier
-        self.wrapped = element
+        wrapped = element
     }
 
     //

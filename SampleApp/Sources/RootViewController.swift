@@ -30,11 +30,11 @@ final class RootViewController: UIViewController {
     }
 
     override func loadView() {
-        let blueprintView = BlueprintView(element: self.contents)
+        let blueprintView = BlueprintView(element: contents)
 
-        self.view = blueprintView
+        view = blueprintView
 
-        self.view.backgroundColor = .init(white: 0.9, alpha: 1.0)
+        view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
 
     var contents: Element {
@@ -55,7 +55,7 @@ final class RootViewController: UIViewController {
     }
 
     private func push(_ viewController: UIViewController) {
-        self.navigationController?.pushViewController(viewController, animated: true)
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }
 
@@ -68,7 +68,7 @@ fileprivate struct DemoItem: ProxyElement {
 
     var elementRepresentation: Element {
 
-        Label(text: self.title) { label in
+        Label(text: title) { label in
             label.font = .systemFont(ofSize: 18.0, weight: .semibold)
         }
         .inset(uniform: 20.0)

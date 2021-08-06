@@ -22,7 +22,7 @@ public struct Inset: Element {
         right: CGFloat = 0.0,
         wrapping element: Element
     ) {
-        self.wrappedElement = element
+        wrappedElement = element
         self.top = top
         self.bottom = bottom
         self.left = left
@@ -30,19 +30,19 @@ public struct Inset: Element {
     }
 
     public init(uniformInset: CGFloat, wrapping element: Element) {
-        self.wrappedElement = element
-        self.top = uniformInset
-        self.bottom = uniformInset
-        self.left = uniformInset
-        self.right = uniformInset
+        wrappedElement = element
+        top = uniformInset
+        bottom = uniformInset
+        left = uniformInset
+        right = uniformInset
     }
 
     public init(insets: UIEdgeInsets, wrapping element: Element) {
-        self.wrappedElement = element
-        self.top = insets.top
-        self.bottom = insets.bottom
-        self.left = insets.left
-        self.right = insets.right
+        wrappedElement = element
+        top = insets.top
+        bottom = insets.bottom
+        left = insets.left
+        right = insets.right
     }
 
     public init(sideInsets: CGFloat, wrapping element: Element) {

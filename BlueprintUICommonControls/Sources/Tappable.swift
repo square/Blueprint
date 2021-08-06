@@ -9,7 +9,7 @@ public struct Tappable: Element {
     public var onTap: () -> Void
 
     public init(onTap: @escaping () -> Void, wrapping element: Element) {
-        self.wrappedElement = element
+        wrappedElement = element
         self.onTap = onTap
     }
 

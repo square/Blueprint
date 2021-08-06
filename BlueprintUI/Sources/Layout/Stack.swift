@@ -133,7 +133,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        self.add(
+        add(
             growPriority: 0,
             shrinkPriority: 0,
             alignmentGuide: alignmentGuide,
@@ -161,7 +161,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        self.add(
+        add(
             growPriority: 1,
             shrinkPriority: 1,
             alignmentGuide: alignmentGuide,
@@ -370,7 +370,7 @@ extension StackLayout {
         let frames = _frames(for: items, in: vectorConstraint)
 
         return frames.map { frame in
-            return LayoutAttributes(frame: frame.rect(axis: axis))
+            LayoutAttributes(frame: frame.rect(axis: axis))
         }
     }
 
@@ -383,7 +383,7 @@ extension StackLayout {
         let frames = _frames(for: items, in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
-            return Vector(
+            Vector(
                 axis: max(vector.axis, frame.maxAxis),
                 cross: max(vector.cross, frame.maxCross)
             )
@@ -796,18 +796,18 @@ extension StackLayout {
         func size(axis: StackLayout.Axis) -> CGSize {
             switch axis {
             case .horizontal:
-                return CGSize(width: self.axis, height: self.cross)
+                return CGSize(width: self.axis, height: cross)
             case .vertical:
-                return CGSize(width: self.cross, height: self.axis)
+                return CGSize(width: cross, height: self.axis)
             }
         }
 
         func point(axis: StackLayout.Axis) -> CGPoint {
             switch axis {
             case .horizontal:
-                return CGPoint(x: self.axis, y: self.cross)
+                return CGPoint(x: self.axis, y: cross)
             case .vertical:
-                return CGPoint(x: self.cross, y: self.axis)
+                return CGPoint(x: cross, y: self.axis)
             }
         }
     }
@@ -853,8 +853,8 @@ extension StackLayout {
         }
 
         init(axis: Segment, cross: Segment) {
-            self.origin = Vector(axis: axis.origin, cross: cross.origin)
-            self.size = Vector(axis: axis.magnitude, cross: cross.magnitude)
+            origin = Vector(axis: axis.origin, cross: cross.origin)
+            size = Vector(axis: axis.magnitude, cross: cross.magnitude)
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {

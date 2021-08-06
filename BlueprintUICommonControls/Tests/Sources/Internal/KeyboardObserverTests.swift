@@ -93,7 +93,7 @@ class KeyboardObserverTests: XCTestCase {
             options: UIView.AnimationOptions
         ) {
 
-            self.keyboardFrameWillChange_callCount += 1
+            keyboardFrameWillChange_callCount += 1
         }
     }
 }

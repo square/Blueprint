@@ -25,6 +25,6 @@ extension CGRect {
     }
 
     func offset(by point: CGPoint) -> CGRect {
-        return self.offsetBy(dx: point.x, dy: point.y)
+        return offsetBy(dx: point.x, dy: point.y)
     }
 }

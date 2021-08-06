@@ -28,7 +28,7 @@ public struct Box: Element {
         self.shadowStyle = shadowStyle
         self.clipsContent = clipsContent
 
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     public var content: ElementContent {
@@ -91,7 +91,7 @@ public struct Box: Element {
 
 
             config.contentView = { view in
-                return view.contentView
+                view.contentView
             }
 
         }

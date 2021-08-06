@@ -32,7 +32,6 @@ extension XCTestCase {
             )
         } catch (let error) {
             XCTFail("Failed to create directory for snapshot image: \(error)", file: file, line: line)
-            return
         }
 
 
@@ -62,7 +61,6 @@ extension XCTestCase {
             try pngData.write(to: imageURL)
         } catch (let error) {
             XCTFail("Failed to write snapshot image: \(error)", file: file, line: line)
-            return
         }
 
     }
@@ -127,8 +125,8 @@ extension UIImage {
 
     var pixelData: [UInt8] {
         let size = CGSize(
-            width: self.size.width * self.scale,
-            height: self.size.height * self.scale
+            width: self.size.width * scale,
+            height: self.size.height * scale
         )
         let dataSize = size.width * size.height * 4
         var pixelData = [UInt8](repeating: 0, count: Int(dataSize))

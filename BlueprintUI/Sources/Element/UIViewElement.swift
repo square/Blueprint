@@ -106,7 +106,7 @@ extension UIViewElement {
 
     /// Defer to the reused measurement view to provide the size of the element.
     public var content: ElementContent {
-        let key = self.measurementCacheKey.map {
+        let key = measurementCacheKey.map {
             MeasurementCachingKey(type: Self.self, input: $0)
         }
 
@@ -147,7 +147,7 @@ private final class UIViewElementMeasurer {
 
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
 
-        let view = self.measurementView(for: element)
+        let view = measurementView(for: element)
 
         element.updateUIView(view, with: .init(isMeasuring: true))
 
@@ -159,11 +159,11 @@ private final class UIViewElementMeasurer {
             elementType: ObjectIdentifier(ViewElement.self)
         )
 
-        if let existing = self.views[key] {
+        if let existing = views[key] {
             return existing as! ViewElement.UIViewType
         } else {
             let new = ViewElement.makeUIView()
-            self.views[key] = new
+            views[key] = new
             return new
         }
     }

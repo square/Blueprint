@@ -28,7 +28,7 @@ public struct AdaptedEnvironment: Element {
             self = adapter
         } else {
             self.wrapped = wrapped
-            self.adapters = [adapt]
+            adapters = [adapt]
         }
     }
 

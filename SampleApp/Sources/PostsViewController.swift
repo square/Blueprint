@@ -35,7 +35,7 @@ final class PostsViewController: UIViewController {
     private var isLoading = false
 
     override func loadView() {
-        self.view = blueprintView
+        view = blueprintView
     }
 
     override func viewDidLoad() {

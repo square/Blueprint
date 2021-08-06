@@ -26,7 +26,7 @@ extension ElementContent {
     /// A convenience wrapper to perform layout during testing, using a default `Environment` and
     /// a new cache.
     func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        self.performLayout(
+        performLayout(
             attributes: attributes,
             environment: .empty,
             cache: CacheFactory.makeCache(name: "test")

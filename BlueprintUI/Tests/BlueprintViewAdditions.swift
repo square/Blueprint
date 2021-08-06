@@ -30,6 +30,6 @@ extension BlueprintView {
          ```
          */
 
-        self.subviews.first?.subviews ?? []
+        subviews.first?.subviews ?? []
     }
 }

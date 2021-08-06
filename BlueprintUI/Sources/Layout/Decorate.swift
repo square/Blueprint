@@ -55,7 +55,7 @@ public struct Decorate: ProxyElement {
     ) {
         self.layering = layering
 
-        self.wrapped = wrapping
+        wrapped = wrapping
 
         self.position = position
         self.decoration = decoration
@@ -227,10 +227,10 @@ extension Element {
 extension UIEdgeInsets {
     fileprivate var negated: UIEdgeInsets {
         UIEdgeInsets(
-            top: -self.top,
-            left: -self.left,
-            bottom: -self.bottom,
-            right: -self.right
+            top: -top,
+            left: -left,
+            bottom: -bottom,
+            right: -right
         )
     }
 }

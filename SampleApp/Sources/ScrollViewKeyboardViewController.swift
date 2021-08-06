@@ -16,7 +16,7 @@ final class ScrollViewKeyboardViewController: UIViewController {
 
         let view = BlueprintView()
 
-        view.element = self.content()
+        view.element = content()
 
         self.view = view
     }

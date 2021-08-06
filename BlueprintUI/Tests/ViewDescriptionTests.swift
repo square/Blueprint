@@ -62,7 +62,7 @@ private final class TestView: UIView {
     }
 
     override init(frame: CGRect) {
-        self.initializationProperty = ""
+        initializationProperty = ""
         super.init(frame: frame)
     }
 

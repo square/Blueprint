@@ -28,10 +28,10 @@ public struct TransitionContainer: Element {
     ///   - wrapping: The element to which transitions will be applied.
     @available(*, deprecated, message: "Use TransitionContainer(transitioning:), which has better defaults")
     public init(wrapping element: Element) {
-        self.appearingTransition = .fade
-        self.disappearingTransition = .fade
-        self.layoutTransition = .specific(AnimationAttributes())
-        self.wrappedElement = element
+        appearingTransition = .fade
+        disappearingTransition = .fade
+        layoutTransition = .specific(AnimationAttributes())
+        wrappedElement = element
     }
 
     /// Create a transition container wrapping an element.
@@ -51,7 +51,7 @@ public struct TransitionContainer: Element {
         self.appearingTransition = appearingTransition
         self.disappearingTransition = disappearingTransition
         self.layoutTransition = layoutTransition
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     public var content: ElementContent {

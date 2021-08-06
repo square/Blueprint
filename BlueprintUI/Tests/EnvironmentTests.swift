@@ -196,7 +196,7 @@ class EnvironmentTests: XCTestCase {
     struct AdaptingElement: ProxyElement {
         var elementRepresentation: Element {
             return EnvironmentReader { environment -> Element in
-                return TestElement(value: environment.testValue)
+                TestElement(value: environment.testValue)
             }
         }
     }
@@ -235,7 +235,7 @@ class Environment_UIView_Tests: XCTestCase {
             super.init(frame: .zero)
 
             if let subview = subview {
-                self.addSubview(subview)
+                addSubview(subview)
             }
         }
 

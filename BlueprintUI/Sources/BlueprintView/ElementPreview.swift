@@ -157,13 +157,13 @@
 
             func makeUIView(context: Context) -> BlueprintView {
                 let view = BlueprintView()
-                view.element = self.element
+                view.element = element
 
                 return view
             }
 
             func updateUIView(_ view: BlueprintView, context: Context) {
-                view.element = self.element
+                view.element = element
             }
         }
 
@@ -208,21 +208,21 @@
                 switch self {
                 case .device(let device):
                     return AnyView(
-                        self.constrained(element: element)
+                        constrained(element: element)
                             .previewDevice(.init(rawValue: device.rawValue))
                             .previewDisplayName(device.rawValue + formattedName)
                     )
 
                 case .fixed(let width, let height):
                     return AnyView(
-                        self.constrained(element: element)
+                        constrained(element: element)
                             .previewLayout(.fixed(width: width, height: height))
                             .previewDisplayName("Fixed Size: (\(width), \(height))" + formattedName)
                     )
 
                 case .thatFits(let padding):
                     return AnyView(
-                        self.constrained(element: element)
+                        constrained(element: element)
                             .previewLayout(.sizeThatFits)
                             .previewDisplayName("Size That Fits" + formattedName)
                             .padding(.all, padding)
