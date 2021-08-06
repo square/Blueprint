@@ -143,7 +143,7 @@ class PerformancePlayground : XCTestCase
 private struct NonCachingLabel: UIViewElement {
     var text: String
 
-    static func makeUIView() -> UILabel {
+    func makeUIView() -> UILabel {
         UILabel()
     }
 
@@ -161,7 +161,7 @@ fileprivate struct TestLabel : UIViewElement
     
     typealias UIViewType = UILabel
     
-    static func makeUIView() ->  UILabel {
+    func makeUIView() ->  UILabel {
         UILabel()
     }
     
