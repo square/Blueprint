@@ -82,6 +82,32 @@ class BlueprintViewTests: XCTestCase {
             }
         }
     }
+    
+    func test_onDidLayoutContents() {
+        let view = BlueprintView()
+        
+        var callCount : Int = 0
+        
+        view.onDidLayoutContents = {
+            callCount += 1
+        }
+        
+        XCTAssertEqual(callCount, 0)
+        
+        view.element = SimpleViewElement(color: .red)
+        XCTAssertEqual(callCount, 0)
+        
+        // Should not get called until an explicit layout event.
+        view.layoutIfNeeded()
+        XCTAssertEqual(callCount, 1)
+        
+        view.element = SimpleViewElement(color: .red)
+        XCTAssertEqual(callCount, 1)
+        
+        // Ensure setting a new element still calls the callback.
+        view.layoutIfNeeded()
+        XCTAssertEqual(callCount, 2)
+    }
 
     func test_displaysSimpleView() {
 

@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [The `Environment` is now automatically propagated through to nested `BlueprintViews` within a displayed `Element` hierarchy](https://github.com/square/Blueprint/pull/234). This means that if your view-backed `Elements` themselves contain a `BlueprintView` (eg to manage their own state), that nested view will now automatically receive the correct `Environment` across `BlueprintView` boundaries. If you were previously manually propagating `Environment` values you may remove this code. If you would like to opt-out of this behavior; you can set `view.automaticallyInheritsEnvironmentFromContainingBlueprintViews = false` on your `BlueprintView`.
 
+- [Introduced `BlueprintView.onDidLayoutContents`](https://github.com/square/Blueprint/pull/248), to allow monitoring and performing additional work when a `BlueprintView`'s contents are laid out.
+
 ### Removed
 
 ### Changed

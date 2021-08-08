@@ -90,7 +90,10 @@ public final class BlueprintView: UIView {
     
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
-
+    
+    /// Called after the view lays out its content, as a result of a new element, a bounds change, etc.
+    public var onDidLayoutContents : (() -> ())? = nil
+    
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
@@ -277,6 +280,8 @@ public final class BlueprintView: UIView {
                 appearanceTransitionsEnabled: hasUpdatedViewHierarchy
             )
         )
+        
+        self.onDidLayoutContents?()
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
