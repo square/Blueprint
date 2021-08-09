@@ -11,9 +11,9 @@ public struct AccessibilityBlocker: Element {
 
     /// Creates a new `AccessibilityBlocker` wrapping the provided element.
     public init(wrapping element: Element) {
-        self.wrapped = element
+        wrapped = element
     }
-    
+
     //
     // MARK: Element
     //
@@ -31,12 +31,12 @@ public struct AccessibilityBlocker: Element {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Blocks all accessibility on the element, so that it is
     /// is no longer an accessibility element, and its children are
     /// hidden from the accessibility system.
-    func blockAccessibility() -> AccessibilityBlocker {
+    public func blockAccessibility() -> AccessibilityBlocker {
         AccessibilityBlocker(wrapping: self)
     }
 }

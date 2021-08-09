@@ -51,7 +51,7 @@ public struct Row: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    private (set) public var layout = StackLayout(
+    public private(set) var layout = StackLayout(
         axis: .horizontal,
         alignment: RowAlignment.top.stackAlignment
     )

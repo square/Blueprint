@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
@@ -10,12 +10,14 @@ class BoxTests: XCTestCase {
         compareSnapshot(
             of: box,
             size: CGSize(width: 100, height: 100),
-            identifier: "red")
+            identifier: "red"
+        )
 
         compareSnapshot(
             of: Box(backgroundColor: .clear),
             size: CGSize(width: 100, height: 100),
-            identifier: "clear")
+            identifier: "clear"
+        )
     }
 
     func test_cornerStyle() {
@@ -26,12 +28,14 @@ class BoxTests: XCTestCase {
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 200, height: 100),
-                identifier: "wideCapsule")
+                identifier: "wideCapsule"
+            )
 
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 200),
-                identifier: "longCapsule")
+                identifier: "longCapsule"
+            )
         }
 
         do {
@@ -41,7 +45,8 @@ class BoxTests: XCTestCase {
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
-                identifier: "rounded")
+                identifier: "rounded"
+            )
         }
     }
 
@@ -53,7 +58,8 @@ class BoxTests: XCTestCase {
 
         compareSnapshot(
             of: element,
-            size: CGSize(width: 100, height: 100))
+            size: CGSize(width: 100, height: 100)
+        )
     }
 
     func test_borders() {
@@ -65,7 +71,8 @@ class BoxTests: XCTestCase {
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
-                identifier: "square")
+                identifier: "square"
+            )
         }
 
         do {
@@ -76,7 +83,8 @@ class BoxTests: XCTestCase {
             compareSnapshot(
                 of: box,
                 size: CGSize(width: 100, height: 100),
-                identifier: "rounded")
+                identifier: "rounded"
+            )
         }
     }
 
@@ -85,7 +93,8 @@ class BoxTests: XCTestCase {
         element.box.wrappedElement = Label(text: "Hello, world")
         compareSnapshot(
             of: element,
-            size: CGSize(width: 100, height: 100))
+            size: CGSize(width: 100, height: 100)
+        )
     }
 
     func test_largeCornerRadius() {
@@ -95,9 +104,10 @@ class BoxTests: XCTestCase {
         element.box.shadowStyle = .simple(radius: 2, opacity: 1, offset: .zero, color: .red)
         compareSnapshot(
             of: element,
-            size: CGSize(width: 120, height: 100))
+            size: CGSize(width: 120, height: 100)
+        )
     }
-    
+
 }
 
 
@@ -118,6 +128,7 @@ private struct InsettingElement: Element {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             return .zero
         }
+
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             return LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
         }

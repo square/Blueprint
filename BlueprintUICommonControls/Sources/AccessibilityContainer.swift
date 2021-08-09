@@ -22,7 +22,7 @@ public struct AccessibilityContainer: Element {
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
     public init(identifier: String? = nil, wrapping element: Element) {
         self.identifier = identifier
-        self.wrapped = element
+        wrapped = element
     }
 
     //
@@ -40,11 +40,11 @@ public struct AccessibilityContainer: Element {
     }
 }
 
-public extension Element {
+extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    func accessibilityContainer(identifier: String? = nil) -> Element {
+    public func accessibilityContainer(identifier: String? = nil) -> Element {
         AccessibilityContainer(identifier: identifier, wrapping: self)
     }
 }

@@ -24,10 +24,10 @@ public struct Centered: ProxyElement {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Wraps the element in a `Centered` element to center it within its parent.
-    func centered() -> Centered {
+    public func centered() -> Centered {
         Centered(self)
     }
 }

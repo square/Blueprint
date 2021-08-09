@@ -1,6 +1,6 @@
-import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
+import UIKit
 
 
 struct Post {
@@ -13,15 +13,18 @@ let posts = [
     Post(
         authorName: "Tim",
         timeAgo: "1 hour ago",
-        body: "Lorem Ipsum"),
+        body: "Lorem Ipsum"
+    ),
     Post(
         authorName: "Jane",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    ),
     Post(
         authorName: "John",
         timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!")
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
+    ),
 
 ]
 
@@ -30,9 +33,9 @@ final class PostsViewController: UIViewController {
 
     private let blueprintView = BlueprintView()
     private var isLoading = false
-    
+
     override func loadView() {
-        self.view = blueprintView
+        view = blueprintView
     }
 
     override func viewDidLoad() {
@@ -43,7 +46,7 @@ final class PostsViewController: UIViewController {
     private func update() {
         blueprintView.element = element
     }
-    
+
     private func startLoading() {
         isLoading = true
         update()
@@ -59,7 +62,7 @@ final class PostsViewController: UIViewController {
 
     var element: Element {
         let theme = FeedTheme(authorColor: .green)
-        
+
         let pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
         if isLoading {
             pullToRefreshBehavior = .refreshing
@@ -68,7 +71,7 @@ final class PostsViewController: UIViewController {
                 self?.startLoading()
             })
         }
-        
+
         return MainView(posts: posts, pullToRefreshBehavior: pullToRefreshBehavior)
             .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
     }
@@ -90,12 +93,12 @@ struct FeedTheme {
 }
 
 fileprivate struct MainView: ProxyElement {
-    
+
     var posts: [Post]
     var pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
 
     var elementRepresentation: Element {
-        EnvironmentReader { (environment) -> Element in
+        EnvironmentReader { environment -> Element in
             Column { col in
                 col.horizontalAlignment = .fill
 
@@ -131,7 +134,7 @@ fileprivate struct List: ProxyElement {
 }
 
 fileprivate struct CommentForm: ProxyElement {
-    
+
     var elementRepresentation: Element {
         Column { col in
             col.horizontalAlignment = .fill
@@ -200,7 +203,7 @@ fileprivate struct FeedItemBody: ProxyElement {
                 row.minimumHorizontalSpacing = 8.0
                 row.verticalAlignment = .center
 
-                let name = EnvironmentReader { (environment) -> Element in
+                let name = EnvironmentReader { environment -> Element in
                     var name = Label(text: self.post.authorName)
                     name.font = UIFont.boldSystemFont(ofSize: 14.0)
                     name.color = environment.feedTheme.authorColor

@@ -38,11 +38,11 @@ import UIKit
 ///     }
 /// }
 /// ```
-public protocol UIViewElement : Element {
-    
+public protocol UIViewElement: Element {
+
     /// The type of the view associated with the element.
-    associatedtype UIViewType : UIView
-        
+    associatedtype UIViewType: UIView
+
     /// Create and return a new instance of the provided view type.
     ///
     /// Note
@@ -59,19 +59,19 @@ public protocol UIViewElement : Element {
     /// -------
     /// If you were to implement a simple `UIViewElement` which wraps a `UISwitch`,
     /// your update method would look like this:
-    /// 
+    ///
     /// ```
     /// func updateUIView(_ view: UISwitch, with context: UIViewElementContext) {
     ///    view.isOn = self.isOn
     /// }
     /// ```
     func updateUIView(_ view: UIViewType, with context: UIViewElementContext)
-    
+
     /// A key which is used to cache measurement results of the `UIViewElement`.
     /// If your element is made of values which can be easily combined to cache its sizing,
     /// you should return them from this variable, to speed up measurement and layout.
-    var measurementCacheKey : AnyHashable? { get }
-    
+    var measurementCacheKey: AnyHashable? { get }
+
     /// Returns the sizing measurement for the element for the provided
     /// measurement view.
     ///
@@ -85,43 +85,43 @@ public protocol UIViewElement : Element {
     /// ----------------
     /// You may want to override this method if you need to mutate the value returned from `sizeThatFits(_:)`,
     /// or if you want to use some other sizing method like `systemLayoutSizeFitting(...)`.
-    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize
+    func size(_ size: CGSize, thatFits view: UIViewType) -> CGSize
 }
 
 
-public extension UIViewElement {
-    
-    var measurementCacheKey : AnyHashable? {
+extension UIViewElement {
+
+    public var measurementCacheKey: AnyHashable? {
         nil
     }
-    
+
     /// The default implementation simply forwards to `sizeThatFits(_:)`.
-    func size(_ size : CGSize, thatFits view : UIViewType) -> CGSize {
+    public func size(_ size: CGSize, thatFits view: UIViewType) -> CGSize {
         view.sizeThatFits(size)
     }
-    
+
     //
     // MARK: Element
     //
-    
+
     /// Defer to the reused measurement view to provide the size of the element.
-    var content: ElementContent {
-        let key = self.measurementCacheKey.map {
+    public var content: ElementContent {
+        let key = measurementCacheKey.map {
             MeasurementCachingKey(type: Self.self, input: $0)
         }
-        
+
         return ElementContent(measurementCachingKey: key) {
             UIViewElementMeasurer.shared.measure(element: self, in: $0)
         }
     }
-    
+
     /// Provide the view for the element.
-    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+    public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIViewType.describe { config in
             config.builder = {
                 Self.makeUIView()
             }
-            
+
             config.apply { view in
                 self.updateUIView(view, with: .init(isMeasuring: false))
             }
@@ -138,41 +138,40 @@ public struct UIViewElementContext {
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
 private final class UIViewElementMeasurer {
-    
+
     /// The standard shared cache.
     static let shared = UIViewElementMeasurer()
-        
+
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement:UIViewElement>(element : ViewElement, in constraint : SizeConstraint) -> CGSize {
-        
+    func measure<ViewElement: UIViewElement>(element: ViewElement, in constraint: SizeConstraint) -> CGSize {
+
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
-        
-        let view = self.measurementView(for: element)
-        
+
+        let view = measurementView(for: element)
+
         element.updateUIView(view, with: .init(isMeasuring: true))
-        
+
         return element.size(bounds.size, thatFits: view)
     }
-    
-    func measurementView<ViewElement:UIViewElement>(for element : ViewElement) -> ViewElement.UIViewType
-    {
+
+    func measurementView<ViewElement: UIViewElement>(for element: ViewElement) -> ViewElement.UIViewType {
         let key = Key(
             elementType: ObjectIdentifier(ViewElement.self)
         )
-        
-        if let existing = self.views[key] {
+
+        if let existing = views[key] {
             return existing as! ViewElement.UIViewType
         } else {
             let new = ViewElement.makeUIView()
-            self.views[key] = new
+            views[key] = new
             return new
         }
     }
-    
-    private var views : [Key:UIView] = [:]
-    
-    private struct Key : Hashable {
-        let elementType : ObjectIdentifier
+
+    private var views: [Key: UIView] = [:]
+
+    private struct Key: Hashable {
+        let elementType: ObjectIdentifier
     }
 }
 

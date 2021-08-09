@@ -48,7 +48,7 @@ final class RenderPassCacheTests: XCTestCase {
         let size1 = CGSize(width: 1, height: 1)
         let size2 = CGSize(width: 2, height: 2)
         let size3 = CGSize(width: 3, height: 3)
-        
+
         cache[SizeConstraint(size1)] = size1
         subcache1[SizeConstraint(size2)] = size2
         subcache2[SizeConstraint(size3)] = size3
@@ -74,14 +74,14 @@ final class RenderPassCacheTests: XCTestCase {
 
         var measureCount = 0
 
-        var val = cache.get(SizeConstraint(size1)) { (constraint) -> CGSize in
+        var val = cache.get(SizeConstraint(size1)) { constraint -> CGSize in
             XCTAssertEqual(constraint, SizeConstraint(size1))
             measureCount += 1
             return size1
         }
         XCTAssertEqual(val, size1)
 
-        val = cache.get(SizeConstraint(size1)) { (constraint) -> CGSize in
+        val = cache.get(SizeConstraint(size1)) { constraint -> CGSize in
             XCTAssertEqual(constraint, SizeConstraint(size1))
             measureCount += 1
             return size1

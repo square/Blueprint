@@ -4,27 +4,28 @@ import XCTest
 class ElementContentTests: XCTestCase {
 
     func test_measurement_caching() {
-        
+
         let environment = Environment.empty
-        
+
         let element = MeasurableElement()
-        
+
         _ = element.content.measure(in: .unconstrained, environment: environment)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
-        
+
         _ = element.content.measure(in: .unconstrained, environment: environment)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
-        
+
         _ = element.content.measure(in: .unconstrained, environment: environment)
         XCTAssertEqual(MeasurableElement.measureCount, 1)
     }
-    
+
     func test_noChildren() {
         let container = ElementContent(layout: FrameLayout())
         XCTAssertEqual(container.childCount, 0)
         XCTAssertEqual(
             container.measure(in: SizeConstraint(CGSize(width: 100, height: 100)), environment: .empty),
-            CGSize.zero)
+            CGSize.zero
+        )
     }
 
     func test_singleChild() {
@@ -44,7 +45,8 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(
             container.measure(in: SizeConstraint(CGSize.zero), environment: .empty),
-            CGSize(width: frame.maxX, height: frame.maxY))
+            CGSize(width: frame.maxX, height: frame.maxY)
+        )
     }
 
     func test_multipleChildren() {
@@ -68,7 +70,8 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(
             container.measure(in: SizeConstraint(CGSize.zero), environment: .empty),
-            CGSize(width: 600, height: 800))
+            CGSize(width: 600, height: 800)
+        )
     }
 
     func test_cacheTree() {
@@ -153,17 +156,17 @@ class ElementContentTests: XCTestCase {
     }
 }
 
-fileprivate struct MeasurableElement : Element {
-    
-    static var measureCount : Int = 0
-    
+fileprivate struct MeasurableElement: Element {
+
+    static var measureCount: Int = 0
+
     var content: ElementContent {
         ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint -> CGSize in
             Self.measureCount += 1
             return .init(width: 20.0, height: 20.0)
         }
     }
-    
+
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { _ in }
     }
@@ -187,10 +190,10 @@ fileprivate struct FrameLayout: Layout {
     typealias Traits = CGRect
 
     func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero, { (result, item) in
+        return items.reduce(into: CGSize.zero) { result, item in
             result.width = max(result.width, item.traits.maxX)
             result.height = max(result.height, item.traits.maxY)
-        })
+        }
     }
 
     func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {

@@ -257,8 +257,8 @@ class GridRowTests: XCTestCase {
     }
 }
 
-private extension GridRow {
-    func frames(in size: CGSize) -> [CGRect] {
+extension GridRow {
+    fileprivate func frames(in size: CGSize) -> [CGRect] {
         layout(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             .children
             .map { $0.node.layoutAttributes.frame }
