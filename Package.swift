@@ -11,28 +11,36 @@ let package = Package(
     products: [
         .library(
             name: "BlueprintUI",
-            targets: ["BlueprintUI"]),
+            targets: ["BlueprintUI"]
+        ),
         .library(
             name: "BlueprintUICommonControls",
-            targets: ["BlueprintUICommonControls"]),
+            targets: ["BlueprintUICommonControls"]
+        ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.48.11"),
+    ],
     targets: [
         .target(
             name: "BlueprintUI",
-            path: "BlueprintUI/Sources"),
+            path: "BlueprintUI/Sources"
+        ),
         .testTarget(
             name: "BlueprintUITests",
             dependencies: ["BlueprintUI"],
-            path: "BlueprintUI/Tests"),
+            path: "BlueprintUI/Tests"
+        ),
         .target(
             name: "BlueprintUICommonControls",
             dependencies: ["BlueprintUI"],
-            path: "BlueprintUICommonControls/Sources"),
+            path: "BlueprintUICommonControls/Sources"
+        ),
         .testTarget(
             name: "BlueprintUICommonControlsTests",
             dependencies: ["BlueprintUICommonControls"],
-            path: "BlueprintUICommonControls/Tests"),
+            path: "BlueprintUICommonControls/Tests"
+        ),
     ],
     swiftLanguageVersions: [.v5]
 )

@@ -1,0 +1,57 @@
+# These rules are based on the Google style guide
+
+--indent 4
+
+--exclude Pods
+
+--maxwidth 120
+--closingparen balanced
+--extensionacl on-declarations
+--importgrouping testable-bottom
+--modifierorder "private,fileprivate,internal,public,open,private(set),fileprivate(set),internal(set),public(set),final,dynamic,optional,required,convenience,override,indirect,lazy,weak,unowned,static,class,mutating,nonmutating,prefix,postfix" # ordering used by the now deprecated specifiers rule
+--operatorfunc spaced
+--nospaceoperators ...,..<
+--shortoptionals always
+--voidtype void
+--wraparguments before-first
+
+--rules anyObjectProtocol
+--rules blankLinesBetweenScopes
+--rules braces # https://google.github.io/swift/#braces
+--rules consecutiveSpaces
+--rules duplicateImports
+--rules elseOnSameLine
+--rules emptyBraces
+--rules extensionAccessControl
+--rules indent
+--rules leadingDelimiters
+--rules linebreakAtEndOfFile
+--rules modifierOrder
+--rules redundantGet # https://google.github.io/swift/#properties-1
+--rules redundantInit # https://google.github.io/swift/#initializers-1
+--rules redundantParens # https://google.github.io/swift/#parentheses, https://google.github.io/swift/#enum-cases, https://google.github.io/swift/#trailing-closures
+# This is a style choice on top of the Google guide
+--rules redundantReturn
+# Also a style choice
+--rules redundantSelf
+--rules redundantVoidReturnType # https://google.github.io/swift/#types-with-shorthand-names
+--rules semicolons # https://google.github.io/swift/#semicolons
+--rules sortedImports # https://google.github.io/swift/#import-statements
+--rules spaceAroundBraces # https://google.github.io/swift/#braces
+--rules spaceAroundBrackets # https://google.github.io/swift/#horizontal-whitespace
+--rules spaceAroundGenerics # https://google.github.io/swift/#horizontal-whitespace
+--rules spaceAroundOperators # https://google.github.io/swift/#horizontal-whitespace
+--rules spaceAroundParens
+--rules spaceInsideBraces # https://google.github.io/swift/#horizontal-whitespace
+--rules spaceInsideBrackets # https://google.github.io/swift/#horizontal-whitespace
+--rules spaceInsideComments # https://google.github.io/swift/#other-expressions
+--rules spaceInsideGenerics
+--rules spaceInsideParens
+--rules todos # https://google.github.io/swift/#type-variable-and-function-declarations
+--rules trailingClosures # https://google.github.io/swift/#trailing-closures
+--rules trailingCommas # https://google.github.io/swift/#trailing-commas
+--rules trailingSpace # https://google.github.io/swift/#horizontal-whitespace
+--rules typeSugar # https://google.github.io/swift/#types-with-shorthand-names
+--rules void # https://google.github.io/swift/#types-with-shorthand-names
+--rules wrapArguments
+--rules wrapMultilineStatementBraces # https://google.github.io/swift/#braces

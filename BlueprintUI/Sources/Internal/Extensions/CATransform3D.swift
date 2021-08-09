@@ -22,13 +22,13 @@ extension CATransform3D {
         m43 = CGFloat(double4x4Value[2][3])
         m44 = CGFloat(double4x4Value[3][3])
     }
-    
+
     var double4x4Value: double4x4 {
         return double4x4(rows: [
-            SIMD4(Double(m11),Double(m12),Double(m13),Double(m14)),
-            SIMD4(Double(m21),Double(m22),Double(m23),Double(m24)),
-            SIMD4(Double(m31),Double(m32),Double(m33),Double(m34)),
-            SIMD4(Double(m41),Double(m42),Double(m43),Double(m44)),
+            SIMD4(Double(m11), Double(m12), Double(m13), Double(m14)),
+            SIMD4(Double(m21), Double(m22), Double(m23), Double(m24)),
+            SIMD4(Double(m31), Double(m32), Double(m33), Double(m34)),
+            SIMD4(Double(m41), Double(m42), Double(m43), Double(m44)),
         ])
     }
 

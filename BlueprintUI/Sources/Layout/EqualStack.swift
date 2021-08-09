@@ -23,8 +23,8 @@ public struct EqualStack: Element {
     ///     - configure: A closure allowing the element to be further customized. Defaults to a no-op.
     public init(
         direction: Direction,
-        configure: (inout EqualStack) -> Void = { _ in })
-    {
+        configure: (inout EqualStack) -> Void = { _ in }
+    ) {
         self.direction = direction
         configure(&self)
     }
@@ -91,11 +91,13 @@ extension EqualStack {
             case .horizontal:
                 totalSize = CGSize(
                     width: maximumItemWidth * CGFloat(items.count) + spacing * CGFloat(items.count - 1),
-                    height: maximumItemHeight)
+                    height: maximumItemHeight
+                )
             case .vertical:
                 totalSize = CGSize(
                     width: maximumItemWidth,
-                    height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1))
+                    height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1)
+                )
             }
 
             return totalSize
@@ -110,11 +112,13 @@ extension EqualStack {
             case .horizontal:
                 itemSize = CGSize(
                     width: (size.width - totalSpacing) / CGFloat(items.count),
-                    height: size.height)
+                    height: size.height
+                )
             case .vertical:
                 itemSize = CGSize(
                     width: size.width,
-                    height: (size.height - totalSpacing) / CGFloat(items.count))
+                    height: (size.height - totalSpacing) / CGFloat(items.count)
+                )
             }
 
             var result: [LayoutAttributes] = []

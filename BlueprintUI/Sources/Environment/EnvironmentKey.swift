@@ -10,7 +10,7 @@
 ///     enum WidgetCountKey: EnvironmentKey {
 ///         static let defaultValue: Int = 0
 ///     }
-/// 
+///
 /// You can write a small extension on `Environment` to make it easier to use your key.
 ///
 ///     extension Environment {

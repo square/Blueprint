@@ -12,16 +12,16 @@ public struct Spacer: Element {
     public init(size: CGSize) {
         self.size = size
     }
-    
+
     /// Initializes a new spacer with the given width and height.
-    public init(width : CGFloat = 0.0, height : CGFloat = 0.0) {
+    public init(width: CGFloat = 0.0, height: CGFloat = 0.0) {
         self.init(
             size: CGSize(width: width, height: height)
         )
     }
-    
+
     /// Initializes a new spacer with the given value for the width and height.
-    public init(_ value : CGFloat) {
+    public init(_ value: CGFloat) {
         self.init(
             size: CGSize(width: value, height: value)
         )

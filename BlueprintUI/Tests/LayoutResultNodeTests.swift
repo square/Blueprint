@@ -49,6 +49,7 @@ fileprivate struct AbstractElement: Element {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             return .zero
         }
+
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             return LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 10, dy: 10))
         }

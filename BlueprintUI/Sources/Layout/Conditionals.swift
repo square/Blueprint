@@ -7,11 +7,11 @@
 
 
 extension Element {
-    
+
     //
     // MARK: If / Else
     //
-    
+
     /// Returns a new element from the provided `modify`
     /// closure, if the provided boolean is true. Otherwise, the original
     /// element is returned.
@@ -21,17 +21,16 @@ extension Element {
     /// }
     /// ```
     public func `if`(
-        _ isTrue : Bool,
-        then : (Self) -> Element
-    ) -> Element
-    {
+        _ isTrue: Bool,
+        then: (Self) -> Element
+    ) -> Element {
         if isTrue {
             return then(self)
         } else {
             return self
         }
     }
-    
+
     /// Returns a new element from the provided `then`
     /// closure if the provided boolean is true. If the provided boolean
     /// is false, the `else` closure is used
@@ -47,22 +46,21 @@ extension Element {
     /// )
     /// ```
     public func `if`(
-        _ isTrue : Bool,
-        then : (Self) -> Element,
-        else : (Self) -> Element
-    ) -> Element
-    {
+        _ isTrue: Bool,
+        then: (Self) -> Element,
+        else: (Self) -> Element
+    ) -> Element {
         if isTrue {
             return then(self)
         } else {
             return `else`(self)
         }
     }
-    
+
     //
     // MARK: If Let
     //
-    
+
     /// Returns a new element from the provided `modify`
     /// closure if the provided value is non-nil. Otherwise, the original
     /// element is returned.
@@ -72,17 +70,16 @@ extension Element {
     /// }
     /// ```
     public func `if`<Value>(
-        `let` value : Value?,
-        then : (Value, Self) -> Element
-    ) -> Element
-    {
+        `let` value: Value?,
+        then: (Value, Self) -> Element
+    ) -> Element {
         if let value = value {
             return then(value, self)
         } else {
             return self
         }
     }
-    
+
     /// Returns a new element from the provided `then`
     /// closure if the provided boolean is true. If the provided value
     /// is nil, the `else` closure is used
@@ -98,22 +95,21 @@ extension Element {
     /// )
     /// ```
     public func `if`<Value>(
-        `let` value : Value?,
-        then : (Value, Self) -> Element,
-        else : (Self) -> Element
-    ) -> Element
-    {
+        `let` value: Value?,
+        then: (Value, Self) -> Element,
+        else: (Self) -> Element
+    ) -> Element {
         if let value = value {
             return then(value, self)
         } else {
             return `else`(self)
         }
     }
-    
+
     //
     // MARK: Map
     //
-    
+
     /// Creates and returns a new element by passing the
     /// element to the provided `map` function.
     ///
@@ -126,8 +122,7 @@ extension Element {
     ///     }
     /// }
     /// ```
-    public func map(_ map : (Self) -> Element) -> Element
-    {
+    public func map(_ map: (Self) -> Element) -> Element {
         map(self)
     }
 }

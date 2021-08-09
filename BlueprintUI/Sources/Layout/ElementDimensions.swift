@@ -35,8 +35,8 @@ public struct ElementDimensions: Equatable {
     private var verticalGuideValues: [ObjectIdentifier: CGFloat] = [:]
 
     init(size: CGSize) {
-        self.width = size.width
-        self.height = size.height
+        width = size.width
+        height = size.height
     }
 
     /// Accesses the value of the given guide, or the default value of the alignment if this

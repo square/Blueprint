@@ -1,10 +1,16 @@
-import XCTest
 import BlueprintUI
+import XCTest
 
 
 extension XCTestCase {
 
-    func compareSnapshot(of image: UIImage, identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line) {
+    func compareSnapshot(
+        of image: UIImage,
+        identifier: String? = nil,
+        file: StaticString = #file,
+        testName: String = #function,
+        line: UInt = #line
+    ) {
 
         // Get image URL
 
@@ -22,10 +28,10 @@ extension XCTestCase {
             try FileManager.default.createDirectory(
                 at: imageURL,
                 withIntermediateDirectories: true,
-                attributes: [:])
-        } catch(let error) {
+                attributes: [:]
+            )
+        } catch (let error) {
             XCTFail("Failed to create directory for snapshot image: \(error)", file: file, line: line)
-            return
         }
 
 
@@ -53,9 +59,8 @@ extension XCTestCase {
 
         do {
             try pngData.write(to: imageURL)
-        } catch(let error) {
+        } catch (let error) {
             XCTFail("Failed to write snapshot image: \(error)", file: file, line: line)
-            return
         }
 
     }
@@ -120,18 +125,21 @@ extension UIImage {
 
     var pixelData: [UInt8] {
         let size = CGSize(
-            width: self.size.width * self.scale,
-            height: self.size.height * self.scale)
+            width: self.size.width * scale,
+            height: self.size.height * scale
+        )
         let dataSize = size.width * size.height * 4
         var pixelData = [UInt8](repeating: 0, count: Int(dataSize))
         let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let context = CGContext(data: &pixelData,
-                                width: Int(size.width),
-                                height: Int(size.height),
-                                bitsPerComponent: 8,
-                                bytesPerRow: 4 * Int(size.width),
-                                space: colorSpace,
-                                bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)
+        let context = CGContext(
+            data: &pixelData,
+            width: Int(size.width),
+            height: Int(size.height),
+            bitsPerComponent: 8,
+            bytesPerRow: 4 * Int(size.width),
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        )
         guard let cgImage = self.cgImage else { return [] }
         context?.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
 

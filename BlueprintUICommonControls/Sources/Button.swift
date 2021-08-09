@@ -12,7 +12,7 @@ public struct Button: Element {
     public var minimumTappableSize: CGSize = CGSize(width: 44, height: 44)
 
     public init(isEnabled: Bool = true, onTap: @escaping () -> Void = {}, wrapping element: Element) {
-        self.wrappedElement = element
+        wrappedElement = element
         self.isEnabled = isEnabled
         self.onTap = onTap
     }
@@ -50,7 +50,7 @@ extension Button {
             addTarget(self, action: #selector(handleTap), for: .touchUpInside)
         }
 
-        required public init?(coder aDecoder: NSCoder) {
+        public required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
@@ -58,7 +58,8 @@ extension Button {
             return bounds
                 .insetBy(
                     dx: min(0, bounds.width - minimumTappableSize.width),
-                    dy: min(0, bounds.height - minimumTappableSize.height))
+                    dy: min(0, bounds.height - minimumTappableSize.height)
+                )
 
         }
 

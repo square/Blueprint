@@ -5,9 +5,9 @@
 //  Created by Noah Blake on 3/15/20.
 //
 
-import XCTest
 import BlueprintUI
 import BlueprintUICommonControls
+import XCTest
 
 final class UserInteractionEnabledTests: XCTestCase {
     func test() throws {

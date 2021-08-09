@@ -1,12 +1,13 @@
-import XCTest
 import BlueprintUI
+import XCTest
 
 class ConstrainedAspectRatioTests: XCTestCase {
     func test_expandWide() {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 2, height: 1),
             contentMode: .fill,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 200, height: 100))
@@ -16,7 +17,8 @@ class ConstrainedAspectRatioTests: XCTestCase {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 1, height: 2),
             contentMode: .fill,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 240))
@@ -26,7 +28,8 @@ class ConstrainedAspectRatioTests: XCTestCase {
         let element = ConstrainedAspectRatio(
             aspectRatio: .square,
             contentMode: .fill,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 120))
@@ -36,7 +39,8 @@ class ConstrainedAspectRatioTests: XCTestCase {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 2, height: 1),
             contentMode: .fit,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 120, height: 60))
@@ -46,7 +50,8 @@ class ConstrainedAspectRatioTests: XCTestCase {
         let element = ConstrainedAspectRatio(
             aspectRatio: AspectRatio(width: 1, height: 2),
             contentMode: .fit,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 50, height: 100))
@@ -56,7 +61,8 @@ class ConstrainedAspectRatioTests: XCTestCase {
         let element = ConstrainedAspectRatio(
             aspectRatio: .square,
             contentMode: .fit,
-            wrapping: TestElement())
+            wrapping: TestElement()
+        )
 
         let size = element.content.measure(in: .unconstrained)
         XCTAssertEqual(size, CGSize(width: 100, height: 100))

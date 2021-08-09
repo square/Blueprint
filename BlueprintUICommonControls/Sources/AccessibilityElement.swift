@@ -46,7 +46,7 @@ public struct AccessibilityElement: Element {
         self.identifier = identifier
         self.traits = traits
         self.accessibilityFrameSize = accessibilityFrameSize
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
@@ -135,11 +135,11 @@ public struct AccessibilityElement: Element {
 }
 
 
-public extension Element {
+extension Element {
 
     /// Wraps the element to provide the passed accessibility
     /// options to the accessibility system.
-    func accessibility(
+    public func accessibility(
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,

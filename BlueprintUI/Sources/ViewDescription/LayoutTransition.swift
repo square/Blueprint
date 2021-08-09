@@ -34,7 +34,7 @@ public enum LayoutTransition {
 
 extension LayoutTransition {
 
-    func perform(_ animations: @escaping ()->Void) {
+    func perform(_ animations: @escaping () -> Void) {
 
         switch self {
         case .inherited:
@@ -47,12 +47,14 @@ extension LayoutTransition {
             } else {
                 fallback.perform(
                     animations: animations,
-                    completion: {})
+                    completion: {}
+                )
             }
         case .specific(let attributes):
             attributes.perform(
                 animations: animations,
-                completion: {})
+                completion: {}
+            )
         }
 
     }

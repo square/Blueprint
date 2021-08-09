@@ -2,7 +2,7 @@ import Foundation
 import os.log
 
 /// Namespace for logging helpers
-enum Logger { }
+enum Logger {}
 
 /// BlueprintView signposts
 extension Logger {

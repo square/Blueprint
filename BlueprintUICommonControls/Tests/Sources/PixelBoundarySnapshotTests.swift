@@ -1,6 +1,6 @@
-import XCTest
 import BlueprintUI
 import BlueprintUICommonControls
+import XCTest
 
 final class PixelBoundarySnapshotTests: XCTestCase {
     func test_nestedBoxes() {
@@ -21,7 +21,7 @@ private struct NestedBoxes: ProxyElement {
         .blue,
         .magenta,
         .purple,
-        .orange
+        .orange,
     ]
     var depth: Int = 10
 

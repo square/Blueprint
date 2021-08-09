@@ -16,7 +16,8 @@ struct ReceiptElement: ProxyElement {
                     child: LineItemElement(
                         style: .regular,
                         title: item.name,
-                        price: item.price))
+                        price: item.price
+                    ))
             }
 
             // Add a rule below all of the line items
@@ -27,25 +28,29 @@ struct ReceiptElement: ProxyElement {
                 child: LineItemElement(
                     style: .regular,
                     title: "Subtotal",
-                    price: purchase.subtotal))
+                    price: purchase.subtotal
+                ))
 
 
             col.add(
                 child: LineItemElement(
                     style: .regular,
                     title: "Tax",
-                    price: purchase.tax))
+                    price: purchase.tax
+                ))
 
             col.add(
                 child: LineItemElement(
                     style: .bold,
                     title: "Total",
-                    price: purchase.total))
+                    price: purchase.total
+                ))
         }
 
         let inset = Inset(
             uniformInset: 24.0,
-            wrapping: column)
+            wrapping: column
+        )
 
         var scrollView = ScrollView(wrapping: inset)
         scrollView.contentSize = .fittingHeight

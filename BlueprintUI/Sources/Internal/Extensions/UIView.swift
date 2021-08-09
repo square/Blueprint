@@ -1,9 +1,9 @@
 import UIKit
 
 extension UIView {
-    
+
     final class var isInAnimationBlock: Bool {
-        return self.inheritedAnimationDuration > 0
+        return inheritedAnimationDuration > 0
     }
-    
+
 }
