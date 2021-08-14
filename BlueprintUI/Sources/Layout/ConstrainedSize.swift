@@ -50,7 +50,7 @@ public struct ConstrainedSize: Element {
 extension ConstrainedSize {
 
     /// The available ways to constrain the measurement of a given axis within a `ConstrainedSize` element.
-    public enum Constraint {
+    public enum Constraint: Equatable {
         /// There is no constraint for this axis – the natural size of the element will be used.
         case unconstrained
 
@@ -80,6 +80,23 @@ extension ConstrainedSize {
                 return value.clamped(to: range)
             case let .absolute(absoluteValue):
                 return absoluteValue
+            }
+        }
+
+        public static func == (lhs: Self, rhs: Self) -> Bool {
+            switch (lhs, rhs) {
+            case (absolute(let lhsAbs), absolute(let rhsAbs)):
+                return lhsAbs == rhsAbs
+            case (atLeast(let lhsVal), atLeast(let rhsVal)):
+                return lhsVal == rhsVal
+            case (atMost(let lhsVal), atMost(let rhsVal)):
+                return lhsVal == rhsVal
+            case (unconstrained, unconstrained):
+                return true
+            case (within(let lhsRange), within(let rhsRange)):
+                return lhsRange == rhsRange
+            default:
+                return false
             }
         }
     }
