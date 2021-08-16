@@ -47,7 +47,7 @@ public struct Box: Element {
                 if self.backgroundColor != view.backgroundColor {
                     view.backgroundColor = self.backgroundColor
                 }
-                
+
                 if self.cornerStyle.cornerMask != view.layer.maskedCorners {
                     view.layer.maskedCorners = self.cornerStyle.cornerMask
                 }
@@ -112,7 +112,7 @@ extension Box {
         case square
         case capsule
         case rounded(radius: CGFloat, corners: Corners = .all)
-        
+
         public struct Corners: OptionSet {
             public let rawValue: UInt8
 
@@ -130,42 +130,42 @@ extension Box {
             public static var left: Corners = [.topLeft, .bottomLeft]
             public static var bottom: Corners = [.bottomLeft, .bottomRight]
             public static var right: Corners = [.topRight, .bottomRight]
-            
+
             var toCACornerMask: CACornerMask {
                 var mask: CACornerMask = []
-                if self.contains(.topLeft) {
+                if contains(.topLeft) {
                     mask.update(with: .layerMinXMinYCorner)
                 }
-                
-                if self.contains(.topRight) {
+
+                if contains(.topRight) {
                     mask.update(with: .layerMaxXMinYCorner)
                 }
-                
-                if self.contains(.bottomLeft) {
+
+                if contains(.bottomLeft) {
                     mask.update(with: .layerMinXMaxYCorner)
                 }
-                
-                if self.contains(.bottomRight) {
+
+                if contains(.bottomRight) {
                     mask.update(with: .layerMaxXMaxYCorner)
                 }
                 return mask
             }
-            
+
             var toUIRectCorner: UIRectCorner {
                 var rectCorner: UIRectCorner = []
-                if self.contains(.topLeft) {
+                if contains(.topLeft) {
                     rectCorner.update(with: .topLeft)
                 }
-                
-                if self.contains(.topRight) {
+
+                if contains(.topRight) {
                     rectCorner.update(with: .topRight)
                 }
-                
-                if self.contains(.bottomLeft) {
+
+                if contains(.bottomLeft) {
                     rectCorner.update(with: .bottomLeft)
                 }
-                
-                if self.contains(.bottomRight) {
+
+                if contains(.bottomRight) {
                     rectCorner.update(with: .bottomRight)
                 }
                 return rectCorner
@@ -227,7 +227,7 @@ extension Box.CornerStyle {
             return corners.toCACornerMask
         }
     }
-    
+
     fileprivate var shadowRoundedCorners: UIRectCorner {
         switch self {
         case .square, .capsule:
@@ -304,7 +304,7 @@ extension Box.ShadowStyle {
 fileprivate final class BoxView: UIView {
 
     let contentView = UIView()
-    
+
     var shadowRoundCorners: UIRectCorner = .allCorners
 
     override init(frame: CGRect) {
