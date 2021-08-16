@@ -14,6 +14,7 @@ public struct Label: ProxyElement {
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
     public var lineHeight: LineHeight = .font
+    public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
         self.text = text
@@ -57,6 +58,7 @@ public struct Label: ProxyElement {
     public var elementRepresentation: Element {
         AttributedLabel(attributedText: attributedText) { label in
             label.numberOfLines = numberOfLines
+            label.accessibilityTraits = accessibilityTraits
 
             switch lineHeight {
             case .custom(let lineHeight, .top):
