@@ -43,9 +43,7 @@ public struct AttributedLabel: Element, Hashable {
         label.attributedText = attributedText
         label.numberOfLines = numberOfLines
         label.textRectOffset = textRectOffset
-        if let traits = accessibilityTraits {
-            label.accessibilityTraits.formUnion(UIAccessibilityTraits(withSet: traits))
-        }
+        updateAccessibilityTraits(label)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -53,9 +51,21 @@ public struct AttributedLabel: Element, Hashable {
             config.apply(update)
         }
     }
+    
+    private func updateAccessibilityTraits(_ label: UILabel) {
+        if let traits = accessibilityTraits {
+            var union = label.accessibilityTraits.union(UIAccessibilityTraits(withSet: traits))
+            // UILabel has the `.staticText` trait by default. If we explicitly set `.updatesFrequently` this should be removed.
+            if traits.contains(.updatesFrequently) && label.accessibilityTraits.contains(.staticText) {
+                union.subtract(.staticText)
+            }
+            label.accessibilityTraits = union
+        }
+    }
 }
 
 extension AttributedLabel {
+    
     private final class LabelView: UILabel {
         var textRectOffset: UIOffset = .zero {
             didSet {
