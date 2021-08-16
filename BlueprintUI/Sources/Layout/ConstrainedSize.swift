@@ -82,23 +82,6 @@ extension ConstrainedSize {
                 return absoluteValue
             }
         }
-
-        public static func == (lhs: Self, rhs: Self) -> Bool {
-            switch (lhs, rhs) {
-            case (absolute(let lhsAbs), absolute(let rhsAbs)):
-                return lhsAbs == rhsAbs
-            case (atLeast(let lhsVal), atLeast(let rhsVal)):
-                return lhsVal == rhsVal
-            case (atMost(let lhsVal), atMost(let rhsVal)):
-                return lhsVal == rhsVal
-            case (unconstrained, unconstrained):
-                return true
-            case (within(let lhsRange), within(let rhsRange)):
-                return lhsRange == rhsRange
-            default:
-                return false
-            }
-        }
     }
 }
 
