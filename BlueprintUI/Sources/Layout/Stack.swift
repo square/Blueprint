@@ -32,24 +32,22 @@ extension StackElement {
         self.init()
         configure(&self)
     }
-    
+
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
-    ///   - children: A block containing all elements to be included in the stack.
-    ///   - configure: A closure used to modify the stack.
+    ///   - elementsBuilder: A block containing all elements to be included in the stack.
     /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
-    public init(@Builder<Element> elements: () -> [Element], configure: (inout Self) -> Void = { _ in }) {
+    public init(@Builder<Element> elementsBuilder: () -> [Element]) {
         self.init()
-        self.children = elements().map { element in
+        children = elementsBuilder().map { element in
             if let stackChild = element as? StackChild {
                 return (stackChild, stackChild.traits, stackChild.key)
             } else {
                 return (element, StackLayout.Traits(), nil)
             }
         }
-        configure(&self)
     }
-    
+
     /// Initializes stack transforming an array of some item into an array of elements.
     /// - Parameters:
     ///   - items: The array of items to transform.
@@ -208,6 +206,28 @@ extension StackElement {
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
 public struct StackLayout: Layout {
+
+    /// Default layout for a `Column`.
+    public static let defaultColumn: Self = StackLayout(
+        axis: .vertical,
+        alignment: Column.ColumnAlignment.leading.stackAlignment
+    )
+
+    /// Default layout for a `Row`.
+    public static let defaultRow: Self = StackLayout(
+        axis: .horizontal,
+        alignment: Row.RowAlignment.top.stackAlignment
+    )
+
+    /// Converts alignment to `RowAlignment`.
+    public var rowAlignment: Row.RowAlignment {
+        .init(alignment)
+    }
+
+    /// Converts alignment to `ColumnAlignment`.
+    public var columnAlignment: Column.ColumnAlignment {
+        .init(alignment)
+    }
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {

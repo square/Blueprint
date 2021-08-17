@@ -39,7 +39,7 @@ public struct Row: StackElement {
             }
         }
 
-        var stackAlignment: StackLayout.Alignment {
+        public var stackAlignment: StackLayout.Alignment {
             switch self {
             case .fill:
                 return .fill
@@ -51,12 +51,47 @@ public struct Row: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    public private(set) var layout = StackLayout(
-        axis: .horizontal,
-        alignment: RowAlignment.top.stackAlignment
-    )
+    public private(set) var layout: StackLayout = .defaultRow
 
     public init() {}
+
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - layout: A StackLayout describing the row's layout
+    ///   - elements: A block containing all elements to be included in the stack.
+    /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
+    public init(
+        layout: StackLayout = .defaultRow,
+        @Builder<Element> elements: () -> [Element]
+    ) {
+        self.init(elementsBuilder: elements)
+        self.layout = layout
+    }
+
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - alignment: Determines the cross-axis layout
+    ///   - horizontalUnderflow: Determines the layout when there is extra free space available.
+    ///   - horizontalOverflow: Determines the layout when there is not enough space to fit all children as measured.
+    ///   - verticalAlignment: Specifies how children will be aligned vertically.
+    ///   - minimumHorizontalSpacing: Spacing in between elements.
+    ///   - elements: A block containing all elements to be included in the stack.
+    /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
+    public init(
+        alignment: StackLayout.Alignment = StackLayout.defaultRow.alignment,
+        horizontalUnderflow: StackLayout.UnderflowDistribution = StackLayout.defaultRow.underflow,
+        horizontalOverflow: StackLayout.OverflowDistribution = StackLayout.defaultRow.overflow,
+        verticalAlignment: RowAlignment = StackLayout.defaultRow.rowAlignment,
+        minimumHorizontalSpacing: CGFloat = StackLayout.defaultRow.minimumSpacing,
+        @Builder<Element> elements: () -> [Element]
+    ) {
+        var layout: StackLayout = .init(axis: StackLayout.defaultRow.axis, alignment: alignment)
+        layout.underflow = horizontalUnderflow
+        layout.overflow = horizontalOverflow
+        layout.alignment = verticalAlignment.stackAlignment
+        layout.minimumSpacing = minimumHorizontalSpacing
+        self.init(layout: layout, elements: elements)
+    }
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {
         get { layout.underflow }

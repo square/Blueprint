@@ -52,11 +52,9 @@ class StackTests: XCTestCase {
     }
 
     func test_minimumSpacing() {
-        let row = Row {
+        let row = Row(minimumHorizontalSpacing: 10.0) {
             TestElement()
             TestElement()
-        } configure: {
-            $0.minimumHorizontalSpacing = 10.0
         }
 
         XCTAssertEqual(row.content.measure(in: .unconstrained).width, 210)
@@ -81,10 +79,8 @@ class StackTests: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let column = Column {
+            let column = Column(horizontalAlignment: alignment) {
                 TestElement(size: CGSize(width: elementCrossSize, height: 100))
-            } configure: {
-                $0.horizontalAlignment = alignment
             }
 
             XCTAssertEqual(
@@ -124,10 +120,8 @@ class StackTests: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let row = Row {
+            let row = Row(verticalAlignment: alignment) {
                 TestElement(size: CGSize(width: 100, height: elementCrossSize))
-            } configure: {
-                $0.verticalAlignment = alignment
             }
 
             XCTAssertEqual(
@@ -208,15 +202,13 @@ class StackTests: XCTestCase {
         //  anchor ▶┴┴──────────┴──────────────┴──────────┴─◀
         //
         test(
-            stack: Row {
+            stack: Row(verticalAlignment: .bottom) {
                 TestElement()
-                    .stackChild(alignmentGuide: { _ in 0 }) //align to top edge
+                    .stackChild(alignmentGuide: { _ in 0 }) // align to top edge
                 TestElement()
                     .stackChild(alignmentGuide: { d in d.height }) // align to bottom edge
                 TestElement()
                     .stackChild(alignmentGuide: { d in d[.top] }) // align to top using another guide
-            } configure: {
-                $0.verticalAlignment = .bottom
             },
             layoutSize: CGSize(width: 300, height: 200),
             expectedSize: CGSize(width: 300, height: 200),
@@ -228,12 +220,10 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column {
+            stack: Column(horizontalAlignment: .trailing) {
                 TestElement().stackChild(alignmentGuide: { _ in 0 })
                 TestElement().stackChild(alignmentGuide: { d in d.width })
                 TestElement().stackChild(alignmentGuide: { d in d[.leading] })
-            } configure: {
-                $0.horizontalAlignment = .trailing
             },
             layoutSize: CGSize(width: 200, height: 300),
             expectedSize: CGSize(width: 200, height: 300),
@@ -268,7 +258,7 @@ class StackTests: XCTestCase {
         //           │                          │          │
         //            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┴──────────┘─ ─ ─ ─ ─ ─ ┘
         test(
-            stack: Row {
+            stack: Row(verticalAlignment: .center) {
                 TestElement()
                     .stackChild(alignmentGuide: { _ in 0 }) // align to top edge
                 TestElement() // default (center)
@@ -276,8 +266,6 @@ class StackTests: XCTestCase {
                     .stackChild(alignmentGuide: { d in -40 }) // align outside bounds
                 TestElement()
                     .stackChild(alignmentGuide: { d in 160 }) // align outside bounds
-            } configure: {
-                $0.verticalAlignment = .center
             },
             layoutSize: CGSize(width: 400, height: 200),
             expectedSize: CGSize(width: 400, height: 300),
@@ -290,13 +278,11 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column {
+            stack: Column(horizontalAlignment: .center) {
                 TestElement().stackChild(alignmentGuide: { _ in 0 })
                 TestElement()
                 TestElement().stackChild(alignmentGuide: { d in -40 })
                 TestElement().stackChild(alignmentGuide: { d in 160 })
-            } configure: {
-                $0.horizontalAlignment = .center
             },
             layoutSize: CGSize(width: 200, height: 400),
             expectedSize: CGSize(width: 300, height: 400),
@@ -328,14 +314,12 @@ class StackTests: XCTestCase {
         //  anchor ▶─┴─────────────────────────┴──────────┴┴◀
         //
         test(
-            stack: Row {
+            stack: Row(verticalAlignment: .bottom) {
                 TestElement()
                     .stackChild(alignmentGuide: { d in d.height - 10 }) // 10 from bottom
                 TestElement() // default (bottom)
                 TestElement()
                     .stackChild(alignmentGuide: { d in d.height - 20 }) // 20 from bottom
-            } configure: {
-                $0.verticalAlignment = .bottom
             },
             layoutSize: CGSize(width: 300, height: 200),
             expectedSize: CGSize(width: 300, height: 120),
@@ -347,12 +331,10 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column {
+            stack: Column(horizontalAlignment: .trailing) {
                 TestElement().stackChild(alignmentGuide: { d in d.width - 10 })
                 TestElement()
                 TestElement().stackChild(alignmentGuide: { d in d.width - 20 })
-            } configure: {
-                $0.horizontalAlignment = .trailing
             },
             layoutSize: CGSize(width: 200, height: 300),
             expectedSize: CGSize(width: 120, height: 300),
@@ -373,10 +355,8 @@ class StackTests: XCTestCase {
             line: UInt = #line
         ) {
             do {
-                let row = Row {
+                let row = Row(verticalAlignment: .fill) {
                     TestElement(size: CGSize(width: 100, height: 100))
-                } configure: {
-                    $0.verticalAlignment = .fill
                 }
 
                 let constraint = SizeConstraint(width: .unconstrained, height: crossConstraint)
@@ -396,10 +376,8 @@ class StackTests: XCTestCase {
             }
 
             do {
-                let column = Column {
+                let column = Column(horizontalAlignment: .fill) {
                     TestElement(size: CGSize(width: 100, height: 100))
-                } configure: {
-                    $0.horizontalAlignment = .fill
                 }
 
                 let constraint = SizeConstraint(width: crossConstraint, height: .unconstrained)
@@ -854,7 +832,7 @@ class StackTests: XCTestCase {
                 } configure: {
                     $0.horizontalOverflow = overflow
                 }
-                
+
                 let size = row.content.measure(
                     in: SizeConstraint(
                         width: .atMost(layoutLength),
