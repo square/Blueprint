@@ -51,7 +51,11 @@ public struct GridRow: Element {
     /// Initializer using result builder to declaritively build up a grid row.
     /// - Parameter elements: A block containing all elements to be included in the row.
     /// - Parameter configure: A closure used to modify the stack.
-    public init(@ElementBuilder _ elements: () -> [Element], configure: (inout Self) -> Void = { _ in }) {
+    public init(
+        verticalAlignment: Row.RowAlignment = .fill,
+        spacing: CGFloat = 0,
+        @ElementBuilder _ elements: () -> [Element]
+    ) {
         children = elements().map { element in
             if let gridRowElement = element as? GridRowChildElement {
                 return GridRow.Child(width: gridRowElement.width, key: gridRowElement.key, element: element)
@@ -59,7 +63,8 @@ public struct GridRow: Element {
                 return GridRow.Child(width: .proportional(1), element: element)
             }
         }
-        configure(&self)
+        self.verticalAlignment = verticalAlignment
+        self.spacing = spacing
     }
 
     // MARK: - mutations -
