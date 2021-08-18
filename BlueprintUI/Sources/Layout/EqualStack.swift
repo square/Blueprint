@@ -35,12 +35,12 @@ public struct EqualStack: Element {
     ///   - children: A block containing all elements to be included in the stack.
     public init(
         direction: Direction,
-        @ElementBuilder elements: () -> [Element],
-        configure: (inout Self) -> Void = { _ in }
+        spacing: CGFloat = 0,
+        @ElementBuilder elements: () -> [Element]
     ) {
         self.init(direction: direction)
+        self.spacing = spacing
         children = elements()
-        configure(&self)
     }
 
     public var content: ElementContent {
