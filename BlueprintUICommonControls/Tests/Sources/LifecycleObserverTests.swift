@@ -6,8 +6,6 @@ final class LifecycleObserverTests: XCTestCase {
     enum Event: Equatable {
         case appear(Int)
         case disappear(Int)
-        case mount(Int)
-        case unmount(Int)
     }
 
     func test_coalescingCallbacks() {
@@ -16,8 +14,6 @@ final class LifecycleObserverTests: XCTestCase {
         let element = LifecycleObserver(
             onAppear: { events.append(.appear(1)) },
             onDisappear: { events.append(.disappear(1)) },
-            onMount: { events.append(.mount(1)) },
-            onUnmount: { events.append(.unmount(1)) },
             wrapping: Empty()
         )
         .onAppear {
@@ -26,12 +22,6 @@ final class LifecycleObserverTests: XCTestCase {
         .onDisappear {
             events.append(.disappear(2))
         }
-        .onMount {
-            events.append(.mount(2))
-        }
-        .onUnmount {
-            events.append(.unmount(2))
-        }
 
         element.onAppear?()
         XCTAssertEqual(events, [.appear(1), .appear(2)])
@@ -39,14 +29,6 @@ final class LifecycleObserverTests: XCTestCase {
         events.removeAll()
         element.onDisappear?()
         XCTAssertEqual(events, [.disappear(1), .disappear(2)])
-
-        events.removeAll()
-        element.onMount?()
-        XCTAssertEqual(events, [.mount(1), .mount(2)])
-
-        events.removeAll()
-        element.onUnmount?()
-        XCTAssertEqual(events, [.unmount(1), .unmount(2)])
     }
 
     func test_viewDescription() {
@@ -55,8 +37,6 @@ final class LifecycleObserverTests: XCTestCase {
         let element = LifecycleObserver(
             onAppear: { events.append(.appear(1)) },
             onDisappear: { events.append(.disappear(1)) },
-            onMount: { events.append(.mount(1)) },
-            onUnmount: { events.append(.unmount(1)) },
             wrapping: Empty()
         )
 
@@ -74,13 +54,5 @@ final class LifecycleObserverTests: XCTestCase {
         events.removeAll()
         viewDescription?.onDisappear?()
         XCTAssertEqual(events, [.disappear(1)])
-
-        events.removeAll()
-        viewDescription?.onMount?()
-        XCTAssertEqual(events, [.mount(1)])
-
-        events.removeAll()
-        viewDescription?.onUnmount?()
-        XCTAssertEqual(events, [.unmount(1)])
     }
 }

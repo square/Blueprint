@@ -141,13 +141,6 @@ public final class BlueprintView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    deinit {
-        // ensure final unmount is called if there's still a mounted element tree
-        rootController.traverse { node in
-            node.onUnmount?()
-        }
-    }
-
     ///
     /// Measures the size needed to display the view within then given constraining size,
     /// by measuring the current `element` of the `BlueprintView`.
@@ -410,14 +403,6 @@ extension BlueprintView {
             viewDescription.onDisappear
         }
 
-        var onMount: LifecycleCallback? {
-            viewDescription.onMount
-        }
-
-        var onUnmount: LifecycleCallback? {
-            viewDescription.onUnmount
-        }
-
         let view: UIView
 
         init(node: NativeViewNode) {
@@ -525,7 +510,6 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        controller.onMount?()
                         if context.viewIsVisible {
                             controller.onAppear?()
                         }
@@ -549,11 +533,10 @@ extension BlueprintView {
 
             for controller in oldChildren.values {
                 func removeChild() {
-                    controller.traverse { node in
-                        if context.viewIsVisible {
+                    if context.viewIsVisible {
+                        controller.traverse { node in
                             node.onDisappear?()
                         }
-                        node.onUnmount?()
                     }
                     controller.view.removeFromSuperview()
                 }

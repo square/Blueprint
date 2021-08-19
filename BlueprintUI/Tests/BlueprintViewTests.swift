@@ -400,12 +400,6 @@ class BlueprintViewTests: XCTestCase {
         var expectedEvents: [LifecycleTestEvent] = []
 
         let element = LifecycleTestElement(
-            onMount: {
-                events.append(.mount(1))
-            },
-            onUnmount: {
-                events.append(.unmount(1))
-            },
             onAppear: {
                 events.append(.appear(1))
             },
@@ -413,12 +407,6 @@ class BlueprintViewTests: XCTestCase {
                 events.append(.disappear(1))
             },
             wrapped: LifecycleTestElement(
-                onMount: {
-                    events.append(.mount(2))
-                },
-                onUnmount: {
-                    events.append(.unmount(2))
-                },
                 onAppear: {
                     events.append(.appear(2))
                 },
@@ -438,8 +426,6 @@ class BlueprintViewTests: XCTestCase {
         view.element = element
         view.ensureLayoutPass()
 
-        expectedEvents.append(.mount(1))
-        expectedEvents.append(.mount(2))
         XCTAssertEqual(events, expectedEvents)
 
         // Become visible
@@ -457,9 +443,7 @@ class BlueprintViewTests: XCTestCase {
         view.ensureLayoutPass()
 
         expectedEvents.append(.disappear(1))
-        expectedEvents.append(.unmount(1))
         expectedEvents.append(.disappear(2))
-        expectedEvents.append(.unmount(2))
         XCTAssertEqual(events, expectedEvents)
 
         // Add element while visible
@@ -467,9 +451,7 @@ class BlueprintViewTests: XCTestCase {
         view.element = element
         view.ensureLayoutPass()
 
-        expectedEvents.append(.mount(1))
         expectedEvents.append(.appear(1))
-        expectedEvents.append(.mount(2))
         expectedEvents.append(.appear(2))
         XCTAssertEqual(events, expectedEvents)
 
@@ -486,42 +468,6 @@ class BlueprintViewTests: XCTestCase {
         view.element = nil
         view.ensureLayoutPass()
 
-        expectedEvents.append(.unmount(1))
-        expectedEvents.append(.unmount(2))
-        XCTAssertEqual(events, expectedEvents)
-    }
-
-    func test_unmountOnDeinit() {
-        var view: BlueprintView? = BlueprintView()
-
-        var events: [LifecycleTestEvent] = []
-        var expectedEvents: [LifecycleTestEvent] = []
-
-        let element = LifecycleTestElement(
-            onMount: {
-                events.append(.mount(1))
-            },
-            onUnmount: {
-                events.append(.unmount(1))
-            },
-            onAppear: {
-                events.append(.appear(1))
-            },
-            onDisappear: {
-                events.append(.disappear(1))
-            },
-            wrapped: nil
-        )
-
-        view?.element = element
-        view?.ensureLayoutPass()
-
-        expectedEvents.append(.mount(1))
-        XCTAssertEqual(events, expectedEvents)
-
-        view = nil
-
-        expectedEvents.append(.unmount(1))
         XCTAssertEqual(events, expectedEvents)
     }
 }
@@ -612,9 +558,6 @@ private struct TestContainer: Element {
 }
 
 private struct LifecycleTestElement: Element {
-    var onMount: LifecycleCallback
-    var onUnmount: LifecycleCallback
-
     var onAppear: LifecycleCallback
     var onDisappear: LifecycleCallback
 
@@ -630,8 +573,6 @@ private struct LifecycleTestElement: Element {
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { config in
-            config.onMount = onMount
-            config.onUnmount = onUnmount
             config.onAppear = onAppear
             config.onDisappear = onDisappear
         }
@@ -641,8 +582,6 @@ private struct LifecycleTestElement: Element {
 private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
     case appear(Int)
     case disappear(Int)
-    case mount(Int)
-    case unmount(Int)
 
     var description: String {
         switch self {
@@ -650,10 +589,6 @@ private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
             return "appear(\(i))"
         case .disappear(let i):
             return "disappear(\(i))"
-        case .mount(let i):
-            return "mount(\(i))"
-        case .unmount(let i):
-            return "unmount(\(i))"
         }
     }
 }

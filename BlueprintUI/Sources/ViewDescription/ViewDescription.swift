@@ -51,8 +51,6 @@ public struct ViewDescription {
 
     let onAppear: LifecycleCallback?
     let onDisappear: LifecycleCallback?
-    let onMount: LifecycleCallback?
-    let onUnmount: LifecycleCallback?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -97,8 +95,6 @@ public struct ViewDescription {
 
         onAppear = configuration.onAppear
         onDisappear = configuration.onDisappear
-        onMount = configuration.onMount
-        onUnmount = configuration.onUnmount
     }
 
     public var viewType: UIView.Type {
@@ -168,12 +164,6 @@ extension ViewDescription {
 
         /// A hook to call when the element disappears.
         public var onDisappear: LifecycleCallback?
-
-        /// A hook to call when the element is mounted.
-        public var onMount: LifecycleCallback?
-
-        /// A hook to call when the element is unmounted.
-        public var onUnmount: LifecycleCallback?
 
         /// Initializes a default configuration object.
         public init() {
