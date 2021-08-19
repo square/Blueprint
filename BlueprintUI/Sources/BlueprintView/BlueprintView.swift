@@ -91,6 +91,18 @@ public final class BlueprintView: UIView {
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate: BlueprintViewMetricsDelegate? = nil
 
+    private var isVisible: Bool = false {
+        didSet {
+            switch (oldValue, isVisible) {
+            case (false, true):
+                handleAppeared()
+            case (true, false):
+                handleDisappeared()
+            default: break
+            }
+        }
+    }
+
     /// Instantiates a view with the given element
     ///
     /// - parameter element: The root element that will be displayed in the view.
@@ -127,6 +139,13 @@ public final class BlueprintView: UIView {
     @available(*, unavailable)
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        // ensure final unmount is called if there's still a mounted element tree
+        rootController.traverse { node in
+            node.onUnmount?()
+        }
     }
 
     ///
@@ -220,6 +239,7 @@ public final class BlueprintView: UIView {
 
     public override func didMoveToWindow() {
         super.didMoveToWindow()
+        isVisible = (window != nil)
         setNeedsViewHierarchyUpdate()
     }
 
@@ -277,7 +297,8 @@ public final class BlueprintView: UIView {
         rootController.update(
             node: rootNode,
             context: .init(
-                appearanceTransitionsEnabled: hasUpdatedViewHierarchy
+                appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
+                viewIsVisible: isVisible
             )
         )
 
@@ -338,6 +359,18 @@ public final class BlueprintView: UIView {
 
         return environment
     }
+
+    private func handleAppeared() {
+        rootController.traverse { node in
+            node.onAppear?()
+        }
+    }
+
+    private func handleDisappeared() {
+        rootController.traverse { node in
+            node.onDisappear?()
+        }
+    }
 }
 
 
@@ -368,6 +401,22 @@ extension BlueprintView {
         private var layoutAttributes: LayoutAttributes
 
         private(set) var children: [(ElementPath, NativeViewController)]
+
+        var onAppear: LifecycleCallback? {
+            viewDescription.onAppear
+        }
+
+        var onDisappear: LifecycleCallback? {
+            viewDescription.onDisappear
+        }
+
+        var onMount: LifecycleCallback? {
+            viewDescription.onMount
+        }
+
+        var onUnmount: LifecycleCallback? {
+            viewDescription.onUnmount
+        }
 
         let view: UIView
 
@@ -476,6 +525,11 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
+                        controller.onMount?()
+                        if context.viewIsVisible {
+                            controller.onAppear?()
+                        }
+
                         controller.update(node: child, context: context.modified {
                             $0.appearanceTransitionsEnabled = false
                         })
@@ -494,16 +548,36 @@ extension BlueprintView {
             }
 
             for controller in oldChildren.values {
-                if let transition = controller.viewDescription.disappearingTransition {
-                    transition.performDisappearing(view: controller.view, layoutAttributes: controller.layoutAttributes, completion: {
-                        controller.view.removeFromSuperview()
-                    })
-                } else {
+                func removeChild() {
+                    controller.traverse { node in
+                        if context.viewIsVisible {
+                            node.onDisappear?()
+                        }
+                        node.onUnmount?()
+                    }
                     controller.view.removeFromSuperview()
+                }
+
+                if let transition = controller.viewDescription.disappearingTransition {
+                    transition.performDisappearing(
+                        view: controller.view,
+                        layoutAttributes: controller.layoutAttributes,
+                        completion: removeChild
+                    )
+                } else {
+                    removeChild()
                 }
             }
 
             children = newChildren
+        }
+
+        /// Perform a depth-first traversal of the view-backing tree from this node.
+        func traverse(visitor: (NativeViewController) -> Void) {
+            visitor(self)
+            for (_, child) in children {
+                child.traverse(visitor: visitor)
+            }
         }
     }
 }
@@ -516,6 +590,9 @@ extension BlueprintView.NativeViewController {
 
         /// If appearance transitions are enabled for insertions and removals.
         var appearanceTransitionsEnabled: Bool
+
+        /// True if the hosting view is in the view hierarchy
+        var viewIsVisible: Bool
 
         /// Returns a copy of the update context, modified by the changes provided.
         func modified(_ modify: (inout Self) -> Void) -> Self {

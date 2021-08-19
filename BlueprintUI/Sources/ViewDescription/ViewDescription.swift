@@ -34,6 +34,7 @@ extension NativeView where Self: UIView {
 ///   additional subviews.
 /// - How to animate transitions for appearance, layout changes, and
 ///   disappearance.
+/// - Hooks to be called during lifecycle events.
 ///
 /// A view description does **not** contain a concrete view instance. It simply
 /// contains functionality for creating, updating, and animating view instances.
@@ -47,6 +48,11 @@ public struct ViewDescription {
     private let _layoutTransition: LayoutTransition
     private let _appearingTransition: VisibilityTransition?
     private let _disappearingTransition: VisibilityTransition?
+
+    let onAppear: LifecycleCallback?
+    let onDisappear: LifecycleCallback?
+    let onMount: LifecycleCallback?
+    let onUnmount: LifecycleCallback?
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -88,6 +94,11 @@ public struct ViewDescription {
         _layoutTransition = configuration.layoutTransition
         _appearingTransition = configuration.appearingTransition
         _disappearingTransition = configuration.disappearingTransition
+
+        onAppear = configuration.onAppear
+        onDisappear = configuration.onDisappear
+        onMount = configuration.onMount
+        onUnmount = configuration.onUnmount
     }
 
     public var viewType: UIView.Type {
@@ -151,6 +162,18 @@ extension ViewDescription {
 
         /// The transition to use when this view disappears.
         public var disappearingTransition: VisibilityTransition? = nil
+
+        /// A hook to call when the element appears.
+        public var onAppear: LifecycleCallback?
+
+        /// A hook to call when the element disappears.
+        public var onDisappear: LifecycleCallback?
+
+        /// A hook to call when the element is mounted.
+        public var onMount: LifecycleCallback?
+
+        /// A hook to call when the element is unmounted.
+        public var onUnmount: LifecycleCallback?
 
         /// Initializes a default configuration object.
         public init() {

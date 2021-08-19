@@ -32,4 +32,8 @@ extension BlueprintView {
 
         subviews.first?.subviews ?? []
     }
+
+    func ensureLayoutPass() {
+        _ = currentNativeViewControllers
+    }
 }
