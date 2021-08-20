@@ -394,6 +394,82 @@ class BlueprintViewTests: XCTestCase {
             }
         }
     }
+
+    func test_lifecycleEvents() {
+        var events: [LifecycleTestEvent] = []
+        var expectedEvents: [LifecycleTestEvent] = []
+
+        let element = LifecycleTestElement(
+            onAppear: {
+                events.append(.appear(1))
+            },
+            onDisappear: {
+                events.append(.disappear(1))
+            },
+            wrapped: LifecycleTestElement(
+                onAppear: {
+                    events.append(.appear(2))
+                },
+                onDisappear: {
+                    events.append(.disappear(2))
+                },
+                wrapped: nil
+            )
+        )
+
+        let view = BlueprintView()
+
+        XCTAssertEqual(events, expectedEvents)
+
+        // Add element before visible
+
+        view.element = element
+        view.ensureLayoutPass()
+
+        XCTAssertEqual(events, expectedEvents)
+
+        // Become visible
+
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.addSubview(view)
+
+        expectedEvents.append(.appear(1))
+        expectedEvents.append(.appear(2))
+        XCTAssertEqual(events, expectedEvents)
+
+        // Remove element while visible
+
+        view.element = nil
+        view.ensureLayoutPass()
+
+        expectedEvents.append(.disappear(1))
+        expectedEvents.append(.disappear(2))
+        XCTAssertEqual(events, expectedEvents)
+
+        // Add element while visible
+
+        view.element = element
+        view.ensureLayoutPass()
+
+        expectedEvents.append(.appear(1))
+        expectedEvents.append(.appear(2))
+        XCTAssertEqual(events, expectedEvents)
+
+        // Become not visible while element is set
+
+        view.removeFromSuperview()
+
+        expectedEvents.append(.disappear(1))
+        expectedEvents.append(.disappear(2))
+        XCTAssertEqual(events, expectedEvents)
+
+        // Remove element while not visible
+
+        view.element = nil
+        view.ensureLayoutPass()
+
+        XCTAssertEqual(events, expectedEvents)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -480,3 +556,40 @@ private struct TestContainer: Element {
         }
     }
 }
+
+private struct LifecycleTestElement: Element {
+    var onAppear: LifecycleCallback
+    var onDisappear: LifecycleCallback
+
+    var wrapped: Element?
+
+    var content: ElementContent {
+        if let wrapped = wrapped {
+            return ElementContent(child: wrapped)
+        } else {
+            return ElementContent(intrinsicSize: .zero)
+        }
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config.onAppear = onAppear
+            config.onDisappear = onDisappear
+        }
+    }
+}
+
+private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
+    case appear(Int)
+    case disappear(Int)
+
+    var description: String {
+        switch self {
+        case .appear(let i):
+            return "appear(\(i))"
+        case .disappear(let i):
+            return "disappear(\(i))"
+        }
+    }
+}
+
