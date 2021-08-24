@@ -46,7 +46,10 @@ public struct ElementContent {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         environment.measurementCache.measurement(with: measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, environment: environment, cache: cache)
+            var size = self.storage.measure(in: constraint, environment: environment, cache: cache)
+            size.width.round(.toNearestOrAwayFromZero, by: environment.displayScale)
+            size.height.round(.toNearestOrAwayFromZero, by: environment.displayScale)
+            return size
         }
     }
 
