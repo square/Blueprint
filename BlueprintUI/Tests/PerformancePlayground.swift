@@ -151,12 +151,12 @@ private struct NonCachingLabel: UIViewElement {
 }
 
 fileprivate struct TestLabel: UIViewElement {
-    
+
     var text: String
 
     // MARK: UIViewElement
-    
-    func makeUIView() ->  UILabel {
+
+    func makeUIView() -> UILabel {
         UILabel()
     }
 
