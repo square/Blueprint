@@ -35,8 +35,8 @@ extension CacheTree {
         return subcache(
             key: index,
             name: childCount == 1
-                ? "\(self.name).\(type(of: element))"
-                : "\(self.name)[\(index)].\(type(of: element))"
+                ? "\(name).\(type(of: element))"
+                : "\(name)[\(index)].\(type(of: element))"
         )
     }
 

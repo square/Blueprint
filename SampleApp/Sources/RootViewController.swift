@@ -9,14 +9,13 @@
 import Foundation
 
 
-import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
+import UIKit
 
 
-final class RootViewController : UIViewController
-{
-    fileprivate var demos : [DemoItem] {
+final class RootViewController: UIViewController {
+    fileprivate var demos: [DemoItem] {
         [
             DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
@@ -29,20 +28,20 @@ final class RootViewController : UIViewController
             }),
         ]
     }
-    
+
     override func loadView() {
-        let blueprintView = BlueprintView(element: self.contents)
+        let blueprintView = BlueprintView(element: contents)
 
-        self.view = blueprintView
+        view = blueprintView
 
-        self.view.backgroundColor = .init(white: 0.9, alpha: 1.0)
+        view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
 
-    var contents : Element {
+    var contents: Element {
         Column { column in
             column.minimumVerticalSpacing = 20.0
             column.horizontalAlignment = .fill
-            
+
             self.demos.forEach { demo in
                 column.add(child: demo)
             }
@@ -54,23 +53,22 @@ final class RootViewController : UIViewController
             scrollView.alwaysBounceVertical = true
         }
     }
-    
-    private func push(_ viewController : UIViewController) {
-        self.navigationController?.pushViewController(viewController, animated: true)
+
+    private func push(_ viewController: UIViewController) {
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }
 
 
-fileprivate struct DemoItem : ProxyElement
-{
-    var title : String
-    var badgeText : String?
-    
-    var onTap : () -> ()
+fileprivate struct DemoItem: ProxyElement {
+    var title: String
+    var badgeText: String?
+
+    var onTap: () -> Void
 
     var elementRepresentation: Element {
-        
-        Label(text: self.title) { label in
+
+        Label(text: title) { label in
             label.font = .systemFont(ofSize: 18.0, weight: .semibold)
         }
         .inset(uniform: 20.0)
@@ -94,7 +92,7 @@ fileprivate struct DemoItem : ProxyElement
             guard let badge = self.badgeText else {
                 return Empty()
             }
-            
+
             return Label(text: badge) {
                 $0.font = .systemFont(ofSize: 22.0, weight: .bold)
                 $0.color = .white

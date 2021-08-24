@@ -23,7 +23,9 @@ class CenteredTests: XCTestCase {
                     x: 2438.5,
                     y: 2772,
                     width: 123,
-                    height: 456))
+                    height: 456
+                )
+            )
         } else {
             XCTFail("TestElement should be a child element")
         }

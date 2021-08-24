@@ -6,7 +6,7 @@ import UIKit
 /// different layouts.
 ///
 /// ## Example
-/// 
+///
 /// ```swift
 /// GeometryReader { (geometry) -> Element in
 ///     let image: UIImage
@@ -31,7 +31,7 @@ public struct GeometryReader: Element {
     }
 
     public var content: ElementContent {
-        ElementContent { (constraint, environment) -> Element in
+        ElementContent { constraint, environment -> Element in
             self.elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
         }
     }

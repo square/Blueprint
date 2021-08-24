@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
@@ -107,10 +107,23 @@ class LabelTests: XCTestCase {
         compareSnapshot(of: variations(for: .bottom), identifier: "bottom")
     }
 
-    fileprivate func compareSnapshot(identifier: String? = nil, file: StaticString = #file, testName: String = #function, line: UInt = #line, configuration: (inout Label) -> Void) {
+    fileprivate func compareSnapshot(
+        identifier: String? = nil,
+        file: StaticString = #file,
+        testName: String = #function,
+        line: UInt = #line,
+        configuration: (inout Label) -> Void
+    ) {
         var label = Label(text: "Hello, world. This is a long run of text that should wrap at some point. Someone should improve this test by adding a joke or something. Alright, it's been fun!")
         configuration(&label)
-        compareSnapshot(of: label, size: CGSize(width: 300, height: 300), identifier: identifier, file: file, testName: testName, line: line)
+        compareSnapshot(
+            of: label,
+            size: CGSize(width: 300, height: 300),
+            identifier: identifier,
+            file: file,
+            testName: testName,
+            line: line
+        )
     }
 
 }

@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 
 final class ScaleRoundingTests: XCTestCase {
     func assert(
@@ -110,25 +110,25 @@ final class ScaleRoundingTests: XCTestCase {
         assert(0.0, roundsTo: 0.0, rule: .towardZero, scale: scale)
         assert(0.0, roundsTo: 0.0, rule: .up, scale: scale)
 
-        assert(0.1, roundsTo: 1/3, rule: .awayFromZero, scale: scale)
+        assert(0.1, roundsTo: 1 / 3, rule: .awayFromZero, scale: scale)
         assert(0.1, roundsTo: 0.0, rule: .down, scale: scale)
         assert(0.1, roundsTo: 0.0, rule: .toNearestOrAwayFromZero, scale: scale)
         assert(0.1, roundsTo: 0.0, rule: .toNearestOrEven, scale: scale)
         assert(0.1, roundsTo: 0.0, rule: .towardZero, scale: scale)
-        assert(0.1, roundsTo: 1/3, rule: .up, scale: scale)
+        assert(0.1, roundsTo: 1 / 3, rule: .up, scale: scale)
 
-        assert(0.5, roundsTo: 2/3, rule: .awayFromZero, scale: scale)
-        assert(0.5, roundsTo: 1/3, rule: .down, scale: scale)
-        assert(0.5, roundsTo: 2/3, rule: .toNearestOrAwayFromZero, scale: scale)
-        assert(0.5, roundsTo: 2/3, rule: .toNearestOrEven, scale: scale)
-        assert(0.5, roundsTo: 1/3, rule: .towardZero, scale: scale)
-        assert(0.5, roundsTo: 2/3, rule: .up, scale: scale)
+        assert(0.5, roundsTo: 2 / 3, rule: .awayFromZero, scale: scale)
+        assert(0.5, roundsTo: 1 / 3, rule: .down, scale: scale)
+        assert(0.5, roundsTo: 2 / 3, rule: .toNearestOrAwayFromZero, scale: scale)
+        assert(0.5, roundsTo: 2 / 3, rule: .toNearestOrEven, scale: scale)
+        assert(0.5, roundsTo: 1 / 3, rule: .towardZero, scale: scale)
+        assert(0.5, roundsTo: 2 / 3, rule: .up, scale: scale)
 
         assert(0.9, roundsTo: 1.0, rule: .awayFromZero, scale: scale)
-        assert(0.9, roundsTo: 2/3, rule: .down, scale: scale)
+        assert(0.9, roundsTo: 2 / 3, rule: .down, scale: scale)
         assert(0.9, roundsTo: 1.0, rule: .toNearestOrAwayFromZero, scale: scale)
         assert(0.9, roundsTo: 1.0, rule: .toNearestOrEven, scale: scale)
-        assert(0.9, roundsTo: 2/3, rule: .towardZero, scale: scale)
+        assert(0.9, roundsTo: 2 / 3, rule: .towardZero, scale: scale)
         assert(0.9, roundsTo: 1.0, rule: .up, scale: scale)
     }
 }

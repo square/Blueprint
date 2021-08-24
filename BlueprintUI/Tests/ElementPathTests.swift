@@ -53,5 +53,5 @@ fileprivate struct B: Element {
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         return nil
     }
-    
+
 }

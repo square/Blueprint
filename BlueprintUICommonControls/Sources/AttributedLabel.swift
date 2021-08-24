@@ -12,9 +12,9 @@ public struct AttributedLabel: Element, Hashable {
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
 
-    public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
+    public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
         self.attributedText = attributedText
-        
+
         configure(&self)
     }
 
@@ -44,7 +44,7 @@ public struct AttributedLabel: Element, Hashable {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return LabelView.describe { (config) in
+        return LabelView.describe { config in
             config.apply(update)
         }
     }

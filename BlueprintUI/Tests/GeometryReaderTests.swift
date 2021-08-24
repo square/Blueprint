@@ -7,7 +7,7 @@ final class GeometryReaderTests: XCTestCase {
         let constrainedSize = CGSize(width: 100, height: 100)
         let unconstrainedSize = CGSize(width: 200, height: 200)
 
-        let element = GeometryReader { (geometry) -> Element in
+        let element = GeometryReader { geometry -> Element in
             if geometry.constraint.width.isConstrained {
                 return Spacer(size: constrainedSize)
             } else {
@@ -27,7 +27,7 @@ final class GeometryReaderTests: XCTestCase {
     }
 
     func test_layout() {
-        let element = GeometryReader { (geometry) -> Element in
+        let element = GeometryReader { geometry -> Element in
             // Create an element with half the dimensions of the available size,
             // aligned in the bottom right.
 
@@ -89,8 +89,8 @@ final class GeometryReaderTests: XCTestCase {
     }
 }
 
-private extension SizeConstraint.Axis {
-    var isConstrained: Bool {
+extension SizeConstraint.Axis {
+    fileprivate var isConstrained: Bool {
         switch self {
         case .atMost:
             return true

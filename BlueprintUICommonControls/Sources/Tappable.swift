@@ -9,7 +9,7 @@ public struct Tappable: Element {
     public var onTap: () -> Void
 
     public init(onTap: @escaping () -> Void, wrapping element: Element) {
-        self.wrappedElement = element
+        wrappedElement = element
         self.onTap = onTap
     }
 
@@ -26,10 +26,10 @@ public struct Tappable: Element {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Wraps the element and calls the provided closure when tapped.
-    func tappable(onTap: @escaping () -> Void) -> Tappable {
+    public func tappable(onTap: @escaping () -> Void) -> Tappable {
         Tappable(onTap: onTap, wrapping: self)
     }
 }
@@ -37,7 +37,7 @@ public extension Element {
 
 fileprivate final class TappableView: UIView {
 
-    var onTap: (()->Void)? = nil
+    var onTap: (() -> Void)? = nil
 
     override init(frame: CGRect) {
         super.init(frame: frame)

@@ -18,7 +18,8 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: layoutResultNode.resolve()))
+                children: layoutResultNode.resolve()
+            ))
 
         viewDescription.apply(to: view)
 
@@ -32,7 +33,8 @@ class EnvironmentTests: XCTestCase {
         let element = AdaptedEnvironment(
             key: TestKey.self,
             value: testValue,
-            wrapping: AdaptingElement())
+            wrapping: AdaptingElement()
+        )
 
         let view = TestView()
         let size = element.content.measure(in: .unconstrained, environment: .empty)
@@ -44,7 +46,8 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: layoutResultNode.resolve()))
+                children: layoutResultNode.resolve()
+            ))
 
         viewDescription.apply(to: view)
 
@@ -61,7 +64,9 @@ class EnvironmentTests: XCTestCase {
             wrapping: AdaptedEnvironment(
                 key: TestKey.self,
                 value: testValue,
-                wrapping: AdaptingElement()))
+                wrapping: AdaptingElement()
+            )
+        )
 
         let view = TestView()
         let size = element.content.measure(in: .unconstrained, environment: .empty)
@@ -73,7 +78,8 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: layoutResultNode.resolve()))
+                children: layoutResultNode.resolve()
+            ))
 
         viewDescription.apply(to: view)
 
@@ -86,7 +92,8 @@ class EnvironmentTests: XCTestCase {
         let rightElement = AdaptedEnvironment(
             key: TestKey.self,
             value: .right,
-            wrapping: TestViewBackedElement())
+            wrapping: TestViewBackedElement()
+        )
 
         let rightLayoutResultNode = rightElement.layout(frame: .zero)
         let rightViewDescription = leafViewDescription(
@@ -94,7 +101,8 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: rightLayoutResultNode.resolve()))
+                children: rightLayoutResultNode.resolve()
+            ))
 
         let view = TestView()
 
@@ -107,7 +115,8 @@ class EnvironmentTests: XCTestCase {
         let wrongElement = AdaptedEnvironment(
             key: TestKey.self,
             value: .wrong,
-            wrapping: TestViewBackedElement())
+            wrapping: TestViewBackedElement()
+        )
 
         let wrongLayoutResultNode = wrongElement.layout(frame: .zero)
         let wrongViewDescription = leafViewDescription(
@@ -115,7 +124,8 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: wrongLayoutResultNode.resolve()))
+                children: wrongLayoutResultNode.resolve()
+            ))
 
         wrongViewDescription.apply(to: view)
 
@@ -130,7 +140,9 @@ class EnvironmentTests: XCTestCase {
             wrapping: AdaptedEnvironment(
                 key: TestKey.self,
                 value: testValue,
-                wrapping: TestViewBackedElement()))
+                wrapping: TestViewBackedElement()
+            )
+        )
 
         let view = TestView()
         let layoutResultNode = element.layout(frame: .zero)
@@ -139,31 +151,32 @@ class EnvironmentTests: XCTestCase {
                 content: UIView.describe { _ in },
                 environment: .empty,
                 layoutAttributes: LayoutAttributes(frame: .zero),
-                children: layoutResultNode.resolve()))
+                children: layoutResultNode.resolve()
+            ))
 
         viewDescription.apply(to: view)
 
         XCTAssertEqual(view.testValue, testValue)
     }
-    
+
     func test_merged() {
         var lhs = Environment.empty
         lhs[TestKey] = .wrong
         lhs[LHSTestKey] = 2
-        
-        
+
+
         var rhs = Environment.empty
         rhs[TestKey] = .right
         rhs[RHSTestKey] = 3
-        
+
         let output = lhs.merged(prioritizing: rhs)
-        
+
         XCTAssertEqual(output[TestKey], .right)
         XCTAssertEqual(output[LHSTestKey], 2)
         XCTAssertEqual(output[RHSTestKey], 3)
-        
-        enum LHSTestKey : EnvironmentKey { static let defaultValue: Int? = nil }
-        enum RHSTestKey : EnvironmentKey { static let defaultValue: Int? = nil }
+
+        enum LHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum RHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
     }
 
     func leafAttributes(in node: LayoutResultNode) -> LayoutAttributes {
@@ -183,49 +196,49 @@ class EnvironmentTests: XCTestCase {
     struct AdaptingElement: ProxyElement {
         var elementRepresentation: Element {
             return EnvironmentReader { environment -> Element in
-                return TestElement(value: environment.testValue)
+                TestElement(value: environment.testValue)
             }
         }
     }
 }
 
 
-class Environment_UIView_Tests : XCTestCase {
-    
+class Environment_UIView_Tests: XCTestCase {
+
     func test_inheritedBlueprintEnvironment() {
-        
+
         var environment = Environment.empty
         environment[TestingKey1.self] = 1
-        
+
         let first = View(subview: View(subview: View(subview: nil)))
         let second = first.subviews[0]
         let third = second.subviews[0]
-        
+
         first.nativeViewNodeBlueprintEnvironment = environment
-        
+
         XCTAssertEqual(first.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
         XCTAssertEqual(second.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
         XCTAssertEqual(third.inheritedBlueprintEnvironment?[TestingKey1.self], 1)
-        
+
         first.nativeViewNodeBlueprintEnvironment = nil
-        
+
         XCTAssertEqual(first.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
         XCTAssertEqual(second.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
         XCTAssertEqual(third.inheritedBlueprintEnvironment?[TestingKey1.self], nil)
     }
-    
-    enum TestingKey1 : EnvironmentKey { static let defaultValue: Int? = nil }
-    
-    private final class View : UIView {
-        
-        init(subview : UIView?) {
+
+    enum TestingKey1: EnvironmentKey { static let defaultValue: Int? = nil }
+
+    private final class View: UIView {
+
+        init(subview: UIView?) {
             super.init(frame: .zero)
-            
+
             if let subview = subview {
-                self.addSubview(subview)
+                addSubview(subview)
             }
         }
-        
+
         required init?(coder: NSCoder) { fatalError() }
     }
 }
@@ -238,9 +251,10 @@ private struct TestElement: Element {
     var content: ElementContent {
         return ElementContent(
             layout: TestLayout(value: value),
-            configure: { (layout) in
+            configure: { layout in
                 layout.add(element: Spacer(size: CGSize(width: 8, height: 8)))
-            })
+            }
+        )
     }
 
     struct TestLayout: Layout {
@@ -303,8 +317,8 @@ private enum TestKey: EnvironmentKey {
     static let defaultValue = TestValue.defaultValue
 }
 
-private extension Environment {
-    var testValue: TestValue  {
+extension Environment {
+    fileprivate var testValue: TestValue {
         get { return self[TestKey.self] }
         set { self[TestKey.self] = newValue }
     }

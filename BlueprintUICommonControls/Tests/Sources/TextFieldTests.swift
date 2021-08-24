@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
@@ -12,7 +12,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "simple")
+                identifier: "simple"
+            )
         }
 
         do {
@@ -21,7 +22,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "placeholder")
+                identifier: "placeholder"
+            )
         }
 
         do {
@@ -30,16 +32,18 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "disabled")
+                identifier: "disabled"
+            )
         }
-        
+
         do {
             var field = TextField(text: "Right Aligned")
             field.textAlignment = .right
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "right-aligned")
+                identifier: "right-aligned"
+            )
         }
 
         do {
@@ -48,7 +52,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "title-font")
+                identifier: "title-font"
+            )
         }
 
         do {
@@ -57,7 +62,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "blue-text-color")
+                identifier: "blue-text-color"
+            )
         }
 
     }

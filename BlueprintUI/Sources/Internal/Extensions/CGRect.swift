@@ -6,7 +6,8 @@ extension CGRect {
             x: minX,
             y: minY,
             width: maxX - minX,
-            height: maxY - minY)
+            height: maxY - minY
+        )
     }
 
     /// Creates a new rectangle by rounding each of the min and max X and Y values of this rect individually.
@@ -19,10 +20,11 @@ extension CGRect {
             minX: minX.rounded(rule, by: scale),
             minY: minY.rounded(rule, by: scale),
             maxX: maxX.rounded(rule, by: scale),
-            maxY: maxY.rounded(rule, by: scale))
+            maxY: maxY.rounded(rule, by: scale)
+        )
     }
 
     func offset(by point: CGPoint) -> CGRect {
-        return self.offsetBy(dx: point.x, dy: point.y)
+        return offsetBy(dx: point.x, dy: point.y)
     }
 }

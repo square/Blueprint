@@ -28,10 +28,10 @@ public struct TransitionContainer: Element {
     ///   - wrapping: The element to which transitions will be applied.
     @available(*, deprecated, message: "Use TransitionContainer(transitioning:), which has better defaults")
     public init(wrapping element: Element) {
-        self.appearingTransition = .fade
-        self.disappearingTransition = .fade
-        self.layoutTransition = .specific(AnimationAttributes())
-        self.wrappedElement = element
+        appearingTransition = .fade
+        disappearingTransition = .fade
+        layoutTransition = .specific(AnimationAttributes())
+        wrappedElement = element
     }
 
     /// Create a transition container wrapping an element.
@@ -51,7 +51,7 @@ public struct TransitionContainer: Element {
         self.appearingTransition = appearingTransition
         self.disappearingTransition = disappearingTransition
         self.layoutTransition = layoutTransition
-        self.wrappedElement = element
+        wrappedElement = element
     }
 
     public var content: ElementContent {
@@ -68,7 +68,7 @@ public struct TransitionContainer: Element {
 
 }
 
-public extension Element {
+extension Element {
 
     /// Wraps the element in a transition container to provide an animated transition.
     ///
@@ -78,7 +78,7 @@ public extension Element {
     ///   - onLayout: The transition to use when the element's layout changes. The default value is
     ///     `.inherited`, which means the element will participate in the same transition as its
     ///     nearest ancestor with a specified transition.
-    func transition(
+    public func transition(
         onAppear: VisibilityTransition? = nil,
         onDisappear: VisibilityTransition? = nil,
         onLayout: LayoutTransition = .inherited
@@ -95,7 +95,7 @@ public extension Element {
     ///
     /// - Parameters:
     ///   - onAppearOrDisappear: The transition to use when the element appears or disappears.
-    func transition(_ onAppearOrDisappear: VisibilityTransition) -> TransitionContainer {
+    public func transition(_ onAppearOrDisappear: VisibilityTransition) -> TransitionContainer {
         TransitionContainer(
             appearingTransition: onAppearOrDisappear,
             disappearingTransition: onAppearOrDisappear,

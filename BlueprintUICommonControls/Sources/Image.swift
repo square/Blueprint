@@ -86,7 +86,7 @@ extension CGSize {
 
     fileprivate var aspectRatio: CGFloat {
         if height > 0.0 {
-            return width/height
+            return width / height
         } else {
             return 0.0
         }
@@ -135,11 +135,13 @@ extension Image {
             case .fitWidth(let width):
                 return CGSize(
                     width: width,
-                    height: width / imageSize.aspectRatio)
+                    height: width / imageSize.aspectRatio
+                )
             case .fitHeight(let height):
                 return CGSize(
                     width: height * imageSize.aspectRatio,
-                    height: height)
+                    height: height
+                )
             case .useImageSize:
                 return imageSize
             }

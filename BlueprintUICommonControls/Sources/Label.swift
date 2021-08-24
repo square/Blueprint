@@ -7,7 +7,7 @@ public struct Label: ProxyElement {
 
     /// The text to be displayed.
     public var text: String
-    
+
     public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
@@ -28,7 +28,7 @@ public struct Label: ProxyElement {
         }
         return lineBreakMode
     }
-    
+
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
@@ -49,8 +49,9 @@ public struct Label: ProxyElement {
             attributes: [
                 NSAttributedString.Key.font: font,
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.paragraphStyle: paragraphStyle
-            ])
+                NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            ]
+        )
     }
 
     public var elementRepresentation: Element {
