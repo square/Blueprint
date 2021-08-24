@@ -23,7 +23,7 @@ class UIViewElementTests: XCTestCase {
 
             static var makeUIView_count: Int = 0
 
-            static func makeUIView() -> TestView {
+            func makeUIView() -> TestView {
                 Self.makeUIView_count += 1
 
                 return TestView()
@@ -75,7 +75,7 @@ class UIViewElementTests: XCTestCase {
 
             static var makeUIView_count: Int = 0
 
-            static func makeUIView() -> TestView {
+            func makeUIView() -> TestView {
                 Self.makeUIView_count += 1
 
                 return TestView()

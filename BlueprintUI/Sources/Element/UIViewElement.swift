@@ -29,7 +29,7 @@ import UIKit
 ///
 ///     typealias UIViewType = UISwitch
 ///
-///     static func makeUIView() -> UISwitch {
+///     func makeUIView() -> UISwitch {
 ///         UISwitch()
 ///     }
 ///
@@ -50,7 +50,7 @@ public protocol UIViewElement: Element {
     /// Ensure that you do not pass any values to the initializer of your view type
     /// that you cannot also update in `updateUIView(_:)`, as view instances
     /// are reused for sizing and measurement.
-    static func makeUIView() -> UIViewType
+    func makeUIView() -> UIViewType
 
     /// Update the view instance with the content from the element. The context provides additional
     /// information, such as whether the update is for the measuring instance.
@@ -119,7 +119,7 @@ extension UIViewElement {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIViewType.describe { config in
             config.builder = {
-                Self.makeUIView()
+                self.makeUIView()
             }
 
             config.apply { view in
@@ -162,7 +162,7 @@ private final class UIViewElementMeasurer {
         if let existing = views[key] {
             return existing as! ViewElement.UIViewType
         } else {
-            let new = ViewElement.makeUIView()
+            let new = element.makeUIView()
             views[key] = new
             return new
         }

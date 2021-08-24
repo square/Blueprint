@@ -31,7 +31,7 @@ import Foundation
 ///
 ///     typealias UIViewType = UILabel
 ///
-///     static func makeUIView() -> UILabel {
+///     func makeUIView() -> UILabel {
 ///         UILabel()
 ///     }
 ///
@@ -71,7 +71,7 @@ import Foundation
 ///
 ///     typealias UIViewType = UILabel
 ///
-///     static func makeUIView() -> UILabel {
+///     func makeUIView() -> UILabel {
 ///         UILabel()
 ///     }
 ///

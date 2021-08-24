@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- [`makeUIView()` on `UIViewElement` is no longer a static function](https://github.com/square/Blueprint/pull/246), to allow access to properties during view creation. 
+
 ### Deprecated
 
 ### Security
