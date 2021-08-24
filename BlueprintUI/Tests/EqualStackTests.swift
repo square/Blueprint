@@ -110,9 +110,9 @@ class EqualStackTests: XCTestCase {
                     stack.children = children
                 }
 
-                // 400 / 3 = 133.333…
+                // 400 / 3 = 133.333, rounded up to 133.5…
                 // 1200 / 133.333… = 9
-                XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 9, height: 400))
+                XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 9, height: 400.5))
             }
 
             // spacing = 50
