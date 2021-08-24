@@ -69,8 +69,7 @@ public struct TextField: Element {
             if let traits = accessibilityTraits {
                 if let existing = configuration[\.accessibilityTraits] {
                     configuration[\.accessibilityTraits] = existing.union(UIAccessibilityTraits(withSet: traits))
-                }
-                else{
+                } else {
                     configuration[\.accessibilityTraits] = UIAccessibilityTraits(withSet: traits)
                 }
             }

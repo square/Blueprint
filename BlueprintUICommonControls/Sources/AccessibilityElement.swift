@@ -50,7 +50,7 @@ public struct AccessibilityElement: Element {
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
-        return UIAccessibilityTraits(withSet: self.traits)
+        return UIAccessibilityTraits(withSet: traits)
     }
 
     public var content: ElementContent {
@@ -119,47 +119,47 @@ extension Element {
 }
 
 
-public extension UIAccessibilityTraits {
-    
-    init(withSet set:Set<AccessibilityElement.Trait>) {
-         self.init(rawValue: UIAccessibilityTraits.none.rawValue)
-             for trait in set {
-                 switch trait {
-                 case .button:
-                     self.formUnion(.button)
-                 case .link:
-                     self.formUnion(.link)
-                 case .header:
-                     self.formUnion(.header)
-                 case .searchField:
-                     self.formUnion(.searchField)
-                 case .image:
-                     self.formUnion(.image)
-                 case .selected:
-                     self.formUnion(.selected)
-                 case .playsSound:
-                     self.formUnion(.playsSound)
-                 case .keyboardKey:
-                     self.formUnion(.keyboardKey)
-                 case .staticText:
-                     self.formUnion(.staticText)
-                 case .summaryElement:
-                     self.formUnion(.summaryElement)
-                 case .notEnabled:
-                     self.formUnion(.notEnabled)
-                 case .updatesFrequently:
-                     self.formUnion(.updatesFrequently)
-                 case .startsMediaSession:
-                     self.formUnion(.startsMediaSession)
-                 case .adjustable:
-                     self.formUnion(.adjustable)
-                 case .allowsDirectInteraction:
-                     self.formUnion(.allowsDirectInteraction)
-                 case .causesPageTurn:
-                     self.formUnion(.causesPageTurn)
-                 case .tabBar:
-                     self.formUnion(.tabBar)
-                 }
-             }
-         }
+extension UIAccessibilityTraits {
+
+    public init(withSet set: Set<AccessibilityElement.Trait>) {
+        self.init(rawValue: UIAccessibilityTraits.none.rawValue)
+        for trait in set {
+            switch trait {
+            case .button:
+                formUnion(.button)
+            case .link:
+                formUnion(.link)
+            case .header:
+                formUnion(.header)
+            case .searchField:
+                formUnion(.searchField)
+            case .image:
+                formUnion(.image)
+            case .selected:
+                formUnion(.selected)
+            case .playsSound:
+                formUnion(.playsSound)
+            case .keyboardKey:
+                formUnion(.keyboardKey)
+            case .staticText:
+                formUnion(.staticText)
+            case .summaryElement:
+                formUnion(.summaryElement)
+            case .notEnabled:
+                formUnion(.notEnabled)
+            case .updatesFrequently:
+                formUnion(.updatesFrequently)
+            case .startsMediaSession:
+                formUnion(.startsMediaSession)
+            case .adjustable:
+                formUnion(.adjustable)
+            case .allowsDirectInteraction:
+                formUnion(.allowsDirectInteraction)
+            case .causesPageTurn:
+                formUnion(.causesPageTurn)
+            case .tabBar:
+                formUnion(.tabBar)
+            }
+        }
+    }
 }
