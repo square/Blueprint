@@ -154,6 +154,26 @@ class ElementContentTests: XCTestCase {
             XCTAssertEqual(counts.measures, 2)
         }
     }
+
+    func test_roundingElementSize() {
+        // These values are based on actual numbers that measuring UILabel has returned
+
+        let row = Row {
+            $0.add(child: SizedElement(size: CGSize(width: 0.33333333333334, height: 1)))
+            $0.add(child: SizedElement(size: CGSize(width: 0.66666666666669, height: 1)))
+        }
+
+        let inset = row.inset(uniform: 24)
+
+        let rowSize = row.content.measure(in: .unconstrained)
+        let insetSize = inset.content.measure(in: .unconstrained)
+
+        // The measured row width should equal the measured inset width with the insets subtracted
+        XCTAssertEqual(insetSize.width - inset.left - inset.right, rowSize.width)
+
+        // The measured row should be rounded to the nearest pixel
+        XCTAssertEqual(rowSize.width, 1)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -184,6 +204,18 @@ fileprivate struct SimpleElement: Element {
 
 }
 
+fileprivate struct SizedElement: Element {
+
+    var size: CGSize
+
+    var content: ElementContent {
+        return ElementContent(intrinsicSize: size)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        nil
+    }
+}
 
 fileprivate struct FrameLayout: Layout {
 
@@ -302,3 +334,4 @@ private class TestCache: CacheTree {
     }
 
 }
+
