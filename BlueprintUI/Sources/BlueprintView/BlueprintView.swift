@@ -251,6 +251,19 @@ public final class BlueprintView: UIView {
     private func updateViewHierarchyIfNeeded() {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
+        // Bounds could be infinite if we're attempting to layout before we've been added to a real view hierarchy.
+        guard bounds.isFinite else {
+            print("""
+            Layout was requested on a BlueprintView before valid bounds were provided.
+
+            This can occur if layoutSubviews() or layoutIfNeeded() are called before the view has been added to the
+            view hierarchy.
+
+            Please avoid laying out BlueprintViews before their bounds have a valid value.
+            """)
+            return
+        }
+
         assert(
             !isInsideUpdate,
             "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
