@@ -34,6 +34,9 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
+    /// Used to skip layout passes with infinite dimensions until valid dimensions are provided
+    private var hasAttemptedLayout: Bool = false
+
     private let rootController: NativeViewController
 
     /// A base environment used when laying out and rendering the element tree.
@@ -252,7 +255,7 @@ public final class BlueprintView: UIView {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
         // Bounds could be infinite if we're attempting to layout before we've been added to a real view hierarchy.
-        guard bounds.isFinite else {
+        guard bounds.isFinite && !hasAttemptedLayout else {
             print("""
             Layout was requested on a BlueprintView before valid bounds were provided.
 
@@ -269,6 +272,7 @@ public final class BlueprintView: UIView {
             "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
         )
         isInsideUpdate = true
+        hasAttemptedLayout = true
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
