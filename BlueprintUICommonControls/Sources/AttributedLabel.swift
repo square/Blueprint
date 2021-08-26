@@ -5,6 +5,7 @@ public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
+    public var isAccessibilityElement = false
 
     /// An offset that will be applied to the rect used by `drawText(in:)`.
     ///
@@ -40,6 +41,7 @@ public struct AttributedLabel: Element, Hashable {
     private func update(label: LabelView) {
         label.attributedText = attributedText
         label.numberOfLines = numberOfLines
+        label.isAccessibilityElement = isAccessibilityElement
         label.textRectOffset = textRectOffset
     }
 
