@@ -5,7 +5,6 @@ public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
-    public var isAccessibilityElement = false
 
     /// An offset that will be applied to the rect used by `drawText(in:)`.
     ///
@@ -13,9 +12,9 @@ public struct AttributedLabel: Element, Hashable {
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
 
-    public init(attributedText: NSAttributedString, configure : (inout Self) -> () = { _ in }) {
+    public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
         self.attributedText = attributedText
-        
+
         configure(&self)
     }
 
@@ -41,12 +40,11 @@ public struct AttributedLabel: Element, Hashable {
     private func update(label: LabelView) {
         label.attributedText = attributedText
         label.numberOfLines = numberOfLines
-        label.isAccessibilityElement = isAccessibilityElement
         label.textRectOffset = textRectOffset
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return LabelView.describe { (config) in
+        return LabelView.describe { config in
             config.apply(update)
         }
     }

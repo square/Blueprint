@@ -54,7 +54,8 @@ public struct Rule: ProxyElement {
         return ConstrainedSize(
             width: width,
             height: height,
-            wrapping: Box(backgroundColor: color))
+            wrapping: Box(backgroundColor: color)
+        )
     }
 
     private var width: ConstrainedSize.Constraint {

@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
@@ -15,7 +15,7 @@ class AttributedLabelTests: XCTestCase {
         let element = AttributedLabel(attributedText: string)
 
         compareSnapshot(of: element)
-        
+
     }
 
     func test_numberOfLines() {
@@ -30,17 +30,20 @@ class AttributedLabelTests: XCTestCase {
         element.numberOfLines = 0
         compareSnapshot(
             of: constrained(),
-            identifier: "zero")
+            identifier: "zero"
+        )
 
         element.numberOfLines = 1
         compareSnapshot(
             of: constrained(),
-            identifier: "one")
+            identifier: "one"
+        )
 
         element.numberOfLines = 2
         compareSnapshot(
             of: constrained(),
-            identifier: "two")
+            identifier: "two"
+        )
     }
 
     func test_measuring() {
@@ -50,7 +53,11 @@ class AttributedLabelTests: XCTestCase {
                 .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)
                 .appending(string: "e", font: .systemFont(ofSize: 14.0), color: .blue)
                 .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
-                .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
+                .appending(
+                    string: "World!",
+                    font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black),
+                    color: .yellow
+                )
 
             let element = AttributedLabel(attributedText: string)
 
@@ -63,29 +70,37 @@ class AttributedLabelTests: XCTestCase {
         if #available(iOS 11, *) {
             test(
                 in: CGSize(width: 30, height: 20),
-                expectedSize: CGSize(width: 30, height: 235.5))
+                expectedSize: CGSize(width: 30, height: 235.5)
+            )
             test(
                 in: CGSize(width: 100, height: 300),
-                expectedSize: CGSize(width: 95, height: 105.5))
+                expectedSize: CGSize(width: 95, height: 105.5)
+            )
             test(
                 in: CGSize(width: 120, height: 300),
-                expectedSize: CGSize(width: 107, height: 67))
+                expectedSize: CGSize(width: 107, height: 67)
+            )
             test(
                 in: CGSize(width: 8000, height: 4000),
-                expectedSize: CGSize(width: 153.5, height: 38.5))
+                expectedSize: CGSize(width: 153.5, height: 38.5)
+            )
         } else {
             test(
                 in: CGSize(width: 30, height: 20),
-                expectedSize: CGSize(width: 30, height: 235.5))
+                expectedSize: CGSize(width: 30, height: 235.5)
+            )
             test(
                 in: CGSize(width: 100, height: 300),
-                expectedSize: CGSize(width: 96, height: 105.5))
+                expectedSize: CGSize(width: 96, height: 105.5)
+            )
             test(
                 in: CGSize(width: 120, height: 300),
-                expectedSize: CGSize(width: 108.5, height: 67))
+                expectedSize: CGSize(width: 108.5, height: 67)
+            )
             test(
                 in: CGSize(width: 8000, height: 4000),
-                expectedSize: CGSize(width: 155, height: 38.5))
+                expectedSize: CGSize(width: 155, height: 38.5)
+            )
         }
 
     }
@@ -101,7 +116,7 @@ class AttributedLabelTests: XCTestCase {
         let string = NSAttributedString(
             string: "This text should be centered within the line height", attributes: [
                 .font: font,
-                .paragraphStyle: paragraphStyle
+                .paragraphStyle: paragraphStyle,
             ]
         )
 
@@ -124,8 +139,9 @@ extension NSAttributedString {
             string: string,
             attributes: [
                 NSAttributedString.Key.font: font,
-                NSAttributedString.Key.foregroundColor: color
-            ])
+                NSAttributedString.Key.foregroundColor: color,
+            ]
+        )
         mutableResult.append(stringToAppend)
         return NSAttributedString(attributedString: mutableResult)
     }

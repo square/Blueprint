@@ -25,7 +25,7 @@ struct Purchase {
         return Purchase(items: [
             Item(name: "Burger", price: 7.99),
             Item(name: "Fries", price: 2.49),
-            Item(name: "Soda", price: 1.49)
+            Item(name: "Soda", price: 1.49),
         ])
     }
 

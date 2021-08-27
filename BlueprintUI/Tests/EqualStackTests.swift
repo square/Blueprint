@@ -14,7 +14,7 @@ class EqualStackTests: XCTestCase {
         let children = [
             TestElement(size: CGSize(width: 50, height: 50)),
             TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 150, height: 150))
+            TestElement(size: CGSize(width: 150, height: 150)),
         ]
 
         let constraint = SizeConstraint.unconstrained
@@ -137,7 +137,7 @@ class EqualStackTests: XCTestCase {
         let children = [
             TestElement(size: CGSize(width: 50, height: 50)),
             TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 150, height: 150))
+            TestElement(size: CGSize(width: 150, height: 150)),
         ]
 
         // direction = .horizontal, spacing = 0
@@ -155,7 +155,7 @@ class EqualStackTests: XCTestCase {
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 50, height: 150),
                 CGRect(x: 50, y: 0, width: 50, height: 150),
-                CGRect(x: 100, y: 0, width: 50, height: 150)
+                CGRect(x: 100, y: 0, width: 50, height: 150),
             ])
         }
 
@@ -174,7 +174,7 @@ class EqualStackTests: XCTestCase {
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 200, height: 700),
                 CGRect(x: 250, y: 0, width: 200, height: 700),
-                CGRect(x: 500, y: 0, width: 200, height: 700)
+                CGRect(x: 500, y: 0, width: 200, height: 700),
             ])
         }
 
@@ -193,7 +193,7 @@ class EqualStackTests: XCTestCase {
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 600, height: 200),
                 CGRect(x: 0, y: 200, width: 600, height: 200),
-                CGRect(x: 0, y: 400, width: 600, height: 200)
+                CGRect(x: 0, y: 400, width: 600, height: 200),
             ])
         }
 
@@ -212,7 +212,7 @@ class EqualStackTests: XCTestCase {
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 200, height: 50),
                 CGRect(x: 0, y: 75, width: 200, height: 50),
-                CGRect(x: 0, y: 150, width: 200, height: 50)
+                CGRect(x: 0, y: 150, width: 200, height: 50),
             ])
         }
 

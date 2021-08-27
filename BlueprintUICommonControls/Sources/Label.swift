@@ -7,14 +7,13 @@ public struct Label: ProxyElement {
 
     /// The text to be displayed.
     public var text: String
-    
+
     public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
     public var lineHeight: LineHeight = .font
-    public var isAccessibilityElement = false
 
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
         self.text = text
@@ -29,7 +28,7 @@ public struct Label: ProxyElement {
         }
         return lineBreakMode
     }
-    
+
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
@@ -50,14 +49,14 @@ public struct Label: ProxyElement {
             attributes: [
                 NSAttributedString.Key.font: font,
                 NSAttributedString.Key.foregroundColor: color,
-                NSAttributedString.Key.paragraphStyle: paragraphStyle
-            ])
+                NSAttributedString.Key.paragraphStyle: paragraphStyle,
+            ]
+        )
     }
 
     public var elementRepresentation: Element {
         AttributedLabel(attributedText: attributedText) { label in
             label.numberOfLines = numberOfLines
-            label.isAccessibilityElement = isAccessibilityElement
 
             switch lineHeight {
             case .custom(let lineHeight, .top):

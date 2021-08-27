@@ -10,8 +10,10 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
-            children: layoutResultNode.resolve())
+            children: layoutResultNode.resolve()
+        )
 
         let unroundedFrames = globalFrames(in: rootNode)
         assert(rect: unroundedFrames[0], closeTo: CGRect(minX: 0.0, minY: 0.0, maxX: 100, maxY: 100))
@@ -36,8 +38,10 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
-            children: layoutResultNode.resolve())
+            children: layoutResultNode.resolve()
+        )
 
         let unroundedFrames = globalFrames(in: rootNode)
         assert(rect: unroundedFrames[0], closeTo: CGRect(minX: 0.0, minY: 0.0, maxX: 100, maxY: 100))
@@ -62,8 +66,10 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
-            children: layoutResultNode.resolve())
+            children: layoutResultNode.resolve()
+        )
 
         let unroundedFrames = globalFrames(in: rootNode)
         assert(rect: unroundedFrames[0], closeTo: CGRect(minX: 0.0, minY: 0.0, maxX: 100, maxY: 100))
@@ -88,8 +94,10 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
-            children: layoutResultNode.resolve())
+            children: layoutResultNode.resolve()
+        )
 
         let unroundedFrames = globalFrames(in: rootNode)
         assert(rect: unroundedFrames[0], closeTo: CGRect(minX: 0.0, minY: 0.0, maxX: 100, maxY: 100))
@@ -114,8 +122,10 @@ class PixelBoundaryTests: XCTestCase {
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
+            environment: .empty,
             layoutAttributes: LayoutAttributes(frame: frame),
-            children: layoutResultNode.resolve())
+            children: layoutResultNode.resolve()
+        )
 
         let unroundedFrames = globalFrames(in: rootNode)
         assert(rect: unroundedFrames[0], closeTo: CGRect(minX: 0.0, minY: 0.0, maxX: 100, maxY: 100))
@@ -168,7 +178,8 @@ class PixelBoundaryTests: XCTestCase {
         return Inset(
             uniformInset: inset,
             wrapping: Container(
-                wrapping: elementTree(shiftedBy: inset, depth: depth - 1)))
+                wrapping: elementTree(shiftedBy: inset, depth: depth - 1))
+        )
     }
 
     /// A view-backed box to generate a native view node
@@ -176,7 +187,7 @@ class PixelBoundaryTests: XCTestCase {
         var wrappedElement: Element?
 
         init(wrapping: Element?) {
-            self.wrappedElement = wrapping
+            wrappedElement = wrapping
         }
 
         var content: ElementContent {

@@ -31,7 +31,7 @@ import Foundation
 ///
 ///     typealias UIViewType = UILabel
 ///
-///     static func makeUIView() -> UILabel {
+///     func makeUIView() -> UILabel {
 ///         UILabel()
 ///     }
 ///
@@ -71,7 +71,7 @@ import Foundation
 ///
 ///     typealias UIViewType = UILabel
 ///
-///     static func makeUIView() -> UILabel {
+///     func makeUIView() -> UILabel {
 ///         UILabel()
 ///     }
 ///
@@ -88,14 +88,12 @@ import Foundation
 ///     }
 /// }
 /// ```
-public struct MeasurementCachingKey : Hashable
-{
-    private let elementType : ObjectIdentifier
-    private let input : AnyHashable
-    
-    public init<ElementType:Element, Input:Hashable>(type : ElementType.Type, input : Input)
-    {
-        self.elementType = ObjectIdentifier(type)
+public struct MeasurementCachingKey: Hashable {
+    private let elementType: ObjectIdentifier
+    private let input: AnyHashable
+
+    public init<ElementType: Element, Input: Hashable>(type: ElementType.Type, input: Input) {
+        elementType = ObjectIdentifier(type)
         self.input = input
     }
 }

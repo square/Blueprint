@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Do not run on merge
+if [[ $(git rev-parse -q --verify MERGE_HEAD) ]]; then
+    exit 0
+fi
+
+git diff --diff-filter=d --staged --name-only | grep -e ".swift$" | while read file; do
+    swift run -c release swiftformat "${file}";
+    git add "$file";
+done

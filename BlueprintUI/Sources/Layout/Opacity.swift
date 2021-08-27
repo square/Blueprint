@@ -45,13 +45,13 @@ public struct Opacity: Element {
     }
 }
 
-public extension Element {
+extension Element {
     /// Wraps the element in an `Opacity` element with the provided opacity.
     ///
     /// - parameters:
     ///   - opacity: The opacity to be applied.
     ///
-    func opacity(_ opacity: CGFloat) -> Opacity {
+    public func opacity(_ opacity: CGFloat) -> Opacity {
         return Opacity(
             opacity: opacity,
             wrapping: self

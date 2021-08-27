@@ -19,7 +19,7 @@ public struct ConstrainedSize: Element {
 
     /// The constraint to place on the width of the element.
     public var width: Constraint
-    
+
     /// The constraint to place on the height of the element.
     public var height: Constraint
 
@@ -31,7 +31,7 @@ public struct ConstrainedSize: Element {
     ) {
         self.width = width
         self.height = height
-        self.wrapped = element
+        wrapped = element
     }
 
     public var content: ElementContent {
@@ -50,21 +50,21 @@ public struct ConstrainedSize: Element {
 extension ConstrainedSize {
 
     /// The available ways to constrain the measurement of a given axis within a `ConstrainedSize` element.
-    public enum Constraint {
+    public enum Constraint: Equatable {
         /// There is no constraint for this axis – the natural size of the element will be used.
         case unconstrained
-        
+
         /// The measured size for this axis will be **no greater** than the value provided.
         case atMost(CGFloat)
-        
+
         /// The measured size for this axis will be **no less** than the value provided.
         case atLeast(CGFloat)
-        
+
         /// The measured size for this axis will be **within** the range provided.
         /// If the measured value is below the bottom of the range, the lower value will be used.
         /// If the measured value is above the top of the range, the lower value will be used.
         case within(ClosedRange<CGFloat>)
-        
+
         /// The measured size for this axis will be **exactly**  the value provided.
         case absolute(CGFloat)
 
@@ -86,52 +86,48 @@ extension ConstrainedSize {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Constrains the measured size of the element to the provided width and height.
-    func constrainedTo(
+    public func constrainedTo(
         width: ConstrainedSize.Constraint = .unconstrained,
         height: ConstrainedSize.Constraint = .unconstrained
-    ) -> ConstrainedSize
-    {
+    ) -> ConstrainedSize {
         ConstrainedSize(width: width, height: height, wrapping: self)
     }
-    
+
     /// Constrains the measured size of the element to the provided width and height.
-    func constrainedTo(
+    public func constrainedTo(
         width: CGFloat,
         height: CGFloat
-    ) -> ConstrainedSize
-    {
+    ) -> ConstrainedSize {
         ConstrainedSize(
             width: .absolute(width),
             height: .absolute(height),
             wrapping: self
         )
     }
-    
+
     /// Constrains the measured size of the element to the provided size.
-    func constrainedTo(
-        size : CGSize
-    ) -> ConstrainedSize
-    {
+    public func constrainedTo(
+        size: CGSize
+    ) -> ConstrainedSize {
         ConstrainedSize(
             width: .absolute(size.width),
             height: .absolute(size.height),
             wrapping: self
         )
     }
-    
+
     /// Constrains the measured size of the element to the provided `SizeConstraint`.
-    func constrained(to sizeConstraint : SizeConstraint) -> ConstrainedSize
-    {
-        func toConstrainedSize(_ axis : SizeConstraint.Axis) -> ConstrainedSize.Constraint {
+    public func constrained(to sizeConstraint: SizeConstraint) -> ConstrainedSize {
+        func toConstrainedSize(_ axis: SizeConstraint.Axis) -> ConstrainedSize.Constraint {
             switch axis {
             case .atMost(let value): return .atMost(value)
             case .unconstrained: return .unconstrained
             }
         }
-        
+
         return ConstrainedSize(
             width: toConstrainedSize(sizeConstraint.width),
             height: toConstrainedSize(sizeConstraint.height),
@@ -142,7 +138,7 @@ public extension Element {
 
 
 extension Comparable {
-    
+
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
         return min(max(self, limits.lowerBound), limits.upperBound)
     }
@@ -162,26 +158,26 @@ extension ConstrainedSize {
             if case let .absolute(width) = width, case let .absolute(height) = height {
                 return CGSize(width: width, height: height)
             }
-                        
+
             /// 1) Measure how big the element should be by constraining the passed in
             /// `SizeConstraint` to not be larger than our maximum size. This ensures
             /// the real maximum possible width is passed to the child, not an unconstrained width.
             ///
             /// This is important because some elements heights are affected by their width (eg, a text label),
             /// or any other elements type which reflows its content.
-            
+
             let maximumConstraint = SizeConstraint(
-                width: .init(self.width.applied(to: constraint.width.maximum)),
-                height: .init(self.height.applied(to: constraint.height.maximum))
+                width: .init(width.applied(to: constraint.width.maximum)),
+                height: .init(height.applied(to: constraint.height.maximum))
             )
-            
+
             let measurement = child.measure(in: maximumConstraint)
-            
+
             /// 2) If our returned size needs to be larger than the measured size,
             /// eg: the element did not take up all the space during measurement,
             /// and we have a minimum size in either axis. In that case, adjust the
             /// measured size to that minimum size before returning.
-            
+
             return CGSize(
                 width: width.applied(to: measurement.width),
                 height: height.applied(to: measurement.height)

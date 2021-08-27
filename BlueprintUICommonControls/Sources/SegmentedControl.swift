@@ -1,5 +1,5 @@
-import UIKit
 import BlueprintUI
+import UIKit
 
 
 /// Allows users to pick from an array of options.
@@ -16,7 +16,7 @@ public struct SegmentedControl: Element, Measurable {
         self.items = items
     }
 
-    public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping ()->Void) {
+    public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping () -> Void) {
         items.append(Item(title: title, width: width, onSelect: onSelect))
     }
 
@@ -25,12 +25,13 @@ public struct SegmentedControl: Element, Measurable {
     }
 
     public func measure(in constraint: SizeConstraint) -> CGSize {
-        return items.reduce(CGSize.zero, { (current, item) -> CGSize in
+        return items.reduce(CGSize.zero) { current, item -> CGSize in
             let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
             return CGSize(
                 width: itemSize.width + current.width,
-                height: max(itemSize.height, current.height))
-        })
+                height: max(itemSize.height, current.height)
+            )
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -39,7 +40,7 @@ public struct SegmentedControl: Element, Measurable {
         }
     }
 
-    fileprivate var titleTextAttributes: [NSAttributedString.Key:Any] {
+    fileprivate var titleTextAttributes: [NSAttributedString.Key: Any] {
         return [NSAttributedString.Key.font: font]
     }
 
@@ -72,7 +73,8 @@ extension SegmentedControl {
         internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: CGFloat) -> CGSize {
             return CGSize(
                 width: width.requiredWidth(for: title, font: font, in: constraint, roundingScale: roundingScale),
-                height: 36.0)
+                height: 36.0
+            )
         }
 
     }
@@ -107,7 +109,8 @@ extension SegmentedControl.Item {
                         with: constraint.maximum,
                         options: [.usesLineFragmentOrigin],
                         attributes: [.font: font],
-                        context: nil)
+                        context: nil
+                    )
                     .size
                     .width
                     .rounded(.up, by: roundingScale)
@@ -157,7 +160,8 @@ fileprivate final class SegmentedControlView: UIView {
                 segmentedControl.insertSegment(
                     withTitle: item.title,
                     at: offset,
-                    animated: false)
+                    animated: false
+                )
             } else {
                 if item.title != segmentedControl.titleForSegment(at: offset) {
                     segmentedControl.setTitle(item.title, forSegmentAt: offset)
@@ -167,13 +171,14 @@ fileprivate final class SegmentedControlView: UIView {
             if segmentedControl.widthForSegment(at: offset) != item.width.resolvedWidth {
                 segmentedControl.setWidth(
                     item.width.resolvedWidth,
-                    forSegmentAt: offset)
+                    forSegmentAt: offset
+                )
             }
 
         }
 
         while segmentedControl.numberOfSegments > element.items.count {
-            segmentedControl.removeSegment(at: segmentedControl.numberOfSegments-1, animated: false)
+            segmentedControl.removeSegment(at: segmentedControl.numberOfSegments - 1, animated: false)
         }
 
         if segmentedControl.selectedSegmentIndex != element.selection.resolvedIndex {

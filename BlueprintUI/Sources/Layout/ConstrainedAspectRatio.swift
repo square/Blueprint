@@ -59,7 +59,8 @@ public struct ConstrainedAspectRatio: Element {
             switch self {
             case .fillParent:
                 if constraint.width.constrainedValue == nil &&
-                    constraint.height.constrainedValue == nil {
+                    constraint.height.constrainedValue == nil
+                {
                     if constrainedWidth > availableWidth {
                         return aspectRatio.size(forWidth: constrainedWidth)
                     } else if constrainedHeight > availableHeight {
@@ -77,7 +78,8 @@ public struct ConstrainedAspectRatio: Element {
 
             case .fitParent:
                 if constraint.width.constrainedValue == nil &&
-                    constraint.height.constrainedValue == nil {
+                    constraint.height.constrainedValue == nil
+                {
                     if constrainedWidth > availableWidth {
                         return aspectRatio.size(forWidth: constrainedWidth)
                     } else if constrainedHeight > availableHeight {
@@ -160,7 +162,7 @@ public struct ConstrainedAspectRatio: Element {
 }
 
 
-public extension Element {
+extension Element {
     ///
     /// Constrains the element to the provided aspect ratio.
     ///
@@ -168,11 +170,10 @@ public extension Element {
     ///   - aspectRatio: The aspect ratio that the content size should match.
     ///   - contentMode: How the content should size itself relative to its parent.
     ///
-    func constrainedTo(
+    public func constrainedTo(
         aspectRatio: AspectRatio,
         contentMode: ConstrainedAspectRatio.ContentMode = .fitContent
-    ) -> ConstrainedAspectRatio
-    {
+    ) -> ConstrainedAspectRatio {
         ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
     }
 }

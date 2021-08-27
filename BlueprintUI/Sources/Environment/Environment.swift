@@ -1,12 +1,13 @@
 import Foundation
+import UIKit
 
 /// Environment is a container for values to be passed down an element tree.
 ///
 /// Environment values are not resolved until the tree is being rendered, so they do not need to be
 /// explicitly passed to elements at the time they are created.
 ///
-/// Environment key-value pairs are strongly typed: keys are types conforming to the 
-/// `EnvironmentKey` protocol, and each key's value is the type of that key's 
+/// Environment key-value pairs are strongly typed: keys are types conforming to the
+/// `EnvironmentKey` protocol, and each key's value is the type of that key's
 /// `EnvironmentKey.Value` associated value. Keys must provide a default value.
 ///
 /// ## Example
@@ -34,20 +35,20 @@ import Foundation
 ///         }
 ///     }
 public struct Environment {
-    
+
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
-    public static var empty : Environment {
-        
+    public static var empty: Environment {
+
         /// Intentionally a derived value instead of a `static let empty = ...`. because `MeasurementCache`
         /// is a `class` type (needed due to implementation constraints – the `MeasurementCache` is passed around during layout),
         /// we want to ensure that each new environment that we ask for has a new `measurementCache` to avoid "leaking" / retaining
         /// all the contained keys for the lifetime of the application, as a `static let` would cause.
-        
+
         Environment(measurementCache: MeasurementCache())
     }
 
-    private init(measurementCache : MeasurementCache) {
+    private init(measurementCache: MeasurementCache) {
         self.measurementCache = measurementCache
     }
 
@@ -68,9 +69,51 @@ public struct Environment {
             values[ObjectIdentifier(key)] = newValue
         }
     }
-    
+
+    /// Returns a new `Environment` by merging the values from `self` and the
+    /// provided environment; keeping values from the provided environment when there
+    /// are key overlaps between the two environments.
+    func merged(prioritizing other: Environment) -> Environment {
+        var merged = self
+        merged.values.merge(other.values) { $1 }
+        return merged
+    }
+
     /// Cache used to speed up measurements during a layout pass.
     /// This is declared on the `Environment` directly, because access to the `measurementCache` is a hot path
     /// which we can optimize by not needing the usual `env.values[...]` lookup.
-    var measurementCache : MeasurementCache
+    var measurementCache: MeasurementCache
+}
+
+
+extension UIView {
+
+    /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree,
+    /// or if the view is not explicitly managed by Blueprint, the ``Environment`` of
+    /// the nearest superview that is managed by Blueprint.
+    ///
+    /// If no views in the superview hierarchy are managed by Blueprint, this property returns nil.
+    var inheritedBlueprintEnvironment: Environment? {
+        if let environment = nativeViewNodeBlueprintEnvironment {
+            return environment
+        } else if let superview = self.superview {
+            return superview.inheritedBlueprintEnvironment
+        } else {
+            return nil
+        }
+    }
+
+    /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree.
+    ///
+    /// If this view is not managed by Blueprint, this property returns nil.
+    var nativeViewNodeBlueprintEnvironment: Environment? {
+        get {
+            objc_getAssociatedObject(self, &UIView.environmentKey) as? Environment ?? nil
+        }
+        set {
+            objc_setAssociatedObject(self, &UIView.environmentKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    private static var environmentKey = NSObject()
 }

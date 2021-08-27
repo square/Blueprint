@@ -3,7 +3,7 @@ import CoreGraphics
 /// Types used to identify alignment guides.
 ///
 /// Types conforming to `AlignmentID` have a corresponding alignment guide value,
-/// typically declared as a static constant property of `HorizontalAlignment` or 
+/// typically declared as a static constant property of `HorizontalAlignment` or
 /// `VerticalAlignment`.
 ///
 public protocol AlignmentID {

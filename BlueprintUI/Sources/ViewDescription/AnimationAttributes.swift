@@ -12,7 +12,11 @@ public struct AnimationAttributes {
     /// Whether the view supports user interaction during the animation.
     public var allowUserInteraction: Bool
 
-    public init(duration: TimeInterval = 0.2, curve: UIView.AnimationCurve = .easeInOut, allowUserInteraction: Bool = true) {
+    public init(
+        duration: TimeInterval = 0.2,
+        curve: UIView.AnimationCurve = .easeInOut,
+        allowUserInteraction: Bool = true
+    ) {
         self.duration = duration
         self.curve = curve
         self.allowUserInteraction = allowUserInteraction
@@ -23,7 +27,7 @@ public struct AnimationAttributes {
 
 extension AnimationAttributes {
 
-    func perform(animations: @escaping () -> Void, completion: @escaping ()->Void) {
+    func perform(animations: @escaping () -> Void, completion: @escaping () -> Void) {
 
         var options: UIView.AnimationOptions = [UIView.AnimationOptions(animationCurve: curve), .beginFromCurrentState]
         if allowUserInteraction {
@@ -36,9 +40,10 @@ extension AnimationAttributes {
             options: options,
             animations: {
                 animations()
-            }) { _ in
-                completion()
             }
+        ) { _ in
+            completion()
+        }
 
     }
 }

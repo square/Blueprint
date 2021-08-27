@@ -7,7 +7,7 @@ class OverlayTests: XCTestCase {
         let overlay = Overlay(elements: [
             TestElement(size: CGSize(width: 200, height: 200)),
             TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 50, height: 50))
+            TestElement(size: CGSize(width: 50, height: 50)),
         ])
         XCTAssertEqual(overlay.content.measure(in: .unconstrained), CGSize(width: 200, height: 200))
     }
@@ -16,7 +16,7 @@ class OverlayTests: XCTestCase {
         let overlay = Overlay(elements: [
             TestElement(size: CGSize(width: 200, height: 200)),
             TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 50, height: 50))
+            TestElement(size: CGSize(width: 50, height: 50)),
         ])
         XCTAssertEqual(
             overlay

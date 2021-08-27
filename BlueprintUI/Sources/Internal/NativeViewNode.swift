@@ -19,23 +19,29 @@ import UIKit
 /// - (path: ["A"])
 ///  - (path: ["B","C","D"])
 struct NativeViewNode {
-    
+
     /// The view description returned by this node
     var viewDescription: ViewDescription
-    
+
+    /// The environment at this node in the tree.
+    var environment: Environment
+
     /// The layout attributes for this content (relative to the parent's layout
     /// attributes).
     var layoutAttributes: LayoutAttributes
 
     /// The children of this node.
     var children: [(path: ElementPath, node: NativeViewNode)]
-    
+
     init(
         content: ViewDescription,
+        environment: Environment,
         layoutAttributes: LayoutAttributes,
-        children: [(path: ElementPath, node: NativeViewNode)]) {
-        
-        self.viewDescription = content
+        children: [(path: ElementPath, node: NativeViewNode)]
+    ) {
+
+        viewDescription = content
+        self.environment = environment
         self.layoutAttributes = layoutAttributes
         self.children = children
     }
@@ -60,7 +66,8 @@ struct NativeViewNode {
         let childCorrection = layoutAttributes.round(
             from: origin,
             correction: correction,
-            scale: scale)
+            scale: scale
+        )
 
         let childOrigin = origin + layoutAttributes.frame.origin
 
