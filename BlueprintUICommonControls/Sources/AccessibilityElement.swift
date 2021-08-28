@@ -50,7 +50,7 @@ public struct AccessibilityElement: Element {
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
-        return UIAccessibilityTraits(withSet: traits)
+        return UIAccessibilityTraits(with: traits)
     }
 
     public var content: ElementContent {
@@ -121,7 +121,7 @@ extension Element {
 
 extension UIAccessibilityTraits {
 
-    public init(withSet set: Set<AccessibilityElement.Trait>) {
+    public init(with set: Set<AccessibilityElement.Trait>) {
         self.init(rawValue: UIAccessibilityTraits.none.rawValue)
         for trait in set {
             switch trait {

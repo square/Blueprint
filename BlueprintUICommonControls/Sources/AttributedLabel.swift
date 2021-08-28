@@ -12,7 +12,10 @@ public struct AttributedLabel: Element, Hashable {
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
 
+    /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
+
+    /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
@@ -56,7 +59,7 @@ public struct AttributedLabel: Element, Hashable {
 
     private func updateAccessibilityTraits(_ label: UILabel) {
         if let traits = accessibilityTraits {
-            var union = label.accessibilityTraits.union(UIAccessibilityTraits(withSet: traits))
+            var union = label.accessibilityTraits.union(UIAccessibilityTraits(with: traits))
             // UILabel has the `.staticText` trait by default. If we explicitly set `.updatesFrequently` this should be removed.
             if traits.contains(.updatesFrequently) && label.accessibilityTraits.contains(.staticText) {
                 union.subtract(.staticText)
