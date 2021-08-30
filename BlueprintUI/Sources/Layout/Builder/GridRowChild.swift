@@ -34,3 +34,9 @@ extension Element {
         .init(self, key: key, width: width)
     }
 }
+
+extension GridRowChild: ElementInitializable {
+    public init(from element: Element) {
+        self = element.gridRowChild(width: .proportional(1))
+    }
+}

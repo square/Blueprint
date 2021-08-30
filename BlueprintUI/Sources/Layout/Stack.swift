@@ -37,7 +37,7 @@ extension StackElement {
     /// - Parameters:
     ///   - elementsBuilder: A block containing all elements to be included in the stack.
     /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
-    public init(@StackChildBuilder elementsBuilder: () -> [StackChild]) {
+    public init(@ElementBuilder<StackChild> elementsBuilder: () -> [StackChild]) {
         self.init()
         children = elementsBuilder().map { stackChild in
             (stackChild.element, stackChild.traits, stackChild.key)

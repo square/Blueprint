@@ -36,11 +36,11 @@ public struct EqualStack: Element {
     public init(
         direction: Direction,
         spacing: CGFloat = 0,
-        @ElementBuilder elements: () -> [Element]
+        @ElementBuilder<EqualStackChild> elements: () -> [EqualStackChild]
     ) {
         self.init(direction: direction)
         self.spacing = spacing
-        children = elements()
+        children = elements().map(\.element)
     }
 
     public var content: ElementContent {

@@ -1,7 +1,7 @@
 import UIKit
 
 /// `StackChild` is a wrapper which allows an element to define its StackLayout traits and Keys.
-/// This struct is particularly useful when working with `@StackElementBuilder`.
+/// This struct is particularly useful when working with `@ElementBuilder`.
 /// By default, elements will default to a nil key and the default `StackLayout.Traits` initializer.
 /// `@StackElementBuilder` will check every child to see if it can be type cast to a `StackChild`
 /// and then pull of the given traits and key and then apply those to the stack
@@ -80,5 +80,12 @@ extension Element {
     /// - Returns: A wrapped element with additional layout information for the `StackElement`.
     public func stackChild(traits: StackLayout.Traits = .init(), key: AnyHashable? = nil) -> StackChild {
         .init(element: self, traits: traits, key: key)
+    }
+}
+
+
+extension StackChild: ElementInitializable {
+    public init(from element: Element) {
+        self = element.stackChild()
     }
 }
