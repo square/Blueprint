@@ -31,6 +31,10 @@ public struct TextField: Element {
     public var becomeActiveTrigger: Trigger?
     public var resignActiveTrigger: Trigger?
 
+    /// A set of accessibility traits that should be applied to the field, these will be merged with any existing traits.
+    /// These traits should relate to the content of the text, for example `.header`, `.link`, or `.updatesFrequently`.
+    public var accessibilityTraits: Set<AccessibilityElement.Trait>?
+
     public init(text: String, configure: (inout TextField) -> Void = { _ in }) {
         self.text = text
         configure(&self)
@@ -65,6 +69,13 @@ public struct TextField: Element {
 
             configuration[\.becomeActiveTrigger] = becomeActiveTrigger
             configuration[\.resignActiveTrigger] = resignActiveTrigger
+            if let traits = accessibilityTraits {
+                if let existing = configuration[\.accessibilityTraits] {
+                    configuration[\.accessibilityTraits] = existing.union(UIAccessibilityTraits(with: traits))
+                } else {
+                    configuration[\.accessibilityTraits] = UIAccessibilityTraits(with: traits)
+                }
+            }
         }
     }
 

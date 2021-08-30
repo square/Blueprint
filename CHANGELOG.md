@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Label` `AttributedLabel` and `TextField` elements now support configuration of accessibility traits.
+
 - [The `Environment` is now automatically propagated through to nested `BlueprintViews` within a displayed `Element` hierarchy](https://github.com/square/Blueprint/pull/234). This means that if your view-backed `Elements` themselves contain a `BlueprintView` (eg to manage their own state), that nested view will now automatically receive the correct `Environment` across `BlueprintView` boundaries. If you were previously manually propagating `Environment` values you may remove this code. If you would like to opt-out of this behavior; you can set `view.automaticallyInheritsEnvironmentFromContainingBlueprintViews = false` on your `BlueprintView`.
 
 - [Lifecycle hooks][#244]. You can hook into lifecycle events when an element's visibility changes.

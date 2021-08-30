@@ -12,6 +12,12 @@ public struct AttributedLabel: Element, Hashable {
     /// the way text is distributed within the line height.
     public var textRectOffset: UIOffset = .zero
 
+    /// Determines if the label should be included when navigating the UI via accessibility.
+    public var isAccessibilityElement = true
+
+    /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
+    public var accessibilityTraits: Set<AccessibilityElement.Trait>?
+
     public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
         self.attributedText = attributedText
 
@@ -41,6 +47,8 @@ public struct AttributedLabel: Element, Hashable {
         label.attributedText = attributedText
         label.numberOfLines = numberOfLines
         label.textRectOffset = textRectOffset
+        label.isAccessibilityElement = isAccessibilityElement
+        updateAccessibilityTraits(label)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -48,9 +56,21 @@ public struct AttributedLabel: Element, Hashable {
             config.apply(update)
         }
     }
+
+    private func updateAccessibilityTraits(_ label: UILabel) {
+        if let traits = accessibilityTraits {
+            var union = label.accessibilityTraits.union(UIAccessibilityTraits(with: traits))
+            // UILabel has the `.staticText` trait by default. If we explicitly set `.updatesFrequently` this should be removed.
+            if traits.contains(.updatesFrequently) && label.accessibilityTraits.contains(.staticText) {
+                union.subtract(.staticText)
+            }
+            label.accessibilityTraits = union
+        }
+    }
 }
 
 extension AttributedLabel {
+
     private final class LabelView: UILabel {
         var textRectOffset: UIOffset = .zero {
             didSet {

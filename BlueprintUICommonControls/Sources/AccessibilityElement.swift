@@ -50,48 +50,7 @@ public struct AccessibilityElement: Element {
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
-        var traits: UIAccessibilityTraits = .none
-
-        for trait in self.traits {
-            switch trait {
-            case .button:
-                traits.formUnion(.button)
-            case .link:
-                traits.formUnion(.link)
-            case .header:
-                traits.formUnion(.header)
-            case .searchField:
-                traits.formUnion(.searchField)
-            case .image:
-                traits.formUnion(.image)
-            case .selected:
-                traits.formUnion(.selected)
-            case .playsSound:
-                traits.formUnion(.playsSound)
-            case .keyboardKey:
-                traits.formUnion(.keyboardKey)
-            case .staticText:
-                traits.formUnion(.staticText)
-            case .summaryElement:
-                traits.formUnion(.summaryElement)
-            case .notEnabled:
-                traits.formUnion(.notEnabled)
-            case .updatesFrequently:
-                traits.formUnion(.updatesFrequently)
-            case .startsMediaSession:
-                traits.formUnion(.startsMediaSession)
-            case .adjustable:
-                traits.formUnion(.adjustable)
-            case .allowsDirectInteraction:
-                traits.formUnion(.allowsDirectInteraction)
-            case .causesPageTurn:
-                traits.formUnion(.causesPageTurn)
-            case .tabBar:
-                traits.formUnion(.tabBar)
-            }
-        }
-
-        return traits
+        return UIAccessibilityTraits(with: traits)
     }
 
     public var content: ElementContent {
@@ -156,5 +115,51 @@ extension Element {
             accessibilityFrameSize: accessibilityFrameSize,
             wrapping: self
         )
+    }
+}
+
+
+extension UIAccessibilityTraits {
+
+    public init(with set: Set<AccessibilityElement.Trait>) {
+        self.init(rawValue: UIAccessibilityTraits.none.rawValue)
+        for trait in set {
+            switch trait {
+            case .button:
+                formUnion(.button)
+            case .link:
+                formUnion(.link)
+            case .header:
+                formUnion(.header)
+            case .searchField:
+                formUnion(.searchField)
+            case .image:
+                formUnion(.image)
+            case .selected:
+                formUnion(.selected)
+            case .playsSound:
+                formUnion(.playsSound)
+            case .keyboardKey:
+                formUnion(.keyboardKey)
+            case .staticText:
+                formUnion(.staticText)
+            case .summaryElement:
+                formUnion(.summaryElement)
+            case .notEnabled:
+                formUnion(.notEnabled)
+            case .updatesFrequently:
+                formUnion(.updatesFrequently)
+            case .startsMediaSession:
+                formUnion(.startsMediaSession)
+            case .adjustable:
+                formUnion(.adjustable)
+            case .allowsDirectInteraction:
+                formUnion(.allowsDirectInteraction)
+            case .causesPageTurn:
+                formUnion(.causesPageTurn)
+            case .tabBar:
+                formUnion(.tabBar)
+            }
+        }
     }
 }
