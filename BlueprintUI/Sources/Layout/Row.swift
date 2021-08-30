@@ -62,7 +62,7 @@ public struct Row: StackElement {
     /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
     public init(
         layout: StackLayout = .defaultRow,
-        @ElementBuilder elements: () -> [Element]
+        @StackChildBuilder elements: () -> [StackChild]
     ) {
         self.init(elementsBuilder: elements)
         self.layout = layout
@@ -83,7 +83,7 @@ public struct Row: StackElement {
         horizontalOverflow: StackLayout.OverflowDistribution = StackLayout.defaultRow.overflow,
         verticalAlignment: RowAlignment = StackLayout.defaultRow.rowAlignment,
         minimumHorizontalSpacing: CGFloat = StackLayout.defaultRow.minimumSpacing,
-        @ElementBuilder elements: () -> [Element]
+        @StackChildBuilder elements: () -> [StackChild]
     ) {
         var layout: StackLayout = .init(axis: StackLayout.defaultRow.axis, alignment: alignment)
         layout.underflow = horizontalUnderflow

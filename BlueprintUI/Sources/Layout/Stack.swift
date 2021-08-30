@@ -37,14 +37,10 @@ extension StackElement {
     /// - Parameters:
     ///   - elementsBuilder: A block containing all elements to be included in the stack.
     /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
-    public init(@ElementBuilder elementsBuilder: () -> [Element]) {
+    public init(@StackChildBuilder elementsBuilder: () -> [StackChild]) {
         self.init()
-        children = elementsBuilder().map { element in
-            if let stackChild = element as? StackChild {
-                return (stackChild, stackChild.traits, stackChild.key)
-            } else {
-                return (element, StackLayout.Traits(), nil)
-            }
+        children = elementsBuilder().map { stackChild in
+            (stackChild.element, stackChild.traits, stackChild.key)
         }
     }
 
@@ -53,14 +49,10 @@ extension StackElement {
     ///   - items: The array of items to transform.
     ///   - transform: Closure to be applied to each item `T` which transforms that item into an `Element`.
     ///   - configure: A closure used to modify the stack.
-    public init<T>(_ items: [T], transform: (T) -> Element, configure: (inout Self) -> Void = { _ in }) {
+    public init<T>(_ items: [T], transform: (T) -> StackChild, configure: (inout Self) -> Void = { _ in }) {
         self.init()
-        children = items.map(transform).map { element in
-            if let stackChild = element as? StackChild {
-                return (stackChild, stackChild.traits, stackChild.key)
-            } else {
-                return (element, StackLayout.Traits(), nil)
-            }
+        children = items.map(transform).map { stackChild in
+            (stackChild.element, stackChild.traits, stackChild.key)
         }
         configure(&self)
     }

@@ -54,14 +54,10 @@ public struct GridRow: Element {
     public init(
         verticalAlignment: Row.RowAlignment = .fill,
         spacing: CGFloat = 0,
-        @ElementBuilder _ elements: () -> [Element]
+        @GridRowChildBuilder _ elements: () -> [GridRowChild]
     ) {
-        children = elements().map { element in
-            if let gridRowElement = element as? GridRowChildElement {
-                return GridRow.Child(width: gridRowElement.width, key: gridRowElement.key, element: element)
-            } else {
-                return GridRow.Child(width: .proportional(1), element: element)
-            }
+        children = elements().map { gridRowChild in
+            GridRow.Child(width: gridRowChild.width, key: gridRowChild.key, element: gridRowChild.element)
         }
         self.verticalAlignment = verticalAlignment
         self.spacing = spacing

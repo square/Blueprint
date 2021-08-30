@@ -5,8 +5,8 @@ import UIKit
 /// By default, elements will default to a nil key and the default `StackLayout.Traits` initializer.
 /// `@StackElementBuilder` will check every child to see if it can be type cast to a `StackChild`
 /// and then pull of the given traits and key and then apply those to the stack
-public struct StackChild: ProxyElement {
-    private let wrapped: Element
+public struct StackChild {
+    public let element: Element
     public var traits: StackLayout.Traits
     public var key: AnyHashable?
     
@@ -24,23 +24,23 @@ public struct StackChild: ProxyElement {
     }
 
     public init(
-        wrappedElement: Element,
+        element: Element,
         traits: StackLayout.Traits = .init(),
         key: AnyHashable? = nil
     ) {
-        self.wrapped = wrappedElement
+        self.element = element
         self.traits = traits
         self.key = key
     }
     
     public init(
-        wrappedElement: Element,
+        element: Element,
         sizing: Sizing = .flexible,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
         key: AnyHashable? = nil
     ) {
         self.init(
-            wrappedElement: wrappedElement,
+            element: element,
             traits: .init(
                 growPriority: sizing.growPriority,
                 shrinkPriority: sizing.shrinkPriority,
@@ -49,9 +49,6 @@ public struct StackChild: ProxyElement {
             key: key
         )
     }
-
-    // Simply wraps the given element.
-    public var elementRepresentation: Element { wrapped }
 }
 
 extension Element {
@@ -69,7 +66,7 @@ extension Element {
         key: AnyHashable? = nil
     ) -> StackChild {
         .init(
-            wrappedElement: self,
+            element: self,
             sizing: sizing,
             alignmentGuide: alignmentGuide, key: key
         )
@@ -82,6 +79,6 @@ extension Element {
     ///     hierarchy.
     /// - Returns: A wrapped element with additional layout information for the `StackElement`.
     public func stackChild(traits: StackLayout.Traits = .init(), key: AnyHashable? = nil) -> StackChild {
-        .init(wrappedElement: self, traits: traits, key: key)
+        .init(element: self, traits: traits, key: key)
     }
 }
