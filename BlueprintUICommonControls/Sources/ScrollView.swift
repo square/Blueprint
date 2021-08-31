@@ -131,8 +131,13 @@ extension ScrollView {
             result.width += contentInset.left + contentInset.right
             result.height += contentInset.top + contentInset.bottom
 
-            result.width = min(result.width, constraint.width.maximum)
-            result.height = min(result.height, constraint.height.maximum)
+            if let width = constraint.width.constrainedValue {
+                result.width = min(result.width, width)
+            }
+
+            if let height = constraint.height.constrainedValue {
+                result.height = min(result.height, height)
+            }
 
             return result
         }

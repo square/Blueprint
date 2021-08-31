@@ -15,7 +15,7 @@ class BlueprintViewTests: XCTestCase {
 
         do {
             let element = MeasurableElement { constraint in
-                XCTAssertEqual(constraint.maximum, CGSize(width: 200, height: 100))
+                XCTAssertEqual(constraint.maximum(), CGSize(width: 200, height: 100))
                 return CGSize(width: 100, height: 50)
             }
 
@@ -31,8 +31,8 @@ class BlueprintViewTests: XCTestCase {
                 XCTAssertEqual(constraint.width, .unconstrained)
                 XCTAssertEqual(constraint.height, .unconstrained)
                 XCTAssertEqual(
-                    constraint.maximum,
-                    CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+                    constraint.maximum(),
+                    .zero
                 )
 
                 return CGSize(width: 100, height: 50)
@@ -62,8 +62,8 @@ class BlueprintViewTests: XCTestCase {
             do {
                 let element = MeasurableElement { constraint in
                     XCTAssertEqual(constraint.width, .unconstrained)
-                    XCTAssertEqual(constraint.height.maximum, 100.0)
-                    XCTAssertEqual(constraint.maximum, CGSize(width: CGFloat.greatestFiniteMagnitude, height: 100.0))
+                    XCTAssertEqual(constraint.height.constrainedValue, 100.0)
+                    XCTAssertEqual(constraint.maximum(), CGSize(width: 0, height: 100.0))
 
                     return CGSize(width: 100, height: 50)
                 }
@@ -88,9 +88,9 @@ class BlueprintViewTests: XCTestCase {
 
             do {
                 let element = MeasurableElement { constraint in
-                    XCTAssertEqual(constraint.width.maximum, 100.0)
+                    XCTAssertEqual(constraint.width.constrainedValue, 100.0)
                     XCTAssertEqual(constraint.height, .unconstrained)
-                    XCTAssertEqual(constraint.maximum, CGSize(width: 100.0, height: CGFloat.greatestFiniteMagnitude))
+                    XCTAssertEqual(constraint.maximum(), CGSize(width: 100.0, height: 0))
 
                     return CGSize(width: 100, height: 50)
                 }

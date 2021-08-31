@@ -40,8 +40,8 @@ extension SizeConstraint {
         return CGSize(width: width.minimum, height: height.minimum)
     }
 
-    public var maximum: CGSize {
-        return CGSize(width: width.maximum, height: height.maximum)
+    public func maximum(fallback: CGFloat = 0) -> CGSize {
+        return CGSize(width: width.constrainedValue ?? fallback, height: height.constrainedValue ?? fallback)
     }
 
     public func inset(width: CGFloat, height: CGFloat) -> SizeConstraint {
@@ -67,20 +67,10 @@ extension SizeConstraint {
 
         /// Creates a `SizeConstraint` with the provided value.
         init(_ value: CGFloat) {
-            if value == Axis.maxValue {
+            if value == .greatestFiniteMagnitude {
                 self = .unconstrained
             } else {
                 self = .atMost(value)
-            }
-        }
-
-        /// The maximum magnitude in the given dimension.
-        public var maximum: CGFloat {
-            switch self {
-            case .atMost(let value):
-                return value
-            case .unconstrained:
-                return Axis.maxValue
             }
         }
 
@@ -103,8 +93,6 @@ extension SizeConstraint {
                 return nil
             }
         }
-
-        private static var maxValue: CGFloat = .greatestFiniteMagnitude
 
         /// Adds a scalar value to an Axis. If the Axis is unconstrained the
         /// result will remain unconstrained.

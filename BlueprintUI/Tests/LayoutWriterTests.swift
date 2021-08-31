@@ -103,7 +103,7 @@ class LayoutWriterTests: XCTestCase {
 fileprivate struct TestElement: Element {
 
     var content: ElementContent {
-        ElementContent { $0.maximum }
+        ElementContent { $0.maximum() }
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

@@ -31,8 +31,8 @@ final class GeometryReaderTests: XCTestCase {
             // Create an element with half the dimensions of the available size,
             // aligned in the bottom right.
 
-            let width = geometry.constraint.maximum.width / 2.0
-            let height = geometry.constraint.maximum.height / 2.0
+            let width = geometry.constraint.maximum().width / 2.0
+            let height = geometry.constraint.maximum().height / 2.0
 
             return Spacer(width: width, height: height)
                 .aligned(vertically: .bottom, horizontally: .trailing)

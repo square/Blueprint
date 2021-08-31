@@ -33,7 +33,7 @@ public struct AttributedLabel: Element, Hashable {
             func measure(in constraint: SizeConstraint) -> CGSize {
                 let label = Self.prototypeLabel
                 model.update(label: label)
-                return label.sizeThatFits(constraint.maximum)
+                return label.sizeThatFits(constraint.maximum())
             }
         }
 

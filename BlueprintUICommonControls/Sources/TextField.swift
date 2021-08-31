@@ -82,7 +82,7 @@ public struct TextField: Element {
     public var content: ElementContent {
         ElementContent { constraint -> CGSize in
             CGSize(
-                width: max(constraint.maximum.width, 44),
+                width: max(constraint.maximum().width, 44),
                 height: 44.0
             )
         }

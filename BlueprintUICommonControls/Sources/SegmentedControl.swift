@@ -106,7 +106,7 @@ extension SegmentedControl.Item {
             case .automatic:
                 let width = (title as NSString)
                     .boundingRect(
-                        with: constraint.maximum,
+                        with: constraint.maximum(),
                         options: [.usesLineFragmentOrigin],
                         attributes: [.font: font],
                         context: nil

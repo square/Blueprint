@@ -165,10 +165,14 @@ extension ConstrainedSize {
             ///
             /// This is important because some elements heights are affected by their width (eg, a text label),
             /// or any other elements type which reflows its content.
+            ///
+            /// We use the size of the child as a fallback for unconstrained axes.
+
+            let size = child.measure(in: constraint)
 
             let maximumConstraint = SizeConstraint(
-                width: .init(width.applied(to: constraint.width.maximum)),
-                height: .init(height.applied(to: constraint.height.maximum))
+                width: .init(width.applied(to: constraint.width.constrainedValue ?? size.width)),
+                height: .init(height.applied(to: constraint.height.constrainedValue ?? size.height))
             )
 
             let measurement = child.measure(in: maximumConstraint)

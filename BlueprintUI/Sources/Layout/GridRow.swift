@@ -214,7 +214,7 @@ extension GridRow {
             // The tallest child will be used to size the row unless it is a layout pass, in which the row's height
             // is already known.
             let rowHeight = isExactConstraint
-                ? constraint.height.maximum
+                ? constraint.height.constrainedValue ?? 0
                 : sizes.map { $0.height }.max() ?? 0
 
             // Define alignment positioning.

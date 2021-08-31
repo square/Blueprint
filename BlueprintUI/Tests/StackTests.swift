@@ -1198,7 +1198,10 @@ class StackTests: XCTestCase {
             ElementContent { constraint -> CGSize in
                 switch self.axis {
                 case .horizontal:
-                    let itemsPerLine = max(1, Int(constraint.width.maximum / self.itemSize.width))
+                    let itemsPerLine = max(
+                        1,
+                        Int(constraint.width.constrainedValue ?? .greatestFiniteMagnitude / self.itemSize.width)
+                    )
                     let lineCount = (self.itemCount + itemsPerLine - 1) / itemsPerLine
                     return CGSize(
                         width: CGFloat(itemsPerLine) * self.itemSize.width,
@@ -1206,7 +1209,10 @@ class StackTests: XCTestCase {
                     )
 
                 case .vertical:
-                    let itemsPerColumn = max(1, Int(constraint.height.maximum / self.itemSize.height))
+                    let itemsPerColumn = max(
+                        1,
+                        Int(constraint.height.constrainedValue ?? .greatestFiniteMagnitude / self.itemSize.height)
+                    )
                     let columnCount = (self.itemCount + itemsPerColumn - 1) / itemsPerColumn
                     let size = CGSize(
                         width: CGFloat(columnCount) * self.itemSize.width,

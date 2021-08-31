@@ -144,8 +144,7 @@ private final class UIViewElementMeasurer {
 
     /// Provides the size for the provided element by using a cached measurement view.
     func measure<ViewElement: UIViewElement>(element: ViewElement, in constraint: SizeConstraint) -> CGSize {
-
-        let bounds = CGRect(origin: .zero, size: constraint.maximum)
+        let bounds = CGRect(origin: .zero, size: constraint.maximum())
 
         let view = measurementView(for: element)
 
