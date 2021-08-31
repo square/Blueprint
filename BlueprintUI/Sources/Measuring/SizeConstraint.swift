@@ -1,33 +1,5 @@
 import UIKit
 
-/// This property wrapper checks the value of `atMost` cases, and turns it into an
-/// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
-@propertyWrapper public struct UnconstrainedInfiteAxis: Equatable, Hashable {
-    private var correctedAxis: SizeConstraint.Axis
-
-    public var wrappedValue: SizeConstraint.Axis {
-        get { correctedAxis }
-        set { correctedAxis = Self.correctedAxis(for: newValue) }
-    }
-
-    public init(wrappedValue value: SizeConstraint.Axis) {
-        correctedAxis = Self.correctedAxis(for: value)
-    }
-
-    private static func correctedAxis(for axis: SizeConstraint.Axis) -> SizeConstraint.Axis {
-        switch axis {
-        case .atMost(let maxAxis):
-            if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
-                return .unconstrained
-            } else {
-                return axis
-            }
-        case .unconstrained:
-            return axis
-        }
-    }
-}
-
 /// Defines the maximum size for a measurement.
 ///
 /// Currently this constraint type can only handles layout where
@@ -202,5 +174,35 @@ extension SizeConstraint {
             lhs = lhs * rhs
         }
 
+    }
+}
+
+extension SizeConstraint {
+    /// This property wrapper checks the value of `atMost` cases, and turns it into an
+    /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
+    @propertyWrapper public struct UnconstrainedInfiteAxis: Equatable, Hashable {
+        private var correctedAxis: Axis
+
+        public var wrappedValue: Axis {
+            get { correctedAxis }
+            set { correctedAxis = Self.correctedAxis(for: newValue) }
+        }
+
+        public init(wrappedValue value: Axis) {
+            correctedAxis = Self.correctedAxis(for: value)
+        }
+
+        private static func correctedAxis(for axis: Axis) -> Axis {
+            switch axis {
+            case .atMost(let maxAxis):
+                if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
+                    return .unconstrained
+                } else {
+                    return axis
+                }
+            case .unconstrained:
+                return axis
+            }
+        }
     }
 }
