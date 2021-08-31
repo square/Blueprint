@@ -71,17 +71,17 @@ public struct Column: StackElement {
     /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
     public init(
         alignment: StackLayout.Alignment = StackLayout.defaultColumn.alignment,
-        verticalUnderflow: StackLayout.UnderflowDistribution = StackLayout.defaultColumn.underflow,
-        verticalOverflow: StackLayout.OverflowDistribution = StackLayout.defaultColumn.overflow,
-        horizontalAlignment: ColumnAlignment = StackLayout.defaultColumn.columnAlignment,
-        minimumVerticalSpacing: CGFloat = StackLayout.defaultColumn.minimumSpacing,
+        underflow: StackLayout.UnderflowDistribution = StackLayout.defaultColumn.underflow,
+        overflow: StackLayout.OverflowDistribution = StackLayout.defaultColumn.overflow,
+        alignment: ColumnAlignment = StackLayout.defaultColumn.columnAlignment,
+        minimumSpacing: CGFloat = StackLayout.defaultColumn.minimumSpacing,
         @ElementBuilder<StackChild> elements: () -> [StackChild]
     ) {
         var layout: StackLayout = .init(axis: StackLayout.defaultColumn.axis, alignment: alignment)
-        layout.underflow = verticalUnderflow
-        layout.overflow = verticalOverflow
-        layout.alignment = horizontalAlignment.stackAlignment
-        layout.minimumSpacing = minimumVerticalSpacing
+        layout.underflow = underflow
+        layout.overflow = overflow
+        layout.alignment = alignment.stackAlignment
+        layout.minimumSpacing = minimumSpacing
         self.init(layout: layout, elements: elements)
     }
 

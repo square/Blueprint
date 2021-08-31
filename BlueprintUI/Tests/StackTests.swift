@@ -52,7 +52,7 @@ class StackTests: XCTestCase {
     }
 
     func test_minimumSpacing() {
-        let row = Row(minimumHorizontalSpacing: 10.0) {
+        let row = Row(minimumSpacing: 10.0) {
             TestElement()
             TestElement()
         }
@@ -79,7 +79,7 @@ class StackTests: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let column = Column(horizontalAlignment: alignment) {
+            let column = Column(alignment: alignment) {
                 TestElement(size: CGSize(width: elementCrossSize, height: 100))
             }
 
@@ -120,7 +120,7 @@ class StackTests: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let row = Row(verticalAlignment: alignment) {
+            let row = Row(alignment: alignment) {
                 TestElement(size: CGSize(width: 100, height: elementCrossSize))
             }
 
@@ -202,7 +202,7 @@ class StackTests: XCTestCase {
         //  anchor ▶┴┴──────────┴──────────────┴──────────┴─◀
         //
         test(
-            stack: Row(verticalAlignment: .bottom) {
+            stack: Row(alignment: .bottom) {
                 TestElement()
                     .stackChild(alignmentGuide: { _ in 0 }) // align to top edge
                 TestElement()
@@ -220,7 +220,7 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(horizontalAlignment: .trailing) {
+            stack: Column(alignment: .trailing) {
                 TestElement().stackChild(alignmentGuide: { _ in 0 })
                 TestElement().stackChild(alignmentGuide: { d in d.width })
                 TestElement().stackChild(alignmentGuide: { d in d[.leading] })
@@ -258,7 +258,7 @@ class StackTests: XCTestCase {
         //           │                          │          │
         //            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┴──────────┘─ ─ ─ ─ ─ ─ ┘
         test(
-            stack: Row(verticalAlignment: .center) {
+            stack: Row(alignment: .center) {
                 TestElement()
                     .stackChild(alignmentGuide: { _ in 0 }) // align to top edge
                 TestElement() // default (center)
@@ -278,7 +278,7 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(horizontalAlignment: .center) {
+            stack: Column(alignment: .center) {
                 TestElement().stackChild(alignmentGuide: { _ in 0 })
                 TestElement()
                 TestElement().stackChild(alignmentGuide: { d in -40 })
@@ -314,7 +314,7 @@ class StackTests: XCTestCase {
         //  anchor ▶─┴─────────────────────────┴──────────┴┴◀
         //
         test(
-            stack: Row(verticalAlignment: .bottom) {
+            stack: Row(alignment: .bottom) {
                 TestElement()
                     .stackChild(alignmentGuide: { d in d.height - 10 }) // 10 from bottom
                 TestElement() // default (bottom)
@@ -331,7 +331,7 @@ class StackTests: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(horizontalAlignment: .trailing) {
+            stack: Column(alignment: .trailing) {
                 TestElement().stackChild(alignmentGuide: { d in d.width - 10 })
                 TestElement()
                 TestElement().stackChild(alignmentGuide: { d in d.width - 20 })
@@ -355,7 +355,7 @@ class StackTests: XCTestCase {
             line: UInt = #line
         ) {
             do {
-                let row = Row(verticalAlignment: .fill) {
+                let row = Row(alignment: .fill) {
                     TestElement(size: CGSize(width: 100, height: 100))
                 }
 
@@ -376,7 +376,7 @@ class StackTests: XCTestCase {
             }
 
             do {
-                let column = Column(horizontalAlignment: .fill) {
+                let column = Column(alignment: .fill) {
                     TestElement(size: CGSize(width: 100, height: 100))
                 }
 
