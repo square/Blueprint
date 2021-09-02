@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.28.0] - 2021-09-01
+
+### Fixed
+
 - Fixed an [issue](https://github.com/square/Blueprint/pull/241) where `Label` and `AttributedLabel` were not accessibility elements.
 
 ### Added
@@ -35,16 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - [`makeUIView()` on `UIViewElement` is no longer a static function](https://github.com/square/Blueprint/pull/246), to allow access to properties during view creation. 
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.27.0] - 2021-06-22
 
@@ -596,7 +606,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.27.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.28.0...HEAD
+[0.28.0]: https://github.com/square/Blueprint/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/square/Blueprint/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/square/Blueprint/compare/0.25.0...0.26.0
 [0.25.0]: https://github.com/square/Blueprint/compare/0.24.0...0.25.0
