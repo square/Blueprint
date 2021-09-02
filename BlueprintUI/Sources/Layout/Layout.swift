@@ -7,7 +7,7 @@ public protocol Layout {
     associatedtype Traits = ()
 
     /// Computes the size that this layout requires in a layout, given an array
-    /// of chidren and accompanying layout traits.
+    /// of children and accompanying layout traits.
     ///
     /// - parameter constraint: The size constraint in which measuring should
     ///   occur.

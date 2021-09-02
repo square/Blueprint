@@ -32,10 +32,7 @@ public struct AttributedLabel: Element, Hashable {
             }
         }
 
-        return ElementContent(
-            measurable: Measurer(model: self),
-            measurementCachingKey: .init(type: Self.self, input: self)
-        )
+        return ElementContent(layout: LabelLayout(measurer: Measurer(model: self)))
     }
 
     private func update(label: LabelView) {
@@ -64,6 +61,25 @@ extension AttributedLabel {
 
         override func drawText(in rect: CGRect) {
             super.drawText(in: rect.offsetBy(dx: textRectOffset.horizontal, dy: textRectOffset.vertical))
+        }
+    }
+
+    private struct LabelLayout: Layout {
+        private let measurer: Measurable
+
+        init(measurer: Measurable) {
+            self.measurer = measurer
+        }
+
+        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+            measurer.measure(in: constraint)
+        }
+
+        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+            let size = measurer.measure(in: SizeConstraint(size))
+            var attributes = LayoutAttributes(size: size)
+            attributes.pixelRounding = .size
+            return [attributes]
         }
     }
 }

@@ -3,6 +3,11 @@ import UIKit
 /// Contains layout-related metrics for an element.
 public struct LayoutAttributes {
 
+    public enum PixelRoundingPriority {
+        case edges
+        case size
+    }
+
     /// Corresponds to `UIView.center`.
     public var center: CGPoint {
         didSet { validateCenter() }
@@ -22,6 +27,8 @@ public struct LayoutAttributes {
     public var alpha: CGFloat {
         didSet { validateAlpha() }
     }
+
+    public var pixelRounding: PixelRoundingPriority
     
     public init() {
         self.init(center: .zero, bounds: .zero)
@@ -43,6 +50,7 @@ public struct LayoutAttributes {
         self.bounds = bounds
         self.transform = CATransform3DIdentity
         self.alpha = 1.0
+        self.pixelRounding = .edges
 
         validateBounds()
         validateCenter()
@@ -169,8 +177,14 @@ public struct LayoutAttributes {
             .offset(by: correction)
 
         // Round
-        let roundedFrame = correctedFrame
-            .rounded(.toNearestOrAwayFromZero, by: scale)
+        let roundedFrame: CGRect = {
+            switch pixelRounding {
+            case .edges:
+                return correctedFrame.roundingEdges(.toNearestOrAwayFromZero, by: scale)
+            case.size:
+                return correctedFrame.roundingOriginAndSize(.toNearestOrAwayFromZero, by: scale)
+            }
+        }()
 
         // Save rounding correction
         let roundingCorrection = correctedFrame.origin - roundedFrame.origin
