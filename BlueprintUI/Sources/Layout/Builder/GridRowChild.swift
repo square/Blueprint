@@ -1,26 +1,42 @@
-/// `GridRowChild` is a wrapper which allows an element to define its `GridRow.Width` and `key`.
-/// This struct is particularly useful when working with a result builder initializer that uses `@ElementBuilder`.
-/// By default, elements will be set to a nil key and `.proportional(1)` initializer.
-/// The initializer will check every child to see if it can be type cast to a `GridRowChild`
-/// and then pull out the given width and key and then apply those to the row.
-public struct GridRowChild {
-    public let element: Element
-    public var width: GridRow.Width
-    public let key: AnyHashable?
+import UIKit
 
-    /// Bundles a wrapped element with the layout information needed for a `GridRow`.
-    /// - Parameters:
-    ///   - wrappedElement: The element to wrap.
-    ///   - key: A unique identifier for the child.
-    ///   - width: The sizing for the element.
-    public init(
-        _ element: Element,
-        key: AnyHashable? = nil,
-        width: GridRow.Width
-    ) {
-        self.element = element
-        self.key = key
-        self.width = width
+// MARK: - child modeling -
+extension GridRow {
+    /// A child of a `GridRow`.
+    public struct Child {
+        // MARK: - properties -
+        /// The element displayed in the `Grid`.
+        public var element: Element
+        /// A unique identifier for the child.
+        public var key: AnyHashable?
+        // The sizing for the element.
+        public var width: Width
+
+        // MARK: - initialialization -
+        public init(width: Width, key: AnyHashable? = nil, element: Element) {
+            self.element = element
+            self.key = key
+            self.width = width
+        }
+    }
+
+    /// The sizing and content of a `GridRow` child.
+    public enum Width: Equatable {
+        /// Assign the child a fixed width equal to the payload.
+        case absolute(CGFloat)
+        /// Assign the child a proportional width of the available layout width. Note that proportional children
+        /// take proportional shares of the available layout width.
+        ///
+        /// ## Example:
+        ///     Available layout width: 100
+        ///     Child A: .proportional(1)  -> 25 (100 * 1/4)
+        ///     Child B: .proportional(3) -> 75 (100 * 3/4)
+        ///
+        /// ## Example:
+        ///     Available layout width: 100
+        ///     Child A: .proportional(0.25)  -> 25 (100 * 1/4)
+        ///     Child B: .proportional(0.75) -> 75 (100 * 3/4)
+        case proportional(CGFloat)
     }
 }
 
@@ -30,12 +46,12 @@ extension Element {
     ///   - key: A unique identifier for the child.
     ///   - width: The sizing for the element.
     /// - Returns: `GridRowChild`
-    public func gridRowChild(key: AnyHashable? = nil, width: GridRow.Width) -> GridRowChild {
-        .init(self, key: key, width: width)
+    public func gridRowChild(key: AnyHashable? = nil, width: GridRow.Width) -> GridRow.Child {
+        .init(width: width, key: key, element: self)
     }
 }
 
-extension GridRowChild: ElementInitializable {
+extension GridRow.Child: ElementBuilderChild {
     public init(from element: Element) {
         self = element.gridRowChild(width: .proportional(1))
     }

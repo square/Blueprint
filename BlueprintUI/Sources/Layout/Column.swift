@@ -62,25 +62,23 @@ public struct Column: StackElement {
 
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
-    ///   - alignment: Determines the cross-axis layout
-    ///   - verticalUnderflow: Determines the layout when there is extra free space available.
-    ///   - verticalOverflow: Determines the layout when there is not enough space to fit all children as measured.
+    ///   - alignment: Specifies how children will be aligned horizontally.
+    ///   - underflow: Determines the layout when there is extra free space available.
+    ///   - overflow: Determines the layout when there is not enough space to fit all children as measured.
     ///   - horizontalAlignment: Specifies how children will be aligned horizontally.
-    ///   - minimumVerticalSpacing: Spacing in between elements.
+    ///   - minimumSpacing: Spacing in between elements.
     ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
+    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackChild` with default values
     public init(
-        alignment: StackLayout.Alignment = StackLayout.defaultColumn.alignment,
+        alignment: ColumnAlignment = StackLayout.defaultColumn.columnAlignment,
         underflow: StackLayout.UnderflowDistribution = StackLayout.defaultColumn.underflow,
         overflow: StackLayout.OverflowDistribution = StackLayout.defaultColumn.overflow,
-        alignment: ColumnAlignment = StackLayout.defaultColumn.columnAlignment,
         minimumSpacing: CGFloat = StackLayout.defaultColumn.minimumSpacing,
         @ElementBuilder<StackChild> elements: () -> [StackChild]
     ) {
-        var layout: StackLayout = .init(axis: StackLayout.defaultColumn.axis, alignment: alignment)
+        var layout: StackLayout = .init(axis: StackLayout.defaultColumn.axis, alignment: alignment.stackAlignment)
         layout.underflow = underflow
         layout.overflow = overflow
-        layout.alignment = alignment.stackAlignment
         layout.minimumSpacing = minimumSpacing
         self.init(layout: layout, elements: elements)
     }

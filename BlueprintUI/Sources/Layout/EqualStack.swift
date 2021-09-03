@@ -36,7 +36,7 @@ public struct EqualStack: Element {
     public init(
         direction: Direction,
         spacing: CGFloat = 0,
-        @ElementBuilder<EqualStackChild> elements: () -> [EqualStackChild]
+        @ElementBuilder<Child> elements: () -> [Child]
     ) {
         self.init(direction: direction)
         self.spacing = spacing
