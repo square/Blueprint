@@ -18,11 +18,11 @@ public struct Button: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return Button.NativeButton.describe { config in
+        Button.NativeButton.describe { config in
             config.contentView = { $0.contentView }
             config[\.isEnabled] = isEnabled
             config[\.onTap] = onTap
@@ -55,7 +55,7 @@ extension Button {
         }
 
         private var tappableRect: CGRect {
-            return bounds
+            bounds
                 .insetBy(
                     dx: min(0, bounds.width - minimumTappableSize.width),
                     dy: min(0, bounds.height - minimumTappableSize.height)
@@ -64,7 +64,7 @@ extension Button {
         }
 
         override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-            return tappableRect.contains(point)
+            tappableRect.contains(point)
         }
 
         override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {

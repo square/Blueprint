@@ -419,7 +419,7 @@ extension BlueprintView {
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
-            return node.viewDescription.viewType == type(of: view)
+            node.viewDescription.viewType == type(of: view)
         }
 
         fileprivate func update(node: NativeViewNode, context: UpdateContext) {

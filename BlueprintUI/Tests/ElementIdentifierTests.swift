@@ -68,11 +68,11 @@ class ElementIdentifier_FactoryTests: XCTestCase {
 fileprivate struct A: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -80,11 +80,11 @@ fileprivate struct A: Element {
 fileprivate struct B: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

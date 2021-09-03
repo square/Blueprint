@@ -51,7 +51,7 @@ public struct Rule: ProxyElement {
     }
 
     public var elementRepresentation: Element {
-        return ConstrainedSize(
+        ConstrainedSize(
             width: width,
             height: height,
             wrapping: Box(backgroundColor: color)

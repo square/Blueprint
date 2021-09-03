@@ -483,7 +483,7 @@ fileprivate struct MeasurableElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }
 
@@ -492,11 +492,11 @@ fileprivate struct SimpleViewElement: Element {
     var color: UIColor
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
+        ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { config in
+        UIView.describe { config in
             config[\.backgroundColor] = color
         }
     }
@@ -507,11 +507,11 @@ private struct TestElement1: Element {
     var tag: Int
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { config in
+        UIView.describe { config in
             config[\.tag] = tag
         }
     }
@@ -521,11 +521,11 @@ private struct TestElement2: Element {
     var tag: Int
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { config in
+        UIView.describe { config in
             config[\.tag] = tag
         }
     }
@@ -535,7 +535,7 @@ private struct TestContainer: Element {
     var children: [Element]
 
     var content: ElementContent {
-        return ElementContent(layout: TestLayout()) { builder in
+        ElementContent(layout: TestLayout()) { builder in
             for child in children {
                 builder.add(element: child)
             }
@@ -543,16 +543,16 @@ private struct TestContainer: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private class TestLayout: Layout {
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            return .zero
+            .zero
         }
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            return Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+            Array(repeating: LayoutAttributes(size: .zero), count: items.count)
         }
     }
 }

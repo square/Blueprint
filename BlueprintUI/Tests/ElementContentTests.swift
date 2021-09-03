@@ -175,11 +175,11 @@ fileprivate struct MeasurableElement: Element {
 fileprivate struct SimpleElement: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -190,18 +190,18 @@ fileprivate struct FrameLayout: Layout {
     typealias Traits = CGRect
 
     func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero) { result, item in
+        items.reduce(into: CGSize.zero) { result, item in
             result.width = max(result.width, item.traits.maxX)
             result.height = max(result.height, item.traits.maxY)
         }
     }
 
     func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {
-        return items.map { LayoutAttributes(frame: $0.traits) }
+        items.map { LayoutAttributes(frame: $0.traits) }
     }
 
     static var defaultTraits: CGRect {
-        return CGRect.zero
+        CGRect.zero
     }
 
 }
@@ -245,7 +245,7 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
     }
 
     func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return layout.layout(size: size, items: items)
+        layout.layout(size: size, items: items)
     }
 }
 

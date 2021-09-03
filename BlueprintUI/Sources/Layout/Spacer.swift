@@ -28,11 +28,11 @@ public struct Spacer: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(intrinsicSize: size)
+        ElementContent(intrinsicSize: size)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

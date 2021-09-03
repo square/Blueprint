@@ -1218,14 +1218,14 @@ class StackTests: XCTestCase {
         }
 
         func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-            return nil
+            nil
         }
     }
 }
 
 extension CGSize {
     fileprivate func rounded(_ rule: FloatingPointRoundingRule = .toNearestOrAwayFromZero) -> CGSize {
-        return CGSize(
+        CGSize(
             width: width.rounded(rule),
             height: height.rounded(rule)
         )
@@ -1241,11 +1241,11 @@ fileprivate struct TestElement: Element {
     }
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: size)
+        ElementContent(intrinsicSize: size)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

@@ -24,18 +24,18 @@ public struct AspectRatio {
     }
 
     func height(forWidth width: CGFloat) -> CGFloat {
-        return width / ratio
+        width / ratio
     }
 
     func width(forHeight height: CGFloat) -> CGFloat {
-        return height * ratio
+        height * ratio
     }
 
     func size(forHeight height: CGFloat) -> CGSize {
-        return CGSize(width: width(forHeight: height), height: height)
+        CGSize(width: width(forHeight: height), height: height)
     }
 
     func size(forWidth width: CGFloat) -> CGSize {
-        return CGSize(width: width, height: height(forWidth: width))
+        CGSize(width: width, height: height(forWidth: width))
     }
 }

@@ -231,11 +231,11 @@ fileprivate struct TestElement: Element {
     }
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: size)
+        ElementContent(intrinsicSize: size)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -250,7 +250,7 @@ fileprivate struct AreaElement: Element {
     }
 
     var content: ElementContent {
-        return ElementContent { [area] constraint in
+        ElementContent { [area] constraint in
             if case .atMost(let maxWidth) = constraint.width {
                 return CGSize(
                     width: maxWidth,
@@ -271,7 +271,7 @@ fileprivate struct AreaElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

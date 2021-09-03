@@ -83,7 +83,7 @@ extension Environment {
     }
 
     var feedTheme: FeedTheme {
-        get { return self[FeedThemeKey.self] }
+        get { self[FeedThemeKey.self] }
         set { self[FeedThemeKey.self] = newValue }
     }
 }

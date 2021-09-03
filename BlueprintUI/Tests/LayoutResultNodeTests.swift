@@ -38,20 +38,20 @@ fileprivate struct AbstractElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout())
+        ElementContent(child: wrappedElement, layout: Layout())
     }
 
     private struct Layout: SingleChildLayout {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return .zero
+            .zero
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 10, dy: 10))
+            LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 10, dy: 10))
         }
     }
 
@@ -61,11 +61,11 @@ fileprivate struct AbstractElement: Element {
 fileprivate struct ConcreteElement: Element {
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { _ in }
+        UIView.describe { _ in }
     }
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: .zero)
+        ElementContent(intrinsicSize: .zero)
     }
 
 }

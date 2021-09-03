@@ -187,7 +187,7 @@ public struct LayoutAttributes {
 extension LayoutAttributes: Equatable {
 
     public static func == (lhs: LayoutAttributes, rhs: LayoutAttributes) -> Bool {
-        return lhs.center == rhs.center
+        lhs.center == rhs.center
             && lhs.bounds == rhs.bounds
             && CATransform3DEqualToTransform(lhs.transform, rhs.transform)
             && lhs.alpha == rhs.alpha
@@ -197,25 +197,25 @@ extension LayoutAttributes: Equatable {
 
 extension CGRect {
     var isFinite: Bool {
-        return origin.isFinite && size.isFinite
+        origin.isFinite && size.isFinite
     }
 }
 
 extension CGPoint {
     var isFinite: Bool {
-        return x.isFinite && y.isFinite
+        x.isFinite && y.isFinite
     }
 }
 
 extension CGSize {
     var isFinite: Bool {
-        return width.isFinite && height.isFinite
+        width.isFinite && height.isFinite
     }
 }
 
 extension CATransform3D {
     var isFinite: Bool {
-        return m11.isFinite
+        m11.isFinite
             && m12.isFinite
             && m13.isFinite
             && m14.isFinite

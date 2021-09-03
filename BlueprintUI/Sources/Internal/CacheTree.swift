@@ -32,7 +32,7 @@ extension CacheTree {
 
     /// Gets a subcache for an element with siblings.
     func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
-        return subcache(
+        subcache(
             key: index,
             name: childCount == 1
                 ? "\(name).\(type(of: element))"

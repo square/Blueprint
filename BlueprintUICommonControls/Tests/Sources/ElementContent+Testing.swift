@@ -8,6 +8,6 @@ extension ElementContent {
     ///   - constraint: The size constraint.
     /// - returns: The layout size needed by this content.
     func measure(in constraint: SizeConstraint) -> CGSize {
-        return measure(in: constraint, environment: .empty)
+        measure(in: constraint, environment: .empty)
     }
 }

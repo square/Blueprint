@@ -66,7 +66,7 @@ public struct Inset: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(
+        ElementContent(
             child: wrappedElement,
             layout: Layout(
                 top: top,
@@ -78,7 +78,7 @@ public struct Inset: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }
 

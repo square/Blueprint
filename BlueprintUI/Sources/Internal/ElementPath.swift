@@ -37,7 +37,7 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
     }
 
     static var empty: ElementPath {
-        return ElementPath()
+        ElementPath()
     }
 
     func hash(into hasher: inout Hasher) {
@@ -47,7 +47,7 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
     // MARK: CustomDebugStringConvertible
 
     var debugDescription: String {
-        return identifiers.map { $0.debugDescription }.joined()
+        identifiers.map { $0.debugDescription }.joined()
     }
 }
 

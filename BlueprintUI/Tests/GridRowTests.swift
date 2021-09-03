@@ -273,10 +273,10 @@ private struct TestElement: Element {
     }
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: size)
+        ElementContent(intrinsicSize: size)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }

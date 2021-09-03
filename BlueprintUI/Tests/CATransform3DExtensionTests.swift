@@ -18,6 +18,6 @@ class CATransform3DExtensionTests: XCTestCase {
 
 extension CATransform3D: Equatable {
     public static func == (lhs: CATransform3D, rhs: CATransform3D) -> Bool {
-        return CATransform3DEqualToTransform(lhs, rhs)
+        CATransform3DEqualToTransform(lhs, rhs)
     }
 }

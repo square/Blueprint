@@ -52,7 +52,7 @@ public struct AttributedLabel: Element, Hashable {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return LabelView.describe { config in
+        LabelView.describe { config in
             config.apply(update)
         }
     }

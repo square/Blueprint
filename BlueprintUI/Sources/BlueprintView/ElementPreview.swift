@@ -88,7 +88,7 @@
             named name: String = "",
             with provider: @escaping ElementProvider
         ) -> Self {
-            return Self(
+            Self(
                 named: name,
                 with: [
                     .device(.iPhoneSE_1),
@@ -283,7 +283,7 @@
 
         @available(iOS 13.4.1, *)
         public static var iPhoneSE_2: PreviewDevice {
-            return PreviewDevice("iPhone SE (2nd generation)")
+            PreviewDevice("iPhone SE (2nd generation)")
         }
 
         /// iPhone X

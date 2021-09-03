@@ -32,7 +32,7 @@ public struct Image: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIImageView.describe { config in
+        UIImageView.describe { config in
             config[\.image] = image
             config[\.contentMode] = contentMode.uiViewContentMode
             config[\.layer.minificationFilter] = .trilinear

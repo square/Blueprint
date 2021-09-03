@@ -51,12 +51,12 @@ public struct Column: StackElement {
     public init() {}
 
     public var verticalUnderflow: StackLayout.UnderflowDistribution {
-        get { return layout.underflow }
+        get { layout.underflow }
         set { layout.underflow = newValue }
     }
 
     public var verticalOverflow: StackLayout.OverflowDistribution {
-        get { return layout.overflow }
+        get { layout.overflow }
         set { layout.overflow = newValue }
     }
 
@@ -71,7 +71,7 @@ public struct Column: StackElement {
     }
 
     public var minimumVerticalSpacing: CGFloat {
-        get { return layout.minimumSpacing }
+        get { layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
 

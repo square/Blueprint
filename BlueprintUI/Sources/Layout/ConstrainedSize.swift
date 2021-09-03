@@ -42,7 +42,7 @@ public struct ConstrainedSize: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -140,7 +140,7 @@ extension Element {
 extension Comparable {
 
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
-        return min(max(self, limits.lowerBound), limits.upperBound)
+        min(max(self, limits.lowerBound), limits.upperBound)
     }
 }
 
@@ -185,7 +185,7 @@ extension ConstrainedSize {
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(size: size)
+            LayoutAttributes(size: size)
         }
     }
 

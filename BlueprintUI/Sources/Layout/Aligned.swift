@@ -63,7 +63,7 @@ public struct Aligned: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
@@ -71,7 +71,7 @@ public struct Aligned: Element {
         var horizontalAlignment: HorizontalAlignment
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
+            child.measure(in: constraint)
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {

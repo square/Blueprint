@@ -50,15 +50,15 @@ public struct AccessibilityElement: Element {
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
-        return UIAccessibilityTraits(with: traits)
+        UIAccessibilityTraits(with: traits)
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return AccessibilityView.describe { config in
+        AccessibilityView.describe { config in
             config[\.accessibilityLabel] = label
             config[\.accessibilityValue] = value
             config[\.accessibilityHint] = hint

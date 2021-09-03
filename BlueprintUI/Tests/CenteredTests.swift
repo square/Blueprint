@@ -49,11 +49,11 @@ class CenteredTests: XCTestCase {
 fileprivate struct TestElement: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 123, height: 456))
+        ElementContent(intrinsicSize: CGSize(width: 123, height: 456))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

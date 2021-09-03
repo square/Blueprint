@@ -20,7 +20,7 @@ public struct VisibilityTransition {
 
     /// Returns a `VisibilityTransition` that scales in and out.
     public static var scale: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 1.0,
             transform: CATransform3DMakeScale(0.01, 0.01, 0.01)
         )
@@ -28,7 +28,7 @@ public struct VisibilityTransition {
 
     /// Returns a `VisibilityTransition` that fades in and out.
     public static var fade: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 0.0,
             transform: CATransform3DIdentity
         )
@@ -36,7 +36,7 @@ public struct VisibilityTransition {
 
     /// Returns a `VisibilityTransition` that simultaneously scales and fades in and out.
     public static var scaleAndFade: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 0.0,
             transform: CATransform3DMakeScale(0.01, 0.01, 0.01)
         )

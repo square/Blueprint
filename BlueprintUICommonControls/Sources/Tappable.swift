@@ -14,11 +14,11 @@ public struct Tappable: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return TappableView.describe { config in
+        TappableView.describe { config in
             config[\.onTap] = onTap
         }
     }
