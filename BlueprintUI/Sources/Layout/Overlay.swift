@@ -29,7 +29,7 @@ public struct Overlay: Element {
     // MARK: Element
 
     public var content: ElementContent {
-        return ElementContent(layout: OverlayLayout()) {
+        ElementContent(layout: OverlayLayout()) {
             for element in elements {
                 $0.add(element: element)
             }
@@ -37,7 +37,7 @@ public struct Overlay: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }
 
@@ -46,7 +46,7 @@ public struct Overlay: Element {
 fileprivate struct OverlayLayout: Layout {
 
     func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
-        return items.reduce(into: CGSize.zero) { result, item in
+        items.reduce(into: CGSize.zero) { result, item in
             let measuredSize = item.content.measure(in: constraint)
             result.width = max(result.width, measuredSize.width)
             result.height = max(result.height, measuredSize.height)
@@ -54,7 +54,7 @@ fileprivate struct OverlayLayout: Layout {
     }
 
     func layout(size: CGSize, items: [(traits: Void, content: Measurable)]) -> [LayoutAttributes] {
-        return Array(
+        Array(
             repeating: LayoutAttributes(size: size),
             count: items.count
         )

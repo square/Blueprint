@@ -25,7 +25,7 @@ final class ViewController: UIViewController {
     }
 
     override var prefersStatusBarHidden: Bool {
-        return true
+        true
     }
 
 }

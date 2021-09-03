@@ -125,7 +125,7 @@ class ScrollViewTests: XCTestCase {
 
     private struct UnderflowElement: ProxyElement {
         var elementRepresentation: Element {
-            return Row { row in
+            Row { row in
                 row.verticalAlignment = .fill
                 row.add(
                     growPriority: 0,
@@ -175,7 +175,7 @@ class ScrollViewTests: XCTestCase {
         """
 
         var elementRepresentation: Element {
-            return Label(text: lipsum)
+            Label(text: lipsum)
         }
     }
 }

@@ -37,18 +37,18 @@ public struct Transformed: Element {
 
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(transform: transform))
+        ElementContent(child: wrappedElement, layout: Layout(transform: transform))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
         var transform: CATransform3D
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
+            child.measure(in: constraint)
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
@@ -66,7 +66,7 @@ extension Element {
     ///   - transform: The 3D transform to be applied.
     ///
     public func transformed(_ transform: CATransform3D) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: transform,
             wrapping: self
         )
@@ -78,7 +78,7 @@ extension Element {
     ///   - transform: The 2D transform to be applied.
     ///
     public func transformed(_ transform: CGAffineTransform) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: transform,
             wrapping: self
         )
@@ -96,7 +96,7 @@ extension Element {
         translateY: CGFloat = 0,
         translateZ: CGFloat = 0
     ) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: CATransform3DMakeTranslation(translateX, translateY, translateZ),
             wrapping: self
         )
@@ -108,7 +108,7 @@ extension Element {
     ///   - rotate: The angle measurement to rotate the receiver by.
     ///
     public func rotated(by rotationAngle: Measurement<UnitAngle>) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: CGAffineTransform(
                 rotationAngle: CGFloat(rotationAngle.converted(to: .radians).value)
             ),
@@ -126,7 +126,7 @@ extension Element {
         scaleX: CGFloat = 1,
         scaleY: CGFloat = 1
     ) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: CGAffineTransform(scaleX: scaleX, y: scaleY),
             wrapping: self
         )

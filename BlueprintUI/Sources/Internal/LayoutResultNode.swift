@@ -10,7 +10,7 @@ extension Element {
     ///
     /// - Returns: A layout result
     func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        return LayoutResultNode(
+        LayoutResultNode(
             root: self,
             layoutAttributes: layoutAttributes,
             environment: environment

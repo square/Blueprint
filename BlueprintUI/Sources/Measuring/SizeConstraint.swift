@@ -21,7 +21,7 @@ public struct SizeConstraint: Hashable {
 extension SizeConstraint {
 
     public static var unconstrained: SizeConstraint {
-        return SizeConstraint(width: .unconstrained, height: .unconstrained)
+        SizeConstraint(width: .unconstrained, height: .unconstrained)
     }
 
     public init(_ size: CGSize) {
@@ -37,15 +37,15 @@ extension SizeConstraint {
     }
 
     public var minimum: CGSize {
-        return CGSize(width: width.minimum, height: height.minimum)
+        CGSize(width: width.minimum, height: height.minimum)
     }
 
     public var maximum: CGSize {
-        return CGSize(width: width.maximum, height: height.maximum)
+        CGSize(width: width.maximum, height: height.maximum)
     }
 
     public func inset(width: CGFloat, height: CGFloat) -> SizeConstraint {
-        return SizeConstraint(
+        SizeConstraint(
             width: self.width - width,
             height: self.height - height
         )

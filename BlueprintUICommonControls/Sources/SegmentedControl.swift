@@ -21,11 +21,11 @@ public struct SegmentedControl: Element, Measurable {
     }
 
     public var content: ElementContent {
-        return ElementContent(measurable: self)
+        ElementContent(measurable: self)
     }
 
     public func measure(in constraint: SizeConstraint) -> CGSize {
-        return items.reduce(CGSize.zero) { current, item -> CGSize in
+        items.reduce(CGSize.zero) { current, item -> CGSize in
             let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
             return CGSize(
                 width: itemSize.width + current.width,
@@ -35,13 +35,13 @@ public struct SegmentedControl: Element, Measurable {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return SegmentedControlView.describe { config in
+        SegmentedControlView.describe { config in
             config[\.element] = self
         }
     }
 
     fileprivate var titleTextAttributes: [NSAttributedString.Key: Any] {
-        return [NSAttributedString.Key.font: font]
+        [NSAttributedString.Key.font: font]
     }
 
 }
@@ -71,7 +71,7 @@ extension SegmentedControl {
         public var onSelect: () -> Void
 
         internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: CGFloat) -> CGSize {
-            return CGSize(
+            CGSize(
                 width: width.requiredWidth(for: title, font: font, in: constraint, roundingScale: roundingScale),
                 height: 36.0
             )

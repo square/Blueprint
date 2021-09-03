@@ -40,7 +40,7 @@ public struct Box: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return BoxView.describe { config in
+        BoxView.describe { config in
 
             config.apply { view in
 

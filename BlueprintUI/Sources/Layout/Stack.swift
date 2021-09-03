@@ -13,7 +13,7 @@ public protocol StackElement: Element {
 extension StackElement {
 
     public var content: ElementContent {
-        return ElementContent(layout: layout) {
+        ElementContent(layout: layout) {
             for child in self.children {
                 $0.add(traits: child.traits, key: child.key, element: child.element)
             }
@@ -21,7 +21,7 @@ extension StackElement {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -177,7 +177,7 @@ public struct StackLayout: Layout {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
-        return Traits()
+        Traits()
     }
 
     /// Determines how a stack child will be aligned on the cross axis relative to other children.
@@ -254,7 +254,7 @@ public struct StackLayout: Layout {
     }
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return _layout(size: size, items: items)
+        _layout(size: size, items: items)
     }
 
 }
@@ -858,23 +858,23 @@ extension StackLayout {
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {
-            return CGRect(origin: origin.point(axis: axis), size: size.size(axis: axis))
+            CGRect(origin: origin.point(axis: axis), size: size.size(axis: axis))
         }
 
         var maxAxis: CGFloat {
-            return origin.axis + size.axis
+            origin.axis + size.axis
         }
 
         var minAxis: CGFloat {
-            return origin.axis
+            origin.axis
         }
 
         var maxCross: CGFloat {
-            return origin.cross + size.cross
+            origin.cross + size.cross
         }
 
         var minCross: CGFloat {
-            return origin.cross
+            origin.cross
         }
     }
 }

@@ -117,20 +117,20 @@ private struct InsettingElement: Element {
     var box: Box = Box()
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     var content: ElementContent {
-        return ElementContent(child: box, layout: Layout())
+        ElementContent(child: box, layout: Layout())
     }
 
     private struct Layout: SingleChildLayout {
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return .zero
+            .zero
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
+            LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
         }
     }
 

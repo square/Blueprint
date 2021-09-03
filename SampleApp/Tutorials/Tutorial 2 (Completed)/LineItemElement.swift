@@ -8,7 +8,7 @@ struct LineItemElement: ProxyElement {
     var price: Double
 
     var elementRepresentation: Element {
-        return Row { row in
+        Row { row in
 
             row.horizontalUnderflow = .spaceEvenly
 

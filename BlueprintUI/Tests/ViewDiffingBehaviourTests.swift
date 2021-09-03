@@ -99,11 +99,11 @@ class ViewDiffingBehaviourTests: XCTestCase {
 
 fileprivate struct A: Element {
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
+        ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return View.describe { _ in }
+        View.describe { _ in }
     }
 
     final class View: UIView {}
@@ -112,12 +112,12 @@ fileprivate struct A: Element {
 
 fileprivate struct B: Element {
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
+        ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 
-        return View.describe { _ in }
+        View.describe { _ in }
     }
 
     final class View: UIView {}
@@ -126,12 +126,12 @@ fileprivate struct B: Element {
 
 fileprivate struct C: Element {
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
+        ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 
-        return View.describe { _ in }
+        View.describe { _ in }
     }
 
     final class View: UIView {}
@@ -140,12 +140,12 @@ fileprivate struct C: Element {
 
 fileprivate struct D: Element {
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
+        ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 
-        return View.describe { _ in }
+        View.describe { _ in }
     }
 
     final class View: UIView {}

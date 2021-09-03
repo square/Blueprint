@@ -19,7 +19,7 @@ extension NativeView where Self: UIView {
     ///
     /// - returns: The resulting view description.
     public static func describe(_ configuring: (inout ViewDescription.Configuration<Self>) -> Void) -> ViewDescription {
-        return ViewDescription(Self.self, configuring: configuring)
+        ViewDescription(Self.self, configuring: configuring)
     }
 }
 
@@ -98,11 +98,11 @@ public struct ViewDescription {
     }
 
     public var viewType: UIView.Type {
-        return _viewType
+        _viewType
     }
 
     public func build() -> UIView {
-        return _build()
+        _build()
     }
 
     public func apply(to view: UIView) {
@@ -110,19 +110,19 @@ public struct ViewDescription {
     }
 
     public func contentView(in view: UIView) -> UIView {
-        return _contentView(view)
+        _contentView(view)
     }
 
     public var layoutTransition: LayoutTransition {
-        return _layoutTransition
+        _layoutTransition
     }
 
     public var appearingTransition: VisibilityTransition? {
-        return _appearingTransition
+        _appearingTransition
     }
 
     public var disappearingTransition: VisibilityTransition? {
-        return _disappearingTransition
+        _disappearingTransition
     }
 
 }

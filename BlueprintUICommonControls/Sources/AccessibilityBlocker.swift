@@ -19,11 +19,11 @@ public struct AccessibilityBlocker: Element {
     //
 
     public var content: ElementContent {
-        return ElementContent(child: wrapped)
+        ElementContent(child: wrapped)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { config in
+        UIView.describe { config in
             config[\.isAccessibilityElement] = false
             config[\.accessibilityElementsHidden] = true
         }

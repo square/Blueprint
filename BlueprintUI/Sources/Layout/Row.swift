@@ -59,12 +59,12 @@ public struct Row: StackElement {
     public init() {}
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {
-        get { return layout.underflow }
+        get { layout.underflow }
         set { layout.underflow = newValue }
     }
 
     public var horizontalOverflow: StackLayout.OverflowDistribution {
-        get { return layout.overflow }
+        get { layout.overflow }
         set { layout.overflow = newValue }
     }
 
@@ -79,7 +79,7 @@ public struct Row: StackElement {
     }
 
     public var minimumHorizontalSpacing: CGFloat {
-        get { return layout.minimumSpacing }
+        get { layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
 

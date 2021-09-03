@@ -253,10 +253,10 @@ class ConstrainedAspectRatioTests: XCTestCase {
 
 private struct TestElement: Element {
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 120, height: 100))
+        ElementContent(intrinsicSize: CGSize(width: 120, height: 100))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }

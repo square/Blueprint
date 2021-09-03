@@ -39,7 +39,7 @@ public struct EqualStack: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     public mutating func add(child: Element) {

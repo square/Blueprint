@@ -195,7 +195,7 @@ class EnvironmentTests: XCTestCase {
 
     struct AdaptingElement: ProxyElement {
         var elementRepresentation: Element {
-            return EnvironmentReader { environment -> Element in
+            EnvironmentReader { environment -> Element in
                 TestElement(value: environment.testValue)
             }
         }
@@ -249,7 +249,7 @@ private struct TestElement: Element {
     var value: TestValue
 
     var content: ElementContent {
-        return ElementContent(
+        ElementContent(
             layout: TestLayout(value: value),
             configure: { layout in
                 layout.add(element: Spacer(size: CGSize(width: 8, height: 8)))
@@ -261,16 +261,16 @@ private struct TestElement: Element {
         var value: TestValue
 
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            return value.size
+            value.size
         }
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            return [value.layoutAttributes]
+            [value.layoutAttributes]
         }
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return TestView.describe { config in
+        TestView.describe { config in
             config[\.testValue] = self.value
         }
     }
@@ -282,7 +282,7 @@ private class TestViewBackedElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return TestView.describe { config in
+        TestView.describe { config in
             config[\.testValue] = context.environment[TestKey.self]
         }
     }
@@ -309,7 +309,7 @@ private enum TestValue {
     }
 
     var layoutAttributes: LayoutAttributes {
-        return LayoutAttributes(size: size)
+        LayoutAttributes(size: size)
     }
 }
 
@@ -319,7 +319,7 @@ private enum TestKey: EnvironmentKey {
 
 extension Environment {
     fileprivate var testValue: TestValue {
-        get { return self[TestKey.self] }
+        get { self[TestKey.self] }
         set { self[TestKey.self] = newValue }
     }
 }

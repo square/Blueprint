@@ -199,7 +199,7 @@ class PixelBoundaryTests: XCTestCase {
         }
 
         func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-            return UIView.describe { _ in }
+            UIView.describe { _ in }
         }
     }
 }

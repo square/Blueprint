@@ -9,7 +9,7 @@ extension Element {
     ///
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment = .empty) -> LayoutResultNode {
-        return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
     }
 }
 
@@ -20,7 +20,7 @@ extension ElementContent {
     ///   - constraint: The size constraint.
     /// - returns: The layout size needed by this content.
     func measure(in constraint: SizeConstraint) -> CGSize {
-        return measure(in: constraint, environment: .empty)
+        measure(in: constraint, environment: .empty)
     }
 
     /// A convenience wrapper to perform layout during testing, using a default `Environment` and

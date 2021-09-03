@@ -17,6 +17,6 @@ final class FakeCache: CacheTree {
     }
 
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        return FakeCache(name: name(), signpostRef: signpostRef)
+        FakeCache(name: name(), signpostRef: signpostRef)
     }
 }

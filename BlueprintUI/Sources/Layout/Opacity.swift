@@ -23,18 +23,18 @@ public struct Opacity: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(opacity: opacity))
+        ElementContent(child: wrappedElement, layout: Layout(opacity: opacity))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
         var opacity: CGFloat
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
+            child.measure(in: constraint)
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
@@ -52,7 +52,7 @@ extension Element {
     ///   - opacity: The opacity to be applied.
     ///
     public func opacity(_ opacity: CGFloat) -> Opacity {
-        return Opacity(
+        Opacity(
             opacity: opacity,
             wrapping: self
         )

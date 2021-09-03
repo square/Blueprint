@@ -37,7 +37,7 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        return measure(
+        measure(
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent")
@@ -51,7 +51,7 @@ public struct ElementContent {
     }
 
     public var childCount: Int {
-        return storage.childCount
+        storage.childCount
     }
 
     func performLayout(
@@ -59,7 +59,7 @@ public struct ElementContent {
         environment: Environment,
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        return storage.performLayout(
+        storage.performLayout(
             attributes: attributes,
             environment: environment,
             cache: cache
@@ -248,7 +248,7 @@ extension ElementContent {
         // MARK: ContentStorage
 
         var childCount: Int {
-            return children.count
+            children.count
         }
 
         func measure(
@@ -256,7 +256,7 @@ extension ElementContent {
             environment: Environment,
             cache: CacheTree
         ) -> CGSize {
-            return cache.get(constraint) { constraint -> CGSize in
+            cache.get(constraint) { constraint -> CGSize in
                 Logger.logMeasureStart(
                     object: cache.signpostRef,
                     description: cache.name,
@@ -321,7 +321,7 @@ extension ElementContent {
             in environment: Environment,
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
-            return children.enumerated().map { index, child in
+            children.enumerated().map { index, child in
                 let childContent = child.content
                 let childCache = cache.subcache(
                     index: index,
@@ -448,7 +448,7 @@ private struct LazyStorage: ContentStorage {
     }
 
     private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
-        return builder(constraint, environment)
+        builder(constraint, environment)
     }
 }
 
@@ -481,11 +481,11 @@ fileprivate struct SingleChildLayoutHost: Layout {
 fileprivate struct PassthroughLayout: SingleChildLayout {
 
     func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        return child.measure(in: constraint)
+        child.measure(in: constraint)
     }
 
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        return LayoutAttributes(size: size)
+        LayoutAttributes(size: size)
     }
 
 }
@@ -511,6 +511,6 @@ fileprivate struct MeasurableLayout: Layout {
 struct Measurer: Measurable {
     var _measure: (SizeConstraint) -> CGSize
     func measure(in constraint: SizeConstraint) -> CGSize {
-        return _measure(constraint)
+        _measure(constraint)
     }
 }

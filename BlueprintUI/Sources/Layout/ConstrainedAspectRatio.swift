@@ -135,11 +135,11 @@ public struct ConstrainedAspectRatio: Element {
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(aspectRatio: aspectRatio, contentMode: contentMode))
+        ElementContent(child: wrappedElement, layout: Layout(aspectRatio: aspectRatio, contentMode: contentMode))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
@@ -156,7 +156,7 @@ public struct ConstrainedAspectRatio: Element {
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            return LayoutAttributes(size: size)
+            LayoutAttributes(size: size)
         }
     }
 }

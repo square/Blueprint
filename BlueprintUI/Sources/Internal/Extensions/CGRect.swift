@@ -16,7 +16,7 @@ extension CGRect {
     ///   - scale: The rounding scale.
     /// - Returns: A rectangle with the rounded values.
     func rounded(_ rule: FloatingPointRoundingRule, by scale: CGFloat) -> CGRect {
-        return CGRect(
+        CGRect(
             minX: minX.rounded(rule, by: scale),
             minY: minY.rounded(rule, by: scale),
             maxX: maxX.rounded(rule, by: scale),
@@ -25,6 +25,6 @@ extension CGRect {
     }
 
     func offset(by point: CGPoint) -> CGRect {
-        return offsetBy(dx: point.x, dy: point.y)
+        offsetBy(dx: point.x, dy: point.y)
     }
 }

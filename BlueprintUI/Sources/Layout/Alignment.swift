@@ -26,7 +26,7 @@ public struct HorizontalAlignment: Equatable {
     }
 
     public static func == (lhs: HorizontalAlignment, rhs: HorizontalAlignment) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 }
 
@@ -43,7 +43,7 @@ public struct VerticalAlignment: Equatable {
     }
 
     public static func == (lhs: VerticalAlignment, rhs: VerticalAlignment) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 }
 

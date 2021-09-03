@@ -46,7 +46,7 @@ private struct NestedBoxes: ProxyElement {
 
 private struct FractionRow: ProxyElement {
     var elementRepresentation: Element {
-        return Box(
+        Box(
             backgroundColor: .yellow,
             wrapping: ConstrainedSize(
                 width: .absolute(13.0),

@@ -340,7 +340,7 @@ fileprivate struct FixedElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }
 
@@ -363,6 +363,6 @@ fileprivate struct FlexibleElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }
