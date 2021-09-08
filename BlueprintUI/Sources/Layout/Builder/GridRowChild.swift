@@ -52,7 +52,7 @@ extension Element {
 }
 
 extension GridRow.Child: ElementBuilderChild {
-    public init(from element: Element) {
-        self = element.gridRowChild(width: .proportional(1))
+    public init(_ element: Element) {
+        self.init(width: .proportional(1), element: element)
     }
 }

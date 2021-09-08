@@ -116,3 +116,16 @@ public struct Row: StackElement {
     }
 
 }
+
+extension StackLayout {
+    /// Default layout for a `Row`.
+    public static let defaultRow: Self = StackLayout(
+        axis: .horizontal,
+        alignment: Row.RowAlignment.top.stackAlignment
+    )
+
+    /// Converts alignment to `RowAlignment`.
+    public var rowAlignment: Row.RowAlignment {
+        .init(alignment)
+    }
+}

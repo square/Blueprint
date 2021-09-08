@@ -199,28 +199,6 @@ extension StackElement {
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
 public struct StackLayout: Layout {
 
-    /// Default layout for a `Column`.
-    public static let defaultColumn: Self = StackLayout(
-        axis: .vertical,
-        alignment: Column.ColumnAlignment.leading.stackAlignment
-    )
-
-    /// Default layout for a `Row`.
-    public static let defaultRow: Self = StackLayout(
-        axis: .horizontal,
-        alignment: Row.RowAlignment.top.stackAlignment
-    )
-
-    /// Converts alignment to `RowAlignment`.
-    public var rowAlignment: Row.RowAlignment {
-        .init(alignment)
-    }
-
-    /// Converts alignment to `ColumnAlignment`.
-    public var columnAlignment: Column.ColumnAlignment {
-        .init(alignment)
-    }
-
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
         Traits()

@@ -11,7 +11,7 @@ extension EqualStack {
 }
 
 extension EqualStack.Child: ElementBuilderChild {
-    public init(from element: Element) {
+    public init(_ element: Element) {
         self.init(element: element)
     }
 }

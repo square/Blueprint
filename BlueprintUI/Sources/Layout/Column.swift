@@ -109,3 +109,16 @@ public struct Column: StackElement {
     }
 
 }
+
+extension StackLayout {
+    /// Default layout for a `Column`.
+    public static let defaultColumn: Self = StackLayout(
+        axis: .vertical,
+        alignment: Column.ColumnAlignment.leading.stackAlignment
+    )
+
+    /// Converts alignment to `ColumnAlignment`.
+    public var columnAlignment: Column.ColumnAlignment {
+        .init(alignment)
+    }
+}

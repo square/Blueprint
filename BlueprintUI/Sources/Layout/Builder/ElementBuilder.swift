@@ -30,7 +30,7 @@ public struct ElementBuilder<Child: ElementBuilderChild> {
 
     /// Allow an Element to be implicitly converted into `Child`.
     public static func buildExpression(_ element: Element) -> Children {
-        [Child(from: element)]
+        [Child(element)]
     }
 
     /// Allow Elements to be implicitly converted into `Child`.
@@ -42,5 +42,5 @@ public struct ElementBuilder<Child: ElementBuilderChild> {
 /// Defines a way for an`Element` to be implicitly converted into the conforming type (the child of a container).
 /// In practive, this allows us to pass an `Element` directly into the result builder without manually converting to `Child` (i.e. Converting `Element` -> `StackChild`.
 public protocol ElementBuilderChild {
-    init(from element: Element)
+    init(_ element: Element)
 }

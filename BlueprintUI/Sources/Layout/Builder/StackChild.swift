@@ -4,7 +4,9 @@ import UIKit
 /// `StackChild` is a wrapper which holds an element along with  its StackLayout traits and Keys.
 /// This struct is particularly useful when working with `@ElementBuilder<StackChild>`.
 /// By default, elements inside of `ElementBuilder<StackChild>` will be implicitly converted to a StackChild
-/// with a nil key and the default `StackLayout.Traits` initializer. But when given a `StackChild` via `Element.stackChild(...)` modifier or initialized directly, `@ElementBuilder<StackChild>`pull out the given traits and key and then apply those to the stack
+/// with a nil key and the default `StackLayout.Traits` initializer. But when given a `StackChild` via
+/// `Element.stackChild(...)` modifier or initialized directly, `@ElementBuilder<StackChild>`
+/// pull out the given traits and key and then apply those to the stack
 public struct StackChild {
     public let element: Element
     public let traits: StackLayout.Traits
@@ -99,7 +101,7 @@ extension Element {
 
 
 extension StackChild: ElementBuilderChild {
-    public init(from element: Element) {
-        self = element.stackChild()
+    public init(_ element: Element) {
+        self.init(element: element)
     }
 }
