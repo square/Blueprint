@@ -470,6 +470,32 @@ class BlueprintViewTests: XCTestCase {
 
         XCTAssertEqual(events, expectedEvents)
     }
+
+    func test_onAppearAfterViewUpdates() {
+        let childViewDescriptionApplied = expectation(description: "child view description applied")
+        let parentAppeared = expectation(description: "parent appeared")
+
+        let element = LifecycleTestElement(
+            onAppear: {
+                parentAppeared.fulfill()
+            },
+            onDisappear: {},
+            wrapped: CallbackElement(onViewDescriptionApplied: {
+                childViewDescriptionApplied.fulfill()
+            })
+        )
+
+        let view = BlueprintView()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.addSubview(view)
+
+        view.element = element
+        view.ensureLayoutPass()
+
+        // Check that parent element lifecycle callbacks happen *after* view updates
+        // of their children, so things like focus triggers can be set up.
+        wait(for: [childViewDescriptionApplied, parentAppeared], timeout: 1, enforceOrder: true)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -553,6 +579,22 @@ private struct TestContainer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        }
+    }
+}
+
+private struct CallbackElement: Element {
+    var onViewDescriptionApplied: () -> Void
+
+    var content: ElementContent {
+        ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config.apply { _ in
+                onViewDescriptionApplied()
+            }
         }
     }
 }

@@ -287,13 +287,17 @@ public final class BlueprintView: UIView {
 
         Logger.logViewUpdateStart(view: self)
 
-        rootController.update(
+        let updateResult = rootController.update(
             node: rootNode,
             context: .init(
                 appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
                 viewIsVisible: isVisible
             )
         )
+
+        for callback in updateResult.lifecycleCallbacks {
+            callback()
+        }
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
@@ -422,7 +426,7 @@ extension BlueprintView {
             node.viewDescription.viewType == type(of: view)
         }
 
-        fileprivate func update(node: NativeViewNode, context: UpdateContext) {
+        fileprivate func update(node: NativeViewNode, context: UpdateContext) -> UpdateResult {
 
             assert(node.viewDescription.viewType == type(of: view))
 
@@ -439,11 +443,13 @@ extension BlueprintView {
                 view.layoutIfNeeded()
             }
 
+            var result = UpdateResult()
+
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update
             // pass is otherwise expensive to perform for empty elements.
             if children.isEmpty && node.children.isEmpty {
-                return
+                return result
             }
 
             var oldChildren: [ElementPath: NativeViewController] = [:]
@@ -497,7 +503,8 @@ extension BlueprintView {
                             contentView.insertSubview(controller.view, at: index)
                         }
 
-                        controller.update(node: child, context: context)
+                        let childResult = controller.update(node: child, context: context)
+                        result.merge(childResult)
                     }
                 } else {
                     var controller: NativeViewController!
@@ -510,13 +517,17 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        if context.viewIsVisible {
-                            controller.onAppear?()
+                        if context.viewIsVisible, let onAppear = controller.onAppear {
+                            result.lifecycleCallbacks.append(onAppear)
                         }
 
-                        controller.update(node: child, context: context.modified {
-                            $0.appearanceTransitionsEnabled = false
-                        })
+                        let childResult = controller.update(
+                            node: child,
+                            context: context.modified {
+                                $0.appearanceTransitionsEnabled = false
+                            }
+                        )
+                        result.merge(childResult)
                     }
 
                     newChildren.append((path: path, node: controller))
@@ -533,12 +544,15 @@ extension BlueprintView {
 
             for controller in oldChildren.values {
                 func removeChild() {
-                    if context.viewIsVisible {
-                        controller.traverse { node in
-                            node.onDisappear?()
+                    controller.view.removeFromSuperview()
+                }
+
+                if context.viewIsVisible {
+                    controller.traverse { node in
+                        if let onDisappear = node.onDisappear {
+                            result.lifecycleCallbacks.append(onDisappear)
                         }
                     }
-                    controller.view.removeFromSuperview()
                 }
 
                 if let transition = controller.viewDescription.disappearingTransition {
@@ -553,6 +567,8 @@ extension BlueprintView {
             }
 
             children = newChildren
+
+            return result
         }
 
         /// Perform a depth-first traversal of the view-backing tree from this node.
@@ -582,6 +598,17 @@ extension BlueprintView.NativeViewController {
             var modified = self
             modify(&modified)
             return modified
+        }
+    }
+
+    /// The result of a native view update, including all child updates.
+    struct UpdateResult {
+        /// The lifecycle callbacks accumulated during the view update.
+        var lifecycleCallbacks: [LifecycleCallback] = []
+
+        /// Merges another update result (such as from a child) into this result.
+        mutating func merge(_ other: UpdateResult) {
+            lifecycleCallbacks += other.lifecycleCallbacks
         }
     }
 }

@@ -34,6 +34,7 @@ public struct LifecycleObserver: Element {
 extension LifecycleObserver {
     /// Adds a hook that will be called when this element appears.
     ///
+    /// Callbacks run in depth-first traversal order, with parents before children.
     public func onAppear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(
             onAppear: onAppear + callback,
@@ -44,6 +45,9 @@ extension LifecycleObserver {
 
     /// Adds a hook that will be called when this element disappears.
     ///
+    /// Callbacks run in depth-first traversal order, with parents before children. There is no
+    /// guaranteed order between disappearance callbacks and backing views being removed from their
+    /// superviews.
     public func onDisappear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(
             onAppear: onAppear,
@@ -56,12 +60,16 @@ extension LifecycleObserver {
 extension Element {
     /// Adds a hook that will be called when this element appears.
     ///
+    /// Callbacks run in depth-first traversal order, with parents before children.
     public func onAppear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(onAppear: callback, wrapping: self)
     }
 
     /// Adds a hook that will be called when this element disappears.
     ///
+    /// Callbacks run in depth-first traversal order, with parents before children. There is no
+    /// guaranteed order between disappearance callbacks and backing views being removed from their
+    /// superviews.
     public func onDisappear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(onDisappear: callback, wrapping: self)
     }
