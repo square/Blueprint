@@ -66,7 +66,8 @@ struct NativeViewNode {
         let childCorrection = layoutAttributes.round(
             from: origin,
             correction: correction,
-            scale: scale
+            scale: scale,
+            behavior: viewDescription.frameRoundingBehavior
         )
 
         let childOrigin = origin + layoutAttributes.frame.origin

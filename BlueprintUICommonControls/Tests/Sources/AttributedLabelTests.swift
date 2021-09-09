@@ -128,6 +128,25 @@ class AttributedLabelTests: XCTestCase {
         let element = ConstrainedSize(width: .atMost(150), wrapping: label)
         compareSnapshot(of: element)
     }
+
+    func test_pixelSnappingDoesNotCauseTruncation() {
+        // Offset by a big enough number to force loss of precision
+        let offset = CGFloat(2 << 15)
+
+        let element = Label(text: "Sample text should not get cut off") {
+            $0.lineBreakMode = .byTruncatingTail
+            $0.numberOfLines = 1
+        }
+        .inset(uniform: offset)
+        .inset(uniform: -offset)
+        .centered()
+
+        compareSnapshot(
+            of: element,
+            size: CGSize(width: 400, height: 100),
+            scale: UIScreen.main.scale
+        )
+    }
 }
 
 
