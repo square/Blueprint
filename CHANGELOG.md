@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- View-backed elements may opt-in to a frame rounding behavior that prioritizes preserving the frame size rather than the frame edges. This is primarily meant for text labels, to fix an issue where labels gain or lose a pixel in rounding and become wrapped or truncated incorrectly. ([#257])
+
 ### Removed
 
 ### Changed
@@ -643,6 +645,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#257]: https://github.com/square/Blueprint/pull/257
 [#244]: https://github.com/square/Blueprint/pull/244
 [#209]: https://github.com/square/Blueprint/pull/209
 [#176]: https://github.com/square/Blueprint/pull/176
