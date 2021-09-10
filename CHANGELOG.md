@@ -11,13 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- View-backed elements may opt-in to a frame rounding behavior that prioritizes preserving the frame size rather than the frame edges. This is primarily meant for text labels, to fix an issue where labels gain or lose a pixel in rounding and become wrapped or truncated incorrectly. ([#257])
-
 ### Removed
 
 ### Changed
-
-- Lifecycle hooks are guaranteed to run after all views are updated. ([#260])
 
 ### Deprecated
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.28.1] - 2021-09-10
+
+### Added
+
+- View-backed elements may opt-in to a frame rounding behavior that prioritizes preserving the frame size rather than the frame edges. This is primarily meant for text labels, to fix an issue where labels gain or lose a pixel in rounding and become wrapped or truncated incorrectly. ([#257])
+
+### Changed
+
+- Lifecycle hooks are guaranteed to run after all views are updated. ([#260])
 
 ## [0.28.0] - 2021-09-01
 
