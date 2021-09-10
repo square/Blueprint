@@ -163,15 +163,26 @@ public struct LayoutAttributes {
     ///   - correction: The amount of rounding correction to apply to the origin before rounding, to account for the
     ///     rounding applied to this node's parent.
     ///   - scale: The screen scale to use when rounding.
-    mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) -> CGPoint {
+    ///   - behavior: The rounding prioritization method for this frame.
+    mutating func round(
+        from origin: CGPoint,
+        correction: CGPoint,
+        scale: CGFloat,
+        behavior: ViewDescription.FrameRoundingBehavior
+    ) -> CGPoint {
         // Apply origin offset and rounding correction
         let correctedFrame = frame
             .offset(by: origin)
             .offset(by: correction)
 
         // Round
-        let roundedFrame = correctedFrame
-            .rounded(.toNearestOrAwayFromZero, by: scale)
+        let roundedFrame: CGRect
+        switch behavior {
+        case .prioritizeEdges:
+            roundedFrame = correctedFrame.roundedPrioritizingEdges(.toNearestOrAwayFromZero, by: scale)
+        case .prioritizeSize:
+            roundedFrame = correctedFrame.roundedPrioritizingSize(.toNearestOrAwayFromZero, by: scale)
+        }
 
         // Save rounding correction
         let roundingCorrection = correctedFrame.origin - roundedFrame.origin

@@ -53,6 +53,7 @@ public struct AttributedLabel: Element, Hashable {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         LabelView.describe { config in
+            config.frameRoundingBehavior = .prioritizeSize
             config.apply(update)
         }
     }

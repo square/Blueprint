@@ -52,6 +52,8 @@ public struct ViewDescription {
     let onAppear: LifecycleCallback?
     let onDisappear: LifecycleCallback?
 
+    let frameRoundingBehavior: FrameRoundingBehavior
+
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
     public init<View>(_ viewType: View.Type) where View: UIView {
@@ -95,6 +97,8 @@ public struct ViewDescription {
 
         onAppear = configuration.onAppear
         onDisappear = configuration.onDisappear
+
+        frameRoundingBehavior = configuration.frameRoundingBehavior
     }
 
     public var viewType: UIView.Type {
@@ -128,6 +132,14 @@ public struct ViewDescription {
 }
 
 extension ViewDescription {
+
+    /// The available prioritization options for rounding frames to pixel boundaries.
+    public enum FrameRoundingBehavior: Equatable {
+        /// Prioritize preserving frame edge positions
+        case prioritizeEdges
+        /// Prioritize preserving frame sizes
+        case prioritizeSize
+    }
 
     /// Represents the configuration of a specific UIView type.
     public struct Configuration<View: UIView> {
@@ -164,6 +176,26 @@ extension ViewDescription {
 
         /// A hook to call when the element disappears.
         public var onDisappear: LifecycleCallback?
+
+        /// The prioritization method to use when snapping the native view's frame to pixel
+        /// boundaries.
+        ///
+        /// When snapping views to pixel boundaries, Blueprint prioritizes placing frame edges as
+        /// close to the correct value as possible. This ensures that flush edges stay flush after
+        /// rounding, but can result in frame sizes growing or shrinking by 1 pixel in either axis.
+        ///
+        /// Backing views that are particularly sensitive to size changes can opt-in to prioritize
+        /// preserving their frame size instead of maximally correct edges. This will guarantee
+        /// frame sizes, with the tradeoff that their edges may no longer be flush to other edges as
+        /// they were laid out.
+        ///
+        /// Generally you should not change this value except in specific circumstances when all
+        /// criteria are met:
+        /// - The backing view is sensitive to frame size, such as a text label.
+        /// - And the backing view has a transparent background, so that overlapping frames or gaps
+        ///   between frames are not visible.
+        ///
+        public var frameRoundingBehavior: FrameRoundingBehavior = .prioritizeEdges
 
         /// Initializes a default configuration object.
         public init() {
