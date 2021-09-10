@@ -616,7 +616,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.28.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.28.1...HEAD
+[0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
 [0.28.0]: https://github.com/square/Blueprint/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/square/Blueprint/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/square/Blueprint/compare/0.25.0...0.26.0
