@@ -52,11 +52,10 @@ public struct Column: StackElement {
 
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
-    ///   - alignment: Specifies how children will be aligned horizontally.
-    ///   - underflow: Determines the layout when there is extra free space available.
-    ///   - overflow: Determines the layout when there is not enough space to fit all children as measured.
-    ///   - horizontalAlignment: Specifies how children will be aligned horizontally.
-    ///   - minimumSpacing: Spacing in between elements.
+    ///   - alignment: Specifies how children will be aligned horizontally. Default: .leading
+    ///   - underflow: Determines the layout when there is extra free space available. Default: .spaceEvenly
+    ///   - overflow: Determines the layout when there is not enough space to fit all children as measured. Default: .condenseProportionally
+    ///   - minimumSpacing: Spacing in between elements. Default: 0
     ///   - elements: A block containing all elements to be included in the stack.
     /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackLayout.Child` with default values
     public init(
@@ -70,7 +69,7 @@ public struct Column: StackElement {
         layout.underflow = underflow
         layout.overflow = overflow
         layout.minimumSpacing = minimumSpacing
-        
+
         self.init(elementsBuilder: elements)
         self.layout = layout
     }
