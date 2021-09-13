@@ -421,7 +421,7 @@ class StackTestsResultBuilders: XCTestCase {
                 let row = Row(underflow: underflow) {
                     items.map { item in
                         TestElement(size: CGSize(width: item.measuredLength, height: 100))
-                        .stackLayoutChild(priority: item.priority)
+                            .stackLayoutChild(priority: item.priority)
                     }
                 }
 
@@ -1002,35 +1002,12 @@ class StackTestsResultBuilders: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: .flexible)
-            ],
-            expectedSizes: [
-                StackLayout.Vector(axis: 75, cross: 20), // 7 x 2
-            ]
-        )
-
-        test(
-            items: [
                 (item: .fixed, priority: .fixed),
                 (item: .flex, priority: .flexible)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
                 StackLayout.Vector(axis: 90, cross: 20)
-            ]
-        )
-
-        test(
-            // overflow of 120
-            items: [
-                (item: .fixed, priority: .fixed),
-                (item: .flex, priority: .flexible), // shrinks by 40
-                (item: .fixed, priority: .fixed)
-            ],
-            expectedSizes: [
-                StackLayout.Vector(axis: 10, cross: 10),
-                StackLayout.Vector(axis: 60, cross: 20), // 6 x 2
-                StackLayout.Vector(axis: 10, cross: 10)
             ]
         )
     }
