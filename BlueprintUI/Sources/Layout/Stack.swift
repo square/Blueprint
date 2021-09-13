@@ -7,7 +7,7 @@ import UIKit
 public protocol StackElement: Element {
     init()
     var layout: StackLayout { get }
-    var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
+    var children: [StackLayout.Child] { get set }
 }
 
 extension StackElement {
@@ -39,9 +39,7 @@ extension StackElement {
     /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.
     init(@ElementBuilder<StackLayout.Child> elementsBuilder: () -> [StackLayout.Child]) {
         self.init()
-        children = elementsBuilder().map { stackLayoutChild in
-            (stackLayoutChild.element, stackLayoutChild.traits, stackLayoutChild.key)
-        }
+        children = elementsBuilder()
     }
 
     /// Adds a given child element to the stack.
@@ -113,7 +111,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        children.append((
+        children.append(.init(
             element: child,
             traits: StackLayout.Traits(
                 growPriority: growPriority,
@@ -977,7 +975,7 @@ extension SizeConstraint.Axis {
     }
 }
 
-// Mark: - Result Builders
+// MARK: - Result Builders
 
 /// `StackLayout.Child` is a wrapper which holds an element along with  its StackLayout traits and Keys.
 /// This struct is particularly useful when working with `@ElementBuilder<StackLayout.Child>`.

@@ -41,7 +41,7 @@ public struct Column: StackElement {
         }
     }
 
-    public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
+    public var children: [StackLayout.Child] = []
 
     public private(set) var layout: StackLayout = StackLayout(
         axis: .vertical,
