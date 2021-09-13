@@ -1,7 +1,7 @@
 import XCTest
 @testable import BlueprintUI
 
-class EqualStackTests: XCTestCase {
+class EqualStackTestsResultBuilders: XCTestCase {
 
     func test_defaults() {
         let stack = EqualStack(direction: .horizontal)
@@ -11,19 +11,14 @@ class EqualStackTests: XCTestCase {
 
     func test_measuring_unconstrained() {
 
-        let children = [
-            TestElement(size: CGSize(width: 50, height: 50)),
-            TestElement(size: CGSize(width: 100, height: 100)),
-            TestElement(size: CGSize(width: 150, height: 150)),
-        ]
-
         let constraint = SizeConstraint.unconstrained
 
         // direction = .horizontal, spacing = 0
         do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 0
-                stack.children = children
+            let stack = EqualStack(direction: .horizontal, spacing: 0) {
+                TestElement(size: CGSize(width: 50, height: 50))
+                TestElement(size: CGSize(width: 100, height: 100))
+                TestElement(size: CGSize(width: 150, height: 150))
             }
 
             XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 450, height: 150))
@@ -31,9 +26,10 @@ class EqualStackTests: XCTestCase {
 
         // direction = .horizontal, spacing = 50
         do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 50
-                stack.children = children
+            let stack = EqualStack(direction: .horizontal, spacing: 50) {
+                TestElement(size: CGSize(width: 50, height: 50))
+                TestElement(size: CGSize(width: 100, height: 100))
+                TestElement(size: CGSize(width: 150, height: 150))
             }
 
             XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 550, height: 150))
@@ -41,9 +37,10 @@ class EqualStackTests: XCTestCase {
 
         // direction = .vertical, spacing = 0
         do {
-            let stack = EqualStack(direction: .vertical) { stack in
-                stack.spacing = 0
-                stack.children = children
+            let stack = EqualStack(direction: .vertical, spacing: 0) {
+                TestElement(size: CGSize(width: 50, height: 50))
+                TestElement(size: CGSize(width: 100, height: 100))
+                TestElement(size: CGSize(width: 150, height: 150))
             }
 
             XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 150, height: 450))
@@ -51,9 +48,10 @@ class EqualStackTests: XCTestCase {
 
         // direction = .vertical, spacing = 50
         do {
-            let stack = EqualStack(direction: .vertical) { stack in
-                stack.spacing = 50
-                stack.children = children
+            let stack = EqualStack(direction: .vertical, spacing: 50) {
+                TestElement(size: CGSize(width: 50, height: 50))
+                TestElement(size: CGSize(width: 100, height: 100))
+                TestElement(size: CGSize(width: 150, height: 150))
             }
 
             XCTAssertEqual(stack.content.measure(in: constraint), CGSize(width: 150, height: 550))
@@ -75,9 +73,8 @@ class EqualStackTests: XCTestCase {
 
             // spacing = 0
             do {
-                let stack = EqualStack(direction: .horizontal) { stack in
-                    stack.spacing = 0
-                    stack.children = children
+                let stack = EqualStack(direction: .horizontal, spacing: 0) {
+                    children
                 }
 
                 // 300 / 3 = 100
@@ -87,9 +84,8 @@ class EqualStackTests: XCTestCase {
 
             // spacing = 30
             do {
-                let stack = EqualStack(direction: .horizontal) { stack in
-                    stack.spacing = 30
-                    stack.children = children
+                let stack = EqualStack(direction: .horizontal, spacing: 30) {
+                    children
                 }
 
                 // 300 - 30 - 30 = 240
@@ -105,9 +101,8 @@ class EqualStackTests: XCTestCase {
 
             // spacing = 0
             do {
-                let stack = EqualStack(direction: .vertical) { stack in
-                    stack.spacing = 0
-                    stack.children = children
+                let stack = EqualStack(direction: .vertical, spacing: 0) {
+                    children
                 }
 
                 // 400 / 3 = 133.333…
@@ -117,9 +112,8 @@ class EqualStackTests: XCTestCase {
 
             // spacing = 50
             do {
-                let stack = EqualStack(direction: .vertical) { stack in
-                    stack.spacing = 50
-                    stack.children = children
+                let stack = EqualStack(direction: .vertical, spacing: 50) {
+                    children
                 }
 
                 // 400 - 50 - 50 = 300
@@ -142,9 +136,8 @@ class EqualStackTests: XCTestCase {
 
         // direction = .horizontal, spacing = 0
         do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 0
-                stack.children = children
+            let stack = EqualStack(direction: .horizontal, spacing: 0) {
+                children
             }
 
             let childFrames = stack
@@ -161,9 +154,8 @@ class EqualStackTests: XCTestCase {
 
         // direction = .horizontal, spacing = 50
         do {
-            let stack = EqualStack(direction: .horizontal) { stack in
-                stack.spacing = 50
-                stack.children = children
+            let stack = EqualStack(direction: .horizontal, spacing: 50) {
+                children
             }
 
             let childFrames = stack
@@ -180,9 +172,8 @@ class EqualStackTests: XCTestCase {
 
         // direction = .vertical, spacing = 0
         do {
-            let stack = EqualStack(direction: .vertical) { stack in
-                stack.spacing = 0
-                stack.children = children
+            let stack = EqualStack(direction: .vertical, spacing: 0) {
+                children
             }
 
             let childFrames = stack
@@ -199,9 +190,8 @@ class EqualStackTests: XCTestCase {
 
         // direction = .vertical, spacing = 25
         do {
-            let stack = EqualStack(direction: .vertical) { stack in
-                stack.spacing = 25
-                stack.children = children
+            let stack = EqualStack(direction: .vertical, spacing: 25) {
+                children
             }
 
             let childFrames = stack

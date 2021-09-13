@@ -1,7 +1,7 @@
 import XCTest
 @testable import BlueprintUI
 
-class StackTestsResultBuilders: XCTestCase {
+class StackTests: XCTestCase {
 
     func test_defaults() {
         let column = Column()
@@ -12,10 +12,9 @@ class StackTestsResultBuilders: XCTestCase {
     }
 
     func test_vertical() {
-        let column = Column {
-            TestElement()
-            TestElement()
-        }
+        var column = Column()
+        column.add(child: TestElement())
+        column.add(child: TestElement())
 
         XCTAssertEqual(column.content.measure(in: .unconstrained).width, 100)
         XCTAssertEqual(column.content.measure(in: .unconstrained).height, 200)
@@ -32,10 +31,9 @@ class StackTestsResultBuilders: XCTestCase {
     }
 
     func test_horizontal() {
-        let row = Row {
-            TestElement()
-            TestElement()
-        }
+        var row = Row()
+        row.add(child: TestElement())
+        row.add(child: TestElement())
 
         XCTAssertEqual(row.content.measure(in: .unconstrained).width, 200)
         XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
@@ -52,10 +50,10 @@ class StackTestsResultBuilders: XCTestCase {
     }
 
     func test_minimumSpacing() {
-        let row = Row(minimumSpacing: 10.0) {
-            TestElement()
-            TestElement()
-        }
+        var row = Row()
+        row.add(child: TestElement())
+        row.add(child: TestElement())
+        row.minimumHorizontalSpacing = 10.0
 
         XCTAssertEqual(row.content.measure(in: .unconstrained).width, 210)
         XCTAssertEqual(row.content.measure(in: .unconstrained).height, 100)
@@ -79,8 +77,9 @@ class StackTestsResultBuilders: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let column = Column(alignment: alignment) {
-                TestElement(size: CGSize(width: elementCrossSize, height: 100))
+            let column = Column { column in
+                column.add(child: TestElement(size: CGSize(width: elementCrossSize, height: 100)))
+                column.horizontalAlignment = alignment
             }
 
             XCTAssertEqual(
@@ -120,8 +119,9 @@ class StackTestsResultBuilders: XCTestCase {
             file: StaticString = #file,
             line: UInt = #line
         ) {
-            let row = Row(alignment: alignment) {
-                TestElement(size: CGSize(width: 100, height: elementCrossSize))
+            let row = Row { row in
+                row.add(child: TestElement(size: CGSize(width: 100, height: elementCrossSize)))
+                row.verticalAlignment = alignment
             }
 
             XCTAssertEqual(
@@ -202,13 +202,15 @@ class StackTestsResultBuilders: XCTestCase {
         //  anchor ▶┴┴──────────┴──────────────┴──────────┴─◀
         //
         test(
-            stack: Row(alignment: .bottom) {
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { _ in 0 }) // align to top edge
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in d.height }) // align to bottom edge
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in d[.top] }) // align to top using another guide
+            stack: Row { row in
+                row.verticalAlignment = .bottom
+
+                // align to top edge
+                row.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                // align to bottom edge
+                row.add(alignmentGuide: { d in d.height }, child: TestElement())
+                // align to top using another guide
+                row.add(alignmentGuide: { d in d[.top] }, child: TestElement())
             },
             layoutSize: CGSize(width: 300, height: 200),
             expectedSize: CGSize(width: 300, height: 200),
@@ -220,10 +222,12 @@ class StackTestsResultBuilders: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(alignment: .trailing) {
-                TestElement().stackLayoutChild(alignmentGuide: { _ in 0 })
-                TestElement().stackLayoutChild(alignmentGuide: { d in d.width })
-                TestElement().stackLayoutChild(alignmentGuide: { d in d[.leading] })
+            stack: Column { column in
+                column.horizontalAlignment = .trailing
+
+                column.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                column.add(alignmentGuide: { d in d.width }, child: TestElement())
+                column.add(alignmentGuide: { d in d[.leading] }, child: TestElement())
             },
             layoutSize: CGSize(width: 200, height: 300),
             expectedSize: CGSize(width: 200, height: 300),
@@ -258,14 +262,17 @@ class StackTestsResultBuilders: XCTestCase {
         //           │                          │          │
         //            ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┴──────────┘─ ─ ─ ─ ─ ─ ┘
         test(
-            stack: Row(alignment: .center) {
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { _ in 0 }) // align to top edge
-                TestElement() // default (center)
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in -40 }) // align outside bounds
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in 160 }) // align outside bounds
+            stack: Row { row in
+                row.verticalAlignment = .center
+
+                // align to top edge
+                row.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                // default (center)
+                row.add(child: TestElement())
+                // align outside bounds
+                row.add(alignmentGuide: { d in -40 }, child: TestElement())
+                // align outside bounds
+                row.add(alignmentGuide: { d in 160 }, child: TestElement())
             },
             layoutSize: CGSize(width: 400, height: 200),
             expectedSize: CGSize(width: 400, height: 300),
@@ -278,11 +285,13 @@ class StackTestsResultBuilders: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(alignment: .center) {
-                TestElement().stackLayoutChild(alignmentGuide: { _ in 0 })
-                TestElement()
-                TestElement().stackLayoutChild(alignmentGuide: { d in -40 })
-                TestElement().stackLayoutChild(alignmentGuide: { d in 160 })
+            stack: Column { column in
+                column.horizontalAlignment = .center
+
+                column.add(alignmentGuide: { _ in 0 }, child: TestElement())
+                column.add(child: TestElement())
+                column.add(alignmentGuide: { d in -40 }, child: TestElement())
+                column.add(alignmentGuide: { d in 160 }, child: TestElement())
             },
             layoutSize: CGSize(width: 200, height: 400),
             expectedSize: CGSize(width: 300, height: 400),
@@ -314,12 +323,15 @@ class StackTestsResultBuilders: XCTestCase {
         //  anchor ▶─┴─────────────────────────┴──────────┴┴◀
         //
         test(
-            stack: Row(alignment: .bottom) {
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in d.height - 10 }) // 10 from bottom
-                TestElement() // default (bottom)
-                TestElement()
-                    .stackLayoutChild(alignmentGuide: { d in d.height - 20 }) // 20 from bottom
+            stack: Row { row in
+                row.verticalAlignment = .bottom
+
+                // 10 from bottom
+                row.add(alignmentGuide: { d in d.height - 10 }, child: TestElement())
+                // default (bottom)
+                row.add(child: TestElement())
+                // 20 from bottom
+                row.add(alignmentGuide: { d in d.height - 20 }, child: TestElement())
             },
             layoutSize: CGSize(width: 300, height: 200),
             expectedSize: CGSize(width: 300, height: 120),
@@ -331,10 +343,12 @@ class StackTestsResultBuilders: XCTestCase {
         )
         // Same test on the other axis.
         test(
-            stack: Column(alignment: .trailing) {
-                TestElement().stackLayoutChild(alignmentGuide: { d in d.width - 10 })
-                TestElement()
-                TestElement().stackLayoutChild(alignmentGuide: { d in d.width - 20 })
+            stack: Column { column in
+                column.horizontalAlignment = .trailing
+
+                column.add(alignmentGuide: { d in d.width - 10 }, child: TestElement())
+                column.add(child: TestElement())
+                column.add(alignmentGuide: { d in d.width - 20 }, child: TestElement())
             },
             layoutSize: CGSize(width: 200, height: 300),
             expectedSize: CGSize(width: 120, height: 300),
@@ -355,8 +369,9 @@ class StackTestsResultBuilders: XCTestCase {
             line: UInt = #line
         ) {
             do {
-                let row = Row(alignment: .fill) {
-                    TestElement(size: CGSize(width: 100, height: 100))
+                let row = Row { row in
+                    row.verticalAlignment = .fill
+                    row.add(child: TestElement(size: CGSize(width: 100, height: 100)))
                 }
 
                 let constraint = SizeConstraint(width: .unconstrained, height: crossConstraint)
@@ -376,8 +391,9 @@ class StackTestsResultBuilders: XCTestCase {
             }
 
             do {
-                let column = Column(alignment: .fill) {
-                    TestElement(size: CGSize(width: 100, height: 100))
+                let column = Column { column in
+                    column.horizontalAlignment = .fill
+                    column.add(child: TestElement(size: CGSize(width: 100, height: 100)))
                 }
 
                 let constraint = SizeConstraint(width: crossConstraint, height: .unconstrained)
@@ -407,7 +423,7 @@ class StackTestsResultBuilders: XCTestCase {
         func test(
             underflow: StackLayout.UnderflowDistribution,
             layoutLength: CGFloat,
-            items: [(measuredLength: CGFloat, priority: StackLayout.Child.Priority)],
+            items: [(measuredLength: CGFloat, growPriority: CGFloat)],
             expectedRanges: [ClosedRange<CGFloat>],
             file: StaticString = #file,
             line: UInt = #line
@@ -418,12 +434,15 @@ class StackTestsResultBuilders: XCTestCase {
                 .reduce(0, +)
 
             do {
-                let row = Row(underflow: underflow) {
-                    items.map { item in
-                        TestElement(size: CGSize(width: item.measuredLength, height: 100))
-                        .stackLayoutChild(priority: item.priority)
-                    }
+                var row = Row()
+                for item in items {
+                    row.add(
+                        growPriority: item.growPriority,
+                        shrinkPriority: 1.0,
+                        child: TestElement(size: CGSize(width: item.measuredLength, height: 100))
+                    )
                 }
+                row.horizontalUnderflow = underflow
 
                 let size = row.content.measure(
                     in: SizeConstraint(
@@ -452,12 +471,15 @@ class StackTestsResultBuilders: XCTestCase {
             }
 
             do {
-                let column = Column(underflow: underflow) {
-                    items.map { item in
-                        TestElement(size: CGSize(width: 100, height: item.measuredLength))
-                            .stackLayoutChild(priority: item.priority)
-                    }
+                var column = Column()
+                for item in items {
+                    column.add(
+                        growPriority: item.growPriority,
+                        shrinkPriority: 1.0,
+                        child: TestElement(size: CGSize(width: 100, height: item.measuredLength))
+                    )
                 }
+                column.verticalUnderflow = underflow
 
                 let size = column.content.measure(
                     in: SizeConstraint(
@@ -488,16 +510,14 @@ class StackTestsResultBuilders: XCTestCase {
         }
 
         // Ensure that elements of size zero do not result in NaN in the outputted frames.
-
         do {
             // Note: Only applicable to `growProportionally`.
-
             test(
                 underflow: .growProportionally,
                 layoutLength: 100,
                 items: [
-                    (measuredLength: 0, priority: .flexible),
-                    (measuredLength: 0, priority: .flexible),
+                    (measuredLength: 0, growPriority: 1.0),
+                    (measuredLength: 0, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...0,
@@ -512,7 +532,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .spaceEvenly,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -523,7 +543,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .spaceEvenly,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -534,7 +554,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .growProportionally,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...200,
@@ -545,7 +565,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .growProportionally,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -556,7 +576,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .growUniformly,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...200,
@@ -567,7 +587,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .growUniformly,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -578,7 +598,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToStart,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -589,7 +609,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToStart,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...100,
@@ -600,7 +620,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToCenter,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     50...150,
@@ -611,7 +631,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToCenter,
                 layoutLength: 10,
                 items: [
-                    (measuredLength: 5, priority: .fixed),
+                    (measuredLength: 5, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     2.5...7.5,
@@ -622,7 +642,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToCenter,
                 layoutLength: 15,
                 items: [
-                    (measuredLength: 12, priority: .fixed),
+                    (measuredLength: 12, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     1.5...13.5,
@@ -633,7 +653,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToCenter,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     50...150,
@@ -644,7 +664,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToEnd,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .fixed),
+                    (measuredLength: 100, growPriority: 0.0),
                 ],
                 expectedRanges: [
                     100...200,
@@ -655,7 +675,7 @@ class StackTestsResultBuilders: XCTestCase {
                 underflow: .justifyToEnd,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
                 ],
                 expectedRanges: [
                     100...200,
@@ -669,8 +689,8 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .spaceEvenly,
                 layoutLength: 400, items: [
-                    (measuredLength: 100, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     0...100,
                     300...400,
@@ -680,8 +700,8 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .growUniformly,
                 layoutLength: 400, items: [
-                    (measuredLength: 200, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 200, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     0...250,
                     250...400,
@@ -691,8 +711,8 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .growProportionally,
                 layoutLength: 600, items: [
-                    (measuredLength: 200, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 200, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     0...400,
                     400...600,
@@ -702,8 +722,8 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .justifyToStart,
                 layoutLength: 400, items: [
-                    (measuredLength: 100, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     0...100,
                     100...200,
@@ -713,8 +733,8 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .justifyToCenter,
                 layoutLength: 400, items: [
-                    (measuredLength: 100, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     100...200,
                     200...300,
@@ -724,37 +744,121 @@ class StackTestsResultBuilders: XCTestCase {
             test(
                 underflow: .justifyToEnd,
                 layoutLength: 400, items: [
-                    (measuredLength: 100, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 100, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 1.0),
                 ], expectedRanges: [
                     200...300,
                     300...400,
                 ]
             )
+
         }
+
+        // Test with custom grow priorities
+        do {
+
+            test(
+                underflow: .spaceEvenly,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0),
+                ], expectedRanges: [
+                    0...100,
+                    300...400,
+                ]
+            )
+
+            test(
+                underflow: .growUniformly,
+                layoutLength: 600,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0),
+                ], expectedRanges: [
+                    0...400,
+                    400...600,
+                ]
+            )
+
+            test(
+                underflow: .growProportionally,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 200, growPriority: 1.0),
+                    (measuredLength: 100, growPriority: 2.0),
+                ], expectedRanges: [
+                    0...250,
+                    250...400,
+                ]
+            )
+
+            test(
+                underflow: .justifyToStart,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0),
+                ], expectedRanges: [
+                    0...100,
+                    100...200,
+                ]
+            )
+
+            test(
+                underflow: .justifyToCenter,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0),
+                ], expectedRanges: [
+                    100...200,
+                    200...300,
+                ]
+            )
+
+            test(
+                underflow: .justifyToEnd,
+                layoutLength: 400,
+                items: [
+                    (measuredLength: 100, growPriority: 3.0),
+                    (measuredLength: 100, growPriority: 1.0),
+                ], expectedRanges: [
+                    200...300,
+                    300...400,
+                ]
+            )
+
+        }
+
+
     }
 
     func test_overflow() {
+
         func test(
             overflow: StackLayout.OverflowDistribution,
             layoutLength: CGFloat,
-            items: [(measuredLength: CGFloat, priority: StackLayout.Child.Priority)],
+            items: [(measuredLength: CGFloat, shrinkPriority: CGFloat)],
             expectedRanges: [ClosedRange<CGFloat>],
             file: StaticString = #file,
             line: UInt = #line
         ) {
 
             let minSize = items
-                .map { $0.priority == .fixed ? $0.measuredLength : 0 }
+                .map { $0.shrinkPriority.isZero ? $0.measuredLength : 0 }
                 .reduce(0, +)
 
             do {
-                let row = Row(overflow: overflow) {
-                    items.map { item in
-                        TestElement(size: CGSize(width: item.measuredLength, height: 100))
-                            .stackLayoutChild(priority: item.priority)
-                    }
+                var row = Row()
+                for item in items {
+                    row.add(
+                        growPriority: 1.0,
+                        shrinkPriority: item.shrinkPriority,
+                        child: TestElement(size: CGSize(width: item.measuredLength, height: 100))
+                    )
                 }
+                row.horizontalOverflow = overflow
 
                 let size = row.content.measure(
                     in: SizeConstraint(
@@ -782,12 +886,15 @@ class StackTestsResultBuilders: XCTestCase {
             }
 
             do {
-                let column = Column(overflow: overflow) {
-                    items.map { item in
-                        TestElement(size: CGSize(width: 100, height: item.measuredLength))
-                            .stackLayoutChild(priority: item.priority)
-                    }
+                var column = Column()
+                for item in items {
+                    column.add(
+                        growPriority: 1.0,
+                        shrinkPriority: item.shrinkPriority,
+                        child: TestElement(size: CGSize(width: 100, height: item.measuredLength))
+                    )
                 }
+                column.verticalOverflow = overflow
 
                 let size = column.content.measure(
                     in: SizeConstraint(
@@ -818,10 +925,8 @@ class StackTestsResultBuilders: XCTestCase {
         }
 
         // Ensure that elements of size zero do not result in NaN in the outputted frames.
-
         do {
             // Note: Only applicable to `condenseProportionally`.
-
             test(
                 overflow: .condenseProportionally,
 
@@ -829,8 +934,8 @@ class StackTestsResultBuilders: XCTestCase {
                 layoutLength: 0,
 
                 items: [
-                    (measuredLength: 0.0, priority: .flexible),
-                    (measuredLength: 0.0, priority: .flexible),
+                    (measuredLength: 0.0, shrinkPriority: 1.0),
+                    (measuredLength: 0.0, shrinkPriority: 1.0),
                 ],
                 expectedRanges: [
                     0...0,
@@ -845,7 +950,7 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseUniformly,
                 layoutLength: 100,
                 items: [
-                    (measuredLength: 200, priority: .flexible),
+                    (measuredLength: 200, shrinkPriority: 1.0),
                 ], expectedRanges: [
                     0...100,
                 ]
@@ -855,7 +960,7 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseUniformly,
                 layoutLength: 100,
                 items: [
-                    (measuredLength: 200, priority: .fixed),
+                    (measuredLength: 200, shrinkPriority: 0.0),
                 ], expectedRanges: [
                     0...200,
                 ]
@@ -865,7 +970,7 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseProportionally,
                 layoutLength: 100,
                 items: [
-                    (measuredLength: 200, priority: .flexible),
+                    (measuredLength: 200, shrinkPriority: 1.0),
                 ], expectedRanges: [
                     0...100,
                 ]
@@ -875,7 +980,7 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseProportionally,
                 layoutLength: 100,
                 items: [
-                    (measuredLength: 200, priority: .fixed),
+                    (measuredLength: 200, shrinkPriority: 0.0),
                 ], expectedRanges: [
                     0...200,
                 ]
@@ -889,8 +994,8 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseProportionally,
                 layoutLength: 200,
                 items: [
-                    (measuredLength: 300, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 300, shrinkPriority: 1.0),
+                    (measuredLength: 100, shrinkPriority: 1.0),
                 ], expectedRanges: [
                     0...150,
                     150...200,
@@ -901,8 +1006,8 @@ class StackTestsResultBuilders: XCTestCase {
                 overflow: .condenseUniformly,
                 layoutLength: 300,
                 items: [
-                    (measuredLength: 300, priority: .flexible),
-                    (measuredLength: 100, priority: .flexible),
+                    (measuredLength: 300, shrinkPriority: 1.0),
+                    (measuredLength: 100, shrinkPriority: 1.0),
                 ], expectedRanges: [
                     0...250,
                     250...300,
@@ -910,6 +1015,35 @@ class StackTestsResultBuilders: XCTestCase {
             )
 
         }
+
+        // Test with custom shrink priorities
+        do {
+            test(
+                overflow: .condenseProportionally,
+                layoutLength: 200,
+                items: [
+                    (measuredLength: 200, shrinkPriority: 2.0),
+                    (measuredLength: 100, shrinkPriority: 1.0),
+                ], expectedRanges: [
+                    0...120,
+                    120...200,
+                ]
+            )
+
+            test(
+                overflow: .condenseUniformly,
+                layoutLength: 300,
+                items: [
+                    (measuredLength: 300, shrinkPriority: 1.0),
+                    (measuredLength: 100, shrinkPriority: 4.0),
+                ], expectedRanges: [
+                    0...280,
+                    280...300,
+                ]
+            )
+        }
+
+
     }
 
     func test_flexibleContents() {
@@ -928,15 +1062,20 @@ class StackTestsResultBuilders: XCTestCase {
         }
 
         func test(
-            items: [(item: TestItem, priority: StackLayout.Child.Priority)],
+            items: [(item: TestItem, priority: CGFloat)],
             expectedSizes: [StackLayout.Vector],
             file: StaticString = #file,
             line: UInt = #line
         ) {
             do {
-                let row = Row(overflow: .condenseUniformly) {
-                    items.map { pair in
-                        pair.item.element(on: .horizontal).stackLayoutChild(priority: pair.priority)
+                let row = Row { row in
+                    row.horizontalOverflow = .condenseUniformly
+                    for (item, priority) in items {
+                        row.add(
+                            growPriority: priority,
+                            shrinkPriority: priority,
+                            child: item.element(on: .horizontal)
+                        )
                     }
                 }
 
@@ -957,9 +1096,14 @@ class StackTestsResultBuilders: XCTestCase {
             }
 
             do {
-                let column = Column(overflow: .condenseUniformly) {
-                    items.map { pair in
-                        pair.item.element(on: .vertical).stackLayoutChild(priority: pair.priority)
+                let column = Column { column in
+                    column.verticalOverflow = .condenseUniformly
+                    for (item, priority) in items {
+                        column.add(
+                            growPriority: priority,
+                            shrinkPriority: priority,
+                            child: item.element(on: .vertical)
+                        )
                     }
                 }
 
@@ -982,7 +1126,7 @@ class StackTestsResultBuilders: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: .flexible)
+                (item: .flex, priority: 1)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 100, cross: 10)
@@ -991,8 +1135,8 @@ class StackTestsResultBuilders: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: .flexible),
-                (item: .flex, priority: .flexible)
+                (item: .flex, priority: 1),
+                (item: .flex, priority: 1)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 50, cross: 20),
@@ -1002,17 +1146,19 @@ class StackTestsResultBuilders: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: .flexible)
+                (item: .flex, priority: 1),
+                (item: .flex, priority: 3)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 75, cross: 20), // 7 x 2
+                StackLayout.Vector(axis: 25, cross: 50) // 2 x 5
             ]
         )
 
         test(
             items: [
-                (item: .fixed, priority: .fixed),
-                (item: .flex, priority: .flexible)
+                (item: .fixed, priority: 0),
+                (item: .flex, priority: 1)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
@@ -1023,12 +1169,14 @@ class StackTestsResultBuilders: XCTestCase {
         test(
             // overflow of 120
             items: [
-                (item: .fixed, priority: .fixed),
-                (item: .flex, priority: .flexible), // shrinks by 40
-                (item: .fixed, priority: .fixed)
+                (item: .fixed, priority: 0),
+                (item: .flex, priority: 2), // shrinks by 80
+                (item: .flex, priority: 1), // shrinks by 40
+                (item: .fixed, priority: 0)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
+                StackLayout.Vector(axis: 20, cross: 50), // 2 x 5
                 StackLayout.Vector(axis: 60, cross: 20), // 6 x 2
                 StackLayout.Vector(axis: 10, cross: 10)
             ]
@@ -1096,24 +1244,4 @@ fileprivate struct TestElement: Element {
         nil
     }
 
-}
-
-extension HorizontalAlignment {
-    enum Test25: AlignmentID {
-        static func defaultValue(in d: ElementDimensions) -> CGFloat {
-            d.width * 0.25
-        }
-    }
-
-    static let test25 = HorizontalAlignment(Test25.self)
-}
-
-extension VerticalAlignment {
-    enum Test25: AlignmentID {
-        static func defaultValue(in d: ElementDimensions) -> CGFloat {
-            d.height * 0.25
-        }
-    }
-
-    static let test25 = VerticalAlignment(Test25.self)
 }

@@ -1,7 +1,7 @@
 import XCTest
 @testable import BlueprintUI
 
-class GridRowTests: XCTestCase {
+class GridRowTestsResultBuilders: XCTestCase {
     func test_defaults() {
         let gridRow = GridRow()
         XCTAssertTrue(gridRow.children.isEmpty)
@@ -18,9 +18,9 @@ class GridRowTests: XCTestCase {
             //  max scale:        12.5
             //  width:            (1 * 12.5) + (2 * 12.5) = 37.5
             //  height:           max(5, 10) = 10
-            let gridRow = GridRow { row in
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 10, height: 5)))
-                row.add(width: .proportional(2), child: TestElement(size: CGSize(width: 25, height: 10)))
+            let gridRow = GridRow {
+                TestElement(size: CGSize(width: 10, height: 5)).gridRowChild(width: .proportional(1))
+                TestElement(size: CGSize(width: 25, height: 10)).gridRowChild(width: .proportional(2))
             }
             XCTAssertEqual(gridRow.content.measure(in: .unconstrained), CGSize(width: 37.5, height: 10))
         }
@@ -31,10 +31,10 @@ class GridRowTests: XCTestCase {
             //  child to a width of 30.
             //   width:   37.5 + 30 = 67.5
             //   height:  max(5, 10, 50) = 50
-            let gridRow = GridRow { row in
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 10, height: 5)))
-                row.add(width: .proportional(2), child: TestElement(size: CGSize(width: 25, height: 10)))
-                row.add(width: .absolute(30), child: TestElement(size: CGSize(width: 1, height: 50)))
+            let gridRow = GridRow {
+                TestElement(size: CGSize(width: 10, height: 5)).gridRowChild(width: .proportional(1))
+                TestElement(size: CGSize(width: 25, height: 10)).gridRowChild(width: .proportional(2))
+                TestElement(size: CGSize(width: 1, height: 50)).gridRowChild(width: .absolute(30))
             }
             XCTAssertEqual(gridRow.content.measure(in: .unconstrained), CGSize(width: 67.5, height: 50))
         }
@@ -44,10 +44,9 @@ class GridRowTests: XCTestCase {
             //  Same approach as #1, plus a 5 point spacing between elements.
             //  width:   37.5 + 5.0 = 42.5
             //  height:  10
-            let gridRow = GridRow { row in
-                row.spacing = 5
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 10, height: 5)))
-                row.add(width: .proportional(2), child: TestElement(size: CGSize(width: 25, height: 10)))
+            let gridRow = GridRow(spacing: 5) {
+                TestElement(size: CGSize(width: 10, height: 5)).gridRowChild(width: .proportional(1))
+                TestElement(size: CGSize(width: 25, height: 10)).gridRowChild(width: .proportional(2))
             }
             XCTAssertEqual(gridRow.content.measure(in: .unconstrained), CGSize(width: 42.5, height: 10))
         }
@@ -55,9 +54,9 @@ class GridRowTests: XCTestCase {
 
     func test_measure_constrained() {
         //  Proportional children size to fit the available width. The tallest child is used as the measured height.
-        let gridRow = GridRow { row in
-            row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 10, height: 5)))
-            row.add(width: .proportional(2), child: TestElement(size: CGSize(width: 25, height: 10)))
+        let gridRow = GridRow {
+            TestElement(size: CGSize(width: 10, height: 5)).gridRowChild(width: .proportional(1))
+            TestElement(size: CGSize(width: 25, height: 10)).gridRowChild(width: .proportional(2))
         }
         let constraint = SizeConstraint(width: .atMost(25), height: .atMost(100))
         XCTAssertEqual(gridRow.content.measure(in: constraint), CGSize(width: 25.0, height: 10))
@@ -70,9 +69,9 @@ class GridRowTests: XCTestCase {
             //  width:            30
             //  available width:  30
             //  widths:           10,    20
-            let gridRow = GridRow { row in
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 10, height: 5)))
-                row.add(width: .proportional(2), child: TestElement(size: CGSize(width: 25, height: 10)))
+            let gridRow = GridRow {
+                TestElement(size: CGSize(width: 10, height: 5)).gridRowChild(width: .proportional(1))
+                TestElement(size: CGSize(width: 25, height: 10)).gridRowChild(width: .proportional(2))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 30, height: 10))
@@ -91,10 +90,10 @@ class GridRowTests: XCTestCase {
             //  width:            40
             //  available width:  width - absolutely-sized -> 40 - 7  = 33
             //  widths:           11,    22,    7 (absolutely-sized)
-            let gridRow = GridRow { row in
-                row.add(width: .proportional(1), child: TestElement())
-                row.add(width: .proportional(2), child: TestElement())
-                row.add(width: .absolute(7), child: TestElement())
+            let gridRow = GridRow {
+                TestElement().gridRowChild(width: .proportional(1))
+                TestElement().gridRowChild(width: .proportional(2))
+                TestElement().gridRowChild(width: .absolute(7))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 40, height: 10))
@@ -114,11 +113,10 @@ class GridRowTests: XCTestCase {
             //  width:            40
             //  available width:  width - absolutely-sized - spacing -> 40 - 7 - 6  = 27
             //  widths:           9,    18,    7 (absolutely-sized)
-            let gridRow = GridRow { row in
-                row.spacing = 3
-                row.add(width: .proportional(1), child: TestElement())
-                row.add(width: .proportional(2), child: TestElement())
-                row.add(width: .absolute(7), child: TestElement())
+            let gridRow = GridRow(spacing: 3) {
+                TestElement().gridRowChild(width: .proportional(1))
+                TestElement().gridRowChild(width: .proportional(2))
+                TestElement().gridRowChild(width: .absolute(7))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 40, height: 10))
@@ -135,10 +133,9 @@ class GridRowTests: XCTestCase {
 
     func test_layout_alignment() {
         let makeGridRow: (Row.RowAlignment) -> GridRow = { alignment in
-            GridRow { row in
-                row.verticalAlignment = alignment
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 0, height: 5)))
-                row.add(width: .proportional(1), child: TestElement(size: CGSize(width: 0, height: 10)))
+            GridRow(verticalAlignment: alignment) {
+                TestElement(size: CGSize(width: 0, height: 5)).gridRowChild(width: .proportional(1))
+                TestElement(size: CGSize(width: 0, height: 10)).gridRowChild(width: .proportional(1))
             }
         }
 
@@ -205,9 +202,9 @@ class GridRowTests: XCTestCase {
     func test_layout_edgeCases() {
         do {
             // #1: A row with only absolutely-sized children justifies those childen to the start.
-            let gridRow = GridRow { row in
-                row.add(width: .absolute(10), child: TestElement())
-                row.add(width: .absolute(15), child: TestElement())
+            let gridRow = GridRow {
+                TestElement().gridRowChild(width: .absolute(10))
+                TestElement().gridRowChild(width: .absolute(15))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 40, height: 20))
@@ -222,9 +219,9 @@ class GridRowTests: XCTestCase {
 
         do {
             // #2: A child with a proportion of 0 is sized to a width of 0.
-            let gridRow = GridRow { row in
-                row.add(width: .proportional(1), child: TestElement())
-                row.add(width: .proportional(0), child: TestElement())
+            let gridRow = GridRow {
+                TestElement().gridRowChild(width: .proportional(1))
+                TestElement().gridRowChild(width: .proportional(0))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 40, height: 20))
@@ -240,9 +237,9 @@ class GridRowTests: XCTestCase {
         do {
             // #3: Absolutely-sized children can overflow. In these cases, proportionally-sized children are sized
             // to a width of 0.
-            let gridRow = GridRow { row in
-                row.add(width: .absolute(50), child: TestElement())
-                row.add(width: .proportional(1), child: TestElement())
+            let gridRow = GridRow {
+                TestElement().gridRowChild(width: .absolute(50))
+                TestElement().gridRowChild(width: .proportional(1))
             }
 
             let frames = gridRow.frames(in: CGSize(width: 40, height: 20))

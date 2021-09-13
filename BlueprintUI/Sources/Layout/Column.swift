@@ -43,22 +43,12 @@ public struct Column: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    public private(set) var layout: StackLayout = .defaultColumn
+    public private(set) var layout: StackLayout = StackLayout(
+        axis: .vertical,
+        alignment: Column.ColumnAlignment.leading.stackAlignment
+    )
 
     public init() {}
-
-    /// Initializer using result builder to declaritively build up a stack.
-    /// - Parameters:
-    ///   - layout: A StackLayout describing the column's layout
-    ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
-    public init(
-        layout: StackLayout = .defaultColumn,
-        @ElementBuilder<StackChild> elements: () -> [StackChild]
-    ) {
-        self.init(elementsBuilder: elements)
-        self.layout = layout
-    }
 
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
@@ -68,19 +58,21 @@ public struct Column: StackElement {
     ///   - horizontalAlignment: Specifies how children will be aligned horizontally.
     ///   - minimumSpacing: Spacing in between elements.
     ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackChild` with default values
+    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackLayout.Child` with default values
     public init(
-        alignment: ColumnAlignment = StackLayout.defaultColumn.columnAlignment,
-        underflow: StackLayout.UnderflowDistribution = StackLayout.defaultColumn.underflow,
-        overflow: StackLayout.OverflowDistribution = StackLayout.defaultColumn.overflow,
-        minimumSpacing: CGFloat = StackLayout.defaultColumn.minimumSpacing,
-        @ElementBuilder<StackChild> elements: () -> [StackChild]
+        alignment: ColumnAlignment = .leading,
+        underflow: StackLayout.UnderflowDistribution = .spaceEvenly,
+        overflow: StackLayout.OverflowDistribution = .condenseProportionally,
+        minimumSpacing: CGFloat = 0,
+        @ElementBuilder<StackLayout.Child> elements: () -> [StackLayout.Child]
     ) {
-        var layout: StackLayout = .init(axis: StackLayout.defaultColumn.axis, alignment: alignment.stackAlignment)
+        var layout: StackLayout = .init(axis: .vertical, alignment: alignment.stackAlignment)
         layout.underflow = underflow
         layout.overflow = overflow
         layout.minimumSpacing = minimumSpacing
-        self.init(layout: layout, elements: elements)
+        
+        self.init(elementsBuilder: elements)
+        self.layout = layout
     }
 
     public var verticalUnderflow: StackLayout.UnderflowDistribution {
@@ -106,19 +98,5 @@ public struct Column: StackElement {
     public var minimumVerticalSpacing: CGFloat {
         get { layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
-    }
-
-}
-
-extension StackLayout {
-    /// Default layout for a `Column`.
-    public static let defaultColumn: Self = StackLayout(
-        axis: .vertical,
-        alignment: Column.ColumnAlignment.leading.stackAlignment
-    )
-
-    /// Converts alignment to `ColumnAlignment`.
-    public var columnAlignment: Column.ColumnAlignment {
-        .init(alignment)
     }
 }

@@ -39,7 +39,7 @@ public struct Row: StackElement {
             }
         }
 
-        public var stackAlignment: StackLayout.Alignment {
+        var stackAlignment: StackLayout.Alignment {
             switch self {
             case .fill:
                 return .fill
@@ -51,22 +51,12 @@ public struct Row: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    public private(set) var layout: StackLayout = .defaultRow
+    public private(set) var layout: StackLayout = StackLayout(
+        axis: .horizontal,
+        alignment: Row.RowAlignment.top.stackAlignment
+    )
 
     public init() {}
-
-    /// Initializer using result builder to declaritively build up a stack.
-    /// - Parameters:
-    ///   - layout: A StackLayout describing the row's layout
-    ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a StackChild, then traits and key will be pulled from the element, otherwise defaults are passed through.
-    public init(
-        layout: StackLayout = .defaultRow,
-        @ElementBuilder<StackChild> elements: () -> [StackChild]
-    ) {
-        self.init(elementsBuilder: elements)
-        self.layout = layout
-    }
 
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
@@ -75,19 +65,20 @@ public struct Row: StackElement {
     ///   - overflow: Determines the layout when there is not enough space to fit all children as measured.
     ///   - minimumSpacing: Spacing in between elements.
     ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackChild` with default values
+    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackLayout.Child` with default values
     public init(
-        alignment: RowAlignment = StackLayout.defaultRow.rowAlignment,
-        underflow: StackLayout.UnderflowDistribution = StackLayout.defaultRow.underflow,
-        overflow: StackLayout.OverflowDistribution = StackLayout.defaultRow.overflow,
-        minimumSpacing: CGFloat = StackLayout.defaultRow.minimumSpacing,
-        @ElementBuilder<StackChild> elements: () -> [StackChild]
+        alignment: RowAlignment = .top,
+        underflow: StackLayout.UnderflowDistribution = .spaceEvenly,
+        overflow: StackLayout.OverflowDistribution = .condenseProportionally,
+        minimumSpacing: CGFloat = 0,
+        @ElementBuilder<StackLayout.Child> elements: () -> [StackLayout.Child]
     ) {
-        var layout: StackLayout = .init(axis: StackLayout.defaultRow.axis, alignment: alignment.stackAlignment)
+        var layout: StackLayout = .init(axis: .horizontal, alignment: alignment.stackAlignment)
         layout.underflow = underflow
         layout.overflow = overflow
         layout.minimumSpacing = minimumSpacing
-        self.init(layout: layout, elements: elements)
+        self.init(elementsBuilder: elements)
+        self.layout = layout
     }
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {
@@ -115,17 +106,4 @@ public struct Row: StackElement {
         set { layout.minimumSpacing = newValue }
     }
 
-}
-
-extension StackLayout {
-    /// Default layout for a `Row`.
-    public static let defaultRow: Self = StackLayout(
-        axis: .horizontal,
-        alignment: Row.RowAlignment.top.stackAlignment
-    )
-
-    /// Converts alignment to `RowAlignment`.
-    public var rowAlignment: Row.RowAlignment {
-        .init(alignment)
-    }
 }

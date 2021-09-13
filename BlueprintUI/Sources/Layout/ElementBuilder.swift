@@ -40,7 +40,7 @@ public struct ElementBuilder<Child: ElementBuilderChild> {
 }
 
 /// Defines a way for an`Element` to be implicitly converted into the conforming type (the child of a container).
-/// In practive, this allows us to pass an `Element` directly into the result builder without manually converting to `Child` (i.e. Converting `Element` -> `StackChild`.
+/// In practive, this allows us to pass an `Element` directly into the result builder without manually converting to `Child` (i.e. Converting `Element` -> `StackLayout.Child`.
 public protocol ElementBuilderChild {
     init(_ element: Element)
 }
