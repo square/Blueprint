@@ -992,15 +992,15 @@ extension StackLayout {
         public enum Priority {
             case fixed
             case flexible
-            case grows
-            case shrinks
+            case growsOnUnderflow
+            case shrinksOnOverflow
 
             fileprivate var growPriority: CGFloat {
                 switch self {
                 case .fixed: return 0
                 case .flexible: return 1
-                case .grows: return 1
-                case .shrinks: return 0
+                case .growsOnUnderflow: return 1
+                case .shrinksOnOverflow: return 0
                 }
             }
 
@@ -1008,8 +1008,8 @@ extension StackLayout {
                 switch self {
                 case .fixed: return 0
                 case .flexible: return 1
-                case .grows: return 0
-                case .shrinks: return 1
+                case .growsOnUnderflow: return 0
+                case .shrinksOnOverflow: return 1
                 }
             }
         }
