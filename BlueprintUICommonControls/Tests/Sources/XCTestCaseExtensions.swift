@@ -146,3 +146,18 @@ extension UIImage {
         return pixelData
     }
 }
+
+extension XCTestCase {
+    /// Run the given block with a window that is key and visible, then releases it.
+    func withWindow(block: (UIWindow) -> Void) {
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.makeKeyAndVisible()
+
+        block(window)
+
+        window.isHidden = true
+        if #available(iOS 13, *) {
+            window.windowScene = nil
+        }
+    }
+}

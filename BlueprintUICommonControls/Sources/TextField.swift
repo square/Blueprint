@@ -28,8 +28,7 @@ public struct TextField: Element {
     public var returnKeyType: UIReturnKeyType = .default
     public var enablesReturnKeyAutomatically: Bool = false
 
-    public var becomeActiveTrigger: Trigger?
-    public var resignActiveTrigger: Trigger?
+    public var focusBinding: FocusBinding?
 
     /// A set of accessibility traits that should be applied to the field, these will be merged with any existing traits.
     /// These traits should relate to the content of the text, for example `.header`, `.link`, or `.updatesFrequently`.
@@ -67,8 +66,8 @@ public struct TextField: Element {
             configuration[\.returnKeyType] = returnKeyType
             configuration[\.enablesReturnKeyAutomatically] = enablesReturnKeyAutomatically
 
-            configuration[\.becomeActiveTrigger] = becomeActiveTrigger
-            configuration[\.resignActiveTrigger] = resignActiveTrigger
+            configuration[\.focusBinding] = focusBinding
+
             if let traits = accessibilityTraits {
                 if let existing = configuration[\.accessibilityTraits] {
                     configuration[\.accessibilityTraits] = existing.union(UIAccessibilityTraits(with: traits))
@@ -90,41 +89,31 @@ public struct TextField: Element {
 
 }
 
-extension TextField {
-
-    public final class Trigger {
-
-        var action: () -> Void
-
-        public init() {
-            action = {}
-        }
-
-        public func fire() {
-            action()
-        }
-
-    }
-
-}
-
 
 fileprivate final class CallbackTextField: UITextField, UITextFieldDelegate {
 
     var onChange: ((String) -> Void)? = nil
     var onReturn: (() -> Void)? = nil
 
-    var becomeActiveTrigger: TextField.Trigger? {
+    var focusBinding: FocusBinding? {
         didSet {
-            oldValue?.action = {}
-            becomeActiveTrigger?.action = { [weak self] in self?.becomeFirstResponder() }
-        }
-    }
+            oldValue?.trigger.focusAction = nil
+            oldValue?.trigger.blurAction = nil
 
-    var resignActiveTrigger: TextField.Trigger? {
-        didSet {
-            oldValue?.action = {}
-            resignActiveTrigger?.action = { [weak self] in self?.resignFirstResponder() }
+            guard let focusBinding = focusBinding else { return }
+
+            focusBinding.trigger.focusAction = { [weak self] in
+                self?.becomeFirstResponder()
+            }
+            focusBinding.trigger.blurAction = { [weak self] in
+                self?.resignFirstResponder()
+            }
+
+            if isFirstResponder {
+                focusBinding.onFocus()
+            } else {
+                focusBinding.onBlur()
+            }
         }
     }
 
@@ -148,4 +137,158 @@ fileprivate final class CallbackTextField: UITextField, UITextFieldDelegate {
         return true
     }
 
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        let focused = super.becomeFirstResponder()
+        if focused {
+            focusBinding?.onFocus()
+        }
+        return focused
+    }
+
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        let blurred = super.resignFirstResponder()
+        if blurred {
+            focusBinding?.onBlur()
+        }
+        return blurred
+    }
+
+}
+
+extension TextField {
+    /// Modifies this text field by binding its focus state to the given state value.
+    ///
+    /// Use this modifier to cause the text field to receive focus whenever the the `state` equals
+    /// the `value`. Typically, you create an enumeration of fields that may receive focus, bind an
+    /// instance of this enumeration, and assign its cases to focusable views.
+    ///
+    /// The following example uses the cases of a `LoginForm` enumeration to bind the focus state of
+    /// two `TextField` elements. A sign-in button validates the fields and sets the bound
+    /// `focusedField` value to any field that requires the user to correct a problem.
+    ///
+    ///     struct LoginForm: ProxyElement {
+    ///         enum Field: Hashable {
+    ///             case username
+    ///             case password
+    ///         }
+    ///
+    ///         var username: String
+    ///         var password: String
+    ///         var handleLogin: () -> Void
+    ///
+    ///         @FocusState private var focusedField: Field?
+    ///
+    ///         var elementRepresentation: Element {
+    ///             Column { column in
+    ///                 column.add(
+    ///                     child: TextField(text: "")
+    ///                         .focused(when: $focusedField, equals: .username)
+    ///                 )
+    ///
+    ///                 column.add(
+    ///                     child: TextField(text: "")
+    ///                         .focused(when: $focusedField, equals: .password)
+    ///                 )
+    ///
+    ///                 column.add(
+    ///                     child: Button(
+    ///                         onTap: {
+    ///                             if username.isEmpty {
+    ///                                 focusedField = .username
+    ///                             } else if password.isEmpty {
+    ///                                 focusedField = .password
+    ///                             } else {
+    ///                                 handleLogin()
+    ///                             }
+    ///                         },
+    ///                         wrapping: Label(text: "Sign In")
+    ///                     )
+    ///                 )
+    ///             }
+    ///         }
+    ///     }
+    ///
+    /// To control focus using a Boolean, use the `focused(when:)` method instead.
+    ///
+    /// - Parameters:
+    ///   - state: The state to bind to.
+    ///
+    ///     When focus moves to this text field, the binding sets the bound value to the
+    ///     corresponding match value. If a caller sets the state value programmatically to the
+    ///     matching value, then focus moves to this text field.
+    ///
+    ///     When focus leaves this text field, the binding sets the bound value to `nil`. Likewise,
+    ///     if a caller sets the value to `nil`, this text field will lose focus.
+    ///
+    ///   - value: The value to match against when determining whether the binding should change.
+    ///
+    /// - Returns: A modified text field.
+    public func focused<Value>(
+        when state: FocusState<Value?>,
+        equals value: Value
+    ) -> Self {
+        var textField = self
+        textField.focusBinding = state.binding(for: value)
+        return textField
+    }
+
+    /// Modifies this text field by binding its focus state to the given Boolean state value.
+    ///
+    /// Use this modifier to cause the text field to receive focus whenever the the `condition` is
+    /// `true`. You can use this modifier to observe the focus state of a text field, or
+    /// programmatically focus or blur the field.
+    ///
+    /// In the following example, a single text field accepts a user's desired `username`. The text
+    /// field binds its focus state to the Boolean value `isUsernameFocused`. A "Submit" button's
+    /// action checks if the username is empty, and sets `isUsernameFocused` to `true`, which causes
+    /// focus to return to the text field.
+    ///
+    ///     struct SignupForm: ProxyElement {
+    ///         var username: String
+    ///         var onSignUpTapped: () -> Void
+    ///
+    ///         @FocusState var isUsernameFocused: Bool
+    ///
+    ///         var elementRepresentation: Element {
+    ///             Column { column in
+    ///                 column.add(
+    ///                     child: TextField(text: username)
+    ///                         .focused(when: $isUsernameFocused)
+    ///                 )
+    ///
+    ///                 column.add(
+    ///                     child: Button(
+    ///                         onTap: {
+    ///                             if username.isEmpty {
+    ///                                 isUsernameFocused = true
+    ///                             } else {
+    ///                                 onSignUpTapped()
+    ///                             }
+    ///                         },
+    ///                         wrapping: Label(text: "Submit")
+    ///                     )
+    ///                 )
+    ///             }
+    ///         }
+    ///     }
+    ///
+    /// To control focus by matching a value, use the `focused(when:equals:)` method instead.
+    ///
+    /// - Parameters:
+    ///   - condition: The state to bind to.
+    ///
+    ///     When focus moves to this text field, the binding sets the bound value to `true`. If a
+    ///     caller sets the value to `true` programmatically, then focus moves to this text field.
+    ///
+    ///     When focus leaves this text field, the binding sets the bound value to `false`.
+    ///     Likewise, if a caller sets the value to `false`, this text field will lose focus.
+    ///
+    /// - Returns: A modified text field.
+    public func focused(when condition: FocusState<Bool>) -> Self {
+        var textField = self
+        textField.focusBinding = condition.binding()
+        return textField
+    }
 }
