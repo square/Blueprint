@@ -496,6 +496,30 @@ class BlueprintViewTests: XCTestCase {
         // of their children, so things like focus triggers can be set up.
         wait(for: [childViewDescriptionApplied, parentAppeared], timeout: 1, enforceOrder: true)
     }
+
+    func test_intrinsicContentSize_noElement() {
+        let view = BlueprintView()
+
+        let noIntrinsicMetricSize = CGSize(
+            width: UIView.noIntrinsicMetric,
+            height: UIView.noIntrinsicMetric
+        )
+
+        XCTAssertEqual(view.intrinsicContentSize, noIntrinsicMetricSize)
+    }
+
+    func test_intrinsicContentSize_constrained() {
+        let view = BlueprintView()
+
+        let size = CGSize(
+            width: 42,
+            height: 7
+        )
+
+        view.element = Empty().constrainedTo(size: size)
+
+        XCTAssertEqual(view.intrinsicContentSize, size)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
