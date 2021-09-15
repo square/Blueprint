@@ -11,9 +11,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The `@FocusState` property wrapper can be used to manage focus of text fields. ([#259])
+
+  After binding a text field to a state, you can programmatically focus the field by setting the state value.
+  
+  ```swift
+  struct LoginForm: ProxyElement {
+      enum Field: Hashable {
+          case username, password
+      }
+
+      @FocusState private var focusedField: Field?
+
+      var elementRepresentation: Element {
+          // This text field will be focused when `self.focusedField = .username`
+          TextField(text: "")
+              .focused(when: $focusedField, equals: .username)
+      }
+  }
+  ```
+
 ### Removed
 
 ### Changed
+
+- `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
 
 ### Deprecated
 
@@ -655,6 +677,7 @@ searchField
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
 [#260]: https://github.com/square/Blueprint/pull/260
+[#259]: https://github.com/square/Blueprint/pull/259
 [#257]: https://github.com/square/Blueprint/pull/257
 [#244]: https://github.com/square/Blueprint/pull/244
 [#209]: https://github.com/square/Blueprint/pull/209
