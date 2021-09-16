@@ -3,7 +3,7 @@ import Foundation
 /// A property wrapper type that can read and write a value that represents the placement of focus.
 ///
 /// Use this property wrapper in conjunction with modifiers on elements that support focus, such as
-/// `TextField.focused(when:equals)` and `TextField.focused(when:)`, to describe when those elements
+/// `TextField.focused(when:equals:)` and `TextField.focused(when:)`, to describe when those elements
 /// should have focus. When focus enters the modified element, the wrapped value of this property
 /// updates to match a given value. Similarly, when focus leaves, the wrapped value of this property
 /// resets to `nil` or `false`. Setting this property's value programmatically has the reverse

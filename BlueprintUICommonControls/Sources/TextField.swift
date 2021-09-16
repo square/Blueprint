@@ -160,7 +160,7 @@ fileprivate final class CallbackTextField: UITextField, UITextFieldDelegate {
 extension TextField {
     /// Modifies this text field by binding its focus state to the given state value.
     ///
-    /// Use this modifier to cause the text field to receive focus whenever the the `state` equals
+    /// Use this modifier to cause the text field to receive focus whenever the `state` equals
     /// the `value`. Typically, you create an enumeration of fields that may receive focus, bind an
     /// instance of this enumeration, and assign its cases to focusable views.
     ///
