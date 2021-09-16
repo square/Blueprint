@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `BlueprintView`'s `intrinsicContentSize` will now return `UIView.noIntrinsicMetric` if there is no `element` associated with it.
+
 ### Deprecated
 
 ### Security
