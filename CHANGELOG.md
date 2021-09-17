@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
+- The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibiiltyElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
+
 ### Removed
 
 ### Changed
@@ -40,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
 
 ### Deprecated
+
+- The `accessibility(...)` modifier has been deprecated. Use `accessibilityElement(...)` instead.
 
 ### Security
 
