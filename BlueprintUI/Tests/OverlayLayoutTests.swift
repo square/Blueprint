@@ -27,6 +27,27 @@ class OverlayTests: XCTestCase {
         )
     }
 
+    func test_keys() {
+        struct Test1: ProxyElement { var elementRepresentation: Element = Empty() }
+        struct Test2: ProxyElement { var elementRepresentation: Element = Empty() }
+        struct Test3: ProxyElement { var elementRepresentation: Element = Empty() }
+
+        let element = Overlay { overlay in
+            overlay.add(key: AnyHashable(1), child: Test1())
+            overlay.add(key: AnyHashable("foo"), child: Test2())
+            overlay.add(child: Test3())
+        }
+
+        XCTAssertEqual(element.children[0].key, AnyHashable(1))
+        XCTAssert(type(of: element.children[0].element) == Test1.self)
+
+        XCTAssertEqual(element.children[1].key, AnyHashable("foo"))
+        XCTAssert(type(of: element.children[1].element) == Test2.self)
+
+        XCTAssertEqual(element.children[2].key, nil)
+        XCTAssert(type(of: element.children[2].element) == Test3.self)
+    }
+
 }
 
 
