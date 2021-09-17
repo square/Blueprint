@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `BlueprintView`'s `intrinsicContentSize` will now return `UIView.noIntrinsicMetric` if there is no `element` associated with it.
+
 - `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
 
 ### Deprecated
