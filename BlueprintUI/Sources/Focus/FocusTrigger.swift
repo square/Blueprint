@@ -14,6 +14,9 @@ import Foundation
 /// [FocusBinding](x-source-tag://FocusBinding)
 ///
 public final class FocusTrigger {
+    /// Create a new trigger, not yet bound to any view.
+    public init() {}
+
     /// The action to be invoked on focus, which will be set by a backing view.
     public var focusAction: (() -> Void)?
     /// The action to be invoked on blur, which will be set by a backing view.
