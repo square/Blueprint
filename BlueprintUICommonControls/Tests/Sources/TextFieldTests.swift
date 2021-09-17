@@ -68,5 +68,34 @@ class TextFieldTests: XCTestCase {
 
     }
 
-}
+    func test_focus() {
+        // make a fake window so that focus works
+        withWindow { window in
+            let view = BlueprintView()
+            window.addSubview(view)
 
+            var isFocused = true
+            let binding = FocusBinding(
+                onFocus: { isFocused = true },
+                onBlur: { isFocused = false }
+            )
+            view.element = TextField(text: "") { textField in
+                textField.focusBinding = binding
+            }
+
+            view.layoutIfNeeded()
+            let testView = view.subviews[0].subviews[0]
+
+            XCTAssertFalse(testView.isFirstResponder)
+            XCTAssertFalse(isFocused)
+
+            binding.trigger.focus()
+            XCTAssertTrue(testView.isFirstResponder)
+            XCTAssertTrue(isFocused)
+
+            binding.trigger.blur()
+            XCTAssertFalse(testView.isFirstResponder)
+            XCTAssertFalse(isFocused)
+        }
+    }
+}
