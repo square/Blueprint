@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
+- `Overlay` supports keys for disambiguation between view updates. ([#264])
+
 ### Removed
 
 ### Changed
@@ -40,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
 
 ### Deprecated
+
+- `Overlay.add(_:)` deprecated in favor of `Overlay.add(key:child:)`.
 
 ### Security
 
@@ -678,6 +682,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#264]: https://github.com/square/Blueprint/pull/264
 [#260]: https://github.com/square/Blueprint/pull/260
 [#259]: https://github.com/square/Blueprint/pull/259
 [#257]: https://github.com/square/Blueprint/pull/257
