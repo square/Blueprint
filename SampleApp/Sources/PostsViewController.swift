@@ -4,35 +4,47 @@ import UIKit
 
 
 struct Post {
-    var authorName: String
-    var timeAgo: String
-    var body: String
+    var authorName: String = ""
+    var date: Date = Date()
+    var body: String = ""
 }
-
-let posts = [
-    Post(
-        authorName: "Tim",
-        timeAgo: "1 hour ago",
-        body: "Lorem Ipsum"
-    ),
-    Post(
-        authorName: "Jane",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-    ),
-    Post(
-        authorName: "John",
-        timeAgo: "2 days ago",
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
-    ),
-
-]
 
 
 final class PostsViewController: UIViewController {
 
+    struct State {
+        var isLoading = false
+        var posts: [Post] = [
+            Post(
+                authorName: "Tim",
+                date: Calendar.current.date(byAdding: .hour, value: -1, to: Date())!,
+                body: "Lorem Ipsum"
+            ),
+            Post(
+                authorName: "Jane",
+                date: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
+                body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            ),
+            Post(
+                authorName: "John",
+                date: Calendar.current.date(byAdding: .day, value: -2, to: Date())!,
+                body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit!"
+            ),
+        ]
+        var entry: Post = Post()
+
+        mutating func publishEntry() {
+            posts.append(entry)
+            entry = Post()
+        }
+    }
+
     private let blueprintView = BlueprintView()
-    private var isLoading = false
+    private var state = State() {
+        didSet {
+            update()
+        }
+    }
 
     override func loadView() {
         view = blueprintView
@@ -48,23 +60,21 @@ final class PostsViewController: UIViewController {
     }
 
     private func startLoading() {
-        isLoading = true
-        update()
+        state.isLoading = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.finishLoading()
         }
     }
 
     private func finishLoading() {
-        isLoading = false
-        update()
+        state.isLoading = false
     }
 
     var element: Element {
         let theme = FeedTheme(authorColor: .green)
 
         let pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
-        if isLoading {
+        if state.isLoading {
             pullToRefreshBehavior = .refreshing
         } else {
             pullToRefreshBehavior = .enabled(action: { [weak self] in
@@ -72,8 +82,22 @@ final class PostsViewController: UIViewController {
             })
         }
 
-        return MainView(posts: posts, pullToRefreshBehavior: pullToRefreshBehavior)
-            .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
+        return MainView(
+            state: state,
+            onChange: { field, text in
+                switch field {
+                case .name:
+                    self.state.entry.authorName = text
+                case .body:
+                    self.state.entry.body = text
+                }
+            },
+            onSubmit: {
+                self.state.publishEntry()
+            },
+            pullToRefreshBehavior: pullToRefreshBehavior
+        )
+        .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
     }
 }
 
@@ -94,7 +118,9 @@ struct FeedTheme {
 
 fileprivate struct MainView: ProxyElement {
 
-    var posts: [Post]
+    var state: PostsViewController.State
+    var onChange: (EntryForm.Field, String) -> Void
+    var onSubmit: () -> Void
     var pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
 
     var elementRepresentation: Element {
@@ -102,8 +128,14 @@ fileprivate struct MainView: ProxyElement {
             Column { col in
                 col.horizontalAlignment = .fill
 
-                col.add(child: List(posts: self.posts))
-                col.add(child: CommentForm())
+                col.add(child: List(posts: state.posts))
+                col.add(
+                    child: EntryForm(
+                        entry: state.entry,
+                        onChange: onChange,
+                        onSubmit: onSubmit
+                    )
+                )
             }
             .scrollable {
                 $0.contentSize = .fittingHeight
@@ -133,25 +165,56 @@ fileprivate struct List: ProxyElement {
     }
 }
 
-fileprivate struct CommentForm: ProxyElement {
+fileprivate struct EntryForm: ProxyElement {
+
+    enum Field: Hashable {
+        case name, body
+    }
+
+    var entry: Post
+    var onChange: (Field, String) -> Void
+    var onSubmit: () -> Void
+
+    @FocusState var focusedField: Field?
 
     var elementRepresentation: Element {
         Column { col in
             col.horizontalAlignment = .fill
 
-            let label = Label(text: "Add your comment:")
-            col.add(child: label)
+            col.add(child: Label(text: "New post:"))
 
-            var nameField = TextField(text: "")
-            nameField.placeholder = "Name"
-            col.add(child: nameField)
+            col.addFixed(
+                child: TextField(text: entry.authorName) { field in
+                    field.placeholder = "Name"
+                    field.onReturn = {
+                        focusedField = .body
+                    }
+                    field.onChange = { text in
+                        onChange(.name, text)
+                    }
+                }
+                .focused(when: $focusedField, equals: .name)
+            )
 
-            var commentField = TextField(text: "")
-            commentField.placeholder = "Comment"
-            col.add(child: commentField)
+            col.addFixed(
+                child: TextField(text: entry.body) { field in
+                    field.placeholder = "Comment"
+                    field.onChange = { text in
+                        onChange(.body, text)
+                    }
+                    field.onReturn = {
+                        focusedField = nil
+                        onSubmit()
+                    }
+                }
+                .focused(when: $focusedField, equals: .body)
+            )
         }
         .inset(uniform: 16.0)
         .box(background: .lightGray)
+        .onAppear {
+            focusedField = .name
+        }
     }
 }
 
@@ -193,6 +256,14 @@ fileprivate struct FeedItemBody: ProxyElement {
 
     var post: Post
 
+    let dateFormatter: Formatter = {
+        if #available(iOS 13.0, *) {
+            return RelativeDateTimeFormatter()
+        } else {
+            return DateFormatter()
+        }
+    }()
+
     var elementRepresentation: Element {
         let column = Column { col in
 
@@ -211,7 +282,7 @@ fileprivate struct FeedItemBody: ProxyElement {
                 }
                 row.add(child: name)
 
-                var timeAgo = Label(text: post.timeAgo)
+                var timeAgo = Label(text: dateFormatter.string(for: post.date)!)
                 timeAgo.font = UIFont.systemFont(ofSize: 14.0)
                 timeAgo.color = .lightGray
                 row.add(child: timeAgo)
