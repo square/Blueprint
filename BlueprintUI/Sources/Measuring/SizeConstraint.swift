@@ -7,10 +7,10 @@ import UIKit
 public struct SizeConstraint: Hashable {
 
     /// The width constraint.
-    @UnconstrainedInfiteAxis public var width: Axis
+    @UnconstrainedInfiniteAxis public var width: Axis
 
     /// The height constraint.
-    @UnconstrainedInfiteAxis public var height: Axis
+    @UnconstrainedInfiniteAxis public var height: Axis
 
     public init(width: Axis, height: Axis) {
         self.width = width
@@ -180,7 +180,7 @@ extension SizeConstraint {
 extension SizeConstraint {
     /// This property wrapper checks the value of `atMost` cases, and turns it into an
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
-    @propertyWrapper public struct UnconstrainedInfiteAxis: Equatable, Hashable {
+    @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {
         private var correctedAxis: Axis
 
         public var wrappedValue: Axis {
