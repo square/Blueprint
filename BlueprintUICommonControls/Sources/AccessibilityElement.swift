@@ -32,6 +32,29 @@ public struct AccessibilityElement: Element {
     public var wrappedElement: Element
 
     public init(
+        label: String?,
+        value: String?,
+        traits: Set<AccessibilityElement.Trait>,
+        hint: String? = nil,
+        identifier: String? = nil,
+        accessibilityFrameSize: CGSize? = nil,
+        wrapping element: Element
+    ) {
+        self.label = label
+        self.value = value
+        self.traits = traits
+        self.hint = hint
+        self.identifier = identifier
+        self.accessibilityFrameSize = accessibilityFrameSize
+        wrappedElement = element
+    }
+
+    @available(
+        *,
+        deprecated,
+        renamed: "init(label:value:traits:hint:identifier:accessibilityFrameSize:wrapping:)"
+    )
+    public init(
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,
@@ -40,13 +63,15 @@ public struct AccessibilityElement: Element {
         accessibilityFrameSize: CGSize? = nil,
         wrapping element: Element
     ) {
-        self.label = label
-        self.value = value
-        self.hint = hint
-        self.identifier = identifier
-        self.traits = traits
-        self.accessibilityFrameSize = accessibilityFrameSize
-        wrappedElement = element
+        self.init(
+            label: label,
+            value: value,
+            traits: traits,
+            hint: hint,
+            identifier: identifier,
+            accessibilityFrameSize: accessibilityFrameSize,
+            wrapping: element
+        )
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
@@ -142,9 +167,9 @@ extension Element {
         AccessibilityElement(
             label: label,
             value: value,
+            traits: traits,
             hint: hint,
             identifier: identifier,
-            traits: traits,
             accessibilityFrameSize: accessibilityFrameSize,
             wrapping: self
         )
