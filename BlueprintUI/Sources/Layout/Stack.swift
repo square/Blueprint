@@ -75,6 +75,18 @@ extension StackElement {
     ///     }
     ///     ```
     ///
+    ///   - shrinkBehavior:
+    ///
+    ///     If the layout overflows and the child shrinks, this allows you to specify whether the child
+    ///     should fill the space its given, or be re-measured in the shrunk space and fitted based on
+    ///     the new measurement.
+    ///
+    ///     For example, if a label in a row wraps a word to a new line when forced to shrink, `fill` will make
+    ///     the label larger than necessary, with whitespace on the trailing edge. The `fit` option will shrink
+    ///     the label further so it encloses the new wrapped layout.
+    ///
+    ///     Note that "surrendered" space is not distributed among other elements.
+    ///
     ///   - alignmentGuide:
     ///
     ///     A closure that can be used to provide a custom alignment guide for this child.
@@ -98,6 +110,7 @@ extension StackElement {
     public mutating func add(
         growPriority: CGFloat = 1.0,
         shrinkPriority: CGFloat = 1.0,
+        shrinkBehavior: StackLayout.ShrinkBehavior = .fill,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
         key: AnyHashable? = nil,
         child: Element
@@ -107,7 +120,8 @@ extension StackElement {
             traits: StackLayout.Traits(
                 growPriority: growPriority,
                 shrinkPriority: shrinkPriority,
-                alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init)
+                alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init),
+                shrinkBehavior: shrinkBehavior
             ),
             key: key
         ))
@@ -157,6 +171,7 @@ extension StackElement {
     /// [StackElement.add()](x-source-tag://StackElement.add)
     ///
     public mutating func addFlexible(
+        shrinkBehavior: StackLayout.ShrinkBehavior = .fill,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
         key: AnyHashable? = nil,
         child: Element
@@ -164,6 +179,7 @@ extension StackElement {
         add(
             growPriority: 1,
             shrinkPriority: 1,
+            shrinkBehavior: shrinkBehavior,
             alignmentGuide: alignmentGuide,
             key: key,
             child: child
@@ -185,6 +201,17 @@ public struct StackLayout: Layout {
         /// Returns a value along the stack's cross axis, in the element's own coordinate space,
         /// where a child should be aligned relative to the alignment guides of its siblings.
         public var computeValue: (ElementDimensions) -> CGFloat
+    }
+
+    /// Determines how a stack child will behave when it shrinks.
+    public enum ShrinkBehavior {
+        /// The child will take up as much space as it is given.
+        case fill
+
+        /// The child will be re-measured in the available space,
+        /// and the minimum of that measurement and the available
+        /// space will be used.
+        case fit
     }
 
     /// Contains traits that affect the layout of individual children in the stack.
@@ -223,15 +250,25 @@ public struct StackLayout: Layout {
         ///
         public var alignmentGuide: AlignmentGuide?
 
+        /// Controls how the child behaves when it shrinks.
+        /// See `StackElement.add(...)` for details.
+        ///
+        /// # In Xcode
+        /// [StackElement.add()](x-source-tag://StackElement.add)
+        ///
+        public var shrinkBehavior: ShrinkBehavior
+
         /// Creates a new set of traits with default values.
         public init(
             growPriority: CGFloat = 1.0,
             shrinkPriority: CGFloat = 1.0,
-            alignmentGuide: AlignmentGuide? = nil
+            alignmentGuide: AlignmentGuide? = nil,
+            shrinkBehavior: ShrinkBehavior = .fill
         ) {
             self.growPriority = growPriority
             self.shrinkPriority = shrinkPriority
             self.alignmentGuide = alignmentGuide
+            self.shrinkBehavior = shrinkBehavior
         }
     }
 
@@ -456,6 +493,12 @@ extension StackLayout {
                 return _layoutOverflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
+                    remeasure: items.map { item in
+                        { width in
+                            let constraint = VectorConstraint(axis: .atMost(width), cross: vectorConstraint.cross).constraint(axis: axis)
+                            return item.content.measure(in: constraint).axis(on: axis)
+                        }
+                    },
                     layoutSize: axisSize
                 )
             } else {
@@ -473,6 +516,12 @@ extension StackLayout {
                 return _layoutOverflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
+                    remeasure: items.map { item in
+                        { width in
+                            let constraint = VectorConstraint(axis: .atMost(width), cross: vectorConstraint.cross).constraint(axis: axis)
+                            return item.content.measure(in: constraint).axis(on: axis)
+                        }
+                    },
                     layoutSize: axisMax
                 )
             } else {
@@ -498,7 +547,12 @@ extension StackLayout {
         }
     }
 
-    private func _layoutOverflow(basisSizes: [CGFloat], traits: [Traits], layoutSize: CGFloat) -> [Segment] {
+    private func _layoutOverflow(
+        basisSizes: [CGFloat],
+        traits: [Traits],
+        remeasure: [(CGFloat) -> CGFloat],
+        layoutSize: CGFloat
+    ) -> [Segment] {
         assert(basisSizes.count > 0)
 
         let totalBasisSize: CGFloat = basisSizes.reduce(0.0, +)
@@ -537,9 +591,18 @@ extension StackLayout {
 
         var axisOrigin: CGFloat = 0.0
 
-        let axisSegments = zip(basisSizes, shrinkPriorities).map { basis, shrinkPriority -> Segment in
+        let axisSegments = basisSizes.enumerated().map { index, basis -> Segment in
+            let shrinkPriority = shrinkPriorities[index]
+            let shrinkBehavior = traits[index].shrinkBehavior
+
             let sizeAdjustment = (shrinkPriority / totalPriority) * extraSize
-            let magnitude = basis + sizeAdjustment
+            let magnitude: CGFloat
+
+            switch shrinkBehavior {
+            case .fill: magnitude = basis + sizeAdjustment
+            case .fit: magnitude = remeasure[index](basis + sizeAdjustment)
+            }
+
             let origin = axisOrigin
 
             axisOrigin = origin + magnitude + minimumSpacing
