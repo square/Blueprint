@@ -57,9 +57,7 @@ public struct GridRow: Element {
         spacing: CGFloat = 0,
         @ElementBuilder<Child> _ elements: () -> [Child]
     ) {
-        children = elements().map { gridRowChild in
-            GridRow.Child(width: gridRowChild.width, key: gridRowChild.key, element: gridRowChild.element)
-        }
+        children = elements()
         self.verticalAlignment = verticalAlignment
         self.spacing = spacing
     }
