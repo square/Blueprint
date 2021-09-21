@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.29.0] - 2021-09-21
+
+### Added
+
 - The `@FocusState` property wrapper can be used to manage focus of text fields. ([#259])
 
   After binding a text field to a state, you can programmatically focus the field by setting the state value.
@@ -35,8 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An initializer on `AccessibilityElement` that requires a `label`, `value`, and `traits`.
 - `Overlay` supports keys for disambiguation between view updates. ([#264])
 
-### Removed
-
 ### Changed
 
 - `BlueprintView`'s `intrinsicContentSize` will now return `UIView.noIntrinsicMetric` if there is no `element` associated with it.
@@ -48,14 +64,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `accessibility(...)` modifier has been deprecated. Use `accessibilityElement(...)` instead.
 - An initializer on `AccessibilityElement` that allowed all parameters to be unspecified. Use the initializer with required parameters instead.
 - `Overlay.add(_:)` deprecated in favor of `Overlay.add(key:child:)`.
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.28.1] - 2021-09-10
 
@@ -648,7 +656,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.28.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.29.0...HEAD
+[0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
 [0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
 [0.28.0]: https://github.com/square/Blueprint/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/square/Blueprint/compare/0.26.0...0.27.0
