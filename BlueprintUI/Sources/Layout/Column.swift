@@ -50,14 +50,46 @@ public struct Column: StackElement {
 
     public init() {}
 
-    /// Initializer using result builder to declaritively build up a stack.
+    /// Creates a Column, using result builder syntax. Columns display a list of items in a vertical
+    /// stack.
+    ///
+    ///     Column {
+    ///         Label(text: "Welcome")
+    ///
+    ///         TextField(text: username)
+    ///         TextField(text: password)
+    ///
+    ///         Button(
+    ///             onTap: handleSignIn,
+    ///             wrapping: Label(text: "Sign In")
+    ///         )
+    ///     }
+    ///
+    /// By default, each item in the column will be stretched or compressed with equal priority in
+    /// the event of overflow or underflow. You can control this behavior by adding a
+    /// `stackLayoutChild` modifier to an item.
+    ///
+    ///     Column {
+    ///         ImportantHeader()
+    ///             .stackLayoutChild(priority: .fixed)
+    ///
+    ///         LessImportantContent()
+    ///     }
+    ///
+    /// You can also use this modifier to add keys and alignment guides. See `StackElement.add` for
+    /// more information.
+    ///
+    /// ## See Also
+    /// [StackElement.add()](x-source-tag://StackElement.add)
+    ///
     /// - Parameters:
-    ///   - alignment: Specifies how children will be aligned horizontally. Default: .leading
-    ///   - underflow: Determines the layout when there is extra free space available. Default: .spaceEvenly
-    ///   - overflow: Determines the layout when there is not enough space to fit all children as measured. Default: .condenseProportionally
-    ///   - minimumSpacing: Spacing in between elements. Default: 0
+    ///   - alignment: Specifies how children will be aligned horizontally. Default: `.leading`
+    ///   - underflow: Determines the layout when there is extra free space available. Default:
+    ///     `.spaceEvenly`
+    ///   - overflow: Determines the layout when there is not enough space to fit all children as
+    ///     measured. Default: `.condenseProportionally`
+    ///   - minimumSpacing: Spacing in between elements. Default: `0`
     ///   - elements: A block containing all elements to be included in the stack.
-    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackLayout.Child` with default values
     public init(
         alignment: ColumnAlignment = .leading,
         underflow: StackLayout.UnderflowDistribution = .spaceEvenly,
