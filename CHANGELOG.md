@@ -31,8 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
-- The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibiiltyElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
+- The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibilityElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
 - An initializer on `AccessibilityElement` that requires a `label`, `value`, and `traits`.
+- `Overlay` supports keys for disambiguation between view updates. ([#264])
 
 ### Removed
 
@@ -46,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The `accessibility(...)` modifier has been deprecated. Use `accessibilityElement(...)` instead.
 - An initializer on `AccessibilityElement` that allowed all parameters to be unspecified. Use the initializer with required parameters instead.
+- `Overlay.add(_:)` deprecated in favor of `Overlay.add(key:child:)`.
 
 ### Security
 
@@ -684,6 +686,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#264]: https://github.com/square/Blueprint/pull/264
 [#260]: https://github.com/square/Blueprint/pull/260
 [#259]: https://github.com/square/Blueprint/pull/259
 [#257]: https://github.com/square/Blueprint/pull/257

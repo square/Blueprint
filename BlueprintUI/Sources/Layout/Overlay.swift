@@ -10,28 +10,39 @@ import UIKit
 public struct Overlay: Element {
 
     /// All elements displayed in the overlay.
-    public var elements: [Element]
+    public var children: [Child]
 
     /// Creates a new overlay with the provided elements.
     public init(
         elements: [Element] = [],
         configure: (inout Overlay) -> Void = { _ in }
     ) {
-        self.elements = elements
+        children = elements.map { Child(element: $0) }
         configure(&self)
     }
 
     /// Adds the provided element to the overlay.
+    @available(*, deprecated, renamed: "add(child:)")
     public mutating func add(_ element: Element) {
-        elements.append(element)
+        children.append(Child(element: element))
+    }
+
+    /// Adds the provided element to the overlay, above other children.
+    ///
+    /// - Parameters:
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy
+    ///   - child: The child element to add.
+    public mutating func add(key: AnyHashable? = nil, child: Element) {
+        children.append(Child(element: child, key: key))
     }
 
     // MARK: Element
 
     public var content: ElementContent {
-        ElementContent(layout: OverlayLayout()) {
-            for element in elements {
-                $0.add(element: element)
+        ElementContent(layout: OverlayLayout()) { builder in
+            for child in children {
+                builder.add(key: child.key, element: child.element)
             }
         }
     }
@@ -60,4 +71,20 @@ fileprivate struct OverlayLayout: Layout {
         )
     }
 
+}
+
+extension Overlay {
+    /// The child of an `Overlay`.
+    public struct Child {
+        /// The child element
+        public var element: Element
+        /// An optional key to disambiguate between view updates
+        public var key: AnyHashable?
+
+        /// Create a new child.
+        public init(element: Element, key: AnyHashable? = nil) {
+            self.element = element
+            self.key = key
+        }
+    }
 }
