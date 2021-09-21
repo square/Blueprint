@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `@FocusState` property wrapper can be used to manage focus of text fields. ([#259])
 
   After binding a text field to a state, you can programmatically focus the field by setting the state value.
-  
+
   ```swift
   struct LoginForm: ProxyElement {
       enum Field: Hashable {
@@ -31,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 
+- The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibiiltyElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
+- An initializer on `AccessibilityElement` that requires a `label`, `value`, and `traits`.
+
 ### Removed
 
 ### Changed
@@ -40,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
 
 ### Deprecated
+
+- The `accessibility(...)` modifier has been deprecated. Use `accessibilityElement(...)` instead.
+- An initializer on `AccessibilityElement` that allowed all parameters to be unspecified. Use the initializer with required parameters instead.
 
 ### Security
 
@@ -88,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- [`makeUIView()` on `UIViewElement` is no longer a static function](https://github.com/square/Blueprint/pull/246), to allow access to properties during view creation. 
+- [`makeUIView()` on `UIViewElement` is no longer a static function](https://github.com/square/Blueprint/pull/246), to allow access to properties during view creation.
 
 ## [0.27.0] - 2021-06-22
 
@@ -121,11 +127,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - vertical alignment
   - children with absolutely-sized widths
   - children with proportionally-sized widths¹
-  
+
   ¹Proportional width in this case always means "a proportion of available layout space after spacing and absolutely-sized children are laid out."
-  
+
   Example:
-  
+
   ```swift
   GridRow { row in
     row.spacing = 8
@@ -135,11 +141,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     row.add(width: .proportional(0.25), child: dateLabel)
   }
   ```
-  
+
 - [Added support to `LayoutWriter` to allow specifying keys for child `Element`s](https://github.com/square/Blueprint/pull/216).
 
 - Blueprint can now emit [signpost logs](https://developer.apple.com/documentation/os/logging/recording_performance_data) during its render pass, which you can use for performance tuning. ([#209])
-  
+
   Signpost logs are disabled by default. To enable them, set `BlueprintLogging.enabled = true`.
 
 ### Changed
@@ -292,13 +298,13 @@ searchField
     Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
   }
   ```
-  
+
   into
-  
+
   ```swift
   Box(cornerStyle: .capsule)
   ```
-  
+
 - Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over. ([#144])
 
 - Add `Opacity` element for modifying the opacity of a wrapped element. ([#147])
@@ -364,7 +370,7 @@ searchField
 - Introduce [MeasurementCachingKey](https://github.com/square/Blueprint/pull/115), to allow for elements to provide a way to cache their measurement during layout passes. This provides performance optimizations for elements whose layout and measurement is expensive to calculate.
 
 - Introduce `UIViewElement` [to make wrapping self-sizing UIViews easier](https://github.com/square/Blueprint/pull/106).
-  
+
   You can now write a `UIViewElement` like this:
 
   ```
