@@ -1066,7 +1066,7 @@ class StackTests: XCTestCase {
         }
 
         func test(
-            items: [(item: TestItem, priority: CGFloat)],
+            items: [(item: TestItem, priority: CGFloat, shrinkBehavior: StackLayout.ShrinkBehavior)],
             expectedSizes: [StackLayout.Vector],
             file: StaticString = #file,
             line: UInt = #line
@@ -1074,10 +1074,11 @@ class StackTests: XCTestCase {
             do {
                 let row = Row { row in
                     row.horizontalOverflow = .condenseUniformly
-                    for (item, priority) in items {
+                    for (item, priority, shrinkBehavior) in items {
                         row.add(
                             growPriority: priority,
                             shrinkPriority: priority,
+                            shrinkBehavior: shrinkBehavior,
                             child: item.element(on: .horizontal)
                         )
                     }
@@ -1102,10 +1103,11 @@ class StackTests: XCTestCase {
             do {
                 let column = Column { column in
                     column.verticalOverflow = .condenseUniformly
-                    for (item, priority) in items {
+                    for (item, priority, shrinkBehavior) in items {
                         column.add(
                             growPriority: priority,
                             shrinkPriority: priority,
+                            shrinkBehavior: shrinkBehavior,
                             child: item.element(on: .vertical)
                         )
                     }
@@ -1130,7 +1132,7 @@ class StackTests: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: 1)
+                (item: .flex, priority: 1, shrinkBehavior: .fill)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 100, cross: 10)
@@ -1139,8 +1141,8 @@ class StackTests: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: 1),
-                (item: .flex, priority: 1)
+                (item: .flex, priority: 1, shrinkBehavior: .fill),
+                (item: .flex, priority: 1, shrinkBehavior: .fill)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 50, cross: 20),
@@ -1150,8 +1152,8 @@ class StackTests: XCTestCase {
 
         test(
             items: [
-                (item: .flex, priority: 1),
-                (item: .flex, priority: 3)
+                (item: .flex, priority: 1, shrinkBehavior: .fill),
+                (item: .flex, priority: 3, shrinkBehavior: .fill)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 75, cross: 20), // 7 x 2
@@ -1161,8 +1163,8 @@ class StackTests: XCTestCase {
 
         test(
             items: [
-                (item: .fixed, priority: 0),
-                (item: .flex, priority: 1)
+                (item: .fixed, priority: 0, shrinkBehavior: .fill),
+                (item: .flex, priority: 1, shrinkBehavior: .fill)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
@@ -1173,15 +1175,55 @@ class StackTests: XCTestCase {
         test(
             // overflow of 120
             items: [
-                (item: .fixed, priority: 0),
-                (item: .flex, priority: 2), // shrinks by 80
-                (item: .flex, priority: 1), // shrinks by 40
-                (item: .fixed, priority: 0)
+                (item: .fixed, priority: 0, shrinkBehavior: .fill),
+                (item: .flex, priority: 2, shrinkBehavior: .fill), // shrinks by 80
+                (item: .flex, priority: 1, shrinkBehavior: .fill), // shrinks by 40
+                (item: .fixed, priority: 0, shrinkBehavior: .fill)
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
                 StackLayout.Vector(axis: 20, cross: 50), // 2 x 5
                 StackLayout.Vector(axis: 60, cross: 20), // 6 x 2
+                StackLayout.Vector(axis: 10, cross: 10)
+            ]
+        )
+
+        // Fitting shrink behavior
+
+        test(
+            items: [
+                (item: .flex, priority: 1, shrinkBehavior: .fit),
+                (item: .flex, priority: 3, shrinkBehavior: .fit)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 70, cross: 20), // 7 x 2
+                StackLayout.Vector(axis: 20, cross: 50) // 2 x 5
+            ]
+        )
+
+        test(
+            items: [
+                (item: .flex, priority: 1, shrinkBehavior: .fill),
+                (item: .flex, priority: 3, shrinkBehavior: .fit)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 75, cross: 20), // 7 x 2
+                StackLayout.Vector(axis: 20, cross: 50) // 2 x 5
+            ]
+        )
+
+        test(
+            // overflow of 120
+            items: [
+                (item: .fixed, priority: 0, shrinkBehavior: .fill),
+                (item: .flex, priority: 3, shrinkBehavior: .fit), // shrinks by 72
+                (item: .flex, priority: 2, shrinkBehavior: .fit), // shrinks by 48
+                (item: .fixed, priority: 0, shrinkBehavior: .fill)
+            ],
+            expectedSizes: [
+                StackLayout.Vector(axis: 10, cross: 10),
+                StackLayout.Vector(axis: 20, cross: 50), // 2 x 5
+                StackLayout.Vector(axis: 50, cross: 20), // 5 x 2
                 StackLayout.Vector(axis: 10, cross: 10)
             ]
         )
