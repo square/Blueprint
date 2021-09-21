@@ -49,7 +49,7 @@ public struct Row: StackElement {
         }
     }
 
-    public var children: [StackLayout.Child] = []
+    public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
     public private(set) var layout: StackLayout = StackLayout(
         axis: .horizontal,

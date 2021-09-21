@@ -7,7 +7,7 @@ import UIKit
 public protocol StackElement: Element {
     init()
     var layout: StackLayout { get }
-    var children: [StackLayout.Child] { get set }
+    var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] { get set }
 }
 
 extension StackElement {
@@ -39,7 +39,9 @@ extension StackElement {
     /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.
     init(@ElementBuilder<StackLayout.Child> elementsBuilder: () -> [StackLayout.Child]) {
         self.init()
-        children = elementsBuilder()
+        children = elementsBuilder().map { stackLayoutChild in
+            (stackLayoutChild.element, stackLayoutChild.traits, stackLayoutChild.key)
+        }
     }
 
     /// Adds a given child element to the stack.
@@ -111,7 +113,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        children.append(.init(
+        children.append((
             element: child,
             traits: StackLayout.Traits(
                 growPriority: growPriority,
