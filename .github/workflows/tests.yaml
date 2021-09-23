@@ -24,8 +24,8 @@ jobs:
           - sdk: "13.5"
             destination: platform=iOS Simulator,OS=13.5,name=iPhone 8
 
-          - sdk: "14.0"
-            destination: platform=iOS Simulator,OS=14.0.1,name=iPhone 8
+          - sdk: "14.5"
+            destination: platform=iOS Simulator,OS=14.5,name=iPhone 8
 
     steps:
     - uses: actions/checkout@v1
