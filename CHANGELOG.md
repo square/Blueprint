@@ -48,6 +48,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       }
   }
   ```
+- Row, Column, EqualStack, and GridRow can now be initialized declaritively using result builders. ([#220])
+  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure. 
+  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters. 
+  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`. 
+  ```swift
+  let row = Row(alignment: .fill) {
+    TestElement()
+    TestElement2()
+      .stackLayoutChild(priority: .fixed, alignmentGuide: { _ in 0 }, key: "two")
+  }
+  ```
 
 - The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibilityElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
 - An initializer on `AccessibilityElement` that requires a `label`, `value`, and `traits`.
