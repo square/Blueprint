@@ -26,6 +26,9 @@ public struct LayoutAttributes {
     /// Corresponds to `UIView.isUserInteractionEnabled`.
     public var isUserInteractionEnabled: Bool
 
+    /// Corresponds to `UIView.isHidden`.
+    public var isHidden: Bool
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
@@ -47,6 +50,7 @@ public struct LayoutAttributes {
         transform = CATransform3DIdentity
         alpha = 1.0
         isUserInteractionEnabled = true
+        isHidden = false
 
         validateBounds()
         validateCenter()
@@ -207,6 +211,8 @@ extension LayoutAttributes: Equatable {
             && lhs.bounds == rhs.bounds
             && CATransform3DEqualToTransform(lhs.transform, rhs.transform)
             && lhs.alpha == rhs.alpha
+            && lhs.isUserInteractionEnabled == rhs.isUserInteractionEnabled
+            && lhs.isHidden == rhs.isHidden
     }
 
 }
