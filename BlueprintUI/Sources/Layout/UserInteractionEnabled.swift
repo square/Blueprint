@@ -1,11 +1,4 @@
-//
-//  UserInteractionEnabled.swift
-//  BlueprintUICommonControls
-//
-//  Created by Noah Blake on 3/15/21.
-//
-
-import UIKit
+import CoreGraphics
 
 /// `UserInteractionEnabled` conditionally enables user interaction of its wrapped element.
 ///

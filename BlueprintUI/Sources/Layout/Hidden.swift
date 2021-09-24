@@ -1,13 +1,4 @@
-//
-//  File.swift
-//
-//
-//  Created by Kyle Bashour on 9/24/21.
-//
-
-import Foundation
-
-import UIKit
+import CoreGraphics
 
 /// `Hidden` conditionally hides its wrapped element.
 ///
