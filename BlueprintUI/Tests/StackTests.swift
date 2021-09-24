@@ -1245,3 +1245,23 @@ fileprivate struct TestElement: Element {
     }
 
 }
+
+extension HorizontalAlignment {
+    enum Test25: AlignmentID {
+        static func defaultValue(in d: ElementDimensions) -> CGFloat {
+            d.width * 0.25
+        }
+    }
+
+    static let test25 = HorizontalAlignment(Test25.self)
+}
+
+extension VerticalAlignment {
+    enum Test25: AlignmentID {
+        static func defaultValue(in d: ElementDimensions) -> CGFloat {
+            d.height * 0.25
+        }
+    }
+
+    static let test25 = VerticalAlignment(Test25.self)
+}
