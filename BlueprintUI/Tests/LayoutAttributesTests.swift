@@ -42,6 +42,13 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertNotEqual(attributes, other)
         }
 
+        do {
+            /// Enabled
+            var other = attributes
+            other.isUserInteractionEnabled = false
+            XCTAssertNotEqual(attributes, other)
+        }
+
     }
 
     func testConcatAlpha() {

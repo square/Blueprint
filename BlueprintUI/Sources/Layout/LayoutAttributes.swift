@@ -23,6 +23,9 @@ public struct LayoutAttributes {
         didSet { validateAlpha() }
     }
 
+    /// Corresponds to `UIView.isUserInteractionEnabled`.
+    public var isUserInteractionEnabled: Bool
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
@@ -43,6 +46,7 @@ public struct LayoutAttributes {
         self.bounds = bounds
         transform = CATransform3DIdentity
         alpha = 1.0
+        isUserInteractionEnabled = true
 
         validateBounds()
         validateCenter()
@@ -70,6 +74,7 @@ public struct LayoutAttributes {
         view.center = center
         view.layer.transform = transform
         view.alpha = alpha
+        view.isUserInteractionEnabled = isUserInteractionEnabled
     }
 
 
