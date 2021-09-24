@@ -1,4 +1,4 @@
-import QuartzCore
+import UIKit
 import XCTest
 @testable import BlueprintUI
 
@@ -127,6 +127,58 @@ final class LayoutAttributesTests: XCTestCase {
 
     }
 
+    func test_concat_isUserInteractionEnabled() {
+        do {
+            var a = LayoutAttributes()
+            a.isUserInteractionEnabled = true
+
+            var b = LayoutAttributes()
+            b.isUserInteractionEnabled = false
+
+            let combined = b.within(a)
+
+            XCTAssertFalse(combined.isUserInteractionEnabled)
+        }
+
+        do {
+            var a = LayoutAttributes()
+            a.isUserInteractionEnabled = false
+
+            var b = LayoutAttributes()
+            b.isUserInteractionEnabled = true
+
+            let combined = b.within(a)
+
+            XCTAssertFalse(combined.isUserInteractionEnabled)
+        }
+    }
+
+
+    func test_concat_isHidden() {
+        do {
+            var a = LayoutAttributes()
+            a.isHidden = true
+
+            var b = LayoutAttributes()
+            b.isHidden = false
+
+            let combined = b.within(a)
+
+            XCTAssertTrue(combined.isHidden)
+        }
+
+        do {
+            var a = LayoutAttributes()
+            a.isHidden = false
+
+            var b = LayoutAttributes()
+            b.isHidden = true
+
+            let combined = b.within(a)
+
+            XCTAssertTrue(combined.isHidden)
+        }
+    }
 }
 
 final class LayoutAttributesTests_CGRect: XCTestCase {
@@ -169,5 +221,26 @@ final class LayoutAttributesTests_CATransform3D: XCTestCase {
         invalid.m11 = CGFloat.nan
 
         XCTAssertFalse(invalid.isFinite)
+    }
+}
+
+final class LayoutAttributesTests_Apply: XCTestCase {
+
+    func test_apply_isUserInteractionEnabled() {
+        var attributes = LayoutAttributes()
+        attributes.isUserInteractionEnabled = false
+
+        let view = UIView()
+        attributes.apply(to: view)
+        XCTAssertFalse(view.isUserInteractionEnabled)
+    }
+
+    func test_apply_isHidden() {
+        var attributes = LayoutAttributes()
+        attributes.isHidden = true
+
+        let view = UIView()
+        attributes.apply(to: view)
+        XCTAssertTrue(view.isHidden)
     }
 }

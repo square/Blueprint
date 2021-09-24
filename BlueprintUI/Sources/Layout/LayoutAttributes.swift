@@ -79,6 +79,7 @@ public struct LayoutAttributes {
         view.layer.transform = transform
         view.alpha = alpha
         view.isUserInteractionEnabled = isUserInteractionEnabled
+        view.isHidden = isHidden
     }
 
 
@@ -116,7 +117,7 @@ public struct LayoutAttributes {
     //    │                                               │
     //    └───────────────────────────────────────────────┘
     //
-    /// Concatonates layout attributes, moving the receiver from the local
+    /// Concatenates layout attributes, moving the receiver from the local
     /// coordinate space of `layoutAttributes` and into its parent coordinate
     /// space.
     ///
@@ -144,6 +145,8 @@ public struct LayoutAttributes {
 
         result.transform = CATransform3DConcat(transform, t.untranslated)
         result.alpha = alpha * layoutAttributes.alpha
+        result.isUserInteractionEnabled = layoutAttributes.isUserInteractionEnabled && isUserInteractionEnabled
+        result.isHidden = layoutAttributes.isHidden || isHidden
 
         return result
     }
