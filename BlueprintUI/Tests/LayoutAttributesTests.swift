@@ -49,6 +49,13 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertNotEqual(attributes, other)
         }
 
+        do {
+            /// hidden
+            var other = attributes
+            other.isHidden = true
+            XCTAssertNotEqual(attributes, other)
+        }
+
     }
 
     func testConcatAlpha() {

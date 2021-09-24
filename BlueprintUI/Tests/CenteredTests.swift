@@ -16,7 +16,8 @@ class CenteredTests: XCTestCase {
         let centered = Centered(element)
 
         let layout = centered.layout(frame: CGRect(x: 0, y: 0, width: 5000, height: 6000))
-        if let child = findLayout(of: TestElement.self, in: layout) {
+
+        if let child = layout.findLayout(of: TestElement.self) {
             XCTAssertEqual(
                 child.layoutAttributes.frame,
                 CGRect(
@@ -29,19 +30,6 @@ class CenteredTests: XCTestCase {
         } else {
             XCTFail("TestElement should be a child element")
         }
-    }
-
-    private func findLayout(of elementType: Element.Type, in node: LayoutResultNode) -> LayoutResultNode? {
-        if type(of: node.element) == elementType {
-            return node
-        }
-
-        for child in node.children {
-            if let node = findLayout(of: elementType, in: child.node) {
-                return node
-            }
-        }
-        return nil
     }
 }
 
