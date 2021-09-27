@@ -43,7 +43,7 @@ final class LayoutAttributesTests: XCTestCase {
         }
 
         do {
-            /// Enabled
+            /// User Interaction Enabled
             var other = attributes
             other.isUserInteractionEnabled = false
             XCTAssertNotEqual(attributes, other)
