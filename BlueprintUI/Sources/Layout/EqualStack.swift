@@ -29,6 +29,20 @@ public struct EqualStack: Element {
         configure(&self)
     }
 
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - direction: Direction of the stack.
+    ///   - children: A block containing all elements to be included in the stack.
+    public init(
+        direction: Direction,
+        spacing: CGFloat = 0,
+        @ElementBuilder<Child> elements: () -> [Child]
+    ) {
+        self.init(direction: direction)
+        self.spacing = spacing
+        children = elements().map(\.element)
+    }
+
     public var content: ElementContent {
         let layout = EqualLayout(direction: direction, spacing: spacing)
         return ElementContent(layout: layout) {
@@ -141,4 +155,16 @@ extension EqualStack {
 
     }
 
+}
+
+/// Wraps around an Element for consistency with `StackLayout.Child` and `GridRowChild`.
+/// In the future this struct could hold traits used for laying out inside an EqualStack
+extension EqualStack {
+    public struct Child: ElementBuilderChild {
+        public let element: Element
+
+        public init(_ element: Element) {
+            self.element = element
+        }
+    }
 }
