@@ -510,10 +510,8 @@ class StackTests: XCTestCase {
         }
 
         // Ensure that elements of size zero do not result in NaN in the outputted frames.
-
         do {
             // Note: Only applicable to `growProportionally`.
-
             test(
                 underflow: .growProportionally,
                 layoutLength: 100,
@@ -927,10 +925,8 @@ class StackTests: XCTestCase {
         }
 
         // Ensure that elements of size zero do not result in NaN in the outputted frames.
-
         do {
             // Note: Only applicable to `condenseProportionally`.
-
             test(
                 overflow: .condenseProportionally,
 

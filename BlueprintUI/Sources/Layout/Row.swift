@@ -51,12 +51,35 @@ public struct Row: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    public private(set) var layout = StackLayout(
+    public private(set) var layout: StackLayout = StackLayout(
         axis: .horizontal,
-        alignment: RowAlignment.top.stackAlignment
+        alignment: Row.RowAlignment.top.stackAlignment
     )
 
     public init() {}
+
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - alignment: Specifies how children will be aligned vertically. Default: .top
+    ///   - underflow: Determines the layout when there is extra free space available. Default: .spaceEvenly
+    ///   - overflow: Determines the layout when there is not enough space to fit all children as measured. Default: .condenseProportionally
+    ///   - minimumSpacing: Spacing in between elements. Default: 0
+    ///   - elements: A block containing all elements to be included in the stack.
+    /// - Note: If element is a plain Element, then that Element will be implicitly converted into a `StackLayout.Child` with default values
+    public init(
+        alignment: RowAlignment = .top,
+        underflow: StackLayout.UnderflowDistribution = .spaceEvenly,
+        overflow: StackLayout.OverflowDistribution = .condenseProportionally,
+        minimumSpacing: CGFloat = 0,
+        @ElementBuilder<StackLayout.Child> elements: () -> [StackLayout.Child]
+    ) {
+        var layout: StackLayout = .init(axis: .horizontal, alignment: alignment.stackAlignment)
+        layout.underflow = underflow
+        layout.overflow = overflow
+        layout.minimumSpacing = minimumSpacing
+        self.init(elementsBuilder: elements)
+        self.layout = layout
+    }
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {
         get { layout.underflow }

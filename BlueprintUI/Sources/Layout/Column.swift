@@ -43,12 +43,68 @@ public struct Column: StackElement {
 
     public var children: [(element: Element, traits: StackLayout.Traits, key: AnyHashable?)] = []
 
-    public private(set) var layout = StackLayout(
+    public private(set) var layout: StackLayout = StackLayout(
         axis: .vertical,
-        alignment: ColumnAlignment.leading.stackAlignment
+        alignment: Column.ColumnAlignment.leading.stackAlignment
     )
 
     public init() {}
+
+    /// Creates a Column, using result builder syntax. Columns display a list of items in a vertical
+    /// stack.
+    ///
+    ///     Column {
+    ///         Label(text: "Welcome")
+    ///
+    ///         TextField(text: username)
+    ///         TextField(text: password)
+    ///
+    ///         Button(
+    ///             onTap: handleSignIn,
+    ///             wrapping: Label(text: "Sign In")
+    ///         )
+    ///     }
+    ///
+    /// By default, each item in the column will be stretched or compressed with equal priority in
+    /// the event of overflow or underflow. You can control this behavior by adding a
+    /// `stackLayoutChild` modifier to an item.
+    ///
+    ///     Column {
+    ///         ImportantHeader()
+    ///             .stackLayoutChild(priority: .fixed)
+    ///
+    ///         LessImportantContent()
+    ///     }
+    ///
+    /// You can also use this modifier to add keys and alignment guides. See `StackElement.add` for
+    /// more information.
+    ///
+    /// ## See Also
+    /// [StackElement.add()](x-source-tag://StackElement.add)
+    ///
+    /// - Parameters:
+    ///   - alignment: Specifies how children will be aligned horizontally. Default: `.leading`
+    ///   - underflow: Determines the layout when there is extra free space available. Default:
+    ///     `.spaceEvenly`
+    ///   - overflow: Determines the layout when there is not enough space to fit all children as
+    ///     measured. Default: `.condenseProportionally`
+    ///   - minimumSpacing: Spacing in between elements. Default: `0`
+    ///   - elements: A block containing all elements to be included in the stack.
+    public init(
+        alignment: ColumnAlignment = .leading,
+        underflow: StackLayout.UnderflowDistribution = .spaceEvenly,
+        overflow: StackLayout.OverflowDistribution = .condenseProportionally,
+        minimumSpacing: CGFloat = 0,
+        @ElementBuilder<StackLayout.Child> elements: () -> [StackLayout.Child]
+    ) {
+        var layout: StackLayout = .init(axis: .vertical, alignment: alignment.stackAlignment)
+        layout.underflow = underflow
+        layout.overflow = overflow
+        layout.minimumSpacing = minimumSpacing
+
+        self.init(elementsBuilder: elements)
+        self.layout = layout
+    }
 
     public var verticalUnderflow: StackLayout.UnderflowDistribution {
         get { layout.underflow }
@@ -74,5 +130,4 @@ public struct Column: StackElement {
         get { layout.minimumSpacing }
         set { layout.minimumSpacing = newValue }
     }
-
 }

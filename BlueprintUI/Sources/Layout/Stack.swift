@@ -33,6 +33,17 @@ extension StackElement {
         configure(&self)
     }
 
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - elementsBuilder: A block containing all elements to be included in the stack.
+    /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.
+    init(@ElementBuilder<StackLayout.Child> elementsBuilder: () -> [StackLayout.Child]) {
+        self.init()
+        children = elementsBuilder().map { stackLayoutChild in
+            (stackLayoutChild.element, stackLayoutChild.traits, stackLayoutChild.key)
+        }
+    }
+
     /// Adds a given child element to the stack.
     ///
     /// - parameters:
@@ -963,5 +974,97 @@ extension SizeConstraint.Axis {
         case .unconstrained:
             return .unconstrained
         }
+    }
+}
+
+// MARK: - Result Builders
+
+/// `StackLayout.Child` is a wrapper which holds an element along with  its StackLayout traits and Keys.
+/// This struct is particularly useful when working with `@ElementBuilder<StackLayout.Child>`.
+/// By default, elements inside of `ElementBuilder<StackLayout.Child>` will be implicitly converted to a StackLayout.Child
+/// with a nil key and the default `StackLayout.Traits` initializer. But when given a `StackLayout.Child` via
+/// `Element.StackLayout.Child(...)` modifier or initialized directly, `@ElementBuilder<StackLayout.Child>`
+/// pull out the given traits and key and then apply those to the stack
+extension StackLayout {
+    public struct Child {
+        public let element: Element
+        public let traits: StackLayout.Traits
+        public let key: AnyHashable?
+
+        public enum Priority {
+            case fixed
+            case flexible
+
+            fileprivate var growPriority: CGFloat {
+                switch self {
+                case .fixed: return 0
+                case .flexible: return 1
+                }
+            }
+
+            fileprivate var shrinkPriority: CGFloat {
+                switch self {
+                case .fixed: return 0
+                case .flexible: return 1
+                }
+            }
+        }
+
+        public init(
+            element: Element,
+            traits: StackLayout.Traits = .init(),
+            key: AnyHashable? = nil
+        ) {
+            self.element = element
+            self.traits = traits
+            self.key = key
+        }
+
+        public init(
+            element: Element,
+            priority: Priority = .flexible,
+            alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+            key: AnyHashable? = nil
+        ) {
+            self.init(
+                element: element,
+                traits: .init(
+                    growPriority: priority.growPriority,
+                    shrinkPriority: priority.shrinkPriority,
+                    alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init)
+                ),
+                key: key
+            )
+        }
+    }
+}
+
+extension Element {
+
+    /// Wraps an element with a `StackLayout.Child` in order to customize `StackLayout.Traits` and the key.
+    /// - Parameters:
+    ///   - sizing: Controls the amount of extra space distributed to this child during underflow and overflow
+    ///   - alignmentGuide: Allows for custom alignment of a child along the cross axis.
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy.
+    /// - Returns: A wrapper containing this element with additional layout information for the `StackElement`.
+    public func stackLayoutChild(
+        priority: StackLayout.Child.Priority = .flexible,
+        alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+        key: AnyHashable? = nil
+    ) -> StackLayout.Child {
+        .init(
+            element: self,
+            priority: priority,
+            alignmentGuide: alignmentGuide,
+            key: key
+        )
+    }
+}
+
+
+extension StackLayout.Child: ElementBuilderChild {
+    public init(_ element: Element) {
+        self.init(element: element)
     }
 }
