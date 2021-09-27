@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- Removed deprecated initializer from `AccessibilityElement` which was causing ambiguous initializer errors.
+
 ### Changed
 
 ### Deprecated
