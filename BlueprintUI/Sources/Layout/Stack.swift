@@ -180,6 +180,37 @@ extension StackElement {
             child: child
         )
     }
+
+    /// Adds a `Spacer` element to the stack, which will grow (and shrink) depending on the amount
+    /// of left over available space when measuring the elements.
+    public mutating func addFlexibleSpacer() {
+        precondition(
+            layout.underflow.growsInUnderflow,
+            """
+            Flexible have no effect if the Stack's underflow does not stretch contents. \
+            Underflow must be one of: `.growProportionally`, `.growUniformly`.
+            """
+        )
+
+        add(growPriority: 1, shrinkPriority: 1, child: Spacer(1.0))
+    }
+
+    /// Adds a fixed `Spacer` element to the stack, with the provided width.
+    ///
+    /// ### Note
+    /// Do not use this method to add spacing between each element in your stack.
+    ///
+    /// Instead, utilize the `minimumHorizontalSpacing` (`Row`)
+    /// or `minimumVerticalSpacing` (`Column`) to control uniform spacing
+    /// between elements in your stack.
+    public mutating func addFixedSpacer(_ size: CGFloat) {
+        switch layout.axis {
+        case .horizontal:
+            addFixed(child: Spacer(width: size, height: 0))
+        case .vertical:
+            addFixed(child: Spacer(width: 0, height: size))
+        }
+    }
 }
 
 
@@ -973,6 +1004,20 @@ extension SizeConstraint.Axis {
             return .atMost(max)
         case .unconstrained:
             return .unconstrained
+        }
+    }
+}
+
+extension StackLayout.UnderflowDistribution {
+
+    var growsInUnderflow: Bool {
+        switch self {
+        case .spaceEvenly: return false
+        case .growProportionally: return true
+        case .growUniformly: return true
+        case .justifyToStart: return false
+        case .justifyToCenter: return false
+        case .justifyToEnd: return false
         }
     }
 }

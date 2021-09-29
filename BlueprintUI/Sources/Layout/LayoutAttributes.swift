@@ -23,6 +23,8 @@ public struct LayoutAttributes {
         didSet { validateAlpha() }
     }
 
+    public var isHidden: Bool
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
@@ -43,6 +45,7 @@ public struct LayoutAttributes {
         self.bounds = bounds
         transform = CATransform3DIdentity
         alpha = 1.0
+        isHidden = false
 
         validateBounds()
         validateCenter()
