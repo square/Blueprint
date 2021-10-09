@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- [Introduced `addFlexibleSpacer()` and `addFixedSpacer(_:)`](TODO) to `StackElement`, to more easily add spacers to stacks.
-
 ### Removed
 
 - Removed deprecated initializer from `AccessibilityElement` which was causing ambiguous initializer errors.
