@@ -16,6 +16,10 @@ public struct SegmentedControl: Element, Measurable {
         self.items = items
     }
 
+    public init(@Builder<Item> itemBuilder: () -> [Item]) {
+        items = itemBuilder()
+    }
+
     public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping () -> Void) {
         items.append(Item(title: title, width: width, onSelect: onSelect))
     }
