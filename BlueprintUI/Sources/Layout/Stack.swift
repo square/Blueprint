@@ -33,7 +33,7 @@ extension StackElement {
         configure(&self)
     }
 
-    /// Initializer using result builder to declaritively build up a stack.
+    /// Initializer using result builder to declaratively build up a stack.
     /// - Parameters:
     ///   - elementsBuilder: A block containing all elements to be included in the stack.
     /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.

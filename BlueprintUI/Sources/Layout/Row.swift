@@ -58,7 +58,7 @@ public struct Row: StackElement {
 
     public init() {}
 
-    /// Initializer using result builder to declaritively build up a stack.
+    /// Initializer using result builder to declaratively build up a stack.
     /// - Parameters:
     ///   - alignment: Specifies how children will be aligned vertically. Default: .top
     ///   - underflow: Determines the layout when there is extra free space available. Default: .spaceEvenly
