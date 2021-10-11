@@ -21,6 +21,15 @@ public struct Overlay: Element {
         configure(&self)
     }
 
+    /// Creates a new overlay using a result builder.
+    public init(
+        @ElementBuilder<Overlay.Child> elements: () -> [Overlay.Child],
+        configure: (inout Overlay) -> Void = { _ in }
+    ) {
+        children = elements()
+        configure(&self)
+    }
+
     /// Adds the provided element to the overlay.
     @available(*, deprecated, renamed: "add(child:)")
     public mutating func add(_ element: Element) {
@@ -86,5 +95,17 @@ extension Overlay {
             self.element = element
             self.key = key
         }
+    }
+}
+
+extension Overlay.Child: ElementBuilderChild {
+    public init(_ element: Element) {
+        self.init(element: element, key: nil)
+    }
+}
+
+extension Element {
+    public func overlayChild(key: AnyHashable? = nil) -> Overlay.Child {
+        .init(element: self, key: key)
     }
 }
