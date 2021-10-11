@@ -23,11 +23,9 @@ public struct Overlay: Element {
 
     /// Creates a new overlay using a result builder.
     public init(
-        @ElementBuilder<Overlay.Child> elements: () -> [Overlay.Child],
-        configure: (inout Overlay) -> Void = { _ in }
+        @ElementBuilder<Overlay.Child> elements: () -> [Overlay.Child]
     ) {
         children = elements()
-        configure(&self)
     }
 
     /// Adds the provided element to the overlay.
