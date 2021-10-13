@@ -49,31 +49,6 @@ public struct AccessibilityElement: Element {
         wrappedElement = element
     }
 
-    @available(
-        *,
-        deprecated,
-        renamed: "init(label:value:traits:hint:identifier:accessibilityFrameSize:wrapping:)"
-    )
-    public init(
-        label: String? = nil,
-        value: String? = nil,
-        hint: String? = nil,
-        identifier: String? = nil,
-        traits: Set<Trait> = [],
-        accessibilityFrameSize: CGSize? = nil,
-        wrapping element: Element
-    ) {
-        self.init(
-            label: label,
-            value: value,
-            traits: traits,
-            hint: hint,
-            identifier: identifier,
-            accessibilityFrameSize: accessibilityFrameSize,
-            wrapping: element
-        )
-    }
-
     private var accessibilityTraits: UIAccessibilityTraits {
         UIAccessibilityTraits(with: traits)
     }
@@ -121,6 +96,31 @@ public struct AccessibilityElement: Element {
 
 extension Element {
 
+    /// Wraps the receiver in an accessibility element with the provided values.
+    ///
+    /// Providing a `nil` value for any of these parameters will result in no resolved value for that accessibility
+    /// parameter—it does not inherit parameters from the wrapped element's accessibility configuration.
+    ///
+    /// - Important: ⚠️ This overrides the accessibility of the contained element and all of its children ⚠️
+    public func accessibilityElement(
+        label: String?,
+        value: String?,
+        traits: Set<AccessibilityElement.Trait>,
+        hint: String? = nil,
+        identifier: String? = nil,
+        accessibilityFrameSize: CGSize? = nil
+    ) -> AccessibilityElement {
+        AccessibilityElement(
+            label: label,
+            value: value,
+            traits: traits,
+            hint: hint,
+            identifier: identifier,
+            accessibilityFrameSize: accessibilityFrameSize,
+            wrapping: self
+        )
+    }
+
 
     /// Wraps the receiver in an accessibility element with the provided values.
     ///
@@ -147,31 +147,6 @@ extension Element {
             hint: hint,
             identifier: identifier,
             accessibilityFrameSize: accessibilityFrameSize
-        )
-    }
-
-    /// Wraps the receiver in an accessibility element with the provided values.
-    ///
-    /// Providing a `nil` value for any of these parameters will result in no resolved value for that accessibility
-    /// parameter—it does not inherit parameters from the wrapped element's accessibility configuration.
-    ///
-    /// - Important: ⚠️ This overrides the accessibility of the contained element and all of its children ⚠️
-    public func accessibilityElement(
-        label: String?,
-        value: String?,
-        traits: Set<AccessibilityElement.Trait>,
-        hint: String? = nil,
-        identifier: String? = nil,
-        accessibilityFrameSize: CGSize? = nil
-    ) -> AccessibilityElement {
-        AccessibilityElement(
-            label: label,
-            value: value,
-            traits: traits,
-            hint: hint,
-            identifier: identifier,
-            accessibilityFrameSize: accessibilityFrameSize,
-            wrapping: self
         )
     }
 }
