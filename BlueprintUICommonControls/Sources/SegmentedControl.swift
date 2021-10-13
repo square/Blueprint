@@ -12,8 +12,9 @@ public struct SegmentedControl: Element, Measurable {
     public var font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)
     public var roundingScale: CGFloat = UIScreen.main.scale
 
-    public init(items: [Item] = []) {
+    public init(items: [Item] = [], configure: (inout SegmentedControl) -> Void = { _ in }) {
         self.items = items
+        configure(&self)
     }
 
     public init(@Builder<Item> itemBuilder: () -> [Item]) {
