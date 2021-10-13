@@ -17,8 +17,14 @@ public struct SegmentedControl: Element, Measurable {
         configure(&self)
     }
 
-    public init(@Builder<Item> itemBuilder: () -> [Item]) {
+    public init(
+        selection: Selection = .none,
+        font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body),
+        @Builder<Item> itemBuilder: () -> [Item]
+    ) {
         items = itemBuilder()
+        self.selection = selection
+        self.font = font
     }
 
     public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping () -> Void) {
