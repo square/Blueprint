@@ -38,6 +38,8 @@ public struct Hidden: Element {
 extension Element {
     /// Conditionally hide the wrapped element.
     ///
+    /// Hidden elements still participate in layout. Hiding sets the `UIView.isHidden` property of the nearest backing view.
+    ///
     /// - Note: When an element is hidden, any elements within the wrapped element will be hidden.
     public func hidden(_ hidden: Bool = true) -> Hidden {
         Hidden(hidden, wrapping: self)
