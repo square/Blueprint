@@ -6,12 +6,15 @@ class OverlayTestsResultBuilders: XCTestCase {
         let overlay = Overlay {
             TestElement()
             TestElement2().overlayChild(key: "foo")
+            TestElement2().keyed("bar")
         }
 
         XCTAssert(type(of: overlay.children[0].element) == TestElement.self)
         XCTAssertNil(overlay.children[0].key)
         XCTAssert(type(of: overlay.children[1].element) == TestElement2.self)
         XCTAssertEqual(overlay.children[1].key, "foo")
+        XCTAssert(type(of: overlay.children[2].element) == TestElement2.self)
+        XCTAssertEqual(overlay.children[2].key, "bar")
     }
 }
 

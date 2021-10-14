@@ -1062,6 +1062,12 @@ extension Element {
     }
 }
 
+/// Map `Keyed` elements in result builders to `StackLayout.Child`.
+extension ElementBuilder where Child == StackLayout.Child {
+    public static func buildExpression(_ keyed: Keyed) -> Children {
+        [StackLayout.Child(element: keyed.wrapped, key: keyed.key)]
+    }
+}
 
 extension StackLayout.Child: ElementBuilderChild {
     public init(_ element: Element) {

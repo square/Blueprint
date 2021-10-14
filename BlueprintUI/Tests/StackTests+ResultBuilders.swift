@@ -6,6 +6,7 @@ class StackTestsResultBuilders: XCTestCase {
         let column = Column {
             TestElement()
             TestElement2().stackLayoutChild(priority: .fixed, alignmentGuide: { _ in 0 }, key: "two")
+            TestElement2().keyed("three")
         }
 
         let child1 = column.children[0]
@@ -22,6 +23,9 @@ class StackTestsResultBuilders: XCTestCase {
         XCTAssertNotNil(child2.traits.alignmentGuide)
         XCTAssertEqual(child2.key, "two")
 
+        let child3 = column.children[2]
+        XCTAssert(type(of: child3.element) == TestElement2.self)
+        XCTAssertEqual(child3.key, "three")
     }
 
     func test_resultBuilder_row() {

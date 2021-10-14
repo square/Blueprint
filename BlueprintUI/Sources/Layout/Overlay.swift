@@ -102,6 +102,13 @@ extension Overlay.Child: ElementBuilderChild {
     }
 }
 
+/// Map `Keyed` elements in result builders to `Overlay.Child`.
+extension ElementBuilder where Child == Overlay.Child {
+    public static func buildExpression(_ keyed: Keyed) -> Children {
+        [Overlay.Child(element: keyed.wrapped, key: keyed.key)]
+    }
+}
+
 extension Element {
     public func overlayChild(key: AnyHashable? = nil) -> Overlay.Child {
         .init(element: self, key: key)
