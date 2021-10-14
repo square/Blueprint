@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added a `Hidden` element and `.hidden()` modifier for hiding elements.
+
 ### Removed
 
 - Removed deprecated initializer from `AccessibilityElement` which was causing ambiguous initializer errors.
 
 ### Changed
+
+- `UserInteractionEnabled` has been moved from `BlueprintUICommonControls` into `BlueprintUI`. It no longer has a backing view, and instead uses layout attributes to apply itself to elements. This change shouldn't affect consumers.
 
 ### Deprecated
 

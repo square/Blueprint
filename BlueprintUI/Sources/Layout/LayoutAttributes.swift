@@ -23,6 +23,12 @@ public struct LayoutAttributes {
         didSet { validateAlpha() }
     }
 
+    /// Corresponds to `UIView.isUserInteractionEnabled`.
+    public var isUserInteractionEnabled: Bool
+
+    /// Corresponds to `UIView.isHidden`.
+    public var isHidden: Bool
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
@@ -43,6 +49,8 @@ public struct LayoutAttributes {
         self.bounds = bounds
         transform = CATransform3DIdentity
         alpha = 1.0
+        isUserInteractionEnabled = true
+        isHidden = false
 
         validateBounds()
         validateCenter()
@@ -70,6 +78,8 @@ public struct LayoutAttributes {
         view.center = center
         view.layer.transform = transform
         view.alpha = alpha
+        view.isUserInteractionEnabled = isUserInteractionEnabled
+        view.isHidden = isHidden
     }
 
 
@@ -107,7 +117,7 @@ public struct LayoutAttributes {
     //    │                                               │
     //    └───────────────────────────────────────────────┘
     //
-    /// Concatonates layout attributes, moving the receiver from the local
+    /// Concatenates layout attributes, moving the receiver from the local
     /// coordinate space of `layoutAttributes` and into its parent coordinate
     /// space.
     ///
@@ -135,6 +145,8 @@ public struct LayoutAttributes {
 
         result.transform = CATransform3DConcat(transform, t.untranslated)
         result.alpha = alpha * layoutAttributes.alpha
+        result.isUserInteractionEnabled = layoutAttributes.isUserInteractionEnabled && isUserInteractionEnabled
+        result.isHidden = layoutAttributes.isHidden || isHidden
 
         return result
     }
@@ -202,6 +214,8 @@ extension LayoutAttributes: Equatable {
             && lhs.bounds == rhs.bounds
             && CATransform3DEqualToTransform(lhs.transform, rhs.transform)
             && lhs.alpha == rhs.alpha
+            && lhs.isUserInteractionEnabled == rhs.isUserInteractionEnabled
+            && lhs.isHidden == rhs.isHidden
     }
 
 }

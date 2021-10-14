@@ -1,12 +1,4 @@
-//
-//  UserInteractionEnabled.swift
-//  BlueprintUICommonControls
-//
-//  Created by Noah Blake on 3/15/21.
-//
-
-import BlueprintUI
-import UIKit
+import CoreGraphics
 
 /// `UserInteractionEnabled` conditionally enables user interaction of its wrapped element.
 ///
@@ -21,12 +13,24 @@ public struct UserInteractionEnabled: Element {
     }
 
     public var content: ElementContent {
-        ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement, layout: Layout(isEnabled: isEnabled))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        UIView.describe { config in
-            config[\.isUserInteractionEnabled] = isEnabled
+        nil
+    }
+
+    private struct Layout: SingleChildLayout {
+        var isEnabled: Bool
+
+        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+            child.measure(in: constraint)
+        }
+
+        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+            var attributes = LayoutAttributes(size: size)
+            attributes.isUserInteractionEnabled = isEnabled
+            return attributes
         }
     }
 }
