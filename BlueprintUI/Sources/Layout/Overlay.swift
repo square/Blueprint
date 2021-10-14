@@ -21,6 +21,13 @@ public struct Overlay: Element {
         configure(&self)
     }
 
+    /// Creates a new overlay using a result builder.
+    public init(
+        @ElementBuilder<Overlay.Child> elements: () -> [Overlay.Child]
+    ) {
+        children = elements()
+    }
+
     /// Adds the provided element to the overlay.
     @available(*, deprecated, renamed: "add(child:)")
     public mutating func add(_ element: Element) {
@@ -86,5 +93,24 @@ extension Overlay {
             self.element = element
             self.key = key
         }
+    }
+}
+
+extension Overlay.Child: ElementBuilderChild {
+    public init(_ element: Element) {
+        self.init(element: element, key: nil)
+    }
+}
+
+/// Map `Keyed` elements in result builders to `Overlay.Child`.
+extension ElementBuilder where Child == Overlay.Child {
+    public static func buildExpression(_ keyed: Keyed) -> Children {
+        [Overlay.Child(element: keyed.wrapped, key: keyed.key)]
+    }
+}
+
+extension Element {
+    public func overlayChild(key: AnyHashable? = nil) -> Overlay.Child {
+        .init(element: self, key: key)
     }
 }

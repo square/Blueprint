@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added a `Hidden` element and `.hidden()` modifier for hiding elements.
+- `Overlay` now supports result builders.
+- `SegmentedControl` now supports result builders.
 
 ### Removed
 
@@ -54,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       }
   }
   ```
-- Row, Column, EqualStack, and GridRow can now be initialized declaritively using result builders. ([#220])
+- Row, Column, EqualStack, and GridRow can now be initialized declaratively using result builders. ([#220])
   - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure. 
   - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters. 
   - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`. 

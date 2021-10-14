@@ -33,7 +33,7 @@ extension StackElement {
         configure(&self)
     }
 
-    /// Initializer using result builder to declaritively build up a stack.
+    /// Initializer using result builder to declaratively build up a stack.
     /// - Parameters:
     ///   - elementsBuilder: A block containing all elements to be included in the stack.
     /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.
@@ -1062,6 +1062,12 @@ extension Element {
     }
 }
 
+/// Map `Keyed` elements in result builders to `StackLayout.Child`.
+extension ElementBuilder where Child == StackLayout.Child {
+    public static func buildExpression(_ keyed: Keyed) -> Children {
+        [StackLayout.Child(element: keyed.wrapped, key: keyed.key)]
+    }
+}
 
 extension StackLayout.Child: ElementBuilderChild {
     public init(_ element: Element) {
