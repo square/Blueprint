@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+# Past Releases
+
+## [0.30.0] - 2021-10-15
+
+### Added
+
 - Added a `Hidden` element and `.hidden()` modifier for hiding elements.
 - `Overlay` now supports result builders.
 - `SegmentedControl` now supports result builders.
@@ -22,16 +40,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `UserInteractionEnabled` has been moved from `BlueprintUICommonControls` into `BlueprintUI`. It no longer has a backing view, and instead uses layout attributes to apply itself to elements. This change shouldn't affect consumers.
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-# Past Releases
 
 ## [0.29.0] - 2021-09-21
 
@@ -675,7 +683,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.29.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.30.0...HEAD
+[0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
 [0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
 [0.28.0]: https://github.com/square/Blueprint/compare/0.27.0...0.28.0
