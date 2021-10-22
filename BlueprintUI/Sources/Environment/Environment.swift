@@ -73,7 +73,7 @@ public struct Environment {
     /// Returns a new `Environment` by merging the values from `self` and the
     /// provided environment; keeping values from the provided environment when there
     /// are key overlaps between the two environments.
-    func merged(prioritizing other: Environment) -> Environment {
+    public func merged(prioritizing other: Environment) -> Environment {
         var merged = self
         merged.values.merge(other.values) { $1 }
         return merged
