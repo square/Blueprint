@@ -36,6 +36,8 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
+    private var cachedIntrinsicContentSize: CGSize? = nil
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -184,36 +186,19 @@ public final class BlueprintView: UIView {
         )
     }
 
-    /// Returns the size of the element bound to the current width (mimicking
-    /// UILabel’s `intrinsicContentSize` behavior)
     public override var intrinsicContentSize: CGSize {
-
-        guard let element = element else {
-            return CGSize(
-                width: UIView.noIntrinsicMetric,
-                height: UIView.noIntrinsicMetric
-            )
+        if let intrinsicContentSize = cachedIntrinsicContentSize {
+            return intrinsicContentSize
         }
 
-        let constraint: SizeConstraint
+        let intrinsicContentSize = resolveIntrinsicContentSize()
+        cachedIntrinsicContentSize = intrinsicContentSize
+        return intrinsicContentSize
+    }
 
-        // Use unconstrained when
-        // a) we need a view hierarchy update to force a loop through an
-        //    unconstrained width so we don’t end up “caching” the previous
-        //    element’s width
-        // b) the current width is zero, since constraining by zero is
-        //    nonsensical
-        if bounds.width == 0 || needsViewHierarchyUpdate {
-            constraint = .unconstrained
-        } else {
-            constraint = SizeConstraint(width: bounds.width)
-        }
-
-        return element.content.measure(
-            in: constraint,
-            environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
-        )
+    public override func invalidateIntrinsicContentSize() {
+        cachedIntrinsicContentSize = nil
+        super.invalidateIntrinsicContentSize()
     }
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
@@ -318,6 +303,37 @@ public final class BlueprintView: UIView {
                 measureDuration: measurementEndDate.timeIntervalSince(start),
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
+        )
+    }
+
+    /// Returns the size of the element bound to the current width (mimicking
+    /// UILabel’s `intrinsicContentSize` behavior)
+    private func resolveIntrinsicContentSize() -> CGSize {
+        guard let element = element else {
+            return CGSize(
+                width: UIView.noIntrinsicMetric,
+                height: UIView.noIntrinsicMetric
+            )
+        }
+
+        let constraint: SizeConstraint
+
+        // Use unconstrained when
+        // a) we need a view hierarchy update to force a loop through an
+        //    unconstrained width so we don’t end up “caching” the previous
+        //    element’s width
+        // b) the current width is zero, since constraining by zero is
+        //    nonsensical
+        if bounds.width == 0 || needsViewHierarchyUpdate {
+            constraint = .unconstrained
+        } else {
+            constraint = SizeConstraint(width: bounds.width)
+        }
+
+        return element.content.measure(
+            in: constraint,
+            environment: makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
 
