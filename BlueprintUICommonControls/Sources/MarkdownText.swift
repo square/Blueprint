@@ -29,6 +29,28 @@ extension MarkdownText {
     
     public struct Style : Equatable {
         
+        var fonts : Fonts
+        var colors : Colors
+        
+        struct Fonts : Equatable {
+            var heading1: UIFont
+            var heading2: UIFont
+            var heading3: UIFont
+            var heading4: UIFont
+            var heading5: UIFont
+            var heading6: UIFont
+            var body: UIFont
+        }
+        
+        struct Colors : Equatable {
+            var heading1: UIFont
+            var heading2: UIFont
+            var heading3: UIFont
+            var heading4: UIFont
+            var heading5: UIFont
+            var heading6: UIFont
+            var body: UIFont
+        }
     }
 }
 
@@ -36,6 +58,9 @@ extension MarkdownText {
 private struct TextViewElement : UIViewElement {
     
     var text : String
+    
+    /// TODO: Switch back to a label and do manual link tracking... We can't seem to
+    /// turn off text selection but allow links.
     
     static func makeUIView() -> View {
         
