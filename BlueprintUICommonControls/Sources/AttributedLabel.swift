@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-public struct AttributedLabel: Element, Hashable {
+public struct Fpp: Element, Hashable {
 
     public var attributedText: NSAttributedString
     public var numberOfLines: Int = 0
@@ -28,7 +28,7 @@ public struct AttributedLabel: Element, Hashable {
         struct Measurer: Measurable {
             private static let prototypeLabel = LabelView()
 
-            var model: AttributedLabel
+            var model: Fpp
 
             func measure(in constraint: SizeConstraint) -> CGSize {
                 let label = Self.prototypeLabel
@@ -70,7 +70,7 @@ public struct AttributedLabel: Element, Hashable {
     }
 }
 
-extension AttributedLabel {
+extension Fpp {
 
     private final class LabelView: UILabel {
         var textRectOffset: UIOffset = .zero {
