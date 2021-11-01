@@ -520,6 +520,42 @@ class BlueprintViewTests: XCTestCase {
 
         XCTAssertEqual(view.intrinsicContentSize, size)
     }
+
+    func test_intrinsicContentSize_changesInvalidatesCachedSize() {
+        let view = BlueprintView()
+
+        var measureCount = 0
+
+        func makeElement(size: CGSize) -> Element {
+            MeasurableElement { constraint in
+                measureCount += 1
+                return size
+            }
+        }
+
+        view.element = makeElement(size: CGSize(
+            width: 13,
+            height: 99
+        ))
+
+        // Query intrinsicContentSize so that it is cached.
+        _ = view.intrinsicContentSize
+        XCTAssertEqual(measureCount, 1)
+
+        _ = view.intrinsicContentSize
+        // Re-querying intrinsicContentSize without changes should skip measurement.
+        XCTAssertEqual(measureCount, 1)
+
+        let size = CGSize(
+            width: 42,
+            height: 7
+        )
+
+        view.element = makeElement(size: size)
+
+        XCTAssertEqual(view.intrinsicContentSize, size)
+        XCTAssertEqual(measureCount, 2)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
