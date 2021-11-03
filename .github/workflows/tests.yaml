@@ -30,8 +30,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Switch to Xcode 12.5.1
-      run: sudo xcode-select -s /Applications/Xcode_12.5.1.app
+    - name: Read env
+      run: cat .github/workflows/env.properties >> $GITHUB_ENV
+
+    - name: Switch to Xcode ${{ env.xcode_version }}
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
     - name: Install iOS ${{ matrix.sdk }}
       run: xcversion simulators --install="iOS ${{ matrix.sdk }}"
@@ -54,18 +57,24 @@ jobs:
 
 
   cocoapods:
-    name: "Cocoapods"
+    name: "CocoaPods"
 
     runs-on: macos-11
 
     steps:
     - uses: actions/checkout@v1
 
-    - name: Cache gems
-      uses: actions/cache@v1
+    - name: Read env
+      run: cat .github/workflows/env.properties >> $GITHUB_ENV
+
+    - name: Switch to Xcode ${{ env.xcode_version }}
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
       with:
-          path: .bundle
-          key: gems-${{ hashFiles('Gemfile.lock') }}
+        ruby-version: 2.6
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
     - name: Bundle Install
       run: |
@@ -74,9 +83,6 @@ jobs:
     - name: Pod Install
       run: |
         bundle exec pod install --project-directory=SampleApp/
-
-    - name: Switch to Xcode 12.5.1
-      run: sudo xcode-select -s /Applications/Xcode_12.5.1.app
 
     - name: Build & Test
       run: |

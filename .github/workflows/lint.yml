@@ -9,11 +9,17 @@ on:
 jobs:
   lint:
     name: Lint Swift code with SwiftFormat
-    runs-on: macos-latest
+    runs-on: macos-11
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Read env
+        run: cat .github/workflows/env.properties >> $GITHUB_ENV
+
+      - name: Switch to Xcode ${{ env.xcode_version }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
       - name: Cache SPM build
         uses: actions/cache@v2
