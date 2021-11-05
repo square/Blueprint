@@ -508,20 +508,139 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(view.intrinsicContentSize, noIntrinsicMetricSize)
     }
 
-    func test_intrinsicContentSize_constrained() {
+    func test_intrinsicContentSize_element() {
         let view = BlueprintView()
 
-        let size = CGSize(
+        let space: CGFloat = 100.0 * 100
+
+        func setElement() {
+            view.element = MeasurableElement { constraint in
+
+                let width = constraint.width.constrainedValue ?? 100.0
+
+                return CGSize(
+                    width: width,
+                    height: space / width
+                )
+            }
+        }
+
+        setElement()
+
+        // Test the behavior of no width – should be an unconstrained measurement.
+
+        view.frame.size.width = 0
+
+        XCTAssertEqual(
+            view.intrinsicContentSize,
+            CGSize(width: 100, height: 100)
+        )
+
+        // Constrained width should use that to measure.
+
+        view.frame.size.width = 50
+
+        XCTAssertEqual(
+            view.intrinsicContentSize,
+            CGSize(width: 50, height: 200)
+        )
+
+        // Setting the element should not change the result.
+
+        setElement()
+
+        XCTAssertEqual(
+            view.intrinsicContentSize,
+            CGSize(width: 50, height: 200)
+        )
+    }
+
+    func test_measurement_caching() {
+        let view = BlueprintView()
+
+        var measureCount = 0
+
+        func makeElement(size: CGSize) -> Element {
+            MeasurableElement { constraint in
+                measureCount += 1
+                return size
+            }
+        }
+
+        view.element = makeElement(size: .init(
+            width: 13,
+            height: 99
+        ))
+
+        // Ensure that the measurement is cached
+
+        _ = view.intrinsicContentSize
+        XCTAssertEqual(measureCount, 1)
+        _ = view.sizeThatFits(.init(width: 50, height: 100))
+        XCTAssertEqual(measureCount, 2)
+
+        // Measuring again should be cached.
+
+        _ = view.intrinsicContentSize
+        _ = view.sizeThatFits(.init(width: 50, height: 100))
+        XCTAssertEqual(measureCount, 2)
+
+        // Measuring in a different size should be cached.
+
+        _ = view.sizeThatFits(.init(width: 100, height: 200))
+        XCTAssertEqual(measureCount, 3)
+
+        // View size hasn't changed, so this should not re-measure.
+
+        _ = view.intrinsicContentSize
+        XCTAssertEqual(measureCount, 3)
+
+        // Changing the element should re-measure
+
+        let size2 = CGSize(
             width: 42,
             height: 7
         )
 
-        view.element = Empty().constrainedTo(size: size)
+        view.element = makeElement(size: size2)
 
-        XCTAssertEqual(view.intrinsicContentSize, size)
+        XCTAssertEqual(view.intrinsicContentSize, size2)
+        XCTAssertEqual(measureCount, 4)
+
+        XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
+        XCTAssertEqual(measureCount, 5)
+
+        // Changing the environment should re-measure (any change should do,
+        // the environment has no concept of equality presently).
+
+        view.environment = .empty
+
+        XCTAssertEqual(view.intrinsicContentSize, size2)
+        XCTAssertEqual(measureCount, 6)
+
+        XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
+        XCTAssertEqual(measureCount, 7)
+
+        // Changing the environment inheritance since we cannot currently equate environments.
+
+        view.automaticallyInheritsEnvironmentFromContainingBlueprintViews.toggle()
+
+        XCTAssertEqual(view.intrinsicContentSize, size2)
+        XCTAssertEqual(measureCount, 8)
+
+        XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
+        XCTAssertEqual(measureCount, 9)
+
+        // ...Finally ensure that no further changes do not re-measure.
+
+        XCTAssertEqual(view.intrinsicContentSize, size2)
+        XCTAssertEqual(measureCount, 9)
+
+        XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
+        XCTAssertEqual(measureCount, 9)
     }
 
-    func test_intrinsicContentSize_changesInvalidatesCachedSize() {
+    func test_sizeThatFits_cache() {
         let view = BlueprintView()
 
         var measureCount = 0
@@ -538,13 +657,17 @@ class BlueprintViewTests: XCTestCase {
             height: 99
         ))
 
-        // Query intrinsicContentSize so that it is cached.
-        _ = view.intrinsicContentSize
+        // Query sizeThatFits so that it is cached.
+        _ = view.sizeThatFits(CGSize(width: 100, height: 200))
         XCTAssertEqual(measureCount, 1)
 
-        _ = view.intrinsicContentSize
-        // Re-querying intrinsicContentSize without changes should skip measurement.
+        _ = view.sizeThatFits(CGSize(width: 100, height: 200))
+        // Re-querying sizeThatFits without changing the size should skip measurement.
         XCTAssertEqual(measureCount, 1)
+
+        _ = view.sizeThatFits(CGSize(width: 150, height: 200))
+        // sizeThatFits with a new size should re-measure.
+        XCTAssertEqual(measureCount, 2)
 
         let size = CGSize(
             width: 42,
@@ -552,9 +675,9 @@ class BlueprintViewTests: XCTestCase {
         )
 
         view.element = makeElement(size: size)
-
-        XCTAssertEqual(view.intrinsicContentSize, size)
-        XCTAssertEqual(measureCount, 2)
+        // Changing the element should cause another measurement.
+        XCTAssertEqual(view.sizeThatFits(CGSize(width: 150, height: 200)), size)
+        XCTAssertEqual(measureCount, 3)
     }
 }
 
