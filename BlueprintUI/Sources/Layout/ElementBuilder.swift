@@ -7,6 +7,15 @@ extension ElementBuilder {
         [Child(element)]
     }
 
+    @available(
+        *,
+        unavailable,
+        message: "Optionals must be unwrapped with `if let value = ...` to be returned from a result builder."
+    )
+    public static func buildExpression(_ child: Element?) -> Children {
+        fatalError()
+    }
+
     /// Allow Elements to be implicitly converted into `Child`.
     public static func buildExpression(_ elements: [Element]) -> Children {
         elements.map(Child.init)
