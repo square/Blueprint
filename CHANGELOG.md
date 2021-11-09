@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
-## [0.30.1] - 2021-11-09
+## [0.31.0] - 2021-11-09
 
 ### Fixed
 
@@ -693,8 +693,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.30.1...HEAD
-[0.30.1]: https://github.com/square/Blueprint/compare/0.30.0...0.30.1
+[main]: https://github.com/square/Blueprint/compare/0.31.0...HEAD
+[0.31.0]: https://github.com/square/Blueprint/compare/0.30.0...0.31.0
 [0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
 [0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
