@@ -161,19 +161,19 @@ class EnvironmentTests: XCTestCase {
 
     func test_merged() {
         var lhs = Environment.empty
-        lhs[TestKey] = .wrong
-        lhs[LHSTestKey] = 2
+        lhs[TestKey.self] = .wrong
+        lhs[LHSTestKey.self] = 2
 
 
         var rhs = Environment.empty
-        rhs[TestKey] = .right
-        rhs[RHSTestKey] = 3
+        rhs[TestKey.self] = .right
+        rhs[RHSTestKey.self] = 3
 
         let output = lhs.merged(prioritizing: rhs)
 
-        XCTAssertEqual(output[TestKey], .right)
-        XCTAssertEqual(output[LHSTestKey], 2)
-        XCTAssertEqual(output[RHSTestKey], 3)
+        XCTAssertEqual(output[TestKey.self], .right)
+        XCTAssertEqual(output[LHSTestKey.self], 2)
+        XCTAssertEqual(output[RHSTestKey.self], 3)
 
         enum LHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
         enum RHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }

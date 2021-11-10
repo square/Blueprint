@@ -21,7 +21,7 @@ class AdaptedEnvironmentTests: XCTestCase {
 
         view.layoutIfNeeded()
 
-        XCTAssertEqual(environment?[TestingKey1], "adapted1")
+        XCTAssertEqual(environment?[TestingKey1.self], "adapted1")
     }
 
     func test_wrapping_multiple() {
@@ -41,8 +41,8 @@ class AdaptedEnvironmentTests: XCTestCase {
         view.layoutIfNeeded()
 
         // The inner-most change; the one closest to the element; should be the value we get.
-        XCTAssertEqual(environment?[TestingKey1], "adapted1.1")
-        XCTAssertEqual(environment?[TestingKey2], "adapted2.1")
+        XCTAssertEqual(environment?[TestingKey1.self], "adapted1.1")
+        XCTAssertEqual(environment?[TestingKey2.self], "adapted2.1")
 
         // Ensure we collapsed the AdaptedEnvironments down to one level of wrapping.
         XCTAssertTrue((element as? AdaptedEnvironment)?.wrapped is TestElement)
