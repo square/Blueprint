@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `intrinsicContentSize` is now cached.
-
 ### Added
-
-- Improved error messages when using result builders with optional values.
 
 ### Removed
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.31.0] - 2021-11-09
+
+### Fixed
+
+- `intrinsicContentSize` is now cached.
+
+### Added
+
+- Improved error messages when using result builders with optional values.
 
 ## [0.30.0] - 2021-10-15
 
@@ -687,7 +693,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.30.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.31.0...HEAD
+[0.31.0]: https://github.com/square/Blueprint/compare/0.30.0...0.31.0
 [0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
 [0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
