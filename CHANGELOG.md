@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where the keyboard inset adjustment was incorrect in some cases.
+
 ### Added
 
 ### Removed
