@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an issue where the keyboard inset adjustment was incorrect in some cases.
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.31.1] - 2021-11-13
+
+### Fixed
+
+- Fixed an issue where the keyboard inset adjustment was incorrect in some cases.
 
 ## [0.31.0] - 2021-11-09
 
@@ -695,7 +699,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.31.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.31.1...HEAD
+[0.31.1]: https://github.com/square/Blueprint/compare/0.31.0...0.31.1
 [0.31.0]: https://github.com/square/Blueprint/compare/0.30.0...0.31.0
 [0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
 [0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
