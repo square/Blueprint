@@ -132,6 +132,37 @@ class ElementBuilderTests: XCTestCase {
             XCTAssert(type(of: gridRow.children[0].element) == TestElement3.self)
         }
     }
+
+    func test_resultBuilder_for_loop() {
+
+        let gridRow = GridRow {
+            for _ in 1...3 {
+                TestElement()
+            }
+        }
+
+        XCTAssertEqual(gridRow.children.count, 3)
+    }
+
+    func test_resultBuilder_available() {
+
+        let gridRow = GridRow {
+            if #available(iOS 30.0, *) {
+                TestElement()
+            } else {
+                TestElement2()
+            }
+
+            if #available(iOS 11.0, *) {
+                TestElement3()
+            }
+        }
+
+        XCTAssertEqual(gridRow.children.count, 2)
+
+        XCTAssert(type(of: gridRow.children[0].element) == TestElement2.self)
+        XCTAssert(type(of: gridRow.children[1].element) == TestElement3.self)
+    }
 }
 
 private struct TestElement: Element {
