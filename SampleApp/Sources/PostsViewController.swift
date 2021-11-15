@@ -84,7 +84,8 @@ final class PostsViewController: UIViewController {
 
         return MainView(
             state: state,
-            onChange: { field, text in
+            onChange: { [weak self] field, text in
+                guard let self = self else { return }
                 switch field {
                 case .name:
                     self.state.entry.authorName = text
@@ -92,8 +93,8 @@ final class PostsViewController: UIViewController {
                     self.state.entry.body = text
                 }
             },
-            onSubmit: {
-                self.state.publishEntry()
+            onSubmit: { [weak self] in
+                self?.state.publishEntry()
             },
             pullToRefreshBehavior: pullToRefreshBehavior
         )
