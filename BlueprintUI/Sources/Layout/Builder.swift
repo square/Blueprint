@@ -43,7 +43,7 @@ public struct Builder<Child> {
     }
 
     public static func buildArray(_ components: [Children]) -> Children {
-        components.reduce(into: []) { $0 += $1 }
+        components.flatMap { $0 }
     }
 
     public static func buildArray(_ components: Children) -> Children {
