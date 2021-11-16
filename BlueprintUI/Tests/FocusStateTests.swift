@@ -72,4 +72,16 @@ final class FocusStateTests: XCTestCase {
         binding.onBlur()
         XCTAssertEqual(state.isFocused, false)
     }
+
+    func test_memoryRelease() {
+        struct StateHolder {
+            @FocusState var isFocused: Bool
+        }
+
+        var state: StateHolder? = StateHolder()
+        weak var trigger = state?.$isFocused.binding().trigger
+
+        state = nil
+        XCTAssertNil(trigger)
+    }
 }

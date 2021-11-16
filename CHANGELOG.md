@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an issue where the keyboard inset adjustment was incorrect in some cases.
+- Fixed a retain cycle in `@FocusState`. ([#285](https://github.com/square/Blueprint/pull/285))
 
 ### Added
 
