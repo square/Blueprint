@@ -117,16 +117,12 @@ public struct FocusState<Value> where Value: Hashable {
 
     /// Creates a focus state that binds to a Boolean.
     public init() where Value == Bool {
-        _value = Storage(wrappedValue: false)
-        // In Xcode 12.5 use this instead:
-        // value = false
+        value = false
     }
 
     /// Creates a focus state that binds to an optional type.
     public init<T>() where Value == T?, T: Hashable {
-        _value = Storage(wrappedValue: nil)
-        // In Xcode 12.5 use this instead
-        // value = nil
+        value = nil
     }
 
     /// The current state value, taking into account whatever bindings might be
@@ -157,24 +153,7 @@ public struct FocusState<Value> where Value: Hashable {
     private var storage: Storage { $value }
 
     private subscript(value: Value) -> FocusBinding {
-        if let binding = storage.bindings[value] {
-            return binding
-        }
-
-        let binding = FocusBinding(
-            onFocus: {
-                self.value = value
-            },
-            onBlur: {
-                if self.value == value {
-                    self.value = storage.defaultValue
-                }
-            }
-        )
-
-        storage.bindings[value] = binding
-
-        return binding
+        storage.binding(for: value)
     }
 
     /// Gets a focus binding associated with the `FocusState` being a specific value.
@@ -244,6 +223,27 @@ extension FocusState {
                     binding.trigger.focus()
                 }
             }
+        }
+
+        func binding(for value: Value) -> FocusBinding {
+            if let binding = bindings[value] {
+                return binding
+            }
+
+            let binding = FocusBinding(
+                onFocus: { [weak self] in
+                    self?.value = value
+                },
+                onBlur: { [weak self] in
+                    if let self = self, self.value == value {
+                        self.value = self.defaultValue
+                    }
+                }
+            )
+
+            bindings[value] = binding
+
+            return binding
         }
     }
 }

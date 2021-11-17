@@ -42,6 +42,18 @@ public struct Builder<Child> {
         fatalError()
     }
 
+    public static func buildArray(_ components: [Children]) -> Children {
+        components.flatMap { $0 }
+    }
+
+    public static func buildArray(_ components: Children) -> Children {
+        components
+    }
+
+    public static func buildLimitedAvailability(_ component: Children) -> Children {
+        component
+    }
+
     /// Allow for an array of `Child` to be flattened into the overall result.
     public static func buildExpression(_ children: [Child]) -> Children {
         children
