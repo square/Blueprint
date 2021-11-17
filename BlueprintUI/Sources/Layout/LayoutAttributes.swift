@@ -179,6 +179,11 @@ public struct LayoutAttributes {
             you should ensure that you are not measuring against unconstrained sizes.
             """
         )
+
+        assert(
+            bounds.size.isFinite,
+            "LayoutAttributes.bounds.size must only contain finite values."
+        )
     }
 
     private func validateCenter() {
@@ -191,7 +196,7 @@ public struct LayoutAttributes {
     private func validateTransform() {
         assert(
             transform.isFinite,
-            "LayoutAttributes.transform only not contain finite values."
+            "LayoutAttributes.transform must only contain finite values."
         )
     }
 
