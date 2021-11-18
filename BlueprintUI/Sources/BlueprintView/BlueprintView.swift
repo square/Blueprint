@@ -148,7 +148,7 @@ public final class BlueprintView: UIView {
     }
 
     ///
-    /// Measures the size needed to display the view within then given constraining size,
+    /// Measures the size needed to display the view within the given constraining size,
     /// by measuring the current `element` of the `BlueprintView`.
     ///
     /// If you would like to not constrain the measurement in a given axis,
@@ -166,9 +166,6 @@ public final class BlueprintView: UIView {
     /// ```
     ///
     public override func sizeThatFits(_ fittingSize: CGSize) -> CGSize {
-        guard let element = element else {
-            return .zero
-        }
 
         func measurementConstraint(with size: CGSize) -> SizeConstraint {
 
@@ -183,7 +180,15 @@ public final class BlueprintView: UIView {
             )
         }
 
-        let constraint = measurementConstraint(with: fittingSize)
+        return sizeThatFits(measurementConstraint(with: fittingSize))
+    }
+
+    /// Measures the size needed to display the view within the given `SizeConstraint`.
+    /// by measuring the current `element` of the `BlueprintView`.
+    public func sizeThatFits(_ constraint: SizeConstraint) -> CGSize {
+        guard let element = element else {
+            return .zero
+        }
 
         if let cachedSize = sizesThatFit[constraint] {
             return cachedSize
@@ -240,15 +245,15 @@ public final class BlueprintView: UIView {
             )
         }
 
-        let constraint = { () -> SizeConstraint in
+        func constraint() -> SizeConstraint {
             if bounds.width == 0 {
                 return .unconstrained
             } else {
                 return .init(width: bounds.width)
             }
-        }()
+        }
 
-        return sizeThatFits(constraint.maximum)
+        return sizeThatFits(constraint())
     }
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
@@ -276,6 +281,8 @@ public final class BlueprintView: UIView {
         setNeedsViewHierarchyUpdate()
     }
 
+    /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
+    /// view, and marks the view as needing a layout.
     private func setNeedsViewHierarchyUpdate() {
 
         invalidateIntrinsicContentSize()
