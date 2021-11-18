@@ -1043,7 +1043,7 @@ extension Element {
 
     /// Wraps an element with a `StackLayout.Child` in order to customize `StackLayout.Traits` and the key.
     /// - Parameters:
-    ///   - sizing: Controls the amount of extra space distributed to this child during underflow and overflow
+    ///   - priority: Controls the amount of extra space distributed to this child during underflow and overflow
     ///   - alignmentGuide: Allows for custom alignment of a child along the cross axis.
     ///   - key: A key used to disambiguate children between subsequent updates of the view
     ///     hierarchy.
@@ -1058,6 +1058,21 @@ extension Element {
             priority: priority,
             alignmentGuide: alignmentGuide,
             key: key
+        )
+    }
+
+    /// Wraps an element with a `StackLayout.Child` in order to customize the `StackLayout.Child.Priority`.
+    /// - Parameters:
+    ///   - priority: Controls the amount of extra space distributed to this child during underflow and overflow
+    /// - Returns: A wrapper containing this element with additional layout information for the `StackElement`.
+    public func stackLayoutChild(
+        priority: StackLayout.Child.Priority
+    ) -> StackLayout.Child {
+        .init(
+            element: self,
+            priority: priority,
+            alignmentGuide: nil,
+            key: nil
         )
     }
 }
