@@ -48,7 +48,7 @@ public struct GeometryProxy {
     /// The size constraint of the element being laid out.
     public var constraint: SizeConstraint
 
-    /// Measure the given element, using the provided constraint (or the proxy's constraint if not provided), and the current environment.
+    /// Measure the given element, constrained to the same size as the `GeometryProxy` itself (unless a constraint is explicitly provided).
     public func measure(element: Element, in explicit: SizeConstraint? = nil) -> CGSize {
         element.content.measure(in: explicit ?? constraint, environment: environment)
     }
