@@ -152,19 +152,59 @@ public struct LayoutAttributes {
     }
 
     private func validateBounds() {
-        assert(bounds.isFinite, "LayoutAttributes.bounds must only contain finite values.")
+        assert(
+            bounds.width.isFinite,
+            """
+            The `width` of this `LayoutAttributes` is infinite, which is meaningless. \
+            This usually means that you are attempting to use the `constraint.width.maximum`
+            of a `SizeConstraint` for measurement or sizing, but \
+            that `SizeConstraint` has no actual maximum value for its `width`.
+
+            You should likely use `constraint.width.constrainedValue`, which is an
+            optional value, and provide a default width for unconstrained measurements. Or, \
+            you should ensure that you are not measuring against unconstrained sizes.
+            """
+        )
+
+        assert(
+            bounds.height.isFinite,
+            """
+            The `height` of this `LayoutAttributes` is infinite, which is meaningless. \
+            This usually means that you are attempting to use the `constraint.height.maximum`
+            of a `SizeConstraint` for measurement or sizing, but \
+            that `SizeConstraint` has no actual maximum value for its `height`.
+
+            You should likely use `constraint.height.constrainedValue`, which is an
+            optional value, and provide a default height for unconstrained measurements. Or, \
+            you should ensure that you are not measuring against unconstrained sizes.
+            """
+        )
+
+        assert(
+            bounds.size.isFinite,
+            "LayoutAttributes.bounds.size must only contain finite values."
+        )
     }
 
     private func validateCenter() {
-        assert(center.isFinite, "LayoutAttributes.center must only contain finite values.")
+        assert(
+            center.isFinite,
+            "LayoutAttributes.center must only contain finite values."
+        )
     }
 
     private func validateTransform() {
-        assert(transform.isFinite, "LayoutAttributes.transform only not contain finite values.")
+        assert(
+            transform.isFinite,
+            "LayoutAttributes.transform must only contain finite values."
+        )
     }
 
     private func validateAlpha() {
-        assert(alpha.isFinite, "LayoutAttributes.alpha must only contain finite values.")
+        assert(
+            alpha.isFinite,
+            "LayoutAttributes.alpha must only contain finite values."
+        )
     }
 
     /// Performs rounding on the frame to snap to pixel boundaries.

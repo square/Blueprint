@@ -23,7 +23,7 @@ class ScrollViewTests: XCTestCase {
 
             ScrollView.calculateContentInset(
                 scrollViewInsets: .zero,
-                safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+                adjustedContentInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: .zero,
                 refreshControlState: .disabled,
                 refreshControlBounds: CGRect(origin: .zero, size: CGSize(width: 25.0, height: 25.0))
@@ -37,7 +37,7 @@ class ScrollViewTests: XCTestCase {
 
             ScrollView.calculateContentInset(
                 scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
-                safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+                adjustedContentInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: 50.0,
                 refreshControlState: .disabled,
                 refreshControlBounds: CGRect(origin: .zero, size: CGSize(width: 25.0, height: 25.0))
@@ -59,7 +59,7 @@ class ScrollViewTests: XCTestCase {
 
             ScrollView.calculateContentInset(
                 scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
-                safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+                adjustedContentInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
                 keyboardBottomInset: 50.0,
                 refreshControlState: .refreshing,
                 refreshControlBounds: CGRect(origin: .zero, size: CGSize(width: 25.0, height: 25.0))

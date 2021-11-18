@@ -293,10 +293,11 @@ public final class BlueprintView: UIView {
     private func updateViewHierarchyIfNeeded() {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
-        assert(
+        precondition(
             !isInsideUpdate,
             "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
         )
+
         isInsideUpdate = true
 
         needsViewHierarchyUpdate = false
