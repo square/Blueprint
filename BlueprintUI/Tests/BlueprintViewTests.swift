@@ -610,10 +610,22 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
         XCTAssertEqual(measureCount, 5)
 
+        // If the environment goes from empty to empty, no measurement should occur.
+
+        view.environment = .empty
+
+        XCTAssertEqual(view.intrinsicContentSize, size2)
+        XCTAssertEqual(measureCount, 5)
+
+        XCTAssertEqual(view.sizeThatFits(.init(width: 100, height: 200)), size2)
+        XCTAssertEqual(measureCount, 5)
+
         // Changing the environment should re-measure (any change should do,
         // the environment has no concept of equality presently).
 
-        view.environment = .empty
+        var newEnv = Environment.empty
+        newEnv.safeAreaInsets = UIEdgeInsets(top: 1, left: 2, bottom: 3, right: 4)
+        view.environment = newEnv
 
         XCTAssertEqual(view.intrinsicContentSize, size2)
         XCTAssertEqual(measureCount, 6)

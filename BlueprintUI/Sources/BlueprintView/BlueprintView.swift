@@ -48,8 +48,10 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
+            // Shortcut: If both environments were empty, nothing changed.
+            if oldValue.isEmpty && environment.isEmpty { return }
+
             setNeedsViewHierarchyUpdate()
-            invalidateCachedSizes()
         }
     }
 
@@ -67,12 +69,11 @@ public final class BlueprintView: UIView {
     ///
     public var automaticallyInheritsEnvironmentFromContainingBlueprintViews: Bool = true {
         didSet {
-            guard oldValue != automaticallyInheritsEnvironmentFromContainingBlueprintViews else {
+            if oldValue == automaticallyInheritsEnvironmentFromContainingBlueprintViews {
                 return
             }
 
             setNeedsViewHierarchyUpdate()
-            invalidateCachedSizes()
         }
     }
 
@@ -87,7 +88,6 @@ public final class BlueprintView: UIView {
             Logger.logElementAssigned(view: self)
 
             setNeedsViewHierarchyUpdate()
-            invalidateCachedSizes()
         }
     }
 
@@ -172,7 +172,7 @@ public final class BlueprintView: UIView {
 
         func measurementConstraint(with size: CGSize) -> SizeConstraint {
 
-            let unconstrainedValues: [CGFloat] = [0.0, .greatestFiniteMagnitude, .infinity]
+            let unconstrainedValues: Set<CGFloat> = [0.0, .greatestFiniteMagnitude, .infinity]
 
             let widthUnconstrained = unconstrainedValues.contains(size.width)
             let heightUnconstrained = unconstrainedValues.contains(size.height)
@@ -211,7 +211,7 @@ public final class BlueprintView: UIView {
         _ targetSize: CGSize
     ) -> CGSize {
         /// For us, this is the same as `sizeThatFits`, since blueprint does not
-        /// translate the concept of constraints.
+        /// contain the same concept of constraints as Autolayout.
         sizeThatFits(targetSize)
     }
 
@@ -228,7 +228,7 @@ public final class BlueprintView: UIView {
         verticalFittingPriority: UILayoutPriority
     ) -> CGSize {
         /// For us, this is the same as `sizeThatFits`, since blueprint does not
-        /// translate the concept of horizontal or vertical constraints.
+        /// contain the same concept of constraints as Autolayout.
         sizeThatFits(targetSize)
     }
 
@@ -255,7 +255,6 @@ public final class BlueprintView: UIView {
         didSet {
             if semanticContentAttribute != oldValue {
                 setNeedsViewHierarchyUpdate()
-                invalidateCachedSizes()
             }
         }
     }
@@ -264,23 +263,6 @@ public final class BlueprintView: UIView {
         super.safeAreaInsetsDidChange()
 
         setNeedsViewHierarchyUpdate()
-        invalidateCachedSizes()
-    }
-
-    public override var frame: CGRect {
-        didSet {
-            guard oldValue != frame else { return }
-
-            invalidateIntrinsicContentSize()
-        }
-    }
-
-    public override var bounds: CGRect {
-        didSet {
-            guard oldValue != bounds else { return }
-
-            invalidateIntrinsicContentSize()
-        }
     }
 
     public override func layoutSubviews() {
@@ -295,17 +277,17 @@ public final class BlueprintView: UIView {
     }
 
     private func setNeedsViewHierarchyUpdate() {
-        guard !needsViewHierarchyUpdate else { return }
+
+        invalidateIntrinsicContentSize()
+        sizesThatFit.removeAll()
+
+        if needsViewHierarchyUpdate { return }
+
         needsViewHierarchyUpdate = true
 
         /// We use `UIView`'s layout pass to actually perform a hierarchy update.
         /// If a manual update is required, call `layoutIfNeeded()`.
         setNeedsLayout()
-    }
-
-    private func invalidateCachedSizes() {
-        invalidateIntrinsicContentSize()
-        sizesThatFit.removeAll()
     }
 
     private func updateViewHierarchyIfNeeded() {
