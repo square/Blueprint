@@ -70,6 +70,7 @@ public struct Environment {
         }
     }
 
+    /// If the `Environment` contains any values.
     public var isEmpty: Bool {
         values.isEmpty
     }

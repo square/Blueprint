@@ -11,9 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Environment` now has an `isEmpty`, to check to see if the environment contains any values.
+
 ### Removed
 
 ### Changed
+
+- Values returned from `sizeThatFits` and `systemLayoutSizeFitting` are now cached.
 
 ### Deprecated
 
