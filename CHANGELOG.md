@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Allow measuring within an explicit `SizeConstraint` in `GeometryProxy`.
+
 - Add an additional `stackLayoutChild(priority:)` method overload, for easier autocomplete when only customizing the layout priority.
 
 ### Removed
