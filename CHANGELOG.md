@@ -11,15 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Allow measuring within an explicit `SizeConstraint` in `GeometryProxy`.
-
-- Add an additional `stackLayoutChild(priority:)` method overload, for easier autocomplete when only customizing the layout priority.
-
 ### Removed
 
 ### Changed
-
-- Values returned from `sizeThatFits` and `systemLayoutSizeFitting` are now cached.
 
 ### Deprecated
 
@@ -30,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.33.0] - 2021-11-18
+
+### Added
+
+- Allow measuring within an explicit `SizeConstraint` in `GeometryProxy`.
+
+- Add an additional `stackLayoutChild(priority:)` method overload, for easier autocomplete when only customizing the layout priority.
+
+### Changed
+
+- Values returned from `sizeThatFits` and `systemLayoutSizeFitting` are now cached.
 
 ## [0.32.0] - 2021-11-16
 
@@ -711,7 +717,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.32.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.33.0...HEAD
+[0.33.0]: https://github.com/square/Blueprint/compare/0.32.0...0.33.0
 [0.32.0]: https://github.com/square/Blueprint/compare/0.31.0...0.32.0
 [0.31.0]: https://github.com/square/Blueprint/compare/0.30.0...0.31.0
 [0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
