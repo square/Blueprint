@@ -36,7 +36,7 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
-    private var cachedIntrinsicContentSize: CGSize? = nil
+    private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -48,8 +48,10 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
+            // Shortcut: If both environments were empty, nothing changed.
+            if oldValue.isEmpty && environment.isEmpty { return }
+
             setNeedsViewHierarchyUpdate()
-            invalidateIntrinsicContentSize()
         }
     }
 
@@ -67,8 +69,11 @@ public final class BlueprintView: UIView {
     ///
     public var automaticallyInheritsEnvironmentFromContainingBlueprintViews: Bool = true {
         didSet {
+            if oldValue == automaticallyInheritsEnvironmentFromContainingBlueprintViews {
+                return
+            }
+
             setNeedsViewHierarchyUpdate()
-            invalidateIntrinsicContentSize()
         }
     }
 
@@ -83,7 +88,6 @@ public final class BlueprintView: UIView {
             Logger.logElementAssigned(view: self)
 
             setNeedsViewHierarchyUpdate()
-            invalidateIntrinsicContentSize()
         }
     }
 
@@ -140,11 +144,11 @@ public final class BlueprintView: UIView {
 
     @available(*, unavailable)
     public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) is not available for BlueprintView.")
     }
 
     ///
-    /// Measures the size needed to display the view within then given constraining size,
+    /// Measures the size needed to display the view within the given constraining size,
     /// by measuring the current `element` of the `BlueprintView`.
     ///
     /// If you would like to not constrain the measurement in a given axis,
@@ -161,14 +165,11 @@ public final class BlueprintView: UIView {
     /// blueprintView.sizeThatFits(.zero)
     /// ```
     ///
-    public override func sizeThatFits(_ size: CGSize) -> CGSize {
-        guard let element = element else {
-            return .zero
-        }
+    public override func sizeThatFits(_ fittingSize: CGSize) -> CGSize {
 
         func measurementConstraint(with size: CGSize) -> SizeConstraint {
 
-            let unconstrainedValues: [CGFloat] = [0.0, .greatestFiniteMagnitude, .infinity]
+            let unconstrainedValues: Set<CGFloat> = [0.0, .greatestFiniteMagnitude, .infinity]
 
             let widthUnconstrained = unconstrainedValues.contains(size.width)
             let heightUnconstrained = unconstrainedValues.contains(size.height)
@@ -179,26 +180,80 @@ public final class BlueprintView: UIView {
             )
         }
 
-        return element.content.measure(
-            in: measurementConstraint(with: size),
+        return sizeThatFits(measurementConstraint(with: fittingSize))
+    }
+
+    /// Measures the size needed to display the view within the given `SizeConstraint`.
+    /// by measuring the current `element` of the `BlueprintView`.
+    public func sizeThatFits(_ constraint: SizeConstraint) -> CGSize {
+        guard let element = element else {
+            return .zero
+        }
+
+        if let cachedSize = sizesThatFit[constraint] {
+            return cachedSize
+        }
+
+        let measurement = element.content.measure(
+            in: constraint,
             environment: makeEnvironment(),
             cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
+
+        sizesThatFit[constraint] = measurement
+
+        return measurement
+    }
+
+    ///
+    /// Measures the size needed to display the view within then given constraining size,
+    /// by measuring the current `element` of the `BlueprintView`.
+    ///
+    /// If you would like to not constrain the measurement in a given axis,
+    /// pass `0.0` or `.greatestFiniteMagnitude` for that axis.
+    ///
+    public override func systemLayoutSizeFitting(
+        _ targetSize: CGSize
+    ) -> CGSize {
+        /// For us, this is the same as `sizeThatFits`, since blueprint does not
+        /// contain the same concept of constraints as Autolayout.
+        sizeThatFits(targetSize)
+    }
+
+    ///
+    /// Measures the size needed to display the view within then given constraining size,
+    /// by measuring the current `element` of the `BlueprintView`.
+    ///
+    /// If you would like to not constrain the measurement in a given axis,
+    /// pass `0.0` or `.greatestFiniteMagnitude` for that axis.
+    ///
+    public override func systemLayoutSizeFitting(
+        _ targetSize: CGSize,
+        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+        verticalFittingPriority: UILayoutPriority
+    ) -> CGSize {
+        /// For us, this is the same as `sizeThatFits`, since blueprint does not
+        /// contain the same concept of constraints as Autolayout.
+        sizeThatFits(targetSize)
     }
 
     public override var intrinsicContentSize: CGSize {
-        if let intrinsicContentSize = cachedIntrinsicContentSize {
-            return intrinsicContentSize
+        guard element != nil else {
+            return CGSize(
+                width: UIView.noIntrinsicMetric,
+                height: UIView.noIntrinsicMetric
+            )
         }
 
-        let intrinsicContentSize = resolveIntrinsicContentSize()
-        cachedIntrinsicContentSize = intrinsicContentSize
-        return intrinsicContentSize
-    }
+        func constraint() -> SizeConstraint {
+            if bounds.width == 0 {
+                return .unconstrained
+            } else {
+                return .init(width: bounds.width)
+            }
+        }
 
-    public override func invalidateIntrinsicContentSize() {
-        cachedIntrinsicContentSize = nil
-        super.invalidateIntrinsicContentSize()
+        return sizeThatFits(constraint())
     }
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
@@ -211,13 +266,13 @@ public final class BlueprintView: UIView {
 
     public override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
+
         setNeedsViewHierarchyUpdate()
     }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        invalidateIntrinsicContentSize()
-        performUpdate()
+        updateViewHierarchyIfNeeded()
     }
 
     public override func didMoveToWindow() {
@@ -226,15 +281,19 @@ public final class BlueprintView: UIView {
         setNeedsViewHierarchyUpdate()
     }
 
-    private func performUpdate() {
-        updateViewHierarchyIfNeeded()
-    }
-
+    /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
+    /// view, and marks the view as needing a layout.
     private func setNeedsViewHierarchyUpdate() {
-        guard !needsViewHierarchyUpdate else { return }
+
+        invalidateIntrinsicContentSize()
+        sizesThatFit.removeAll()
+
+        if needsViewHierarchyUpdate { return }
+
         needsViewHierarchyUpdate = true
 
-        /// We currently rely on CA's layout pass to actually perform a hierarchy update.
+        /// We use `UIView`'s layout pass to actually perform a hierarchy update.
+        /// If a manual update is required, call `layoutIfNeeded()`.
         setNeedsLayout()
     }
 
@@ -304,37 +363,6 @@ public final class BlueprintView: UIView {
                 measureDuration: measurementEndDate.timeIntervalSince(start),
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
-        )
-    }
-
-    /// Returns the size of the element bound to the current width (mimicking
-    /// UILabel’s `intrinsicContentSize` behavior)
-    private func resolveIntrinsicContentSize() -> CGSize {
-        guard let element = element else {
-            return CGSize(
-                width: UIView.noIntrinsicMetric,
-                height: UIView.noIntrinsicMetric
-            )
-        }
-
-        let constraint: SizeConstraint
-
-        // Use unconstrained when
-        // a) we need a view hierarchy update to force a loop through an
-        //    unconstrained width so we don’t end up “caching” the previous
-        //    element’s width
-        // b) the current width is zero, since constraining by zero is
-        //    nonsensical
-        if bounds.width == 0 || needsViewHierarchyUpdate {
-            constraint = .unconstrained
-        } else {
-            constraint = SizeConstraint(width: bounds.width)
-        }
-
-        return element.content.measure(
-            in: constraint,
-            environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
         )
     }
 
@@ -634,3 +662,4 @@ extension BlueprintView.NativeViewController {
         }
     }
 }
+

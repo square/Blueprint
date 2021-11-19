@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Values returned from `sizeThatFits` and `systemLayoutSizeFitting` are now cached.
+
 ### Deprecated
 
 ### Security

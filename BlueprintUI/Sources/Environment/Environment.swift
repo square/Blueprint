@@ -70,6 +70,11 @@ public struct Environment {
         }
     }
 
+    /// If the `Environment` contains any values.
+    var isEmpty: Bool {
+        values.isEmpty
+    }
+
     /// Returns a new `Environment` by merging the values from `self` and the
     /// provided environment; keeping values from the provided environment when there
     /// are key overlaps between the two environments.
