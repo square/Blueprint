@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `Environment` now has an `isEmpty`, to check to see if the environment contains any values.
+- Allow measuring within an explicit `SizeConstraint` in `GeometryProxy`.
+
+- Add an additional `stackLayoutChild(priority:)` method overload, for easier autocomplete when only customizing the layout priority.
 
 ### Removed
 
