@@ -12,7 +12,7 @@ import Foundation
 public protocol EnvironmentElement : Element {
     
     /// Return your `Element` body, reading from the constraint and environment as necessary.
-    func content(in size : SizeConstraint, with environment : Environment) -> Element
+    func elementRepresentation(in size : SizeConstraint, with environment : Environment) -> Element
 }
 
 
@@ -20,7 +20,7 @@ extension EnvironmentElement {
     
     public var content: ElementContent {
         ElementContent { constraint, context in
-            self.content(in: constraint, with: context.environment)
+            self.elementRepresentation(in: constraint, with: context.environment)
         }
     }
 
