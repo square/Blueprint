@@ -91,6 +91,15 @@ public final class BlueprintView: UIView {
         }
     }
 
+    /// We need to invalidateIntrinsicContentSize when the bounds change for Auto Layout to work correctly.
+    public override var bounds: CGRect {
+        didSet {
+            guard oldValue != bounds else { return }
+
+            invalidateIntrinsicContentSize()
+        }
+    }
+
     /// An optional name to help identify this view
     public var name: String?
 
