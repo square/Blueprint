@@ -91,10 +91,10 @@ public final class BlueprintView: UIView {
         }
     }
 
-    /// We need to invalidateIntrinsicContentSize when the bounds change for Auto Layout to work correctly.
+    /// We need to invalidateIntrinsicContentSize when `bound.size` changes for Auto Layout to work correctly.
     public override var bounds: CGRect {
         didSet {
-            guard oldValue != bounds else { return }
+            guard oldValue.size != bounds.size else { return }
 
             invalidateIntrinsicContentSize()
         }
