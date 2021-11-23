@@ -74,6 +74,25 @@ class ElementContentTests: XCTestCase {
         )
     }
 
+    func test_measureFunction() {
+        let expectedConstraint = SizeConstraint(width: .atMost(100), height: .atMost(200))
+        let expectedSafeArea = UIEdgeInsets(top: 1, left: 2, bottom: 3, right: 4)
+
+        let content = ElementContent { constraint, env -> CGSize in
+            XCTAssertEqual(constraint, expectedConstraint)
+            XCTAssertEqual(env.safeAreaInsets, expectedSafeArea)
+
+            return CGSize(width: 10, height: 20)
+        }
+
+        var env = Environment.empty
+        env.safeAreaInsets = UIEdgeInsets(top: 1, left: 2, bottom: 3, right: 4)
+
+        let size = content.measure(in: expectedConstraint, environment: env)
+
+        XCTAssertEqual(size, CGSize(width: 10, height: 20))
+    }
+
     func test_cacheTree() {
         let size1 = CGSize(width: 10, height: 15)
         let size2 = CGSize(width: 20, height: 25)

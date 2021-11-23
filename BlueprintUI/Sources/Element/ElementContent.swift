@@ -143,10 +143,21 @@ extension ElementContent {
         measurementCachingKey: MeasurementCachingKey? = nil,
         measureFunction: @escaping (SizeConstraint) -> CGSize
     ) {
-        self = ElementContent(
-            measurable: Measurer(_measure: measureFunction),
-            measurementCachingKey: measurementCachingKey
-        )
+        self = ElementContent(measurementCachingKey: measurementCachingKey) { constraint, _ in
+            measureFunction(constraint)
+        }
+    }
+
+    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
+    ///
+    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
+    /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
+    public init(
+        measurementCachingKey: MeasurementCachingKey? = nil,
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+    ) {
+        self.measurementCachingKey = measurementCachingKey
+        storage = MeasurableStorage(measurer: measureFunction)
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
@@ -449,6 +460,28 @@ private struct LazyStorage: ContentStorage {
 
     private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
         builder(constraint, environment)
+    }
+}
+
+
+private struct MeasurableStorage: ContentStorage {
+
+    let childCount = 0
+
+    let measurer: (SizeConstraint, Environment) -> CGSize
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment,
+        cache: CacheTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        []
+    }
+
+    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+        cache.get(constraint) { constraint in
+            measurer(constraint, environment)
+        }
     }
 }
 

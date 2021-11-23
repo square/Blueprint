@@ -47,7 +47,7 @@ public struct LayoutWriter: Element {
     //
 
     public var content: ElementContent {
-        ElementContent { size, env in
+        ElementContent { size, env -> Element in
             var builder = Builder()
             self.build(Context(size: size), &builder)
 
