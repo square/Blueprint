@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added an `ElementContent` variant whose `measureFunction` takes in both a `SizeConstraint` and an `Environment`.
-
 ### Removed
 
 ### Changed
@@ -32,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an issue where `BlueprintView` would not size correctly when used with Auto Layout.
+
+### Added
+
+- Added an `ElementContent` variant whose `measureFunction` takes in both a `SizeConstraint` and an `Environment`.
 
 ## [0.33.0] - 2021-11-18
 
