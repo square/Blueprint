@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added an `ElementContent` variant whose `measureFunction` takes in both a `SizeConstraint` and an `Environment`.
-
 ### Removed
 
 ### Changed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.34.0] - 2021-11-22
+
+### Added
+
+- Added an `ElementContent` variant whose `measureFunction` takes in both a `SizeConstraint` and an `Environment`.
 
 ## [0.33.1] - 2021-11-22
 
@@ -724,7 +728,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.33.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.34.0...HEAD
+[0.34.0]: https://github.com/square/Blueprint/compare/0.33.1...0.34.0
 [0.33.1]: https://github.com/square/Blueprint/compare/0.33.0...0.33.1
 [0.33.0]: https://github.com/square/Blueprint/compare/0.32.0...0.33.0
 [0.32.0]: https://github.com/square/Blueprint/compare/0.31.0...0.32.0
