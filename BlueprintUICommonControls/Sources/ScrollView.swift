@@ -357,6 +357,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     private func applyContentInset(with scrollView: ScrollView) {
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: scrollView.contentInset,
+            contentInsets: scrollView.contentInset,
             adjustedContentInsets: self.scrollView.adjustedContentInset,
             keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: scrollView.pullToRefreshBehavior,
@@ -407,12 +408,18 @@ extension ScrollView {
 
     static func calculateContentInset(
         scrollViewInsets: UIEdgeInsets,
+        contentInsets: UIEdgeInsets,
         adjustedContentInsets: UIEdgeInsets,
         keyboardBottomInset: CGFloat,
         refreshControlState: PullToRefreshBehavior,
         refreshControlBounds: CGRect?
     ) -> UIEdgeInsets {
         var finalContentInset = scrollViewInsets
+
+        // The safe area may not actually be applied to the scroll view depending on
+        // the content height and inset adjustment mode. We need to determine the actual applied
+        // safe area insets by subtracting the content inset from the adjusted content inset.
+        let appliedSafeAreaInset = adjustedContentInsets - contentInsets
 
         // Include the keyboard's adjustment at the bottom of the scroll view.
 
@@ -421,7 +428,7 @@ extension ScrollView {
 
             // Exclude the safe area insets, so the content hugs the top of the keyboard.
 
-            finalContentInset.bottom -= adjustedContentInsets.bottom
+            finalContentInset.bottom -= appliedSafeAreaInset.bottom
         }
 
         if #available(iOS 13, *) {
@@ -452,6 +459,7 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
 
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: representedElement.contentInset,
+            contentInsets: scrollView.contentInset,
             adjustedContentInsets: scrollView.adjustedContentInset,
             keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: representedElement.pullToRefreshBehavior,
@@ -542,5 +550,16 @@ extension ScrollView {
         public init(provider: @escaping Provider) {
             self.provider = provider
         }
+    }
+}
+
+extension UIEdgeInsets {
+    fileprivate static func - (lhs: UIEdgeInsets, rhs: UIEdgeInsets) -> UIEdgeInsets {
+        UIEdgeInsets(
+            top: lhs.top - rhs.top,
+            left: lhs.left - rhs.left,
+            bottom: lhs.bottom - rhs.bottom,
+            right: lhs.right - rhs.right
+        )
     }
 }
