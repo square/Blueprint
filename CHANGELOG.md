@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `ScrollView` did not adjust its content inset correctly when the keyboard height or content insets changed.
+
 ### Added
 
 ### Removed
