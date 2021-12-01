@@ -334,4 +334,37 @@ fileprivate final class BoxView: UIView {
         }
     }
 
+    override func action(for layer: CALayer, forKey event: String) -> CAAction? {
+        let keyPath = #keyPath(CALayer.shadowPath)
+
+        guard event == keyPath,
+              let currentPath = layer.shadowPath,
+              let sizeAnimation = layer.animation(forKey: "bounds.size") as? CABasicAnimation
+        else {
+            return super.action(for: layer, forKey: event)
+        }
+
+        let animation = sizeAnimation.copy() as! CABasicAnimation
+        animation.keyPath = keyPath
+        animation.fromValue = currentPath
+
+        return ShadowPathAction(pendingAnimation: animation)
+    }
+}
+
+private final class ShadowPathAction: NSObject, CAAction {
+    let pendingAnimation: CABasicAnimation
+
+    init(pendingAnimation: CABasicAnimation) {
+        self.pendingAnimation = pendingAnimation
+    }
+
+    func run(forKey event: String, object anObject: Any, arguments dict: [AnyHashable: Any]?) {
+        guard let layer = anObject as? CALayer else {
+            return
+        }
+
+        pendingAnimation.toValue = layer.shadowPath
+        layer.add(pendingAnimation, forKey: pendingAnimation.keyPath)
+    }
 }
