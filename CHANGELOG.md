@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `Box` did not implicitly animate its shadow.
+
 ### Added
 
 ### Removed
