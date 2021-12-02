@@ -334,4 +334,21 @@ fileprivate final class BoxView: UIView {
         }
     }
 
+    /// This method is overridden to provide a `ShadowPathAction` for the `shadowPath` event;
+    /// this ensure the shadow implicitly animates alongside changes in the views size.
+    override func action(for layer: CALayer, forKey event: String) -> CAAction? {
+        let keyPath = #keyPath(CALayer.shadowPath)
+
+        guard event == keyPath,
+              let currentPath = layer.shadowPath,
+              let sizeAnimation = layer.animation(forKey: "bounds.size") as? CABasicAnimation
+        else {
+            return super.action(for: layer, forKey: event)
+        }
+
+        let animation = sizeAnimation.copy() as! CABasicAnimation
+        animation.keyPath = keyPath
+        animation.fromValue = currentPath
+        return animation
+    }
 }
