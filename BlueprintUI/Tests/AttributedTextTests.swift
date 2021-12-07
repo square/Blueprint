@@ -98,6 +98,13 @@ class AttributedTextTests: XCTestCase {
         XCTAssertEqual(concat[concat.range(of: "ig")!].color, .green)
         XCTAssertEqual(concat[concat.range(of: "right")!].kern, 10)
     }
+
+    func testValueSemantics() {
+        let text = AttributedText(string: "Hello world")
+        var copy = text
+        copy.font = .systemFont(ofSize: 20)
+        XCTAssertNil(text.font)
+    }
 }
 
 extension AttributedText {

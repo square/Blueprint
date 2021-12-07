@@ -29,7 +29,7 @@ import UIKit
         mutableAttributedString
     }
 
-    private let mutableAttributedString: NSMutableAttributedString
+    private var mutableAttributedString: NSMutableAttributedString
 
     /// Create some `AttributedText` from a plain string.
     public init(string: String) {
@@ -84,8 +84,7 @@ import UIKit
             return makeAttributeStore(range: range)
         }
         set {
-            let range = NSRange(range, in: string)
-            mutableAttributedString.addAttributes(newValue.storage, range: range)
+            addAttributes(attributes: newValue, to: range)
         }
     }
 
@@ -99,6 +98,16 @@ import UIKit
 
     private var entireRange: Range<String.Index> {
         string.startIndex..<string.endIndex
+    }
+
+    private mutating func addAttributes(attributes: TextAttributeContainer, to range: Range<String.Index>) {
+        let range = NSRange(range, in: string)
+
+        if !isKnownUniquelyReferenced(&mutableAttributedString) {
+            mutableAttributedString = NSMutableAttributedString(attributedString: mutableAttributedString)
+        }
+
+        mutableAttributedString.addAttributes(attributes.storage, range: range)
     }
 
     /// The implementation of this function may not be intuitive, but is necessary due to how enumerating attributes
