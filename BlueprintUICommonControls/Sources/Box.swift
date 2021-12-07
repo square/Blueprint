@@ -56,6 +56,12 @@ public struct Box: Element {
                     view.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
+                if #available(iOS 13.0, *) {
+                    if self.cornerStyle.cornerCurve != view.layer.cornerCurve {
+                        view.layer.cornerCurve = self.cornerStyle.cornerCurve
+                    }
+                }
+
                 if self.borderStyle.color?.cgColor != view.layer.borderColor {
                     view.layer.borderColor = self.borderStyle.color?.cgColor
                 }
@@ -110,8 +116,10 @@ extension Box {
 
     public enum CornerStyle {
         case square
-        case capsule
-        case rounded(radius: CGFloat, corners: Corners = .all)
+        case capsule(curve: CornerCurve = .circular)
+        case rounded(radius: CGFloat, corners: Corners = .all, curve: CornerCurve = .circular)
+
+        public static let capsule: Self = .capsule()
 
         public struct Corners: OptionSet {
             public let rawValue: UInt8
@@ -173,6 +181,27 @@ extension Box {
         }
     }
 
+    /// Specifies the curve style when showing rounded corners on a `Box`.
+    public enum CornerCurve: Equatable {
+
+        /// Provides a standard-style corner radius as you would see in design tools like Figma.
+        case circular
+
+        /// Provides an iOS icon-style corner radius.
+        ///
+        /// ### Note
+        /// Only appears on iOS 13 and later. Before iOS 13, `circular` corners will be displayed.
+        case continuous
+
+        @available(iOS 13.0, *)
+        var toLayerCornerCurve: CALayerCornerCurve {
+            switch self {
+            case .circular: return .circular
+            case .continuous: return .continuous
+            }
+        }
+    }
+
     public enum BorderStyle {
         case none
         case solid(color: UIColor, width: CGFloat)
@@ -213,7 +242,7 @@ extension Box.CornerStyle {
             return 0
         case .capsule:
             return min(bounds.width, bounds.height) / 2
-        case let .rounded(radius: radius, _):
+        case let .rounded(radius: radius, _, _):
             let maximumRadius = min(bounds.width, bounds.height) / 2
             return min(maximumRadius, radius)
         }
@@ -223,7 +252,7 @@ extension Box.CornerStyle {
         switch self {
         case .square, .capsule:
             return Corners.all.toCACornerMask
-        case let .rounded(_, corners):
+        case let .rounded(_, corners, _):
             return corners.toCACornerMask
         }
     }
@@ -232,8 +261,17 @@ extension Box.CornerStyle {
         switch self {
         case .square, .capsule:
             return Corners.all.toUIRectCorner
-        case let .rounded(_, corners):
+        case let .rounded(_, corners, _):
             return corners.toUIRectCorner
+        }
+    }
+
+    @available(iOS 13.0, *)
+    fileprivate var cornerCurve: CALayerCornerCurve {
+        switch self {
+        case .square: return .circular
+        case .capsule(let curve): return curve.toLayerCornerCurve
+        case .rounded(_, _, let curve): return curve.toLayerCornerCurve
         }
     }
 }
