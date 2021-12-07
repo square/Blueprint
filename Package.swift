@@ -23,8 +23,22 @@ let package = Package(
     ],
     targets: [
         .target(
+            name: "libcmark",
+            dependencies: [],
+            path: "cmark",
+            exclude: [
+                "include",
+                "case_fold_switch.inc",
+                "entities.inc",
+                "COPYING",
+            ],
+            publicHeadersPath: "./"
+        ),
+        .target(
             name: "BlueprintUI",
-            path: "BlueprintUI/Sources"
+            dependencies: ["libcmark"],
+            path: "BlueprintUI/Sources",
+            exclude: ["BlueprintUI.h"]
         ),
         .testTarget(
             name: "BlueprintUITests",
@@ -33,7 +47,7 @@ let package = Package(
         ),
         .target(
             name: "BlueprintUICommonControls",
-            dependencies: ["BlueprintUI"],
+            dependencies: ["BlueprintUI", "libcmark"],
             path: "BlueprintUICommonControls/Sources"
         ),
         .testTarget(

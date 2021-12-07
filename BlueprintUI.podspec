@@ -15,7 +15,11 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '12.0'
 
-  s.source_files = 'BlueprintUI/Sources/**/*.swift'
+  s.source_files = 'BlueprintUI/Sources/**/*.{swift,h}', 'cmark/**/*.{h,c}'
+  s.public_header_files = "BlueprintUI/Sources/*.h"
+  s.preserve_paths = "cmark/include/module.modulemap", "cmark/*.inc", "cmark/COPYING"
+
+  s.pod_target_xcconfig = { 'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/cmark/**' }
 
   s.weak_framework = 'SwiftUI'
 
