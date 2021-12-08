@@ -26,19 +26,19 @@ import UIKit
 
     /// An `NSAttributedString` representation of the attributed text.
     public var attributedString: NSAttributedString {
-        mutableAttributedString
+        NSAttributedString(attributedString: mutableAttributedString)
     }
 
     private var mutableAttributedString: NSMutableAttributedString
 
     /// Create some `AttributedText` from a plain string.
-    public init(string: String) {
+    public init(_ string: String) {
         self.string = string
         self.mutableAttributedString = NSMutableAttributedString(string: string)
     }
 
     /// Create some `AttributedText` from an attributed string. The attributes are preserved.
-    public init(attributedString: NSAttributedString) {
+    public init(_ attributedString: NSAttributedString) {
         self.string = attributedString.string
         self.mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
     }
@@ -94,7 +94,7 @@ import UIKit
     public static func + (lhs: AttributedText, rhs: AttributedText) -> AttributedText {
         let newString = NSMutableAttributedString(attributedString: lhs.mutableAttributedString)
         newString.append(rhs.mutableAttributedString)
-        return AttributedText(attributedString: newString)
+        return AttributedText(newString)
     }
 
     private var entireRange: Range<String.Index> {

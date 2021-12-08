@@ -7,7 +7,7 @@ class AttributedTextTests: XCTestCase {
         let font = UIFont.systemFont(ofSize: 30)
         let color = UIColor.green
 
-        var text = AttributedText(string: "Hello world")
+        var text = AttributedText("Hello world")
         text.font = font
         text.color = color
 
@@ -32,7 +32,7 @@ class AttributedTextTests: XCTestCase {
         let green = UIColor.green
         let blue = UIColor.blue
 
-        var text = AttributedText(string: "Hello world")
+        var text = AttributedText("Hello world")
 
         let hello = text.range(of: "Hello")!
         let world = text.range(of: "world")!
@@ -93,11 +93,11 @@ class AttributedTextTests: XCTestCase {
     }
 
     func testConcatenation() {
-        var left = AttributedText(string: "left")
+        var left = AttributedText("left")
         left.color = .blue
         left[left.range(of: "le")!].tracking = 20
 
-        var right = AttributedText(string: "right")
+        var right = AttributedText("right")
         right.tracking = 10
         right[right.range(of: "ig")!].color = .green
 
@@ -109,7 +109,7 @@ class AttributedTextTests: XCTestCase {
     }
 
     func testValueSemantics() {
-        let text = AttributedText(string: "Hello world")
+        let text = AttributedText("Hello world")
         var copy = text
         copy.font = .systemFont(ofSize: 20)
         XCTAssertNil(text.font)
