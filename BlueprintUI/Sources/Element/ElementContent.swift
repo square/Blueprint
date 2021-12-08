@@ -65,6 +65,14 @@ public struct ElementContent {
             cache: cache
         )
     }
+
+    func singlePassLayout(
+        in context: SPLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> SPSubtreeResult {
+        storage.singlePassLayout(in: context, environment: environment, cache: cache)
+    }
 }
 
 extension ElementContent {
@@ -208,7 +216,7 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage {
+protocol ContentStorage {
     var childCount: Int { get }
 
     func measure(
@@ -222,6 +230,14 @@ fileprivate protocol ContentStorage {
         environment: Environment,
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+
+    func singlePassLayout(
+        in context: SPLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> SPSubtreeResult
+
+//    func children(in context: LayoutContext) -> [Element]
 }
 
 
@@ -234,7 +250,7 @@ extension ElementContent {
         public var layout: LayoutType
 
         /// Child elements.
-        fileprivate var children: [Child] = []
+        var children: [Child] = []
 
         init(layout: LayoutType) {
             self.layout = layout
@@ -351,7 +367,11 @@ extension ElementContent {
             }
         }
 
-        fileprivate struct Child {
+//        func children(in context: LayoutContext) -> [Element] {
+//            return children.map { $0.element }
+//        }
+
+        struct Child {
 
             var traits: LayoutType.Traits
             var key: AnyHashable?
@@ -363,7 +383,7 @@ extension ElementContent {
 }
 
 
-private struct EnvironmentAdaptingStorage: ContentStorage {
+struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
 
     /// During measurement or layout, the environment adapter will be applied
@@ -409,7 +429,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         }
     }
 
-    private func adapted(environment: Environment) -> Environment {
+    func adapted(environment: Environment) -> Environment {
         var environment = environment
         adapter(&environment)
         return environment
@@ -417,7 +437,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 }
 
 /// Content storage that defers creation of its child until measurement or layout time.
-private struct LazyStorage: ContentStorage {
+struct LazyStorage: ContentStorage {
     let childCount = 1
 
     var builder: (SizeConstraint, Environment) -> Element
@@ -458,13 +478,13 @@ private struct LazyStorage: ContentStorage {
         }
     }
 
-    private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
+    func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
         builder(constraint, environment)
     }
 }
 
 
-private struct MeasurableStorage: ContentStorage {
+struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
