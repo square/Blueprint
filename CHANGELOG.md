@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Reverted scroll view keyboard inset behavior to the behavior in `0.30.0`, as it was causing other issues.
+- Reverted scroll view keyboard inset behavior to the behavior in `0.30.0`, since the recent changes were causing unexpected issues.
 
 ## [0.33.2] - 2021-11-30
 
