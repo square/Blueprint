@@ -357,7 +357,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     private func applyContentInset(with scrollView: ScrollView) {
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: scrollView.contentInset,
-            adjustedContentInsets: self.scrollView.adjustedContentInset,
+            safeAreaInsets: safeAreaInsets,
             keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: scrollView.pullToRefreshBehavior,
             refreshControlBounds: refreshControl?.bounds
@@ -407,7 +407,7 @@ extension ScrollView {
 
     static func calculateContentInset(
         scrollViewInsets: UIEdgeInsets,
-        adjustedContentInsets: UIEdgeInsets,
+        safeAreaInsets: UIEdgeInsets,
         keyboardBottomInset: CGFloat,
         refreshControlState: PullToRefreshBehavior,
         refreshControlBounds: CGRect?
@@ -421,7 +421,7 @@ extension ScrollView {
 
             // Exclude the safe area insets, so the content hugs the top of the keyboard.
 
-            finalContentInset.bottom -= adjustedContentInsets.bottom
+            finalContentInset.bottom -= safeAreaInsets.bottom
         }
 
         if #available(iOS 13, *) {
@@ -452,7 +452,7 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
 
         let contentInset = ScrollView.calculateContentInset(
             scrollViewInsets: representedElement.contentInset,
-            adjustedContentInsets: scrollView.adjustedContentInset,
+            safeAreaInsets: safeAreaInsets,
             keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
             refreshControlState: representedElement.pullToRefreshBehavior,
             refreshControlBounds: refreshControl?.bounds
