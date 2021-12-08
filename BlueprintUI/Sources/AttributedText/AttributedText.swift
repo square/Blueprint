@@ -26,6 +26,7 @@ import UIKit
 
     /// An `NSAttributedString` representation of the attributed text.
     public var attributedString: NSAttributedString {
+        // Returns a copy so that you can't mutate the underlying storage.
         NSAttributedString(attributedString: mutableAttributedString)
     }
 
