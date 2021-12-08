@@ -9,15 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an issue where `Box` did not implicitly animate its shadow.
-
 ### Added
 
 ### Removed
 
 ### Changed
-
-- Reverted scroll view keyboard inset behavior to the behavior in `0.30.0`, as it was causing other issues.
 
 ### Deprecated
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.33.3] - 2021-12-8
+
+### Fixed
+
+- Fixed an issue where `Box` did not implicitly animate its shadow.
+
+### Changed
+
+- Reverted scroll view keyboard inset behavior to the behavior in `0.30.0`, since the recent changes were causing unexpected issues.
 
 ## [0.33.2] - 2021-11-30
 
@@ -736,7 +742,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.33.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.33.3...HEAD
+[0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
+[0.33.2]: https://github.com/square/Blueprint/compare/0.33.1...0.33.2
 [0.33.1]: https://github.com/square/Blueprint/compare/0.33.0...0.33.1
 [0.33.0]: https://github.com/square/Blueprint/compare/0.32.0...0.33.0
 [0.32.0]: https://github.com/square/Blueprint/compare/0.31.0...0.32.0
