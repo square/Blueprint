@@ -6,10 +6,22 @@ import UIKit
 /// background color.
 public struct Box: Element {
 
+    /// The background color to show in the box.
     public var backgroundColor: UIColor
+
+    /// The corner style to apply, eg rounded, capsule, or normal, square corners.
     public var cornerStyle: CornerStyle
+
+    /// How to style the curves when `cornerStyle` is non-square.
+    public var cornerCurve: CornerCurve
+
+    /// The border to apply around the edges of the box.
     public var borderStyle: BorderStyle
+
+    /// The shadow style to apply to the outside of the box.
     public var shadowStyle: ShadowStyle
+
+    /// If content placed within the box should be clipped.
     public var clipsContent: Bool
 
     public var wrappedElement: Element?
@@ -17,6 +29,7 @@ public struct Box: Element {
     public init(
         backgroundColor: UIColor = .clear,
         cornerStyle: CornerStyle = .square,
+        cornerCurve: CornerCurve = .circular,
         borderStyle: BorderStyle = .none,
         shadowStyle: ShadowStyle = .none,
         clipsContent: Bool = false,
@@ -24,6 +37,7 @@ public struct Box: Element {
     ) {
         self.backgroundColor = backgroundColor
         self.cornerStyle = cornerStyle
+        self.cornerCurve = cornerCurve
         self.borderStyle = borderStyle
         self.shadowStyle = shadowStyle
         self.clipsContent = clipsContent
@@ -57,8 +71,8 @@ public struct Box: Element {
                 }
 
                 if #available(iOS 13.0, *) {
-                    if self.cornerStyle.cornerCurve != view.layer.cornerCurve {
-                        view.layer.cornerCurve = self.cornerStyle.cornerCurve
+                    if self.cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
+                        view.layer.cornerCurve = self.cornerCurve.toLayerCornerCurve
                     }
                 }
 
@@ -116,10 +130,8 @@ extension Box {
 
     public enum CornerStyle {
         case square
-        case capsule(curve: CornerCurve = .circular)
-        case rounded(radius: CGFloat, corners: Corners = .all, curve: CornerCurve = .circular)
-
-        public static let capsule: Self = .capsule()
+        case capsule
+        case rounded(radius: CGFloat, corners: Corners = .all)
 
         public struct Corners: OptionSet {
             public let rawValue: UInt8
@@ -219,6 +231,7 @@ extension Element {
     public func box(
         background: UIColor = .clear,
         corners: Box.CornerStyle = .square,
+        cornerCurve: Box.CornerCurve = .circular,
         borders: Box.BorderStyle = .none,
         shadow: Box.ShadowStyle = .none,
         clipsContent: Bool = false
@@ -226,6 +239,7 @@ extension Element {
         Box(
             backgroundColor: background,
             cornerStyle: corners,
+            cornerCurve: cornerCurve,
             borderStyle: borders,
             shadowStyle: shadow,
             clipsContent: clipsContent,
@@ -242,7 +256,7 @@ extension Box.CornerStyle {
             return 0
         case .capsule:
             return min(bounds.width, bounds.height) / 2
-        case let .rounded(radius: radius, _, _):
+        case let .rounded(radius: radius, _):
             let maximumRadius = min(bounds.width, bounds.height) / 2
             return min(maximumRadius, radius)
         }
@@ -252,7 +266,7 @@ extension Box.CornerStyle {
         switch self {
         case .square, .capsule:
             return Corners.all.toCACornerMask
-        case let .rounded(_, corners, _):
+        case let .rounded(_, corners):
             return corners.toCACornerMask
         }
     }
@@ -261,17 +275,8 @@ extension Box.CornerStyle {
         switch self {
         case .square, .capsule:
             return Corners.all.toUIRectCorner
-        case let .rounded(_, corners, _):
+        case let .rounded(_, corners):
             return corners.toUIRectCorner
-        }
-    }
-
-    @available(iOS 13.0, *)
-    fileprivate var cornerCurve: CALayerCornerCurve {
-        switch self {
-        case .square: return .circular
-        case .capsule(let curve): return curve.toLayerCornerCurve
-        case .rounded(_, _, let curve): return curve.toLayerCornerCurve
         }
     }
 }
