@@ -78,12 +78,13 @@ import UIKit
     /// Note that the returned `TextAttributeContainer` will only contain attributes that apply to the entire subscript
     /// range. (Setting an attribute will set it across the subscript range regardless of any existing contents).
     ///
-    public subscript(range: Range<String.Index>) -> TextAttributeContainer {
+    public subscript<R>(range: R) -> TextAttributeContainer where R: RangeExpression, R.Bound == String.Index {
         get {
             let range = NSRange(range, in: string)
             return makeAttributeStore(range: range)
         }
         set {
+            let range = NSRange(range, in: string)
             addAttributes(attributes: newValue, to: range)
         }
     }
@@ -100,9 +101,7 @@ import UIKit
         string.startIndex..<string.endIndex
     }
 
-    private mutating func addAttributes(attributes: TextAttributeContainer, to range: Range<String.Index>) {
-        let range = NSRange(range, in: string)
-
+    private mutating func addAttributes(attributes: TextAttributeContainer, to range: NSRange) {
         if !isKnownUniquelyReferenced(&mutableAttributedString) {
             mutableAttributedString = NSMutableAttributedString(attributedString: mutableAttributedString)
         }
