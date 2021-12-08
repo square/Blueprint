@@ -42,17 +42,17 @@ extension TextAttributeContainer {
     }
 }
 
-// MARK: Kern
+// MARK: Tracking
 
-public enum KernKey: AttributedTextKey {
+public enum TrackingKey: AttributedTextKey {
     public typealias Value = CGFloat
-    public static var name: NSAttributedString.Key { .kern }
+    public static var name: NSAttributedString.Key { kCTTrackingAttributeName as NSAttributedString.Key }
 }
 
 extension TextAttributeContainer {
-    public var kern: CGFloat? {
-        get { self[KernKey.self] }
-        set { self[KernKey.self] = newValue }
+    public var tracking: CGFloat? {
+        get { self[TrackingKey.self] }
+        set { self[TrackingKey.self] = newValue }
     }
 }
 

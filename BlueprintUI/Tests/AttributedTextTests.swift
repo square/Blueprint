@@ -44,6 +44,15 @@ class AttributedTextTests: XCTestCase {
         text[loWo].color = blue
 
         XCTAssertEqual(text[hello].font, font, "The font should be returned when it applies to the whole range")
+        XCTAssertEqual(
+            text[text.range(of: "ell")!].font,
+            font,
+            "The font should be returned when it applies to the whole range"
+        )
+        XCTAssertNil(
+            text[text.range(of: "Hello wo")!].font,
+            "The font should not be returned if it applies to part of the range"
+        )
         XCTAssertNil(text[loWo].font, "The font should not be returned if it applies to part of the range")
 
         XCTAssertEqual(text[loWo].color, blue, "The color should be returned if it applies to the whole range")
@@ -86,17 +95,17 @@ class AttributedTextTests: XCTestCase {
     func testConcatenation() {
         var left = AttributedText(string: "left")
         left.color = .blue
-        left[left.range(of: "le")!].kern = 20
+        left[left.range(of: "le")!].tracking = 20
 
         var right = AttributedText(string: "right")
-        right.kern = 10
+        right.tracking = 10
         right[right.range(of: "ig")!].color = .green
 
         let concat = left + right
         XCTAssertEqual(concat[concat.range(of: "left")!].color, .blue)
-        XCTAssertEqual(concat[concat.range(of: "le")!].kern, 20)
+        XCTAssertEqual(concat[concat.range(of: "le")!].tracking, 20)
         XCTAssertEqual(concat[concat.range(of: "ig")!].color, .green)
-        XCTAssertEqual(concat[concat.range(of: "right")!].kern, 10)
+        XCTAssertEqual(concat[concat.range(of: "right")!].tracking, 10)
     }
 
     func testValueSemantics() {
