@@ -6,10 +6,22 @@ import UIKit
 /// background color.
 public struct Box: Element {
 
+    /// The background color to show in the box.
     public var backgroundColor: UIColor
+
+    /// The corner style to apply, eg rounded, capsule, or normal, square corners.
     public var cornerStyle: CornerStyle
+
+    /// How to style the curves when `cornerStyle` is non-square.
+    public var cornerCurve: CornerCurve
+
+    /// The border to apply around the edges of the box.
     public var borderStyle: BorderStyle
+
+    /// The shadow style to apply to the outside of the box.
     public var shadowStyle: ShadowStyle
+
+    /// If content placed within the box should be clipped.
     public var clipsContent: Bool
 
     public var wrappedElement: Element?
@@ -17,6 +29,7 @@ public struct Box: Element {
     public init(
         backgroundColor: UIColor = .clear,
         cornerStyle: CornerStyle = .square,
+        cornerCurve: CornerCurve = .circular,
         borderStyle: BorderStyle = .none,
         shadowStyle: ShadowStyle = .none,
         clipsContent: Bool = false,
@@ -24,6 +37,7 @@ public struct Box: Element {
     ) {
         self.backgroundColor = backgroundColor
         self.cornerStyle = cornerStyle
+        self.cornerCurve = cornerCurve
         self.borderStyle = borderStyle
         self.shadowStyle = shadowStyle
         self.clipsContent = clipsContent
@@ -54,6 +68,12 @@ public struct Box: Element {
 
                 if self.cornerStyle.radius(for: context.bounds) != view.layer.cornerRadius {
                     view.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
+                }
+
+                if #available(iOS 13.0, *) {
+                    if self.cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
+                        view.layer.cornerCurve = self.cornerCurve.toLayerCornerCurve
+                    }
                 }
 
                 if self.borderStyle.color?.cgColor != view.layer.borderColor {
@@ -173,6 +193,27 @@ extension Box {
         }
     }
 
+    /// Specifies the curve style when showing rounded corners on a `Box`.
+    public enum CornerCurve: Equatable {
+
+        /// Provides a standard-style corner radius as you would see in design tools like Figma.
+        case circular
+
+        /// Provides an iOS icon-style corner radius.
+        ///
+        /// ### Note
+        /// Only appears on iOS 13 and later. Before iOS 13, `circular` corners will be displayed.
+        case continuous
+
+        @available(iOS 13.0, *)
+        var toLayerCornerCurve: CALayerCornerCurve {
+            switch self {
+            case .circular: return .circular
+            case .continuous: return .continuous
+            }
+        }
+    }
+
     public enum BorderStyle {
         case none
         case solid(color: UIColor, width: CGFloat)
@@ -190,6 +231,7 @@ extension Element {
     public func box(
         background: UIColor = .clear,
         corners: Box.CornerStyle = .square,
+        cornerCurve: Box.CornerCurve = .circular,
         borders: Box.BorderStyle = .none,
         shadow: Box.ShadowStyle = .none,
         clipsContent: Bool = false
@@ -197,6 +239,7 @@ extension Element {
         Box(
             backgroundColor: background,
             cornerStyle: corners,
+            cornerCurve: cornerCurve,
             borderStyle: borders,
             shadowStyle: shadow,
             clipsContent: clipsContent,
