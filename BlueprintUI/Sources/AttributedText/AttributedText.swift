@@ -107,6 +107,15 @@ import UIKit
             mutableAttributedString = NSMutableAttributedString(attributedString: mutableAttributedString)
         }
 
+        let oldAttributes = makeAttributeStore(range: range)
+        let oldKeys = Set(oldAttributes.storage.keys)
+        let newKeys = Set(attributes.storage.keys)
+        let removedKeys = oldKeys.subtracting(newKeys)
+
+        for key in removedKeys {
+            mutableAttributedString.removeAttribute(key, range: range)
+        }
+
         mutableAttributedString.addAttributes(attributes.storage, range: range)
     }
 

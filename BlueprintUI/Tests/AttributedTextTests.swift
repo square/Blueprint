@@ -141,6 +141,19 @@ class AttributedTextTests: XCTestCase {
         XCTAssertEqual(text[someHiragana].color, .green)
         XCTAssertEqual(text[someKatakana].color, .red)
     }
+
+    func testRemovingAttributes() {
+        var text = AttributedText("Hello")
+        text.font = .systemFont(ofSize: 10)
+        text.color = .blue
+
+        text.font = nil
+        text["H"].color = nil
+
+        XCTAssertNil(text.font)
+        XCTAssertNil(text["H"].color)
+        XCTAssertEqual(text["ello"].color, .blue)
+    }
 }
 
 extension AttributedText {
