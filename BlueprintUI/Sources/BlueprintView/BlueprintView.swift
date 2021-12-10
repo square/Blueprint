@@ -326,7 +326,7 @@ public final class BlueprintView: UIView {
 
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(frame: frame, environment: environment, singlePass: false)
+            .layout(frame: frame, environment: environment, singlePass: true)
             .resolve() ?? []
 
         let measurementEndDate = Date()
