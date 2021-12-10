@@ -98,6 +98,27 @@ import UIKit
         return AttributedText(newString)
     }
 
+    /// Enumerates ranges of the provided attribute key, calling the provided closure with each value found in the
+    /// string and the range of that value. The longest effective range of an attribute may not be used, meaning that
+    /// the block may be called with consecutive attribute ranges that have the same value.
+    ///
+    public func enumerate<AttributeKey: AttributedTextKey>(
+        _ key: AttributeKey.Type,
+        using block: (AttributeKey.Value, Range<String.Index>) -> Void
+    ) {
+        mutableAttributedString.enumerateAttribute(
+            key.name,
+            in: NSRange(entireRange, in: string),
+            options: [.longestEffectiveRangeNotRequired]
+        ) { attribute, range, _ in
+            guard let range = Range(range, in: string), let attribute = attribute as? AttributeKey.Value else {
+                return
+            }
+
+            block(attribute, range)
+        }
+    }
+
     private var entireRange: Range<String.Index> {
         string.startIndex..<string.endIndex
     }

@@ -154,6 +154,28 @@ class AttributedTextTests: XCTestCase {
         XCTAssertNil(text["H"].color)
         XCTAssertEqual(text["ello"].color, .blue)
     }
+
+    func testEnumerating() {
+        var text = AttributedText("Hello world")
+
+        text["Hello"].color = .blue
+        text["world"].color = .red
+
+        let blueExpectation = XCTestExpectation(description: "Should find blue")
+        let redExpectation = XCTestExpectation(description: "Should find red")
+
+        text.enumerate(ColorKey.self) { color, range in
+            if color == .blue, range == text.range(of: "Hello") {
+                blueExpectation.fulfill()
+            }
+
+            if color == .red, range == text.range(of: "world") {
+                redExpectation.fulfill()
+            }
+        }
+
+        wait(for: [blueExpectation, redExpectation], timeout: 0)
+    }
 }
 
 extension AttributedText {
