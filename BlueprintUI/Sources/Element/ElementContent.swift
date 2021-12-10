@@ -104,7 +104,7 @@ extension ElementContent {
     public init(
         child: Element,
         key: AnyHashable? = nil,
-        layout: SingleChildLayout,
+        layout: SingleChildLayout & SPSingleChildLayout,
         measurementCachingKey: MeasurementCachingKey? = nil
     ) {
         self = ElementContent(
@@ -508,11 +508,11 @@ struct MeasurableStorage: ContentStorage {
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
-fileprivate struct SingleChildLayoutHost: Layout {
+fileprivate struct SingleChildLayoutHost: Layout, SPLayout {
 
-    private var wrapped: SingleChildLayout
+    private var wrapped: SingleChildLayout & SPSingleChildLayout
 
-    init(wrapping layout: SingleChildLayout) {
+    init(wrapping layout: SingleChildLayout & SPSingleChildLayout) {
         wrapped = layout
     }
 
@@ -527,11 +527,15 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
+
+    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+        wrapped.layout(in: context, child: children[0])
+    }
 }
 
 
 // Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
+fileprivate struct PassthroughLayout: SingleChildLayout, SPSingleChildLayout {
 
     func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
         child.measure(in: constraint)
@@ -541,11 +545,17 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
         LayoutAttributes(size: size)
     }
 
+    func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+        SPLayoutAttributes(
+            size: child.layout(in: context.proposedSize),
+            childPositions: [.zero]
+        )
+    }
 }
 
 
 // Used for empty elements with an intrinsic size
-fileprivate struct MeasurableLayout: Layout {
+fileprivate struct MeasurableLayout: Layout, SPLayout {
 
     var measurable: Measurable
 
@@ -559,6 +569,12 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 
+    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+        SPLayoutAttributes(
+            size: measurable.measure(in: .init(context.proposedSize)),
+            childPositions: []
+        )
+    }
 }
 
 struct Measurer: Measurable {

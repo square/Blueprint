@@ -186,6 +186,10 @@ public struct SPLayoutAttributes {
     /// Corresponds to `UIView.isHidden`.
     public var isHidden: Bool = false
 
+    public var transform: CATransform3D = CATransform3DIdentity
+
+    public var alpha: CGFloat = 1.0
+
     public init(size: CGSize, childPositions: [CGPoint] = []) {
         self.size = size
         self.childPositions = childPositions

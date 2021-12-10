@@ -30,7 +30,7 @@ public struct Opacity: Element {
         nil
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
         var opacity: CGFloat
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
@@ -41,6 +41,13 @@ public struct Opacity: Element {
             var attributes = LayoutAttributes(size: size)
             attributes.alpha = opacity
             return attributes
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+            SPLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
         }
     }
 }

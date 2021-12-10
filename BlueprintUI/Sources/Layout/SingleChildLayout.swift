@@ -21,3 +21,7 @@ public protocol SingleChildLayout {
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes
 
 }
+
+public protocol SPSingleChildLayout {
+    func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes
+}

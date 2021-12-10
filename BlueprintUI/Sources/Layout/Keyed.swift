@@ -53,22 +53,12 @@ public struct Keyed: Element {
         ElementContent(
             child: wrapped,
             key: key,
-            layout: KeyedLayout()
+            layout: SPNeutralLayout()
         )
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
-    }
-
-    private struct KeyedLayout: SingleChildLayout {
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            LayoutAttributes(size: size)
-        }
     }
 }
 
