@@ -17,6 +17,34 @@ extension Element {
         )
     }
 
+    func layout(frame: CGRect, environment: Environment, singlePass: Bool) -> LayoutResultNode {
+        if singlePass {
+            return singlePassLayout(frame: frame, environment: environment)
+        } else {
+            return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        }
+    }
+
+    func singlePassLayout(frame: CGRect, environment: Environment) -> LayoutResultNode {
+
+        let attributes = LayoutAttributes(frame: frame)
+        let context = SPLayoutContext(proposedSize: frame.size)
+        let cache = CacheFactory.makeCache(name: "\(type(of: self))")
+
+        let children = self.content.singlePassLayout(
+            in: context,
+            environment: environment,
+            cache: cache
+        )
+        .resolve()
+
+        return LayoutResultNode(
+            element: self,
+            layoutAttributes: attributes,
+            environment: environment,
+            children: children
+        )
+    }
 }
 
 /// Represents a tree of elements with complete layout attributes
