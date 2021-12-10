@@ -47,11 +47,11 @@ final class RootViewController: UIViewController {
             }
         }
         .constrainedTo(width: .within(300...400))
-        .aligned(vertically: .top, horizontally: .center)
+        .aligned(vertically: .center, horizontally: .center)
         .inset(uniform: 40.0)
-        .scrollable(.fittingHeight) { scrollView in
-            scrollView.alwaysBounceVertical = true
-        }
+//        .scrollable(.fittingHeight) { scrollView in
+//            scrollView.alwaysBounceVertical = true
+//        }
     }
 
     private func push(_ viewController: UIViewController) {
@@ -85,20 +85,20 @@ fileprivate struct DemoItem: ProxyElement {
         .tappable {
             self.onTap()
         }
-        .decorate(layering: .below, position: .inset(5)) {
-            Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
-        }
-        .decorate(layering: .above, position: .corner(.topLeft)) {
-            guard let badge = self.badgeText else {
-                return Empty()
-            }
-
-            return Label(text: badge) {
-                $0.font = .systemFont(ofSize: 22.0, weight: .bold)
-                $0.color = .white
-            }
-            .inset(uniform: 7.0)
-            .box(background: .systemRed, corners: .capsule)
-        }
+//        .decorate(layering: .below, position: .inset(5)) {
+//            Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
+//        }
+//        .decorate(layering: .above, position: .corner(.topLeft)) {
+//            guard let badge = self.badgeText else {
+//                return Empty()
+//            }
+//
+//            return Label(text: badge) {
+//                $0.font = .systemFont(ofSize: 22.0, weight: .bold)
+//                $0.color = .white
+//            }
+//            .inset(uniform: 7.0)
+//            .box(background: .systemRed, corners: .capsule)
+//        }
     }
 }
