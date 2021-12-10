@@ -78,7 +78,7 @@ fileprivate struct OverlayLayout: Layout, SPLayout {
         )
     }
 
-    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
         func maxSize(lhs: CGSize, rhs: CGSize) -> CGSize {
             CGSize(
                 width: max(lhs.width, rhs.width),
@@ -88,7 +88,7 @@ fileprivate struct OverlayLayout: Layout, SPLayout {
 
         return SPLayoutAttributes(
             size: children
-                .map { $0.layout(in: context.proposedSize) }
+                .map { $1.layout(in: context.proposedSize) }
                 .reduce(.zero, maxSize),
             childPositions: Array(repeating: .zero, count: children.count)
         )

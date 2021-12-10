@@ -528,8 +528,8 @@ fileprivate struct SingleChildLayoutHost: Layout, SPLayout {
         ]
     }
 
-    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
-        wrapped.layout(in: context, child: children[0])
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+        wrapped.layout(in: context, child: children[0].layoutable)
     }
 }
 
@@ -569,7 +569,7 @@ fileprivate struct MeasurableLayout: Layout, SPLayout {
         return []
     }
 
-    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
         SPLayoutAttributes(
             size: measurable.measure(in: .init(context.proposedSize)),
             childPositions: []
