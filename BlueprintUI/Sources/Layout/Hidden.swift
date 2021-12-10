@@ -20,7 +20,7 @@ public struct Hidden: Element {
         nil
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
         var isHidden: Bool
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
@@ -31,6 +31,15 @@ public struct Hidden: Element {
             var attributes = LayoutAttributes(size: size)
             attributes.isHidden = isHidden
             return attributes
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+            var result = SPLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
+            result.isHidden = isHidden
+            return result
         }
     }
 }

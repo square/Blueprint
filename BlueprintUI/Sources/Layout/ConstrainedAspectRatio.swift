@@ -142,7 +142,7 @@ public struct ConstrainedAspectRatio: Element {
         nil
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
         var aspectRatio: AspectRatio
         var contentMode: ContentMode
 
@@ -157,6 +157,12 @@ public struct ConstrainedAspectRatio: Element {
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+
+            fatalError("TODO")
+
         }
     }
 }

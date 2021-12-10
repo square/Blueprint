@@ -147,7 +147,7 @@ extension Comparable {
 
 extension ConstrainedSize {
 
-    fileprivate struct Layout: SingleChildLayout {
+    fileprivate struct Layout: SingleChildLayout, SPSingleChildLayout {
 
         var width: Constraint
         var height: Constraint
@@ -186,6 +186,29 @@ extension ConstrainedSize {
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+
+            // TODO: I think to preserve behavior we need to "push" this constraint down in the
+            // context, not just apply it here.
+
+            let constrainedSize = CGSize(
+                width: width.applied(to: context.proposedSize.width),
+                height: height.applied(to: context.proposedSize.width)
+            )
+
+            let measuredSize = child.layout(in: constrainedSize)
+
+            let childSize = CGSize(
+                width: width.applied(to: measuredSize.width),
+                height: height.applied(to: measuredSize.width)
+            )
+
+            return SPLayoutAttributes(
+                size: childSize,
+                childPositions: [.zero]
+            )
         }
     }
 

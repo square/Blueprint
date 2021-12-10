@@ -44,7 +44,7 @@ public struct Transformed: Element {
         nil
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
         var transform: CATransform3D
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
@@ -53,6 +53,15 @@ public struct Transformed: Element {
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             var attributes = LayoutAttributes(size: size)
+            attributes.transform = transform
+            return attributes
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+            var attributes = SPLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
             attributes.transform = transform
             return attributes
         }

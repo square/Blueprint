@@ -129,7 +129,7 @@ extension Element {
 
 extension Inset {
 
-    fileprivate struct Layout: SingleChildLayout {
+    fileprivate struct Layout: SingleChildLayout, SPSingleChildLayout {
 
         var top: CGFloat
         var bottom: CGFloat
@@ -157,6 +157,12 @@ extension Inset {
             frame.size.width -= left + right
             frame.size.height -= top + bottom
             return LayoutAttributes(frame: frame)
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+
+            fatalError("TODO")
+
         }
     }
 }

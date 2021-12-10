@@ -66,7 +66,7 @@ public struct Aligned: Element {
         nil
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
         var verticalAlignment: VerticalAlignment
         var horizontalAlignment: HorizontalAlignment
 
@@ -104,6 +104,12 @@ public struct Aligned: Element {
             }
 
             return attributes
+        }
+
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+
+            fatalError("TODO")
+
         }
     }
 }
