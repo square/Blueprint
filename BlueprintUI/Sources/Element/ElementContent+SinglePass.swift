@@ -5,14 +5,12 @@ typealias LayoutResultChildren = [(identifier: ElementIdentifier, node: LayoutRe
 
 
 extension ElementContent.Builder {
-    func children(in context: SPLayoutContext) -> [(id: ElementIdentifier, element: Element)] {
+    func identifiers(in context: SPLayoutContext) -> [ElementIdentifier] {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
 
         return children.map { child in
-            let childElement = child.element
-            let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
-            return (id: id, element: childElement)
+            identifierFactory.nextIdentifier(for: type(of: child.element), key: child.key)
         }
     }
 
@@ -22,9 +20,10 @@ extension ElementContent.Builder {
         cache: CacheTree
     ) -> SPSubtreeResult {
 
-        let children = self.children(in: context)
-        let layoutChildren = children.indices.map { (index: Int) -> SPLayoutNode in
-            let (id, child) = children[index]
+        let identifiers = self.identifiers(in: context)
+        let nodes = children.indices.map { (index: Int) -> SPLayoutNode in
+            let child = children[index].element
+            let id = identifiers[index]
             
             return SPLayoutNode(
                 id: id,
@@ -34,11 +33,14 @@ extension ElementContent.Builder {
             )
         }
 
-        let intermediateResult = layout.layout(in: context, children: layoutChildren)
+        let intermediateResult = layout.layout(
+            in: context,
+            children: children.indices.map { (traits: children[$0].traits, layoutable: nodes[$0] ) }
+        )
 
         return SPSubtreeResult(
             intermediate: intermediateResult,
-            children: layoutChildren
+            children: nodes
         )
     }
 }
@@ -186,13 +188,21 @@ public struct SPLayoutAttributes {
     }
 }
 
-public protocol SPLayout {
-    func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes
+// extending only to pick up Traits
+public protocol SPLayout: Layout {
+    typealias SPLayoutChild = (traits: Traits, layoutable: SPLayoutable)
+
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes
 }
 
 public protocol SPLayoutable {
-    func layout(in proposedSize: CGSize) -> CGSize
-//    var layoutPriority: Int { get }
+    func layout(in proposedSize: CGSize, options: SPLayoutOptions) -> CGSize
+}
+
+extension SPLayoutable {
+    func layout(in proposedSize: CGSize) -> CGSize {
+        layout(in: proposedSize, options: .default)
+    }
 }
 
 public struct SPNeutralLayout: SingleChildLayout, SPSingleChildLayout {
@@ -228,6 +238,8 @@ class SPLayoutNode: SPLayoutable {
 
     var layoutResult: SPSubtreeResult?
 
+    private var layoutCount = 0
+
     var ensuredResult: SPSubtreeResult {
         guard let layoutResult = layoutResult else {
             fatalError("child was not laid out")
@@ -235,8 +247,11 @@ class SPLayoutNode: SPLayoutable {
         return layoutResult
     }
 
-    func layout(in proposedSize: CGSize) -> CGSize {
-        assert(layoutResult == nil, "layout called twice")
+    func layout(in proposedSize: CGSize, options: SPLayoutOptions) -> CGSize {
+        layoutCount += 1
+        if layoutCount > options.maxAllowedLayoutCount {
+            fatalError("\(type(of: element)) layout called \(layoutCount) times")
+        }
 
         let result = element.content.singlePassLayout(
             in: SPLayoutContext(proposedSize: proposedSize),
@@ -248,4 +263,19 @@ class SPLayoutNode: SPLayoutable {
         return result.intermediate.size
     }
 
+}
+
+public struct SPLayoutOptions {
+    public static let `default` = SPLayoutOptions()
+
+    /// Legacy override to support Stacks
+    public var maxAllowedLayoutCount: Int
+
+    /// Legacy override for size constraints and "fill" alignments
+    public var sizeOverride: ((CGSize) -> CGSize)
+
+    public init(maxAllowedLayoutCount: Int = 1, sizeOverride: @escaping ((CGSize) -> CGSize) = { $0 }) {
+        self.maxAllowedLayoutCount = maxAllowedLayoutCount
+        self.sizeOverride = sizeOverride
+    }
 }

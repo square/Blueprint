@@ -227,7 +227,7 @@ extension LayoutWriter {
                 }
             }
 
-            func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+            func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
                 fatalError("TODO")
             }
         }

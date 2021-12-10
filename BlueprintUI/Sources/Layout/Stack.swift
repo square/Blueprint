@@ -267,11 +267,6 @@ public struct StackLayout: Layout, SPLayout {
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         _layout(size: size, items: items)
     }
-
-    public func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
-        fatalError("TODO")
-    }
-
 }
 
 extension StackLayout {
@@ -375,6 +370,38 @@ extension StackLayout {
 //      └─────────────────────────┘
 //
 extension StackLayout {
+
+    public func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+        guard !children.isEmpty else {
+            return SPLayoutAttributes(size: .zero)
+        }
+
+        let vectorConstraint = context.proposedSize.vectorConstraint(axis: axis)
+        let layoutOptions = SPLayoutOptions(maxAllowedLayoutCount: 2)
+
+        let items: [(traits: Traits, content: Measurable)] = children.map { (traits, layoutable) in
+            let measurable = Measurer { constraint in
+                layoutable.layout(in: constraint.maximum, options: layoutOptions)
+            }
+            return (traits, measurable)
+        }
+
+        let frames = _frames(for: items, in: vectorConstraint)
+
+        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
+            Vector(
+                axis: max(vector.axis, frame.maxAxis),
+                cross: max(vector.cross, frame.maxCross)
+            )
+        }
+
+        let size = vector.size(axis: axis)
+
+        return SPLayoutAttributes(
+            size: size,
+            childPositions: frames.map { $0.origin.point(axis: axis) }
+        )
+    }
 
     private func _layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         guard items.count > 0 else { return [] }
