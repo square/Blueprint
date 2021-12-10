@@ -214,7 +214,7 @@ extension LayoutWriter {
 
         // MARK: Layout
 
-        private struct Layout: BlueprintUI.Layout {
+        private struct Layout: BlueprintUI.Layout, SPLayout {
             var builder: Builder
 
             func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
@@ -225,6 +225,10 @@ extension LayoutWriter {
                 builder.children.map { child in
                     .init(frame: child.frame)
                 }
+            }
+
+            func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+                fatalError("TODO")
             }
         }
     }

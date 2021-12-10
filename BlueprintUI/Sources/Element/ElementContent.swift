@@ -17,7 +17,7 @@ public struct ElementContent {
     /// - parameter layout: The layout to use.
     /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter configure: A closure that configures the layout and adds children to the container.
-    public init<LayoutType: Layout>(
+    public init<LayoutType: Layout & SPLayout>(
         layout: LayoutType,
         measurementCachingKey: MeasurementCachingKey? = nil,
         configure: (inout Builder<LayoutType>) -> Void = { _ in }
@@ -243,7 +243,7 @@ protocol ContentStorage {
 
 extension ElementContent {
 
-    public struct Builder<LayoutType: Layout>: ContentStorage {
+    public struct Builder<LayoutType: Layout & SPLayout>: ContentStorage {
 
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
