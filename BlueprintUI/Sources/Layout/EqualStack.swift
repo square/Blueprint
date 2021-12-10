@@ -73,7 +73,7 @@ extension EqualStack {
 
 extension EqualStack {
 
-    fileprivate struct EqualLayout: Layout {
+    fileprivate struct EqualLayout: Layout, SPLayout {
 
         var direction: Direction
         var spacing: CGFloat
@@ -151,6 +151,10 @@ extension EqualStack {
             }
 
             return result
+        }
+
+        func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+            fatalError("TODO")
         }
 
     }

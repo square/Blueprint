@@ -184,7 +184,7 @@ extension StackElement {
 
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
-public struct StackLayout: Layout {
+public struct StackLayout: Layout, SPLayout {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
@@ -266,6 +266,10 @@ public struct StackLayout: Layout {
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         _layout(size: size, items: items)
+    }
+
+    public func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+        fatalError("TODO")
     }
 
 }

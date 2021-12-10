@@ -83,7 +83,7 @@ public struct GridRow: Element {
 
 // MARK: - layout -
 extension GridRow {
-    struct GridRowLayout: Layout {
+    struct GridRowLayout: Layout, SPLayout {
         let verticalAlignment: Row.RowAlignment
         let spacing: CGFloat
 
@@ -118,6 +118,10 @@ extension GridRow {
             let attributes = frames.map(LayoutAttributes.init)
 
             return attributes
+        }
+
+        func layout(in context: SPLayoutContext, children: [SPLayoutable]) -> SPLayoutAttributes {
+            fatalError("TODO")
         }
 
         /// Compute child frames in a given layout space.

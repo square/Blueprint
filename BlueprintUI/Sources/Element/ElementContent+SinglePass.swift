@@ -22,16 +22,6 @@ extension ElementContent.Builder {
         cache: CacheTree
     ) -> SPSubtreeResult {
 
-        guard let spl = layout as? SPLayout else {
-//            let old = performLayout(
-//                attributes: LayoutAttributes(size: context.proposedSize),
-//                environment: environment,
-//                cache: cache
-//            )
-
-            fatalError()
-        }
-
         let children = self.children(in: context)
         let layoutChildren = children.indices.map { (index: Int) -> SPLayoutNode in
             let (id, child) = children[index]
@@ -44,7 +34,7 @@ extension ElementContent.Builder {
             )
         }
 
-        let intermediateResult = spl.layout(in: context, children: layoutChildren)
+        let intermediateResult = layout.layout(in: context, children: layoutChildren)
 
         return SPSubtreeResult(
             intermediate: intermediateResult,
