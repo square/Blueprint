@@ -6,8 +6,12 @@ public struct TextAttributeContainer {
     internal var storage: [NSAttributedString.Key: Any]
 
     /// Private empty initializer to make the `empty` environment explicit.
-    private init() {
+    init() {
         storage = [:]
+    }
+
+    init(storage: [NSAttributedString.Key: Any]) {
+        self.storage = storage
     }
 
     /// Get or set for the given `AttributedTextKey`.

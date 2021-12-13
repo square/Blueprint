@@ -155,26 +155,36 @@ class AttributedTextTests: XCTestCase {
         XCTAssertEqual(text["ello"].color, .blue)
     }
 
-    func testEnumerating() {
+    func testRuns() {
         var text = AttributedText("Hello world")
+        let font = UIFont.systemFont(ofSize: 20)
 
         text["Hello"].color = .blue
         text["world"].color = .red
+        text["lo wo"].font = font
 
-        let blueExpectation = XCTestExpectation(description: "Should find blue")
-        let redExpectation = XCTestExpectation(description: "Should find red")
+        let runs = text.runs
+        XCTAssertEqual(runs.count, 5)
 
-        text.enumerate(ColorKey.self) { color, range in
-            if color == .blue, range == text.range(of: "Hello") {
-                blueExpectation.fulfill()
-            }
+        XCTAssertEqual(runs[0].range, text.range(of: "Hel"))
+        XCTAssertEqual(runs[0].color, .blue)
+        XCTAssertNil(runs[0].font)
 
-            if color == .red, range == text.range(of: "world") {
-                redExpectation.fulfill()
-            }
-        }
+        XCTAssertEqual(runs[1].range, text.range(of: "lo"))
+        XCTAssertEqual(runs[1].color, .blue)
+        XCTAssertEqual(runs[1].font, font)
 
-        wait(for: [blueExpectation, redExpectation], timeout: 0)
+        XCTAssertEqual(runs[2].range, text.range(of: " "))
+        XCTAssertNil(runs[2].color)
+        XCTAssertEqual(runs[2].font, font)
+
+        XCTAssertEqual(runs[3].range, text.range(of: "wo"))
+        XCTAssertEqual(runs[3].color, .red)
+        XCTAssertEqual(runs[3].font, font)
+
+        XCTAssertEqual(runs[4].range, text.range(of: "rld"))
+        XCTAssertEqual(runs[4].color, .red)
+        XCTAssertNil(runs[4].font)
     }
 }
 
