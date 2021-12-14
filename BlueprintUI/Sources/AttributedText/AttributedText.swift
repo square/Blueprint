@@ -198,12 +198,22 @@ extension AttributedText {
         ///
         public let range: Range<String.Index>
 
-        private let attributes: TextAttributeContainer
+        /// The attributes that apply to this run.
+        ///
+        /// Note that you can access properties of the attribute container directly on the `Run` itself, since it
+        /// implements dynamic member look up.
+        ///
+        public let attributes: TextAttributeContainer
 
         /// Dynamic member getter for the `TextAttributeContainer` of this run.
         ///
         public subscript<Value>(dynamicMember keyPath: KeyPath<TextAttributeContainer, Value>) -> Value {
             attributes[keyPath: keyPath]
+        }
+
+        init(range: Range<String.Index>, attributes: TextAttributeContainer) {
+            self.range = range
+            self.attributes = attributes
         }
     }
 }
