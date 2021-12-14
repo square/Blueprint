@@ -17,6 +17,9 @@ import UIKit
 final class RootViewController: UIViewController {
     fileprivate var demos: [DemoItem] {
         [
+            DemoItem(title: "Text Links", onTap: { [weak self] in
+                self?.push(TextLinkViewController())
+            }),
             DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
             }),
