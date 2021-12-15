@@ -38,12 +38,16 @@ extension Element {
         )
         .resolve()
 
-        return LayoutResultNode(
+        let root = LayoutResultNode(
             element: self,
             layoutAttributes: attributes,
             environment: environment,
             children: children
         )
+
+        root.dump()
+
+        return root
     }
 }
 
@@ -139,4 +143,17 @@ extension LayoutResultNode {
 
     }
 
+}
+
+extension LayoutResultNode {
+    func dump(depth: Int = 0) {
+        for child in children {
+            let attributes = child.node.layoutAttributes
+            let origin = "x:\(attributes.frame.origin.x) y:\(attributes.frame.origin.y)"
+            let size = "w:\(attributes.frame.size.width) h:\(attributes.frame.size.height)"
+            let indent = String(repeating: "  ", count: depth)
+            print("\(indent)\(child.identifier), \(origin) \(size)")
+            child.node.dump(depth: depth + 1)
+        }
+    }
 }
