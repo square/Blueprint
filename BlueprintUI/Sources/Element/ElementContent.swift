@@ -44,6 +44,28 @@ public struct ElementContent {
         )
     }
 
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree,
+        singlePass: Bool
+    ) -> CGSize {
+        if singlePass {
+            return singlePassLayout(
+                in: SPLayoutContext(
+                    proposedSize: constraint.singlePassSize,
+                    mode: AxisVarying(horizontal: .natural, vertical: .natural)
+                ),
+                environment: environment,
+                cache: cache
+            )
+            .intermediate
+            .size
+        } else {
+            return measure(in: constraint, environment: environment, cache: cache)
+        }
+    }
+
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         environment.measurementCache.measurement(with: measurementCachingKey, in: constraint) {
             self.storage.measure(in: constraint, environment: environment, cache: cache)

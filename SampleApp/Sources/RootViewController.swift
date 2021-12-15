@@ -29,12 +29,43 @@ final class RootViewController: UIViewController {
         ]
     }
 
+    let blueprintView = BlueprintView()
+
     override func loadView() {
-        let blueprintView = BlueprintView(element: contents)
+//        let blueprintView = BlueprintView(element: contents)
+        blueprintView.element = contents
+        blueprintView.singlePassLayout = false
 
         view = blueprintView
 
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .action,
+            target: self,
+            action: #selector(splToggleTapped)
+        )
+        setNavItem()
+    }
+
+    var singlePass: Bool {
+        get { blueprintView.singlePassLayout }
+        set {
+            blueprintView.singlePassLayout = newValue
+            setNavItem()
+        }
+    }
+
+    func setNavItem() {
+        navigationItem.title = "SPL: \(singlePass)"
+    }
+
+    @objc private func splToggleTapped() {
+        singlePass.toggle()
     }
 
     var contents: Element {
@@ -46,9 +77,12 @@ final class RootViewController: UIViewController {
                 column.add(child: demo)
             }
         }
-        .constrainedTo(width: .within(300...400))
-        .aligned(vertically: .center, horizontally: .center)
+        .box(borders: .solid(color: .blue, width: 1))
+        // TODO: test out various constraints, fill mode, etc
+//        .constrainedTo(width: .within(300...400))
+        .aligned(vertically: .center, horizontally: .fill)
         .inset(uniform: 40.0)
+        .box(borders: .solid(color: .red, width: 1))
 //        .scrollable(.fittingHeight) { scrollView in
 //            scrollView.alwaysBounceVertical = true
 //        }
@@ -71,6 +105,8 @@ fileprivate struct DemoItem: ProxyElement {
         Label(text: title) { label in
             label.font = .systemFont(ofSize: 18.0, weight: .semibold)
         }
+        .box(borders: .solid(color: .cyan, width: 1))
+        .aligned(vertically: .fill, horizontally: .trailing)
         .inset(uniform: 20.0)
         .box(
             background: .white,
@@ -85,6 +121,7 @@ fileprivate struct DemoItem: ProxyElement {
         .tappable {
             self.onTap()
         }
+        .box(borders: .solid(color: .green, width: 1))
 //        .decorate(layering: .below, position: .inset(5)) {
 //            Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
 //        }
