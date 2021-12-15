@@ -43,14 +43,14 @@
  */
 struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    let elementType: ObjectIdentifier
+    let elementType: Metatype
     let key: AnyHashable?
 
     let count: Int
 
     init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
-        self.elementType = ObjectIdentifier(elementType)
+        self.elementType = Metatype(elementType)
         self.key = key
 
         self.count = count
@@ -105,5 +105,25 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
             let elementType: ObjectIdentifier
             let key: AnyHashable?
         }
+    }
+}
+
+struct Metatype: Hashable, CustomStringConvertible {
+    var type: Any.Type
+
+    init(_ type: Any.Type) {
+        self.type = type
+    }
+
+    var description: String {
+        "\(type)"
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(type))
+    }
+
+    static func == (lhs: Metatype, rhs: Metatype) -> Bool {
+        lhs.type == rhs.type
     }
 }
