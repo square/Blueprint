@@ -14,6 +14,7 @@ public struct Label: ProxyElement {
     public var numberOfLines: Int = 0
     public var lineBreakMode: NSLineBreakMode = .byWordWrapping
     public var lineHeight: LineHeight = .font
+    public var textFitting: TextFittingAdjustment = .noAdjustment
 
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
@@ -65,6 +66,7 @@ public struct Label: ProxyElement {
             label.numberOfLines = numberOfLines
             label.isAccessibilityElement = isAccessibilityElement
             label.accessibilityTraits = accessibilityTraits
+            label.textFitting = textFitting
 
             switch lineHeight {
             case .custom(let lineHeight, .top):

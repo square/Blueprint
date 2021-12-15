@@ -15,6 +15,9 @@ public struct AttributedLabel: Element, Hashable {
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
+    /// Controls how to adjust the size of the text when it does not fit in the given layout.
+    public var textFitting: TextFittingAdjustment = .noAdjustment
+
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
@@ -48,6 +51,9 @@ public struct AttributedLabel: Element, Hashable {
         label.numberOfLines = numberOfLines
         label.textRectOffset = textRectOffset
         label.isAccessibilityElement = isAccessibilityElement
+
+        textFitting.apply(to: label)
+
         updateAccessibilityTraits(label)
     }
 
@@ -69,6 +75,73 @@ public struct AttributedLabel: Element, Hashable {
         }
     }
 }
+
+/// Provides a way to allow the adjustment of the text within a label when it become too wide to fit within a label.
+public enum TextFittingAdjustment: Hashable {
+
+    /// No adjustment is performed.
+    case noAdjustment
+
+    /// The provided adjustment is applied.
+    case adjusts(Adjusts)
+
+    /// The provided adjustment is applied.
+    public static func adjusts(
+        allowsTightening: Bool,
+        minimumScale: CGFloat
+    ) -> Self {
+        .adjusts(
+            .init(
+                allowsTightening: allowsTightening,
+                minimumScale: minimumScale
+            )
+        )
+    }
+
+    /// Controls the adjustments applied to a label when it does not fit in the provided layout rect.
+    public struct Adjusts: Hashable {
+
+        /// If the layout should tighten letter spacing when there is not enough spacing to fit the text.
+        public var allowsTightening: Bool
+
+        /// When scaling text down, controls the minimum text before it stops scaling down.
+        public var minimumScale: CGFloat
+    }
+
+    var labelProperties: LabelProperties {
+        switch self {
+        case .noAdjustment:
+            return LabelProperties(
+                adjustsFontToFit: false,
+                allowsTightening: false,
+                minimumScaleFactor: 0
+            )
+        case .adjusts(let adjustment):
+            return LabelProperties(
+                adjustsFontToFit: true,
+                allowsTightening: adjustment.allowsTightening,
+                minimumScaleFactor: adjustment.minimumScale
+            )
+        }
+    }
+
+    struct LabelProperties: Equatable {
+        var adjustsFontToFit: Bool
+        var allowsTightening: Bool
+        var minimumScaleFactor: CGFloat
+
+        func apply(to label: UILabel) {
+            label.adjustsFontSizeToFitWidth = adjustsFontToFit
+            label.allowsDefaultTighteningForTruncation = allowsTightening
+            label.minimumScaleFactor = minimumScaleFactor
+        }
+    }
+
+    func apply(to label: UILabel) {
+        labelProperties.apply(to: label)
+    }
+}
+
 
 extension AttributedLabel {
 

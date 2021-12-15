@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support `CALayerCornerCurve` for `Box` corner styles.
 
+- Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
+
 ### Removed
 
 ### Changed
