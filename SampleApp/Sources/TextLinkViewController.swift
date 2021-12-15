@@ -21,17 +21,12 @@ final class TextLinkViewController: UIViewController {
             $0.linkDetectionTypes = [.link, .phoneNumber, .address, .date]
         }
 
-        return Column {
-            $0.minimumVerticalSpacing = 20
-            $0.addFixed(child: label)
-
-            $0.addFixed(child: Label(text: "Custom link handling:"))
-
-            $0.addFixed(
-                child: label.openLink {
-                    self.presentAlert(message: $0)
-                }
-            )
+        return Column(alignment: .fill, minimumSpacing: 20) {
+            label
+            Label(text: "Custom link handling:")
+            label.onLinkTapped {
+                self.presentAlert(message: $0)
+            }
         }
         .inset(uniform: 20)
         .centered()

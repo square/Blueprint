@@ -99,7 +99,7 @@ extension AttributedLabel {
 
 extension AttributedLabel {
 
-    private final class LabelView: UILabel, UIGestureRecognizerDelegate {
+    private final class LabelView: UILabel {
         /// The touch handling logic explicitly tracks the active links when touches begin, so if you drag outside
         /// the link and touch up over another link, it just cancels the tap rather than accidentally opening
         /// a different link.
@@ -385,7 +385,7 @@ extension AttributedLabel {
             let touchedLinks = links(at: first.location(in: self))
             let activeLinks = Set(touchedLinks).intersection(trackingLinks)
             for link in activeLinks {
-                linkHandler?.open(link: link.text)
+                linkHandler?.onTap(link: link.text)
             }
 
             self.trackingLinks = nil
@@ -437,7 +437,7 @@ extension AttributedLabel {
         }
 
         override func accessibilityActivate() -> Bool {
-            container?.linkHandler?.open(link: link.text)
+            container?.linkHandler?.onTap(link: link.text)
             return true
         }
     }
@@ -451,11 +451,11 @@ extension AttributedLabel {
 /// the link handler in the environment.
 ///
 public protocol LinkHandler {
-    func open(link: String)
+    func onTap(link: String)
 }
 
 struct DefaultLinkHandler: LinkHandler {
-    func open(link: String) {
+    func onTap(link: String) {
         if let url = URL(string: link) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
@@ -463,9 +463,7 @@ struct DefaultLinkHandler: LinkHandler {
 }
 
 public struct LinkHandlerEnvironmentKey: EnvironmentKey {
-    public static var defaultValue: LinkHandler {
-        DefaultLinkHandler()
-    }
+    public static let defaultValue: LinkHandler = DefaultLinkHandler()
 }
 
 extension Environment {
@@ -477,22 +475,18 @@ extension Environment {
 }
 
 struct ClosureLinkHandler: LinkHandler {
-    var openLink: (String) -> Void
+    var onTap: (String) -> Void
 
-    func open(link: String) {
-        openLink(link)
+    func onTap(link: String) {
+        onTap(link)
     }
 }
 
 extension AttributedLabel {
     /// Handle links opened in the receiver using the provided closure.
     ///
-    public func openLink(_ closure: @escaping (String) -> Void) -> Element {
-        AdaptedEnvironment(
-            key: LinkHandlerEnvironmentKey.self,
-            value: ClosureLinkHandler(openLink: closure),
-            wrapping: self
-        )
+    public func onLinkTapped(_ onTap: @escaping (String) -> Void) -> Element {
+        adaptedEnvironment(keyPath: \.linkHandler, value: ClosureLinkHandler(onTap: onTap))
     }
 }
 
