@@ -100,6 +100,13 @@ public final class BlueprintView: UIView {
         }
     }
 
+    public var singlePassLayout: Bool = false {
+        didSet {
+            guard oldValue != singlePassLayout else { return }
+            setNeedsViewHierarchyUpdate()
+        }
+    }
+
     /// An optional name to help identify this view
     public var name: String?
 
@@ -206,8 +213,11 @@ public final class BlueprintView: UIView {
         let measurement = element.content.measure(
             in: constraint,
             environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))"),
+            singlePass: singlePassLayout
         )
+
+        print("measured, sp=\(singlePassLayout), size=\(measurement)")
 
         sizesThatFit[constraint] = measurement
 
@@ -324,9 +334,11 @@ public final class BlueprintView: UIView {
 
         let environment = makeEnvironment()
 
+        print("layout, sp=\(singlePassLayout)")
+
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(frame: frame, environment: environment, singlePass: true)
+            .layout(frame: frame, environment: environment, singlePass: singlePassLayout)
             .resolve() ?? []
 
         let measurementEndDate = Date()
