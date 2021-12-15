@@ -28,7 +28,10 @@ extension Element {
     func singlePassLayout(frame: CGRect, environment: Environment) -> LayoutResultNode {
 
         let attributes = LayoutAttributes(frame: frame)
-        let context = SPLayoutContext(proposedSize: frame.size)
+        let context = SPLayoutContext(
+            proposedSize: frame.size,
+            mode: AxisVarying(horizontal: .fill, vertical: .fill)
+        )
         let cache = CacheFactory.makeCache(name: "\(type(of: self))")
 
         let children = self.content.singlePassLayout(

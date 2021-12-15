@@ -206,3 +206,20 @@ extension SizeConstraint {
         }
     }
 }
+
+extension SizeConstraint {
+    var singlePassSize: CGSize {
+        CGSize(width: width.singlePassValue, height: height.singlePassValue)
+    }
+}
+
+extension SizeConstraint.Axis {
+    var singlePassValue: CGFloat {
+        switch self {
+        case .atMost(let max):
+            return max
+        case .unconstrained:
+            return .infinity
+        }
+    }
+}

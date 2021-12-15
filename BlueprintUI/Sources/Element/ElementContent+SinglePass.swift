@@ -28,6 +28,7 @@ extension ElementContent.Builder {
             return SPLayoutNode(
                 id: id,
                 element: child,
+                context: context,
                 environment: environment,
                 cache: cache.subcache(index: index, of: childCount, element: child)
             )
@@ -72,6 +73,7 @@ extension EnvironmentAdaptingStorage {
                 SPLayoutNode(
                     id: identifier,
                     element: child,
+                    context: context,
                     environment: environment,
                     cache: cache
                 )
@@ -105,6 +107,7 @@ extension LazyStorage {
                 SPLayoutNode(
                     id: identifier,
                     element: child,
+                    context: context,
                     environment: environment,
                     cache: cache
                 )
@@ -165,7 +168,29 @@ public struct SPLayoutContext {
 //    var environment: Environment
 //    var cache: CacheTree
 
-    var proposedSize: CGSize
+    public var proposedSize: CGSize
+
+    public var mode: AxisVarying<SPLayoutMode>
+
+    public init(
+        proposedSize: CGSize,
+        mode: AxisVarying<SPLayoutMode> // = .init(horizontal: .natural, vertical: .natural)
+    ) {
+        self.proposedSize = proposedSize
+        self.mode = mode
+    }
+}
+
+public enum SPLayoutMode: Equatable, CustomStringConvertible {
+    case natural
+    case fill
+
+    public var description: String {
+        switch self {
+        case .natural: return "natural"
+        case .fill: return "fill"
+        }
+    }
 }
 
 public struct SPLayoutAttributes {
@@ -224,15 +249,17 @@ public struct SPNeutralLayout: SingleChildLayout, SPSingleChildLayout {
 
 
 class SPLayoutNode: SPLayoutable {
-    init(id: ElementIdentifier, element: Element, environment: Environment, cache: CacheTree) {
+    init(id: ElementIdentifier, element: Element, context: SPLayoutContext, environment: Environment, cache: CacheTree) {
         self.id = id
         self.element = element
+        self.context = context
         self.environment = environment
         self.cache = cache
     }
 
     var id: ElementIdentifier
     var element: Element
+    var context: SPLayoutContext
     var environment: Environment
     var cache: CacheTree
 
@@ -253,12 +280,39 @@ class SPLayoutNode: SPLayoutable {
             fatalError("\(type(of: element)) layout called \(layoutCount) times")
         }
 
-        let result = element.content.singlePassLayout(
-            in: SPLayoutContext(proposedSize: proposedSize),
+        let layoutMode = AxisVarying(
+            horizontal: options.mode.horizontal ?? context.mode.horizontal,
+            vertical: options.mode.vertical ?? context.mode.vertical
+        )
+
+
+        print("\(type(of: element)) h:\(layoutMode.horizontal) v:\(layoutMode.vertical)")
+
+        var result = element.content.singlePassLayout(
+            in: SPLayoutContext(
+                proposedSize: proposedSize,
+                mode: layoutMode
+            ),
             environment: environment,
             cache: cache
         )
+
+        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
+            let oldWidth = result.intermediate.size.width
+            print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
+            result.intermediate.size.width = width
+        } else {
+//            print("Not applying width to \(type(of: element))")
+        }
+        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
+            let oldHeight = result.intermediate.size.height
+            print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
+            result.intermediate.size.height = height
+        }
+
         layoutResult = result
+
+        assert(result.intermediate.size.isFinite, "\(type(of: element)) layout size must be finite")
 
         return result.intermediate.size
     }
@@ -272,10 +326,42 @@ public struct SPLayoutOptions {
     public var maxAllowedLayoutCount: Int
 
     /// Legacy override for size constraints and "fill" alignments
-    public var sizeOverride: ((CGSize) -> CGSize)
+//    public var sizeOverride: ((CGSize) -> CGSize)
+    public var mode: AxisVarying<SPLayoutMode?>
 
-    public init(maxAllowedLayoutCount: Int = 1, sizeOverride: @escaping ((CGSize) -> CGSize) = { $0 }) {
+    public init(
+        maxAllowedLayoutCount: Int = 1,
+        mode: AxisVarying<SPLayoutMode?> = AxisVarying(horizontal: nil, vertical: nil)
+//        sizeOverride: @escaping ((CGSize) -> CGSize) = { $0 }
+    ) {
         self.maxAllowedLayoutCount = maxAllowedLayoutCount
-        self.sizeOverride = sizeOverride
+        self.mode = mode
+//        self.sizeOverride = sizeOverride
+    }
+}
+
+public struct AxisVarying<T> {
+    public var horizontal: T
+    public var vertical: T
+
+    public init(horizontal: T, vertical: T) {
+        self.horizontal = horizontal
+        self.vertical = vertical
+    }
+}
+
+extension CGFloat {
+    var finiteValue: CGFloat? {
+        isFinite ? self : nil
+    }
+}
+
+extension CGSize {
+    var finiteWidth: CGFloat? {
+        width.finiteValue
+    }
+
+    var finiteHeight: CGFloat? {
+        height.finiteValue
     }
 }

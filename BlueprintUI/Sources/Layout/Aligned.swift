@@ -18,6 +18,15 @@ public struct Aligned: Element {
         case bottom
         /// The content fills the full vertical height of the containing element.
         case fill
+
+        func layoutMode(in mode: SPLayoutMode) -> SPLayoutMode {
+            switch (self, mode) {
+            case (.fill, .fill):
+                return .fill
+            default:
+                return .natural
+            }
+        }
     }
 
     /// The possible horizontal alignment values.
@@ -32,6 +41,15 @@ public struct Aligned: Element {
         case trailing
         /// The content fills the full horizontal width of the containing element.
         case fill
+
+        func layoutMode(in mode: SPLayoutMode) -> SPLayoutMode {
+            switch (self, mode) {
+            case (.fill, .fill):
+                return .fill
+            default:
+                return .natural
+            }
+        }
     }
 
     /// The content element to be aligned.
@@ -108,8 +126,63 @@ public struct Aligned: Element {
 
         func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
 
-            fatalError("TODO")
+            let proposedSize = context.proposedSize
 
+
+//            let options = SPLayoutOptions(
+//                mode: AxisVarying(
+//                    horizontal: horizontalAlignment.layoutMode,
+//                    vertical: verticalAlignment.layoutMode
+//                )
+//            )
+            let options = SPLayoutOptions(
+                mode: AxisVarying(
+                    horizontal: horizontalAlignment.layoutMode(in: context.mode.horizontal),
+                    vertical: verticalAlignment.layoutMode(in: context.mode.vertical)
+                )
+            )
+            let childSize = child.layout(in: proposedSize, options: options)
+
+            let x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat
+
+            if context.mode.vertical == .natural || proposedSize.height.isInfinite {
+                height = childSize.height
+                y = 0
+            } else {
+                height = proposedSize.height
+                switch verticalAlignment {
+                case .top, .fill:
+                    y = 0
+                case .center:
+                    y = (proposedSize.height - childSize.height) / 2.0
+                case .bottom:
+                    y = proposedSize.height - childSize.height
+                }
+            }
+
+            if context.mode.horizontal == .natural || proposedSize.width.isInfinite {
+                width = childSize.width
+                x = 0
+            } else {
+                width = proposedSize.width
+                switch horizontalAlignment {
+                case .leading, .fill:
+                    x = 0
+                case .center:
+                    x = (proposedSize.width - childSize.width) / 2.0
+                case .trailing:
+                    x = proposedSize.width - childSize.width
+                }
+            }
+
+            // TODO: need some sort of dual mode here to decide whether to fill or not
+            // - pressure: in = natural size, out = fill
+            // - atLeast vs exactly
+            return SPLayoutAttributes(
+                size: CGSize(width: width, height: height),
+//                size: childSize,
+                childPositions: [CGPoint(x: x, y: y)]
+            )
         }
     }
 }

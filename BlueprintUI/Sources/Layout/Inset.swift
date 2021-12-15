@@ -161,8 +161,18 @@ extension Inset {
 
         func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
 
-            fatalError("TODO")
+            var proposedSize = context.proposedSize
+            proposedSize.width -= left + right
+            proposedSize.height -= top + bottom
 
+            var size = child.layout(in: proposedSize)
+            size.width += left + right
+            size.height += top + bottom
+
+            return SPLayoutAttributes(
+                size: size,
+                childPositions: [CGPoint(x: left, y: top)]
+            )
         }
     }
 }
