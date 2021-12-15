@@ -376,8 +376,17 @@ extension StackLayout {
             return SPLayoutAttributes(size: .zero)
         }
 
-        let vectorConstraint = context.proposedSize.vectorConstraint(axis: axis)
-        let layoutOptions = SPLayoutOptions(maxAllowedLayoutCount: 2)
+        let vectorConstraint = context.vectorConstraint(on: axis)
+
+        let axisLayoutMode = alignment.layoutMode
+        let mode: AxisVarying<SPLayoutMode?> = axis == .horizontal
+            ? AxisVarying(horizontal: .natural, vertical: axisLayoutMode)
+            : AxisVarying(horizontal: axisLayoutMode, vertical: .natural)
+
+        let layoutOptions = SPLayoutOptions(
+            maxAllowedLayoutCount: 2,
+            mode: mode
+        )
 
         let items: [(traits: Traits, content: Measurable)] = children.map { (traits, layoutable) in
             let measurable = Measurer { constraint in
@@ -923,6 +932,17 @@ extension StackLayout {
 
 // MARK: - Extensions
 
+extension StackLayout.Alignment {
+    var layoutMode: SPLayoutMode {
+        switch self {
+        case .align:
+            return .natural
+        case .fill:
+            return .fill
+        }
+    }
+}
+
 extension CGSize {
 
     fileprivate func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
@@ -1118,5 +1138,23 @@ extension ElementBuilder where Child == StackLayout.Child {
 extension StackLayout.Child: ElementBuilderChild {
     public init(_ element: Element) {
         self.init(element: element)
+    }
+}
+
+extension SPLayoutContext {
+    func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
+        let width: StackLayout.VectorConstraint.Axis = mode.horizontal == .fill
+            ? .exactly(proposedSize.width)
+            : .atMost(proposedSize.width)
+        let height: StackLayout.VectorConstraint.Axis = mode.vertical == .fill
+            ? .exactly(proposedSize.height)
+            : .atMost(proposedSize.height)
+
+        switch axis {
+        case .horizontal:
+            return StackLayout.VectorConstraint(axis: width, cross: height)
+        case .vertical:
+            return StackLayout.VectorConstraint(axis: height, cross: width)
+        }
     }
 }
