@@ -21,11 +21,38 @@ final class TextLinkViewController: UIViewController {
             $0.linkDetectionTypes = [.link, .phoneNumber, .address, .date]
         }
 
+        let centered = NSMutableParagraphStyle()
+        centered.alignment = NSTextAlignment.center
+
+        let right = NSMutableParagraphStyle()
+        right.alignment = NSTextAlignment.right
+
+        let justified = NSMutableParagraphStyle()
+        justified.alignment = NSTextAlignment.justified
+
         return Column(alignment: .fill, minimumSpacing: 20) {
             label
             Label(text: "Custom link handling:")
             label.onLinkTapped {
-                self.presentAlert(message: $0)
+                self.presentAlert(message: $0.absoluteString)
+            }
+
+            AttributedLabel(attributedText: NSAttributedString(string: "https://squareup.com")) {
+                $0.linkDetectionTypes = [.link]
+            }
+
+            AttributedLabel(attributedText: NSAttributedString(
+                string: "https://squareup.com",
+                attributes: [.paragraphStyle: centered]
+            )) {
+                $0.linkDetectionTypes = [.link]
+            }
+
+            AttributedLabel(attributedText: NSAttributedString(
+                string: "https://squareup.com",
+                attributes: [.paragraphStyle: right]
+            )) {
+                $0.linkDetectionTypes = [.link]
             }
         }
         .inset(uniform: 20)

@@ -39,29 +39,26 @@ public struct AttributedLabel: Element, Hashable {
     }
 
     public var content: ElementContent {
-        struct Measurer: Measurable {
+        struct Measurer {
             private static let prototypeLabel = LabelView()
 
-            var model: AttributedLabel
-
-            func measure(in constraint: SizeConstraint) -> CGSize {
+            func measure(model: AttributedLabel, in constraint: SizeConstraint, environment: Environment) -> CGSize {
                 let label = Self.prototypeLabel
-                label.update(model: model, linkHandler: nil, isMeasuring: true)
+                label.update(model: model, environment: environment, isMeasuring: true)
                 return label.sizeThatFits(constraint.maximum)
             }
         }
 
-        return ElementContent(
-            measurable: Measurer(model: self),
-            measurementCachingKey: .init(type: Self.self, input: self)
-        )
+        return ElementContent(measurementCachingKey: .init(type: Self.self, input: self)) { sizeConstraint, environment -> CGSize in
+            Measurer().measure(model: self, in: sizeConstraint, environment: environment)
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         LabelView.describe { config in
             config.frameRoundingBehavior = .prioritizeSize
             config.apply { view in
-                view.update(model: self, linkHandler: context.environment.linkHandler, isMeasuring: false)
+                view.update(model: self, environment: context.environment, isMeasuring: false)
             }
         }
     }
@@ -105,15 +102,11 @@ extension AttributedLabel {
         /// a different link.
         private var trackingLinks: [Link]?
 
+        private var layoutDirection: Environment.LayoutDirection = .leftToRight
         private var linkDetectionTypes: Set<LinkDetectionType> = []
         private var linkAttributes: [NSAttributedString.Key: Any] = [:]
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
-
-        private var links: [Link] = [] {
-            didSet {
-                isUserInteractionEnabled = !links.isEmpty
-            }
-        }
+        private var links: [Link] = []
 
         private var textRectOffset: UIOffset = .zero {
             didSet {
@@ -150,10 +143,10 @@ extension AttributedLabel {
             }
         }
 
-        var linkHandler: LinkHandler?
+        var urlHandler: URLHandler?
 
-        func update(model: AttributedLabel, linkHandler: LinkHandler?, isMeasuring: Bool) {
-            let previousString = attributedText?.string
+        func update(model: AttributedLabel, environment: Environment, isMeasuring: Bool) {
+            let previousAttributedText = attributedText
 
             linkAttributes = model.linkAttributes
             activeLinkAttributes = model.activeLinkAttributes
@@ -164,11 +157,11 @@ extension AttributedLabel {
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
             isAccessibilityElement = model.isAccessibilityElement
-            self.linkHandler = linkHandler
+            urlHandler = environment.urlHandler
+            layoutDirection = environment.layoutDirection
 
-            if !isMeasuring, previousString != attributedText?.string {
+            if !isMeasuring, previousAttributedText != attributedText {
                 links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
-                accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
             }
 
             applyLinkColors()
@@ -200,8 +193,10 @@ extension AttributedLabel {
 
             textContainer.lineFragmentPadding = 0
             textContainer.lineBreakMode = lineBreakMode
+            textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
 
+            layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
             textStorage.addLayoutManager(layoutManager)
             textStorage.setAttributedString(attributedText)
@@ -217,14 +212,44 @@ extension AttributedLabel {
                 return []
             }
 
+            func alignmentMultiplier() -> CGFloat {
+                var alignment: NSTextAlignment = .natural
+
+                textStorage.enumerateAttribute(
+                    .paragraphStyle,
+                    in: textStorage.entireRange,
+                    options: []
+                ) { style, range, continuePointer in
+                    if let style = style as? NSParagraphStyle, range == textStorage.entireRange {
+                        alignment = style.alignment
+                        continuePointer.pointee = false
+                    }
+                }
+
+                switch (alignment, layoutDirection) {
+                case (.left, _),
+                     (.justified, _),
+                     (.natural, .leftToRight):
+                    return 0
+                case (.right, _),
+                     (.natural, .rightToLeft):
+                    return 1
+                case (.center, _):
+                    return 0.5
+                @unknown default:
+                    return 0
+                }
+            }
+
             let labelSize = bounds.size
+            let alignmentMultiplier = alignmentMultiplier()
             let textBoundingBox = layoutManager.usedRect(for: textContainer).offsetBy(
                 dx: textRectOffset.horizontal,
                 dy: textRectOffset.vertical
             )
             let textContainerOffset = CGPoint(
-                x: (labelSize.width - textBoundingBox.size.width) * 0.5 - textBoundingBox.origin.x,
-                y: (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
+                x: (labelSize.width - textBoundingBox.size.width) * alignmentMultiplier - textBoundingBox.origin.x,
+                y: (labelSize.height - textBoundingBox.size.height) * alignmentMultiplier - textBoundingBox.origin.y
             )
             let locationInTextContainer = CGPoint(
                 x: location.x - textContainerOffset.x,
@@ -253,9 +278,9 @@ extension AttributedLabel {
                 options: []
             ) { link, range, _ in
                 if let link = link as? URL {
-                    links.append(.init(text: link.absoluteString, range: range))
-                } else if let link = link as? String {
-                    links.append(.init(text: link, range: range))
+                    links.append(.init(url: link, range: range))
+                } else if let link = link as? String, let url = URL(string: link) {
+                    links.append(.init(url: url, range: range))
                 }
             }
 
@@ -290,13 +315,13 @@ extension AttributedLabel {
                         let charactersToRemove = CharacterSet.decimalDigits.inverted
                         let trimmedPhoneNumber = phoneNumber.components(separatedBy: charactersToRemove).joined()
                         if let url = URL(string: "tel:\(trimmedPhoneNumber)") {
-                            links.append(.init(text: url.absoluteString, range: result.range))
+                            links.append(.init(url: url, range: result.range))
                         }
                     }
 
                 case .link:
                     if let url = result.url {
-                        links.append(.init(text: url.absoluteString, range: result.range))
+                        links.append(.init(url: url, range: result.range))
                     }
 
                 case .address:
@@ -317,7 +342,7 @@ extension AttributedLabel {
                         if let urlQuery = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                            let url = URL(string: "https://maps.apple.com/?address=\(urlQuery)")
                         {
-                            links.append(.init(text: url.absoluteString, range: result.range))
+                            links.append(.init(url: url, range: result.range))
                         }
                     }
 
@@ -325,7 +350,7 @@ extension AttributedLabel {
                     if let date = result.date,
                        let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")
                     {
-                        links.append(.init(text: url.absoluteString, range: result.range))
+                        links.append(.init(url: url, range: result.range))
                     }
 
                 default:
@@ -385,7 +410,7 @@ extension AttributedLabel {
             let touchedLinks = links(at: first.location(in: self))
             let activeLinks = Set(touchedLinks).intersection(trackingLinks)
             for link in activeLinks {
-                linkHandler?.onTap(link: link.text)
+                urlHandler?.onTap(url: link.url)
             }
 
             self.trackingLinks = nil
@@ -402,7 +427,7 @@ extension AttributedLabel {
 
 extension AttributedLabel {
     struct Link: Equatable, Hashable {
-        var text: String
+        var url: URL
         var range: NSRange
     }
 
@@ -437,56 +462,17 @@ extension AttributedLabel {
         }
 
         override func accessibilityActivate() -> Bool {
-            container?.linkHandler?.onTap(link: link.text)
+            container?.urlHandler?.onTap(url: link.url)
             return true
         }
-    }
-}
-
-// MARK: Environment
-
-/// Conform to this protocol to handle links tapped in an `AttributedLabel`.
-///
-/// Use the `LinkHandlerEnvironmentKey` or `Environment.linkHandler` property to override
-/// the link handler in the environment.
-///
-public protocol LinkHandler {
-    func onTap(link: String)
-}
-
-struct DefaultLinkHandler: LinkHandler {
-    func onTap(link: String) {
-        if let url = URL(string: link) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        }
-    }
-}
-
-public struct LinkHandlerEnvironmentKey: EnvironmentKey {
-    public static let defaultValue: LinkHandler = DefaultLinkHandler()
-}
-
-extension Environment {
-    /// The link handler to use to open links tapped in an `AttributedLabel`.
-    public var linkHandler: LinkHandler {
-        get { self[LinkHandlerEnvironmentKey.self] }
-        set { self[LinkHandlerEnvironmentKey.self] = newValue }
-    }
-}
-
-struct ClosureLinkHandler: LinkHandler {
-    var onTap: (String) -> Void
-
-    func onTap(link: String) {
-        onTap(link)
     }
 }
 
 extension AttributedLabel {
     /// Handle links opened in the receiver using the provided closure.
     ///
-    public func onLinkTapped(_ onTap: @escaping (String) -> Void) -> Element {
-        adaptedEnvironment(keyPath: \.linkHandler, value: ClosureLinkHandler(onTap: onTap))
+    public func onLinkTapped(_ onTap: @escaping (URL) -> Void) -> Element {
+        adaptedEnvironment(keyPath: \.urlHandler, value: ClosureURLHandler(onTap: onTap))
     }
 }
 
@@ -510,7 +496,8 @@ extension NSAttributedString {
         NSRange(location: 0, length: length)
     }
 
-    /// Apply a system font of size 17 (the UILabel default) to any runs of attributes with no font.
+    /// Apply the default label font to any runs with no font attribute. This ensures the NSTextStorage is rendering
+    /// the same attributes as the label.
     fileprivate func applyingDefaultFont() -> NSAttributedString {
         let mutableString = NSMutableAttributedString(attributedString: self)
 
@@ -520,7 +507,7 @@ extension NSAttributedString {
             options: [.longestEffectiveRangeNotRequired]
         ) { font, range, _ in
             if font == nil {
-                mutableString.addAttribute(.font, value: UIFont.systemFont(ofSize: 17) as Any, range: range)
+                mutableString.addAttribute(.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: range)
             }
         }
 
