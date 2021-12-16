@@ -147,6 +147,24 @@ class AttributedLabelTests: XCTestCase {
             scale: UIScreen.main.scale
         )
     }
+
+    func test_linkDetection() {
+        let string = NSAttributedString(string: "Phone: (555) 555-5555 Address: 1455 Market St URL: https://block.xyz Date: 12/1/12")
+        let element = AttributedLabel(attributedText: string) {
+            $0.linkDetectionTypes = [.link, .address, .phoneNumber, .date]
+        }
+
+        compareSnapshot(of: element)
+    }
+
+    func test_linkAttribute() {
+        let string = NSAttributedString(string: "Some text", attributes: [.link: "https://block.xyz"])
+        let element = AttributedLabel(attributedText: string) {
+            $0.linkAttributes = [.foregroundColor: UIColor.red, .backgroundColor: UIColor.black]
+        }
+
+        compareSnapshot(of: element)
+    }
 }
 
 

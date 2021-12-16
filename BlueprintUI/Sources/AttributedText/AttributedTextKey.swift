@@ -95,3 +95,17 @@ extension TextAttributeContainer {
         set { self[ParagraphStyleKey.self] = newValue }
     }
 }
+
+// MARK: Link
+
+public enum LinkKey: AttributedTextKey {
+    public typealias Value = URL
+    public static var name: NSAttributedString.Key { .link }
+}
+
+extension TextAttributeContainer {
+    public var link: URL? {
+        get { self[LinkKey.self] }
+        set { self[LinkKey.self] = newValue }
+    }
+}
