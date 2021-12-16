@@ -11,13 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support `CALayerCornerCurve` for `Box` corner styles.
-- Added `AttributedText`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
-- Added support for links to `AttributedLabel`:
-  - Links can be added using the `link` attribute of the attributed string. This attribute supports `URL`s or `String`s.
-  - The label also supports detecting certain types of data and links, much like UITextView. Use the `linkDetectionTypes` property to specify which types of data to detect.
-  - Links are opened using the `LinkHandler` in the environment, which by default uses `UIApplication.shared.open(_:options:completionHandler:)`. Customize link handling by providing a `LinkHandler` to the environment at the appropriate scope. `AttributedLabel` also has a function for easily handling links with a closure using the `openLinks` method.
-
 ### Removed
 
 ### Changed
@@ -31,6 +24,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.34.0] - 2021-12-16
+
+### Added
+
+- Support `CALayerCornerCurve` for `Box` corner styles.
+- Added `AttributedText`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
+- Added support for links to `AttributedLabel`:
+  - Links can be added using the `link` attribute of the attributed string. This attribute supports `URL`s or `String`s.
+  - The label also supports detecting certain types of data and links, much like UITextView. Use the `linkDetectionTypes` property to specify which types of data to detect.
+  - Links are opened using the `LinkHandler` in the environment, which by default uses `UIApplication.shared.open(_:options:completionHandler:)`. Customize link handling by providing a `LinkHandler` to the environment at the appropriate scope. `AttributedLabel` also has a function for easily handling links with a closure using the `openLinks` method.
 
 ## [0.33.3] - 2021-12-8
 
@@ -749,7 +753,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.33.3...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.34.0...HEAD
+[0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0
 [0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
 [0.33.2]: https://github.com/square/Blueprint/compare/0.33.1...0.33.2
 [0.33.1]: https://github.com/square/Blueprint/compare/0.33.0...0.33.1
