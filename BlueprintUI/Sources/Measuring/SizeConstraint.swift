@@ -208,7 +208,7 @@ extension SizeConstraint {
 }
 
 extension SizeConstraint {
-    var singlePassSize: CGSize {
+    public var singlePassSize: CGSize {
         CGSize(width: width.singlePassValue, height: height.singlePassValue)
     }
 }

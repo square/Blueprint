@@ -34,11 +34,13 @@ extension Element {
         )
         let cache = CacheFactory.makeCache(name: "\(type(of: self))")
 
-        let children = self.content.singlePassLayout(
+        let subtree = self.content.singlePassLayout(
             in: context,
             environment: environment,
             cache: cache
         )
+
+        let children = subtree
         .resolve()
 
         let root = LayoutResultNode(
