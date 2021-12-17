@@ -77,7 +77,7 @@ extension LazyStorage {
         environment: Environment,
         cache: CacheTree
     ) -> SPSubtreeResult {
-        let child = buildChild(in: .init(context.proposedSize), environment: environment)
+        let child = buildChild(in: .init(context.proposedSize), environment: environment, cache: cache.outOfBandCache)
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let cache = cache.subcache(element: child)
 

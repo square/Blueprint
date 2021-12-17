@@ -24,7 +24,7 @@ public struct EnvironmentReader: Element {
     }
 
     public var content: ElementContent {
-        ElementContent { _, environment in
+        ElementContent { _, environment, _ in
             self.elementRepresentation(environment)
         }
     }
