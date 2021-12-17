@@ -334,7 +334,7 @@ public final class BlueprintView: UIView {
 
         let environment = makeEnvironment()
 
-        print("layout, sp=\(singlePassLayout)")
+//        print("layout, sp=\(singlePassLayout)")
 
         /// Grab view descriptions
         let viewNodes = element?

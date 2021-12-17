@@ -45,7 +45,10 @@ fileprivate struct AbstractElement: Element {
         ElementContent(child: wrappedElement, layout: Layout())
     }
 
-    private struct Layout: SingleChildLayout {
+    private struct Layout: SingleChildLayout, SPSingleChildLayout {
+        func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+            fatalError()
+        }
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             .zero
         }

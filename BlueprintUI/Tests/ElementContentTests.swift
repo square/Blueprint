@@ -204,7 +204,7 @@ fileprivate struct SimpleElement: Element {
 }
 
 
-fileprivate struct FrameLayout: Layout {
+fileprivate struct FrameLayout: Layout, SPLayout {
 
     typealias Traits = CGRect
 
@@ -223,9 +223,12 @@ fileprivate struct FrameLayout: Layout {
         CGRect.zero
     }
 
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+        fatalError()
+    }
 }
 
-private struct HalfLayout: Layout {
+private struct HalfLayout: Layout, SPLayout {
     func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
         let halfConstraint = SizeConstraint(
             width: constraint.width / 2,
@@ -244,13 +247,16 @@ private struct HalfLayout: Layout {
             LayoutAttributes(size: $1.measure(in: halfConstraint))
         }
     }
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+        fatalError()
+    }
 }
 
 private class TestCounter {
     var measures: Int = 0
 }
 
-private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout: Layout {
+private struct MeasureCountingLayout<WrappedLayout>: Layout, SPLayout where WrappedLayout: Layout & SPLayout {
     static var defaultTraits: Traits { WrappedLayout.defaultTraits }
 
     typealias Traits = WrappedLayout.Traits
@@ -265,6 +271,10 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
 
     func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         layout.layout(size: size, items: items)
+    }
+
+    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+        layout.layout(in: context, children: children)
     }
 }
 
@@ -282,9 +292,12 @@ private struct MeasureCountingSpacer: Element {
         nil
     }
 
-    struct FixedLayout: Layout {
+    struct FixedLayout: Layout, SPLayout {
         var size: CGSize
 
+        func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+            fatalError()
+        }
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
             size
         }

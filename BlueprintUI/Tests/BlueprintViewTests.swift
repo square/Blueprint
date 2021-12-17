@@ -767,7 +767,10 @@ private struct TestContainer: Element {
         nil
     }
 
-    private class TestLayout: Layout {
+    private class TestLayout: Layout,  SPLayout {
+        func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+            fatalError()
+        }
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
             .zero
         }

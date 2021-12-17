@@ -30,8 +30,10 @@ final class MeasurementCache {
         )
 
         if let existing = measurements[innerKey] {
+            print("o hit")
             return existing
         }
+        print("x miss")
 
         let size = measure()
 
