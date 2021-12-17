@@ -1143,12 +1143,24 @@ extension StackLayout.Child: ElementBuilderChild {
 
 extension SPLayoutContext {
     func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
-        let width: StackLayout.VectorConstraint.Axis = mode.horizontal == .fill
-            ? .exactly(proposedSize.width)
-            : .atMost(proposedSize.width)
-        let height: StackLayout.VectorConstraint.Axis = mode.vertical == .fill
-            ? .exactly(proposedSize.height)
-            : .atMost(proposedSize.height)
+        let width: StackLayout.VectorConstraint.Axis
+        let height: StackLayout.VectorConstraint.Axis
+
+        if !proposedSize.width.isFinite {
+            width = .unconstrained
+        } else if mode.horizontal == .fill {
+            width = .exactly(proposedSize.width)
+        } else {
+            width = .atMost(proposedSize.width)
+        }
+
+        if !proposedSize.height.isFinite {
+            height = .unconstrained
+        } else if mode.vertical == .fill {
+            height = .exactly(proposedSize.height)
+        } else {
+            height = .atMost(proposedSize.height)
+        }
 
         switch axis {
         case .horizontal:

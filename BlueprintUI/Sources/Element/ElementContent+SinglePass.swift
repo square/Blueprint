@@ -56,28 +56,17 @@ extension EnvironmentAdaptingStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let cache = cache.subcache(element: child)
 
-        // or, a NeutralLayout, and hoist the behavior to ElementContent
-
-        let r = child.content.singlePassLayout(
-            in: context,
+        let node = SPLayoutNode(
+            id: identifier,
+            element: child,
+            context: context,
             environment: environment,
             cache: cache
         )
 
         return SPSubtreeResult(
-            intermediate: SPLayoutAttributes(
-                size: r.intermediate.size,
-                childPositions: [.zero]
-            ),
-            children: [
-                SPLayoutNode(
-                    id: identifier,
-                    element: child,
-                    context: context,
-                    environment: environment,
-                    cache: cache
-                )
-            ]
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
         )
     }
 }
@@ -92,26 +81,26 @@ extension LazyStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let cache = cache.subcache(element: child)
 
-        let r = child.content.singlePassLayout(
-            in: context,
+        let node = SPLayoutNode(
+            id: identifier,
+            element: child,
+            context: context,
             environment: environment,
             cache: cache
         )
 
         return SPSubtreeResult(
-            intermediate: SPLayoutAttributes(
-                size: r.intermediate.size,
-                childPositions: [.zero]
-            ),
-            children: [
-                SPLayoutNode(
-                    id: identifier,
-                    element: child,
-                    context: context,
-                    environment: environment,
-                    cache: cache
-                )
-            ]
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
+        )
+    }
+}
+
+struct NeutralLayout: SPSingleChildLayout {
+    func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
+        SPLayoutAttributes(
+            size: child.layout(in: context.proposedSize),
+            childPositions: [.zero]
         )
     }
 }
@@ -225,7 +214,7 @@ public protocol SPLayoutable {
 }
 
 extension SPLayoutable {
-    func layout(in proposedSize: CGSize) -> CGSize {
+    public func layout(in proposedSize: CGSize) -> CGSize {
         layout(in: proposedSize, options: .default)
     }
 }
@@ -312,7 +301,15 @@ class SPLayoutNode: SPLayoutable {
 
         layoutResult = result
 
-        assert(result.intermediate.size.isFinite, "\(type(of: element)) layout size must be finite")
+        assert(
+            result.intermediate.size.isFinite,
+            "\(type(of: element)) layout size must be finite"
+        )
+
+        assert(
+            result.intermediate.childPositions.allSatisfy { $0.isFinite },
+            "\(type(of: element)) child positions must be finite"
+        )
 
         return result.intermediate.size
     }
