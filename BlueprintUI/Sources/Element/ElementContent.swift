@@ -17,7 +17,7 @@ public struct ElementContent {
     /// - parameter layout: The layout to use.
     /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter configure: A closure that configures the layout and adds children to the container.
-    public init<LayoutType: Layout & SPLayout>(
+    public init<LayoutType: Layout>(
         layout: LayoutType,
         measurementCachingKey: MeasurementCachingKey? = nil,
         configure: (inout Builder<LayoutType>) -> Void = { _ in }
@@ -41,7 +41,7 @@ public struct ElementContent {
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent"),
-            singlePass: true
+            singlePass: false
         )
     }
 

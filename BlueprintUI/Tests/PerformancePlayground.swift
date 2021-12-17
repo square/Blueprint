@@ -23,7 +23,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+         super.invokeTest()
     }
 
     func test_repeated_layouts() {
@@ -35,10 +35,14 @@ class PerformancePlayground: XCTestCase {
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
 
-        determineAverage(for: 10.0) {
+        determineAverage(for: 10.0, view: view) {
             view.element = element
             view.layoutIfNeeded()
         }
+    }
+
+    override class func setUp() {
+        BlueprintLogging.enabled = true
     }
 
     func test_deep_element_hierarchy() {
@@ -65,7 +69,7 @@ class PerformancePlayground: XCTestCase {
         let view = BlueprintView()
         view.frame.size = CGSize(width: 1000.0, height: 10000)
 
-        determineAverage(for: 10.0) {
+        determineAverage(for: 2, view: view) {
             view.element = stack
             view.layoutIfNeeded()
         }
@@ -109,6 +113,16 @@ class PerformancePlayground: XCTestCase {
             view.element = tree
             view.layoutIfNeeded()
         }
+    }
+
+    func determineAverage(for seconds: TimeInterval, view: BlueprintView, using block: () -> Void) {
+        view.singlePassLayout = false
+        print("SPL: OFF")
+        determineAverage(for: seconds, using: block)
+
+        view.singlePassLayout = true
+        print("SPL: ON")
+        determineAverage(for: seconds, using: block)
     }
 
     func determineAverage(for seconds: TimeInterval, using block: () -> Void) {

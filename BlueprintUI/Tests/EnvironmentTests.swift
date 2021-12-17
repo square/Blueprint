@@ -257,7 +257,10 @@ private struct TestElement: Element {
         )
     }
 
-    struct TestLayout: Layout {
+    struct TestLayout: Layout, SPLayout {
+        func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
+            fatalError()
+        }
         var value: TestValue
 
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {

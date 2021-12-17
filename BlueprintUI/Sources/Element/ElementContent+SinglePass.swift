@@ -275,7 +275,7 @@ class SPLayoutNode: SPLayoutable {
         )
 
 
-        print("\(type(of: element)) h:\(layoutMode.horizontal) v:\(layoutMode.vertical)")
+//        print("\(type(of: element)) h:\(layoutMode.horizontal) v:\(layoutMode.vertical)")
 
         var result = element.content.singlePassLayout(
             in: SPLayoutContext(
@@ -288,14 +288,14 @@ class SPLayoutNode: SPLayoutable {
 
         if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
             let oldWidth = result.intermediate.size.width
-            print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
+//            print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
             result.intermediate.size.width = width
         } else {
 //            print("Not applying width to \(type(of: element))")
         }
         if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
             let oldHeight = result.intermediate.size.height
-            print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
+//            print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
             result.intermediate.size.height = height
         }
 
