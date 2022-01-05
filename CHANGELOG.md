@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Label.font` now defaults to using a font of size `UIFont.labelFontSize` (17) instead of `UIFont.systemFontSize`.
+
 ### Deprecated
 
 ### Security

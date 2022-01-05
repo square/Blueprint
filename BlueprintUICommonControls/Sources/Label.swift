@@ -8,7 +8,7 @@ public struct Label: ProxyElement {
     /// The text to be displayed.
     public var text: String
 
-    public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
+    public var font: UIFont = UIFont.systemFont(ofSize: UIFont.labelFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
