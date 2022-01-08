@@ -192,9 +192,14 @@ extension AttributedLabel {
             let textContainer = NSTextContainer()
 
             textContainer.lineFragmentPadding = 0
-            textContainer.lineBreakMode = lineBreakMode
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
+
+            /// This can only be set if we have one line because NSTextContainer assumes the number of lines is 1 if
+            /// anything other than wrapping by word or character. This should still work correctly usually.
+            if numberOfLines == 1 {
+                textContainer.lineBreakMode = lineBreakMode
+            }
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
