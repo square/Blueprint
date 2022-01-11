@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
+
 ### Added
+
+- `LayoutWriter.Context` now exposes the layout phase, to differ any calculations between measurement and layout.
 
 ### Removed
 

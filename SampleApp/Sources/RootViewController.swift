@@ -43,7 +43,7 @@ final class RootViewController: UIViewController {
     var contents: Element {
         Column { column in
             column.minimumVerticalSpacing = 20.0
-            column.horizontalAlignment = .fill
+            column.horizontalAlignment = .leading
 
             self.demos.forEach { demo in
                 column.add(child: demo)
