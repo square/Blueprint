@@ -2,6 +2,14 @@ import BlueprintUI
 import Foundation
 import UIKit
 
+enum Fix {
+    case none // broken
+    case applyLineBreakModeToContainer // doesn't work :/
+    case applyLineBreakModeToAttributedString // only solution I could find
+}
+
+let fix: Fix = .applyLineBreakModeToAttributedString
+
 public struct AttributedLabel: Element, Hashable {
 
     public var attributedText: NSAttributedString
@@ -207,12 +215,16 @@ extension AttributedLabel {
 
             var lineBreakAdjustedText = AttributedText(attributedText)
 
-            if numberOfLines != 1, let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
-                if paragraphStyle.lineBreakMode != .byWordWrapping && paragraphStyle.lineBreakMode != .byCharWrapping {
-                    paragraphStyle.lineBreakMode = .byWordWrapping
-                }
+            if fix == .applyLineBreakModeToAttributedString {
+                // If our numberOfLines != 1 and our line break mode isn't a wrapping one, we need to set it to
+                // a wrapping one or the text container won't wrap the text.
+                if numberOfLines != 1, let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+                    if paragraphStyle.lineBreakMode != .byWordWrapping && paragraphStyle.lineBreakMode != .byCharWrapping {
+                        paragraphStyle.lineBreakMode = .byWordWrapping
+                    }
 
-                lineBreakAdjustedText.paragraphStyle = paragraphStyle
+                    lineBreakAdjustedText.paragraphStyle = paragraphStyle
+                }
             }
 
             let textStorage = NSTextStorage()
@@ -222,6 +234,12 @@ extension AttributedLabel {
             textContainer.lineFragmentPadding = 0
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
+
+            if fix == .applyLineBreakModeToContainer {
+                // This is the default actually. And setting it does nothing if the attributed string paragraph style
+                // has a "broken" line break mode.
+                textContainer.lineBreakMode = .byWordWrapping
+            }
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
