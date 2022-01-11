@@ -248,10 +248,7 @@ extension AttributedLabel {
 
             let labelSize = bounds.size
             let alignmentMultiplier = alignmentMultiplier()
-            let textBoundingBox = layoutManager.usedRect(for: textContainer).offsetBy(
-                dx: textRectOffset.horizontal,
-                dy: textRectOffset.vertical
-            )
+            let textBoundingBox = layoutManager.usedRect(for: textContainer)
             let textContainerOffset = CGPoint(
                 x: (labelSize.width - textBoundingBox.size.width) * alignmentMultiplier - textBoundingBox.origin.x,
                 y: (labelSize.height - textBoundingBox.size.height) * alignmentMultiplier - textBoundingBox.origin.y
