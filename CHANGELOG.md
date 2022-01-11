@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the `EditingMenu` element, which allows showing a `UIMenuController` (aka the system editing menu) on tap, long press, or based on a trigger.
+
 ### Removed
 
 ### Changed
