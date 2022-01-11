@@ -2,13 +2,8 @@ import BlueprintUI
 import Foundation
 import UIKit
 
-enum Fix {
-    case none // broken
-    case applyLineBreakModeToContainer // doesn't work :/
-    case applyLineBreakModeToAttributedString // only solution I could find
-}
-
-let fix: Fix = .applyLineBreakModeToAttributedString
+let applyAttributedTextFix = true
+let applyTextContainerFix = true
 
 public struct AttributedLabel: Element, Hashable {
 
@@ -215,14 +210,11 @@ extension AttributedLabel {
 
             var lineBreakAdjustedText = AttributedText(attributedText)
 
-            if fix == .applyLineBreakModeToAttributedString {
+            if applyAttributedTextFix {
                 // If our numberOfLines != 1 and our line break mode isn't a wrapping one, we need to set it to
                 // a wrapping one or the text container won't wrap the text.
-                if numberOfLines != 1, let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
-                    if paragraphStyle.lineBreakMode != .byWordWrapping && paragraphStyle.lineBreakMode != .byCharWrapping {
-                        paragraphStyle.lineBreakMode = .byWordWrapping
-                    }
-
+                if let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+                    paragraphStyle.lineBreakMode = paragraphStyle.lineBreakMode.effectiveLineBreakMode(for: numberOfLines)
                     lineBreakAdjustedText.paragraphStyle = paragraphStyle
                 }
             }
@@ -235,10 +227,8 @@ extension AttributedLabel {
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
 
-            if fix == .applyLineBreakModeToContainer {
-                // This is the default actually. And setting it does nothing if the attributed string paragraph style
-                // has a "broken" line break mode.
-                textContainer.lineBreakMode = .byWordWrapping
+            if applyTextContainerFix {
+                textContainer.lineBreakMode = lineBreakMode.effectiveLineBreakMode(for: numberOfLines)
             }
 
             layoutManager.usesFontLeading = false
@@ -530,6 +520,16 @@ extension UIOffset: Hashable {
 extension NSAttributedString.Key {
     fileprivate static var labelLink: NSAttributedString.Key {
         NSAttributedString.Key(rawValue: "BlueprintUICommonControls.AttributedLabel.Link")
+    }
+}
+
+extension NSLineBreakMode {
+    fileprivate func effectiveLineBreakMode(for numberOfLines: Int) -> NSLineBreakMode {
+        if numberOfLines != 1 && (self != .byCharWrapping || self != .byWordWrapping) {
+            return .byWordWrapping
+        }
+
+        return self
     }
 }
 
