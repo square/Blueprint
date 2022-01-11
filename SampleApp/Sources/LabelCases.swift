@@ -44,6 +44,21 @@ class LabelCasesViewController: UIViewController {
                     }
                 }
             }
+
+
+            Label(text: "No paragraph style") { label in
+                label.font = .boldSystemFont(ofSize: UIFont.systemFontSize)
+            }
+
+            for numberOfLines in [0, 1, 2] {
+                AttributedLabel(attributedText: {
+                    var text = AttributedText(text)
+                    text.font = .systemFont(ofSize: UIFont.labelFontSize)
+                    return text.attributedString
+                }()) { label in
+                    label.numberOfLines = numberOfLines
+                }
+            }
         }
         .inset(uniform: 8)
         .scrollable()
