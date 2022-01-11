@@ -108,6 +108,15 @@ extension AttributedLabel {
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
         private var links: [Link] = []
 
+        private var containerLineBreakMode: NSLineBreakMode {
+            // These line break modes don't work when numberOfLines is not 1, and result in the container
+            // measuring the height of only 1 line
+            if numberOfLines != 1 && (lineBreakMode == .byTruncatingHead || lineBreakMode == .byTruncatingMiddle || lineBreakMode == .byTruncatingTail) {
+                return .byWordWrapping
+            }
+            return lineBreakMode
+        }
+
         private var textRectOffset: UIOffset = .zero {
             didSet {
                 if oldValue != textRectOffset {
@@ -194,12 +203,7 @@ extension AttributedLabel {
             textContainer.lineFragmentPadding = 0
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
-
-            /// This can only be set if we have one line because NSTextContainer assumes the number of lines is 1 if
-            /// anything other than wrapping by word or character. This should still work correctly usually.
-            if numberOfLines == 1 {
-                textContainer.lineBreakMode = lineBreakMode
-            }
+//            textContainer.lineBreakMode = containerLineBreakMode
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
