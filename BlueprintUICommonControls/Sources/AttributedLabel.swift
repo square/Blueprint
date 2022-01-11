@@ -108,15 +108,6 @@ extension AttributedLabel {
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
         private var links: [Link] = []
 
-        private var containerLineBreakMode: NSLineBreakMode {
-            // These line break modes don't work when numberOfLines is not 1, and result in the container
-            // measuring the height of only 1 line
-            if numberOfLines != 1 && (lineBreakMode == .byTruncatingHead || lineBreakMode == .byTruncatingMiddle || lineBreakMode == .byTruncatingTail) {
-                return .byWordWrapping
-            }
-            return lineBreakMode
-        }
-
         private var textRectOffset: UIOffset = .zero {
             didSet {
                 if oldValue != textRectOffset {
@@ -153,6 +144,24 @@ extension AttributedLabel {
         }
 
         var urlHandler: URLHandler?
+
+        private let textContainerView = UIView()
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            if textContainerView.superview == nil {
+                addSubview(textContainerView)
+                textContainerView.backgroundColor = UIColor.red.withAlphaComponent(0.1)
+            }
+
+            if let textStorage = makeTextStorage(),
+               let layoutManager = textStorage.layoutManagers.first,
+               let textContainer = layoutManager.textContainers.first
+            {
+                textContainerView.frame = layoutManager.usedRect(for: textContainer)
+            }
+        }
 
         func update(model: AttributedLabel, environment: Environment, isMeasuring: Bool) {
             let previousAttributedText = attributedText
@@ -196,6 +205,16 @@ extension AttributedLabel {
                 return nil
             }
 
+            var lineBreakAdjustedText = AttributedText(attributedText)
+
+            if numberOfLines != 1, let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+                if paragraphStyle.lineBreakMode != .byWordWrapping && paragraphStyle.lineBreakMode != .byCharWrapping {
+                    paragraphStyle.lineBreakMode = .byWordWrapping
+                }
+
+                lineBreakAdjustedText.paragraphStyle = paragraphStyle
+            }
+
             let textStorage = NSTextStorage()
             let layoutManager = NSLayoutManager()
             let textContainer = NSTextContainer()
@@ -203,12 +222,11 @@ extension AttributedLabel {
             textContainer.lineFragmentPadding = 0
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
-//            textContainer.lineBreakMode = containerLineBreakMode
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
             textStorage.addLayoutManager(layoutManager)
-            textStorage.setAttributedString(attributedText)
+            textStorage.setAttributedString(lineBreakAdjustedText.attributedString)
 
             return textStorage
         }
