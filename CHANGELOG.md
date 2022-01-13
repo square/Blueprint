@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `Label` and `AttributedLabel` now correctly report their `UIAccessibilityTraits`.
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.35.1] - 2022-01-13
+
+### Fixed
+
+- `Label` and `AttributedLabel` now correctly report their `UIAccessibilityTraits`.
 
 ## [0.35.0] - 2022-01-11
 
@@ -765,7 +769,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.35.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.35.1...HEAD
+[0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
 [0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
 [0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0
 [0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
