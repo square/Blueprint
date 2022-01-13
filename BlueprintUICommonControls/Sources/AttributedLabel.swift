@@ -151,12 +151,18 @@ extension AttributedLabel {
             linkAttributes = model.linkAttributes
             activeLinkAttributes = model.activeLinkAttributes
             linkDetectionTypes = model.linkDetectionTypes ?? []
-            attributedText = model.attributedText
+
+            attributedText = model
+                .attributedText
                 .applyingDefaultFont()
                 .replacingLinkAttributes()
+
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
+
             isAccessibilityElement = model.isAccessibilityElement
+            updateAccessibilityTraits(model)
+
             urlHandler = environment.urlHandler
             layoutDirection = environment.layoutDirection
 
@@ -168,13 +174,18 @@ extension AttributedLabel {
         }
 
         private func updateAccessibilityTraits(_ model: AttributedLabel) {
+
             if let traits = model.accessibilityTraits {
-                var union = accessibilityTraits.union(UIAccessibilityTraits(with: traits))
-                // UILabel has the `.staticText` trait by default. If we explicitly set `.updatesFrequently` this should be removed.
-                if traits.contains(.updatesFrequently) && accessibilityTraits.contains(.staticText) {
-                    union.subtract(.staticText)
+
+                var traits = UIAccessibilityTraits(with: traits)
+
+                if traits.contains(.updatesFrequently) {
+                    /// `UILabel` has the `.staticText` trait by default.
+                    /// If we explicitly set `.updatesFrequently` this should be removed.
+                    traits.subtract(.staticText)
                 }
-                accessibilityTraits = union
+
+                accessibilityTraits = traits
             }
         }
 
