@@ -5,6 +5,71 @@ import XCTest
 
 class AttributedLabelTests: XCTestCase {
 
+    func test_accessibilityTraits() {
+
+        let string = NSAttributedString(string: "Hello, World!")
+
+        let defaultTraits = AttributedLabel(attributedText: string)
+
+        let nilTraits = AttributedLabel(attributedText: string) { label in
+            label.accessibilityTraits = nil
+        }
+
+        let noTraits = AttributedLabel(attributedText: string) { label in
+            label.accessibilityTraits = []
+        }
+
+        let header = AttributedLabel(attributedText: string) { label in
+            label.accessibilityTraits = [.header]
+        }
+
+        let headerAndStatic = AttributedLabel(attributedText: string) { label in
+            label.accessibilityTraits = [.header, .staticText]
+        }
+
+        let updatesFrequently = AttributedLabel(attributedText: string) { label in
+            label.accessibilityTraits = [.header, .updatesFrequently]
+        }
+
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+
+        defaultTraits.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [])
+        }
+
+        nilTraits.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [])
+        }
+
+        noTraits.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [])
+        }
+
+        header.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [.header])
+        }
+
+        headerAndStatic.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [.header, .staticText])
+        }
+
+        updatesFrequently.accessBackingView(in: view) { label in
+            let label = label as! UILabel
+
+            XCTAssertEqual(label.accessibilityTraits, [.header, .updatesFrequently])
+        }
+    }
+
     func test_displaysText() {
         let string = NSAttributedString()
             .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)
