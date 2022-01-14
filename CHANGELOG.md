@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+
 ### Deprecated
 
 ### Security
