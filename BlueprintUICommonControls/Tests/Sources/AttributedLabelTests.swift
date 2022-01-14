@@ -230,8 +230,240 @@ class AttributedLabelTests: XCTestCase {
 
         compareSnapshot(of: element)
     }
+
+    func test_textContainerRects() {
+        let lineBreakModes: [NSLineBreakMode?] = [
+            nil,
+            .byCharWrapping,
+            .byWordWrapping,
+            .byClipping,
+            .byTruncatingHead,
+            .byTruncatingMiddle,
+            .byTruncatingTail,
+        ]
+
+        let numberOfLines = [
+            0,
+            1,
+            2,
+        ]
+
+        let lineHeights: [CGFloat?] = [
+            nil,
+            50,
+        ]
+
+        let widths: [CGFloat] = [
+            320,
+            375,
+        ]
+
+        let text = """
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incididunt ut labore dolore magna aliqua. Ut enim minim veniam, quis nostrud exercitation ullamco laboris nisi aliquip ea commodo consequat.
+        """
+
+        for lineBreakMode in lineBreakModes {
+            let mode = lineBreakMode.flatMap { $0.description } ?? "None"
+            for lineHeight in lineHeights {
+                let height = lineHeight.flatMap { $0.description } ?? "None"
+                for lineCount in numberOfLines {
+                    for width in widths {
+                        let identifier = "\(mode)_\(lineCount)-lines_lineheight-\(height)_width-\(width)"
+                        var attributedText = AttributedText(text)
+
+                        for word in attributedText.string.split(separator: " ") {
+                            let range = attributedText.range(of: word)!
+                            attributedText[range].link = URL(string: "https://link.com")!
+                        }
+
+                        let paragraphStyle = NSMutableParagraphStyle()
+
+                        if let lineBreakMode = lineBreakMode {
+                            paragraphStyle.lineBreakMode = lineBreakMode
+                            attributedText.paragraphStyle = paragraphStyle
+                        }
+
+                        if let lineHeight = lineHeight {
+                            paragraphStyle.minimumLineHeight = lineHeight
+                            paragraphStyle.maximumLineHeight = lineHeight
+                            attributedText.paragraphStyle = paragraphStyle
+                        }
+
+                        let label = AttributedLabel(attributedText: attributedText.attributedString) { label in
+                            label.numberOfLines = lineCount
+                            if let lineHeight = lineHeight {
+                                let fontLineHeight = UIFont.systemFont(ofSize: UIFont.labelFontSize).lineHeight
+                                label.textRectOffset = .init(horizontal: 0, vertical: -(lineHeight - fontLineHeight) / 2)
+                            }
+                        }
+                        let textContainer = TextContainerBox(model: label)
+
+                        let element = Overlay {
+                            textContainer
+                            label
+                        }
+
+                        compareSnapshot(
+                            of: element.constrainedTo(width: .atMost(CGFloat(width))),
+                            identifier: identifier
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    func testTextContainerLineBreakMode() {
+        let wrappingModes: [NSLineBreakMode] = [
+            .byCharWrapping,
+            .byWordWrapping,
+        ]
+
+        let nonWrappingModes: [NSLineBreakMode] = [
+            .byClipping,
+            .byTruncatingHead,
+            .byTruncatingMiddle,
+            .byTruncatingTail,
+        ]
+
+        let numberOfLines = [
+            0,
+            1,
+            2,
+        ]
+
+        for mode in wrappingModes {
+            for lineCount in numberOfLines {
+                let effectiveMode = mode.textContainerMode(for: lineCount)
+                if lineCount == 1 {
+                    XCTAssertEqual(.byClipping, effectiveMode)
+                } else {
+                    XCTAssertEqual(mode, effectiveMode)
+                }
+            }
+        }
+
+        for mode in nonWrappingModes {
+            for lineCount in numberOfLines {
+                let effectiveMode = mode.textContainerMode(for: lineCount)
+                if lineCount == 1 {
+                    XCTAssertEqual(mode, effectiveMode)
+                } else {
+                    XCTAssertEqual(.byWordWrapping, effectiveMode)
+                }
+            }
+        }
+    }
+
+    func testEffectiveLineBreakMode() {
+        let wrappingModes: [NSLineBreakMode] = [
+            .byCharWrapping,
+            .byWordWrapping,
+        ]
+
+        let nonWrappingModes: [NSLineBreakMode] = [
+            .byClipping,
+            .byTruncatingHead,
+            .byTruncatingMiddle,
+            .byTruncatingTail,
+        ]
+
+        let numberOfLines = [
+            0,
+            1,
+            2,
+        ]
+
+        for mode in wrappingModes {
+            for lineCount in numberOfLines {
+                let effectiveMode = mode.textContainerMode(for: lineCount)
+                if lineCount == 1 {
+                    XCTAssertEqual(.byClipping, effectiveMode)
+                } else {
+                    XCTAssertEqual(mode, effectiveMode)
+                }
+            }
+        }
+
+        for mode in nonWrappingModes {
+            for lineCount in numberOfLines {
+                let effectiveMode = mode.textContainerMode(for: lineCount)
+                if lineCount == 1 {
+                    XCTAssertEqual(mode, effectiveMode)
+                } else {
+                    XCTAssertEqual(.byWordWrapping, effectiveMode)
+                }
+            }
+        }
+    }
+
 }
 
+struct TextContainerBox: Element {
+    var model: AttributedLabel
+
+    var content: ElementContent {
+        model.content
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        View.describe { config in
+            config.apply { view in
+                view.update(model: model, environment: context.environment)
+            }
+        }
+    }
+
+    class View: UIView {
+        let textContainerView = UIView()
+        let labelView = AttributedLabel.LabelView()
+        var linkViews: [UIView] = []
+        var model: AttributedLabel!
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            textContainerView.backgroundColor = .red
+            addSubview(textContainerView)
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            labelView.frame = bounds
+
+            guard let textStorage = labelView.makeTextStorage(),
+                  let layoutManager = textStorage.layoutManagers.first,
+                  let textContainer = layoutManager.textContainers.first
+            else {
+                return
+            }
+
+            textContainerView.frame = layoutManager.usedRect(for: textContainer)
+
+            linkViews.forEach { $0.removeFromSuperview() }
+            let attributedText = AttributedText(model.attributedText)
+
+            for run in attributedText.runs.filter({ $0.link != nil }) {
+                let view = UIView()
+                view.backgroundColor = .yellow
+                view.layer.borderColor = UIColor.cyan.cgColor
+                view.layer.borderWidth = 1
+                addSubview(view)
+                let range = NSRange(run.range, in: attributedText.string)
+                print(range)
+                view.frame = layoutManager.boundingRect(forGlyphRange: range, in: textContainer)
+            }
+        }
+
+        func update(model: AttributedLabel, environment: Environment) {
+            self.model = model
+            labelView.update(model: model, environment: environment, isMeasuring: false)
+        }
+    }
+}
 
 extension NSAttributedString {
 
