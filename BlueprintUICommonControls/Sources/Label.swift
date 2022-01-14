@@ -12,7 +12,7 @@ public struct Label: ProxyElement {
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
-    public var lineBreakMode: NSLineBreakMode = .byWordWrapping
+    public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
 
     /// Determines if the label should be included when navigating the UI via accessibility.
