@@ -26,19 +26,10 @@ public struct Label: ProxyElement {
         configure(&self)
     }
 
-    private var effectiveLineBreakMode: NSLineBreakMode {
-        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-        // Normalize them to clipping mode instead.
-        if numberOfLines == 1 && (lineBreakMode == .byCharWrapping || lineBreakMode == .byWordWrapping) {
-            return .byClipping
-        }
-        return lineBreakMode
-    }
-
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
-        paragraphStyle.lineBreakMode = effectiveLineBreakMode
+        paragraphStyle.lineBreakMode = lineBreakMode
 
         switch lineHeight {
         case .custom(let lineHeight, _):

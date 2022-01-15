@@ -4,7 +4,21 @@ import UIKit
 
 public struct AttributedLabel: Element, Hashable {
 
+    /// The attributed text to render in the label.
+    ///
+    /// If you customize the line break mode using an `NSParagraphStyle`, the mode will be normalized
+    /// based on the number of lines allowed. This is because some line break modes are incompatible
+    /// with multi-line text rendering in TextKit, which is used to detect where links are in the text.
+    /// Some modes also break line height adjustment in single-line labels, so these are also normalized.
+    ///
+    /// Specicially:
+    ///
+    /// - 1 line labels with a mode of `byCharWrapping` or `byWordWrapping` will be normalized to `byClipping`.
+    /// - Multiline labels with a mode of `byTruncatingHead` or `byTruncatingMiddle`
+    ///   will be normalized to `byTruncatingTail`.
+    ///
     public var attributedText: NSAttributedString
+
     public var numberOfLines: Int = 0
 
     /// An offset that will be applied to the rect used by `drawText(in:)`.
@@ -96,7 +110,7 @@ extension AttributedLabel {
 
 extension AttributedLabel {
 
-    private final class LabelView: UILabel {
+    final class LabelView: UILabel {
         /// The touch handling logic explicitly tracks the active links when touches begin, so if you drag outside
         /// the link and touch up over another link, it just cancels the tap rather than accidentally opening
         /// a different link.
@@ -154,8 +168,7 @@ extension AttributedLabel {
 
             attributedText = model
                 .attributedText
-                .applyingDefaultFont()
-                .replacingLinkAttributes()
+                .normalizingForView(with: model.numberOfLines)
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
@@ -198,19 +211,28 @@ extension AttributedLabel {
                 return nil
             }
 
+            var lineBreakAdjustedText = AttributedText(attributedText)
+
             let textStorage = NSTextStorage()
             let layoutManager = NSLayoutManager()
             let textContainer = NSTextContainer()
 
             textContainer.lineFragmentPadding = 0
-            textContainer.lineBreakMode = lineBreakMode
             textContainer.maximumNumberOfLines = numberOfLines
-            textContainer.size = textRect(forBounds: bounds, limitedToNumberOfLines: numberOfLines).size
+            textContainer.size = bounds.size
+
+            // If the paragraph style is set, we need to adjust its lineBreakMode
+            // to one that works with NSTextContainer.
+            if let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+                let adjustedLineBreakMode = paragraphStyle.lineBreakMode.textContainerMode(for: numberOfLines)
+                paragraphStyle.lineBreakMode = adjustedLineBreakMode
+                lineBreakAdjustedText.paragraphStyle = paragraphStyle
+            }
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
             textStorage.addLayoutManager(layoutManager)
-            textStorage.setAttributedString(attributedText)
+            textStorage.setAttributedString(lineBreakAdjustedText.attributedString)
 
             return textStorage
         }
@@ -254,10 +276,7 @@ extension AttributedLabel {
 
             let labelSize = bounds.size
             let alignmentMultiplier = alignmentMultiplier()
-            let textBoundingBox = layoutManager.usedRect(for: textContainer).offsetBy(
-                dx: textRectOffset.horizontal,
-                dy: textRectOffset.vertical
-            )
+            let textBoundingBox = layoutManager.usedRect(for: textContainer)
             let textContainerOffset = CGPoint(
                 x: (labelSize.width - textBoundingBox.size.width) * alignmentMultiplier - textBoundingBox.origin.x,
                 y: (labelSize.height - textBoundingBox.size.height) * alignmentMultiplier - textBoundingBox.origin.y
@@ -502,44 +521,75 @@ extension NSAttributedString.Key {
     }
 }
 
+private enum LabelLinkKey: AttributedTextKey {
+    typealias Value = URL
+    static var name: NSAttributedString.Key { .labelLink }
+}
+
+extension TextAttributeContainer {
+    fileprivate var labelLink: URL? {
+        get { self[LabelLinkKey.self] }
+        set { self[LabelLinkKey.self] = newValue }
+    }
+}
+
+extension NSLineBreakMode {
+    func textContainerMode(for numberOfLines: Int) -> NSLineBreakMode {
+        let wrappingModes: Set<NSLineBreakMode> = Set([.byWordWrapping, .byCharWrapping])
+        if numberOfLines != 1 && !wrappingModes.contains(self) {
+            return .byWordWrapping
+        }
+        if numberOfLines == 1 && wrappingModes.contains(self) {
+            return .byClipping
+        }
+        return self
+    }
+}
+
 extension NSAttributedString {
     fileprivate var entireRange: NSRange {
         NSRange(location: 0, length: length)
     }
 
-    /// Apply the default label font to any runs with no font attribute. This ensures the NSTextStorage is rendering
-    /// the same attributes as the label.
-    fileprivate func applyingDefaultFont() -> NSAttributedString {
-        let mutableString = NSMutableAttributedString(attributedString: self)
+    fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {
+        var attributedText = AttributedText(self)
 
-        mutableString.enumerateAttribute(
-            .font,
-            in: NSRange(location: 0, length: mutableString.length),
-            options: [.longestEffectiveRangeNotRequired]
-        ) { font, range, _ in
-            if font == nil {
-                mutableString.addAttribute(.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: range)
+        for run in attributedText.runs {
+            /// Apply the default label font to any runs with no font attribute. This ensures the NSTextStorage is rendering
+            /// the same attributes as the label.
+            if run.font == nil {
+                attributedText[run.range].font = UIFont.systemFont(ofSize: UIFont.labelFontSize)
+            }
+
+            /// Replace `link` attributes with our custom `labelLink` attribute to avoid default
+            /// UILabel styling of `link` ranges.
+            if let link = run.link {
+                attributedText[run.range].link = nil
+                attributedText[run.range].labelLink = link
             }
         }
 
-        return mutableString
-    }
+        if let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+            let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
+            let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
-    fileprivate func replacingLinkAttributes() -> NSAttributedString {
-        let mutableString = NSMutableAttributedString(attributedString: self)
-
-        mutableString.enumerateAttribute(
-            .link,
-            in: NSRange(location: 0, length: mutableString.length),
-            options: [.longestEffectiveRangeNotRequired]
-        ) { link, range, _ in
-            if let link = link {
-                mutableString.removeAttribute(.link, range: range)
-                mutableString.addAttribute(.labelLink, value: link, range: range)
+            // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
+            // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
+            // only the last line with that mode. Normalize them to truncating tail instead.
+            if numberOfLines != 1 && invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
+                paragraphStyle.lineBreakMode = .byTruncatingTail
             }
+
+            // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
+            // Normalize them to clipping mode instead (which renders the same on one line anyway).
+            if numberOfLines == 1 && invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
+                paragraphStyle.lineBreakMode = .byClipping
+            }
+
+            attributedText.paragraphStyle = paragraphStyle
         }
 
-        return mutableString
+        return attributedText.attributedString
     }
 }
 

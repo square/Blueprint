@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+
 ### Added
 
 ### Removed
@@ -16,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+- `AttributedLabel` will normalize certain line break modes based on the number of lines.
 
 ### Deprecated
 
