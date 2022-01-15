@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
+
 ### Added
 
 ### Removed
