@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
 
 ### Added
 
