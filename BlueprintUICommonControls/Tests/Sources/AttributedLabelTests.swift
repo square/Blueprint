@@ -223,7 +223,7 @@ class AttributedLabelTests: XCTestCase {
     }
 
     func test_linkAttribute() {
-        let string = NSAttributedString(string: "Some text", attributes: [.link: "https://block.xyz"])
+        let string = NSAttributedString(string: "Some text", attributes: [.link: URL(string: "https://block.xyz")!])
         let element = AttributedLabel(attributedText: string) {
             $0.linkAttributes = [.foregroundColor: UIColor.red, .backgroundColor: UIColor.black]
         }

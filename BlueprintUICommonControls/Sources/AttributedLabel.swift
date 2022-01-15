@@ -168,9 +168,7 @@ extension AttributedLabel {
 
             attributedText = model
                 .attributedText
-                .applyingDefaultFont()
-                .replacingLinkAttributes()
-                .normalizingLineBreakMode(for: model.numberOfLines)
+                .normalizingForView(with: model.numberOfLines)
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
@@ -523,6 +521,18 @@ extension NSAttributedString.Key {
     }
 }
 
+private enum LabelLinkKey: AttributedTextKey {
+    typealias Value = URL
+    static var name: NSAttributedString.Key { .labelLink }
+}
+
+extension TextAttributeContainer {
+    fileprivate var labelLink: URL? {
+        get { self[LabelLinkKey.self] }
+        set { self[LabelLinkKey.self] = newValue }
+    }
+}
+
 extension NSLineBreakMode {
     func textContainerMode(for numberOfLines: Int) -> NSLineBreakMode {
         let wrappingModes: Set<NSLineBreakMode> = Set([.byWordWrapping, .byCharWrapping])
@@ -541,65 +551,44 @@ extension NSAttributedString {
         NSRange(location: 0, length: length)
     }
 
-    /// Apply the default label font to any runs with no font attribute. This ensures the NSTextStorage is rendering
-    /// the same attributes as the label.
-    fileprivate func applyingDefaultFont() -> NSAttributedString {
-        let mutableString = NSMutableAttributedString(attributedString: self)
-
-        mutableString.enumerateAttribute(
-            .font,
-            in: NSRange(location: 0, length: mutableString.length),
-            options: [.longestEffectiveRangeNotRequired]
-        ) { font, range, _ in
-            if font == nil {
-                mutableString.addAttribute(.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: range)
-            }
-        }
-
-        return mutableString
-    }
-
-    fileprivate func replacingLinkAttributes() -> NSAttributedString {
-        let mutableString = NSMutableAttributedString(attributedString: self)
-
-        mutableString.enumerateAttribute(
-            .link,
-            in: NSRange(location: 0, length: mutableString.length),
-            options: [.longestEffectiveRangeNotRequired]
-        ) { link, range, _ in
-            if let link = link {
-                mutableString.removeAttribute(.link, range: range)
-                mutableString.addAttribute(.labelLink, value: link, range: range)
-            }
-        }
-
-        return mutableString
-    }
-
-    fileprivate func normalizingLineBreakMode(for numberOfLines: Int) -> NSAttributedString {
+    fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {
         var attributedText = AttributedText(self)
 
-        guard let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle else {
-            return self
+        for run in attributedText.runs {
+            /// Apply the default label font to any runs with no font attribute. This ensures the NSTextStorage is rendering
+            /// the same attributes as the label.
+            if run.font == nil {
+                attributedText[run.range].font = UIFont.systemFont(ofSize: UIFont.labelFontSize)
+            }
+
+            /// Replace `link` attributes with our custom `labelLink` attribute to avoid default
+            /// UILabel styling of `link` ranges.
+            if let link = run.link {
+                attributedText[run.range].link = nil
+                attributedText[run.range].labelLink = link
+            }
         }
 
-        let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
-        let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
+        if let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+            let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
+            let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
-        // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
-        // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
-        // only the last line with that mode. Normalize them to truncating tail instead.
-        if numberOfLines != 1 && invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
-            paragraphStyle.lineBreakMode = .byTruncatingTail
+            // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
+            // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
+            // only the last line with that mode. Normalize them to truncating tail instead.
+            if numberOfLines != 1 && invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
+                paragraphStyle.lineBreakMode = .byTruncatingTail
+            }
+
+            // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
+            // Normalize them to clipping mode instead (which renders the same on one line anyway).
+            if numberOfLines == 1 && invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
+                paragraphStyle.lineBreakMode = .byClipping
+            }
+
+            attributedText.paragraphStyle = paragraphStyle
         }
 
-        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-        // Normalize them to clipping mode instead (which renders the same on one line anyway).
-        if numberOfLines == 1 && invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
-            paragraphStyle.lineBreakMode = .byClipping
-        }
-
-        attributedText.paragraphStyle = paragraphStyle
         return attributedText.attributedString
     }
 }
