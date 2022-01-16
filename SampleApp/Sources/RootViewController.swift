@@ -15,7 +15,7 @@ import UIKit
 
 
 final class RootViewController: UIViewController {
-    fileprivate var demos: [DemoItem] {
+    fileprivate var demos: [Element] {
         [
             DemoItem(title: "Text Links", onTap: { [weak self] in
                 self?.push(TextLinkViewController())
@@ -29,6 +29,23 @@ final class RootViewController: UIViewController {
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             }),
+
+            EditingMenu { menu in
+                DemoItem(title: "Show A Menu Controller") {
+                    menu.show()
+                }
+            } items: {
+                EditingMenuItem.copying("A string goes on the pasteboard")
+
+                EditingMenuItem(.paste) {
+                    print("Pasted!")
+                }
+
+                EditingMenuItem(title: "A Custom Item") {
+                    // Do something here...
+                    print("Performed!")
+                }
+            },
         ]
     }
 

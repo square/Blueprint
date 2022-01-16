@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
 - `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
 
 ### Added
@@ -19,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `Label.font` now defaults to using a font of size `UIFont.labelFontSize` (17) instead of `UIFont.systemFontSize`.
+- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+- `AttributedLabel` will normalize certain line break modes based on the number of lines.
 
 ### Deprecated
 
@@ -30,6 +33,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.35.1] - 2022-01-13
+
+### Fixed
+
+- `Label` and `AttributedLabel` now correctly report their `UIAccessibilityTraits`.
+
+## [0.35.0] - 2022-01-11
+
+### Added
+
+- Added the `EditingMenu` element, which allows showing a `UIMenuController` (aka the system editing menu) on tap, long press, or based on a trigger.
+
+### Changed
+
+- `Label.font` now defaults to using a font of size `UIFont.labelFontSize` (17) instead of `UIFont.systemFontSize`.
 
 ## [0.34.0] - 2021-12-16
 
@@ -759,7 +778,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.34.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.35.1...HEAD
+[0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
+[0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
 [0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0
 [0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
 [0.33.2]: https://github.com/square/Blueprint/compare/0.33.1...0.33.2

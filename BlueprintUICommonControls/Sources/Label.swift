@@ -12,7 +12,7 @@ public struct Label: ProxyElement {
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
-    public var lineBreakMode: NSLineBreakMode = .byWordWrapping
+    public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
 
     /// Determines if the label should be included when navigating the UI via accessibility.
@@ -26,19 +26,10 @@ public struct Label: ProxyElement {
         configure(&self)
     }
 
-    private var effectiveLineBreakMode: NSLineBreakMode {
-        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-        // Normalize them to clipping mode instead.
-        if numberOfLines == 1 && (lineBreakMode == .byCharWrapping || lineBreakMode == .byWordWrapping) {
-            return .byClipping
-        }
-        return lineBreakMode
-    }
-
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
-        paragraphStyle.lineBreakMode = effectiveLineBreakMode
+        paragraphStyle.lineBreakMode = lineBreakMode
 
         switch lineHeight {
         case .custom(let lineHeight, _):
