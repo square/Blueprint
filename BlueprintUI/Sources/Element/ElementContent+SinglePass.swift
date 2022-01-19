@@ -24,11 +24,11 @@ extension ElementContent.Builder {
         let nodes = children.indices.map { (index: Int) -> SPLayoutNode in
             let child = children[index].element
             let id = identifiers[index]
-            
+
             return SPLayoutNode(
                 id: id,
                 element: child,
-                context: context,
+                mode: context.mode,
                 environment: environment,
                 cache: cache.subcache(index: index, of: childCount, element: child)
             )
@@ -36,7 +36,7 @@ extension ElementContent.Builder {
 
         let intermediateResult = layout.layout(
             in: context,
-            children: children.indices.map { (traits: children[$0].traits, layoutable: nodes[$0] ) }
+            children: children.indices.map { (traits: children[$0].traits, layoutable: nodes[$0]) }
         )
 
         return SPSubtreeResult(
@@ -59,7 +59,7 @@ extension EnvironmentAdaptingStorage {
         let node = SPLayoutNode(
             id: identifier,
             element: child,
-            context: context,
+            mode: context.mode,
             environment: environment,
             cache: cache
         )
@@ -84,7 +84,7 @@ extension LazyStorage {
         let node = SPLayoutNode(
             id: identifier,
             element: child,
-            context: context,
+            mode: context.mode,
             environment: environment,
             cache: cache
         )
@@ -120,7 +120,8 @@ extension MeasurableStorage {
         return SPSubtreeResult(
             intermediate: SPLayoutAttributes(
                 size: size,
-                childPositions: []),
+                childPositions: []
+            ),
             children: []
         )
     }
@@ -151,9 +152,30 @@ struct SPSubtreeResult {
             return (node.id, result)
         }
     }
+
+    func dump(depth: Int = 0, id: String, position: CGPoint, context: SPLayoutContext) {
+        let size = "w:\(intermediate.size.width) h:\(intermediate.size.height)"
+
+        let indent = String(repeating: "  ", count: depth)
+        let origin = "x:\(position.x) y:\(position.y)"
+
+        print("\(indent)- \(id)")
+        print("\(indent)    \(context)")
+        print("\(indent)    resolved \(origin) \(size)")
+
+        for (child, childPosition) in zip(children, intermediate.childPositions) {
+            child.ensuredResult.dump(
+                depth: depth+1,
+                id: "\(child.id)",
+                position: childPosition,
+                context: child.context
+            )
+        }
+    }
+
 }
 
-public struct SPLayoutContext {
+public struct SPLayoutContext: CustomStringConvertible {
 //    var environment: Environment
 //    var cache: CacheTree
 
@@ -167,6 +189,10 @@ public struct SPLayoutContext {
     ) {
         self.proposedSize = proposedSize
         self.mode = mode
+    }
+
+    public var description: String {
+        "proposed w:\(proposedSize.width) h:\(proposedSize.height), \(mode.horizontal)-\(mode.vertical)"
     }
 }
 
@@ -238,21 +264,22 @@ public struct SPNeutralLayout: SingleChildLayout, SPSingleChildLayout {
 
 
 class SPLayoutNode: SPLayoutable {
-    init(id: ElementIdentifier, element: Element, context: SPLayoutContext, environment: Environment, cache: CacheTree) {
+    init(id: ElementIdentifier, element: Element, mode: AxisVarying<SPLayoutMode>, environment: Environment, cache: CacheTree) {
         self.id = id
         self.element = element
-        self.context = context
+        self.mode = mode
         self.environment = environment
         self.cache = cache
     }
 
     var id: ElementIdentifier
     var element: Element
-    var context: SPLayoutContext
+    var mode: AxisVarying<SPLayoutMode>
     var environment: Environment
     var cache: CacheTree
 
     var layoutResult: SPSubtreeResult?
+    var proposedSize: CGSize?
 
     private var layoutCount = 0
 
@@ -263,6 +290,19 @@ class SPLayoutNode: SPLayoutable {
         return layoutResult
     }
 
+    // saved proposed size, for debugging
+    var ensuredProposedSize: CGSize {
+        guard let proposedSize = proposedSize else {
+            fatalError("child was not laid out")
+        }
+        return proposedSize
+    }
+
+    // effective context, for debugging
+    var context: SPLayoutContext {
+        SPLayoutContext(proposedSize: ensuredProposedSize, mode: mode)
+    }
+
     func layout(in proposedSize: CGSize, options: SPLayoutOptions) -> CGSize {
         layoutCount += 1
         if layoutCount > options.maxAllowedLayoutCount {
@@ -270,14 +310,16 @@ class SPLayoutNode: SPLayoutable {
         }
 
         let layoutMode = AxisVarying(
-            horizontal: options.mode.horizontal ?? context.mode.horizontal,
-            vertical: options.mode.vertical ?? context.mode.vertical
+            horizontal: options.mode.horizontal ?? mode.horizontal,
+            vertical: options.mode.vertical ?? mode.vertical
         )
 
 
 //        print("\(type(of: element)) h:\(layoutMode.horizontal) v:\(layoutMode.vertical)")
 
-        var result = element.content.singlePassLayout(
+        print("* laying out \(id) proposed \(proposedSize) \(mode)")
+
+        let layoutResult = element.content.singlePassLayout(
             in: SPLayoutContext(
                 proposedSize: proposedSize,
                 mode: layoutMode
@@ -286,32 +328,33 @@ class SPLayoutNode: SPLayoutable {
             cache: cache
         )
 
-        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
-            let oldWidth = result.intermediate.size.width
+//        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
+//            let oldWidth = result.intermediate.size.width
 //            print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
-            result.intermediate.size.width = width
-        } else {
-//            print("Not applying width to \(type(of: element))")
-        }
-        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
-            let oldHeight = result.intermediate.size.height
+//            result.intermediate.size.width = width
+//        } else {
+////            print("Not applying width to \(type(of: element))")
+//        }
+//        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
+//            let oldHeight = result.intermediate.size.height
 //            print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
-            result.intermediate.size.height = height
-        }
+//            result.intermediate.size.height = height
+//        }
 
-        layoutResult = result
+        self.proposedSize = proposedSize
+        self.layoutResult = layoutResult
 
         assert(
-            result.intermediate.size.isFinite,
+            layoutResult.intermediate.size.isFinite,
             "\(type(of: element)) layout size must be finite"
         )
 
         assert(
-            result.intermediate.childPositions.allSatisfy { $0.isFinite },
+            layoutResult.intermediate.childPositions.allSatisfy { $0.isFinite },
             "\(type(of: element)) child positions must be finite"
         )
 
-        return result.intermediate.size
+        return layoutResult.intermediate.size
     }
 
 }

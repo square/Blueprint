@@ -37,12 +37,28 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        measure(
+        let sp = measure(
+            in: constraint,
+            environment: environment,
+            cache: CacheFactory.makeCache(name: "ElementContent"),
+            singlePass: true
+        )
+        let mp = measure(
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent"),
             singlePass: false
         )
+        if sp != mp {
+            print("size mismatch")
+            let sp2 = measure(
+                in: constraint,
+                environment: environment,
+                cache: CacheFactory.makeCache(name: "ElementContent"),
+                singlePass: true
+            )
+        }
+        return sp
     }
 
     func measure(
@@ -52,7 +68,7 @@ public struct ElementContent {
         singlePass: Bool
     ) -> CGSize {
         if singlePass {
-            return singlePassLayout(
+            let result = singlePassLayout(
                 in: SPLayoutContext(
                     proposedSize: constraint.singlePassSize,
                     mode: AxisVarying(horizontal: .natural, vertical: .natural)
@@ -60,6 +76,15 @@ public struct ElementContent {
                 environment: environment,
                 cache: cache
             )
+
+            print("* measured")
+            if let node = result.resolve().first?.node {
+                node.dump()
+            } else {
+                print("  leaf")
+            }
+
+            return result
             .intermediate
             .size
         } else {
@@ -99,6 +124,16 @@ public struct ElementContent {
 }
 
 extension ElementContent {
+
+    public init(
+        measurementCachingKey: MeasurementCachingKey? = nil,
+        build builder: @escaping (SizeConstraint, Environment) -> Element
+    ) {
+        self.measurementCachingKey = measurementCachingKey
+        storage = LazyStorage { constraint, environment, _ in
+            builder(constraint, environment)
+        }
+    }
 
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.

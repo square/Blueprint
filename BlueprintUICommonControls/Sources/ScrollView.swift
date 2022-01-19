@@ -173,14 +173,25 @@ extension ScrollView {
 
             let attributes = layout(size: context.proposedSize, child: measurable)
 
+            let size = attributes.bounds.size.upperBounded(by: context.proposedSize)
+
             return SPLayoutAttributes(
-                size: attributes.bounds.size,
+                size: size,
                 childPositions: [attributes.frame.origin]
             )
 
         }
     }
 
+}
+
+extension CGSize {
+    func upperBounded(by max: CGSize) -> CGSize {
+        CGSize(
+            width: min(width, max.width),
+            height: min(height, max.height)
+        )
+    }
 }
 
 extension ScrollView {
