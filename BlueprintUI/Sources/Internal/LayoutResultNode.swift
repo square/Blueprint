@@ -34,14 +34,17 @@ extension Element {
         )
         let cache = CacheFactory.makeCache(name: "\(type(of: self))")
 
-        let subtree = self.content.singlePassLayout(
+        let subtree = content.singlePassLayout(
             in: context,
             environment: environment,
             cache: cache
         )
 
+        print("* layout")
+        subtree.dump(id: "\(type(of: self))", position: .zero, context: context)
+
         let children = subtree
-        .resolve()
+            .resolve()
 
         let root = LayoutResultNode(
             element: self,
