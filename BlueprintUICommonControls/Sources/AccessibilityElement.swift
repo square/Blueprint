@@ -121,6 +121,77 @@ extension Element {
         )
     }
 
+    /// Wraps the receiver in an accessibility element with the provided values.
+    ///
+    /// - Important: ⚠️: This will remove any previously resolved accessibility hint, identifier, or frame size of the element and all of its children. ⚠️
+    public func accessibilityElement(
+        label: String,
+        value: String,
+        traits: Set<AccessibilityElement.Trait>
+    ) -> AccessibilityElement {
+        AccessibilityElement(
+            label: label,
+            value: value,
+            traits: traits,
+            hint: nil,
+            identifier: nil,
+            accessibilityFrameSize: nil,
+            wrapping: self
+        )
+    }
+
+    /// Wraps the receiver in an accessibility element with the provided values.
+    ///
+    /// - Important: ⚠️: This will remove any previously resolved accessibility hint, identifier, or frame size of the element and all of its children. ⚠️
+    public func accessibilityElement(
+        label: String,
+        traits: Set<AccessibilityElement.Trait>
+    ) -> AccessibilityElement {
+        AccessibilityElement(
+            label: label,
+            value: nil,
+            traits: traits,
+            hint: nil,
+            identifier: nil,
+            accessibilityFrameSize: nil,
+            wrapping: self
+        )
+    }
+
+    /// Wraps the receiver in an accessibility element with the provided values.
+    ///
+    /// - Important: ⚠️: This will remove any previously resolved accessibility hint, identifier, or frame size of the element and all of its children. ⚠️
+    public func accessibilityElement(
+        label: String,
+        value: String
+    ) -> AccessibilityElement {
+        AccessibilityElement(
+            label: label,
+            value: value,
+            traits: [],
+            hint: nil,
+            identifier: nil,
+            accessibilityFrameSize: nil,
+            wrapping: self
+        )
+    }
+
+    /// Wraps the receiver in an accessibility element with the provided values.
+    ///
+    /// - Important: ⚠️: This will remove any previously resolved accessibility value, hint, identifier, or frame size of the element and all of its children. ⚠️
+    public func accessibilityElement(
+        label: String
+    ) -> AccessibilityElement {
+        AccessibilityElement(
+            label: label,
+            value: nil,
+            traits: [],
+            hint: nil,
+            identifier: nil,
+            accessibilityFrameSize: nil,
+            wrapping: self
+        )
+    }
 
     /// Wraps the receiver in an accessibility element with the provided values.
     ///
