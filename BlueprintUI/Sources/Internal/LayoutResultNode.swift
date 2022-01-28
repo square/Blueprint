@@ -29,6 +29,7 @@ extension Element {
 
         let attributes = LayoutAttributes(frame: frame)
         let context = SPLayoutContext(
+            path: .empty,
             proposedSize: frame.size,
             mode: AxisVarying(horizontal: .fill, vertical: .fill)
         )
@@ -40,8 +41,7 @@ extension Element {
             cache: cache
         )
 
-        print("* layout")
-        subtree.dump(id: "\(type(of: self))", position: .zero, context: context)
+        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
 
         let children = subtree
             .resolve()

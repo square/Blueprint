@@ -100,7 +100,17 @@ public final class BlueprintView: UIView {
         }
     }
 
-    public var singlePassLayout: Bool = false {
+    /// Whether SPL is enabled by default
+    public static var singlePassLayoutDefault: Bool = true {
+        didSet {
+            if oldValue != singlePassLayoutDefault {
+                print("Toggled SPL default to \(singlePassLayoutDefault)")
+            }
+        }
+    }
+
+    /// Per-view override
+    public var singlePassLayout: Bool? = nil {
         didSet {
             guard oldValue != singlePassLayout else { return }
             setNeedsViewHierarchyUpdate()
@@ -210,6 +220,8 @@ public final class BlueprintView: UIView {
             return cachedSize
         }
 
+        let singlePassLayout = singlePassLayout ?? Self.singlePassLayoutDefault
+
         let measurement = element.content.measure(
             in: constraint,
             environment: makeEnvironment(),
@@ -217,7 +229,7 @@ public final class BlueprintView: UIView {
             singlePass: singlePassLayout
         )
 
-        print("measured, sp=\(singlePassLayout), size=\(measurement)")
+//        print("measured, sp=\(singlePassLayout), size=\(measurement)")
 
         sizesThatFit[constraint] = measurement
 
@@ -333,8 +345,11 @@ public final class BlueprintView: UIView {
         Logger.logLayoutStart(view: self)
 
         let environment = makeEnvironment()
+        let singlePassLayout = singlePassLayout ?? Self.singlePassLayoutDefault
 
-//        print("layout, sp=\(singlePassLayout)")
+        if singlePassLayout {
+            print("* [\(name ?? "BlueprintView")] layout")
+        }
 
         /// Grab view descriptions
         let viewNodes = element?

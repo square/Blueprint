@@ -12,8 +12,9 @@ extension Logger {
             log: .active,
             name: "Layout",
             signpostID: OSSignpostID(log: .active, object: view),
-            "%{public}s",
-            view.name ?? "BlueprintView"
+            "%{public}s SPL=%d",
+            view.name ?? "BlueprintView",
+            view.singlePassLayout ?? BlueprintView.singlePassLayoutDefault
         )
     }
 

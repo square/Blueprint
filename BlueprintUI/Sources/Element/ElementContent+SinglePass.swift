@@ -26,6 +26,7 @@ extension ElementContent.Builder {
             let id = identifiers[index]
 
             return SPLayoutNode(
+                path: context.path,
                 id: id,
                 element: child,
                 mode: context.mode,
@@ -57,6 +58,7 @@ extension EnvironmentAdaptingStorage {
         let cache = cache.subcache(element: child)
 
         let node = SPLayoutNode(
+            path: context.path,
             id: identifier,
             element: child,
             mode: context.mode,
@@ -82,6 +84,7 @@ extension LazyStorage {
         let cache = cache.subcache(element: child)
 
         let node = SPLayoutNode(
+            path: context.path,
             id: identifier,
             element: child,
             mode: context.mode,
@@ -153,7 +156,7 @@ struct SPSubtreeResult {
         }
     }
 
-    func dump(depth: Int = 0, id: String, position: CGPoint, context: SPLayoutContext) {
+    func dump(depth: Int = 0, id: String, position: CGPoint, context: SPLayoutContext, correction: CGSize) {
         let size = "w:\(intermediate.size.width) h:\(intermediate.size.height)"
 
         let indent = String(repeating: "  ", count: depth)
@@ -163,12 +166,20 @@ struct SPSubtreeResult {
         print("\(indent)    \(context)")
         print("\(indent)    resolved \(origin) \(size)")
 
+        if correction.width != 0 {
+            print("\(indent)    corrected width from \(intermediate.size.width - correction.width)")
+        }
+        if correction.height != 0 {
+            print("\(indent)    corrected height from \(intermediate.size.height - correction.height)")
+        }
+
         for (child, childPosition) in zip(children, intermediate.childPositions) {
             child.ensuredResult.dump(
                 depth: depth+1,
                 id: "\(child.id)",
                 position: childPosition,
-                context: child.context
+                context: child.context,
+                correction: child.correction
             )
         }
     }
@@ -176,17 +187,16 @@ struct SPSubtreeResult {
 }
 
 public struct SPLayoutContext: CustomStringConvertible {
-//    var environment: Environment
-//    var cache: CacheTree
-
+    public var path: ElementPath
     public var proposedSize: CGSize
-
-    public var mode: AxisVarying<SPLayoutMode>
+    public var mode: AxisVarying<SPPressureMode>
 
     public init(
+        path: ElementPath,
         proposedSize: CGSize,
-        mode: AxisVarying<SPLayoutMode> // = .init(horizontal: .natural, vertical: .natural)
+        mode: AxisVarying<SPPressureMode>
     ) {
+        self.path = path
         self.proposedSize = proposedSize
         self.mode = mode
     }
@@ -196,7 +206,7 @@ public struct SPLayoutContext: CustomStringConvertible {
     }
 }
 
-public enum SPLayoutMode: Equatable, CustomStringConvertible {
+public enum SPPressureMode: Equatable, CustomStringConvertible {
     case natural
     case fill
 
@@ -208,18 +218,15 @@ public enum SPLayoutMode: Equatable, CustomStringConvertible {
     }
 }
 
+
+/// SPL version of `LayoutAttributes`.
 public struct SPLayoutAttributes {
     public var size: CGSize
     public var childPositions: [CGPoint]
 
-    /// Corresponds to `UIView.isUserInteractionEnabled`.
     public var isUserInteractionEnabled: Bool = true
-
-    /// Corresponds to `UIView.isHidden`.
     public var isHidden: Bool = false
-
     public var transform: CATransform3D = CATransform3DIdentity
-
     public var alpha: CGFloat = 1.0
 
     public init(size: CGSize, childPositions: [CGPoint] = []) {
@@ -228,15 +235,22 @@ public struct SPLayoutAttributes {
     }
 }
 
-// extending only to pick up Traits
+/// SPL version of `Layout`. (Extends `Layout` to pick up `Traits`)
 public protocol SPLayout: Layout {
     typealias SPLayoutChild = (traits: Traits, layoutable: SPLayoutable)
 
-    func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes
+    func layout(
+        in context: SPLayoutContext, 
+        children: [SPLayoutChild]
+    ) -> SPLayoutAttributes
 }
 
+/// SPL version of `Measurable`
 public protocol SPLayoutable {
-    func layout(in proposedSize: CGSize, options: SPLayoutOptions) -> CGSize
+    func layout(
+        in proposedSize: CGSize, 
+        options: SPLayoutOptions
+    ) -> CGSize
 }
 
 extension SPLayoutable {
@@ -264,7 +278,15 @@ public struct SPNeutralLayout: SingleChildLayout, SPSingleChildLayout {
 
 
 class SPLayoutNode: SPLayoutable {
-    init(id: ElementIdentifier, element: Element, mode: AxisVarying<SPLayoutMode>, environment: Environment, cache: CacheTree) {
+    init(
+        path: ElementPath,
+        id: ElementIdentifier,
+        element: Element,
+        mode: AxisVarying<SPPressureMode>,
+        environment: Environment,
+        cache: CacheTree
+    ) {
+        self.path = path
         self.id = id
         self.element = element
         self.mode = mode
@@ -272,14 +294,18 @@ class SPLayoutNode: SPLayoutable {
         self.cache = cache
     }
 
+    var path: ElementPath
     var id: ElementIdentifier
     var element: Element
-    var mode: AxisVarying<SPLayoutMode>
+    var mode: AxisVarying<SPPressureMode>
     var environment: Environment
     var cache: CacheTree
 
+    // These values are initially unset, and captured when the child is laid out:
     var layoutResult: SPSubtreeResult?
     var proposedSize: CGSize?
+    var proposedMode: AxisVarying<SPPressureMode>?
+    var correction: CGSize = .zero
 
     private var layoutCount = 0
 
@@ -300,7 +326,7 @@ class SPLayoutNode: SPLayoutable {
 
     // effective context, for debugging
     var context: SPLayoutContext {
-        SPLayoutContext(proposedSize: ensuredProposedSize, mode: mode)
+        SPLayoutContext(path: path, proposedSize: ensuredProposedSize, mode: proposedMode!)
     }
 
     func layout(in proposedSize: CGSize, options: SPLayoutOptions) -> CGSize {
@@ -314,13 +340,22 @@ class SPLayoutNode: SPLayoutable {
             vertical: options.mode.vertical ?? mode.vertical
         )
 
+        precondition(
+            proposedSize.width != .greatestFiniteMagnitude && proposedSize.height != .greatestFiniteMagnitude,
+            "GFM detected"
+        )
 
-//        print("\(type(of: element)) h:\(layoutMode.horizontal) v:\(layoutMode.vertical)")
+        var environment = environment
+        let path = path.appending(identifier: id)
 
-        print("* laying out \(id) proposed \(proposedSize) \(mode)")
+        if let debugElementPath = environment.debugElementPath, path.matches(expression: debugElementPath) {
+            print("Debugging triggered for path \(path)")
+            environment.debugElementPath = nil
+        }
 
-        let layoutResult = element.content.singlePassLayout(
+        var layoutResult = element.content.singlePassLayout(
             in: SPLayoutContext(
+                path: path,
                 proposedSize: proposedSize,
                 mode: layoutMode
             ),
@@ -328,20 +363,27 @@ class SPLayoutNode: SPLayoutable {
             cache: cache
         )
 
-//        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
-//            let oldWidth = result.intermediate.size.width
-//            print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
-//            result.intermediate.size.width = width
-//        } else {
-////            print("Not applying width to \(type(of: element))")
-//        }
-//        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
-//            let oldHeight = result.intermediate.size.height
-//            print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
-//            result.intermediate.size.height = height
-//        }
+        // Apply size overrides when we are in fill mode.
+
+        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
+            let oldWidth = layoutResult.intermediate.size.width
+            if oldWidth != width {
+                print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
+                correction.width = width - oldWidth
+                layoutResult.intermediate.size.width = width
+            }
+        }
+        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
+            let oldHeight = layoutResult.intermediate.size.height
+            if oldHeight != height {
+                print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
+                correction.height = height - oldHeight
+                layoutResult.intermediate.size.height = height
+            }
+        }
 
         self.proposedSize = proposedSize
+        self.proposedMode = layoutMode
         self.layoutResult = layoutResult
 
         assert(
@@ -359,6 +401,7 @@ class SPLayoutNode: SPLayoutable {
 
 }
 
+/// Enables legacy behavior, and "top-down" cascading effects
 public struct SPLayoutOptions {
     public static let `default` = SPLayoutOptions()
 
@@ -366,17 +409,14 @@ public struct SPLayoutOptions {
     public var maxAllowedLayoutCount: Int
 
     /// Legacy override for size constraints and "fill" alignments
-//    public var sizeOverride: ((CGSize) -> CGSize)
-    public var mode: AxisVarying<SPLayoutMode?>
+    public var mode: AxisVarying<SPPressureMode?>
 
     public init(
         maxAllowedLayoutCount: Int = 1,
-        mode: AxisVarying<SPLayoutMode?> = AxisVarying(horizontal: nil, vertical: nil)
-//        sizeOverride: @escaping ((CGSize) -> CGSize) = { $0 }
+        mode: AxisVarying<SPPressureMode?> = AxisVarying(horizontal: nil, vertical: nil)
     ) {
         self.maxAllowedLayoutCount = maxAllowedLayoutCount
         self.mode = mode
-//        self.sizeOverride = sizeOverride
     }
 }
 
@@ -403,5 +443,22 @@ extension CGSize {
 
     var finiteHeight: CGFloat? {
         height.finiteValue
+    }
+}
+
+public enum DebugElementPathKey: EnvironmentKey {
+    public static let defaultValue: String? = nil
+}
+
+extension Environment {
+    public var debugElementPath: String? {
+        get { self[DebugElementPathKey.self] }
+        set { self[DebugElementPathKey.self] = newValue }
+    }
+}
+
+extension ElementPath {
+    func matches(expression: String) -> Bool {
+        "\(self)".range(of: expression, options: .regularExpression) != nil
     }
 }

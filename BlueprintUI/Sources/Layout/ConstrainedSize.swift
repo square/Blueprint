@@ -195,14 +195,14 @@ extension ConstrainedSize {
 
             let constrainedSize = CGSize(
                 width: width.applied(to: context.proposedSize.width),
-                height: height.applied(to: context.proposedSize.width)
+                height: height.applied(to: context.proposedSize.height)
             )
 
             let measuredSize = child.layout(in: constrainedSize)
 
             let childSize = CGSize(
                 width: width.applied(to: measuredSize.width),
-                height: height.applied(to: measuredSize.width)
+                height: height.applied(to: measuredSize.height)
             )
 
             return SPLayoutAttributes(

@@ -37,28 +37,13 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        let sp = measure(
+        let size = measure(
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent"),
-            singlePass: true
+            singlePass: BlueprintView.singlePassLayoutDefault
         )
-        let mp = measure(
-            in: constraint,
-            environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent"),
-            singlePass: false
-        )
-        if sp != mp {
-            print("size mismatch")
-            let sp2 = measure(
-                in: constraint,
-                environment: environment,
-                cache: CacheFactory.makeCache(name: "ElementContent"),
-                singlePass: true
-            )
-        }
-        return sp
+        return size
     }
 
     func measure(
@@ -68,25 +53,36 @@ public struct ElementContent {
         singlePass: Bool
     ) -> CGSize {
         if singlePass {
-            let result = singlePassLayout(
-                in: SPLayoutContext(
-                    proposedSize: constraint.singlePassSize,
-                    mode: AxisVarying(horizontal: .natural, vertical: .natural)
-                ),
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: "SP \(cache.name)",
+                constraint: constraint
+            )
+            defer {
+                Logger.logMeasureEnd(object: cache.signpostRef)
+            }
+
+            let context = SPLayoutContext(
+                path: .empty,
+                proposedSize: constraint.singlePassSize,
+                mode: AxisVarying(horizontal: .natural, vertical: .natural)
+            )
+            let subtree = singlePassLayout(
+                in: context,
                 environment: environment,
                 cache: cache
             )
 
-            print("* measured")
-            if let node = result.resolve().first?.node {
-                node.dump()
-            } else {
-                print("  leaf")
-            }
+//            subtree.dump(
+//                id: "ElementContent",
+//                position: .zero,
+//                context: context,
+//                correction: .zero
+//            )
 
-            return result
-            .intermediate
-            .size
+            return subtree
+                .intermediate
+                .size
         } else {
             return measure(in: constraint, environment: environment, cache: cache)
         }
