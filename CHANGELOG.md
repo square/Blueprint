@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
+
 ### Added
 
 ### Removed
