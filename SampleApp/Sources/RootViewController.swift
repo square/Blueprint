@@ -53,7 +53,7 @@ final class RootViewController: UIViewController {
     }
 
     var singlePass: Bool {
-        get { blueprintView.singlePassLayout }
+        get { blueprintView.singlePassLayout ?? BlueprintView.singlePassLayoutDefault }
         set {
             blueprintView.singlePassLayout = newValue
             setNavItem()

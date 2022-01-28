@@ -203,7 +203,7 @@ extension LayoutWriter {
         var content: ElementContent {
             ElementContent(layout: Layout(builder: builder)) { builder in
                 for child in self.builder.children {
-                    builder.add(key: child.key, element: child.element)
+                    builder.add(traits: child.frame, key: child.key, element: child.element)
                 }
             }
         }
@@ -215,20 +215,35 @@ extension LayoutWriter {
         // MARK: Layout
 
         private struct Layout: BlueprintUI.Layout, SPLayout {
+            static let defaultTraits: CGRect = .zero
+
             var builder: Builder
 
-            func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+            func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
                 builder.sizing.measure(with: builder)
             }
 
-            func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+            func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {
                 builder.children.map { child in
                     .init(frame: child.frame)
                 }
             }
 
             func layout(in context: SPLayoutContext, children: [SPLayoutChild]) -> SPLayoutAttributes {
-                fatalError("TODO")
+                let options = SPLayoutOptions(mode: .init(horizontal: .fill, vertical: .fill))
+                let size = builder.sizing.measure(with: builder)
+
+                for child in children {
+                    _ = child.layoutable.layout(
+                        in: child.traits.size
+//                        options: options
+                    )
+                }
+
+                return SPLayoutAttributes(
+                    size: size,
+                    childPositions: children.map { $0.traits.origin }
+                )
             }
         }
     }

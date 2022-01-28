@@ -19,7 +19,7 @@ public struct Aligned: Element {
         /// The content fills the full vertical height of the containing element.
         case fill
 
-        func layoutMode(in mode: SPLayoutMode) -> SPLayoutMode {
+        func layoutMode(in mode: SPPressureMode) -> SPPressureMode {
             switch (self, mode) {
             case (.fill, .fill):
                 return .fill
@@ -42,7 +42,7 @@ public struct Aligned: Element {
         /// The content fills the full horizontal width of the containing element.
         case fill
 
-        func layoutMode(in mode: SPLayoutMode) -> SPLayoutMode {
+        func layoutMode(in mode: SPPressureMode) -> SPPressureMode {
             switch (self, mode) {
             case (.fill, .fill):
                 return .fill
@@ -128,27 +128,27 @@ public struct Aligned: Element {
 
             let proposedSize = context.proposedSize
 
-
-//            let options = SPLayoutOptions(
-//                mode: AxisVarying(
-//                    horizontal: horizontalAlignment.layoutMode,
-//                    vertical: verticalAlignment.layoutMode
-//                )
-//            )
+            // each axis will be `fill` if both are true:
+            // - context is already `fill`
+            // - the alignment is `fill`
+            // otherwise, use `natural`
             let options = SPLayoutOptions(
                 mode: AxisVarying(
                     horizontal: horizontalAlignment.layoutMode(in: context.mode.horizontal),
                     vertical: verticalAlignment.layoutMode(in: context.mode.vertical)
                 )
             )
+
             let childSize = child.layout(in: proposedSize, options: options)
 
             let x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat
 
             if context.mode.vertical == .natural || proposedSize.height.isInfinite {
+                // In `natural` mode, Aligned is layout-neutral.
                 height = childSize.height
                 y = 0
             } else {
+                // In `fill` mode, we fill the space and position the child within it.
                 height = proposedSize.height
                 switch verticalAlignment {
                 case .top, .fill:
@@ -175,12 +175,8 @@ public struct Aligned: Element {
                 }
             }
 
-            // TODO: need some sort of dual mode here to decide whether to fill or not
-            // - pressure: in = natural size, out = fill
-            // - atLeast vs exactly
             return SPLayoutAttributes(
                 size: CGSize(width: width, height: height),
-//                size: childSize,
                 childPositions: [CGPoint(x: x, y: y)]
             )
         }

@@ -377,11 +377,27 @@ extension StackLayout {
         }
 
         let vectorConstraint = context.vectorConstraint(on: axis)
+//        let axisLayoutMode = alignment.layoutMode
 
-        let axisLayoutMode = alignment.layoutMode
-        let mode: AxisVarying<SPLayoutMode?> = axis == .horizontal
-            ? AxisVarying(horizontal: .natural, vertical: axisLayoutMode)
-            : AxisVarying(horizontal: axisLayoutMode, vertical: .natural)
+        let mode: AxisVarying<SPPressureMode?>
+//        switch axis {
+//        case .horizontal:
+//            mode = AxisVarying(horizontal: context.mode.horizontal, vertical: axisLayoutMode)
+//        case .vertical:
+//            mode = AxisVarying(horizontal: axisLayoutMode, vertical: context.mode.vertical)
+//        }
+        switch axis {
+        case .horizontal:
+            mode = AxisVarying(
+                horizontal: .natural,
+                vertical: alignment.layoutMode(in: context.mode.vertical)
+            )
+        case .vertical:
+            mode = AxisVarying(
+                horizontal: alignment.layoutMode(in: context.mode.horizontal),
+                vertical: .natural
+            )
+        }
 
         let layoutOptions = SPLayoutOptions(
             maxAllowedLayoutCount: 2,
@@ -390,7 +406,7 @@ extension StackLayout {
 
         let items: [(traits: Traits, content: Measurable)] = children.map { (traits, layoutable) in
             let measurable = Measurer { constraint in
-                layoutable.layout(in: constraint.maximum, options: layoutOptions)
+                layoutable.layout(in: constraint.singlePassSize, options: layoutOptions)
             }
             return (traits, measurable)
         }
@@ -933,12 +949,12 @@ extension StackLayout {
 // MARK: - Extensions
 
 extension StackLayout.Alignment {
-    var layoutMode: SPLayoutMode {
-        switch self {
-        case .align:
-            return .natural
-        case .fill:
+    func layoutMode(in contextMode: SPPressureMode) -> SPPressureMode {
+        switch (self, contextMode) {
+        case (.fill, .fill):
             return .fill
+        default:
+            return .natural
         }
     }
 }

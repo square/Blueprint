@@ -1,6 +1,6 @@
 /// Represents a path into an element hierarchy.
 /// Used for disambiguation during diff operations.
-struct ElementPath: Hashable, CustomDebugStringConvertible {
+public struct ElementPath: Hashable, CustomDebugStringConvertible {
 
     private var identifiersHash: Int? = nil
 
@@ -40,14 +40,14 @@ struct ElementPath: Hashable, CustomDebugStringConvertible {
         ElementPath()
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(identifiersHash)
     }
 
     // MARK: CustomDebugStringConvertible
 
-    var debugDescription: String {
-        identifiers.map { $0.debugDescription }.joined()
+    public var debugDescription: String {
+        identifiers.map { $0.debugDescription }.joined(separator: "/")
     }
 }
 
