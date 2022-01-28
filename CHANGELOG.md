@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.36.1]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
 
 ## [0.36.0]
 
@@ -783,7 +787,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.36.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.36.1...HEAD
+[0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
 [0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
 [0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
 [0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
