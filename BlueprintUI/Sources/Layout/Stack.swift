@@ -377,15 +377,8 @@ extension StackLayout {
         }
 
         let vectorConstraint = context.vectorConstraint(on: axis)
-//        let axisLayoutMode = alignment.layoutMode
 
         let mode: AxisVarying<SPPressureMode?>
-//        switch axis {
-//        case .horizontal:
-//            mode = AxisVarying(horizontal: context.mode.horizontal, vertical: axisLayoutMode)
-//        case .vertical:
-//            mode = AxisVarying(horizontal: axisLayoutMode, vertical: context.mode.vertical)
-//        }
         switch axis {
         case .horizontal:
             mode = AxisVarying(
