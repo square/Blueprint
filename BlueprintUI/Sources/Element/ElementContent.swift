@@ -40,7 +40,7 @@ public struct ElementContent {
         let size = measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent"),
+            cache: CacheFactory.makeCache(name: "ElementContent")
             singlePass: BlueprintView.singlePassLayoutDefault
         )
         return size
@@ -140,7 +140,7 @@ extension ElementContent {
     ///     and `Environment`.
     public init(
         measurementCachingKey: MeasurementCachingKey? = nil,
-        build builder: @escaping (SizeConstraint, Environment, MeasuringCache) -> Element
+        build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
         self.measurementCachingKey = measurementCachingKey
         storage = LazyStorage(builder: builder)
@@ -494,7 +494,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
 struct LazyStorage: ContentStorage {
     let childCount = 1
 
-    var builder: (SizeConstraint, Environment, MeasuringCache) -> Element
+    var builder: (SizeConstraint, Environment) -> Element
 
     func performLayout(
         attributes: LayoutAttributes,
@@ -502,8 +502,7 @@ struct LazyStorage: ContentStorage {
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         let constraint = SizeConstraint(attributes.bounds.size)
-        let measurementCache = cache.subcache(key: -1, name: "measuring")
-        let child = buildChild(in: constraint, environment: environment, cache: measurementCache)
+        let child = buildChild(in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
@@ -524,8 +523,7 @@ struct LazyStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            let measurementCache = cache.subcache(key: -1, name: "measuring")
-            let child = buildChild(in: constraint, environment: environment, cache: measurementCache)
+            let child = buildChild(in: constraint, environment: environment)
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -534,8 +532,8 @@ struct LazyStorage: ContentStorage {
         }
     }
 
-    func buildChild(in constraint: SizeConstraint, environment: Environment, cache: MeasuringCache) -> Element {
-        builder(constraint, environment, cache)
+    func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
+        builder(constraint, environment)
     }
 }
 
@@ -633,13 +631,9 @@ fileprivate struct MeasurableLayout: Layout, SPLayout {
     }
 }
 
-public struct Measurer: Measurable {
-    public init(_ measure: @escaping (SizeConstraint) -> CGSize) {
-        _measure = measure
-    }
-
+struct Measurer: Measurable {
     var _measure: (SizeConstraint) -> CGSize
-    public func measure(in constraint: SizeConstraint) -> CGSize {
+    func measure(in constraint: SizeConstraint) -> CGSize {
         _measure(constraint)
     }
 }
