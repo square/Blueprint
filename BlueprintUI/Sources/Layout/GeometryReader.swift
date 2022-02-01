@@ -31,14 +31,8 @@ public struct GeometryReader: Element {
     }
 
     public var content: ElementContent {
-        ElementContent { constraint, environment, cache -> Element in
-            self.elementRepresentation(
-                GeometryProxy(
-                    environment: environment,
-                    constraint: constraint,
-                    cache: cache
-                )
-            )
+        ElementContent { constraint, environment -> Element in
+            self.elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
         }
     }
 
@@ -54,12 +48,8 @@ public struct GeometryProxy {
     /// The size constraint of the element being laid out.
     public var constraint: SizeConstraint
 
-    var cache: MeasuringCache
-
     /// Measure the given element, constrained to the same size as the `GeometryProxy` itself (unless a constraint is explicitly provided).
     public func measure(element: Element, in explicit: SizeConstraint? = nil) -> CGSize {
-        cache.get(explicit ?? constraint) { constraint in
-            element.content.measure(in: constraint, environment: environment)
-        }
+        element.content.measure(in: explicit ?? constraint, environment: environment)
     }
 }

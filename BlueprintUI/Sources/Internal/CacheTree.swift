@@ -2,7 +2,7 @@ import CoreGraphics
 import os.log
 
 /// A size cache that also holds subcaches.
-protocol CacheTree: MeasuringCache, AnyObject {
+protocol CacheTree: AnyObject {
 
     typealias SubcacheKey = Int
 
@@ -19,9 +19,9 @@ protocol CacheTree: MeasuringCache, AnyObject {
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree
 }
 
-extension MeasuringCache {
+extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
-    public func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
+    func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
         if let size = self[constraint] {
             return size
         }
@@ -29,9 +29,6 @@ extension MeasuringCache {
         self[constraint] = size
         return size
     }
-}
-
-extension CacheTree {
 
     /// Gets a subcache for an element with siblings.
     func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
@@ -47,12 +44,4 @@ extension CacheTree {
     func subcache(element: Element) -> CacheTree {
         subcache(index: 0, of: 1, element: element)
     }
-
-    var outOfBandCache: CacheTree {
-        subcache(key: -1, name: "oob")
-    }
-}
-
-public protocol MeasuringCache: AnyObject {
-    subscript(constraint: SizeConstraint) -> CGSize? { get set }
 }
