@@ -378,33 +378,39 @@ extension StackLayout {
 
         let vectorConstraint = context.vectorConstraint(on: axis)
 
-        let mode: AxisVarying<SPPressureMode?>
-        switch axis {
-        case .horizontal:
-            mode = AxisVarying(
-                horizontal: .natural,
-                vertical: alignment.layoutMode(in: context.mode.vertical)
-            )
-        case .vertical:
-            mode = AxisVarying(
-                horizontal: alignment.layoutMode(in: context.mode.horizontal),
-                vertical: .natural
-            )
-        }
 
-        let layoutOptions = SPLayoutOptions(
-            maxAllowedLayoutCount: 2,
-            mode: mode
-        )
-
-        let items: [(traits: Traits, content: Measurable)] = children.map { (traits, layoutable) in
-            let measurable = Measurer { constraint in
-                layoutable.layout(in: constraint.singlePassSize, options: layoutOptions)
+        func items(axisPressure: SPPressureMode?) -> [(traits: Traits, content: Measurable)] {
+            let mode: AxisVarying<SPPressureMode?>
+            switch axis {
+            case .horizontal:
+                mode = AxisVarying(
+                    horizontal: axisPressure,
+                    vertical: alignment.layoutMode(in: context.mode.vertical)
+                )
+            case .vertical:
+                mode = AxisVarying(
+                    horizontal: alignment.layoutMode(in: context.mode.horizontal),
+                    vertical: axisPressure
+                )
             }
-            return (traits, measurable)
+            let options = SPLayoutOptions(
+                maxAllowedLayoutCount: 2,
+                mode: mode
+            )
+            return children.map { (traits, layoutable) in
+                let measurable = Measurer { constraint in
+                    layoutable.layout(in: constraint.singlePassSize, options: options)
+                }
+                return (traits, measurable)
+            }
         }
 
-        let frames = _frames(for: items, in: vectorConstraint)
+        // First pass, use natural to get a measurement
+        let axisItems = items(axisPressure: .natural)
+        // Second pass, inherit mode so that we fill properly
+        let crossItems = items(axisPressure: nil)
+
+        let frames = _frames(axis: axisItems, cross: crossItems, in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -427,7 +433,7 @@ extension StackLayout {
         // During layout the constraints are always `.exactly` to fit the provided size
         let vectorConstraint = size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: items, in: vectorConstraint)
+        let frames = _frames(axis: items, cross: items, in: vectorConstraint)
 
         return frames.map { frame in
             LayoutAttributes(frame: frame.rect(axis: axis))
@@ -440,7 +446,7 @@ extension StackLayout {
         // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
         let vectorConstraint = constraint.vectorConstraint(on: axis)
 
-        let frames = _frames(for: items, in: vectorConstraint)
+        let frames = _frames(axis: items, cross: items, in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -453,15 +459,16 @@ extension StackLayout {
     }
 
     private func _frames(
-        for items: [(traits: Traits, content: Measurable)],
+        axis axisItems: [(traits: Traits, content: Measurable)],
+        cross crossItems: [(traits: Traits, content: Measurable)],
         in vectorConstraint: VectorConstraint
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
-        let axisSegments = _axisSegments(for: items, in: vectorConstraint)
+        let axisSegments = _axisSegments(for: axisItems, in: vectorConstraint)
 
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
-            for: items,
+            for: crossItems,
             axisConstraints: axisSegments.map { $0.magnitude },
             crossConstraint: vectorConstraint.cross
         )
