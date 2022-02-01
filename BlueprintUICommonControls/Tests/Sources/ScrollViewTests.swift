@@ -121,6 +121,7 @@ class ScrollViewTests: XCTestCase {
         test(contentSize: .fittingContent)
         test(contentSize: .fittingHeight)
         test(contentSize: .fittingWidth)
+        test(contentSize: .fittingConstraint)
     }
 
     private struct UnderflowElement: ProxyElement {

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `ScrollView.ContentSize.fittingConstraint`, to allow measuring content within the fitting size of the scroll view itself.
+
 ### Removed
 
 ### Changed

@@ -117,6 +117,11 @@ extension ScrollView {
                         width: .unconstrained,
                         height: constraint.height
                     ))
+
+            case .fittingConstraint:
+                return child.measure(
+                    in: constraint
+                )
             }
         }
 
@@ -185,6 +190,9 @@ extension ScrollView {
 
         /// The content size will be the minimum required to fit the content.
         case fittingContent
+
+        /// The content size will be measured within the layout constraint of the scroll view.
+        case fittingConstraint
 
         /// Manually provided content size.
         case custom(CGSize)
@@ -311,7 +319,7 @@ fileprivate final class ScrollerWrapperView: UIView {
         let contentSize: CGSize
 
         switch scrollView.contentSize {
-        case .fittingWidth, .fittingHeight, .fittingContent:
+        case .fittingWidth, .fittingHeight, .fittingContent, .fittingConstraint:
             contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
         case .custom(let customSize):
             contentSize = customSize
