@@ -40,7 +40,7 @@ public struct ElementContent {
         let size = measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent")
+            cache: CacheFactory.makeCache(name: "ElementContent"),
             singlePass: BlueprintView.singlePassLayoutDefault
         )
         return size
@@ -120,16 +120,6 @@ public struct ElementContent {
 }
 
 extension ElementContent {
-
-    public init(
-        measurementCachingKey: MeasurementCachingKey? = nil,
-        build builder: @escaping (SizeConstraint, Environment) -> Element
-    ) {
-        self.measurementCachingKey = measurementCachingKey
-        storage = LazyStorage { constraint, environment, _ in
-            builder(constraint, environment)
-        }
-    }
 
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.
@@ -421,10 +411,6 @@ extension ElementContent {
             }
         }
 
-//        func children(in context: LayoutContext) -> [Element] {
-//            return children.map { $0.element }
-//        }
-
         struct Child {
 
             var traits: LayoutType.Traits
@@ -631,9 +617,14 @@ fileprivate struct MeasurableLayout: Layout, SPLayout {
     }
 }
 
-struct Measurer: Measurable {
+public struct Measurer: Measurable {
     var _measure: (SizeConstraint) -> CGSize
-    func measure(in constraint: SizeConstraint) -> CGSize {
+
+    public init(_ measure: @escaping (SizeConstraint) -> CGSize) {
+        _measure = measure
+    }
+
+    public func measure(in constraint: SizeConstraint) -> CGSize {
         _measure(constraint)
     }
 }

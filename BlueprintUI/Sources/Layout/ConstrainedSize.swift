@@ -190,9 +190,6 @@ extension ConstrainedSize {
 
         func layout(in context: SPLayoutContext, child: SPLayoutable) -> SPLayoutAttributes {
 
-            // TODO: I think to preserve behavior we need to "push" this constraint down in the
-            // context, not just apply it here.
-
             let constrainedSize = CGSize(
                 width: width.applied(to: context.proposedSize.width),
                 height: height.applied(to: context.proposedSize.height)
