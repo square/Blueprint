@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
-- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
 - `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
 
 ### Added
@@ -21,9 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
-- `AttributedLabel` will normalize certain line break modes based on the number of lines.
-
 ### Deprecated
 
 ### Security
@@ -33,6 +28,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.36.1]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
+
+## [0.36.0]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
+
+### Changed
+
+- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+- `AttributedLabel` will normalize certain line break modes based on the number of lines.
 
 ## [0.35.1] - 2022-01-13
 
@@ -778,7 +791,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.35.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.36.1...HEAD
+[0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
+[0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
 [0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
 [0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
 [0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0

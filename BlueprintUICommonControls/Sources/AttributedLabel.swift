@@ -11,7 +11,7 @@ public struct AttributedLabel: Element, Hashable {
     /// with multi-line text rendering in TextKit, which is used to detect where links are in the text.
     /// Some modes also break line height adjustment in single-line labels, so these are also normalized.
     ///
-    /// Specicially:
+    /// Specifically:
     ///
     /// - 1 line labels with a mode of `byCharWrapping` or `byWordWrapping` will be normalized to `byClipping`.
     /// - Multiline labels with a mode of `byTruncatingHead` or `byTruncatingMiddle`
@@ -422,21 +422,30 @@ extension AttributedLabel {
         }
 
         override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-            guard let first = touches.first else { return }
+            guard links.isEmpty == false, let first = touches.first else {
+                return super.touchesBegan(touches, with: event)
+            }
+
             let touchedLinks = links(at: first.location(in: self))
             trackingLinks = touchedLinks
             applyLinkColors(activeLinks: touchedLinks)
         }
 
         override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-            guard let first = touches.first, let trackingLinks = trackingLinks else { return }
+            guard links.isEmpty == false, let first = touches.first, let trackingLinks = trackingLinks else {
+                return super.touchesMoved(touches, with: event)
+            }
+
             let touchedLinks = links(at: first.location(in: self))
             let activeLinks = Set(touchedLinks).intersection(trackingLinks)
             applyLinkColors(activeLinks: Array(activeLinks))
         }
 
         override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-            guard let first = touches.first, let trackingLinks = trackingLinks else { return }
+            guard links.isEmpty == false, let first = touches.first, let trackingLinks = trackingLinks else {
+                return super.touchesEnded(touches, with: event)
+            }
+
             let touchedLinks = links(at: first.location(in: self))
             let activeLinks = Set(touchedLinks).intersection(trackingLinks)
             for link in activeLinks {
