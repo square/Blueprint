@@ -67,12 +67,17 @@ public struct Decorate: ProxyElement {
         EnvironmentReader { environment in
             LayoutWriter { context, layout in
 
-                let contentSize = self.wrapped.content.measure(
-                    in: context.size,
-                    environment: environment
+                let contentFrame = CGRect(
+                    origin: .zero,
+                    size: context.phase.onMeasure {
+                        self.wrapped.content.measure(
+                            in: context.size,
+                            environment: environment
+                        )
+                    } onLayout: { size in
+                        size
+                    }
                 )
-
-                let contentFrame = CGRect(origin: .zero, size: contentSize)
 
                 let decorationFrame = self.position.frame(
                     with: contentFrame,
@@ -80,7 +85,7 @@ public struct Decorate: ProxyElement {
                     environment: environment
                 )
 
-                layout.sizing = .fixed(contentSize)
+                layout.sizing = .fixed(contentFrame.size)
 
                 switch self.layering {
                 case .above:
@@ -141,7 +146,7 @@ extension Decorate {
 
         /// The decoration element is positioned in the given corner of the
         /// content element, optionally offset by the provided amount.
-        case corner(Corner, UIOffset = .init())
+        case corner(Corner, UIOffset = .zero)
 
         /// Allows you to provide custom positioning for the decoration, based on the passed context.
         case custom((CustomContext) -> CGRect)

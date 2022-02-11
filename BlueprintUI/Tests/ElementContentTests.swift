@@ -173,6 +173,35 @@ class ElementContentTests: XCTestCase {
             XCTAssertEqual(counts.measures, 2)
         }
     }
+
+    func test_layout_phase() {
+
+        var callCount: Int = 0
+
+        let measure = ElementContent { phase, size, env in
+            XCTAssertEqual(phase, .measurement)
+            callCount += 1
+
+            return Empty()
+        }
+
+        let layout = ElementContent { phase, size, env in
+            XCTAssertEqual(phase, .layout)
+            callCount += 1
+
+            return Empty()
+        }
+
+        let size = measure.measure(in: .unconstrained)
+
+        _ = layout.performLayout(
+            attributes: .init(size: size),
+            environment: .empty,
+            cache: TestCache(name: "test")
+        )
+
+        XCTAssertEqual(callCount, 2)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
