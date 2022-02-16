@@ -144,7 +144,7 @@ extension AttributedLabel {
                     ? []
                     : [
                         UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
-                            guard let self = self, !self.links.isEmpty else {
+                            guard let self = self, !self.accessibilityLinks.isEmpty else {
                                 return nil
                             }
 
@@ -186,6 +186,7 @@ extension AttributedLabel {
 
             if !isMeasuring, previousAttributedText != attributedText {
                 links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
+                accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
             }
 
             applyLinkColors()
