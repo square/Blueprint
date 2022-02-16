@@ -140,20 +140,25 @@ extension AttributedLabel {
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
             set { fatalError() }
             get {
-                [
-                    UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
-                        guard let self = self else {
-                            return nil
-                        }
+                accessibilityLinks.isEmpty
+                    ? []
+                    : [
+                        UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
+                            guard let self = self, !self.links.isEmpty else {
+                                return nil
+                            }
 
-                        self.accessibilityLinkIndex += predicate.searchDirection == .next ? 1 : -1
-                        self.accessibilityLinkIndex = min(self.accessibilityLinks.count - 1, self.accessibilityLinkIndex)
-                        self.accessibilityLinkIndex = max(0, self.accessibilityLinkIndex)
+                            self.accessibilityLinkIndex += predicate.searchDirection == .next ? 1 : -1
+                            self.accessibilityLinkIndex = min(
+                                self.accessibilityLinks.count - 1,
+                                self.accessibilityLinkIndex
+                            )
+                            self.accessibilityLinkIndex = max(0, self.accessibilityLinkIndex)
 
-                        let link = self.accessibilityLinks[self.accessibilityLinkIndex]
-                        return UIAccessibilityCustomRotorItemResult(targetElement: link, targetRange: nil)
-                    },
-                ]
+                            let link = self.accessibilityLinks[self.accessibilityLinkIndex]
+                            return UIAccessibilityCustomRotorItemResult(targetElement: link, targetRange: nil)
+                        },
+                    ]
             }
         }
 
