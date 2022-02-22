@@ -15,6 +15,9 @@ public struct Label: ProxyElement {
     public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
 
+    /// A shadow to display behind the label's text. Defaults to no shadow.
+    public var shadow: TextShadow?
+
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
@@ -54,6 +57,7 @@ public struct Label: ProxyElement {
     public var elementRepresentation: Element {
         AttributedLabel(attributedText: attributedText) { label in
             label.numberOfLines = numberOfLines
+            label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
             label.accessibilityTraits = accessibilityTraits
 
