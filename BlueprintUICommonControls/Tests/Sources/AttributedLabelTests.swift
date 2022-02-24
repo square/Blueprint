@@ -83,6 +83,26 @@ class AttributedLabelTests: XCTestCase {
 
     }
 
+    func test_shadows() {
+        let string = NSAttributedString(
+            string: "Spooky text",
+            attributes: [
+                .font: UIFont.boldSystemFont(ofSize: 24),
+            ]
+        )
+
+        let element = AttributedLabel(attributedText: string) { label in
+            label.shadow = TextShadow(
+                radius: 4,
+                opacity: 0.75,
+                offset: UIOffset(horizontal: 1, vertical: 4),
+                color: .red
+            )
+        }.inset(uniform: 8)
+
+        compareSnapshot(of: element)
+    }
+
     func test_numberOfLines() {
 
         let string = NSAttributedString(string: "Hello, world. This is some long text that runs onto several lines.")

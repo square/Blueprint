@@ -21,6 +21,14 @@ public struct AttributedLabel: Element, Hashable {
 
     public var numberOfLines: Int = 0
 
+    /// A shadow to display behind the label's text. Defaults to no shadow.
+    ///
+    /// - Note: This shadow is applied using the backing view's `CALayer`, and will affect the
+    /// entire label. To apply a shadow to only a portion of text, you can instead set
+    /// `NSAttributedString.Key.shadow` on the string, but note that those shadows may be clipped
+    /// by the bounds of the backing view.
+    public var shadow: TextShadow?
+
     /// An offset that will be applied to the rect used by `drawText(in:)`.
     ///
     /// This can be used to adjust the positioning of text within each line's frame, such as adjusting
@@ -184,9 +192,28 @@ extension AttributedLabel {
             urlHandler = environment.urlHandler
             layoutDirection = environment.layoutDirection
 
-            if !isMeasuring, previousAttributedText != attributedText {
-                links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
-                accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
+            if !isMeasuring {
+                if previousAttributedText != attributedText {
+                    links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
+                    accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
+                }
+
+                if let shadow = model.shadow {
+                    layer.shadowRadius = shadow.radius
+                    layer.shadowOpacity = Float(shadow.opacity)
+                    layer.shadowOffset = CGSize(width: shadow.offset.horizontal, height: shadow.offset.vertical)
+                    layer.shadowColor = shadow.color.cgColor
+
+                    // For performance reasons, we should set `shadowPath`, but that's not practical
+                    // with text content. Instead, enable rasterization on this layer, which will
+                    // cache a bitmap offscreen.
+                    layer.shouldRasterize = true
+                    layer.rasterizationScale = layer.contentsScale
+                } else {
+                    layer.shadowOpacity = 0
+                    layer.shouldRasterize = false
+                }
+
             }
 
             applyLinkColors()
