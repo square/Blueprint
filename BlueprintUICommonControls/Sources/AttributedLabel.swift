@@ -204,7 +204,9 @@ extension AttributedLabel {
                     layer.shadowOffset = CGSize(width: shadow.offset.horizontal, height: shadow.offset.vertical)
                     layer.shadowColor = shadow.color.cgColor
 
-                    // enable rasterization on this layer, since text is too complex for a shadow path
+                    // For performance reasons, we should set `shadowPath`, but that's not practical
+                    // with text content. Instead, enable rasterization on this layer, which will
+                    // cache a bitmap offscreen.
                     layer.shouldRasterize = true
                     layer.rasterizationScale = layer.contentsScale
                 } else {
