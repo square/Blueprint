@@ -167,50 +167,41 @@ class AttributedLabelTests: XCTestCase {
                     color: .yellow
                 )
 
-            let element = AttributedLabel(attributedText: string)
+            var label = AttributedLabel(attributedText: string)
 
-            let elementSize = element.content.measure(in: SizeConstraint(size))
-            XCTAssertEqual(expectedSize, elementSize, file: file, line: line)
-        }
+            XCTAssertEqual(
+                expectedSize,
+                label.content.measure(in: SizeConstraint(size)),
+                file: file,
+                line: line
+            )
 
-        // Strings are measured slightly differently on iOS 10
+            label.textFitting = .adjusts(allowsTightening: true, minimumScale: 0.5)
 
-        if #available(iOS 11, *) {
-            test(
-                in: CGSize(width: 30, height: 20),
-                expectedSize: CGSize(width: 30, height: 235.5)
-            )
-            test(
-                in: CGSize(width: 100, height: 300),
-                expectedSize: CGSize(width: 95, height: 105.5)
-            )
-            test(
-                in: CGSize(width: 120, height: 300),
-                expectedSize: CGSize(width: 107, height: 67)
-            )
-            test(
-                in: CGSize(width: 8000, height: 4000),
-                expectedSize: CGSize(width: 153.5, height: 38.5)
-            )
-        } else {
-            test(
-                in: CGSize(width: 30, height: 20),
-                expectedSize: CGSize(width: 30, height: 235.5)
-            )
-            test(
-                in: CGSize(width: 100, height: 300),
-                expectedSize: CGSize(width: 96, height: 105.5)
-            )
-            test(
-                in: CGSize(width: 120, height: 300),
-                expectedSize: CGSize(width: 108.5, height: 67)
-            )
-            test(
-                in: CGSize(width: 8000, height: 4000),
-                expectedSize: CGSize(width: 155, height: 38.5)
+            XCTAssertEqual(
+                expectedSize,
+                label.content.measure(in: SizeConstraint(size)),
+                file: file,
+                line: line
             )
         }
 
+        test(
+            in: CGSize(width: 30, height: 20),
+            expectedSize: CGSize(width: 30, height: 235.5)
+        )
+        test(
+            in: CGSize(width: 100, height: 300),
+            expectedSize: CGSize(width: 95, height: 105.5)
+        )
+        test(
+            in: CGSize(width: 120, height: 300),
+            expectedSize: CGSize(width: 107, height: 67)
+        )
+        test(
+            in: CGSize(width: 8000, height: 4000),
+            expectedSize: CGSize(width: 153.5, height: 38.5)
+        )
     }
 
     func test_textRectOffset() {

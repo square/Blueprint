@@ -257,8 +257,10 @@ extension AttributedLabel {
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
-            
-            model.textFitting.apply(to: self)
+
+            if !isMeasuring {
+                model.textFitting.apply(to: self)
+            }
 
             isAccessibilityElement = model.isAccessibilityElement
             updateAccessibilityTraits(model)
