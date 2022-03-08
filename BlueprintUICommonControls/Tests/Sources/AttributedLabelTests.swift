@@ -46,6 +46,29 @@ class AttributedLabelTests: XCTestCase {
         )
     }
 
+    func test_textFitting() {
+
+        let element = AttributedLabel(attributedText: NSAttributedString(string: "Hello! What's up y'all")) {
+            $0.textFitting = .adjusts(allowsTightening: true, minimumScale: 0.5)
+            $0.numberOfLines = 1
+        }
+
+        compareSnapshot(
+            of: element.constrainedTo(width: .unconstrained),
+            identifier: "all_fits"
+        )
+
+        compareSnapshot(
+            of: element.constrainedTo(width: .atMost(100)),
+            identifier: "squishes"
+        )
+
+        compareSnapshot(
+            of: element.constrainedTo(width: .atMost(50)),
+            identifier: "overflows"
+        )
+    }
+
     func test_measuring() {
 
         func test(in size: CGSize, expectedSize: CGSize, file: StaticString = #file, line: UInt = #line) {
