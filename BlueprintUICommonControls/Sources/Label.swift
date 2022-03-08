@@ -8,13 +8,16 @@ public struct Label: ProxyElement {
     /// The text to be displayed.
     public var text: String
 
-    public var font: UIFont = UIFont.systemFont(ofSize: UIFont.systemFontSize)
+    public var font: UIFont = UIFont.systemFont(ofSize: UIFont.labelFontSize)
     public var color: UIColor = .black
     public var alignment: NSTextAlignment = .left
     public var numberOfLines: Int = 0
-    public var lineBreakMode: NSLineBreakMode = .byWordWrapping
+    public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
     public var textFitting: TextFittingAdjustment = .noAdjustment
+
+    /// A shadow to display behind the label's text. Defaults to no shadow.
+    public var shadow: TextShadow?
 
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
@@ -27,19 +30,10 @@ public struct Label: ProxyElement {
         configure(&self)
     }
 
-    private var effectiveLineBreakMode: NSLineBreakMode {
-        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-        // Normalize them to clipping mode instead.
-        if numberOfLines == 1 && (lineBreakMode == .byCharWrapping || lineBreakMode == .byWordWrapping) {
-            return .byClipping
-        }
-        return lineBreakMode
-    }
-
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
-        paragraphStyle.lineBreakMode = effectiveLineBreakMode
+        paragraphStyle.lineBreakMode = lineBreakMode
 
         switch lineHeight {
         case .custom(let lineHeight, _):
@@ -64,6 +58,7 @@ public struct Label: ProxyElement {
     public var elementRepresentation: Element {
         AttributedLabel(attributedText: attributedText) { label in
             label.numberOfLines = numberOfLines
+            label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
             label.accessibilityTraits = accessibilityTraits
             label.textFitting = textFitting

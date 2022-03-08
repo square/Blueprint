@@ -27,6 +27,9 @@ jobs:
           - sdk: "14.5"
             destination: platform=iOS Simulator,OS=14.5,name=iPhone 8
 
+          - sdk: "15.0"
+            destination: platform=iOS Simulator,OS=15.0,name=iPhone 8
+
     steps:
     - uses: actions/checkout@v1
 
@@ -46,7 +49,7 @@ jobs:
     - name: Package snapshot changes
       if: ${{ failure() }}
       run: |
-        git ls-files -m BlueprintUICommonControls/Tests/Sources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
+        git ls-files -mo BlueprintUICommonControls/Tests/Sources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
       uses: actions/upload-artifact@v2
@@ -86,4 +89,4 @@ jobs:
 
     - name: Build & Test
       run: |
-        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=14.5,name=iPhone 8"
+        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=15.0,name=iPhone 8"

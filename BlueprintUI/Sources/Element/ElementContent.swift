@@ -81,7 +81,24 @@ extension ElementContent {
         build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
         self.measurementCachingKey = measurementCachingKey
+
+        storage = LazyStorage { _, size, env in
+            builder(size, env)
+        }
+    }
+
+    init(
+        measurementCachingKey: MeasurementCachingKey? = nil,
+        build builder: @escaping (LayoutPhase, SizeConstraint, Environment) -> Element
+    ) {
+        self.measurementCachingKey = measurementCachingKey
+
         storage = LazyStorage(builder: builder)
+    }
+
+    enum LayoutPhase {
+        case measurement
+        case layout
     }
 }
 
@@ -420,7 +437,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 private struct LazyStorage: ContentStorage {
     let childCount = 1
 
-    var builder: (SizeConstraint, Environment) -> Element
+    var builder: (ElementContent.LayoutPhase, SizeConstraint, Environment) -> Element
 
     func performLayout(
         attributes: LayoutAttributes,
@@ -428,7 +445,7 @@ private struct LazyStorage: ContentStorage {
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         let constraint = SizeConstraint(attributes.bounds.size)
-        let child = buildChild(in: constraint, environment: environment)
+        let child = buildChild(for: .layout, in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
@@ -449,7 +466,7 @@ private struct LazyStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            let child = buildChild(in: constraint, environment: environment)
+            let child = buildChild(for: .measurement, in: constraint, environment: environment)
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -458,8 +475,12 @@ private struct LazyStorage: ContentStorage {
         }
     }
 
-    private func buildChild(in constraint: SizeConstraint, environment: Environment) -> Element {
-        builder(constraint, environment)
+    private func buildChild(
+        for phase: ElementContent.LayoutPhase,
+        in constraint: SizeConstraint,
+        environment: Environment
+    ) -> Element {
+        builder(phase, constraint, environment)
     }
 }
 

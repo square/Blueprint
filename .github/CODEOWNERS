@@ -1,0 +1,4 @@
+# This file configures code owners (https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners), to automatically add reviewers to PRs.
+
+# Add UI Systems to each PR.
+* @square/ui-systems-ios

@@ -116,8 +116,8 @@ extension Element {
     ///   - horizontally: The horizontal alignment. Defaults to `.centered`.
     ///
     public func aligned(
-        vertically: Aligned.VerticalAlignment,
-        horizontally: Aligned.HorizontalAlignment
+        vertically: Aligned.VerticalAlignment = .center,
+        horizontally: Aligned.HorizontalAlignment = .center
     ) -> Aligned {
         Aligned(
             vertically: vertically,

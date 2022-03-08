@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Support `CALayerCornerCurve` for `Box` corner styles.
+- Shadows on `Label` and `AttributedLabel`
 
 - Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
 
@@ -28,6 +28,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.37.0]
+
+### Fixed
+
+- `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
+- Fixed an issue where `AttributedLabel` could cause a crash when voice over was enabled.
+
+### Added
+
+- `LayoutWriter.Context` now exposes the layout phase, to differ any calculations between measurement and layout.
+
+## [0.36.1]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
+
+## [0.36.0]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
+
+### Changed
+
+- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+- `AttributedLabel` will normalize certain line break modes based on the number of lines.
+
+## [0.35.1] - 2022-01-13
+
+### Fixed
+
+- `Label` and `AttributedLabel` now correctly report their `UIAccessibilityTraits`.
+
+## [0.35.0] - 2022-01-11
+
+### Added
+
+- Added the `EditingMenu` element, which allows showing a `UIMenuController` (aka the system editing menu) on tap, long press, or based on a trigger.
+
+### Changed
+
+- `Label.font` now defaults to using a font of size `UIFont.labelFontSize` (17) instead of `UIFont.systemFontSize`.
+
+## [0.34.0] - 2021-12-16
+
+### Added
+
+- Support `CALayerCornerCurve` for `Box` corner styles.
+- Added `AttributedText`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
+- Added support for links to `AttributedLabel`:
+  - Links can be added using the `link` attribute of the attributed string. This attribute supports `URL`s or `String`s.
+  - The label also supports detecting certain types of data and links, much like UITextView. Use the `linkDetectionTypes` property to specify which types of data to detect.
+  - Links are opened using the `LinkHandler` in the environment, which by default uses `UIApplication.shared.open(_:options:completionHandler:)`. Customize link handling by providing a `URLHandler` to the environment at the appropriate scope. `AttributedLabel` also has a function for easily handling links with a closure using the `onLinkTapped` method.
 
 ## [0.33.3] - 2021-12-8
 
@@ -746,7 +802,13 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.33.3...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.37.0...HEAD
+[0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
+[0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
+[0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
+[0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
+[0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
+[0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0
 [0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
 [0.33.2]: https://github.com/square/Blueprint/compare/0.33.1...0.33.2
 [0.33.1]: https://github.com/square/Blueprint/compare/0.33.0...0.33.1

@@ -47,9 +47,24 @@ public struct LayoutWriter: Element {
     //
 
     public var content: ElementContent {
-        ElementContent { size, env -> Element in
+        ElementContent { phase, size, env -> Element in
+
+            func layoutPhase() -> Context.LayoutPhase {
+                switch phase {
+                case .measurement: return .measurement
+                case .layout: return .layout(size.maximum)
+                }
+            }
+
             var builder = Builder()
-            self.build(Context(size: size), &builder)
+
+            self.build(
+                Context(
+                    size: size,
+                    phase: layoutPhase()
+                ),
+                &builder
+            )
 
             return Content(builder: builder)
         }
@@ -121,6 +136,12 @@ extension LayoutWriter {
 
         /// The size constraint the layout is occurring in.
         public var size: SizeConstraint
+
+        /// The phase of the layout current occurring – measurement or layout.
+        ///
+        /// You can use this value to vary calculations as needed between phases; eg, to make
+        /// an element take up the full available size during the `.layout` phase, where sizing is known.
+        public var phase: LayoutPhase
     }
 
     /// Controls the sizing calculation of the custom layout.
@@ -188,6 +209,31 @@ extension LayoutWriter {
             self.frame = frame
             self.key = key
             self.element = element
+        }
+    }
+}
+
+
+extension LayoutWriter.Context {
+
+    /// The current phase of the layout event: `.measurement` or `.layout`.
+    public enum LayoutPhase: Equatable {
+
+        /// The element is being measured.
+        case measurement
+
+        /// The element is being laid out with a known size.
+        case layout(CGSize)
+
+        /// Returns the provided value based on if a measurement or layout is occurring.
+        public func onMeasure<Value>(
+            _ onMeasure: () -> Value,
+            onLayout: (CGSize) -> Value
+        ) -> Value {
+            switch self {
+            case .measurement: return onMeasure()
+            case .layout(let size): return onLayout(size)
+            }
         }
     }
 }

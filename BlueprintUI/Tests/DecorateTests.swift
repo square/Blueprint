@@ -11,6 +11,28 @@ import XCTest
 
 class Decorate_Position_Tests: XCTestCase {
 
+    func test_root_size() {
+
+        let decorate = Decorate(
+            layering: .above,
+            position: .corner(.topLeft, .zero),
+            wrapping: BaseElement(),
+            decoration: DecorationElement()
+        )
+
+        let layout = decorate
+            .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+            .children[0].node // Decorate
+            .children[0].node // LayoutWriter
+            .children // LayoutWriter.Content
+            .map { $0.node }
+
+        XCTAssertEqual(layout.count, 2)
+
+        XCTAssertEqual(layout[0].layoutAttributes.bounds.size, CGSize(width: 100, height: 100))
+        XCTAssertEqual(layout[1].layoutAttributes.bounds.size, CGSize(width: 10, height: 15))
+    }
+
     func test_frame() {
 
         let contentFrame = CGRect(x: 10, y: 10, width: 50, height: 30)
@@ -62,6 +84,16 @@ class Decorate_Position_Tests: XCTestCase {
     }
 }
 
+fileprivate struct BaseElement: Element {
+
+    var content: ElementContent {
+        ElementContent { _ in CGSize(width: 60, height: 70) }
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { _ in }
+    }
+}
 
 fileprivate struct DecorationElement: Element {
 

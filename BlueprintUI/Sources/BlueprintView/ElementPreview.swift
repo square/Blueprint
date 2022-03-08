@@ -157,6 +157,7 @@
 
             func makeUIView(context: Context) -> BlueprintView {
                 let view = BlueprintView()
+                view.backgroundColor = .clear
                 view.element = element
 
                 return view

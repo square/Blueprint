@@ -15,8 +15,11 @@ import UIKit
 
 
 final class RootViewController: UIViewController {
-    fileprivate var demos: [DemoItem] {
+    fileprivate var demos: [Element] {
         [
+            DemoItem(title: "Text Links", onTap: { [weak self] in
+                self?.push(TextLinkViewController())
+            }),
             DemoItem(title: "Post List", badgeText: "3", onTap: { [weak self] in
                 self?.push(PostsViewController())
             }),
@@ -26,6 +29,23 @@ final class RootViewController: UIViewController {
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             }),
+
+            EditingMenu { menu in
+                DemoItem(title: "Show A Menu Controller") {
+                    menu.show()
+                }
+            } items: {
+                EditingMenuItem.copying("A string goes on the pasteboard")
+
+                EditingMenuItem(.paste) {
+                    print("Pasted!")
+                }
+
+                EditingMenuItem(title: "A Custom Item") {
+                    // Do something here...
+                    print("Performed!")
+                }
+            },
         ]
     }
 
@@ -40,7 +60,7 @@ final class RootViewController: UIViewController {
     var contents: Element {
         Column { column in
             column.minimumVerticalSpacing = 20.0
-            column.horizontalAlignment = .fill
+            column.horizontalAlignment = .leading
 
             self.demos.forEach { demo in
                 column.add(child: demo)
