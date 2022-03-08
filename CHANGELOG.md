@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Shadows on `Label` and `AttributedLabel`
 - Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
 
 ### Removed
@@ -26,6 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.37.0]
+
+### Fixed
+
+- `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
+- Fixed an issue where `AttributedLabel` could cause a crash when voice over was enabled.
+
+### Added
+
+- `LayoutWriter.Context` now exposes the layout phase, to differ any calculations between measurement and layout.
 
 ## [0.36.1]
 
@@ -789,7 +801,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.36.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.37.0...HEAD
+[0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
 [0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
 [0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
 [0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
