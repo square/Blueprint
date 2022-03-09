@@ -307,12 +307,36 @@ public final class BlueprintView: UIView {
     }
 
     private func updateViewHierarchyIfNeeded() {
+
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
-        precondition(
-            !isInsideUpdate,
-            "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
-        )
+        /// Once the previous call to this method finishes performing
+        /// `performUpdateViewHierarchy`, it will re-run if required.
+        guard isInsideUpdate == false else { return }
+
+        var updateCount: Int = 0
+
+        repeat {
+            if updateCount < 3 {
+                autoreleasepool {
+                    updateCount += 1
+                    performUpdateViewHierarchy()
+                }
+            } else {
+                fatalError(
+                    """
+                    Repeated reentrant updates are not supported in BlueprintView, and likely indicates programmer error \
+                    (eg, your element updates themselves are repeatedly triggering a layout further up the view tree).
+
+                    To debug, set a Swift Error breakpoint, and look for calls to `UIView.layoutIfNeeded()` up the callstack from \
+                    this point, and ensure that events from within the view hierarchy are not repeatedly triggering additional updates.
+                    """
+                )
+            }
+        } while needsViewHierarchyUpdate
+    }
+
+    private func performUpdateViewHierarchy() {
 
         isInsideUpdate = true
 
