@@ -3,22 +3,6 @@ import XCTest
 
 class ElementContentTests: XCTestCase {
 
-    func test_measurement_caching() {
-
-        let environment = Environment.empty
-
-        let element = MeasurableElement()
-
-        _ = element.content.measure(in: .unconstrained, environment: environment)
-        XCTAssertEqual(MeasurableElement.measureCount, 1)
-
-        _ = element.content.measure(in: .unconstrained, environment: environment)
-        XCTAssertEqual(MeasurableElement.measureCount, 1)
-
-        _ = element.content.measure(in: .unconstrained, environment: environment)
-        XCTAssertEqual(MeasurableElement.measureCount, 1)
-    }
-
     func test_noChildren() {
         let container = ElementContent(layout: FrameLayout())
         XCTAssertEqual(container.childCount, 0)
@@ -206,12 +190,9 @@ class ElementContentTests: XCTestCase {
 
 fileprivate struct MeasurableElement: Element {
 
-    static var measureCount: Int = 0
-
     var content: ElementContent {
-        ElementContent(measurementCachingKey: .init(type: Self.self, input: "element")) { constraint -> CGSize in
-            Self.measureCount += 1
-            return .init(width: 20.0, height: 20.0)
+        ElementContent { constraint -> CGSize in
+            .init(width: 20.0, height: 20.0)
         }
     }
 

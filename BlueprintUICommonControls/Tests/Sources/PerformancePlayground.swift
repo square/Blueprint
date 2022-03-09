@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import BlueprintUI
+@testable import BlueprintUICommonControls
 
 
 class PerformancePlayground: XCTestCase {
@@ -23,13 +24,13 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
     }
 
     func test_repeated_layouts() {
         let element = Column { col in
             for index in 1...1000 {
-                col.add(child: TestLabel(text: "This is test label number #\(index)"))
+                col.add(child: Label(text: "This is test label number #\(index)"))
             }
         }
 
@@ -42,7 +43,9 @@ class PerformancePlayground: XCTestCase {
     }
 
     func test_deep_element_hierarchy() {
-        let elements = lipsumStrings.map(TestLabel.init)
+        let elements = lipsumStrings.map {
+            Label(text: $0)
+        }
 
         let stack = Column { col in
             let row = Row { row in
@@ -137,31 +140,12 @@ class PerformancePlayground: XCTestCase {
     }
 }
 
+
 private struct NonCachingLabel: UIViewElement {
     var text: String
 
     func makeUIView() -> UILabel {
         UILabel()
-    }
-
-    func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
-        view.numberOfLines = 0
-        view.text = text
-    }
-}
-
-fileprivate struct TestLabel: UIViewElement {
-
-    var text: String
-
-    // MARK: UIViewElement
-
-    func makeUIView() -> UILabel {
-        UILabel()
-    }
-
-    var measurementCacheKey: AnyHashable? {
-        text
     }
 
     func updateUIView(_ view: UILabel, with context: UIViewElementContext) {
