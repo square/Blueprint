@@ -38,8 +38,41 @@ public struct AttributedLabel: Element, Hashable {
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
-    /// Controls how to adjust the size of the text when it does not fit in the given layout.
-    public var textFitting: TextFittingAdjustment = .noAdjustment
+    /// A Boolean value that determines whether the label reduces the text’s font
+    /// size to fit the title string into the label’s bounding rectangle.
+    ///
+    /// Normally, the label draws the text with the font you specify in the font property.
+    /// If this property is true, and the text in the text property exceeds the label’s bounding rectangle,
+    /// the label reduces the font size until the text fits or it has scaled the font down to the minimum
+    /// font size. The default value for this property is false.
+    ///
+    /// If you change it to true, be sure that you also set an appropriate minimum
+    /// font scale by modifying the minimumScaleFactor property.
+    ///
+    /// This autoshrinking behavior is only intended for use with a single-line label.
+    public var adjustsFontSizeToFitWidth: Bool = false
+
+    /// The minimum scale factor for the label’s text.
+    ///
+    /// If the adjustsFontSizeToFitWidth is true, use this property to specify the
+    /// smallest multiplier for the current font size that yields an acceptable
+    /// font size for the label’s text.
+    ///
+    /// If you specify a value of 0 for this property, the label doesn't scale the text down.
+    /// The default value of this property is 0.
+    public var minimumScaleFactor: CGFloat = 0
+
+    /// A Boolean value that determines whether the label tightens text before truncating.
+    ///
+    /// When the value of this property is true, the label tightens intercharacter spacing
+    /// of its text before allowing any truncation to occur. The label determines the
+    /// maximum amount of tightening automatically based on the font, current line width,
+    /// line break mode, and other relevant information.
+    ///
+    /// This autoshrinking behavior is only intended for use with a single-line label.
+    ///
+    /// The default value of this property is false.
+    public var allowsDefaultTighteningForTruncation: Bool = false
 
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
@@ -86,73 +119,6 @@ public struct AttributedLabel: Element, Hashable {
                 view.update(model: self, environment: context.environment, isMeasuring: false)
             }
         }
-    }
-}
-
-
-/// Provides a way to allow the adjustment of the text within a label when it become too wide to fit within a label.
-public enum TextFittingAdjustment: Hashable {
-
-    /// No adjustment is performed.
-    case noAdjustment
-
-    /// The provided adjustment is applied.
-    case adjusts(Adjusts)
-
-    /// The provided adjustment is applied.
-    public static func adjusts(
-        allowsTightening: Bool,
-        minimumScale: CGFloat
-    ) -> Self {
-        .adjusts(
-            .init(
-                allowsTightening: allowsTightening,
-                minimumScale: minimumScale
-            )
-        )
-    }
-
-    /// Controls the adjustments applied to a label when it does not fit in the provided layout rect.
-    public struct Adjusts: Hashable {
-
-        /// If the layout should tighten letter spacing when there is not enough spacing to fit the text.
-        public var allowsTightening: Bool
-
-        /// When scaling text down, controls the minimum text before it stops scaling down.
-        public var minimumScale: CGFloat
-    }
-
-    var labelProperties: LabelProperties {
-        switch self {
-        case .noAdjustment:
-            return LabelProperties(
-                adjustsFontToFit: false,
-                allowsTightening: false,
-                minimumScaleFactor: 0
-            )
-        case .adjusts(let adjustment):
-            return LabelProperties(
-                adjustsFontToFit: true,
-                allowsTightening: adjustment.allowsTightening,
-                minimumScaleFactor: adjustment.minimumScale
-            )
-        }
-    }
-
-    struct LabelProperties: Equatable {
-        var adjustsFontToFit: Bool
-        var allowsTightening: Bool
-        var minimumScaleFactor: CGFloat
-
-        func apply(to label: UILabel) {
-            label.adjustsFontSizeToFitWidth = adjustsFontToFit
-            label.allowsDefaultTighteningForTruncation = allowsTightening
-            label.minimumScaleFactor = minimumScaleFactor
-        }
-    }
-
-    func apply(to label: UILabel) {
-        labelProperties.apply(to: label)
     }
 }
 
@@ -259,11 +225,11 @@ extension AttributedLabel {
             textRectOffset = model.textRectOffset
 
             if !isMeasuring {
-                model.textFitting.apply(to: self)
+                updateFontFitting(with: model)
             }
 
             isAccessibilityElement = model.isAccessibilityElement
-            updateAccessibilityTraits(model)
+            updateAccessibilityTraits(with: model)
 
             urlHandler = environment.urlHandler
             layoutDirection = environment.layoutDirection
@@ -295,7 +261,14 @@ extension AttributedLabel {
             applyLinkColors()
         }
 
-        private func updateAccessibilityTraits(_ model: AttributedLabel) {
+        private func updateFontFitting(with model: AttributedLabel) {
+
+            adjustsFontSizeToFitWidth = model.adjustsFontSizeToFitWidth
+            minimumScaleFactor = model.minimumScaleFactor
+            allowsDefaultTighteningForTruncation = model.allowsDefaultTighteningForTruncation
+        }
+
+        private func updateAccessibilityTraits(with model: AttributedLabel) {
 
             if let traits = model.accessibilityTraits {
 

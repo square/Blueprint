@@ -131,10 +131,12 @@ class AttributedLabelTests: XCTestCase {
         )
     }
 
-    func test_textFitting() {
+    func test_fontSizeAdjustment() {
 
         let element = AttributedLabel(attributedText: NSAttributedString(string: "Hello! What's up y'all")) {
-            $0.textFitting = .adjusts(allowsTightening: true, minimumScale: 0.5)
+            $0.adjustsFontSizeToFitWidth = true
+            $0.minimumScaleFactor = 0.5
+
             $0.numberOfLines = 1
         }
 
@@ -176,7 +178,8 @@ class AttributedLabelTests: XCTestCase {
                 line: line
             )
 
-            label.textFitting = .adjusts(allowsTightening: true, minimumScale: 0.5)
+            label.adjustsFontSizeToFitWidth = true
+            label.minimumScaleFactor = 0.5
 
             XCTAssertEqual(
                 expectedSize,
