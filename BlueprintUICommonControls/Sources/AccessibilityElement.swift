@@ -42,7 +42,7 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
-        wrapping element: Element
+        wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
         self.label = label
