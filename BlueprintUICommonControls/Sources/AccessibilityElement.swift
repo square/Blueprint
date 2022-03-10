@@ -43,6 +43,7 @@ public struct AccessibilityElement: Element {
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
         wrapping element: Element
+        configure: (inout Self) -> Void = { _ in }
     ) {
         self.label = label
         self.value = value
@@ -51,6 +52,7 @@ public struct AccessibilityElement: Element {
         self.identifier = identifier
         self.accessibilityFrameSize = accessibilityFrameSize
         wrappedElement = element
+        configure(&self)
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
