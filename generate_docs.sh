@@ -6,7 +6,7 @@ set -euxo pipefail
 sourcekitten=`gem contents jazzy | grep 'bin/sourcekitten$' | head -1`
 
 platform="iOS Simulator"
-device=`instruments -s -devices | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}'`
+device=`xcrun xctrace list devices 2>&1 | grep -oE 'iPhone.*?[^\(]+' | sed 's/Simulator//' | head -1 | awk '{$1=$1;print}'`
 destination="platform=$platform,name=$device"
 
 $sourcekitten doc \
