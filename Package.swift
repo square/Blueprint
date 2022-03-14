@@ -24,8 +24,7 @@ let package = Package(
     targets: [
         .target(
             name: "BlueprintUI",
-            path: "BlueprintUI/Sources",
-            swiftSettings: [.unsafeFlags(["-enable-testing"])]
+            path: "BlueprintUI/Sources"
         ),
         .testTarget(
             name: "BlueprintUITests",
@@ -35,8 +34,7 @@ let package = Package(
         .target(
             name: "BlueprintUICommonControls",
             dependencies: ["BlueprintUI"],
-            path: "BlueprintUICommonControls/Sources",
-            swiftSettings: [.unsafeFlags(["-enable-testing"])]
+            path: "BlueprintUICommonControls/Sources"
         ),
         .testTarget(
             name: "BlueprintUICommonControlsTests",

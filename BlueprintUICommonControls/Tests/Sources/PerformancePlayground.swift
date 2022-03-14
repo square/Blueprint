@@ -24,7 +24,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        super.invokeTest()
+        // super.invokeTest()
     }
 
     func test_repeated_layouts() {
@@ -79,7 +79,7 @@ class PerformancePlayground: XCTestCase {
         let leafLabelCount = 4
         let stackDepth = 5
         let branchCount = 2
-        let runCount = 1
+        let runCount = 100
 
         var labelCount = 0
         func element(depth: Int) -> Element {

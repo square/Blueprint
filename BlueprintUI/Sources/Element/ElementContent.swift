@@ -548,7 +548,7 @@ extension Array {
         var mapped = [Mapped]()
         mapped.reserveCapacity(count)
 
-        for index in 0..<count {
+        for index in indices {
             mapped.append(map(index, self[index]))
         }
 

@@ -38,9 +38,7 @@ public struct Environment {
 
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
-    public static var empty: Environment {
-        Environment()
-    }
+    public static let empty = Environment()
 
     private var values: [ObjectIdentifier: Any] = [:]
 
