@@ -130,7 +130,11 @@ extension Decorate {
         ///
         /// A positive value for an edge expands the decoration outside of that edge,
         /// whereas a negative inset pushes the the decoration inside that edge.
-        case inset(UIEdgeInsets)
+        public static func inset(_ inset: UIEdgeInsets) -> Self {
+            .custom { context in
+                context.contentFrame.inset(by: inset.negated)
+            }
+        }
 
         /// Provides a `.inset` position where the decoration is inset by the
         /// same amount on each side.
@@ -146,36 +150,10 @@ extension Decorate {
 
         /// The decoration element is positioned in the given corner of the
         /// content element, optionally offset by the provided amount.
-        case corner(Corner, UIOffset = .zero)
-
-        /// Allows you to provide custom positioning for the decoration, based on the passed context.
-        case custom((CustomContext) -> CGRect)
-
-        /// Information provided to the `.custom` positioning type.
-        public struct CustomContext {
-
-            public var decorationSize: CGSize
-
-            /// The frame of the content element within the `Decorate` element.
-            public var contentFrame: CGRect
-
-            /// The environment the element is being rendered in.
-            public var environment: Environment
-        }
-
-        func frame(
-            with contentFrame: CGRect,
-            decoration: Element,
-            environment: Environment
-        ) -> CGRect {
-
-            switch self {
-            case .inset(let inset):
-                return contentFrame.inset(by: inset.negated)
-
-            case .corner(let corner, let offset):
-
-                let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
+        public static func corner(_ corner: Corner, _ offset: UIOffset = .zero) -> Self {
+            .custom { context in
+                let contentFrame = context.contentFrame
+                let size = context.decorationSize
 
                 let center: CGPoint = {
                     switch corner {
@@ -199,6 +177,31 @@ extension Decorate {
                 ).offset(
                     by: CGPoint(x: offset.horizontal, y: offset.vertical)
                 )
+            }
+        }
+
+        /// Allows you to provide custom positioning for the decoration, based on the passed context.
+        case custom((CustomContext) -> CGRect)
+
+        /// Information provided to the `.custom` positioning type.
+        public struct CustomContext {
+
+            public var decorationSize: CGSize
+
+            /// The frame of the content element within the `Decorate` element.
+            public var contentFrame: CGRect
+
+            /// The environment the element is being rendered in.
+            public var environment: Environment
+        }
+
+        func frame(
+            with contentFrame: CGRect,
+            decoration: Element,
+            environment: Environment
+        ) -> CGRect {
+
+            switch self {
 
             case .custom(let provider):
 
