@@ -154,6 +154,8 @@ extension Decorate {
         /// Information provided to the `.custom` positioning type.
         public struct CustomContext {
 
+            public var decorationSize: CGSize
+
             /// The frame of the content element within the `Decorate` element.
             public var contentFrame: CGRect
 
@@ -199,7 +201,16 @@ extension Decorate {
                 )
 
             case .custom(let provider):
-                return provider(.init(contentFrame: contentFrame, environment: environment))
+
+                let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
+
+                let context = CustomContext(
+                    decorationSize: size,
+                    contentFrame: contentFrame,
+                    environment: environment
+                )
+
+                return provider(context)
             }
         }
     }
