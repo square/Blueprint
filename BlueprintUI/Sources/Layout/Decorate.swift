@@ -123,7 +123,7 @@ extension Decorate {
     }
 
     /// How to position the decoration element relative to the content element.
-    public enum Position {
+    public struct Position {
 
         /// Insets the decoration element on each edge by the amount specified by
         /// the `UIEdgeInsets` property.
@@ -181,7 +181,9 @@ extension Decorate {
         }
 
         /// Allows you to provide custom positioning for the decoration, based on the passed context.
-        case custom((CustomContext) -> CGRect)
+        public static func custom(_ position: @escaping (CustomContext) -> CGRect) -> Self {
+            Position(position: position)
+        }
 
         /// Information provided to the `.custom` positioning type.
         public struct CustomContext {
@@ -195,26 +197,26 @@ extension Decorate {
             public var environment: Environment
         }
 
+        private var position: (CustomContext) -> CGRect
+
+        private init(position: @escaping (CustomContext) -> CGRect) {
+            self.position = position
+        }
+
         func frame(
             with contentFrame: CGRect,
             decoration: Element,
             environment: Environment
         ) -> CGRect {
+            let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
 
-            switch self {
+            let context = CustomContext(
+                decorationSize: size,
+                contentFrame: contentFrame,
+                environment: environment
+            )
 
-            case .custom(let provider):
-
-                let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
-
-                let context = CustomContext(
-                    decorationSize: size,
-                    contentFrame: contentFrame,
-                    environment: environment
-                )
-
-                return provider(context)
-            }
+            return position(context)
         }
     }
 }
