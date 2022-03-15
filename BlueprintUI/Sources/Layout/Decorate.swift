@@ -80,7 +80,7 @@ public struct Decorate: ProxyElement {
                 )
 
                 let decorationFrame = self.position.frame(
-                    with: contentFrame,
+                    with: contentFrame.size,
                     decoration: self.decoration,
                     environment: environment
                 )
@@ -132,7 +132,7 @@ extension Decorate {
         /// whereas a negative inset pushes the the decoration inside that edge.
         public static func inset(_ inset: UIEdgeInsets) -> Self {
             .custom { context in
-                context.contentFrame.inset(by: inset.negated)
+                CGRect(origin: .zero, size: context.contentSize).inset(by: inset.negated)
             }
         }
 
@@ -187,7 +187,7 @@ extension Decorate {
         ) -> Self {
             return .custom { context in
 
-                let boundingDimensions = ElementDimensions(size: context.contentFrame.size)
+                let boundingDimensions = ElementDimensions(size: context.contentSize)
                 let dimensions = ElementDimensions(size: context.decorationSize)
 
                 func position(of alignment: AlignmentID.Type, guide: AlignmentGuide?) -> CGFloat {
@@ -209,7 +209,7 @@ extension Decorate {
         /// content element, optionally offset by the provided amount.
         public static func corner(_ corner: Corner, _ offset: UIOffset = .zero) -> Self {
             .custom { context in
-                let contentFrame = context.contentFrame
+                let contentFrame = CGRect(origin: .zero, size: context.contentSize)
                 let size = context.decorationSize
 
                 let center: CGPoint = {
@@ -248,8 +248,8 @@ extension Decorate {
             /// The size of the decoration being positioned within the decorated content's bounds.
             public var decorationSize: CGSize
 
-            /// The frame of the content element within the `Decorate` element.
-            public var contentFrame: CGRect
+            /// The size of the content element within the `Decorate` element.
+            public var contentSize: CGSize
 
             /// The environment the element is being rendered in.
             public var environment: Environment
@@ -262,15 +262,15 @@ extension Decorate {
         }
 
         func frame(
-            with contentFrame: CGRect,
+            with contentSize: CGSize,
             decoration: Element,
             environment: Environment
         ) -> CGRect {
-            let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
+            let size = decoration.content.measure(in: .init(contentSize), environment: environment)
 
             let context = PositionContext(
                 decorationSize: size,
-                contentFrame: contentFrame,
+                contentSize: contentSize,
                 environment: environment
             )
 
