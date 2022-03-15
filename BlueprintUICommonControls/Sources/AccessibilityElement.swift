@@ -34,7 +34,7 @@ public struct AccessibilityElement: Element {
     public var accessibilityIncrement: (() -> Void)? = nil
     public var accessibilityDecrement: (() -> Void)? = nil
     public var accessibilityActivate: (() -> Bool)? = nil
-    
+
     public init(
         label: String?,
         value: String?,
@@ -84,8 +84,8 @@ public struct AccessibilityElement: Element {
 
         var increment: (() -> Void)?
         var decrement: (() -> Void)?
-        var activate : (() -> Bool)?
-        
+        var activate: (() -> Bool)?
+
         override var accessibilityFrame: CGRect {
             get {
                 guard let accessibilityFrameSize = accessibilityFrameSize else {
@@ -103,15 +103,15 @@ public struct AccessibilityElement: Element {
                 fatalError("accessibilityFrame is not settable on AccessibilityView")
             }
         }
-        
+
         override func accessibilityIncrement() {
             increment?()
         }
-        
+
         override func accessibilityDecrement() {
             decrement?()
         }
-        
+
         override func accessibilityActivate() -> Bool {
             guard let activate = activate else {
                 return super.accessibilityActivate()
