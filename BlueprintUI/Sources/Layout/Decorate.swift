@@ -120,6 +120,15 @@ extension Decorate {
         case topRight
         case bottomRight
         case bottomLeft
+
+        var alignment: Alignment {
+            switch self {
+            case .topLeft: return .topLeading
+            case .topRight: return .topTrailing
+            case .bottomLeft: return .bottomLeading
+            case .bottomRight: return .bottomTrailing
+            }
+        }
     }
 
     /// How to position the decoration element relative to the content element.
@@ -208,33 +217,15 @@ extension Decorate {
         /// The decoration element is positioned in the given corner of the
         /// content element, optionally offset by the provided amount.
         public static func corner(_ corner: Corner, _ offset: UIOffset = .zero) -> Self {
-            .custom { context in
-                let contentFrame = CGRect(origin: .zero, size: context.contentSize)
-                let size = context.decorationSize
-
-                let center: CGPoint = {
-                    switch corner {
-                    case .topLeft:
-                        return .zero
-                    case .topRight:
-                        return CGPoint(x: contentFrame.maxX, y: 0)
-                    case .bottomRight:
-                        return CGPoint(x: contentFrame.maxX, y: contentFrame.maxY)
-                    case .bottomLeft:
-                        return CGPoint(x: 0, y: contentFrame.maxY)
-                    }
-                }()
-
-                return CGRect(
-                    origin: CGPoint(
-                        x: center.x - (size.width / 2.0),
-                        y: center.y - (size.height / 2.0)
-                    ),
-                    size: size
-                ).offset(
-                    by: CGPoint(x: offset.horizontal, y: offset.vertical)
-                )
-            }
+            .aligned(
+                to: corner.alignment,
+                horizontalGuide: { dimensions in
+                    dimensions[HorizontalAlignment.center] - offset.horizontal
+                },
+                verticalGuide: { dimensions in
+                    dimensions[VerticalAlignment.center] - offset.vertical
+                }
+            )
         }
 
         /// Allows you to provide custom positioning for the decoration, based on the passed context.
