@@ -148,6 +148,63 @@ extension Decorate {
             .inset(UIEdgeInsets(top: vertical, left: horizontal, bottom: vertical, right: horizontal))
         }
 
+        /// Aligns the decoration according the given alignment option, optionally adjusting it with
+        /// an alignment guide on either axis.
+        ///
+        /// - Parameters:
+        ///   - alignment: Determines the position of the decoration relative to the decorated
+        ///     content.
+        ///
+        ///   - horizontalGuide:
+        ///
+        ///     A closure that can be used to provide a custom alignment guide for decoration along
+        ///     the horizontal axis.
+        ///
+        ///     This closure will be called with an `ElementDimensions` containing the dimensions of
+        ///     the decoration, and should return a value in the decoration's own coordinate space.
+        ///     This value represents the position along the decoration's horizontal axis that
+        ///     should be aligned relative to the decorated content.
+        ///
+        ///     If not specified, the default value is provided by the alignment.
+        ///
+        ///   - verticalGuide:
+        ///
+        ///     A closure that can be used to provide a custom alignment guide for decoration along
+        ///     the vertical axis.
+        ///
+        ///     This closure will be called with an `ElementDimensions` containing the dimensions of
+        ///     the decoration, and should return a value in the decoration's own coordinate space.
+        ///     This value represents the position along the decoration's vertical axis that should
+        ///     be aligned relative to the decorated content.
+        ///
+        ///     If not specified, the default value is provided by the alignment.
+        ///
+        /// - Returns: An aligned position.
+        public static func aligned(
+            to alignment: Alignment,
+            horizontalGuide: ((ElementDimensions) -> CGFloat)? = nil,
+            verticalGuide: ((ElementDimensions) -> CGFloat)? = nil
+        ) -> Self {
+            return .custom { context in
+
+                let boundingDimensions = ElementDimensions(size: context.contentFrame.size)
+                let dimensions = ElementDimensions(size: context.decorationSize)
+
+                func position(of alignment: AlignmentID.Type, guide: AlignmentGuide?) -> CGFloat {
+                    let anchor = alignment.defaultValue(in: boundingDimensions)
+                    let offset = guide?(dimensions) ?? alignment.defaultValue(in: dimensions)
+                    return anchor - offset
+                }
+
+                let position = CGPoint(
+                    x: position(of: alignment.horizontal.id, guide: horizontalGuide),
+                    y: position(of: alignment.vertical.id, guide: verticalGuide)
+                )
+
+                return CGRect(origin: position, size: context.decorationSize)
+            }
+        }
+
         /// The decoration element is positioned in the given corner of the
         /// content element, optionally offset by the provided amount.
         public static func corner(_ corner: Corner, _ offset: UIOffset = .zero) -> Self {

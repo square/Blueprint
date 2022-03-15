@@ -45,6 +45,24 @@ class Decorate_Position_Tests: XCTestCase {
             CGRect(x: 0, y: 0, width: 70, height: 50)
         )
 
+        // .aligned
+
+        let alignedBottom = Decorate.Position.aligned(to: .bottom)
+        XCTAssertEqual(
+            alignedBottom.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            CGRect(x: 20, y: 15, width: 10, height: 15)
+        )
+
+        let alignedBottomWithGuides = Decorate.Position.aligned(
+            to: .bottom,
+            horizontalGuide: { d in 3 },
+            verticalGuide: { d in 4 }
+        )
+        XCTAssertEqual(
+            alignedBottomWithGuides.frame(with: contentFrame, decoration: DecorationElement(), environment: .empty),
+            CGRect(x: 22, y: 26, width: 10, height: 15)
+        )
+
         // .corner
 
         let topLeft = Decorate.Position.corner(.topLeft, .init(horizontal: 1, vertical: 2))
