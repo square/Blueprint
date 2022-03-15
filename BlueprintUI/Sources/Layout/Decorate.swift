@@ -181,13 +181,14 @@ extension Decorate {
         }
 
         /// Allows you to provide custom positioning for the decoration, based on the passed context.
-        public static func custom(_ position: @escaping (CustomContext) -> CGRect) -> Self {
+        public static func custom(_ position: @escaping (PositionContext) -> CGRect) -> Self {
             Position(position: position)
         }
 
-        /// Information provided to the `.custom` positioning type.
-        public struct CustomContext {
+        /// Information provided to `Position` closures.
+        public struct PositionContext {
 
+            /// The size of the decoration being positioned within the decorated content's bounds.
             public var decorationSize: CGSize
 
             /// The frame of the content element within the `Decorate` element.
@@ -197,9 +198,9 @@ extension Decorate {
             public var environment: Environment
         }
 
-        private var position: (CustomContext) -> CGRect
+        private var position: (PositionContext) -> CGRect
 
-        private init(position: @escaping (CustomContext) -> CGRect) {
+        private init(position: @escaping (PositionContext) -> CGRect) {
             self.position = position
         }
 
@@ -210,7 +211,7 @@ extension Decorate {
         ) -> CGRect {
             let size = decoration.content.measure(in: .init(contentFrame.size), environment: environment)
 
-            let context = CustomContext(
+            let context = PositionContext(
                 decorationSize: size,
                 contentFrame: contentFrame,
                 environment: environment
