@@ -163,6 +163,33 @@ class ElementBuilderTests: XCTestCase {
         XCTAssert(type(of: gridRow.children[0].element) == TestElement2.self)
         XCTAssert(type(of: gridRow.children[1].element) == TestElement3.self)
     }
+
+    func test_optional() {
+        let optionalElementNil: TestElement? = nil
+        let optionalElement: TestElement? = TestElement()
+
+        let gridRow = GridRow {
+            if let optionalElement = optionalElement {
+                optionalElement
+            }
+
+            if let optionalElementNil = optionalElementNil {
+                optionalElementNil
+            }
+
+            optionalElement
+            optionalElementNil
+
+            optionalElement.map { _ in TestElement2() }
+            optionalElementNil.map { _ in TestElement3() }
+        }
+
+        XCTAssertEqual(gridRow.children.count, 3)
+
+        XCTAssert(type(of: gridRow.children[0].element) == TestElement.self)
+        XCTAssert(type(of: gridRow.children[1].element) == TestElement.self)
+        XCTAssert(type(of: gridRow.children[2].element) == TestElement2.self)
+    }
 }
 
 private struct TestElement: Element {

@@ -138,6 +138,32 @@ class BuilderTests: XCTestCase {
         )
     }
 
+    func test_optional() {
+        let optionalNil: String? = nil
+        let optional: String? = "1"
+
+        let content: [String] = build {
+
+            if let optional = optional {
+                optional
+            }
+
+            if let optionalNil = optionalNil {
+                optionalNil
+            }
+
+            optional
+            optionalNil
+
+            optional.map { _ in "2" }
+            optionalNil.map { _ in "3" }
+        }
+
+        XCTAssertEqual(
+            content, ["1", "1", "2"]
+        )
+    }
+
     func test_available() {
 
         let content: [String] = build {
