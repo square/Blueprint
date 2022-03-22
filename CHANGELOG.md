@@ -12,10 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Shadows on `Label` and `AttributedLabel`
+- `Decorate` has a new `aligned` positioning, that uses stack-style `Alignment` values and alignment guides.
+- The context vended to custom `Decorate` positions includes the decorated content size.
 
 ### Removed
 
 ### Changed
+
+- The context vended to custom `Decorate` positions was renamed to `PositionContext`, and the `contentFrame` property was replaced with a `contentSize`.
 
 ### Deprecated
 
