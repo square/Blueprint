@@ -194,7 +194,7 @@ extension Decorate {
             horizontalGuide: ((ElementDimensions) -> CGFloat)? = nil,
             verticalGuide: ((ElementDimensions) -> CGFloat)? = nil
         ) -> Self {
-            return .custom { context in
+            .custom { context in
 
                 let boundingDimensions = ElementDimensions(size: context.contentSize)
                 let dimensions = ElementDimensions(size: context.decorationSize)
