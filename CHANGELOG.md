@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Shadows on `Label` and `AttributedLabel`
+- Accessibility increment, decrement and activate actions now available on `AccessibilityElement`
 
 ### Removed
 
