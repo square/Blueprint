@@ -42,7 +42,6 @@ public struct AccessibilityElement: Element {
 
     /// Used to provide custom behaviour when activated by voiceover. This will override the default behavior of issuing a tap event at the accessibility activation point.
     /// See [Accessibility Activate Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615165-accessibilityactivate) for further information.
-
     public var accessibilityActivate: (() -> Bool)? = nil
 
     public init(
