@@ -11,16 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Shadows on `Label` and `AttributedLabel`
-- Accessibility increment, decrement and activate actions now available on `AccessibilityElement`
-- `Decorate` has a new `aligned` positioning, that uses stack-style `Alignment` values and alignment guides.
-- The context vended to custom `Decorate` positions includes the decorated content size.
-
 ### Removed
 
 ### Changed
-
-- The context vended to custom `Decorate` positions was renamed to `PositionContext`, and the `contentFrame` property was replaced with a `contentSize`.
 
 ### Deprecated
 
@@ -31,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.38.0]
+
+### Added
+
+- Shadows on `Label` and `AttributedLabel`
+- Accessibility increment, decrement and activate actions now available on `AccessibilityElement`
+- `Decorate` has a new `aligned` positioning, that uses stack-style `Alignment` values and alignment guides.
+- The context vended to custom `Decorate` positions includes the decorated content size.
+
+### Changed
+
+- The context vended to custom `Decorate` positions was renamed to `PositionContext`, and the `contentFrame` property was replaced with a `contentSize`.
 
 ## [0.37.0]
 
@@ -805,7 +811,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.37.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.38.0...HEAD
+[0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
 [0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
 [0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
 [0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
