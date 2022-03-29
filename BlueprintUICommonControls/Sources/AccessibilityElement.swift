@@ -3,7 +3,15 @@ import UIKit
 
 public struct AccessibilityElement: Element {
 
-    public enum Trait: Hashable {
+    public enum Trait {
+        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+        /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
+        public typealias IncrementAction = () -> Void
+
+        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+        /// See [Accessibility Decrement Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615169-accessibilitydecrement) for further information.
+        public typealias DecrementAction = () -> Void
+
         case button
         case link
         case header
@@ -17,11 +25,12 @@ public struct AccessibilityElement: Element {
         case notEnabled
         case updatesFrequently
         case startsMediaSession
-        case adjustable
+        case adjustable(IncrementAction, DecrementAction)
         case allowsDirectInteraction
         case causesPageTurn
         case tabBar
     }
+
 
     public var label: String?
     public var value: String?
@@ -30,15 +39,6 @@ public struct AccessibilityElement: Element {
     public var traits: Set<Trait>
     public var accessibilityFrameSize: CGSize?
     public var wrappedElement: Element
-
-
-    /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
-    /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
-    public var accessibilityIncrement: (() -> Void)? = nil
-
-    /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
-    /// See [Accessibility Decrement Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615169-accessibilitydecrement) for further information.
-    public var accessibilityDecrement: (() -> Void)? = nil
 
     /// Used to provide custom behaviour when activated by voiceover. This will override the default behavior of issuing a tap event at the accessibility activation point.
     /// See [Accessibility Activate Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615165-accessibilityactivate) for further information.
@@ -81,9 +81,15 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
             config[\.accessibilityFrameSize] = accessibilityFrameSize
-            config[\.increment] = accessibilityIncrement
-            config[\.decrement] = accessibilityDecrement
             config[\.activate] = accessibilityActivate
+
+            guard let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
+                  case let .adjustable(incrementAction, decrementAction) = adjustable
+            else {
+                return
+            }
+            config[\.increment] = incrementAction
+            config[\.decrement] = decrementAction
         }
     }
 
@@ -131,6 +137,42 @@ public struct AccessibilityElement: Element {
     }
 }
 
+extension AccessibilityElement.Trait: Hashable, Equatable {
+
+    public var rawValue: Int {
+        switch self {
+        case .button: return 0
+        case .link: return 1
+        case .header: return 2
+        case .searchField: return 3
+        case .image: return 4
+        case .selected: return 5
+        case .playsSound: return 6
+        case .keyboardKey: return 7
+        case .staticText: return 8
+        case .summaryElement: return 9
+        case .notEnabled: return 10
+        case .updatesFrequently: return 11
+        case .startsMediaSession: return 12
+        case .adjustable: return 13
+        case .allowsDirectInteraction: return 14
+        case .causesPageTurn: return 15
+        case .tabBar: return 16
+        }
+    }
+
+    public static func == (lhs: AccessibilityElement.Trait, rhs: AccessibilityElement.Trait) -> Bool {
+        lhs.rawValue == rhs.rawValue
+    }
+
+    public var hashValue: Int {
+        rawValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
+}
 
 extension Element {
 
@@ -234,3 +276,4 @@ extension UIAccessibilityTraits {
         }
     }
 }
+

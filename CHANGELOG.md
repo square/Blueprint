@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Accessibility increment, decrement actions have been moved to associated values on the `AccessibilityElement.Trait` enum.
+
 ### Deprecated
 
 ### Security
