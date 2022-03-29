@@ -15,6 +15,42 @@ public struct Label: ProxyElement {
     public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
 
+    /// A Boolean value that determines whether the label reduces the text’s font
+    /// size to fit the title string into the label’s bounding rectangle.
+    ///
+    /// Normally, the label draws the text with the font you specify in the font property.
+    /// If this property is true, and the text in the text property exceeds the label’s bounding rectangle,
+    /// the label reduces the font size until the text fits or it has scaled the font down to the minimum
+    /// font size. The default value for this property is false.
+    ///
+    /// If you change it to true, be sure that you also set an appropriate minimum
+    /// font scale by modifying the minimumScaleFactor property.
+    ///
+    /// This autoshrinking behavior is only intended for use with a single-line label.
+    public var adjustsFontSizeToFitWidth: Bool = false
+
+    /// The minimum scale factor for the label’s text.
+    ///
+    /// If the adjustsFontSizeToFitWidth is true, use this property to specify the
+    /// smallest multiplier for the current font size that yields an acceptable
+    /// font size for the label’s text.
+    ///
+    /// If you specify a value of 0 for this property, the label doesn't scale the text down.
+    /// The default value of this property is 0.
+    public var minimumScaleFactor: CGFloat = 0
+
+    /// A Boolean value that determines whether the label tightens text before truncating.
+    ///
+    /// When the value of this property is true, the label tightens intercharacter spacing
+    /// of its text before allowing any truncation to occur. The label determines the
+    /// maximum amount of tightening automatically based on the font, current line width,
+    /// line break mode, and other relevant information.
+    ///
+    /// This autoshrinking behavior is only intended for use with a single-line label.
+    ///
+    /// The default value of this property is false.
+    public var allowsDefaultTighteningForTruncation: Bool = false
+
     /// A shadow to display behind the label's text. Defaults to no shadow.
     public var shadow: TextShadow?
 
@@ -60,6 +96,9 @@ public struct Label: ProxyElement {
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
             label.accessibilityTraits = accessibilityTraits
+            label.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
+            label.minimumScaleFactor = minimumScaleFactor
+            label.allowsDefaultTighteningForTruncation = allowsDefaultTighteningForTruncation
 
             switch lineHeight {
             case .custom(let lineHeight, .top):
