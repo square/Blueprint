@@ -5,9 +5,6 @@ public struct ElementContent {
 
     private let storage: ContentStorage
 
-    /// The key to use to cache measurement values.
-    private let measurementCachingKey: MeasurementCachingKey?
-
     //
     // MARK: Initialization
     //
@@ -15,18 +12,15 @@ public struct ElementContent {
     /// Initializes a new `ElementContent` with the given layout and children.
     ///
     /// - parameter layout: The layout to use.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter configure: A closure that configures the layout and adds children to the container.
     public init<LayoutType: Layout>(
         layout: LayoutType,
-        measurementCachingKey: MeasurementCachingKey? = nil,
         configure: (inout Builder<LayoutType>) -> Void = { _ in }
     ) {
         var builder = Builder(layout: layout)
         configure(&builder)
 
         storage = builder
-        self.measurementCachingKey = measurementCachingKey
     }
 
     // MARK: Measurement & Children
@@ -45,9 +39,7 @@ public struct ElementContent {
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
-        environment.measurementCache.measurement(with: measurementCachingKey, in: constraint) {
-            self.storage.measure(in: constraint, environment: environment, cache: cache)
-        }
+        storage.measure(in: constraint, environment: environment, cache: cache)
     }
 
     public var childCount: Int {
@@ -72,27 +64,19 @@ extension ElementContent {
     /// Initializes a new `ElementContent` that will lazily create its storage during a layout and measurement pass,
     /// based on the `Environment` passed to the `builder` closure.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey`
-    ///     documentation for more.
     /// - parameter builder: A closure that provides the content `Element` based on the provided `SizeConstraint`
     ///     and `Environment`.
     public init(
-        measurementCachingKey: MeasurementCachingKey? = nil,
         build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
-        self.measurementCachingKey = measurementCachingKey
-
         storage = LazyStorage { _, size, env in
             builder(size, env)
         }
     }
 
     init(
-        measurementCachingKey: MeasurementCachingKey? = nil,
         build builder: @escaping (LayoutPhase, SizeConstraint, Environment) -> Element
     ) {
-        self.measurementCachingKey = measurementCachingKey
-
         storage = LazyStorage(builder: builder)
     }
 
@@ -109,17 +93,12 @@ extension ElementContent {
     /// - parameter element: The single child element.
     /// - parameter key: The key to use to unique the element during updates.
     /// - parameter layout: The layout that will be used.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init(
         child: Element,
         key: AnyHashable? = nil,
-        layout: SingleChildLayout,
-        measurementCachingKey: MeasurementCachingKey? = nil
+        layout: SingleChildLayout
     ) {
-        self = ElementContent(
-            layout: SingleChildLayoutHost(wrapping: layout),
-            measurementCachingKey: measurementCachingKey
-        ) {
+        self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
         }
     }
@@ -129,51 +108,37 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
-    public init(
-        child: Element,
-        measurementCachingKey: MeasurementCachingKey? = nil
-    ) {
-        self = ElementContent(child: child, layout: PassthroughLayout(), measurementCachingKey: measurementCachingKey)
+    public init(child: Element) {
+        self = ElementContent(child: child, layout: PassthroughLayout())
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
     ///
     /// - parameter measurable: How to measure the `ElementContent`.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
-    public init(
-        measurable: Measurable,
-        measurementCachingKey: MeasurementCachingKey? = nil
-    ) {
+    public init(measurable: Measurable) {
         self = ElementContent(
             layout: MeasurableLayout(measurable: measurable),
-            measurementCachingKey: measurementCachingKey,
             configure: { _ in }
         )
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint`.
     public init(
-        measurementCachingKey: MeasurementCachingKey? = nil,
         measureFunction: @escaping (SizeConstraint) -> CGSize
     ) {
-        self = ElementContent(measurementCachingKey: measurementCachingKey) { constraint, _ in
+        self = ElementContent { constraint, _ in
             measureFunction(constraint)
         }
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
     ///
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
     public init(
-        measurementCachingKey: MeasurementCachingKey? = nil,
         measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
-        self.measurementCachingKey = measurementCachingKey
         storage = MeasurableStorage(measurer: measureFunction)
     }
 
@@ -189,15 +154,11 @@ extension ElementContent {
     /// which allows adapting the environment to affect the element, plus elements further down the tree.
     ///
     /// - parameter child: The child element to display.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     /// - parameter environmentAdapter: How to adapt the `Environment` for the child and elements further down the tree.
     public init(
         child: Element,
-        measurementCachingKey: MeasurementCachingKey? = nil,
         environment environmentAdapter: @escaping (inout Environment) -> Void
     ) {
-        self.measurementCachingKey = measurementCachingKey
-
         storage = EnvironmentAdaptingStorage(
             adapter: environmentAdapter,
             child: child
@@ -210,15 +171,13 @@ extension ElementContent {
     /// - parameter child: The child element to display.
     /// - parameter key: The key to set in the `Environment`.
     /// - parameter value: The value to set in the `Environment` for the given key.
-    /// - parameter measurementCachingKey: An optional key to use to cache measurement. See the `MeasurementCachingKey` documentation for more.
     public init<Key>(
         child: Element,
         key: Key.Type,
-        value: Key.Value,
-        measurementCachingKey: MeasurementCachingKey? = nil
+        value: Key.Value
     ) where Key: EnvironmentKey {
 
-        self.init(child: child, measurementCachingKey: measurementCachingKey) { environment in
+        self.init(child: child) { environment in
             environment[key] = value
         }
     }
@@ -349,7 +308,13 @@ extension ElementContent {
             in environment: Environment,
             cache: CacheTree
         ) -> [(LayoutType.Traits, Measurable)] {
-            children.enumerated().map { index, child in
+
+            /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
+            /// here; because the enumerated version is about 25% slower. Because this
+            /// is an extremely hot codepath; this additional performance matters, so we will
+            /// keep track of the index ourselves.
+
+            children.indexedMap { index, child in
                 let childContent = child.content
                 let childCache = cache.subcache(
                     index: index,
@@ -566,5 +531,27 @@ struct Measurer: Measurable {
     var _measure: (SizeConstraint) -> CGSize
     func measure(in constraint: SizeConstraint) -> CGSize {
         _measure(constraint)
+    }
+}
+
+
+extension Array {
+
+    /// A `map` implementation that also passes the `index` of each element in the original array.
+    ///
+    /// This method is more performant than calling `array.enumerated().map(...)` by up
+    /// to 25% for large collections, so prefer it when needing an indexed `map` in areas where performance is critical.
+    @inlinable func indexedMap<Mapped>(_ map: (Int, Element) -> Mapped) -> [Mapped] {
+
+        let count = self.count
+
+        var mapped = [Mapped]()
+        mapped.reserveCapacity(count)
+
+        for index in indices {
+            mapped.append(map(index, self[index]))
+        }
+
+        return mapped
     }
 }

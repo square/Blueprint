@@ -107,7 +107,7 @@ public struct AttributedLabel: Element, Hashable {
             }
         }
 
-        return ElementContent(measurementCachingKey: .init(type: Self.self, input: self)) { sizeConstraint, environment -> CGSize in
+        return ElementContent { sizeConstraint, environment -> CGSize in
             Measurer().measure(model: self, in: sizeConstraint, environment: environment)
         }
     }
