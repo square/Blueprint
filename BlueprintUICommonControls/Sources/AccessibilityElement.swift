@@ -31,6 +31,19 @@ public struct AccessibilityElement: Element {
     public var accessibilityFrameSize: CGSize?
     public var wrappedElement: Element
 
+
+    /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+    /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
+    public var accessibilityIncrement: (() -> Void)? = nil
+
+    /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+    /// See [Accessibility Decrement Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615169-accessibilitydecrement) for further information.
+    public var accessibilityDecrement: (() -> Void)? = nil
+
+    /// Used to provide custom behaviour when activated by voiceover. This will override the default behavior of issuing a tap event at the accessibility activation point.
+    /// See [Accessibility Activate Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615165-accessibilityactivate) for further information.
+    public var accessibilityActivate: (() -> Bool)? = nil
+
     public init(
         label: String?,
         value: String?,
@@ -38,7 +51,8 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
-        wrapping element: Element
+        wrapping element: Element,
+        configure: (inout Self) -> Void = { _ in }
     ) {
         self.label = label
         self.value = value
@@ -47,6 +61,7 @@ public struct AccessibilityElement: Element {
         self.identifier = identifier
         self.accessibilityFrameSize = accessibilityFrameSize
         wrappedElement = element
+        configure(&self)
     }
 
     private var accessibilityTraits: UIAccessibilityTraits {
@@ -66,12 +81,19 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
             config[\.accessibilityFrameSize] = accessibilityFrameSize
+            config[\.increment] = accessibilityIncrement
+            config[\.decrement] = accessibilityDecrement
+            config[\.activate] = accessibilityActivate
         }
     }
 
     private final class AccessibilityView: UIView {
 
         var accessibilityFrameSize: CGSize?
+
+        var increment: (() -> Void)?
+        var decrement: (() -> Void)?
+        var activate: (() -> Bool)?
 
         override var accessibilityFrame: CGRect {
             get {
@@ -90,6 +112,22 @@ public struct AccessibilityElement: Element {
                 fatalError("accessibilityFrame is not settable on AccessibilityView")
             }
         }
+
+        override func accessibilityIncrement() {
+            increment?()
+        }
+
+        override func accessibilityDecrement() {
+            decrement?()
+        }
+
+        override func accessibilityActivate() -> Bool {
+            guard let activate = activate else {
+                return super.accessibilityActivate()
+            }
+            return activate()
+        }
+
     }
 }
 
