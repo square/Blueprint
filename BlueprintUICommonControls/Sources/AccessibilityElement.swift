@@ -83,13 +83,12 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityFrameSize] = accessibilityFrameSize
             config[\.activate] = accessibilityActivate
 
-            guard let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
-                  case let .adjustable(incrementAction, decrementAction) = adjustable
-            else {
-                return
+            if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
+               case let .adjustable(incrementAction, decrementAction) = adjustable
+            {
+                config[\.increment] = incrementAction
+                config[\.decrement] = decrementAction
             }
-            config[\.increment] = incrementAction
-            config[\.decrement] = decrementAction
         }
     }
 
@@ -138,8 +137,9 @@ public struct AccessibilityElement: Element {
 }
 
 extension AccessibilityElement.Trait: Hashable, Equatable {
-
-    public var rawValue: Int {
+    /// This conformance to `Hashable` is provided to allow traits to be included in a `Set`.
+    /// - Important: ⚠️ This implementation does not take equality of associated values on `.adjustable` into account.  ⚠️
+    private var internalValue: Int {
         switch self {
         case .button: return 0
         case .link: return 1
@@ -162,15 +162,11 @@ extension AccessibilityElement.Trait: Hashable, Equatable {
     }
 
     public static func == (lhs: AccessibilityElement.Trait, rhs: AccessibilityElement.Trait) -> Bool {
-        lhs.rawValue == rhs.rawValue
-    }
-
-    public var hashValue: Int {
-        rawValue
+        lhs.internalValue == rhs.internalValue
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(hashValue)
+        hasher.combine(internalValue)
     }
 }
 
