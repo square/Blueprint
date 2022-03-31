@@ -11,15 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
-
 ### Removed
 
-- `MeasurementCachingKey` has been removed – Blueprint has cached measurements per render pass for many releases, so this actually slowed down layouts due to additional allocations and cache checking. This is about a 5-10% performance improvement depending on the layout.
-
 ### Changed
-
-- Accessibility increment, decrement actions have been moved to associated values on the `AccessibilityElement.Trait` enum.
 
 ### Deprecated
 
@@ -30,6 +24,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.39.0]
+
+### Added
+
+- Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
+
+### Removed
+
+- `MeasurementCachingKey` has been removed – Blueprint has cached measurements per render pass for many releases, so this actually slowed down layouts due to additional allocations and cache checking. This is about a 5-10% performance improvement depending on the layout.
+
+### Changed
+
+- Accessibility increment, decrement actions have been moved to associated values on the `AccessibilityElement.Trait` enum.
 
 ## [0.38.0]
 
