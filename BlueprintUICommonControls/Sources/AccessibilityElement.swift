@@ -88,6 +88,9 @@ public struct AccessibilityElement: Element {
             {
                 config[\.increment] = incrementAction
                 config[\.decrement] = decrementAction
+            } else {
+                config[\.increment] = nil
+                config[\.decrement] = nil
             }
         }
     }
