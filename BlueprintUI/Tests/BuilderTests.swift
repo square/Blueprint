@@ -138,6 +138,38 @@ class BuilderTests: XCTestCase {
         )
     }
 
+    func tests_none() {
+        enum TestEnum: CaseIterable {
+            case first
+            case second
+            case third
+        }
+
+        let item = TestEnum.first
+
+        let content: [String] = build {
+            switch item {
+            case .first:
+                None()
+            case .second:
+                "2"
+            case .third:
+                "3"
+            }
+
+            None()
+            "1"
+            None()
+            "2"
+            None()
+            "3"
+        }
+
+        XCTAssertEqual(
+            content, ["1", "2", "3"]
+        )
+    }
+
     func test_optional() {
         let optionalNil: String? = nil
         let optional: String? = "1"

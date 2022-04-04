@@ -44,4 +44,23 @@ public struct Builder<Child> {
     public static func buildExpression(_ children: [Child]) -> Children {
         children
     }
+
+    /// Allow an escape hatch when the control flow requires an output (such as a `switch`).
+    public static func buildExpression(_ children: None) -> Children {
+        []
+    }
+}
+
+/// Empty type that results in no children. This is useful when an expression requires output but no children are applicable (i.e. a switch statement).
+/// Example:
+/// ```
+/// switch item {
+/// case .first:
+///    None()
+/// case .second:
+///     "2"
+/// }
+/// ```
+public struct None {
+    public init() {}
 }
