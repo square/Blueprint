@@ -186,6 +186,38 @@ class BuilderTests: XCTestCase {
         )
     }
 
+    func test_optional_expression() {
+        enum TestEnum: CaseIterable {
+            case first
+            case second
+            case third
+        }
+
+        let item = TestEnum.first
+
+        let content: [String] = build {
+            switch item {
+            case .first:
+                nil
+            case .second:
+                "2"
+            case .third:
+                "3"
+            }
+
+            nil
+            "1"
+            nil
+            "2"
+            nil
+            "3"
+        }
+
+        XCTAssertEqual(
+            content, ["1", "2", "3"]
+        )
+    }
+
     fileprivate func build<Content>(
         @Builder<Content> using builder: () -> [Content]
     ) -> [Content] {

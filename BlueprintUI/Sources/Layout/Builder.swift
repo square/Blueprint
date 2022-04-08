@@ -23,6 +23,10 @@ public struct Builder<Child> {
         [child]
     }
 
+    /// This function is disfavored in case a builder wants to offer additional `buildExpression` functions to support
+    /// multiple types in their builders. `@_disfavoredOverload` allows the compiler to choose the other function when
+    /// `nil` is built, instead of it being ambiguous.
+    @_disfavoredOverload
     public static func buildExpression(_ child: Child?) -> Children {
         guard let child = child else { return [] }
         return [child]
