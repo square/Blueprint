@@ -150,18 +150,18 @@ class BuilderTests: XCTestCase {
         let content: [String] = build {
             switch item {
             case .first:
-                None()
+                Nothing()
             case .second:
                 "2"
             case .third:
                 "3"
             }
 
-            None()
+            Nothing()
             "1"
-            None()
+            Nothing()
             "2"
-            None()
+            Nothing()
             "3"
         }
 

@@ -46,7 +46,7 @@ public struct Builder<Child> {
     }
 
     /// Allow an escape hatch when the control flow requires an output (such as a `switch`).
-    public static func buildExpression(_ children: None) -> Children {
+    public static func buildExpression(_ children: Nothing) -> Children {
         []
     }
 }
@@ -61,6 +61,6 @@ public struct Builder<Child> {
 ///     "2"
 /// }
 /// ```
-public struct None {
+public struct Nothing {
     public init() {}
 }
