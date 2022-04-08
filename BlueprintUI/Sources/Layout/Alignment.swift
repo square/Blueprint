@@ -3,27 +3,27 @@ import CoreGraphics
 /// An alignment in both axes.
 public struct Alignment: Equatable {
     /// A guide marking the center of the element.
-    static let center = Alignment(horizontal: .center, vertical: .center)
+    public static let center = Alignment(horizontal: .center, vertical: .center)
 
     /// A guide marking the leading edge of the element.
-    static let leading = Alignment(horizontal: .leading, vertical: .center)
+    public static let leading = Alignment(horizontal: .leading, vertical: .center)
     /// A guide marking the trailing edge of the element.
-    static let trailing = Alignment(horizontal: .trailing, vertical: .center)
+    public static let trailing = Alignment(horizontal: .trailing, vertical: .center)
 
     /// A guide marking the top edge of the element.
-    static let top = Alignment(horizontal: .center, vertical: .top)
+    public static let top = Alignment(horizontal: .center, vertical: .top)
     /// A guide marking the bottom edge of the element.
-    static let bottom = Alignment(horizontal: .center, vertical: .bottom)
+    public static let bottom = Alignment(horizontal: .center, vertical: .bottom)
 
     /// A guide marking the top and leading edges of the element.
-    static let topLeading = Alignment(horizontal: .leading, vertical: .top)
+    public static let topLeading = Alignment(horizontal: .leading, vertical: .top)
     /// A guide marking the top and trailing edges of the element.
-    static let topTrailing = Alignment(horizontal: .trailing, vertical: .top)
+    public static let topTrailing = Alignment(horizontal: .trailing, vertical: .top)
 
     /// A guide marking the bottom and leading edges of the element.
-    static let bottomLeading = Alignment(horizontal: .leading, vertical: .bottom)
+    public static let bottomLeading = Alignment(horizontal: .leading, vertical: .bottom)
     /// A guide marking the bottom and trailing edges of the element.
-    static let bottomTrailing = Alignment(horizontal: .trailing, vertical: .bottom)
+    public static let bottomTrailing = Alignment(horizontal: .trailing, vertical: .bottom)
 
     /// The alignment on the horizontal axis.
     public var horizontal: HorizontalAlignment

@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added support for optionals in builders without unwrapping via `if let`.
+- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
 - Added None type for all builders as an escape hatch when control flow (i.e. `switch`) requires output but none is desired.
 
 ### Removed

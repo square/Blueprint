@@ -46,7 +46,7 @@ GEM
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.5)
     cocoapods-disable-podfile-validations (0.1.1)
-    cocoapods-downloader (1.5.1)
+    cocoapods-downloader (1.6.3)
     cocoapods-generate (1.6.0)
       cocoapods-disable-podfile-validations (~> 0.1.1)
     cocoapods-plugins (1.0.0)
