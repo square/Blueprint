@@ -51,10 +51,11 @@ public struct Rule: ProxyElement {
     }
 
     public var elementRepresentation: Element {
-        return ConstrainedSize(
+        ConstrainedSize(
             width: width,
             height: height,
-            wrapping: Box(backgroundColor: color))
+            wrapping: Box(backgroundColor: color)
+        )
     }
 
     private var width: ConstrainedSize.Constraint {

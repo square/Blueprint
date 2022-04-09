@@ -63,7 +63,7 @@ public struct Aligned: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
@@ -71,7 +71,7 @@ public struct Aligned: Element {
         var horizontalAlignment: HorizontalAlignment
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
+            child.measure(in: constraint)
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
@@ -108,18 +108,17 @@ public struct Aligned: Element {
     }
 }
 
-public extension Element {
+extension Element {
     /// Wraps the element in an `Aligned` element with the provided parameters.
     ///
     /// - parameters:
     ///   - vertically: The vertical alignment. Defaults to `.centered`.
     ///   - horizontally: The horizontal alignment. Defaults to `.centered`.
     ///
-    func aligned(
-        vertically: Aligned.VerticalAlignment,
-        horizontally: Aligned.HorizontalAlignment
-    ) -> Aligned
-    {
+    public func aligned(
+        vertically: Aligned.VerticalAlignment = .center,
+        horizontally: Aligned.HorizontalAlignment = .center
+    ) -> Aligned {
         Aligned(
             vertically: vertically,
             horizontally: horizontally,

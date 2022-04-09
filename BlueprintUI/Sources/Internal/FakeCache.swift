@@ -13,10 +13,10 @@ final class FakeCache: CacheTree {
 
     subscript(constraint: SizeConstraint) -> CGSize? {
         get { nil }
-        set { }
+        set {}
     }
 
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        return FakeCache(name: name(), signpostRef: signpostRef)
+        FakeCache(name: name(), signpostRef: signpostRef)
     }
 }

@@ -36,6 +36,8 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
+    private var sizesThatFit: [SizeConstraint: CGSize] = [:]
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -46,11 +48,13 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
+            // Shortcut: If both environments were empty, nothing changed.
+            if oldValue.isEmpty && environment.isEmpty { return }
+
             setNeedsViewHierarchyUpdate()
-            invalidateIntrinsicContentSize()
         }
     }
-    
+
     ///
     /// If `true`, then Blueprint will automatically inherit the  ``Environment`` from the nearest
     /// parent ``BlueprintView`` in the view hierarchy.
@@ -63,10 +67,13 @@ public final class BlueprintView: UIView {
     ///
     /// Defaults to `true`.
     ///
-    public var automaticallyInheritsEnvironmentFromContainingBlueprintViews : Bool = true {
+    public var automaticallyInheritsEnvironmentFromContainingBlueprintViews: Bool = true {
         didSet {
+            if oldValue == automaticallyInheritsEnvironmentFromContainingBlueprintViews {
+                return
+            }
+
             setNeedsViewHierarchyUpdate()
-            invalidateIntrinsicContentSize()
         }
     }
 
@@ -74,22 +81,42 @@ public final class BlueprintView: UIView {
     public var element: Element? {
         didSet {
             // Minor performance optimization: We do not need to update anything if the element remains nil.
-            if oldValue == nil && self.element == nil {
+            if oldValue == nil && element == nil {
                 return
             }
 
             Logger.logElementAssigned(view: self)
-            
+
             setNeedsViewHierarchyUpdate()
+        }
+    }
+
+    /// We need to invalidateIntrinsicContentSize when `bound.size` changes for Auto Layout to work correctly.
+    public override var bounds: CGRect {
+        didSet {
+            guard oldValue.size != bounds.size else { return }
+
             invalidateIntrinsicContentSize()
         }
     }
 
     /// An optional name to help identify this view
     public var name: String?
-    
+
     /// Provides performance metrics about the duration of layouts, updates, etc.
-    public weak var metricsDelegate : BlueprintViewMetricsDelegate? = nil
+    public weak var metricsDelegate: BlueprintViewMetricsDelegate? = nil
+
+    private var isVisible: Bool = false {
+        didSet {
+            switch (oldValue, isVisible) {
+            case (false, true):
+                handleAppeared()
+            case (true, false):
+                handleDisappeared()
+            default: break
+            }
+        }
+    }
 
     /// Instantiates a view with the given element
     ///
@@ -99,10 +126,10 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
-        
+
         rootController = NativeViewController(
             node: NativeViewNode(
-                content: UIView.describe() { _ in },
+                content: UIView.describe { _ in },
                 // Because no layout update occurs here, passing an empty environment is fine;
                 // the correct environment will be passed during update.
                 environment: .empty,
@@ -110,27 +137,27 @@ public final class BlueprintView: UIView {
                 children: []
             )
         )
-    
+
         super.init(frame: CGRect.zero)
-        
-        self.backgroundColor = .white
+
+        backgroundColor = .white
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
 
-    public override convenience init(frame: CGRect) {
+    public convenience override init(frame: CGRect) {
         self.init(element: nil)
         self.frame = frame
     }
 
     @available(*, unavailable)
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) is not available for BlueprintView.")
     }
 
     ///
-    /// Measures the size needed to display the view within then given constraining size,
+    /// Measures the size needed to display the view within the given constraining size,
     /// by measuring the current `element` of the `BlueprintView`.
     ///
     /// If you would like to not constrain the measurement in a given axis,
@@ -147,56 +174,95 @@ public final class BlueprintView: UIView {
     /// blueprintView.sizeThatFits(.zero)
     /// ```
     ///
-    override public func sizeThatFits(_ size: CGSize) -> CGSize {
-        guard let element = element else {
-            return .zero
-        }
-        
-        func measurementConstraint(with size : CGSize) -> SizeConstraint {
-            
-            let unconstrainedValues : [CGFloat] = [0.0, .greatestFiniteMagnitude, .infinity]
-            
+    public override func sizeThatFits(_ fittingSize: CGSize) -> CGSize {
+
+        func measurementConstraint(with size: CGSize) -> SizeConstraint {
+
+            let unconstrainedValues: Set<CGFloat> = [0.0, .greatestFiniteMagnitude, .infinity]
+
             let widthUnconstrained = unconstrainedValues.contains(size.width)
             let heightUnconstrained = unconstrainedValues.contains(size.height)
-            
+
             return SizeConstraint(
                 width: widthUnconstrained ? .unconstrained : .atMost(size.width),
                 height: heightUnconstrained ? .unconstrained : .atMost(size.height)
             )
         }
-        
-        return element.content.measure(
-            in: measurementConstraint(with: size),
-            environment: self.makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
-        )
+
+        return sizeThatFits(measurementConstraint(with: fittingSize))
     }
 
-    /// Returns the size of the element bound to the current width (mimicking
-    /// UILabel’s `intrinsicContentSize` behavior)
-    public override var intrinsicContentSize: CGSize {
-        
-        guard let element = element else { return .zero }
-        
-        let constraint: SizeConstraint
-
-        // Use unconstrained when
-        // a) we need a view hierarchy update to force a loop through an
-        //    unconstrained width so we don’t end up “caching” the previous
-        //    element’s width
-        // b) the current width is zero, since constraining by zero is
-        //    nonsensical
-        if bounds.width == 0 || needsViewHierarchyUpdate {
-            constraint = .unconstrained
-        } else {
-            constraint = SizeConstraint(width: bounds.width)
+    /// Measures the size needed to display the view within the given `SizeConstraint`.
+    /// by measuring the current `element` of the `BlueprintView`.
+    public func sizeThatFits(_ constraint: SizeConstraint) -> CGSize {
+        guard let element = element else {
+            return .zero
         }
-        
-        return element.content.measure(
+
+        if let cachedSize = sizesThatFit[constraint] {
+            return cachedSize
+        }
+
+        let measurement = element.content.measure(
             in: constraint,
-            environment: self.makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "intrinsicContentSize:\(type(of: element))")
+            environment: makeEnvironment(),
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
         )
+
+        sizesThatFit[constraint] = measurement
+
+        return measurement
+    }
+
+    ///
+    /// Measures the size needed to display the view within then given constraining size,
+    /// by measuring the current `element` of the `BlueprintView`.
+    ///
+    /// If you would like to not constrain the measurement in a given axis,
+    /// pass `0.0` or `.greatestFiniteMagnitude` for that axis.
+    ///
+    public override func systemLayoutSizeFitting(
+        _ targetSize: CGSize
+    ) -> CGSize {
+        /// For us, this is the same as `sizeThatFits`, since blueprint does not
+        /// contain the same concept of constraints as Autolayout.
+        sizeThatFits(targetSize)
+    }
+
+    ///
+    /// Measures the size needed to display the view within then given constraining size,
+    /// by measuring the current `element` of the `BlueprintView`.
+    ///
+    /// If you would like to not constrain the measurement in a given axis,
+    /// pass `0.0` or `.greatestFiniteMagnitude` for that axis.
+    ///
+    public override func systemLayoutSizeFitting(
+        _ targetSize: CGSize,
+        withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority,
+        verticalFittingPriority: UILayoutPriority
+    ) -> CGSize {
+        /// For us, this is the same as `sizeThatFits`, since blueprint does not
+        /// contain the same concept of constraints as Autolayout.
+        sizeThatFits(targetSize)
+    }
+
+    public override var intrinsicContentSize: CGSize {
+        guard element != nil else {
+            return CGSize(
+                width: UIView.noIntrinsicMetric,
+                height: UIView.noIntrinsicMetric
+            )
+        }
+
+        func constraint() -> SizeConstraint {
+            if bounds.width == 0 {
+                return .unconstrained
+            } else {
+                return .init(width: bounds.width)
+            }
+        }
+
+        return sizeThatFits(constraint())
     }
 
     public override var semanticContentAttribute: UISemanticContentAttribute {
@@ -209,58 +275,67 @@ public final class BlueprintView: UIView {
 
     public override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
+
         setNeedsViewHierarchyUpdate()
     }
-    
-    override public func layoutSubviews() {
+
+    public override func layoutSubviews() {
         super.layoutSubviews()
-        invalidateIntrinsicContentSize()
-        performUpdate()
+        updateViewHierarchyIfNeeded()
     }
 
     public override func didMoveToWindow() {
         super.didMoveToWindow()
+        isVisible = (window != nil)
         setNeedsViewHierarchyUpdate()
     }
-    
-    private func performUpdate() {
-        updateViewHierarchyIfNeeded()
-    }
-    
+
+    /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
+    /// view, and marks the view as needing a layout.
     private func setNeedsViewHierarchyUpdate() {
-        guard !needsViewHierarchyUpdate else { return }
+
+        invalidateIntrinsicContentSize()
+        sizesThatFit.removeAll()
+
+        if needsViewHierarchyUpdate { return }
+
         needsViewHierarchyUpdate = true
-        
-        /// We currently rely on CA's layout pass to actually perform a hierarchy update.
+
+        /// We use `UIView`'s layout pass to actually perform a hierarchy update.
+        /// If a manual update is required, call `layoutIfNeeded()`.
         setNeedsLayout()
     }
-    
+
     private func updateViewHierarchyIfNeeded() {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
-        assert(!isInsideUpdate, "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates.")
+        precondition(
+            !isInsideUpdate,
+            "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
+        )
+
         isInsideUpdate = true
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
-        
+
         let start = Date()
         Logger.logLayoutStart(view: self)
-        
-        let environment = self.makeEnvironment()
+
+        let environment = makeEnvironment()
 
         /// Grab view descriptions
         let viewNodes = element?
             .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment)
             .resolve() ?? []
-        
+
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
 
         rootController.view.frame = bounds
-        
+
         var rootNode = NativeViewNode(
-            content: UIView.describe() { _ in },
+            content: UIView.describe { _ in },
             environment: environment,
             layoutAttributes: LayoutAttributes(frame: bounds),
             children: viewNodes
@@ -271,21 +346,26 @@ public final class BlueprintView: UIView {
 
         Logger.logViewUpdateStart(view: self)
 
-        rootController.update(
+        let updateResult = rootController.update(
             node: rootNode,
             context: .init(
-                appearanceTransitionsEnabled: hasUpdatedViewHierarchy
+                appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
+                viewIsVisible: isVisible
             )
         )
 
+        for callback in updateResult.lifecycleCallbacks {
+            callback()
+        }
+
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
-        
+
         hasUpdatedViewHierarchy = true
 
         isInsideUpdate = false
-        
-        self.metricsDelegate?.blueprintView(
+
+        metricsDelegate?.blueprintView(
             self,
             completedUpdateWith: .init(
                 totalDuration: viewUpdateEndDate.timeIntervalSince(start),
@@ -304,10 +384,10 @@ public final class BlueprintView: UIView {
         /// views that are actually generated by the root element.
         return rootController.children
     }
-    
+
     private func makeEnvironment() -> Environment {
-                
-        let inherited : Environment = {
+
+        let inherited: Environment = {
             if
                 self.automaticallyInheritsEnvironmentFromContainingBlueprintViews,
                 let inherited = self.inheritedBlueprintEnvironment
@@ -317,7 +397,7 @@ public final class BlueprintView: UIView {
                 return .empty
             }
         }()
-        
+
         var environment = inherited.merged(prioritizing: self.environment)
 
         if let displayScale = window?.screen.scale {
@@ -335,65 +415,85 @@ public final class BlueprintView: UIView {
 
         return environment
     }
+
+    private func handleAppeared() {
+        rootController.traverse { node in
+            node.onAppear?()
+        }
+    }
+
+    private func handleDisappeared() {
+        rootController.traverse { node in
+            node.onDisappear?()
+        }
+    }
 }
 
 
 /// Provides performance information for blueprint measurements and updates.
-public protocol BlueprintViewMetricsDelegate : AnyObject {
-    
-    func blueprintView(_ view : BlueprintView, completedUpdateWith metrics : BlueprintViewUpdateMetrics)
-    
+public protocol BlueprintViewMetricsDelegate: AnyObject {
+
+    func blueprintView(_ view: BlueprintView, completedUpdateWith metrics: BlueprintViewUpdateMetrics)
+
 }
 
 
 public struct BlueprintViewUpdateMetrics {
-    
+
     /// The total time it took to apply a new element.
-    public var totalDuration : TimeInterval
+    public var totalDuration: TimeInterval
     /// The time it took to lay out and measure the new element.
-    public var measureDuration : TimeInterval
+    public var measureDuration: TimeInterval
     /// The time it took to update the on-screen views for the element.
-    public var viewUpdateDuration : TimeInterval
+    public var viewUpdateDuration: TimeInterval
 }
 
 
 extension BlueprintView {
-    
+
     final class NativeViewController {
 
         private var viewDescription: ViewDescription
         private var layoutAttributes: LayoutAttributes
-        
-        private (set) var children: [(ElementPath, NativeViewController)]
-        
-        let view: UIView
-        
-        init(node: NativeViewNode) {
-            self.viewDescription = node.viewDescription
-            self.layoutAttributes = node.layoutAttributes
-            self.children = []
-            
-            self.view = node.viewDescription.build()
-            self.view.nativeViewNodeBlueprintEnvironment = node.environment
+
+        private(set) var children: [(ElementPath, NativeViewController)]
+
+        var onAppear: LifecycleCallback? {
+            viewDescription.onAppear
         }
-        
+
+        var onDisappear: LifecycleCallback? {
+            viewDescription.onDisappear
+        }
+
+        let view: UIView
+
+        init(node: NativeViewNode) {
+            viewDescription = node.viewDescription
+            layoutAttributes = node.layoutAttributes
+            children = []
+
+            view = node.viewDescription.build()
+            view.nativeViewNodeBlueprintEnvironment = node.environment
+        }
+
         deinit {
             self.view.nativeViewNodeBlueprintEnvironment = nil
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
-            return node.viewDescription.viewType == type(of: view)
+            node.viewDescription.viewType == type(of: view)
         }
-        
-        fileprivate func update(node: NativeViewNode, context : UpdateContext) {
-                        
+
+        fileprivate func update(node: NativeViewNode, context: UpdateContext) -> UpdateResult {
+
             assert(node.viewDescription.viewType == type(of: view))
 
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
-            
+
             view.nativeViewNodeBlueprintEnvironment = node.environment
-            
+
             viewDescription.apply(to: view)
 
             // After this view's children are updated, allow it to run a layout pass.
@@ -401,33 +501,35 @@ extension BlueprintView {
             defer {
                 view.layoutIfNeeded()
             }
-            
+
+            var result = UpdateResult()
+
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update
             // pass is otherwise expensive to perform for empty elements.
-            if self.children.isEmpty && node.children.isEmpty {
-                return
+            if children.isEmpty && node.children.isEmpty {
+                return result
             }
-            
+
             var oldChildren: [ElementPath: NativeViewController] = [:]
             oldChildren.reserveCapacity(children.count)
-            
-            let oldPaths : [ElementPath] = children.map { $0.0 }
-            
+
+            let oldPaths: [ElementPath] = children.map { $0.0 }
+
             for (path, childController) in children {
                 oldChildren[path] = childController
             }
-            
+
             var newChildren: [(path: ElementPath, node: NativeViewController)] = []
             newChildren.reserveCapacity(node.children.count)
-            
-            let newPaths : [ElementPath] = node.children.map { $0.path }
-            
+
+            let newPaths: [ElementPath] = node.children.map { $0.path }
+
             var usedKeys: Set<ElementPath> = []
             usedKeys.reserveCapacity(node.children.count)
-            
+
             let pathsChanged = oldPaths != newPaths
-            
+
             for index in node.children.indices {
                 let (path, child) = node.children[index]
 
@@ -436,15 +538,15 @@ extension BlueprintView {
                 }
                 usedKeys.insert(path)
 
-                let contentView = node.viewDescription.contentView(in: self.view)
+                let contentView = node.viewDescription.contentView(in: view)
 
                 if let controller = oldChildren[path], controller.canUpdateFrom(node: child) {
 
                     oldChildren.removeValue(forKey: path)
                     newChildren.append((path: path, node: controller))
-                    
+
                     let layoutTransition: LayoutTransition
-                    
+
                     if child.layoutAttributes != controller.layoutAttributes {
                         layoutTransition = child.viewDescription.layoutTransition
                     } else {
@@ -460,7 +562,8 @@ extension BlueprintView {
                             contentView.insertSubview(controller.view, at: index)
                         }
 
-                        controller.update(node: child, context: context)
+                        let childResult = controller.update(node: child, context: context)
+                        result.merge(childResult)
                     }
                 } else {
                     var controller: NativeViewController!
@@ -473,48 +576,99 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.view, at: index)
 
-                        controller.update(node: child, context: context.modified {
-                            $0.appearanceTransitionsEnabled = false
-                        })
+                        if context.viewIsVisible, let onAppear = controller.onAppear {
+                            result.lifecycleCallbacks.append(onAppear)
+                        }
+
+                        let childResult = controller.update(
+                            node: child,
+                            context: context.modified {
+                                $0.appearanceTransitionsEnabled = false
+                            }
+                        )
+                        result.merge(childResult)
                     }
 
                     newChildren.append((path: path, node: controller))
 
                     if context.appearanceTransitionsEnabled {
-                        child.viewDescription.appearingTransition?.performAppearing(view: controller.view, layoutAttributes: child.layoutAttributes, completion: {})
+                        child.viewDescription.appearingTransition?.performAppearing(
+                            view: controller.view,
+                            layoutAttributes: child.layoutAttributes,
+                            completion: {}
+                        )
                     }
                 }
             }
-            
+
             for controller in oldChildren.values {
-                if let transition = controller.viewDescription.disappearingTransition {
-                    transition.performDisappearing(view: controller.view, layoutAttributes: controller.layoutAttributes, completion: {
-                        controller.view.removeFromSuperview()
-                    })
-                } else {
+                func removeChild() {
                     controller.view.removeFromSuperview()
                 }
+
+                if context.viewIsVisible {
+                    controller.traverse { node in
+                        if let onDisappear = node.onDisappear {
+                            result.lifecycleCallbacks.append(onDisappear)
+                        }
+                    }
+                }
+
+                if let transition = controller.viewDescription.disappearingTransition {
+                    transition.performDisappearing(
+                        view: controller.view,
+                        layoutAttributes: controller.layoutAttributes,
+                        completion: removeChild
+                    )
+                } else {
+                    removeChild()
+                }
             }
-            
+
             children = newChildren
+
+            return result
+        }
+
+        /// Perform a depth-first traversal of the view-backing tree from this node.
+        func traverse(visitor: (NativeViewController) -> Void) {
+            visitor(self)
+            for (_, child) in children {
+                child.traverse(visitor: visitor)
+            }
         }
     }
 }
 
 extension BlueprintView.NativeViewController {
-    
+
     /// A context value passed to the ``BlueprintView/NativeViewController`` instance as the view tree is updated by blueprint.
     /// Contains information relevant to the correct construction and management of the view tree.
     struct UpdateContext {
-        
+
         /// If appearance transitions are enabled for insertions and removals.
-        var appearanceTransitionsEnabled : Bool
-        
+        var appearanceTransitionsEnabled: Bool
+
+        /// True if the hosting view is in the view hierarchy
+        var viewIsVisible: Bool
+
         /// Returns a copy of the update context, modified by the changes provided.
-        func modified(_ modify: (inout Self) -> ()) -> Self {
+        func modified(_ modify: (inout Self) -> Void) -> Self {
             var modified = self
             modify(&modified)
             return modified
         }
     }
+
+    /// The result of a native view update, including all child updates.
+    struct UpdateResult {
+        /// The lifecycle callbacks accumulated during the view update.
+        var lifecycleCallbacks: [LifecycleCallback] = []
+
+        /// Merges another update result (such as from a child) into this result.
+        mutating func merge(_ other: UpdateResult) {
+            lifecycleCallbacks += other.lifecycleCallbacks
+        }
+    }
 }
+

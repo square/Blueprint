@@ -9,11 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed an [issue](https://github.com/square/Blueprint/pull/241) where `Label` and `AttributedLabel` were not accessibility elements.
-
 ### Added
 
-- [The `Environment` is now automatically propagated through to nested `BlueprintViews` within a displayed `Element` hierarchy](https://github.com/square/Blueprint/pull/234). This means that if your view-backed `Elements` themselves contain a `BlueprintView` (eg to manage their own state), that nested view will now automatically receive the correct `Environment` across `BlueprintView` boundaries. If you were previously manually propagating `Environment` values you may remove this code. If you would like to opt-out of this behavior; you can set `view.automaticallyInheritsEnvironmentFromContainingBlueprintViews = false` on your `BlueprintView`.
+- Added support for optionals in builders without unwrapping via `if let`.
+- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
 
 ### Removed
 
@@ -28,6 +27,256 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.39.0]
+
+### Added
+
+- Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
+
+### Removed
+
+- `MeasurementCachingKey` has been removed – Blueprint has cached measurements per render pass for many releases, so this actually slowed down layouts due to additional allocations and cache checking. This is about a 5-10% performance improvement depending on the layout.
+
+### Changed
+
+- Accessibility increment, decrement actions have been moved to associated values on the `AccessibilityElement.Trait` enum.
+
+## [0.38.0]
+
+### Added
+
+- Shadows on `Label` and `AttributedLabel`
+- Accessibility increment, decrement and activate actions now available on `AccessibilityElement`
+- `Decorate` has a new `aligned` positioning, that uses stack-style `Alignment` values and alignment guides.
+- The context vended to custom `Decorate` positions includes the decorated content size.
+
+### Changed
+
+- The context vended to custom `Decorate` positions was renamed to `PositionContext`, and the `contentFrame` property was replaced with a `contentSize`.
+
+## [0.37.0]
+
+### Fixed
+
+- `Decorate` will now properly scale its base content to the full size of the rendered element, if the measured and laid out sizes differ.
+- Fixed an issue where `AttributedLabel` could cause a crash when voice over was enabled.
+
+### Added
+
+- `LayoutWriter.Context` now exposes the layout phase, to differ any calculations between measurement and layout.
+
+## [0.36.1]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` and `Label` would not pass touches to super views when expected.
+
+## [0.36.0]
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` might not detect link taps in multi-line labels.
+- `.aligned(vertically:horizontally:)` now has the correct default values to match the `Aligned` initializer.
+
+### Changed
+
+- The default line break mode for `Label` is now `byTruncatingTail`, matching the default for `UILabel`. (It was previously `byWordWrapping`, which does not indicate that truncation occured.)
+- `AttributedLabel` will normalize certain line break modes based on the number of lines.
+
+## [0.35.1] - 2022-01-13
+
+### Fixed
+
+- `Label` and `AttributedLabel` now correctly report their `UIAccessibilityTraits`.
+
+## [0.35.0] - 2022-01-11
+
+### Added
+
+- Added the `EditingMenu` element, which allows showing a `UIMenuController` (aka the system editing menu) on tap, long press, or based on a trigger.
+
+### Changed
+
+- `Label.font` now defaults to using a font of size `UIFont.labelFontSize` (17) instead of `UIFont.systemFontSize`.
+
+## [0.34.0] - 2021-12-16
+
+### Added
+
+- Support `CALayerCornerCurve` for `Box` corner styles.
+- Added `AttributedText`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
+- Added support for links to `AttributedLabel`:
+  - Links can be added using the `link` attribute of the attributed string. This attribute supports `URL`s or `String`s.
+  - The label also supports detecting certain types of data and links, much like UITextView. Use the `linkDetectionTypes` property to specify which types of data to detect.
+  - Links are opened using the `LinkHandler` in the environment, which by default uses `UIApplication.shared.open(_:options:completionHandler:)`. Customize link handling by providing a `URLHandler` to the environment at the appropriate scope. `AttributedLabel` also has a function for easily handling links with a closure using the `onLinkTapped` method.
+
+## [0.33.3] - 2021-12-8
+
+### Fixed
+
+- Fixed an issue where `Box` did not implicitly animate its shadow.
+
+### Changed
+
+- Reverted scroll view keyboard inset behavior to the behavior in `0.30.0`, since the recent changes were causing unexpected issues.
+
+## [0.33.2] - 2021-11-30
+
+### Fixed
+
+- Fixed an issue where `ScrollView` did not adjust its content inset correctly when the keyboard height or content insets changed.
+
+## [0.33.1] - 2021-11-22
+
+### Fixed
+
+- Fixed an issue where `BlueprintView` would not size correctly when used with Auto Layout.
+
+### Added
+
+- Added an `ElementContent` variant whose `measureFunction` takes in both a `SizeConstraint` and an `Environment`.
+
+## [0.33.0] - 2021-11-18
+
+### Added
+
+- Allow measuring within an explicit `SizeConstraint` in `GeometryProxy`.
+- Add an additional `stackLayoutChild(priority:)` method overload, for easier autocomplete when only customizing the layout priority.
+
+### Changed
+
+- Values returned from `sizeThatFits` and `systemLayoutSizeFitting` are now cached.
+
+## [0.32.0] - 2021-11-16
+
+
+### Fixed
+
+- Fixed an issue where the keyboard inset adjustment was incorrect in some cases.
+- Fixed a retain cycle in `@FocusState`. ([#285](https://github.com/square/Blueprint/pull/285))
+
+### Added
+
+- Add support for `for...in` loops and `available` checks to result builder APIs.
+
+## [0.31.0] - 2021-11-09
+
+### Fixed
+
+- `intrinsicContentSize` is now cached.
+
+### Added
+
+- Improved error messages when using result builders with optional values.
+
+## [0.30.0] - 2021-10-15
+
+### Added
+
+- Added a `Hidden` element and `.hidden()` modifier for hiding elements.
+- `Overlay` now supports result builders.
+- `SegmentedControl` now supports result builders.
+
+### Removed
+
+- Removed deprecated initializer from `AccessibilityElement` which was causing ambiguous initializer errors.
+
+### Changed
+
+- `UserInteractionEnabled` has been moved from `BlueprintUICommonControls` into `BlueprintUI`. It no longer has a backing view, and instead uses layout attributes to apply itself to elements. This change shouldn't affect consumers.
+
+## [0.29.0] - 2021-09-21
+
+### Added
+
+- The `@FocusState` property wrapper can be used to manage focus of text fields. ([#259])
+
+  After binding a text field to a state, you can programmatically focus the field by setting the state value.
+
+  ```swift
+  struct LoginForm: ProxyElement {
+      enum Field: Hashable {
+          case username, password
+      }
+
+      @FocusState private var focusedField: Field?
+
+      var elementRepresentation: Element {
+          // This text field will be focused when `self.focusedField = .username`
+          TextField(text: "")
+              .focused(when: $focusedField, equals: .username)
+      }
+  }
+  ```
+- Row, Column, EqualStack, and GridRow can now be initialized declaratively using result builders. ([#220])
+  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure. 
+  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters. 
+  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`. 
+  ```swift
+  let row = Row(alignment: .fill) {
+    TestElement()
+    TestElement2()
+      .stackLayoutChild(priority: .fixed, alignmentGuide: { _ in 0 }, key: "two")
+  }
+  ```
+
+- The `accessibilityElement(...)` modifier has been added for wrapping an `Element` in an `AccessibilityElement`. Note that this will override all accessibility parameters of the `Element` being wrapped, even if values are left unspecified or set to `nil`.
+- An initializer on `AccessibilityElement` that requires a `label`, `value`, and `traits`.
+- `Overlay` supports keys for disambiguation between view updates. ([#264])
+
+### Changed
+
+- `BlueprintView`'s `intrinsicContentSize` will now return `UIView.noIntrinsicMetric` if there is no `element` associated with it.
+
+- `TextField`'s `becomeActiveTrigger` and `resignActiveTrigger` properties have been replaced with a `focusBinding` for use with the new `@FocusState` property wrapper.
+
+### Deprecated
+
+- The `accessibility(...)` modifier has been deprecated. Use `accessibilityElement(...)` instead.
+- An initializer on `AccessibilityElement` that allowed all parameters to be unspecified. Use the initializer with required parameters instead.
+- `Overlay.add(_:)` deprecated in favor of `Overlay.add(key:child:)`.
+
+## [0.28.1] - 2021-09-10
+
+### Added
+
+- View-backed elements may opt-in to a frame rounding behavior that prioritizes preserving the frame size rather than the frame edges. This is primarily meant for text labels, to fix an issue where labels gain or lose a pixel in rounding and become wrapped or truncated incorrectly. ([#257])
+
+### Changed
+
+- Lifecycle hooks are guaranteed to run after all views are updated. ([#260])
+
+## [0.28.0] - 2021-09-01
+
+### Fixed
+
+- Fixed an [issue](https://github.com/square/Blueprint/pull/241) where `Label` and `AttributedLabel` were not accessibility elements.
+
+### Added
+
+- `Label` `AttributedLabel` and `TextField` elements now support configuration of accessibility traits.
+
+- [The `Environment` is now automatically propagated through to nested `BlueprintViews` within a displayed `Element` hierarchy](https://github.com/square/Blueprint/pull/234). This means that if your view-backed `Elements` themselves contain a `BlueprintView` (eg to manage their own state), that nested view will now automatically receive the correct `Environment` across `BlueprintView` boundaries. If you were previously manually propagating `Environment` values you may remove this code. If you would like to opt-out of this behavior; you can set `view.automaticallyInheritsEnvironmentFromContainingBlueprintViews = false` on your `BlueprintView`.
+
+- [Lifecycle hooks][#244]. You can hook into lifecycle events when an element's visibility changes.
+  ```swift
+  element
+    .onAppear {
+      // runs when `element` appears
+    }
+    .onDisappear {
+      // runs when `element` disappears
+    }
+  ```
+
+### Removed
+
+- [Removed support for / deprecated iOS 11](https://github.com/square/Blueprint/pull/250).
+
+### Changed
+
+- [`makeUIView()` on `UIViewElement` is no longer a static function](https://github.com/square/Blueprint/pull/246), to allow access to properties during view creation.
 
 ## [0.27.0] - 2021-06-22
 
@@ -60,11 +309,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - vertical alignment
   - children with absolutely-sized widths
   - children with proportionally-sized widths¹
-  
+
   ¹Proportional width in this case always means "a proportion of available layout space after spacing and absolutely-sized children are laid out."
-  
+
   Example:
-  
+
   ```swift
   GridRow { row in
     row.spacing = 8
@@ -74,11 +323,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     row.add(width: .proportional(0.25), child: dateLabel)
   }
   ```
-  
+
 - [Added support to `LayoutWriter` to allow specifying keys for child `Element`s](https://github.com/square/Blueprint/pull/216).
 
 - Blueprint can now emit [signpost logs](https://developer.apple.com/documentation/os/logging/recording_performance_data) during its render pass, which you can use for performance tuning. ([#209])
-  
+
   Signpost logs are disabled by default. To enable them, set `BlueprintLogging.enabled = true`.
 
 ### Changed
@@ -231,13 +480,13 @@ searchField
     Box(cornerStyle: .rounded(geometry.constraint.height.maximum / 2.0))
   }
   ```
-  
+
   into
-  
+
   ```swift
   Box(cornerStyle: .capsule)
   ```
-  
+
 - Add `accessibilityFrameSize` to `AccessibilityElement` for manually specifying a size for the frame rendered by Voice Over. ([#144])
 
 - Add `Opacity` element for modifying the opacity of a wrapped element. ([#147])
@@ -303,7 +552,7 @@ searchField
 - Introduce [MeasurementCachingKey](https://github.com/square/Blueprint/pull/115), to allow for elements to provide a way to cache their measurement during layout passes. This provides performance optimizations for elements whose layout and measurement is expensive to calculate.
 
 - Introduce `UIViewElement` [to make wrapping self-sizing UIViews easier](https://github.com/square/Blueprint/pull/106).
-  
+
   You can now write a `UIViewElement` like this:
 
   ```
@@ -579,7 +828,25 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.27.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.39.0...HEAD
+[0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
+[0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
+[0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
+[0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1
+[0.36.0]: https://github.com/square/Blueprint/compare/0.35.1...0.36.0
+[0.35.1]: https://github.com/square/Blueprint/compare/0.35.0...0.35.1
+[0.35.0]: https://github.com/square/Blueprint/compare/0.34.0...0.35.0
+[0.34.0]: https://github.com/square/Blueprint/compare/0.33.3...0.34.0
+[0.33.3]: https://github.com/square/Blueprint/compare/0.33.2...0.33.3
+[0.33.2]: https://github.com/square/Blueprint/compare/0.33.1...0.33.2
+[0.33.1]: https://github.com/square/Blueprint/compare/0.33.0...0.33.1
+[0.33.0]: https://github.com/square/Blueprint/compare/0.32.0...0.33.0
+[0.32.0]: https://github.com/square/Blueprint/compare/0.31.0...0.32.0
+[0.31.0]: https://github.com/square/Blueprint/compare/0.30.0...0.31.0
+[0.30.0]: https://github.com/square/Blueprint/compare/0.29.0...0.30.0
+[0.29.0]: https://github.com/square/Blueprint/compare/0.28.1...0.29.0
+[0.28.1]: https://github.com/square/Blueprint/compare/0.28.0...0.28.1
+[0.28.0]: https://github.com/square/Blueprint/compare/0.27.0...0.28.0
 [0.27.0]: https://github.com/square/Blueprint/compare/0.26.0...0.27.0
 [0.26.0]: https://github.com/square/Blueprint/compare/0.25.0...0.26.0
 [0.25.0]: https://github.com/square/Blueprint/compare/0.24.0...0.25.0
@@ -615,6 +882,11 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#264]: https://github.com/square/Blueprint/pull/264
+[#260]: https://github.com/square/Blueprint/pull/260
+[#259]: https://github.com/square/Blueprint/pull/259
+[#257]: https://github.com/square/Blueprint/pull/257
+[#244]: https://github.com/square/Blueprint/pull/244
 [#209]: https://github.com/square/Blueprint/pull/209
 [#176]: https://github.com/square/Blueprint/pull/176
 [#175]: https://github.com/square/Blueprint/pull/175

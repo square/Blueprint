@@ -1,5 +1,5 @@
-import XCTest
 import BlueprintUI
+import XCTest
 @testable import BlueprintUICommonControls
 
 
@@ -12,7 +12,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "simple")
+                identifier: "simple"
+            )
         }
 
         do {
@@ -21,7 +22,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "placeholder")
+                identifier: "placeholder"
+            )
         }
 
         do {
@@ -30,16 +32,18 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "disabled")
+                identifier: "disabled"
+            )
         }
-        
+
         do {
             var field = TextField(text: "Right Aligned")
             field.textAlignment = .right
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "right-aligned")
+                identifier: "right-aligned"
+            )
         }
 
         do {
@@ -48,7 +52,8 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "title-font")
+                identifier: "title-font"
+            )
         }
 
         do {
@@ -57,10 +62,40 @@ class TextFieldTests: XCTestCase {
             compareSnapshot(
                 of: field,
                 size: CGSize(width: 200, height: 44),
-                identifier: "blue-text-color")
+                identifier: "blue-text-color"
+            )
         }
 
     }
 
-}
+    func test_focus() {
+        // make a fake window so that focus works
+        withWindow { window in
+            let view = BlueprintView()
+            window.addSubview(view)
 
+            var isFocused = true
+            let binding = FocusBinding(
+                onFocus: { isFocused = true },
+                onBlur: { isFocused = false }
+            )
+            view.element = TextField(text: "") { textField in
+                textField.focusBinding = binding
+            }
+
+            view.layoutIfNeeded()
+            let testView = view.subviews[0].subviews[0]
+
+            XCTAssertFalse(testView.isFirstResponder)
+            XCTAssertFalse(isFocused)
+
+            binding.trigger.focus()
+            XCTAssertTrue(testView.isFirstResponder)
+            XCTAssertTrue(isFocused)
+
+            binding.trigger.blur()
+            XCTAssertFalse(testView.isFirstResponder)
+            XCTAssertFalse(isFocused)
+        }
+    }
+}

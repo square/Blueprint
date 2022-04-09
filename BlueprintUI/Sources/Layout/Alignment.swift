@@ -1,9 +1,46 @@
 import CoreGraphics
 
+/// An alignment in both axes.
+public struct Alignment: Equatable {
+    /// A guide marking the center of the element.
+    public static let center = Alignment(horizontal: .center, vertical: .center)
+
+    /// A guide marking the leading edge of the element.
+    public static let leading = Alignment(horizontal: .leading, vertical: .center)
+    /// A guide marking the trailing edge of the element.
+    public static let trailing = Alignment(horizontal: .trailing, vertical: .center)
+
+    /// A guide marking the top edge of the element.
+    public static let top = Alignment(horizontal: .center, vertical: .top)
+    /// A guide marking the bottom edge of the element.
+    public static let bottom = Alignment(horizontal: .center, vertical: .bottom)
+
+    /// A guide marking the top and leading edges of the element.
+    public static let topLeading = Alignment(horizontal: .leading, vertical: .top)
+    /// A guide marking the top and trailing edges of the element.
+    public static let topTrailing = Alignment(horizontal: .trailing, vertical: .top)
+
+    /// A guide marking the bottom and leading edges of the element.
+    public static let bottomLeading = Alignment(horizontal: .leading, vertical: .bottom)
+    /// A guide marking the bottom and trailing edges of the element.
+    public static let bottomTrailing = Alignment(horizontal: .trailing, vertical: .bottom)
+
+    /// The alignment on the horizontal axis.
+    public var horizontal: HorizontalAlignment
+    /// The alignment on the vertical axis.
+    public var vertical: VerticalAlignment
+
+    /// Creates an instance with the given horizontal and vertical alignments.
+    public init(horizontal: HorizontalAlignment, vertical: VerticalAlignment) {
+        self.horizontal = horizontal
+        self.vertical = vertical
+    }
+}
+
 /// Types used to identify alignment guides.
 ///
 /// Types conforming to `AlignmentID` have a corresponding alignment guide value,
-/// typically declared as a static constant property of `HorizontalAlignment` or 
+/// typically declared as a static constant property of `HorizontalAlignment` or
 /// `VerticalAlignment`.
 ///
 public protocol AlignmentID {
@@ -26,7 +63,7 @@ public struct HorizontalAlignment: Equatable {
     }
 
     public static func == (lhs: HorizontalAlignment, rhs: HorizontalAlignment) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 }
 
@@ -43,7 +80,7 @@ public struct VerticalAlignment: Equatable {
     }
 
     public static func == (lhs: VerticalAlignment, rhs: VerticalAlignment) -> Bool {
-        return lhs.id == rhs.id
+        lhs.id == rhs.id
     }
 }
 
@@ -104,3 +141,6 @@ extension VerticalAlignment {
     /// A guide marking the bottom edge of the element.
     public static let bottom = VerticalAlignment(Bottom.self)
 }
+
+/// Internal typealias for convenience
+typealias AlignmentGuide = (ElementDimensions) -> CGFloat

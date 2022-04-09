@@ -48,6 +48,20 @@ public struct GridRow: Element {
         configure(&self)
     }
 
+    /// Initializer using result builder to declaritively build up a grid row.
+    /// - Parameter verticalAlignment: How children are aligned vertically. By default, `.fill`.
+    /// - Parameter spacing: The space between children. By default, 0.
+    /// - Parameter elements: A block containing all elements to be included in the row.
+    public init(
+        verticalAlignment: Row.RowAlignment = .fill,
+        spacing: CGFloat = 0,
+        @ElementBuilder<Child> _ elements: () -> [Child]
+    ) {
+        children = elements()
+        self.verticalAlignment = verticalAlignment
+        self.spacing = spacing
+    }
+
     // MARK: - mutations -
     public mutating func add(width: Width, key: AnyHashable? = nil, child: Element) {
         children.append(Child(width: width, key: key, element: child))
@@ -64,46 +78,6 @@ public struct GridRow: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
-    }
-}
-
-// MARK: - child modeling -
-public extension GridRow {
-    /// A child of a `GridRow`.
-    struct Child {
-        // MARK: - properties -
-        /// The element displayed in the `Grid`.
-        public var element: Element
-        /// A unique identifier for the child.
-        public var key: AnyHashable?
-        // The sizing for the element.
-        public var width: Width
-
-        // MARK: - initialialization -
-        public init(width: Width, key: AnyHashable? = nil, element: Element) {
-            self.element = element
-            self.key = key
-            self.width = width
-        }
-    }
-
-    /// The sizing and content of a `GridRow` child.
-    enum Width: Equatable {
-        /// Assign the child a fixed width equal to the payload.
-        case absolute(CGFloat)
-        /// Assign the child a proportional width of the available layout width. Note that proportional children
-        /// take proportional shares of the available layout width.
-        ///
-        /// ## Example:
-        ///     Available layout width: 100
-        ///     Child A: .proportional(1)  -> 25 (100 * 1/4)
-        ///     Child B: .proportional(3) -> 75 (100 * 3/4)
-        ///
-        /// ## Example:
-        ///     Available layout width: 100
-        ///     Child A: .proportional(0.25)  -> 25 (100 * 1/4)
-        ///     Child B: .proportional(0.75) -> 75 (100 * 3/4)
-        case proportional(CGFloat)
     }
 }
 
@@ -170,7 +144,7 @@ extension GridRow {
             // Group children by their sizing. Maintain child order by also storing index.
             var absolutelySized: [(index: Int, width: CGFloat, content: Measurable)] = []
             var proportionallySized: [(index: Int, proportion: CGFloat, content: Measurable)] = []
-            items.enumerated().forEach { (index, item) in
+            items.enumerated().forEach { index, item in
                 switch item.traits {
                 case .absolute(let width):
                     absolutelySized.append((index, width, item.content))
@@ -180,7 +154,7 @@ extension GridRow {
             }
 
             // Measure absolutely-sized children.
-            absolutelySized.forEach { (index, width, content) in
+            absolutelySized.forEach { index, width, content in
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
                 sizes[index] = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
             }
@@ -195,7 +169,7 @@ extension GridRow {
                     availableWidth: availableWidth,
                     items: proportionallySized
                 )
-                .forEach { (index, size) in
+                .forEach { index, size in
                     sizes[index] = size
                 }
             case .unconstrained:
@@ -203,7 +177,7 @@ extension GridRow {
                     in: constraint,
                     items: proportionallySized
                 )
-                .forEach { (index, size) in
+                .forEach { index, size in
                     sizes[index] = size
                 }
             }
@@ -243,14 +217,17 @@ extension GridRow {
 
             guard availableWidth > 0 else {
                 // There's no room to layout so there's no need to perform any measurement.
-                return items.map { (index, _, _) in (index, .zero) }
+                return items.map { index, _, _ in (index, .zero) }
             }
 
             let portionSum = items.map { $0.proportion }.reduce(0, +)
-            precondition(portionSum > 0, "Proportions of a GridRow must sum to a positive number. Found sum: \(portionSum).")
+            precondition(
+                portionSum > 0,
+                "Proportions of a GridRow must sum to a positive number. Found sum: \(portionSum)."
+            )
             let scale = availableWidth / portionSum
 
-            return items.map { (index, proportion, content) in
+            return items.map { index, proportion, content in
                 let width = scale * proportion
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
                 let size = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
@@ -277,13 +254,13 @@ extension GridRow {
             var scale: CGFloat = 0
             var measuredSizes: [CGSize] = []
 
-            items.forEach { (_, proportion, content) in
+            items.forEach { _, proportion, content in
                 let size = content.measure(in: constraint)
                 measuredSizes.append(size)
                 scale = max(scale, size.width / proportion)
             }
 
-            return zip(items, measuredSizes).map { (item, measuredSize) in
+            return zip(items, measuredSizes).map { item, measuredSize in
                 let width = scale * item.proportion
                 // As this width is at least as wide as the one measured above,
                 // the height requirement should not change.
@@ -300,10 +277,67 @@ extension GridRow {
             case .align(let id) where id == .center:
                 return { height in ((rowHeight - height) / 2.0, height) }
             case .align(let id) where id == .bottom:
-                return { height in (rowHeight - height,height) }
+                return { height in (rowHeight - height, height) }
             case .align:
                 fatalError("GridRow supports fill, top, center, and bottom alignment.")
             }
         }
+    }
+}
+
+// MARK: - child modeling -
+extension GridRow {
+    /// A child of a `GridRow`.
+    public struct Child {
+        // MARK: - properties -
+        /// The element displayed in the `Grid`.
+        public var element: Element
+        /// A unique identifier for the child.
+        public var key: AnyHashable?
+        // The sizing for the element.
+        public var width: Width
+
+        // MARK: - initialialization -
+        public init(width: Width, key: AnyHashable? = nil, element: Element) {
+            self.element = element
+            self.key = key
+            self.width = width
+        }
+    }
+
+    /// The sizing and content of a `GridRow` child.
+    public enum Width: Equatable {
+        /// Assign the child a fixed width equal to the payload.
+        case absolute(CGFloat)
+        /// Assign the child a proportional width of the available layout width. Note that proportional children
+        /// take proportional shares of the available layout width.
+        ///
+        /// ## Example:
+        ///     Available layout width: 100
+        ///     Child A: .proportional(1)  -> 25 (100 * 1/4)
+        ///     Child B: .proportional(3) -> 75 (100 * 3/4)
+        ///
+        /// ## Example:
+        ///     Available layout width: 100
+        ///     Child A: .proportional(0.25)  -> 25 (100 * 1/4)
+        ///     Child B: .proportional(0.75) -> 75 (100 * 3/4)
+        case proportional(CGFloat)
+    }
+}
+
+extension Element {
+    /// Wraps an element with a `GridRowChild` in order to provide meta information that a `GridRow` can aply to its layout.
+    /// - Parameters:
+    ///   - key: A unique identifier for the child.
+    ///   - width: The sizing for the element.
+    /// - Returns: `GridRowChild`
+    public func gridRowChild(key: AnyHashable? = nil, width: GridRow.Width) -> GridRow.Child {
+        .init(width: width, key: key, element: self)
+    }
+}
+
+extension GridRow.Child: ElementBuilderChild {
+    public init(_ element: Element) {
+        self.init(width: .proportional(1), element: element)
     }
 }

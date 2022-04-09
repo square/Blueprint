@@ -12,17 +12,17 @@ public struct Button: Element {
     public var minimumTappableSize: CGSize = CGSize(width: 44, height: 44)
 
     public init(isEnabled: Bool = true, onTap: @escaping () -> Void = {}, wrapping element: Element) {
-        self.wrappedElement = element
+        wrappedElement = element
         self.isEnabled = isEnabled
         self.onTap = onTap
     }
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return Button.NativeButton.describe { config in
+        Button.NativeButton.describe { config in
             config.contentView = { $0.contentView }
             config[\.isEnabled] = isEnabled
             config[\.onTap] = onTap
@@ -50,20 +50,21 @@ extension Button {
             addTarget(self, action: #selector(handleTap), for: .touchUpInside)
         }
 
-        required public init?(coder aDecoder: NSCoder) {
+        public required init?(coder aDecoder: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
         private var tappableRect: CGRect {
-            return bounds
+            bounds
                 .insetBy(
                     dx: min(0, bounds.width - minimumTappableSize.width),
-                    dy: min(0, bounds.height - minimumTappableSize.height))
+                    dy: min(0, bounds.height - minimumTappableSize.height)
+                )
 
         }
 
         override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-            return tappableRect.contains(point)
+            tappableRect.contains(point)
         }
 
         override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {

@@ -20,23 +20,26 @@ public struct VisibilityTransition {
 
     /// Returns a `VisibilityTransition` that scales in and out.
     public static var scale: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 1.0,
-            transform: CATransform3DMakeScale(0.01, 0.01, 0.01))
+            transform: CATransform3DMakeScale(0.01, 0.01, 0.01)
+        )
     }
 
     /// Returns a `VisibilityTransition` that fades in and out.
     public static var fade: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 0.0,
-            transform: CATransform3DIdentity)
+            transform: CATransform3DIdentity
+        )
     }
 
     /// Returns a `VisibilityTransition` that simultaneously scales and fades in and out.
     public static var scaleAndFade: VisibilityTransition {
-        return VisibilityTransition(
+        VisibilityTransition(
             alpha: 0.0,
-            transform: CATransform3DMakeScale(0.01, 0.01, 0.01))
+            transform: CATransform3DMakeScale(0.01, 0.01, 0.01)
+        )
     }
 }
 
@@ -45,7 +48,7 @@ public struct VisibilityTransition {
 
 extension VisibilityTransition {
 
-    func performAppearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping ()->Void) {
+    func performAppearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping () -> Void) {
 
         UIView.performWithoutAnimation {
             self.getInvisibleAttributesFor(layoutAttributes: layoutAttributes).apply(to: view)
@@ -53,18 +56,20 @@ extension VisibilityTransition {
 
         attributes.perform(
             animations: { layoutAttributes.apply(to: view) },
-            completion: completion)
+            completion: completion
+        )
 
 
     }
 
-    func performDisappearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping ()->Void) {
+    func performDisappearing(view: UIView, layoutAttributes: LayoutAttributes, completion: @escaping () -> Void) {
 
         attributes.perform(
             animations: {
                 self.getInvisibleAttributesFor(layoutAttributes: layoutAttributes).apply(to: view)
             },
-            completion: completion)
+            completion: completion
+        )
 
     }
 

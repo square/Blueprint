@@ -6,10 +6,10 @@ import CoreGraphics
 /// will automatically inherit those values automatically. Values can be changed
 /// anywhere in a sub-tree by inserting another `AdaptedEnvironment` element.
 public struct AdaptedEnvironment: Element {
-    
+
     /// Takes in a mutable `Environment` which can be mutated to add or override values.
     public typealias Adapter = (inout Environment) -> Void
-    
+
     var wrapped: Element
     var adapters: [Adapter]
 
@@ -28,7 +28,7 @@ public struct AdaptedEnvironment: Element {
             self = adapter
         } else {
             self.wrapped = wrapped
-            self.adapters = [adapt]
+            adapters = [adapt]
         }
     }
 
@@ -41,8 +41,7 @@ public struct AdaptedEnvironment: Element {
         key: Key.Type,
         value: Key.Value,
         wrapping child: Element
-    ) where Key: EnvironmentKey
-    {
+    ) where Key: EnvironmentKey {
         self.init(by: { $0[key] = value }, wrapping: child)
     }
 
@@ -76,20 +75,20 @@ public struct AdaptedEnvironment: Element {
 }
 
 
-public extension Element {
-    
+extension Element {
+
     /// Wraps this element in an `AdaptedEnvironment` with the given environment key and value.
-    func adaptedEnvironment<Key>(key: Key.Type, value: Key.Value) -> Element where Key: EnvironmentKey {
+    public func adaptedEnvironment<Key>(key: Key.Type, value: Key.Value) -> Element where Key: EnvironmentKey {
         AdaptedEnvironment(key: key, value: value, wrapping: self)
     }
 
     /// Wraps this element in an `AdaptedEnvironment` with the given keypath and value.
-    func adaptedEnvironment<Value>(keyPath: WritableKeyPath<Environment, Value>, value: Value) -> Element {
+    public func adaptedEnvironment<Value>(keyPath: WritableKeyPath<Environment, Value>, value: Value) -> Element {
         AdaptedEnvironment(keyPath: keyPath, value: value, wrapping: self)
     }
 
     /// Wraps this element in an `AdaptedEnvironment` with the given configuration block.
-    func adaptedEnvironment(by environmentAdapter: @escaping (inout Environment) -> Void) -> Element {
+    public func adaptedEnvironment(by environmentAdapter: @escaping (inout Environment) -> Void) -> Element {
         AdaptedEnvironment(by: environmentAdapter, wrapping: self)
     }
 }

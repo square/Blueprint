@@ -56,7 +56,7 @@ class AlignedTests: XCTestCase {
         XCTAssertEqual(frame.maxX, 5000)
         XCTAssertTrue(children[0].element is TestElement)
     }
-    
+
     func test_horizontalFill() {
         let children = childLayoutResultNodesAligned(horizontally: .fill)
 
@@ -96,7 +96,7 @@ class AlignedTests: XCTestCase {
         XCTAssertEqual(frame.maxY, 6000)
         XCTAssertTrue(children[0].element is TestElement)
     }
-    
+
     func test_verticalFill() {
         let children = childLayoutResultNodesAligned(vertically: .fill)
 
@@ -112,10 +112,10 @@ private struct TestElement: Element {
     let size: CGSize
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: size)
+        ElementContent(intrinsicSize: size)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 }

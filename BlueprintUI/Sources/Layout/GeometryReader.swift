@@ -6,7 +6,7 @@ import UIKit
 /// different layouts.
 ///
 /// ## Example
-/// 
+///
 /// ```swift
 /// GeometryReader { (geometry) -> Element in
 ///     let image: UIImage
@@ -31,7 +31,7 @@ public struct GeometryReader: Element {
     }
 
     public var content: ElementContent {
-        ElementContent { (constraint, environment) -> Element in
+        ElementContent { constraint, environment -> Element in
             self.elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
         }
     }
@@ -48,8 +48,8 @@ public struct GeometryProxy {
     /// The size constraint of the element being laid out.
     public var constraint: SizeConstraint
 
-    /// Measure the given element, using this proxy's constraint and the current environment.
-    public func measure(element: Element) -> CGSize {
-        element.content.measure(in: constraint, environment: environment)
+    /// Measure the given element, constrained to the same size as the `GeometryProxy` itself (unless a constraint is explicitly provided).
+    public func measure(element: Element, in explicit: SizeConstraint? = nil) -> CGSize {
+        element.content.measure(in: explicit ?? constraint, environment: environment)
     }
 }

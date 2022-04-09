@@ -7,10 +7,10 @@ import UIKit
 public struct SizeConstraint: Hashable {
 
     /// The width constraint.
-    public var width: Axis
+    @UnconstrainedInfiniteAxis public var width: Axis
 
     /// The height constraint.
-    public var height: Axis
+    @UnconstrainedInfiniteAxis public var height: Axis
 
     public init(width: Axis, height: Axis) {
         self.width = width
@@ -21,7 +21,7 @@ public struct SizeConstraint: Hashable {
 extension SizeConstraint {
 
     public static var unconstrained: SizeConstraint {
-        return SizeConstraint(width: .unconstrained, height: .unconstrained)
+        SizeConstraint(width: .unconstrained, height: .unconstrained)
     }
 
     public init(_ size: CGSize) {
@@ -37,17 +37,18 @@ extension SizeConstraint {
     }
 
     public var minimum: CGSize {
-        return CGSize(width: width.minimum, height: height.minimum)
+        CGSize(width: width.minimum, height: height.minimum)
     }
 
     public var maximum: CGSize {
-        return CGSize(width: width.maximum, height: height.maximum)
+        CGSize(width: width.maximum, height: height.maximum)
     }
 
     public func inset(width: CGFloat, height: CGFloat) -> SizeConstraint {
-        return SizeConstraint(
+        SizeConstraint(
             width: self.width - width,
-            height: self.height - height)
+            height: self.height - height
+        )
     }
 
 }
@@ -63,9 +64,9 @@ extension SizeConstraint {
 
         /// The measurement is unconstrained in the given dimension.
         case unconstrained
-        
+
         /// Creates a `SizeConstraint` with the provided value.
-        init(_ value : CGFloat) {
+        init(_ value: CGFloat) {
             if value == Axis.maxValue {
                 self = .unconstrained
             } else {
@@ -102,12 +103,12 @@ extension SizeConstraint {
                 return nil
             }
         }
-        
-        private static var maxValue : CGFloat = .greatestFiniteMagnitude
+
+        private static var maxValue: CGFloat = .greatestFiniteMagnitude
 
         /// Adds a scalar value to an Axis. If the Axis is unconstrained the
         /// result will remain unconstrained.
-        public static func +(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+        public static func + (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
                 return .atMost(limit + rhs)
@@ -118,7 +119,7 @@ extension SizeConstraint {
 
         /// Subtracts a scalar value from an Axis. If the Axis is unconstrained
         /// the result will remain unconstrained.
-        public static func -(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+        public static func - (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
                 return .atMost(limit - rhs)
@@ -129,7 +130,7 @@ extension SizeConstraint {
 
         /// Divides an Axis by a scalar value. If the Axis is unconstrained the
         /// result will remain unconstrained.
-        public static func /(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+        public static func / (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
                 return .atMost(limit / rhs)
@@ -140,7 +141,7 @@ extension SizeConstraint {
 
         /// Multiplies an Axis by a scalar value. If the Axis is unconstrained
         /// the result will remain unconstrained.
-        public static func *(lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
+        public static func * (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
                 return .atMost(limit * rhs)
@@ -151,27 +152,57 @@ extension SizeConstraint {
 
         /// Adds a scalar value to an Axis. If the Axis is unconstrained the
         /// result will remain unconstrained.
-        public static func +=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+        public static func += (lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
             lhs = lhs + rhs
         }
 
         /// Subtracts a scalar value from an Axis. If the Axis is unconstrained
         /// the result will remain unconstrained.
-        public static func -=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+        public static func -= (lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
             lhs = lhs - rhs
         }
 
         /// Divides an Axis by a scalar value. If the Axis is unconstrained the
         /// result will remain unconstrained.
-        public static func /=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+        public static func /= (lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
             lhs = lhs / rhs
         }
 
         /// Multiplies an Axis by a scalar value. If the Axis is unconstrained
         /// the result will remain unconstrained.
-        public static func *=(lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
+        public static func *= (lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
             lhs = lhs * rhs
         }
 
+    }
+}
+
+extension SizeConstraint {
+    /// This property wrapper checks the value of `atMost` cases, and turns it into an
+    /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
+    @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {
+        private var correctedAxis: Axis
+
+        public var wrappedValue: Axis {
+            get { correctedAxis }
+            set { correctedAxis = Self.correctedAxis(for: newValue) }
+        }
+
+        public init(wrappedValue value: Axis) {
+            correctedAxis = Self.correctedAxis(for: value)
+        }
+
+        private static func correctedAxis(for axis: Axis) -> Axis {
+            switch axis {
+            case .atMost(let maxAxis):
+                if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
+                    return .unconstrained
+                } else {
+                    return axis
+                }
+            case .unconstrained:
+                return axis
+            }
+        }
     }
 }

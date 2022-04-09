@@ -1,5 +1,5 @@
-import CoreGraphics
 import BlueprintUI
+import CoreGraphics
 
 extension ElementContent {
     /// A convenience method to measure the required size of this element's content,
@@ -8,6 +8,6 @@ extension ElementContent {
     ///   - constraint: The size constraint.
     /// - returns: The layout size needed by this content.
     func measure(in constraint: SizeConstraint) -> CGSize {
-        return measure(in: constraint, environment: .empty)
+        measure(in: constraint, environment: .empty)
     }
 }

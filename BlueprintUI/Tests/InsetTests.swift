@@ -29,11 +29,11 @@ class InsetTests: XCTestCase {
 fileprivate struct TestElement: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
+        ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }

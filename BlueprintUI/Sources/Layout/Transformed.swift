@@ -37,18 +37,18 @@ public struct Transformed: Element {
 
 
     public var content: ElementContent {
-        return ElementContent(child: wrappedElement, layout: Layout(transform: transform))
+        ElementContent(child: wrappedElement, layout: Layout(transform: transform))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     private struct Layout: SingleChildLayout {
         var transform: CATransform3D
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            return child.measure(in: constraint)
+            child.measure(in: constraint)
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
@@ -59,14 +59,14 @@ public struct Transformed: Element {
     }
 }
 
-public extension Element {
+extension Element {
     /// Wraps the element in an `Transformed` element with the provided 3D transform.
     ///
     /// - parameters:
     ///   - transform: The 3D transform to be applied.
     ///
-    func transformed(_ transform: CATransform3D) -> Transformed {
-        return Transformed(
+    public func transformed(_ transform: CATransform3D) -> Transformed {
+        Transformed(
             transform: transform,
             wrapping: self
         )
@@ -77,8 +77,8 @@ public extension Element {
     /// - parameters:
     ///   - transform: The 2D transform to be applied.
     ///
-    func transformed(_ transform: CGAffineTransform) -> Transformed {
-        return Transformed(
+    public func transformed(_ transform: CGAffineTransform) -> Transformed {
+        Transformed(
             transform: transform,
             wrapping: self
         )
@@ -91,12 +91,12 @@ public extension Element {
     ///   - transformY: The Y component of the translation.
     ///   - transformZ: The Z component of the translation.
     ///
-    func translated(
+    public func translated(
         translateX: CGFloat = 0,
         translateY: CGFloat = 0,
         translateZ: CGFloat = 0
     ) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: CATransform3DMakeTranslation(translateX, translateY, translateZ),
             wrapping: self
         )
@@ -107,8 +107,8 @@ public extension Element {
     /// - parameters:
     ///   - rotate: The angle measurement to rotate the receiver by.
     ///
-    func rotated(by rotationAngle: Measurement<UnitAngle>) -> Transformed {
-        return Transformed(
+    public func rotated(by rotationAngle: Measurement<UnitAngle>) -> Transformed {
+        Transformed(
             transform: CGAffineTransform(
                 rotationAngle: CGFloat(rotationAngle.converted(to: .radians).value)
             ),
@@ -122,11 +122,11 @@ public extension Element {
     ///   - scaleX: The X axis scale.
     ///   - scaleY: The Y axis scale.
     ///
-    func scaled(
+    public func scaled(
         scaleX: CGFloat = 1,
         scaleY: CGFloat = 1
     ) -> Transformed {
-        return Transformed(
+        Transformed(
             transform: CGAffineTransform(scaleX: scaleX, y: scaleY),
             wrapping: self
         )

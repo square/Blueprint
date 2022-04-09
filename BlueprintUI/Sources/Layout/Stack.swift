@@ -13,7 +13,7 @@ public protocol StackElement: Element {
 extension StackElement {
 
     public var content: ElementContent {
-        return ElementContent(layout: layout) {
+        ElementContent(layout: layout) {
             for child in self.children {
                 $0.add(traits: child.traits, key: child.key, element: child.element)
             }
@@ -21,7 +21,7 @@ extension StackElement {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
 }
@@ -31,6 +31,17 @@ extension StackElement {
     public init(_ configure: (inout Self) -> Void) {
         self.init()
         configure(&self)
+    }
+
+    /// Initializer using result builder to declaratively build up a stack.
+    /// - Parameters:
+    ///   - elementsBuilder: A block containing all elements to be included in the stack.
+    /// - Note: If element is a StackLayout.Child, then traits and key will be pulled from the element, otherwise defaults are passed through.
+    init(@ElementBuilder<StackLayout.Child> elementsBuilder: () -> [StackLayout.Child]) {
+        self.init()
+        children = elementsBuilder().map { stackLayoutChild in
+            (stackLayoutChild.element, stackLayoutChild.traits, stackLayoutChild.key)
+        }
     }
 
     /// Adds a given child element to the stack.
@@ -75,7 +86,7 @@ extension StackElement {
     ///     }
     ///     ```
     ///
-    ///   - alignmentGuide: 
+    ///   - alignmentGuide:
     ///
     ///     A closure that can be used to provide a custom alignment guide for this child.
     ///
@@ -95,7 +106,7 @@ extension StackElement {
     ///
     /// - Tag: StackElement.add
     ///
-    mutating public func add(
+    public mutating func add(
         growPriority: CGFloat = 1.0,
         shrinkPriority: CGFloat = 1.0,
         alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
@@ -133,7 +144,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        self.add(
+        add(
             growPriority: 0,
             shrinkPriority: 0,
             alignmentGuide: alignmentGuide,
@@ -161,7 +172,7 @@ extension StackElement {
         key: AnyHashable? = nil,
         child: Element
     ) {
-        self.add(
+        add(
             growPriority: 1,
             shrinkPriority: 1,
             alignmentGuide: alignmentGuide,
@@ -177,7 +188,7 @@ public struct StackLayout: Layout {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
-        return Traits()
+        Traits()
     }
 
     /// Determines how a stack child will be aligned on the cross axis relative to other children.
@@ -254,7 +265,7 @@ public struct StackLayout: Layout {
     }
 
     public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        return _layout(size: size, items: items)
+        _layout(size: size, items: items)
     }
 
 }
@@ -313,12 +324,12 @@ extension StackLayout {
 // MARK: - Layout logic
 
 // Stack layout is generalized to work for both Rows and Columns.
-// 
+//
 // Some special terminology is used to symbolically represent the two axes of a stack:
 //
 //   - The axis along which elements are being laid out is generally called "axis".
 //   - The other axis is the cross axis, or just "cross".
-// 
+//
 // For Rows, the axis is horizontal and the cross is vertical.
 // For Columns, the axis is vertical and the cross is horizontal.
 //
@@ -370,7 +381,7 @@ extension StackLayout {
         let frames = _frames(for: items, in: vectorConstraint)
 
         return frames.map { frame in
-            return LayoutAttributes(frame: frame.rect(axis: axis))
+            LayoutAttributes(frame: frame.rect(axis: axis))
         }
     }
 
@@ -382,10 +393,11 @@ extension StackLayout {
 
         let frames = _frames(for: items, in: vectorConstraint)
 
-        let vector = frames.reduce(Vector.zero) { (vector, frame) -> Vector in
-            return Vector(
+        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
+            Vector(
                 axis: max(vector.axis, frame.maxAxis),
-                cross: max(vector.cross, frame.maxCross))
+                cross: max(vector.cross, frame.maxCross)
+            )
         }
 
         return vector.size(axis: axis)
@@ -402,7 +414,8 @@ extension StackLayout {
         let crossSegments = _crossSegments(
             for: items,
             axisConstraints: axisSegments.map { $0.magnitude },
-            crossConstraint: vectorConstraint.cross)
+            crossConstraint: vectorConstraint.cross
+        )
 
         // Finally, merge axis and cross segments into frames.
         return zip(axisSegments, crossSegments).map(VectorFrame.init(axis:cross:))
@@ -442,7 +455,7 @@ extension StackLayout {
 
         func unconstrainedAxisSize() -> CGFloat {
             let totalMeasuredAxis: CGFloat = basisSizes.reduce(0.0, +)
-            let minimumTotalSpacing = CGFloat(items.count-1) * minimumSpacing
+            let minimumTotalSpacing = CGFloat(items.count - 1) * minimumSpacing
 
             return totalMeasuredAxis + minimumTotalSpacing
         }
@@ -454,13 +467,15 @@ extension StackLayout {
                 return _layoutOverflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
-                    layoutSize: axisSize)
+                    layoutSize: axisSize
+                )
             } else {
                 // Underflow: expand to axis constraint
                 return _layoutUnderflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
-                    layoutSize: axisSize)
+                    layoutSize: axisSize
+                )
             }
 
         case .atMost(let axisMax):
@@ -469,7 +484,8 @@ extension StackLayout {
                 return _layoutOverflow(
                     basisSizes: basisSizes,
                     traits: items.map { $0.traits },
-                    layoutSize: axisMax)
+                    layoutSize: axisMax
+                )
             } else {
                 // Underflow: allow to fit natural size
                 return _layoutUnconstrained(basisSizes: basisSizes)
@@ -497,7 +513,7 @@ extension StackLayout {
         assert(basisSizes.count > 0)
 
         let totalBasisSize: CGFloat = basisSizes.reduce(0.0, +)
-        let totalSpacing = minimumSpacing * CGFloat(basisSizes.count-1)
+        let totalSpacing = minimumSpacing * CGFloat(basisSizes.count - 1)
 
         /// The overflow size that will be distributed among children
         let extraSize: CGFloat = layoutSize - (totalBasisSize + totalSpacing)
@@ -532,7 +548,7 @@ extension StackLayout {
 
         var axisOrigin: CGFloat = 0.0
 
-        let axisSegments = zip(basisSizes, shrinkPriorities).map { (basis, shrinkPriority) -> Segment in
+        let axisSegments = zip(basisSizes, shrinkPriorities).map { basis, shrinkPriority -> Segment in
             let sizeAdjustment = (shrinkPriority / totalPriority) * extraSize
             let magnitude = basis + sizeAdjustment
             let origin = axisOrigin
@@ -550,12 +566,12 @@ extension StackLayout {
 
         let totalBasisSize: CGFloat = basisSizes.reduce(0.0, +)
 
-        let minimumTotalSpace = minimumSpacing * CGFloat(basisSizes.count-1)
+        let minimumTotalSpace = minimumSpacing * CGFloat(basisSizes.count - 1)
         /// The underflow size that will be distributed among children
         let extraSize: CGFloat = layoutSize - (totalBasisSize + minimumTotalSpace)
-        
+
         assert(extraSize >= 0.0)
-        
+
         let space: CGFloat
 
         switch underflow {
@@ -564,7 +580,7 @@ extension StackLayout {
         case .growUniformly:
             space = minimumSpacing
         case .spaceEvenly:
-            space = (layoutSize - totalBasisSize) / CGFloat(basisSizes.count-1)
+            space = (layoutSize - totalBasisSize) / CGFloat(basisSizes.count - 1)
         case .justifyToStart:
             space = minimumSpacing
         case .justifyToCenter:
@@ -624,7 +640,7 @@ extension StackLayout {
             totalPriority = 1
         }
 
-        let axisSegments = zip(basisSizes, growPriorities).map { (basis, growPriority) -> Segment in
+        let axisSegments = zip(basisSizes, growPriorities).map { basis, growPriority -> Segment in
             let sizeAdjustment = (growPriority / totalPriority) * extraSize
             let origin = axisOrigin
             let magnitude = basis + sizeAdjustment
@@ -669,10 +685,11 @@ extension StackLayout {
     ) -> [Segment] {
         // Measures cross magnitudes based on axis constraints
         func measureMagnitudes() -> [CGFloat] {
-            zip(items, axisConstraints).map { (item, axisConstraint) -> CGFloat in
+            zip(items, axisConstraints).map { item, axisConstraint -> CGFloat in
                 let vector = VectorConstraint(
                     axis: .atMost(axisConstraint),
-                    cross: crossConstraint)
+                    cross: crossConstraint
+                )
                 let constraint = vector.constraint(axis: axis)
                 let measuredSize = item.content.measure(in: constraint)
 
@@ -790,18 +807,18 @@ extension StackLayout {
         func size(axis: StackLayout.Axis) -> CGSize {
             switch axis {
             case .horizontal:
-                return CGSize(width: self.axis, height: self.cross)
+                return CGSize(width: self.axis, height: cross)
             case .vertical:
-                return CGSize(width: self.cross, height: self.axis)
+                return CGSize(width: cross, height: self.axis)
             }
         }
 
         func point(axis: StackLayout.Axis) -> CGPoint {
             switch axis {
             case .horizontal:
-                return CGPoint(x: self.axis, y: self.cross)
+                return CGPoint(x: self.axis, y: cross)
             case .vertical:
-                return CGPoint(x: self.cross, y: self.axis)
+                return CGPoint(x: cross, y: self.axis)
             }
         }
     }
@@ -847,37 +864,37 @@ extension StackLayout {
         }
 
         init(axis: Segment, cross: Segment) {
-            self.origin = Vector(axis: axis.origin, cross: cross.origin)
-            self.size = Vector(axis: axis.magnitude, cross: cross.magnitude)
+            origin = Vector(axis: axis.origin, cross: cross.origin)
+            size = Vector(axis: axis.magnitude, cross: cross.magnitude)
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {
-            return CGRect(origin: origin.point(axis: axis), size: size.size(axis: axis))
+            CGRect(origin: origin.point(axis: axis), size: size.size(axis: axis))
         }
 
         var maxAxis: CGFloat {
-            return origin.axis + size.axis
+            origin.axis + size.axis
         }
 
         var minAxis: CGFloat {
-            return origin.axis
+            origin.axis
         }
 
         var maxCross: CGFloat {
-            return origin.cross + size.cross
+            origin.cross + size.cross
         }
 
         var minCross: CGFloat {
-            return origin.cross
+            origin.cross
         }
     }
 }
 
 // MARK: - Extensions
 
-private extension CGSize {
+extension CGSize {
 
-    func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
+    fileprivate func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
         switch axis {
         case .horizontal:
             return StackLayout.Vector(axis: width, cross: height)
@@ -886,20 +903,22 @@ private extension CGSize {
         }
     }
 
-    func vectorConstraint(axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
+    fileprivate func vectorConstraint(axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
         switch axis {
         case .horizontal:
             return StackLayout.VectorConstraint(
                 axis: .exactly(width),
-                cross: .exactly(height))
+                cross: .exactly(height)
+            )
         case .vertical:
             return StackLayout.VectorConstraint(
                 axis: .exactly(height),
-                cross: .exactly(width))
+                cross: .exactly(width)
+            )
         }
     }
 
-    func axis(on axis: StackLayout.Axis) -> CGFloat {
+    fileprivate func axis(on axis: StackLayout.Axis) -> CGFloat {
         switch axis {
         case .horizontal:
             return width
@@ -908,7 +927,7 @@ private extension CGSize {
         }
     }
 
-    func cross(on axis: StackLayout.Axis) -> CGFloat {
+    fileprivate func cross(on axis: StackLayout.Axis) -> CGFloat {
         switch axis {
         case .horizontal:
             return height
@@ -918,8 +937,8 @@ private extension CGSize {
     }
 }
 
-private extension SizeConstraint {
-    func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
+extension SizeConstraint {
+    fileprivate func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
         switch axis {
         case .horizontal:
             return StackLayout.VectorConstraint(axis: width.vectorConstraint, cross: height.vectorConstraint)
@@ -928,7 +947,7 @@ private extension SizeConstraint {
         }
     }
 
-    func axis(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
+    fileprivate func axis(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
         switch axis {
         case .horizontal:
             return width
@@ -937,7 +956,7 @@ private extension SizeConstraint {
         }
     }
 
-    func cross(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
+    fileprivate func cross(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
         switch axis {
         case .horizontal:
             return height
@@ -947,13 +966,126 @@ private extension SizeConstraint {
     }
 }
 
-private extension SizeConstraint.Axis {
-    var vectorConstraint: StackLayout.VectorConstraint.Axis {
+extension SizeConstraint.Axis {
+    fileprivate var vectorConstraint: StackLayout.VectorConstraint.Axis {
         switch self {
         case .atMost(let max):
             return .atMost(max)
         case .unconstrained:
             return .unconstrained
         }
+    }
+}
+
+// MARK: - Result Builders
+
+/// `StackLayout.Child` is a wrapper which holds an element along with  its StackLayout traits and Keys.
+/// This struct is particularly useful when working with `@ElementBuilder<StackLayout.Child>`.
+/// By default, elements inside of `ElementBuilder<StackLayout.Child>` will be implicitly converted to a StackLayout.Child
+/// with a nil key and the default `StackLayout.Traits` initializer. But when given a `StackLayout.Child` via
+/// `Element.StackLayout.Child(...)` modifier or initialized directly, `@ElementBuilder<StackLayout.Child>`
+/// pull out the given traits and key and then apply those to the stack
+extension StackLayout {
+    public struct Child {
+        public let element: Element
+        public let traits: StackLayout.Traits
+        public let key: AnyHashable?
+
+        public enum Priority {
+            case fixed
+            case flexible
+
+            fileprivate var growPriority: CGFloat {
+                switch self {
+                case .fixed: return 0
+                case .flexible: return 1
+                }
+            }
+
+            fileprivate var shrinkPriority: CGFloat {
+                switch self {
+                case .fixed: return 0
+                case .flexible: return 1
+                }
+            }
+        }
+
+        public init(
+            element: Element,
+            traits: StackLayout.Traits = .init(),
+            key: AnyHashable? = nil
+        ) {
+            self.element = element
+            self.traits = traits
+            self.key = key
+        }
+
+        public init(
+            element: Element,
+            priority: Priority = .flexible,
+            alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+            key: AnyHashable? = nil
+        ) {
+            self.init(
+                element: element,
+                traits: .init(
+                    growPriority: priority.growPriority,
+                    shrinkPriority: priority.shrinkPriority,
+                    alignmentGuide: alignmentGuide.map(StackLayout.AlignmentGuide.init)
+                ),
+                key: key
+            )
+        }
+    }
+}
+
+extension Element {
+
+    /// Wraps an element with a `StackLayout.Child` in order to customize `StackLayout.Traits` and the key.
+    /// - Parameters:
+    ///   - priority: Controls the amount of extra space distributed to this child during underflow and overflow
+    ///   - alignmentGuide: Allows for custom alignment of a child along the cross axis.
+    ///   - key: A key used to disambiguate children between subsequent updates of the view
+    ///     hierarchy.
+    /// - Returns: A wrapper containing this element with additional layout information for the `StackElement`.
+    public func stackLayoutChild(
+        priority: StackLayout.Child.Priority = .flexible,
+        alignmentGuide: ((ElementDimensions) -> CGFloat)? = nil,
+        key: AnyHashable? = nil
+    ) -> StackLayout.Child {
+        .init(
+            element: self,
+            priority: priority,
+            alignmentGuide: alignmentGuide,
+            key: key
+        )
+    }
+
+    /// Wraps an element with a `StackLayout.Child` in order to customize the `StackLayout.Child.Priority`.
+    /// - Parameters:
+    ///   - priority: Controls the amount of extra space distributed to this child during underflow and overflow
+    /// - Returns: A wrapper containing this element with additional layout information for the `StackElement`.
+    public func stackLayoutChild(
+        priority: StackLayout.Child.Priority
+    ) -> StackLayout.Child {
+        .init(
+            element: self,
+            priority: priority,
+            alignmentGuide: nil,
+            key: nil
+        )
+    }
+}
+
+/// Map `Keyed` elements in result builders to `StackLayout.Child`.
+extension ElementBuilder where Child == StackLayout.Child {
+    public static func buildExpression(_ keyed: Keyed) -> Children {
+        [StackLayout.Child(element: keyed.wrapped, key: keyed.key)]
+    }
+}
+
+extension StackLayout.Child: ElementBuilderChild {
+    public init(_ element: Element) {
+        self.init(element: element)
     }
 }

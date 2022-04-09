@@ -1,5 +1,5 @@
-import UIKit
 import BlueprintUI
+import UIKit
 
 
 /// Allows users to pick from an array of options.
@@ -12,35 +12,47 @@ public struct SegmentedControl: Element, Measurable {
     public var font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)
     public var roundingScale: CGFloat = UIScreen.main.scale
 
-    public init(items: [Item] = []) {
+    public init(items: [Item] = [], configure: (inout SegmentedControl) -> Void = { _ in }) {
         self.items = items
+        configure(&self)
     }
 
-    public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping ()->Void) {
+    public init(
+        selection: Selection = .none,
+        font: UIFont = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body),
+        @Builder<Item> itemBuilder: () -> [Item]
+    ) {
+        items = itemBuilder()
+        self.selection = selection
+        self.font = font
+    }
+
+    public mutating func appendItem(title: String, width: Item.Width = .automatic, onSelect: @escaping () -> Void) {
         items.append(Item(title: title, width: width, onSelect: onSelect))
     }
 
     public var content: ElementContent {
-        return ElementContent(measurable: self)
+        ElementContent(measurable: self)
     }
 
     public func measure(in constraint: SizeConstraint) -> CGSize {
-        return items.reduce(CGSize.zero, { (current, item) -> CGSize in
+        items.reduce(CGSize.zero) { current, item -> CGSize in
             let itemSize = item.measure(font: font, in: constraint, roundingScale: roundingScale)
             return CGSize(
                 width: itemSize.width + current.width,
-                height: max(itemSize.height, current.height))
-        })
+                height: max(itemSize.height, current.height)
+            )
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return SegmentedControlView.describe { config in
+        SegmentedControlView.describe { config in
             config[\.element] = self
         }
     }
 
-    fileprivate var titleTextAttributes: [NSAttributedString.Key:Any] {
-        return [NSAttributedString.Key.font: font]
+    fileprivate var titleTextAttributes: [NSAttributedString.Key: Any] {
+        [NSAttributedString.Key.font: font]
     }
 
 }
@@ -70,9 +82,10 @@ extension SegmentedControl {
         public var onSelect: () -> Void
 
         internal func measure(font: UIFont, in constraint: SizeConstraint, roundingScale: CGFloat) -> CGSize {
-            return CGSize(
+            CGSize(
                 width: width.requiredWidth(for: title, font: font, in: constraint, roundingScale: roundingScale),
-                height: 36.0)
+                height: 36.0
+            )
         }
 
     }
@@ -107,7 +120,8 @@ extension SegmentedControl.Item {
                         with: constraint.maximum,
                         options: [.usesLineFragmentOrigin],
                         attributes: [.font: font],
-                        context: nil)
+                        context: nil
+                    )
                     .size
                     .width
                     .rounded(.up, by: roundingScale)
@@ -157,7 +171,8 @@ fileprivate final class SegmentedControlView: UIView {
                 segmentedControl.insertSegment(
                     withTitle: item.title,
                     at: offset,
-                    animated: false)
+                    animated: false
+                )
             } else {
                 if item.title != segmentedControl.titleForSegment(at: offset) {
                     segmentedControl.setTitle(item.title, forSegmentAt: offset)
@@ -167,13 +182,14 @@ fileprivate final class SegmentedControlView: UIView {
             if segmentedControl.widthForSegment(at: offset) != item.width.resolvedWidth {
                 segmentedControl.setWidth(
                     item.width.resolvedWidth,
-                    forSegmentAt: offset)
+                    forSegmentAt: offset
+                )
             }
 
         }
 
         while segmentedControl.numberOfSegments > element.items.count {
-            segmentedControl.removeSegment(at: segmentedControl.numberOfSegments-1, animated: false)
+            segmentedControl.removeSegment(at: segmentedControl.numberOfSegments - 1, animated: false)
         }
 
         if segmentedControl.selectedSegmentIndex != element.selection.resolvedIndex {

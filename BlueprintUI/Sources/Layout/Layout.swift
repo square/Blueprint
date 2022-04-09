@@ -2,7 +2,7 @@ import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
 public protocol Layout {
-    
+
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()
 
@@ -27,16 +27,16 @@ public protocol Layout {
     ///
     /// - returns: Layout attributes for the given array of items.
     func layout(size: CGSize, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
-    
+
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
-    
+
 }
 
 extension Layout where Traits == () {
-    
+
     public static var defaultTraits: () {
         return ()
     }
-    
+
 }

@@ -23,10 +23,24 @@ public struct EqualStack: Element {
     ///     - configure: A closure allowing the element to be further customized. Defaults to a no-op.
     public init(
         direction: Direction,
-        configure: (inout EqualStack) -> Void = { _ in })
-    {
+        configure: (inout EqualStack) -> Void = { _ in }
+    ) {
         self.direction = direction
         configure(&self)
+    }
+
+    /// Initializer using result builder to declaritively build up a stack.
+    /// - Parameters:
+    ///   - direction: Direction of the stack.
+    ///   - children: A block containing all elements to be included in the stack.
+    public init(
+        direction: Direction,
+        spacing: CGFloat = 0,
+        @ElementBuilder<Child> elements: () -> [Child]
+    ) {
+        self.init(direction: direction)
+        self.spacing = spacing
+        children = elements().map(\.element)
     }
 
     public var content: ElementContent {
@@ -39,7 +53,7 @@ public struct EqualStack: Element {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return nil
+        nil
     }
 
     public mutating func add(child: Element) {
@@ -91,11 +105,13 @@ extension EqualStack {
             case .horizontal:
                 totalSize = CGSize(
                     width: maximumItemWidth * CGFloat(items.count) + spacing * CGFloat(items.count - 1),
-                    height: maximumItemHeight)
+                    height: maximumItemHeight
+                )
             case .vertical:
                 totalSize = CGSize(
                     width: maximumItemWidth,
-                    height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1))
+                    height: maximumItemHeight * CGFloat(items.count) + spacing * CGFloat(items.count - 1)
+                )
             }
 
             return totalSize
@@ -110,11 +126,13 @@ extension EqualStack {
             case .horizontal:
                 itemSize = CGSize(
                     width: (size.width - totalSpacing) / CGFloat(items.count),
-                    height: size.height)
+                    height: size.height
+                )
             case .vertical:
                 itemSize = CGSize(
                     width: size.width,
-                    height: (size.height - totalSpacing) / CGFloat(items.count))
+                    height: (size.height - totalSpacing) / CGFloat(items.count)
+                )
             }
 
             var result: [LayoutAttributes] = []
@@ -137,4 +155,16 @@ extension EqualStack {
 
     }
 
+}
+
+/// Wraps around an Element for consistency with `StackLayout.Child` and `GridRowChild`.
+/// In the future this struct could hold traits used for laying out inside an EqualStack
+extension EqualStack {
+    public struct Child: ElementBuilderChild {
+        public let element: Element
+
+        public init(_ element: Element) {
+            self.element = element
+        }
+    }
 }
