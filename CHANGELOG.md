@@ -11,11 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for optionals in builders without unwrapping via `if let`.
+- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
 - Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
 
 ### Removed
-
-- `MeasurementCachingKey` has been removed – Blueprint has cached measurements per render pass for many releases, so this actually slowed down layouts due to additional allocations and cache checking. This is about a 5-10% performance improvement depending on the layout.
 
 ### Changed
 
@@ -28,6 +28,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.39.0]
+
+### Added
+
+- Added support for adjusting text spacing and sizing on `AttributedLabel` and `Label` when text does not fit within the provided layout rect.
+
+### Removed
+
+- `MeasurementCachingKey` has been removed – Blueprint has cached measurements per render pass for many releases, so this actually slowed down layouts due to additional allocations and cache checking. This is about a 5-10% performance improvement depending on the layout.
+
+### Changed
+
+- Accessibility increment, decrement actions have been moved to associated values on the `AccessibilityElement.Trait` enum.
 
 ## [0.38.0]
 
@@ -815,7 +829,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.38.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.39.0...HEAD
+[0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
 [0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
 [0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
 [0.36.1]: https://github.com/square/Blueprint/compare/0.36.0...0.36.1

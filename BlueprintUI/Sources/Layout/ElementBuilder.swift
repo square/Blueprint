@@ -7,23 +7,10 @@ extension ElementBuilder {
         [Child(element)]
     }
 
-    @available(
-        *,
-        unavailable,
-        message: "Optionals must be unwrapped with `if let value = ...` to be returned from a result builder."
-    )
+    /// Allow an Optional Element to be unwrapped and implicitly converted into `Child`.
     public static func buildExpression(_ child: Element?) -> Children {
-
-        /// This method ensures better compile-time error messages are shown when
-        /// returning an `Optional` from a result builder. Without this method,
-        /// when an `Optional` is returned from a result builder, the compiler
-        /// will instead resolve the `configure`-based version of our component
-        /// initializers, resulting in a confusing error message.
-        ///
-        /// Adding this explicit override ensures that the compiler continues to attempt to resolve
-        /// the trailing closure as a result builder-based closure, and returns the above error message.
-
-        fatalError()
+        guard let child = child else { return [] }
+        return [Child(child)]
     }
 
     /// Allow Elements to be implicitly converted into `Child`.
