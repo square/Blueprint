@@ -49,12 +49,8 @@ class ElementBuilderTests: XCTestCase {
         }
 
         let gridRow = GridRow {
-            if let element = optionalElement1() {
-                element
-            }
-            if let element = optionalElement2() {
-                element
-            }
+            optionalElement1()
+            optionalElement2()
         }
 
         XCTAssertEqual(gridRow.children.count, 1)
@@ -63,6 +59,38 @@ class ElementBuilderTests: XCTestCase {
         } else {
             XCTAssert(type(of: gridRow.children[0].element) == TestElement2.self)
         }
+    }
+
+    func test_resultBuilder_optional_expression() {
+        enum TestEnum: CaseIterable {
+            case first
+            case second
+            case third
+        }
+
+        let item = TestEnum.first
+
+        let gridRow = GridRow {
+            switch item {
+            case .first:
+                TestElement()
+            case .second:
+                nil
+            case .third:
+                nil
+            }
+
+            switch item {
+            case .first:
+                nil
+            case .second:
+                TestElement()
+            case .third:
+                nil
+            }
+        }
+
+        XCTAssertEqual(gridRow.children.count, 1)
     }
 
     func test_resultBuilder_either_ifelse() {
