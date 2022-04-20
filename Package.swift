@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.4
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -39,7 +39,11 @@ let package = Package(
         .testTarget(
             name: "BlueprintUICommonControlsTests",
             dependencies: ["BlueprintUICommonControls"],
-            path: "BlueprintUICommonControls/Tests"
+            path: "BlueprintUICommonControls/Tests/Sources",
+            resources: [
+                .process("Resources/test-image.jpg"),
+                .copy("Resources/ReferenceImages"),
+            ]
         ),
     ],
     swiftLanguageVersions: [.v5]
