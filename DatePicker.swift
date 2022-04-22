@@ -67,7 +67,6 @@ public struct DatePicker: Element {
 
             config.apply { view in
                 view.apply(model: self)
-//                print(view.frame)
             }
         }
     }
