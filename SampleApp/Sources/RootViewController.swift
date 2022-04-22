@@ -29,6 +29,9 @@ final class RootViewController: UIViewController {
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             }),
+            DemoItem(title: "Date Picker", onTap: { [weak self] in
+                self?.push(DateViewController())
+            }),
 
             EditingMenu { menu in
                 DemoItem(title: "Show A Menu Controller") {
