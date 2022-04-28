@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `AnimationAttributes` has gained a `.default` option.
+- `LayoutTransition` has default values for its `AnimationAttributes` parameters.
+
 ### Deprecated
 
 ### Security

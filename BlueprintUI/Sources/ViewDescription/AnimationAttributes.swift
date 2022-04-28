@@ -12,6 +12,9 @@ public struct AnimationAttributes {
     /// Whether the view supports user interaction during the animation.
     public var allowUserInteraction: Bool
 
+    // Animation attributes with the default values from `.init()`.
+    public static let `default`: Self = .init()
+
     public init(
         duration: TimeInterval = 0.2,
         curve: UIView.AnimationCurve = .easeInOut,
