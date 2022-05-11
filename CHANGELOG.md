@@ -11,15 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for optionals in builders without unwrapping via `if let`.
-- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
-
 ### Removed
 
 ### Changed
-
-- `AnimationAttributes` has gained a `.default` option.
-- `LayoutTransition` has default values for its `AnimationAttributes` parameters.
 
 ### Deprecated
 
@@ -30,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.40.0]
+
+### Added
+
+- Added support for optionals in builders without unwrapping via `if let`.
+- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
+
+### Changed
+
+- `AnimationAttributes` has gained a `.default` option.
+- `LayoutTransition` has default values for its `AnimationAttributes` parameters.
 
 ## [0.39.0]
 
@@ -831,7 +837,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.39.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.40.0...HEAD
+[0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
 [0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
 [0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
 [0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0
