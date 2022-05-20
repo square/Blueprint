@@ -24,7 +24,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
     }
 
     func test_repeated_layouts() {
@@ -38,6 +38,118 @@ class PerformancePlayground: XCTestCase {
 
         determineAverage(for: 10.0) {
             view.element = element
+            view.layoutIfNeeded()
+        }
+    }
+
+    func test_rows_with_one_flexible_element_simple() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+            Box(backgroundColor: .red)
+                .constrainedTo(width: 80, height: 80)
+                .stackLayoutChild(priority: .fixed)
+
+            Column(alignment: .fill, underflow: .justifyToStart, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                let rows: [String] = [
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                ]
+
+                for rowText in rows {
+                    Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                        Box(backgroundColor: .blue)
+                            .constrainedTo(width: 40, height: 40)
+                            .stackLayoutChild(priority: .fixed)
+
+                        Label(text: rowText)
+                            .stackLayoutChild(priority: .flexible)
+                    }
+                    .stackLayoutChild(priority: .fixed)
+                }
+            }
+            .stackLayoutChild(priority: .flexible)
+        }
+
+        let content = Column(alignment: .fill) {
+            for _ in 1...10 {
+                row
+            }
+        }
+
+        let size = content.content.measure(in: .init(width: 300))
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 300.0, height: size.height)
+
+        BlueprintStackUpdates.isOptimizedLayoutEnabled = true
+
+        AttributedLabel.measureCount = 0
+        print("--------------")
+
+        view.element = content
+        view.layoutIfNeeded()
+
+        print(AttributedLabel.measureCount)
+    }
+
+    func test_rows_with_one_flexible_element() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+            Box(backgroundColor: .red)
+                .constrainedTo(width: 80, height: 80)
+                .stackLayoutChild(priority: .fixed)
+
+            Column(alignment: .fill, underflow: .justifyToStart, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                let rows: [String] = [
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "Fusce dignissim vitae leo sed pretium.",
+                    "Morbi molestie, nisl eget faucibus bibendum, magna orci congue ipsum.",
+                    "Eu tincidunt orci nunc ac nisl.",
+                    "Aenean facilisis nulla vitae nibh suscipit, id placerat est lacinia.",
+                ]
+
+                for rowText in rows {
+                    Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                        Box(backgroundColor: .blue)
+                            .constrainedTo(width: 40, height: 40)
+                            .stackLayoutChild(priority: .fixed)
+
+                        Label(text: rowText)
+                            .stackLayoutChild(priority: .flexible)
+                    }
+                    .stackLayoutChild(priority: .fixed)
+                }
+            }
+            .stackLayoutChild(priority: .flexible)
+        }
+
+        let allRows = Column(alignment: .fill) {
+            for _ in 1...100 {
+                row
+            }
+        }
+
+        let size = allRows.content.measure(in: .init(width: 300))
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 300.0, height: size.height)
+
+        BlueprintStackUpdates.isOptimizedLayoutEnabled = false
+
+        determineAverage(for: 2.0) {
+            view.element = allRows
+            view.layoutIfNeeded()
+        }
+
+        BlueprintStackUpdates.isOptimizedLayoutEnabled = true
+
+        determineAverage(for: 2.0) {
+            view.element = allRows
             view.layoutIfNeeded()
         }
     }

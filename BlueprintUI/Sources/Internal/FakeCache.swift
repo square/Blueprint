@@ -5,10 +5,12 @@ final class FakeCache: CacheTree {
 
     var name: String
     var signpostRef: AnyObject
+    var screenScale: CGFloat
 
-    init(name: String, signpostRef: AnyObject) {
+    init(name: String, signpostRef: AnyObject, screenScale: CGFloat) {
         self.name = name
         self.signpostRef = signpostRef
+        self.screenScale = screenScale
     }
 
     subscript(constraint: SizeConstraint) -> CGSize? {
@@ -17,6 +19,6 @@ final class FakeCache: CacheTree {
     }
 
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        FakeCache(name: name(), signpostRef: signpostRef)
+        FakeCache(name: name(), signpostRef: signpostRef, screenScale: screenScale)
     }
 }

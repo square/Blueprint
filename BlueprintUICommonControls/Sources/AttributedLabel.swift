@@ -96,11 +96,15 @@ public struct AttributedLabel: Element, Hashable {
         configure(&self)
     }
 
+    public static var measureCount: Int = 0
+
     public var content: ElementContent {
         struct Measurer {
             private static let prototypeLabel = LabelView()
 
             func measure(model: AttributedLabel, in constraint: SizeConstraint, environment: Environment) -> CGSize {
+                AttributedLabel.measureCount += 1
+                // print("Size: \(constraint)")
                 let label = Self.prototypeLabel
                 label.update(model: model, environment: environment, isMeasuring: true)
                 return label.sizeThatFits(constraint.maximum)

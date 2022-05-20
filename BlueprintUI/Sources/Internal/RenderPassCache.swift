@@ -5,13 +5,15 @@ final class RenderPassCache: CacheTree {
 
     let name: String
     let signpostRef: AnyObject
+    let screenScale: CGFloat
 
     private var subcaches: [SubcacheKey: RenderPassCache] = [:]
     private var measurements: [SizeConstraint: CGSize] = [:]
 
-    init(name: String, signpostRef: AnyObject) {
+    init(name: String, signpostRef: AnyObject, screenScale: CGFloat) {
         self.name = name
         self.signpostRef = signpostRef
+        self.screenScale = screenScale
     }
 
     subscript(constraint: SizeConstraint) -> CGSize? {
@@ -28,7 +30,7 @@ final class RenderPassCache: CacheTree {
             return subcache
         }
 
-        let subcache = RenderPassCache(name: name(), signpostRef: signpostRef)
+        let subcache = RenderPassCache(name: name(), signpostRef: signpostRef, screenScale: screenScale)
         subcaches[key] = subcache
         return subcache
     }

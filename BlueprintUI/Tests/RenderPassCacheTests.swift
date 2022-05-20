@@ -3,7 +3,7 @@ import XCTest
 
 final class RenderPassCacheTests: XCTestCase {
     func test_caching() {
-        let cache = RenderPassCache(name: "test", signpostRef: self)
+        let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
         XCTAssertEqual(cache.name, "test")
         XCTAssert(cache.signpostRef === self)
@@ -34,7 +34,7 @@ final class RenderPassCacheTests: XCTestCase {
     }
 
     func test_subcaches() {
-        let cache = RenderPassCache(name: "test", signpostRef: self)
+        let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
         let subcache1 = cache.subcache(key: 0, name: "1")
         let subcache2 = cache.subcache(key: 1, name: "2")
@@ -68,7 +68,7 @@ final class RenderPassCacheTests: XCTestCase {
 
     /// Test the get(_: orStore:) convenience method
     func test_getOrStore() {
-        let cache = RenderPassCache(name: "test", signpostRef: self)
+        let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
         let size1 = CGSize(width: 1, height: 1)
 
@@ -99,7 +99,7 @@ final class RenderPassCacheTests: XCTestCase {
         }
 
         do {
-            let cache = RenderPassCache(name: "test", signpostRef: self)
+            let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
             let singletonSubcache = cache.subcache(element: Empty())
             XCTAssertEqual(singletonSubcache.name, "test.Empty")
@@ -107,7 +107,7 @@ final class RenderPassCacheTests: XCTestCase {
         }
 
         do {
-            let cache = RenderPassCache(name: "test", signpostRef: self)
+            let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
             let singletonSubcache = cache.subcache(index: 0, of: 1, element: Empty())
             XCTAssertEqual(singletonSubcache.name, "test.Empty")
@@ -115,7 +115,7 @@ final class RenderPassCacheTests: XCTestCase {
         }
 
         do {
-            let cache = RenderPassCache(name: "test", signpostRef: self)
+            let cache = RenderPassCache(name: "test", signpostRef: self, screenScale: 1)
 
             let subcache1 = cache.subcache(index: 0, of: 2, element: Empty())
             let subcache2 = cache.subcache(index: 1, of: 2, element: Empty())
