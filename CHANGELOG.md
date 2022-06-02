@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `.grows` and `.shrinks` to `StackLayout.Child.Priority`, to allow for extra control over how flexible elements grow and shrink.
+- `AccessibilityBlocker` now takes in a `Bool` to control blocking, to avoid changing the element hierarchy to toggle if blocking is occurring.
 
 ### Removed
 
