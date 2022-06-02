@@ -992,13 +992,28 @@ extension StackLayout {
         public let key: AnyHashable?
 
         public enum Priority {
+            /// The element has a fixed size, with a grow and shrink priority of 0.
+            /// The element will neither grow nor shrink during overflow and underflow.
             case fixed
+
+            /// The element has a flexible size, with a grow and shrink priority of 1.
+            /// The element will grow during underflow and shrink during overflow.
             case flexible
+
+            /// The element has a flexible size, it will grow if the stack underflows,
+            /// but it will not shrink if the stack overflows.
+            case grows
+
+            /// The element has a flexible size, it will shrink if the stack overflows,
+            /// but it will not grow if the stack underflows.
+            case shrinks
 
             fileprivate var growPriority: CGFloat {
                 switch self {
                 case .fixed: return 0
                 case .flexible: return 1
+                case .grows: return 1
+                case .shrinks: return 0
                 }
             }
 
@@ -1006,6 +1021,8 @@ extension StackLayout {
                 switch self {
                 case .fixed: return 0
                 case .flexible: return 1
+                case .grows: return 0
+                case .shrinks: return 1
                 }
             }
         }
