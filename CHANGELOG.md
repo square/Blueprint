@@ -11,9 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `.grows` and `.shrinks` to `StackLayout.Child.Priority`, to allow for extra control over how flexible elements grow and shrink.
-- `AccessibilityBlocker` now takes in a `Bool` to control blocking, to avoid changing the element hierarchy to toggle if blocking is occurring.
-
 ### Removed
 
 ### Changed
@@ -27,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.41.0]
+
+### Added
+
+- Added `.grows` and `.shrinks` to `StackLayout.Child.Priority`, to allow for extra control over how flexible elements grow and shrink.
+- `AccessibilityBlocker` now takes in a `Bool` to control blocking, to avoid changing the element hierarchy to toggle if blocking is occurring.
 
 ## [0.40.0]
 
@@ -840,7 +844,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.40.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.41.0...HEAD
+[0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
 [0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
 [0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
 [0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
