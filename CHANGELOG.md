@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Introduced `accessibilityFrameCornerStyle` to `AccessibilityElement`.
-
 ### Removed
 
 ### Changed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.42.0]
+
+### Added
+
+- Introduced `accessibilityFrameCornerStyle` to `AccessibilityElement`.
 
 ## [0.41.0]
 
@@ -846,7 +850,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.41.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.42.0...HEAD
+[0.42.0]: https://github.com/square/Blueprint/compare/0.41.0...0.42.0
 [0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
 [0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
 [0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
