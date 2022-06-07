@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
+
 ### Deprecated
 
 ### Security
