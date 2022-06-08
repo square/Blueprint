@@ -128,12 +128,12 @@ public struct Box: Element {
 
 extension Box {
 
-    public enum CornerStyle {
+    public enum CornerStyle: Equatable {
         case square
         case capsule
         case rounded(radius: CGFloat, corners: Corners = .all)
 
-        public struct Corners: OptionSet {
+        public struct Corners: OptionSet, Equatable {
             public let rawValue: UInt8
 
             public init(rawValue: UInt8) {
