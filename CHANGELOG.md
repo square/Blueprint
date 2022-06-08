@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
 
+- `AccessibilityElement` will now only return `accessibilityPath` for elements with a non-square corner style. This avoids needlessly changing AccessibilitySnapshot (https://github.com/cashapp/AccessibilitySnapshot) reference images.
+
 ### Deprecated
 
 ### Security

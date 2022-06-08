@@ -108,14 +108,11 @@ public struct AccessibilityElement: Element {
         var decrement: (() -> Void)?
         var activate: (() -> Bool)?
 
-        override var accessibilityPath: UIBezierPath? {
+        override var accessibilityFrame: CGRect {
             get {
                 guard let accessibilityFrameSize = accessibilityFrameSize else {
                     return UIAccessibility.convertToScreenCoordinates(
-                        UIBezierPath(
-                            rect: bounds,
-                            corners: accessibilityFrameCornerStyle
-                        ),
+                        bounds,
                         in: self
                     )
                 }
@@ -126,11 +123,25 @@ public struct AccessibilityElement: Element {
                 )
 
                 return UIAccessibility.convertToScreenCoordinates(
-                    UIBezierPath(
-                        rect: adjustedFrame,
-                        corners: accessibilityFrameCornerStyle
-                    ),
+                    adjustedFrame,
                     in: self
+                )
+            }
+
+            set {
+                fatalError("accessibilityFrame is not settable on AccessibilityView")
+            }
+        }
+
+        override var accessibilityPath: UIBezierPath? {
+            get {
+                guard accessibilityFrameCornerStyle != .square else {
+                    return nil
+                }
+
+                return UIBezierPath(
+                    rect: accessibilityFrame,
+                    corners: accessibilityFrameCornerStyle
                 )
             }
 
