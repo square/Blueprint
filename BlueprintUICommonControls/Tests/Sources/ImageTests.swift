@@ -5,24 +5,7 @@ import XCTest
 
 class ImageTests: XCTestCase {
 
-    private let image: UIImage = {
-
-        func getImageURL(file: StaticString = #file) -> URL {
-            if let url = Bundle(for: ImageTests.self).url(forResource: "test-image", withExtension: "jpg") {
-                return url
-            } else {
-                var path = NSString(stringLiteral: file)
-                path = path.deletingLastPathComponent as NSString // filename
-                path = path.deletingLastPathComponent as NSString // `Sources`
-                path = path.appendingPathComponent("Resources") as NSString
-                path = path.appendingPathComponent("test-image.jpg") as NSString
-                return URL(fileURLWithPath: path as String)
-            }
-        }
-
-        let imageURL = getImageURL()
-        return UIImage(contentsOfFile: imageURL.path)!
-    }()
+    private let image = UIImage(named: "test-image.jpg", in: .module, compatibleWith: nil)!
 
     func test_defaults() {
         let element = Image(image: image)

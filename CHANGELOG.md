@@ -11,13 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added support for optionals in builders without unwrapping via `if let`.
-- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
 - Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
 
 ### Removed
 
 ### Changed
+
+- `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
 
 ### Deprecated
 
@@ -28,6 +28,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.42.0]
+
+### Added
+
+- Introduced `accessibilityFrameCornerStyle` to `AccessibilityElement`.
+
+## [0.41.0]
+
+### Added
+
+- Added `.grows` and `.shrinks` to `StackLayout.Child.Priority`, to allow for extra control over how flexible elements grow and shrink.
+- `AccessibilityBlocker` now takes in a `Bool` to control blocking, to avoid changing the element hierarchy to toggle if blocking is occurring.
+
+## [0.40.0]
+
+### Added
+
+- Added support for optionals in builders without unwrapping via `if let`.
+- Static constants on `Alignment` are now public (such as `Alignment.topTrailing`).
+
+### Changed
+
+- `AnimationAttributes` has gained a `.default` option.
+- `LayoutTransition` has default values for its `AnimationAttributes` parameters.
 
 ## [0.39.0]
 
@@ -829,7 +854,10 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.39.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.42.0...HEAD
+[0.42.0]: https://github.com/square/Blueprint/compare/0.41.0...0.42.0
+[0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
+[0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
 [0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
 [0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0
 [0.37.0]: https://github.com/square/Blueprint/compare/0.36.1...0.37.0

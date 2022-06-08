@@ -20,6 +20,7 @@ extension XCTestCase {
         let filename = imageURL.lastPathComponent
 
         imageURL.deleteLastPathComponent()
+        imageURL.appendPathComponent("Resources", isDirectory: true)
         imageURL.appendPathComponent("ReferenceImages", isDirectory: true)
         imageURL.appendPathComponent(filename, isDirectory: true)
 

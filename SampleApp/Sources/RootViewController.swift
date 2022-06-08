@@ -120,5 +120,11 @@ fileprivate struct DemoItem: ProxyElement {
             .inset(uniform: 7.0)
             .box(background: .systemRed, corners: .capsule)
         }
+        .accessibilityElement(
+            label: title,
+            value: nil,
+            traits: [.staticText],
+            accessibilityFrameCornerStyle: .rounded(radius: 15)
+        )
     }
 }
