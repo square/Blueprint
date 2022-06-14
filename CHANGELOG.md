@@ -11,15 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
-
 ### Removed
 
 ### Changed
-
-- `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
-
-- `AccessibilityElement` will now only return `accessibilityPath` for elements with a non-square corner style. This avoids needlessly changing AccessibilitySnapshot (https://github.com/cashapp/AccessibilitySnapshot) reference images.
 
 ### Deprecated
 
@@ -30,6 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.43.0]
+
+### Added
+
+- Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
+
+### Changed
+
+- `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
+
+- `AccessibilityElement` will now only return `accessibilityPath` for elements with a non-square corner style. This avoids needlessly changing AccessibilitySnapshot (https://github.com/cashapp/AccessibilitySnapshot) reference images.
+
 
 ## [0.42.0]
 
@@ -856,7 +863,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.42.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.43.0...HEAD
+[0.43.0]: https://github.com/square/Blueprint/compare/0.42.0...0.43.0
 [0.42.0]: https://github.com/square/Blueprint/compare/0.41.0...0.42.0
 [0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
 [0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
