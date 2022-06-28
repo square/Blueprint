@@ -15,7 +15,7 @@ public struct Image: Element {
     /// not precisely match the size that the element is assigned.
     public var contentMode: ContentMode
 
-    /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always apropreate.
+    /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always appropriate.
     /// Set this to `true` to prevent VoiceOver from discribing the displayed image.
     public var blockAccessibilityDiscription: Bool
 
