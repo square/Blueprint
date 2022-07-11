@@ -87,4 +87,21 @@ class AccessibilityContainerTests: XCTestCase {
         XCTAssertFalse(accessibleSubviews.contains(where: { $0 === undiscoveredViewA }))
         XCTAssertFalse(accessibleSubviews.contains(where: { $0 === undiscoveredViewB }))
     }
+
+    func test_accessibilityElementHiddenNotAccessible() {
+
+        let accessibleView = UIView()
+        accessibleView.isAccessibilityElement = true
+
+        let wrapperView = UIView()
+        wrapperView.addSubview(accessibleView)
+        wrapperView.accessibilityElementsHidden = true
+
+        let containerView = UIView()
+        containerView.addSubview(wrapperView)
+
+        let accessibleSubviews = containerView.recursiveAccessibleSubviews() as! [UIView]
+
+        XCTAssertNil(accessibleSubviews.first)
+    }
 }
