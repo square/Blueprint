@@ -17,19 +17,19 @@ public struct Image: Element {
 
     /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always appropriate.
     /// Set this to `true` to prevent VoiceOver from discribing the displayed image.
-    public var blockAccessibilityDiscription: Bool
+    public var blockAccessibilityDescription: Bool
 
     /// Initializes an image element with the given `UIImage` instance.
     public init(
         image: UIImage?,
         contentMode: ContentMode = .aspectFill,
         tintColor: UIColor? = nil,
-        blockAccessibilityDiscription: Bool = false
+        blockAccessibilityDescription: Bool = false
     ) {
         self.image = image
         self.contentMode = contentMode
         self.tintColor = tintColor
-        self.blockAccessibilityDiscription = blockAccessibilityDiscription
+        self.blockAccessibilityDescription = blockAccessibilityDescription
     }
 
     public var content: ElementContent {
@@ -43,7 +43,7 @@ public struct Image: Element {
             config[\.contentMode] = contentMode.uiViewContentMode
             config[\.layer.minificationFilter] = .trilinear
             config[\.tintColor] = tintColor
-            if blockAccessibilityDiscription {
+            if blockAccessibilityDescription {
                 // Seting `isAccessibilityElement = false` isn't enough here, VoiceOver is very aggressive in finding images to discribe. We need to explicitly remove the `.image` trait.
                 config[\.accessibilityTraits] = UIAccessibilityTraits.none
             }

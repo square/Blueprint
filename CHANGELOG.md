@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `Image` now provides an override to prevent VoiceOver from generating accessibility descriptions.
-
 ### Removed
 
 ### Changed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.44.0]
+
+### Added
+
+- `Image` now provides an override to prevent VoiceOver from generating accessibility descriptions.
 
 ## [0.43.0]
 
