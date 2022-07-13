@@ -61,7 +61,7 @@ extension AccessibilityContainer {
 extension UIView {
     func recursiveAccessibleSubviews() -> [Any] {
         subviews.flatMap { subview -> [Any] in
-            if subview.accessibilityElementsHidden {
+            if subview.accessibilityElementsHidden || subview.isHidden {
                 return []
             } else if let accessibilityElements = subview.accessibilityElements {
                 return accessibilityElements
