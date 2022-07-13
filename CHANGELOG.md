@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `AccessibilityContainer` now omits accessibility elements where `.accessibilityElementsHidden` is `true`.
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.44.1]
+
+### Fixed
+
+- `AccessibilityContainer` now omits accessibility elements where `.accessibilityElementsHidden` is `true`.
 
 ## [0.44.0]
 
@@ -871,7 +875,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.43.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.44.1...HEAD
+[0.44.1]: https://github.com/square/Blueprint/compare/0.44.0...0.44.1
+[0.44.0]: https://github.com/square/Blueprint/compare/0.43.0...0.44.0
 [0.43.0]: https://github.com/square/Blueprint/compare/0.42.0...0.43.0
 [0.42.0]: https://github.com/square/Blueprint/compare/0.41.0...0.42.0
 [0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
