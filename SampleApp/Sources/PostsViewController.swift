@@ -96,6 +96,9 @@ final class PostsViewController: UIViewController {
             onSubmit: { [weak self] in
                 self?.state.publishEntry()
             },
+            onDelete: { [weak self] post in
+                self?.state.posts.removeAll { $0.date == post.date }
+            },
             pullToRefreshBehavior: pullToRefreshBehavior
         )
         .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
@@ -122,6 +125,7 @@ fileprivate struct MainView: ProxyElement {
     var state: PostsViewController.State
     var onChange: (EntryForm.Field, String) -> Void
     var onSubmit: () -> Void
+    var onDelete: (Post) -> Void
     var pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
 
     var elementRepresentation: Element {
@@ -129,7 +133,7 @@ fileprivate struct MainView: ProxyElement {
             Column { col in
                 col.horizontalAlignment = .fill
 
-                col.add(child: List(posts: state.posts))
+                col.add(child: List(posts: state.posts, onDelete: onDelete))
                 col.add(
                     child: EntryForm(
                         entry: state.entry,
@@ -153,6 +157,7 @@ fileprivate struct MainView: ProxyElement {
 fileprivate struct List: ProxyElement {
 
     var posts: [Post]
+    var onDelete: (Post) -> Void
 
     var elementRepresentation: Element {
         Column { col in
@@ -160,7 +165,13 @@ fileprivate struct List: ProxyElement {
             col.minimumVerticalSpacing = 8.0
 
             for post in posts {
-                col.add(child: FeedItem(post: post))
+                col.add(
+                    key: post.date,
+                    child: FeedItem(
+                        post: post,
+                        onDelete: { onDelete(post) }
+                    )
+                )
             }
         }
     }
@@ -223,6 +234,7 @@ fileprivate struct EntryForm: ProxyElement {
 fileprivate struct FeedItem: ProxyElement {
 
     var post: Post
+    var onDelete: () -> Void
 
     var elementRepresentation: Element {
         Row { row in
@@ -244,11 +256,16 @@ fileprivate struct FeedItem: ProxyElement {
             row.add(
                 growPriority: 1.0,
                 shrinkPriority: 1.0,
-                child: FeedItemBody(post: post)
+                child: FeedItemBody(post: post, onDelete: onDelete)
             )
         }
         .inset(uniform: 16.0)
         .box(background: .white)
+        .transition(
+            onAppear: .slide(direction: .init(angle: .pi * 0.25), coefficient: 1),
+            onDisappear: .slide(direction: .init(angle: .pi * 0.25), coefficient: 1)
+        )
+
     }
 
 }
@@ -256,6 +273,7 @@ fileprivate struct FeedItem: ProxyElement {
 fileprivate struct FeedItemBody: ProxyElement {
 
     var post: Post
+    var onDelete: () -> Void
 
     let dateFormatter: Formatter = {
         if #available(iOS 13.0, *) {
@@ -287,6 +305,13 @@ fileprivate struct FeedItemBody: ProxyElement {
                 timeAgo.font = UIFont.systemFont(ofSize: 14.0)
                 timeAgo.color = .lightGray
                 row.add(child: timeAgo)
+
+                row.add(
+                    child: Button(
+                        onTap: onDelete,
+                        wrapping: Label(text: "Delete")
+                    )
+                )
             }
 
             col.add(child: header)
