@@ -73,6 +73,10 @@ public struct LayoutWriter: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(UUID())
+    }
 }
 
 
@@ -272,6 +276,10 @@ extension LayoutWriter {
                     .init(frame: child.frame)
                 }
             }
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(UUID())
         }
     }
 }

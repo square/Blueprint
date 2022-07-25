@@ -65,6 +65,20 @@ public struct Label: ProxyElement {
         configure(&self)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(text)
+        hasher.combine(font)
+        hasher.combine(alignment)
+        hasher.combine(numberOfLines)
+        hasher.combine(lineBreakMode)
+        hasher.combine(lineHeight)
+        hasher.combine(adjustsFontSizeToFitWidth)
+        hasher.combine(minimumScaleFactor)
+        hasher.combine(allowsDefaultTighteningForTruncation)
+        hasher.combine(shadow)
+        hasher.combine(accessibilityTraits)
+    }
+
     private var attributedText: NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = alignment
@@ -118,7 +132,7 @@ public struct Label: ProxyElement {
 }
 
 extension Label {
-    public enum LineHeight: Equatable {
+    public enum LineHeight: Hashable {
         public enum Alignment: Equatable {
             /// Align text to the top of the available line height, with extra space added at the bottom.
             /// This makes line height behave like traditional leading.

@@ -33,6 +33,11 @@ public struct UserInteractionEnabled: Element {
             return attributes
         }
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isEnabled)
+        wrappedElement.hash(into: &hasher)
+    }
 }
 
 extension Element {

@@ -184,7 +184,7 @@ extension StackElement {
 
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
-public struct StackLayout: Layout {
+public struct StackLayout: Layout, Hashable {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {
@@ -205,7 +205,22 @@ public struct StackLayout: Layout {
     /// # In Xcode
     /// [StackElement.add()](x-source-tag://StackElement.add)
     ///
-    public struct Traits {
+    public struct Traits: Hashable {
+
+        public static func == (lhs: StackLayout.Traits, rhs: StackLayout.Traits) -> Bool {
+            lhs.growPriority == rhs.growPriority
+                && lhs.shrinkPriority == rhs.shrinkPriority
+                && (
+                    (lhs.alignmentGuide == nil && rhs.alignmentGuide == nil)
+                        || (lhs.alignmentGuide != nil && rhs.alignmentGuide != nil)
+                )
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(growPriority)
+            hasher.combine(shrinkPriority)
+            hasher.combine(alignmentGuide == nil ? 0 : 1)
+        }
 
         /// Controls the amount of extra space distributed to this child during underflow.
         ///
@@ -268,6 +283,12 @@ public struct StackLayout: Layout {
         _layout(size: size, items: items)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(underflow)
+        hasher.combine(overflow)
+        hasher.combine(alignment)
+        hasher.combine(minimumSpacing)
+    }
 }
 
 extension StackLayout {
@@ -311,7 +332,29 @@ extension StackLayout {
     }
 
     /// Determines the cross-axis layout (height for a horizontal stack, width for a vertical stack).
-    public enum Alignment {
+    public enum Alignment: Hashable {
+
+        public static func == (lhs: StackLayout.Alignment, rhs: StackLayout.Alignment) -> Bool {
+            switch (lhs, rhs) {
+            case (.fill, .fill):
+                return true
+            case (let .align(lidType), let .align(ridType)):
+                return lidType == ridType
+            default:
+                return false
+            }
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .fill:
+                hasher.combine("StackLayout.Alignment")
+            case .align(to: let idType):
+                hasher.combine(String(describing: idType))
+            }
+        }
+
+
         /// Children will be stretched to the size of the stack.
         case fill
         /// Children will be aligned relatively to each other, and then all the contents will be

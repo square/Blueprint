@@ -3,7 +3,7 @@ import UIKit
 /// Displays a list of items in a linear horizontal layout.
 public struct Row: StackElement {
     /// Describes how the row's children will be vertically aligned.
-    public enum RowAlignment: Equatable {
+    public enum RowAlignment: Hashable {
         /// Children will be stretched to fit the vertical size of the row.
         case fill
 
@@ -79,6 +79,15 @@ public struct Row: StackElement {
         layout.minimumSpacing = minimumSpacing
         self.init(elementsBuilder: elements)
         self.layout = layout
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        children.forEach {
+            $0.element.hash(into: &hasher)
+            hasher.combine($0.traits)
+            hasher.combine($0.key)
+        }
+        hasher.combine(layout)
     }
 
     public var horizontalUnderflow: StackLayout.UnderflowDistribution {

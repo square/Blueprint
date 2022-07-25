@@ -32,6 +32,13 @@ public struct Image: Element {
         self.blockAccessibilityDescription = blockAccessibilityDescription
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(image)
+        hasher.combine(tintColor)
+        hasher.combine(contentMode)
+        hasher.combine(blockAccessibilityDescription)
+    }
+
     public var content: ElementContent {
         let measurer = Measurer(contentMode: contentMode, imageSize: image?.size)
         return ElementContent(measurable: measurer)

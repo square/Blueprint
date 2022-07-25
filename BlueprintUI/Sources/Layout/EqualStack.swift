@@ -29,6 +29,12 @@ public struct EqualStack: Element {
         configure(&self)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(direction)
+        hasher.combine(spacing)
+        children.forEach { $0.hash(into: &hasher) }
+    }
+
     /// Initializer using result builder to declaritively build up a stack.
     /// - Parameters:
     ///   - direction: Direction of the stack.

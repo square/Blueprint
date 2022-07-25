@@ -32,6 +32,10 @@ public struct AdaptedEnvironment: Element {
         }
     }
 
+    public func hash(into hasher: inout Hasher) {
+        wrapped.hash(into: &hasher)
+    }
+
     /// Wraps an element with an environment that is modified for a single key and value.
     /// - Parameters:
     ///   - key: The environment key to modify.

@@ -61,6 +61,13 @@ public struct Decorate: ProxyElement {
         self.decoration = decoration
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(layering)
+//        hasher.combine(position)
+        wrapped.hash(into: &hasher)
+        decoration.hash(into: &hasher)
+    }
+
     // MARK: ProxyElement
 
     public var elementRepresentation: Element {
@@ -72,7 +79,9 @@ public struct Decorate: ProxyElement {
                     size: context.phase.onMeasure {
                         self.wrapped.content.measure(
                             in: context.size,
-                            environment: environment
+                            environment: environment,
+                            // TODO: can we re-use the main cache here?
+                            elementCache: ElementContent.ElementSizeCache()
                         )
                     } onLayout: { size in
                         size
@@ -105,7 +114,7 @@ public struct Decorate: ProxyElement {
 extension Decorate {
 
     /// If the decoration should be positioned above or below the content element.
-    public enum Layering: Equatable {
+    public enum Layering: Hashable {
 
         /// The decoration is displayed above the content element.
         case above
@@ -257,7 +266,12 @@ extension Decorate {
             decoration: Element,
             environment: Environment
         ) -> CGRect {
-            let size = decoration.content.measure(in: .init(contentSize), environment: environment)
+            // TODO: Can we re-use the cache here?
+            let size = decoration.content.measure(
+                in: .init(contentSize),
+                environment: environment,
+                elementCache: ElementContent.ElementSizeCache()
+            )
 
             let context = PositionContext(
                 decorationSize: size,

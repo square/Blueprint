@@ -62,6 +62,12 @@ public struct GridRow: Element {
         self.spacing = spacing
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(spacing)
+        hasher.combine(verticalAlignment)
+        children.forEach { hasher.combine($0) }
+    }
+
     // MARK: - mutations -
     public mutating func add(width: Width, key: AnyHashable? = nil, child: Element) {
         children.append(Child(width: width, key: key, element: child))
@@ -288,7 +294,8 @@ extension GridRow {
 // MARK: - child modeling -
 extension GridRow {
     /// A child of a `GridRow`.
-    public struct Child {
+    public struct Child: Hashable {
+
         // MARK: - properties -
         /// The element displayed in the `Grid`.
         public var element: Element
@@ -303,10 +310,22 @@ extension GridRow {
             self.key = key
             self.width = width
         }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(key)
+            hasher.combine(width)
+            element.hash(into: &hasher)
+        }
+
+        public static func == (lhs: GridRow.Child, rhs: GridRow.Child) -> Bool {
+            lhs.key == rhs.key
+                && lhs.width == rhs.width
+                && lhs.element.equals(other: rhs.element)
+        }
     }
 
     /// The sizing and content of a `GridRow` child.
-    public enum Width: Equatable {
+    public enum Width: Hashable {
         /// Assign the child a fixed width equal to the payload.
         case absolute(CGFloat)
         /// Assign the child a proportional width of the available layout width. Note that proportional children

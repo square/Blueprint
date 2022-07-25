@@ -35,6 +35,11 @@ public struct Transformed: Element {
         self.wrappedElement = wrappedElement
     }
 
+    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(transform)
+        wrappedElement.hash(into: &hasher)
+    }
+
 
     public var content: ElementContent {
         ElementContent(child: wrappedElement, layout: Layout(transform: transform))

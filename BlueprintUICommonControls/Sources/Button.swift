@@ -30,6 +30,12 @@ public struct Button: Element {
         }
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isEnabled)
+        hasher.combine(minimumTappableSize.width)
+        hasher.combine(minimumTappableSize.height)
+        wrappedElement.hash(into: &hasher)
+    }
 }
 
 extension Button {

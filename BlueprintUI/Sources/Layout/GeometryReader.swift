@@ -39,6 +39,10 @@ public struct GeometryReader: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(UUID())
+    }
 }
 
 /// Contains information about the current layout being measured by GeometryReader
@@ -50,6 +54,11 @@ public struct GeometryProxy {
 
     /// Measure the given element, constrained to the same size as the `GeometryProxy` itself (unless a constraint is explicitly provided).
     public func measure(element: Element, in explicit: SizeConstraint? = nil) -> CGSize {
-        element.content.measure(in: explicit ?? constraint, environment: environment)
+        // TODO: can we re-use the element cache here?
+        element.content.measure(
+            in: explicit ?? constraint,
+            environment: environment,
+            elementCache: ElementContent.ElementSizeCache()
+        )
     }
 }

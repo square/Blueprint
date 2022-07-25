@@ -21,6 +21,10 @@ public struct Centered: ProxyElement {
             wrapping: wrapped
         )
     }
+
+    public func hash(into hasher: inout Hasher) {
+        wrapped.hash(into: &hasher)
+    }
 }
 
 

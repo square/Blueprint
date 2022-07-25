@@ -45,12 +45,17 @@ public struct ConstrainedSize: Element {
         nil
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(width)
+        hasher.combine(height)
+        wrapped.hash(into: &hasher)
+    }
 }
 
 extension ConstrainedSize {
 
     /// The available ways to constrain the measurement of a given axis within a `ConstrainedSize` element.
-    public enum Constraint: Equatable {
+    public enum Constraint: Hashable {
         /// There is no constraint for this axis – the natural size of the element will be used.
         case unconstrained
 

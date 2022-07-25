@@ -127,4 +127,10 @@ fileprivate struct DemoItem: ProxyElement {
             accessibilityFrameCornerStyle: .rounded(radius: 15)
         )
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(title)
+        hasher.combine(badgeText)
+        elementRepresentation.hash(into: &hasher)
+    }
 }

@@ -33,6 +33,11 @@ public struct Hidden: Element {
             return attributes
         }
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isHidden)
+        wrappedElement.hash(into: &hasher)
+    }
 }
 
 extension Element {

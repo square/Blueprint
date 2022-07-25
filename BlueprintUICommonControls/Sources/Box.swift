@@ -53,6 +53,16 @@ public struct Box: Element {
         }
     }
 
+    public func hash(into hasher: inout Hasher) {
+//        hasher.combine(backgroundColor)
+        hasher.combine(cornerStyle)
+        hasher.combine(cornerCurve)
+        hasher.combine(borderStyle)
+//        hasher.combine(shadowStyle)
+        hasher.combine(clipsContent)
+        wrappedElement?.hash(into: &hasher)
+    }
+
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         BoxView.describe { config in
 
@@ -128,12 +138,12 @@ public struct Box: Element {
 
 extension Box {
 
-    public enum CornerStyle: Equatable {
+    public enum CornerStyle: Hashable {
         case square
         case capsule
         case rounded(radius: CGFloat, corners: Corners = .all)
 
-        public struct Corners: OptionSet, Equatable {
+        public struct Corners: OptionSet, Hashable {
             public let rawValue: UInt8
 
             public init(rawValue: UInt8) {
@@ -214,7 +224,7 @@ extension Box {
         }
     }
 
-    public enum BorderStyle {
+    public enum BorderStyle: Hashable {
         case none
         case solid(color: UIColor, width: CGFloat)
     }

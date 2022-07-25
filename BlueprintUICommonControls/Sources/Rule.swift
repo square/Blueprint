@@ -13,7 +13,7 @@ public struct Rule: ProxyElement {
     }
 
     /// Represents the thickness of a rule in the direction perpendicular to its orientation.
-    public enum Thickness {
+    public enum Thickness: Hashable {
         /// Indicates that the rule should be exactly 1 screen pixel thick,
         /// the thinnest possible line that can be drawn.
         case hairline
@@ -36,6 +36,12 @@ public struct Rule: ProxyElement {
     public var thickness: Thickness
     /// The color that the rule should be drawn.
     public var color: UIColor
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(orientation)
+        hasher.combine(thickness)
+        hasher.combine(color)
+    }
 
     /// Initializes a Rule with the given properties.
     ///

@@ -29,6 +29,14 @@ public struct Inset: Element {
         self.right = right
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(top)
+        hasher.combine(bottom)
+        hasher.combine(left)
+        hasher.combine(right)
+        wrappedElement.hash(into: &hasher)
+    }
+
     public init(uniformInset: CGFloat, wrapping element: Element) {
         wrappedElement = element
         top = uniformInset

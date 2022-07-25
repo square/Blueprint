@@ -23,6 +23,10 @@ public struct Tappable: Element {
         }
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine("Tappable")
+        wrappedElement.hash(into: &hasher)
+    }
 }
 
 

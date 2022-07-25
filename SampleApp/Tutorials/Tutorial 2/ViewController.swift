@@ -12,7 +12,6 @@ struct HelloWorldElement: ProxyElement {
 
         return Centered(label)
     }
-
 }
 
 

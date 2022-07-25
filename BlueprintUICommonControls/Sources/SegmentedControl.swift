@@ -55,11 +55,18 @@ public struct SegmentedControl: Element, Measurable {
         [NSAttributedString.Key.font: font]
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(font)
+        hasher.combine(roundingScale)
+        hasher.combine(selection)
+        items.forEach { hasher.combine($0) }
+    }
+
 }
 
 extension SegmentedControl {
 
-    public enum Selection {
+    public enum Selection: Hashable {
         case none
         case index(Int)
 
@@ -73,7 +80,16 @@ extension SegmentedControl {
         }
     }
 
-    public struct Item {
+    public struct Item: Hashable {
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(title)
+            hasher.combine(width)
+        }
+
+        public static func == (lhs: SegmentedControl.Item, rhs: SegmentedControl.Item) -> Bool {
+            lhs.title == rhs.title && lhs.width == rhs.width
+        }
+
 
         public var title: String
 
@@ -94,7 +110,7 @@ extension SegmentedControl {
 
 extension SegmentedControl.Item {
 
-    public enum Width {
+    public enum Width: Hashable {
         case automatic
         case specific(CGFloat)
 

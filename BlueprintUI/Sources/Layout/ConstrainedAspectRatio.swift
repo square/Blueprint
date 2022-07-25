@@ -159,6 +159,12 @@ public struct ConstrainedAspectRatio: Element {
             LayoutAttributes(size: size)
         }
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(aspectRatio)
+        hasher.combine(contentMode)
+        wrappedElement.hash(into: &hasher)
+    }
 }
 
 

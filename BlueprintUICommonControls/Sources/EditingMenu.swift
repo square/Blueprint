@@ -7,6 +7,7 @@
 
 import BlueprintUI
 import Foundation
+import SwiftUI
 import UIKit
 
 
@@ -44,6 +45,11 @@ public struct EditingMenu: Element {
     public var items: [EditingMenuItem]
 
     let presentationMode: PresentationMode
+
+    public func hash(into hasher: inout Hasher) {
+        items.forEach { hasher.combine($0) }
+        wrapped.hash(into: &hasher)
+    }
 
     /// Creates a new editing menu, wrapping the provided element, and displaying the provided items.
     public init(
@@ -136,7 +142,15 @@ extension EditingMenu {
 
 
 /// A single item in an editing menu.
-public struct EditingMenuItem {
+public struct EditingMenuItem: Hashable {
+
+    public static func == (lhs: EditingMenuItem, rhs: EditingMenuItem) -> Bool {
+        lhs.kind == rhs.kind
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(kind)
+    }
 
     /// The type of menu item.
     public var kind: Kind
@@ -220,7 +234,7 @@ extension Element {
 extension EditingMenuItem {
 
     /// The menu item types you may place into a menu.
-    public enum Kind: Equatable {
+    public enum Kind: Hashable {
 
         /// A standard system item.
         case system(System)

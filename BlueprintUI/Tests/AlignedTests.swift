@@ -109,6 +109,11 @@ class AlignedTests: XCTestCase {
 }
 
 private struct TestElement: Element {
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(1)
+    }
+
     let size: CGSize
 
     var content: ElementContent {

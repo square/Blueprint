@@ -22,4 +22,8 @@ extension ProxyElement {
         elementRepresentation.backingViewDescription(with: context)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        elementRepresentation.hash(into: &hasher)
+    }
+
 }

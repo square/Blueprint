@@ -28,6 +28,10 @@ public struct LifecycleObserver: Element {
             config.onDisappear = onDisappear
         }
     }
+
+    public func hash(into hasher: inout Hasher) {
+        wrapped.hash(into: &hasher)
+    }
 }
 
 // These extensions collapse chained callbacks into a single element

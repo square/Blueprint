@@ -1,6 +1,15 @@
 import BlueprintUI
 import UIKit
 
+extension UIEdgeInsets: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(top)
+        hasher.combine(left)
+        hasher.combine(bottom)
+        hasher.combine(right)
+    }
+}
+
 
 /// Wraps a content element and makes it scrollable.
 public struct ScrollView: Element {
@@ -43,6 +52,16 @@ public struct ScrollView: Element {
         wrappedElement = element
 
         configure(&self)
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(contentSize)
+        hasher.combine(contentInset)
+        hasher.combine(centersUnderflow)
+        hasher.combine(showsHorizontalScrollIndicator)
+        hasher.combine(showsVerticalScrollIndicator)
+        hasher.combine(contentInsetAdjustmentBehavior)
+        wrappedElement.hash(into: &hasher)
     }
 
     public var content: ElementContent {
@@ -168,6 +187,13 @@ extension ScrollView {
 
 }
 
+extension CGSize: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(width)
+        hasher.combine(height)
+    }
+}
+
 extension ScrollView {
 
     public enum KeyboardAdjustmentMode: Equatable {
@@ -175,7 +201,7 @@ extension ScrollView {
         case adjustsWhenVisible
     }
 
-    public enum ContentSize: Equatable {
+    public enum ContentSize: Hashable {
 
         /// The content will fill the height of the scroller, width will be dynamic
         case fittingWidth
@@ -188,7 +214,6 @@ extension ScrollView {
 
         /// Manually provided content size.
         case custom(CGSize)
-
     }
 
     public enum PullToRefreshBehavior {

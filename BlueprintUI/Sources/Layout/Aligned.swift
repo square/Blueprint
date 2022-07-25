@@ -57,6 +57,12 @@ public struct Aligned: Element {
         self.wrappedElement = wrappedElement
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(verticalAlignment)
+        hasher.combine(horizontalAlignment)
+        wrappedElement.hash(into: &hasher)
+    }
+
     public var content: ElementContent {
         let layout = Layout(verticalAlignment: verticalAlignment, horizontalAlignment: horizontalAlignment)
         return ElementContent(child: wrappedElement, layout: layout)

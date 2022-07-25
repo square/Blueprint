@@ -22,4 +22,8 @@ public struct Empty: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(UUID())
+    }
 }

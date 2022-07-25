@@ -57,6 +57,10 @@ public struct Overlay: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
+
+    public func hash(into hasher: inout Hasher) {
+        children.forEach { hasher.combine($0) }
+    }
 }
 
 /// A layout implementation that places all children on top of each other with
@@ -82,7 +86,8 @@ fileprivate struct OverlayLayout: Layout {
 
 extension Overlay {
     /// The child of an `Overlay`.
-    public struct Child {
+    public struct Child: Hashable {
+
         /// The child element
         public var element: Element
         /// An optional key to disambiguate between view updates
@@ -92,6 +97,15 @@ extension Overlay {
         public init(element: Element, key: AnyHashable? = nil) {
             self.element = element
             self.key = key
+        }
+
+        public static func == (lhs: Overlay.Child, rhs: Overlay.Child) -> Bool {
+            lhs.key == rhs.key && lhs.element.equals(other: rhs.element)
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(key)
+            element.hash(into: &hasher)
         }
     }
 }

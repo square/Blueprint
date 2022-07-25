@@ -106,6 +106,15 @@ public struct Column: StackElement {
         self.layout = layout
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(layout)
+        children.forEach {
+            $0.element.hash(into: &hasher)
+            hasher.combine($0.traits)
+            hasher.combine($0.key)
+        }
+    }
+
     public var verticalUnderflow: StackLayout.UnderflowDistribution {
         get { layout.underflow }
         set { layout.underflow = newValue }

@@ -35,4 +35,9 @@ public struct Spacer: Element {
         nil
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(size.width)
+        hasher.combine(size.height)
+    }
+
 }

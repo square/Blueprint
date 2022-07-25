@@ -49,6 +49,11 @@ public struct Keyed: Element {
         wrapped = wrapping
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(key)
+        wrapped.hash(into: &hasher)
+    }
+
     public var content: ElementContent {
         ElementContent(
             child: wrapped,

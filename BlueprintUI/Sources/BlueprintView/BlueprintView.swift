@@ -38,6 +38,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private var elementSizeCache: ElementContent.ElementSizeCache?
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -95,6 +97,8 @@ public final class BlueprintView: UIView {
     public override var bounds: CGRect {
         didSet {
             guard oldValue.size != bounds.size else { return }
+
+            elementSizeCache = nil
 
             invalidateIntrinsicContentSize()
         }
@@ -206,7 +210,8 @@ public final class BlueprintView: UIView {
         let measurement = element.content.measure(
             in: constraint,
             environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))"),
+            elementCache: ElementContent.ElementSizeCache()
         )
 
         sizesThatFit[constraint] = measurement
@@ -324,9 +329,22 @@ public final class BlueprintView: UIView {
 
         let environment = makeEnvironment()
 
+        let cache: ElementContent.ElementSizeCache = {
+            guard let element = element else {
+                return ElementContent.ElementSizeCache()
+            }
+
+            return element.content.elementSizeCache(rootKey: element.hashValue)
+        }()
+
+        if let currentCache = elementSizeCache {
+            currentCache.populateFrom(previousCache: currentCache)
+        }
+        elementSizeCache = cache
+
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment)
+            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment, elementCache: cache)
             .resolve() ?? []
 
         let measurementEndDate = Date()

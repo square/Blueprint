@@ -34,6 +34,11 @@ public struct TransitionContainer: Element {
         wrappedElement = element
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine("TransitionContainer")
+        wrappedElement.hash(into: &hasher)
+    }
+
     /// Create a transition container wrapping an element.
     /// - Parameters:
     ///   - appearingTransition: The transition to use when the element appears. By default, no transition.

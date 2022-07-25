@@ -38,6 +38,11 @@ public struct AccessibilityContainer: Element {
             config[\.accessibilityIdentifier] = identifier
         }
     }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
+        wrapped.hash(into: &hasher)
+    }
 }
 
 extension Element {

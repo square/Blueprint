@@ -1,7 +1,7 @@
 import UIKit
 
 /// Represents an a proportional relationship between width and height.
-public struct AspectRatio {
+public struct AspectRatio: Hashable {
     /// A 1:1 aspect ratio.
     public static let square = AspectRatio(ratio: 1)
 
@@ -37,5 +37,9 @@ public struct AspectRatio {
 
     func size(forWidth width: CGFloat) -> CGSize {
         CGSize(width: width, height: height(forWidth: width))
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(ratio)
     }
 }

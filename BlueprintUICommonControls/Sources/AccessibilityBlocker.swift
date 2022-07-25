@@ -23,6 +23,11 @@ public struct AccessibilityBlocker: Element {
         wrapped = element
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(isBlocking)
+        wrapped.hash(into: &hasher)
+    }
+
     //
     // MARK: Element
     //

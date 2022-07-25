@@ -39,6 +39,17 @@ public struct TextField: Element {
         configure(&self)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(text)
+        hasher.combine(placeholder)
+        hasher.combine(secure)
+        hasher.combine(isEnabled)
+        hasher.combine(textAlignment)
+        hasher.combine(font)
+        hasher.combine(textColor)
+        // .. etc
+    }
+
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         CallbackTextField.describe { configuration in
             configuration[\.backgroundColor] = .clear

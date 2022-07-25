@@ -67,6 +67,17 @@ public struct AccessibilityElement: Element {
         configure(&self)
     }
 
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(label)
+        hasher.combine(value)
+        hasher.combine(hint)
+        hasher.combine(identifier)
+        hasher.combine(accessibilityFrameCornerStyle)
+        hasher.combine(accessibilityFrameSize?.width)
+        hasher.combine(accessibilityFrameSize?.height)
+        wrappedElement.hash(into: &hasher)
+    }
+
     private var accessibilityTraits: UIAccessibilityTraits {
         UIAccessibilityTraits(with: traits)
     }

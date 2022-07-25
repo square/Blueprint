@@ -61,6 +61,30 @@ public protocol Element {
     /// - Returns: An optional `ViewDescription`.
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription?
 
+    func hash(into hasher: inout Hasher)
+}
+
+extension Element {
+
+    func equals(other: Element) -> Bool {
+        var hasher1 = Hasher()
+        hash(into: &hasher1)
+
+        var hasher2 = Hasher()
+        other.hash(into: &hasher2)
+
+        return hasher1.finalize() == hasher2.finalize()
+    }
+
+    var hashValue: Int {
+        var hasher = Hasher()
+        hash(into: &hasher)
+        return hasher.finalize()
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(UUID())
+    }
 }
 
 /// The context passing to the `backingViewDescription` of an Element.

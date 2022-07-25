@@ -68,7 +68,7 @@ public struct HorizontalAlignment: Equatable {
 }
 
 /// An alignment position along the vertical axis.
-public struct VerticalAlignment: Equatable {
+public struct VerticalAlignment: Hashable {
 
     var id: AlignmentID.Type
 
@@ -81,6 +81,10 @@ public struct VerticalAlignment: Equatable {
 
     public static func == (lhs: VerticalAlignment, rhs: VerticalAlignment) -> Bool {
         lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(String(describing: id))
     }
 }
 
