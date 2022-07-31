@@ -38,6 +38,7 @@ public struct AccessibilityElement: Element {
     public var identifier: String?
     public var traits: Set<Trait>
     public var accessibilityFrameSize: CGSize?
+    public var accessibilityFrameCornerStyle: Box.CornerStyle
     public var wrappedElement: Element
 
     /// Used to provide custom behaviour when activated by voiceover. This will override the default behavior of issuing a tap event at the accessibility activation point.
@@ -51,6 +52,7 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
+        accessibilityFrameCornerStyle: Box.CornerStyle = .square,
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
@@ -60,6 +62,7 @@ public struct AccessibilityElement: Element {
         self.hint = hint
         self.identifier = identifier
         self.accessibilityFrameSize = accessibilityFrameSize
+        self.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
         wrappedElement = element
         configure(&self)
     }
@@ -81,6 +84,7 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityTraits] = accessibilityTraits
             config[\.isAccessibilityElement] = true
             config[\.accessibilityFrameSize] = accessibilityFrameSize
+            config[\.accessibilityFrameCornerStyle] = accessibilityFrameCornerStyle
             config[\.activate] = accessibilityActivate
 
             if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
@@ -98,6 +102,7 @@ public struct AccessibilityElement: Element {
     private final class AccessibilityView: UIView {
 
         var accessibilityFrameSize: CGSize?
+        var accessibilityFrameCornerStyle: Box.CornerStyle = .square
 
         var increment: (() -> Void)?
         var decrement: (() -> Void)?
@@ -106,7 +111,10 @@ public struct AccessibilityElement: Element {
         override var accessibilityFrame: CGRect {
             get {
                 guard let accessibilityFrameSize = accessibilityFrameSize else {
-                    return UIAccessibility.convertToScreenCoordinates(bounds, in: self)
+                    return UIAccessibility.convertToScreenCoordinates(
+                        bounds,
+                        in: self
+                    )
                 }
 
                 let adjustedFrame = bounds.insetBy(
@@ -114,10 +122,31 @@ public struct AccessibilityElement: Element {
                     dy: bounds.height - accessibilityFrameSize.height
                 )
 
-                return UIAccessibility.convertToScreenCoordinates(adjustedFrame, in: self)
+                return UIAccessibility.convertToScreenCoordinates(
+                    adjustedFrame,
+                    in: self
+                )
             }
+
             set {
                 fatalError("accessibilityFrame is not settable on AccessibilityView")
+            }
+        }
+
+        override var accessibilityPath: UIBezierPath? {
+            get {
+                guard accessibilityFrameCornerStyle != .square else {
+                    return nil
+                }
+
+                return UIBezierPath(
+                    rect: accessibilityFrame,
+                    corners: accessibilityFrameCornerStyle
+                )
+            }
+
+            set {
+                fatalError("accessibilityPath is not settable on AccessibilityView")
             }
         }
 
@@ -187,7 +216,8 @@ extension Element {
         traits: Set<AccessibilityElement.Trait>,
         hint: String? = nil,
         identifier: String? = nil,
-        accessibilityFrameSize: CGSize? = nil
+        accessibilityFrameSize: CGSize? = nil,
+        accessibilityFrameCornerStyle: Box.CornerStyle = .square
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
@@ -196,6 +226,7 @@ extension Element {
             hint: hint,
             identifier: identifier,
             accessibilityFrameSize: accessibilityFrameSize,
+            accessibilityFrameCornerStyle: accessibilityFrameCornerStyle,
             wrapping: self
         )
     }

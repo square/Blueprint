@@ -75,17 +75,25 @@ public struct Aligned: Element {
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            let contentSize = child.measure(in: SizeConstraint(size))
 
-            var attributes = LayoutAttributes(size: contentSize)
+            let measurement = child.measure(in: SizeConstraint(size))
+
+            let constrainedMeasurement = CGSize(
+                width: min(size.width, measurement.width),
+                height: min(size.height, measurement.height)
+            )
+
+            var attributes = LayoutAttributes(
+                size: constrainedMeasurement
+            )
 
             switch verticalAlignment {
             case .top:
                 attributes.frame.origin.y = 0
             case .center:
-                attributes.frame.origin.y = (size.height - contentSize.height) / 2.0
+                attributes.frame.origin.y = (size.height - constrainedMeasurement.height) / 2.0
             case .bottom:
-                attributes.frame.origin.y = size.height - contentSize.height
+                attributes.frame.origin.y = size.height - constrainedMeasurement.height
             case .fill:
                 attributes.frame.origin.y = 0
                 attributes.frame.size.height = size.height
@@ -95,9 +103,9 @@ public struct Aligned: Element {
             case .leading:
                 attributes.frame.origin.x = 0
             case .center:
-                attributes.frame.origin.x = (size.width - contentSize.width) / 2.0
+                attributes.frame.origin.x = (size.width - constrainedMeasurement.width) / 2.0
             case .trailing:
-                attributes.frame.origin.x = size.width - contentSize.width
+                attributes.frame.origin.x = size.width - constrainedMeasurement.width
             case .fill:
                 attributes.frame.origin.x = 0
                 attributes.frame.size.width = size.width

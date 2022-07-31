@@ -25,6 +25,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [0.44.1]
+
+### Fixed
+
+- `AccessibilityContainer` now omits accessibility elements where `.accessibilityElementsHidden` is `true`.
+
+## [0.44.0]
+
+### Added
+
+- `Image` now provides an override to prevent VoiceOver from generating accessibility descriptions.
+
+## [0.43.0]
+
+### Added
+
+- Introduced an `Element.modify { ... }` conditional, to allow changing properties on an element.
+
+### Changed
+
+- `Aligned` will now constrain its content to the provided layout frame. If you need content to exceed the layout frame, please use `Decoration`.
+
+- `AccessibilityElement` will now only return `accessibilityPath` for elements with a non-square corner style. This avoids needlessly changing AccessibilitySnapshot (https://github.com/cashapp/AccessibilitySnapshot) reference images.
+
+
+## [0.42.0]
+
+### Added
+
+- Introduced `accessibilityFrameCornerStyle` to `AccessibilityElement`.
+
+## [0.41.0]
+
+### Added
+
+- Added `.grows` and `.shrinks` to `StackLayout.Child.Priority`, to allow for extra control over how flexible elements grow and shrink.
+- `AccessibilityBlocker` now takes in a `Bool` to control blocking, to avoid changing the element hierarchy to toggle if blocking is occurring.
+
 ## [0.40.0]
 
 ### Added
@@ -837,7 +875,12 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.40.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.44.1...HEAD
+[0.44.1]: https://github.com/square/Blueprint/compare/0.44.0...0.44.1
+[0.44.0]: https://github.com/square/Blueprint/compare/0.43.0...0.44.0
+[0.43.0]: https://github.com/square/Blueprint/compare/0.42.0...0.43.0
+[0.42.0]: https://github.com/square/Blueprint/compare/0.41.0...0.42.0
+[0.41.0]: https://github.com/square/Blueprint/compare/0.40.0...0.41.0
 [0.40.0]: https://github.com/square/Blueprint/compare/0.39.0...0.40.0
 [0.39.0]: https://github.com/square/Blueprint/compare/0.38.0...0.39.0
 [0.38.0]: https://github.com/square/Blueprint/compare/0.37.0...0.38.0

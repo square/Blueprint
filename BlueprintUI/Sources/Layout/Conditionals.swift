@@ -107,7 +107,7 @@ extension Element {
     }
 
     //
-    // MARK: Map
+    // MARK: Map & Modify
     //
 
     /// Creates and returns a new element by passing the
@@ -124,5 +124,23 @@ extension Element {
     /// ```
     public func map(_ map: (Self) -> Element) -> Element {
         map(self)
+    }
+
+    /// Creates and returns a new element by passing the
+    /// element to the provided `modify` function, which can edit it.
+    ///
+    /// ```
+    /// myElement.modify { element in
+    ///     switch myState {
+    ///     case .small: element.inset = 5
+    ///     case .medium: element.inset = 10
+    ///     case .large: element.inset = 15
+    ///     }
+    /// }
+    /// ```
+    public func modify(_ modify: (inout Self) -> Void) -> Element {
+        var copy = self
+        modify(&copy)
+        return copy
     }
 }
