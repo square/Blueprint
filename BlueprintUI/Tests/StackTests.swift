@@ -1205,8 +1205,6 @@ class StackTests: XCTestCase {
                         return size
 
                     case .area(let total):
-                        // TODO: Also support column
-
                         switch constraint.width {
                         case .atMost(let max):
                             let width = min(total, max)

@@ -24,7 +24,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        super.invokeTest()
+        // super.invokeTest()
     }
 
     func test_repeated_layouts() {
@@ -85,13 +85,8 @@ class PerformancePlayground: XCTestCase {
 
         BlueprintStackUpdates.isOptimizedLayoutEnabled = true
 
-        AttributedLabel.measureCount = 0
-        print("--------------")
-
         view.element = content
         view.layoutIfNeeded()
-
-        print(AttributedLabel.measureCount)
     }
 
     func test_rows_with_one_flexible_element() {

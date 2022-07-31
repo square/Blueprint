@@ -468,6 +468,10 @@ extension StackLayout {
 
                     let isFixed: Bool
 
+                    var isFlexible: Bool {
+                        isFixed == false
+                    }
+
                     init(item: (traits: StackLayout.Traits, content: Measurable)) {
                         self.item = item
                         size = nil
@@ -515,7 +519,7 @@ extension StackLayout {
                 // Measure the flexible items within that constraint
 
                 measurements.forEach { measurement in
-                    guard measurement.size == nil else { return }
+                    guard measurement.isFlexible else { return }
 
                     measurement.size = measurement
                         .item

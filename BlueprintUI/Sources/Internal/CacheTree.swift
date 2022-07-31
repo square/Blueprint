@@ -30,7 +30,7 @@ extension CacheTree {
         /// turned into numbers like 209.99999997 due to loss of precision.
         ///
         /// Because we cache by exact values in this cache,
-        /// let's round this up to the nearest screen-scale pixel.
+        /// let's round this to the nearest screen-scale pixel to avoid a cache miss.
 
         let roundedConstraint = constraint.roundToNearestPixel(with: screenScale)
 
@@ -46,6 +46,9 @@ extension CacheTree {
             self[roundedConstraint] = size
 
             /// 2) Optimization: Cache the size itself as its own constraint.
+            ///
+            /// This avoids a cache miss later on when a layout
+            /// lays out an item with this same size.
             self[SizeConstraint(size)] = size
 
             return size
