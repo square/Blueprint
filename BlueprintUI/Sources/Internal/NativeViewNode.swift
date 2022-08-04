@@ -46,6 +46,9 @@ struct NativeViewNode {
         self.children = children
     }
 
+    private(set) var unusedChildRoundingOrigin: CGPoint = .zero
+    private(set) var unusedChildRoundingCorrection: CGPoint = .zero
+
     /// Recursively rounds this node's layout frame and all its children to snap to pixel boundaries.
     ///
     /// - Parameters:
@@ -70,10 +73,15 @@ struct NativeViewNode {
             behavior: viewDescription.frameRoundingBehavior
         )
 
-        let childOrigin = origin + layoutAttributes.frame.origin
+        if children.isEmpty {
+            unusedChildRoundingOrigin = origin
+            unusedChildRoundingCorrection = childCorrection
+        } else {
+            let childOrigin = origin + layoutAttributes.frame.origin
 
-        for i in children.indices {
-            children[i].node.round(from: childOrigin, correction: childCorrection, scale: scale)
+            for i in children.indices {
+                children[i].node.round(from: childOrigin, correction: childCorrection, scale: scale)
+            }
         }
     }
 }

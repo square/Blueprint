@@ -342,7 +342,12 @@ public final class BlueprintView: UIView {
         )
 
         let scale = window?.screen.scale ?? UIScreen.main.scale
-        rootNode.round(from: .zero, correction: .zero, scale: scale)
+
+        let unused = inheritedBlueprintContext?.unusedRounding ?? .zero
+
+        print("Unused: \(unused)")
+
+        rootNode.round(from: unused.unusedOrigin, correction: unused.unusedCorrection, scale: scale)
 
         Logger.logViewUpdateStart(view: self)
 
@@ -390,7 +395,7 @@ public final class BlueprintView: UIView {
         let inherited: Environment = {
             if
                 self.automaticallyInheritsEnvironmentFromContainingBlueprintViews,
-                let inherited = self.inheritedBlueprintEnvironment
+                let inherited = self.inheritedBlueprintContext?.environment
             {
                 return inherited
             } else {
@@ -474,11 +479,17 @@ extension BlueprintView {
             children = []
 
             view = node.viewDescription.build()
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            view.nativeViewNodeBlueprintInheritedContext = .init(
+                environment: node.environment,
+                unusedRounding: .init(
+                    unusedOrigin: node.unusedChildRoundingOrigin,
+                    unusedCorrection: node.unusedChildRoundingCorrection
+                )
+            )
         }
 
         deinit {
-            self.view.nativeViewNodeBlueprintEnvironment = nil
+            self.view.nativeViewNodeBlueprintInheritedContext = nil
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
@@ -492,7 +503,13 @@ extension BlueprintView {
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
 
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            view.nativeViewNodeBlueprintInheritedContext = .init(
+                environment: node.environment,
+                unusedRounding: .init(
+                    unusedOrigin: node.unusedChildRoundingOrigin,
+                    unusedCorrection: node.unusedChildRoundingCorrection
+                )
+            )
 
             viewDescription.apply(to: view)
 
