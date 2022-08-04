@@ -70,7 +70,7 @@ struct NativeViewNode {
             from: origin,
             correction: correction,
             scale: scale,
-            behavior: viewDescription.frameRoundingBehavior
+            behavior: children.isEmpty ? .prioritizeSize : viewDescription.frameRoundingBehavior
         )
 
         if children.isEmpty {

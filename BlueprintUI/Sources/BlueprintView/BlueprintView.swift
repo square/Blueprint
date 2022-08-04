@@ -345,8 +345,6 @@ public final class BlueprintView: UIView {
 
         let unused = inheritedBlueprintContext?.unusedRounding ?? .zero
 
-        print("Unused: \(unused)")
-
         rootNode.round(from: unused.unusedOrigin, correction: unused.unusedCorrection, scale: scale)
 
         Logger.logViewUpdateStart(view: self)
