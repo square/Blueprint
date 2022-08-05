@@ -1304,6 +1304,34 @@ class StackTests: XCTestCase {
 
     }
 
+    func test_fixed_elements_overflow_behavior() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly) {
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .flexible)
+        }
+
+        let sizes = row
+            .layout(frame: CGRect(x: 0, y: 0, width: 20, height: 10))
+            .children
+            .map { child -> CGSize in
+                child.node.layoutAttributes.frame.size.rounded()
+            }
+
+        XCTAssertEqual(
+            sizes,
+            [
+                CGSize(width: 10, height: 10),
+                CGSize(width: 10, height: 10),
+                CGSize(width: 10, height: 10),
+                CGSize(width: -10, height: 10),
+            ]
+        )
+    }
+
     /// When constrained along `axis`, this element's content "flows" and grows along the cross axis,
     /// similar to text wrapping.
     private struct WrappingElement: Element {

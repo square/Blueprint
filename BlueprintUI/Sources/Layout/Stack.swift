@@ -505,8 +505,6 @@ extension StackLayout {
 
                 let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
 
-                // TODO: What if flexibleMagnitude is negative??
-
                 let flexibleConstraint: SizeConstraint = {
                     switch axis {
                     case .horizontal:
