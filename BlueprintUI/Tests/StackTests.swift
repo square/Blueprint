@@ -1327,7 +1327,7 @@ class StackTests: XCTestCase {
                 CGSize(width: 10, height: 10),
                 CGSize(width: 10, height: 10),
                 CGSize(width: 10, height: 10),
-                CGSize(width: -10, height: 10),
+                CGSize(width: 0, height: 10),
             ]
         )
     }

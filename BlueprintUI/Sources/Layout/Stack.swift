@@ -505,24 +505,35 @@ extension StackLayout {
 
                 let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
 
-                let flexibleConstraint: SizeConstraint = {
-                    switch axis {
-                    case .horizontal:
-                        return .init(width: flexibleMagnitude, height: constraint.height)
-                    case .vertical:
-                        return .init(width: constraint.width, height: flexibleMagnitude)
+                if flexibleMagnitude > 0 {
+                    let flexibleConstraint: SizeConstraint = {
+                        switch axis {
+                        case .horizontal:
+                            return .init(width: flexibleMagnitude, height: constraint.height)
+                        case .vertical:
+                            return .init(width: constraint.width, height: flexibleMagnitude)
+                        }
+                    }()
+
+                    // Measure the flexible items within that constraint
+
+                    measurements.forEach { measurement in
+                        guard measurement.isFlexible else { return }
+
+                        measurement.size = measurement
+                            .item
+                            .content
+                            .measure(in: flexibleConstraint)
                     }
-                }()
+                } else {
+                    // The fixed items in the stack take up all of the available size,
+                    // so we can't meaningfully measure anything. Just set the size to zero.
 
-                // Measure the flexible items within that constraint
+                    measurements.forEach { measurement in
+                        guard measurement.isFlexible else { return }
 
-                measurements.forEach { measurement in
-                    guard measurement.isFlexible else { return }
-
-                    measurement.size = measurement
-                        .item
-                        .content
-                        .measure(in: flexibleConstraint)
+                        measurement.size = .zero
+                    }
                 }
 
                 return measurements.map { $0.size!.axis(on: axis) }
@@ -625,7 +636,7 @@ extension StackLayout {
 
         let axisSegments = zip(basisSizes, shrinkPriorities).map { basis, shrinkPriority -> Segment in
             let sizeAdjustment = (shrinkPriority / totalPriority) * extraSize
-            let magnitude = basis + sizeAdjustment
+            let magnitude = max(0, basis + sizeAdjustment)
             let origin = axisOrigin
 
             axisOrigin = origin + magnitude + minimumSpacing

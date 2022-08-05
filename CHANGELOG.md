@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- When stacks lay out with more `fixed` magnitude than is available for layout, `flexible` items will no longer receive a negative width.
+
 ### Added
 
 ### Removed
