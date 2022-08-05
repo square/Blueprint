@@ -12,9 +12,6 @@ protocol CacheTree: AnyObject {
     /// A reference to use for logging
     var signpostRef: AnyObject { get }
 
-    /// The scale of the screen scale, used for rounding to account for loss of float precision.
-    var screenScale: CGFloat { get }
-
     /// The sizes that are contained in this cache, keyed by size constraint.
     subscript(constraint: SizeConstraint) -> CGSize? { get set }
 
@@ -26,29 +23,18 @@ extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
     func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
 
-        /// Due to various math upstream, we can end up with measurements like 210.0 getting
-        /// turned into numbers like 209.99999997 due to loss of precision.
-        ///
-        /// Because we cache by exact values in this cache,
-        /// let's round this to the nearest screen-scale pixel to avoid a cache miss.
-
-        let roundedConstraint = constraint.roundToNearestPixel(with: screenScale)
-
-        // TODO: Why does this break??
-        // let constraint = constraint.roundToNearestPixel(with: screenScale)
-
-        if let size = self[roundedConstraint] {
+        if let size = self[constraint] {
             return size
         } else {
             let size = calculation(constraint)
 
             /// 1) Cache the measured size for the given constraint.
-            self[roundedConstraint] = size
+            self[constraint] = size
 
-            /// 2) Optimization: Cache the size itself as its own constraint.
+            /// 2) Optimization: Cache the measured size, so if we ask for this
+            /// exact size later on, we don't re-measure the element.
             ///
-            /// This avoids a cache miss later on when a layout
-            /// lays out an item with this same size.
+            /// This avoids a cache miss later on when a layout lays out an item with a measured size.
             self[SizeConstraint(size)] = size
 
             return size

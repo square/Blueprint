@@ -29,7 +29,7 @@ extension ElementContent {
         performLayout(
             attributes: attributes,
             environment: .empty,
-            cache: CacheFactory.makeCache(name: "test", screenScale: 1)
+            cache: CacheFactory.makeCache(name: "test")
         )
     }
 }

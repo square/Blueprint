@@ -46,7 +46,7 @@ struct LayoutResultNode {
     }
 
     init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))", screenScale: environment.displayScale)
+        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,

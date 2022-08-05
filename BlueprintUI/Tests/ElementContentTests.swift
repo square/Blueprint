@@ -323,7 +323,6 @@ private struct MeasureCountingSpacer: Element {
 private class TestCache: CacheTree {
     var name: String
     var signpostRef: AnyObject { self }
-    var screenScale: CGFloat = 1
 
     var measurements: [SizeConstraint: CGSize] = [:]
     var subcaches: [SubcacheKey: TestCache] = [:]
