@@ -34,6 +34,28 @@ final class PixelBoundarySnapshotTests: XCTestCase {
             scale: 2.0
         )
     }
+
+    func test_sizePriority() {
+        // The test box is just shy of 2 pixels, to imitate some rounding error
+        let box = SizePriorityBox(size: CGSize(width: 0.9, height: 0.9), color: .red)
+
+        // Centered in a 3-pixel frame, the edges of the box would normally snap to the center
+        // and become 1-pixel, but since this element prioritizes its size over edge
+        // accuracy, it will snap to 2 pixels.
+        let flat = box
+            .aligned(vertically: .center, horizontally: .center)
+            .constrainedTo(size: CGSize(width: 1.5, height: 1.5))
+
+        compareSnapshot(of: flat, identifier: "flat", scale: 2.0)
+
+        // Nesting in an intermediate BlueprintView breaks layout & rounding into separate operations.
+        // We want this test to appear identical to the flat version.
+        let nested = box
+            .nested()
+            .aligned(vertically: .center, horizontally: .center)
+            .constrainedTo(size: CGSize(width: 1.5, height: 1.5))
+
+        compareSnapshot(of: nested, identifier: "nested", scale: 2.0)
     }
 }
 
@@ -99,6 +121,22 @@ private struct FractionRow: ProxyElement {
                 }
             )
         )
+    }
+}
+
+private struct SizePriorityBox: Element {
+    var size: CGSize
+    var color: UIColor
+
+    var content: ElementContent {
+        ElementContent(intrinsicSize: size)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config.frameRoundingBehavior = .prioritizeSize
+            config[\.backgroundColor] = color
+        }
     }
 }
 
