@@ -194,6 +194,28 @@ extension SizeConstraint {
 }
 
 extension SizeConstraint {
+
+    func roundToNearestPixel(with scale: CGFloat) -> Self {
+        .init(
+            width: width.roundToNearestPixel(with: scale),
+            height: height.roundToNearestPixel(with: scale)
+        )
+    }
+}
+
+extension SizeConstraint.Axis {
+
+    func roundToNearestPixel(with scale: CGFloat) -> Self {
+        switch self {
+        case .atMost(let max):
+            return .atMost(max.rounded(.toNearestOrAwayFromZero, by: scale))
+        case .unconstrained:
+            return .unconstrained
+        }
+    }
+}
+
+extension SizeConstraint {
     /// This property wrapper checks the value of `atMost` cases, and turns it into an
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
     @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {

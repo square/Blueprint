@@ -34,7 +34,7 @@ public struct ElementContent {
         measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent")
+            cache: CacheFactory.makeCache(name: "ElementContent", screenScale: environment.displayScale)
         )
     }
 
