@@ -127,7 +127,7 @@ extension Image {
                 mode = .useImageSize
             case .aspectFit, .aspectFill:
                 if case .atMost(let width) = constraint.width, case .atMost(let height) = constraint.height {
-                    if CGSize(width: width, height: height).aspectRatio > imageSize.aspectRatio {
+                    if CGSize(width: width, height: height).aspectRatio < imageSize.aspectRatio {
                         mode = .fitWidth(width)
                     } else {
                         mode = .fitHeight(height)
