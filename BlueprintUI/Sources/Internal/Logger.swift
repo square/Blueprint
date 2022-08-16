@@ -7,6 +7,9 @@ enum Logger {}
 /// BlueprintView signposts
 extension Logger {
     static func logLayoutStart(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -18,6 +21,9 @@ extension Logger {
     }
 
     static func logLayoutEnd(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .end,
             log: .active,
@@ -27,6 +33,9 @@ extension Logger {
     }
 
     static func logViewUpdateStart(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -38,6 +47,9 @@ extension Logger {
     }
 
     static func logViewUpdateEnd(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .end,
             log: .active,
@@ -47,6 +59,9 @@ extension Logger {
     }
 
     static func logElementAssigned(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .event,
             log: .active,
@@ -61,6 +76,9 @@ extension Logger {
 /// Measuring signposts
 extension Logger {
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -75,6 +93,9 @@ extension Logger {
     }
 
     static func logMeasureEnd(object: AnyObject) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .end,
             log: .active,
