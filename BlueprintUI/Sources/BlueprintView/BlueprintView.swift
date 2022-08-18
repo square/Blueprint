@@ -144,7 +144,7 @@ public final class BlueprintView: UIView {
         super.init(frame: CGRect.zero)
 
         backgroundColor = .white
-        addSubview(rootController.view)
+        addSubview(rootController.content.view) // VC TODO: Correct??
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
@@ -335,7 +335,7 @@ public final class BlueprintView: UIView {
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
 
-        rootController.view.frame = bounds
+        rootController.content.view.frame = bounds
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
@@ -353,7 +353,8 @@ public final class BlueprintView: UIView {
             node: rootNode,
             context: .init(
                 appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
-                viewIsVisible: isVisible
+                viewIsVisible: isVisible,
+                currentViewController: viewController
             )
         )
 
@@ -469,40 +470,99 @@ extension BlueprintView {
             viewDescription.onDisappear
         }
 
-        let view: UIView
+        let content: Content
+
+        enum Content {
+            case view(UIView)
+            case controller(UIViewController)
+
+            func ifView<Output>(_ ifView: (UIView) -> Output, ifController: (UIViewController) -> Output) -> Output {
+                switch self {
+                case .view(let view):
+                    return ifView(view)
+                case .controller(let controller):
+                    return ifController(controller)
+                }
+            }
+
+            func ifController<Output>(_ ifController: (UIViewController) -> Output) -> Output? {
+                switch self {
+                case .view: return nil
+                case .controller(let controller):
+                    return ifController(controller)
+                }
+            }
+
+            var value: Any {
+                switch self {
+                case .view(let view): return view
+                case .controller(let controller): return controller
+                }
+            }
+
+            var view: UIView {
+                switch self {
+                case .view(let view): return view
+                case .controller(let controller): return controller.view
+                }
+            }
+
+            var viewController: UIViewController? {
+                switch self {
+                case .view: return nil
+                case .controller(let controller): return controller
+                }
+            }
+        }
 
         init(node: NativeViewNode) {
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
             children = []
 
-            view = node.viewDescription.build()
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            content = node.viewDescription.ifView { view in
+                .view(view.build())
+            } ifController: { controller in
+                .controller(controller.build())
+            }
+        }
+
+        func wire(environment: Environment) {
+            content.view.nativeViewNodeBlueprintEnvironment = environment
         }
 
         deinit {
-            self.view.nativeViewNodeBlueprintEnvironment = nil
+            content.view.nativeViewNodeBlueprintEnvironment = nil
         }
 
         fileprivate func canUpdateFrom(node: NativeViewNode) -> Bool {
-            node.viewDescription.viewType == type(of: view)
+
+            node.viewDescription.ifView { view in
+                view.viewType == type(of: content.value)
+            } ifController: { controller in
+                controller.controllerType == type(of: content.value)
+            }
         }
 
         fileprivate func update(node: NativeViewNode, context: UpdateContext) -> UpdateResult {
 
-            assert(node.viewDescription.viewType == type(of: view))
+            assert(canUpdateFrom(node: node))
 
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
 
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            content.view.nativeViewNodeBlueprintEnvironment = node.environment
 
-            viewDescription.apply(to: view)
+            viewDescription.ifView { view in
+                view.apply(to: content.value as! UIView)
+            } ifController: { controller in
+                controller.apply(to: content.value as! UIViewController)
+            }
 
             // After this view's children are updated, allow it to run a layout pass.
             // This ensures backing view layout changes are contained in animation blocks.
             defer {
-                view.layoutIfNeeded()
+                content.view.layoutIfNeeded()
             }
 
             var result = UpdateResult()
@@ -541,7 +601,11 @@ extension BlueprintView {
                 }
                 usedKeys.insert(path)
 
-                let contentView = node.viewDescription.contentView(in: view)
+                let contentView: UIView = node.viewDescription.ifView { view in
+                    view.contentView(in: content.value as! UIView)
+                } ifController: { controller in
+                    controller.contentView(in: content.value as! UIViewController)
+                }
 
                 if let controller = oldChildren[path], controller.canUpdateFrom(node: child) {
 
@@ -555,17 +619,19 @@ extension BlueprintView {
                     } else {
                         layoutTransition = .inherited
                     }
+
                     layoutTransition.perform {
-                        child.layoutAttributes.apply(to: controller.view)
+                        child.layoutAttributes.apply(to: controller.content.view)
 
                         if pathsChanged {
                             // Only update the index of the view if the content of the parent view changed.
                             // This is a performance optimization, as this call is otherwise expensive if the index of the
                             // view did not change (it leads to the `contentView` having to check the index of the subview for no reason).
-                            contentView.insertSubview(controller.view, at: index)
+                            contentView.insertSubview(controller.content.view, at: index)
                         }
 
                         let childResult = controller.update(node: child, context: context)
+
                         result.merge(childResult)
                     }
                 } else {
@@ -575,9 +641,19 @@ extension BlueprintView {
                     // performWithoutAnimation so they're not caught up inside an occuring transition.
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
-                        child.layoutAttributes.apply(to: controller.view)
 
-                        contentView.insertSubview(controller.view, at: index)
+                        controller.content.ifController { controller in
+                            guard let parent = context.currentViewController else { fatalError() }
+
+                            parent.addChild(controller)
+                            context.currentViewController?.didMove(toParent: parent)
+                        }
+
+                        controller.wire(environment: node.environment)
+
+                        child.layoutAttributes.apply(to: controller.content.view)
+
+                        contentView.insertSubview(controller.content.view, at: index)
 
                         if context.viewIsVisible, let onAppear = controller.onAppear {
                             result.lifecycleCallbacks.append(onAppear)
@@ -587,6 +663,10 @@ extension BlueprintView {
                             node: child,
                             context: context.modified {
                                 $0.appearanceTransitionsEnabled = false
+
+                                if let vc = controller.content.viewController {
+                                    $0.currentViewController = vc
+                                }
                             }
                         )
                         result.merge(childResult)
@@ -596,7 +676,7 @@ extension BlueprintView {
 
                     if context.appearanceTransitionsEnabled {
                         child.viewDescription.appearingTransition?.performAppearing(
-                            view: controller.view,
+                            view: controller.content.view,
                             layoutAttributes: child.layoutAttributes,
                             completion: {}
                         )
@@ -606,7 +686,13 @@ extension BlueprintView {
 
             for controller in oldChildren.values {
                 func removeChild() {
-                    controller.view.removeFromSuperview()
+                    controller.content.ifView { view in
+                        view.removeFromSuperview()
+                    } ifController: { viewController in
+                        viewController.beginAppearanceTransition(false, animated: false)
+                        viewController.view.removeFromSuperview()
+                        viewController.endAppearanceTransition()
+                    }
                 }
 
                 if context.viewIsVisible {
@@ -619,7 +705,7 @@ extension BlueprintView {
 
                 if let transition = controller.viewDescription.disappearingTransition {
                     transition.performDisappearing(
-                        view: controller.view,
+                        view: controller.content.view,
                         layoutAttributes: controller.layoutAttributes,
                         completion: removeChild
                     )
@@ -654,6 +740,11 @@ extension BlueprintView.NativeViewController {
 
         /// True if the hosting view is in the view hierarchy
         var viewIsVisible: Bool
+
+        /// The current view controller in the blueprint hierarchy. If the view description
+        /// provides a view controller type, it should be set on the context before being
+        /// passed down the hierarchy.
+        var currentViewController: UIViewController? = nil
 
         /// Returns a copy of the update context, modified by the changes provided.
         func modified(_ modify: (inout Self) -> Void) -> Self {

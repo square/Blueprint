@@ -17,6 +17,10 @@ import UIKit
 final class RootViewController: UIViewController {
     fileprivate var demos: [Element] {
         [
+            DemoItem(title: "Hosting View Controllers", onTap: { [weak self] in
+                self?.push(ViewControllerHostingController())
+            }),
+
             DemoItem(title: "Text Links", onTap: { [weak self] in
                 self?.push(TextLinkViewController())
             }),
