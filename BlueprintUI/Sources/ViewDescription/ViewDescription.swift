@@ -40,19 +40,60 @@ extension NativeView where Self: UIView {
 /// contains functionality for creating, updating, and animating view instances.
 public struct ViewDescription {
 
-    private let _viewType: UIView.Type
-    private let _build: () -> UIView
-    private let _apply: (UIView) -> Void
-    private let _contentView: (UIView) -> UIView
-
-    private let _layoutTransition: LayoutTransition
-    private let _appearingTransition: VisibilityTransition?
-    private let _disappearingTransition: VisibilityTransition?
+    public var layoutTransition: LayoutTransition
+    public var appearingTransition: VisibilityTransition?
+    public var disappearingTransition: VisibilityTransition?
 
     let onAppear: LifecycleCallback?
     let onDisappear: LifecycleCallback?
 
     let frameRoundingBehavior: FrameRoundingBehavior
+
+    let content: Content
+
+    enum Content {
+        case view(View)
+        case controller(Controller)
+
+        struct View {
+            public var viewType: UIView.Type
+            public var build: () -> UIView
+
+            private let _apply: (UIView) -> Void
+
+            public func apply(to view: UIView) {
+                _apply(view)
+            }
+
+            private let _contentView: (UIView) -> UIView
+
+            public func contentView(in view: UIView) -> UIView {
+                _contentView(view)
+            }
+        }
+
+        struct Controller {
+            public var controllerType: UIViewController.Type
+            public var build: () -> UIViewController
+
+            private let _apply: (UIViewController) -> Void
+
+            public func apply(to view: UIViewController) {
+                _apply(view)
+            }
+
+            private let _contentView: (UIViewController) -> UIView
+
+            public func contentView(in controller: UIViewController) -> UIView {
+                _contentView(controller)
+            }
+        }
+    }
+
+    public var viewType: UIView.Type
+    public var build: () -> UIView
+    private let _apply: (UIView) -> Void
+    private let _contentView: (UIView) -> UIView
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
@@ -72,9 +113,9 @@ public struct ViewDescription {
     /// Generates a view description with the given configuration object.
     /// - parameter configuration: The configuration object.
     private init<View>(configuration: Configuration<View>) {
-        _viewType = View.self
+        viewType = View.self
 
-        _build = configuration.builder
+        build = configuration.builder
 
         _apply = { view in
             let typedView = configuration.typeChecked(view: view)
@@ -91,22 +132,14 @@ public struct ViewDescription {
             return configuration.contentView(typedView)
         }
 
-        _layoutTransition = configuration.layoutTransition
-        _appearingTransition = configuration.appearingTransition
-        _disappearingTransition = configuration.disappearingTransition
+        layoutTransition = configuration.layoutTransition
+        appearingTransition = configuration.appearingTransition
+        disappearingTransition = configuration.disappearingTransition
 
         onAppear = configuration.onAppear
         onDisappear = configuration.onDisappear
 
         frameRoundingBehavior = configuration.frameRoundingBehavior
-    }
-
-    public var viewType: UIView.Type {
-        _viewType
-    }
-
-    public func build() -> UIView {
-        _build()
     }
 
     public func apply(to view: UIView) {
@@ -116,19 +149,6 @@ public struct ViewDescription {
     public func contentView(in view: UIView) -> UIView {
         _contentView(view)
     }
-
-    public var layoutTransition: LayoutTransition {
-        _layoutTransition
-    }
-
-    public var appearingTransition: VisibilityTransition? {
-        _appearingTransition
-    }
-
-    public var disappearingTransition: VisibilityTransition? {
-        _disappearingTransition
-    }
-
 }
 
 extension ViewDescription {
@@ -210,9 +230,78 @@ extension ViewDescription {
             }
             return typedView
         }
-
     }
 
+    /// Represents the configuration of a specific UIViewController type.
+    public struct ControllerConfiguration<Controller: UIViewController> {
+
+        fileprivate var bindings: [PartialKeyPath<Controller>: AnyValueBinding] = [:]
+
+        /// A closure that is applied to the native view instance during an update cycle.
+        /// - parameter view: The native view instance.
+        public typealias Update = (_ controller: Controller) -> Void
+
+        /// A closure that is responsible for instantiating an instance of the native view.
+        /// The default value instantiates the view using `init(frame:)`.
+        public var builder: () -> Controller
+
+        /// An array of update closures.
+        public var updates: [Update]
+
+        /// A closure that takes a native view instance as the single argument, and
+        /// returns a subview of that view into which child views should be added
+        /// and managed.
+        public var contentView: (Controller) -> UIView
+
+        /// The transition to use during layout changes.
+        public var layoutTransition: LayoutTransition = .inherited
+
+        /// The transition to use when this view appears.
+        public var appearingTransition: VisibilityTransition? = nil
+
+        /// The transition to use when this view disappears.
+        public var disappearingTransition: VisibilityTransition? = nil
+
+        /// A hook to call when the element appears.
+        public var onAppear: LifecycleCallback?
+
+        /// A hook to call when the element disappears.
+        public var onDisappear: LifecycleCallback?
+
+        /// The prioritization method to use when snapping the native view's frame to pixel
+        /// boundaries.
+        ///
+        /// When snapping views to pixel boundaries, Blueprint prioritizes placing frame edges as
+        /// close to the correct value as possible. This ensures that flush edges stay flush after
+        /// rounding, but can result in frame sizes growing or shrinking by 1 pixel in either axis.
+        ///
+        /// Backing views that are particularly sensitive to size changes can opt-in to prioritize
+        /// preserving their frame size instead of maximally correct edges. This will guarantee
+        /// frame sizes, with the tradeoff that their edges may no longer be flush to other edges as
+        /// they were laid out.
+        ///
+        /// Generally you should not change this value except in specific circumstances when all
+        /// criteria are met:
+        /// - The backing view is sensitive to frame size, such as a text label.
+        /// - And the backing view has a transparent background, so that overlapping frames or gaps
+        ///   between frames are not visible.
+        ///
+        public var frameRoundingBehavior: FrameRoundingBehavior = .prioritizeEdges
+
+        /// Initializes a default configuration object.
+        public init() {
+            builder = { Controller() }
+            updates = []
+            contentView = { $0.view }
+        }
+
+        fileprivate func typeChecked(controller: UIViewController) -> Controller {
+            guard let typed = controller as? Controller else {
+                fatalError("A view controller of type \(type(of: controller)) was used with a ViewDescription instance that expects views of type \(Controller.self)")
+            }
+            return typed
+        }
+    }
 }
 
 extension ViewDescription.Configuration {

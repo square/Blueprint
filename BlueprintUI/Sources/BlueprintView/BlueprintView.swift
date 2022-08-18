@@ -36,6 +36,9 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
+    /// The view controller that owns this blueprint view.
+    weak var viewController: BlueprintViewController?
+
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
     /// A base environment used when laying out and rendering the element tree.
