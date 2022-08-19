@@ -354,8 +354,7 @@ public final class BlueprintView: UIView {
             context: .init(
                 appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
                 viewIsVisible: isVisible,
-                currentViewController: viewController,
-                isViewControllerVisible: viewController?.view.window != nil
+                currentViewController: viewController
             )
         )
 
@@ -668,9 +667,7 @@ extension BlueprintView {
                                 true,
                                 animated: child.viewDescription.appearingTransition != nil
                             )
-                        }
 
-                        if context.viewIsVisible {
                             result.lifecycleCallbacks.append {
                                 controller.content.viewController?.endAppearanceTransition()
                             }
@@ -706,23 +703,27 @@ extension BlueprintView {
             }
 
             for controller in oldChildren.values {
+
+                let performAppearanceTransition = context.viewIsVisible
+
                 func removeChild() {
                     controller.content.ifView { view in
                         view.removeFromSuperview()
                     } ifController: { viewController in
-                        if context.isViewControllerVisible {
-                            viewController.beginAppearanceTransition(false, animated: false)
-                        }
-
                         viewController.view.removeFromSuperview()
 
-                        if context.isViewControllerVisible {
+                        if performAppearanceTransition {
                             viewController.endAppearanceTransition()
                         }
                     }
                 }
 
                 if context.viewIsVisible {
+                    controller.content.viewController?.beginAppearanceTransition(
+                        false,
+                        animated: controller.viewDescription.disappearingTransition != nil
+                    )
+
                     controller.traverse { node in
                         if let onDisappear = node.onDisappear {
                             result.lifecycleCallbacks.append(onDisappear)
