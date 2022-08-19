@@ -27,4 +27,8 @@ public final class BlueprintViewController: UIViewController {
         view = blueprintView
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
+
+    public override var shouldAutomaticallyForwardAppearanceMethods: Bool {
+        false
+    }
 }

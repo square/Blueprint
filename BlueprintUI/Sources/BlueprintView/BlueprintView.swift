@@ -354,7 +354,8 @@ public final class BlueprintView: UIView {
             context: .init(
                 appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
                 viewIsVisible: isVisible,
-                currentViewController: viewController
+                currentViewController: viewController,
+                isViewControllerVisible: viewController?.view.window != nil
             )
         )
 
@@ -643,7 +644,14 @@ extension BlueprintView {
                         controller = NativeViewController(node: child)
 
                         controller.content.ifController { controller in
-                            guard let parent = context.currentViewController else { fatalError() }
+                            guard let parent = context.currentViewController else {
+                                fatalError(
+                                    """
+                                    Cannot host a UIViewController-backed Element within a UIView-only hierarchy.
+                                    Please use BlueprintViewController instead of BlueprintView.
+                                    """
+                                )
+                            }
 
                             parent.addChild(controller)
                             context.currentViewController?.didMove(toParent: parent)
@@ -655,8 +663,21 @@ extension BlueprintView {
 
                         contentView.insertSubview(controller.content.view, at: index)
 
-                        if context.viewIsVisible, let onAppear = controller.onAppear {
-                            result.lifecycleCallbacks.append(onAppear)
+                        if context.viewIsVisible {
+                            controller.content.viewController?.beginAppearanceTransition(
+                                true,
+                                animated: child.viewDescription.appearingTransition != nil
+                            )
+                        }
+
+                        if context.viewIsVisible {
+                            result.lifecycleCallbacks.append {
+                                controller.content.viewController?.endAppearanceTransition()
+                            }
+
+                            if let onAppear = controller.onAppear {
+                                result.lifecycleCallbacks.append(onAppear)
+                            }
                         }
 
                         let childResult = controller.update(
@@ -689,9 +710,15 @@ extension BlueprintView {
                     controller.content.ifView { view in
                         view.removeFromSuperview()
                     } ifController: { viewController in
-                        viewController.beginAppearanceTransition(false, animated: false)
+                        if context.isViewControllerVisible {
+                            viewController.beginAppearanceTransition(false, animated: false)
+                        }
+
                         viewController.view.removeFromSuperview()
-                        viewController.endAppearanceTransition()
+
+                        if context.isViewControllerVisible {
+                            viewController.endAppearanceTransition()
+                        }
                     }
                 }
 
@@ -744,7 +771,7 @@ extension BlueprintView.NativeViewController {
         /// The current view controller in the blueprint hierarchy. If the view description
         /// provides a view controller type, it should be set on the context before being
         /// passed down the hierarchy.
-        var currentViewController: UIViewController? = nil
+        var currentViewController: UIViewController?
 
         /// Returns a copy of the update context, modified by the changes provided.
         func modified(_ modify: (inout Self) -> Void) -> Self {
