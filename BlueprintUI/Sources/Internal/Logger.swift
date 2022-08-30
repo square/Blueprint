@@ -71,13 +71,40 @@ extension Logger {
             view.name ?? "BlueprintView"
         )
     }
+
+    static func logSizeThatFitsStart(
+        view: BlueprintView,
+        description: String
+    ) {
+        guard BlueprintLogging.isEnabled else { return }
+
+        os_signpost(
+            .begin,
+            log: .active,
+            name: "View Sizing",
+            signpostID: OSSignpostID(log: .active, object: view),
+            "%{public}s",
+            description
+        )
+    }
+
+    static func logSizeThatFitsEnd(view: BlueprintView) {
+        guard BlueprintLogging.isEnabled else { return }
+
+        os_signpost(
+            .end,
+            log: .active,
+            name: "View Sizing",
+            signpostID: OSSignpostID(log: .active, object: view)
+        )
+    }
 }
 
 /// Measuring signposts
 extension Logger {
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
 
-        guard BlueprintLogging.isEnabled else { return }
+        guard shouldRecordMeasurePass() else { return }
 
         os_signpost(
             .begin,
@@ -94,7 +121,7 @@ extension Logger {
 
     static func logMeasureEnd(object: AnyObject) {
 
-        guard BlueprintLogging.isEnabled else { return }
+        guard shouldRecordMeasurePass() else { return }
 
         os_signpost(
             .end,
@@ -102,5 +129,12 @@ extension Logger {
             name: "Measuring",
             signpostID: OSSignpostID(log: .active, object: object)
         )
+    }
+
+    // MARK: Utilities
+
+    private static func shouldRecordMeasurePass() -> Bool {
+        BlueprintLogging.isEnabled &&
+            BlueprintLogging.config.recordMeasurePasses
     }
 }
