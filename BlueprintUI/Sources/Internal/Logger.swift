@@ -135,6 +135,6 @@ extension Logger {
 
     private static func shouldRecordMeasurePass() -> Bool {
         BlueprintLogging.isEnabled &&
-            BlueprintLogging.config.recordMeasurePasses
+            BlueprintLogging.config.recordElementMeasures
     }
 }

@@ -15,11 +15,11 @@ public enum BlueprintLogging {
     /// Configuration for logging options
     public struct Config {
 
-        /// When `true`, measurement data will be collected for all `Element`s
-        public var recordMeasurePasses: Bool
+        /// When `true`, timing data will be logged when measuring each `Element`
+        public var recordElementMeasures: Bool
 
-        public init(recordMeasurePasses: Bool) {
-            self.recordMeasurePasses = recordMeasurePasses
+        public init(recordElementMeasures: Bool) {
+            self.recordElementMeasures = recordElementMeasures
         }
     }
 
@@ -44,9 +44,9 @@ extension BlueprintLogging.Config {
     /// Logging configuration that will not record measurement data for all `Element`s.
     /// This provides a reasonable balance between data collection and performance impact.
     /// This is the default logging configuration.
-    public static let lite = Self(recordMeasurePasses: false)
+    public static let lite = Self(recordElementMeasures: false)
 
     /// Logging configuration that includes measurement data.
     /// This provides the most granular information, but has a noticeable impact on performance.
-    public static let verbose = Self(recordMeasurePasses: true)
+    public static let verbose = Self(recordElementMeasures: true)
 }
