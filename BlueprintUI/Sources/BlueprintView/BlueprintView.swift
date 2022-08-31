@@ -203,10 +203,18 @@ public final class BlueprintView: UIView {
             return cachedSize
         }
 
+        let cacheName = "sizeThatFits:\(type(of: element))"
+
+        Logger.logSizeThatFitsStart(
+            view: self,
+            description: cacheName
+        )
+        defer { Logger.logSizeThatFitsEnd(view: self) }
+
         let measurement = element.content.measure(
             in: constraint,
             environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: "sizeThatFits:\(type(of: element))")
+            cache: CacheFactory.makeCache(name: cacheName)
         )
 
         sizesThatFit[constraint] = measurement
