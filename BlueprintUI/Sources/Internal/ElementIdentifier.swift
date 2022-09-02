@@ -43,17 +43,30 @@
  */
 struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    let elementType: ObjectIdentifier
+    let elementType: Element.Type
+    let elementTypeIdentifier: ObjectIdentifier
     let key: AnyHashable?
-
     let count: Int
+
+    private let hash: Int
+
+    init(element: Element, key: AnyHashable?, count: Int) {
+        self.init(elementType: type(of: element), key: key, count: count)
+    }
 
     init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
-        self.elementType = ObjectIdentifier(elementType)
+        self.elementType = elementType
+        elementTypeIdentifier = ObjectIdentifier(elementType)
         self.key = key
 
         self.count = count
+
+        var hasher = Hasher()
+        hasher.combine(elementTypeIdentifier)
+        hasher.combine(self.key)
+        hasher.combine(self.count)
+        hash = hasher.finalize()
     }
 
     var debugDescription: String {
@@ -64,13 +77,25 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         }
     }
 
-    /**
-     Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
-     */
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(hash)
+    }
+
+    static func == (lhs: ElementIdentifier, rhs: ElementIdentifier) -> Bool {
+        lhs.elementTypeIdentifier == rhs.elementTypeIdentifier &&
+            lhs.key == rhs.key &&
+            lhs.count == rhs.count
+    }
+
+    /// Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
     struct Factory {
 
         init(elementCount: Int) {
             countsByKey = Dictionary(minimumCapacity: elementCount)
+        }
+
+        mutating func nextIdentifier(for element: Element, key: AnyHashable?) -> ElementIdentifier {
+            nextIdentifier(for: type(of: element), key: key)
         }
 
         mutating func nextIdentifier(for type: Element.Type, key: AnyHashable?) -> ElementIdentifier {
@@ -101,9 +126,9 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
         }
 
         private struct Key: Hashable {
-
             let elementType: ObjectIdentifier
             let key: AnyHashable?
         }
     }
 }
+

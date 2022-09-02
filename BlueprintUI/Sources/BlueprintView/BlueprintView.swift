@@ -38,6 +38,9 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    /// The live, tracked state for each element in the element tree.
+    private let rootState: RootElementState
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -48,8 +51,7 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
-            // Shortcut: If both environments were empty, nothing changed.
-            if oldValue.isEmpty && environment.isEmpty { return }
+            guard oldValue != environment else { return }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -91,6 +93,15 @@ public final class BlueprintView: UIView {
         }
     }
 
+    /// If cross-layout path measurement and layout caching is enabled.
+    /// This value defaults to `true`. You should usually leave this property enabled.
+    ///
+    /// The only time you should disable it is if your `BlueprintView` is being used
+    /// as a prototype/measurement view, where caching layout related information
+    /// longer than needed may result in undesirable outcomes, such as objects being
+    /// retained longer than expected.
+    public var isLayoutCachingEnabled: Bool = true
+
     /// We need to invalidateIntrinsicContentSize when `bound.size` changes for Auto Layout to work correctly.
     public override var bounds: CGRect {
         didSet {
@@ -129,16 +140,22 @@ public final class BlueprintView: UIView {
 
         rootController = NativeViewController(
             node: NativeViewNode(
+                element: nil,
                 content: UIView.describe { _ in },
                 // Because no layout update occurs here, passing an empty environment is fine;
                 // the correct environment will be passed during update.
-                environment: .empty,
+                environment: environment,
                 layoutAttributes: LayoutAttributes(),
+                state: nil,
                 children: []
             )
         )
 
+        rootState = .init(name: "BlueprintView", kind: .blueprintView(""))
+
         super.init(frame: CGRect.zero)
+
+        rootState.kind = .blueprintView(address(of: self))
 
         backgroundColor = .white
         addSubview(rootController.view)
@@ -211,10 +228,9 @@ public final class BlueprintView: UIView {
         )
         defer { Logger.logSizeThatFitsEnd(view: self) }
 
-        let measurement = element.content.measure(
+        let measurement = element.detachedMeasure(
             in: constraint,
-            environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: cacheName)
+            with: makeEnvironment()
         )
 
         sizesThatFit[constraint] = measurement
@@ -324,6 +340,8 @@ public final class BlueprintView: UIView {
 
         isInsideUpdate = true
 
+        rootState.root?.viewSizeChanged(from: lastViewHierarchyUpdateBounds.size, to: bounds.size)
+
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
 
@@ -340,9 +358,7 @@ public final class BlueprintView: UIView {
         )
 
         /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
-            .resolve() ?? []
+        let viewNodes = calculateNativeViewNodes(in: environment, states: rootState)
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -351,9 +367,11 @@ public final class BlueprintView: UIView {
         rootController.view.frame = bounds
 
         var rootNode = NativeViewNode(
+            element: nil,
             content: UIView.describe { _ in },
             environment: environment,
             layoutAttributes: LayoutAttributes(frame: rootFrame),
+            state: nil,
             children: viewNodes
         )
 
@@ -389,6 +407,33 @@ public final class BlueprintView: UIView {
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
         )
+    }
+
+    /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
+    /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
+    /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
+    private func calculateNativeViewNodes(
+        in environment: Environment,
+        states: RootElementState
+    ) -> [(path: ElementPath, node: NativeViewNode)] {
+        guard let element = self.element else { return [] }
+
+        rootState.root?.prepareForLayout()
+
+        defer {
+            self.rootState.root?.finishedLayout()
+        }
+
+        states.update(with: element, in: environment)
+
+        let laidOutNodes = LayoutResultNode(
+            root: element,
+            layoutAttributes: .init(frame: bounds),
+            environment: environment,
+            states: states.root!
+        )
+
+        return laidOutNodes.resolve()
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
@@ -510,12 +555,27 @@ extension BlueprintView {
 
             view.nativeViewNodeBlueprintEnvironment = node.environment
 
-            viewDescription.apply(to: view)
+            var appliedViewDescription: Bool = false
+
+            if let state = node.state {
+                if state.wasUpdateEquivalent == false || state.appliesViewDescriptionIfEquivalent {
+                    // print("Applying to \(view)")
+                    viewDescription.apply(to: view)
+                    appliedViewDescription = true
+                    // print("Applied to \(view)")
+                    // print("")
+                }
+            } else {
+                viewDescription.apply(to: view)
+                appliedViewDescription = true
+            }
 
             // After this view's children are updated, allow it to run a layout pass.
             // This ensures backing view layout changes are contained in animation blocks.
             defer {
-                view.layoutIfNeeded()
+                if appliedViewDescription {
+                    view.layoutIfNeeded()
+                }
             }
 
             var result = UpdateResult()

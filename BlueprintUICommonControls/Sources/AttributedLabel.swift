@@ -2,7 +2,7 @@ import BlueprintUI
 import Foundation
 import UIKit
 
-public struct AttributedLabel: Element, Hashable {
+public struct AttributedLabel: ComparableElement, Hashable {
 
     /// The attributed text to render in the label.
     ///
@@ -120,6 +120,10 @@ public struct AttributedLabel: Element, Hashable {
             }
         }
     }
+
+    public var appliesViewDescriptionIfEquivalent: Bool {
+        false
+    }
 }
 
 
@@ -217,9 +221,13 @@ extension AttributedLabel {
             activeLinkAttributes = model.activeLinkAttributes
             linkDetectionTypes = model.linkDetectionTypes ?? []
 
-            attributedText = model
-                .attributedText
-                .normalizingForView(with: model.numberOfLines)
+            if isMeasuring {
+                attributedText = model.attributedText
+            } else {
+                attributedText = model
+                    .attributedText
+                    .normalizingForView(with: model.numberOfLines)
+            }
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset

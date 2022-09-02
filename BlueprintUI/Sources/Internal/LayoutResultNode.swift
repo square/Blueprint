@@ -1,23 +1,5 @@
 import UIKit
 
-extension Element {
-
-    /// Build a fully laid out element tree with complete layout attributes
-    /// for each element.
-    ///
-    /// - Parameter layoutAttributes: The layout attributes to assign to the
-    ///   root element.
-    ///
-    /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        LayoutResultNode(
-            root: self,
-            layoutAttributes: layoutAttributes,
-            environment: environment
-        )
-    }
-
-}
 
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
@@ -30,6 +12,8 @@ struct LayoutResultNode {
 
     var environment: Environment
 
+    var state: ElementState
+
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
 
@@ -37,28 +21,36 @@ struct LayoutResultNode {
         element: Element,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
+        state: ElementState,
         children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
     ) {
         self.element = element
         self.layoutAttributes = layoutAttributes
         self.environment = environment
+        self.state = state
         self.children = children
+
+        precondition(type(of: element) == type(of: state.element))
     }
 
-    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+    init(
+        root: Element,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        states: ElementState
+    ) {
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
             environment: environment,
+            state: states,
             children: root.content.performLayout(
-                attributes: layoutAttributes,
-                environment: environment,
-                cache: cache
+                in: layoutAttributes.frame.size,
+                with: environment,
+                states: states
             )
         )
     }
-
 }
 
 
@@ -79,9 +71,8 @@ extension LayoutResultNode {
             }
 
         let subtreeExtent: CGRect? = children
-            .map { $0.node }
-            .reduce(into: nil) { rect, node in
-                rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
+            .reduce(into: nil) { rect, child in
+                rect = rect?.union(child.node.layoutAttributes.frame) ?? child.node.layoutAttributes.frame
             }
 
         let viewDescription = element.backingViewDescription(
@@ -94,9 +85,11 @@ extension LayoutResultNode {
 
         if let viewDescription = viewDescription {
             let node = NativeViewNode(
+                element: element,
                 content: viewDescription,
                 environment: environment,
                 layoutAttributes: layoutAttributes,
+                state: state,
                 children: resolvedChildContent
             )
 
@@ -108,7 +101,6 @@ extension LayoutResultNode {
                 return (path, transformedNode)
             }
         }
-
     }
-
 }
+
