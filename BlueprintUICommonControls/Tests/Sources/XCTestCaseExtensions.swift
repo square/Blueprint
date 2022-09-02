@@ -106,6 +106,7 @@ extension XCTestCase {
         line: UInt = #line
     ) {
         let view = BlueprintView(element: element)
+        view.name = "Snapshot Host"
 
         if let size = size {
             view.frame = CGRect(origin: .zero, size: size)

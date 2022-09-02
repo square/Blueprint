@@ -218,14 +218,14 @@ public struct LayoutAttributes {
     ///   - behavior: The rounding prioritization method for this frame.
     mutating func round(
         from origin: CGPoint,
-        correction: CGPoint,
+        correction: CGRect,
         scale: CGFloat,
         behavior: ViewDescription.FrameRoundingBehavior
-    ) -> CGPoint {
+    ) -> CGRect {
         // Apply origin offset and rounding correction
         let correctedFrame = frame
             .offset(by: origin)
-            .offset(by: correction)
+            .offset(by: correction.origin)
 
         // Round
         let roundedFrame: CGRect
@@ -237,7 +237,10 @@ public struct LayoutAttributes {
         }
 
         // Save rounding correction
-        let roundingCorrection = correctedFrame.origin - roundedFrame.origin
+        let roundingCorrection = CGRect(
+            origin: correctedFrame.origin - roundedFrame.origin,
+            size: correctedFrame.size - roundedFrame.size
+        )
 
         // Reverse origin offset and set new frame
         frame = roundedFrame

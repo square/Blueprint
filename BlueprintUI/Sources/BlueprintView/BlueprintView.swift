@@ -332,25 +332,33 @@ public final class BlueprintView: UIView {
 
         let environment = makeEnvironment()
 
+        let rootCorrection = environment.roundingCorrection
+        let rootOrigin = environment.roundingOrigin
+        let rootFrame = CGRect(
+            origin: .zero,
+            size: bounds.size + rootCorrection.size
+        )
+
         /// Grab view descriptions
         let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: bounds), environment: environment)
+            .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
             .resolve() ?? []
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
 
+        // The root controller is fixed, and its layout attributes are never applied.
         rootController.view.frame = bounds
 
         var rootNode = NativeViewNode(
             content: UIView.describe { _ in },
             environment: environment,
-            layoutAttributes: LayoutAttributes(frame: bounds),
+            layoutAttributes: LayoutAttributes(frame: rootFrame),
             children: viewNodes
         )
 
         let scale = window?.screen.scale ?? UIScreen.main.scale
-        rootNode.round(from: .zero, correction: .zero, scale: scale)
+        rootNode.round(from: rootOrigin, correction: rootCorrection, scale: scale)
 
         Logger.logViewUpdateStart(view: self)
 
