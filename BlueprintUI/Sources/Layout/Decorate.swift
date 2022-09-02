@@ -70,9 +70,9 @@ public struct Decorate: ProxyElement {
                 let contentFrame = CGRect(
                     origin: .zero,
                     size: context.phase.onMeasure {
-                        self.wrapped.content.measure(
+                        self.wrapped.detachedMeasure(
                             in: context.size,
-                            environment: environment
+                            with: environment
                         )
                     } onLayout: { size in
                         size
@@ -257,7 +257,7 @@ extension Decorate {
             decoration: Element,
             environment: Environment
         ) -> CGRect {
-            let size = decoration.content.measure(in: .init(contentSize), environment: environment)
+            let size = decoration.detachedMeasure(in: .init(contentSize), with: environment)
 
             let context = PositionContext(
                 decorationSize: size,

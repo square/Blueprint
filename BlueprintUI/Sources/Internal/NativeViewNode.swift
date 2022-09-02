@@ -20,6 +20,8 @@ import UIKit
 ///  - (path: ["B","C","D"])
 struct NativeViewNode {
 
+    var element: Element?
+
     /// The view description returned by this node
     var viewDescription: ViewDescription
 
@@ -30,20 +32,29 @@ struct NativeViewNode {
     /// attributes).
     var layoutAttributes: LayoutAttributes
 
+    var state: ElementState?
+
     /// The children of this node.
     var children: [(path: ElementPath, node: NativeViewNode)]
 
     init(
+        element: Element?,
         content: ViewDescription,
         environment: Environment,
         layoutAttributes: LayoutAttributes,
+        state: ElementState?,
         children: [(path: ElementPath, node: NativeViewNode)]
     ) {
-
+        self.element = element
         viewDescription = content
         self.environment = environment
         self.layoutAttributes = layoutAttributes
+        self.state = state
         self.children = children
+
+        if let element = element, let state = state {
+            precondition(type(of: element) == type(of: state.element))
+        }
     }
 
     /// Recursively rounds this node's layout frame and all its children to snap to pixel boundaries.

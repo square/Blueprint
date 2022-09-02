@@ -113,7 +113,7 @@ extension Environment {
     }
 }
 
-struct FeedTheme {
+struct FeedTheme: Equatable {
     var authorColor: UIColor
 }
 

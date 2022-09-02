@@ -40,3 +40,36 @@ extension Layout where Traits == () {
     }
 
 }
+
+
+public final class LayoutItems<Traits> {
+
+    public let all: [Item]
+
+    public let count: Int
+
+    init(with all: [Item]) {
+        self.all = all
+        count = self.all.count
+    }
+
+    func toTuple() -> [(Traits, Measurable)] {
+        all.map {
+            ($0.traits, $0.content)
+        }
+    }
+
+    public struct Item {
+
+        public let traits: Traits
+        public let content: Measurable
+
+        let identifier: ElementIdentifier
+
+        init(traits: Traits, content: Measurable, identifier: ElementIdentifier) {
+            self.traits = traits
+            self.content = content
+            self.identifier = identifier
+        }
+    }
+}
