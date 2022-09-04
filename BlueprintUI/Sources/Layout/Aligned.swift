@@ -7,9 +7,9 @@ import UIKit
 /// For other modes, the size of the content element is determined by calling `measure(in:)`
 /// on the content element – even if that size is larger than the wrapping element.
 ///
-public struct Aligned: Element {
+public struct Aligned: Element, Equatable, ComparableElement {
     /// The possible vertical alignment values.
-    public enum VerticalAlignment {
+    public enum VerticalAlignment: Equatable {
         /// Aligns the content to the top edge of the containing element.
         case top
         /// Centers the content vertically.
@@ -21,7 +21,7 @@ public struct Aligned: Element {
     }
 
     /// The possible horizontal alignment values.
-    public enum HorizontalAlignment {
+    public enum HorizontalAlignment: Equatable {
         /// Aligns the content to the leading edge of the containing element.
         /// In left-to-right languages, this is the left edge.
         case leading
@@ -35,7 +35,7 @@ public struct Aligned: Element {
     }
 
     /// The content element to be aligned.
-    public var wrappedElement: Element
+    @ElementProperty public var wrappedElement: Element
     /// The vertical alignment.
     public var verticalAlignment: VerticalAlignment
     /// The horizontal alignment.

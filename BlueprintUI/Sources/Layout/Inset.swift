@@ -4,10 +4,10 @@ import UIKit
 ///
 /// Commonly used to add padding around another element when displayed within a container.
 ///
-public struct Inset: Element {
+public struct Inset: Element, Equatable, ComparableElement {
 
     /// The wrapped element to be inset.
-    public var wrappedElement: Element
+    @ElementProperty public var wrappedElement: Element
 
     /// The amount to inset the content element.
     public var top: CGFloat

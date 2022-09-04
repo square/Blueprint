@@ -573,6 +573,7 @@ extension BlueprintView {
             // After this view's children are updated, allow it to run a layout pass.
             // This ensures backing view layout changes are contained in animation blocks.
             defer {
+                // TODO: also need to do if we changed the size
                 if appliedViewDescription {
                     view.layoutIfNeeded()
                 }

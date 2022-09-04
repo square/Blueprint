@@ -3,9 +3,10 @@ import CoreGraphics
 /// `UserInteractionEnabled` conditionally enables user interaction of its wrapped element.
 ///
 /// - Note: When user interaction is disabled, any elements within the wrapped element will become non-interactive.
-public struct UserInteractionEnabled: Element {
+public struct UserInteractionEnabled: Element, Equatable, ComparableElement {
+
     public var isEnabled: Bool
-    public var wrappedElement: Element
+    @ElementProperty public var wrappedElement: Element
 
     public init(_ isEnabled: Bool, wrapping element: Element) {
         self.isEnabled = isEnabled
