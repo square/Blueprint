@@ -1,10 +1,10 @@
 import UIKit
 
 /// Changes the opacity of the wrapped element.
-public struct Opacity: Element {
+public struct Opacity: Element, Equatable, ComparableElement {
 
     /// The content element whose opacity is being affected.
-    public var wrappedElement: Element
+    @ElementProperty public var wrappedElement: Element
 
     /// The opacity of the wrapped element.
     public var opacity: CGFloat

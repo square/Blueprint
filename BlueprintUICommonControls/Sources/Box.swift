@@ -4,7 +4,7 @@ import UIKit
 
 /// A simple element that wraps a child element and adds visual styling including
 /// background color.
-public struct Box: Element {
+public struct Box: Element, Equatable, ComparableElement {
 
     /// The background color to show in the box.
     public var backgroundColor: UIColor
@@ -24,7 +24,7 @@ public struct Box: Element {
     /// If content placed within the box should be clipped.
     public var clipsContent: Bool
 
-    public var wrappedElement: Element?
+    @OptionalElementProperty public var wrappedElement: Element?
 
     public init(
         backgroundColor: UIColor = .clear,
@@ -214,12 +214,12 @@ extension Box {
         }
     }
 
-    public enum BorderStyle {
+    public enum BorderStyle: Equatable {
         case none
         case solid(color: UIColor, width: CGFloat)
     }
 
-    public enum ShadowStyle {
+    public enum ShadowStyle: Equatable {
         case none
         case simple(radius: CGFloat, opacity: CGFloat, offset: CGSize, color: UIColor)
     }

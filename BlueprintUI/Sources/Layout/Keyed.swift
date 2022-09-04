@@ -35,13 +35,13 @@ import UIKit
 ///     }
 /// }
 /// ```
-public struct Keyed: Element {
+public struct Keyed: Element, Equatable, ComparableElement {
 
     /// The key used to differentiate the element.
     public var key: AnyHashable?
 
     /// The wrapped element.
-    public var wrapped: Element
+    @ElementProperty public var wrapped: Element
 
     /// Creates a new `Keyed` element with the provided key and wrapped element.
     public init(key: AnyHashable?, wrapping: Element) {

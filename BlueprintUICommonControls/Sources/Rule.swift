@@ -3,9 +3,9 @@ import UIKit
 
 /// A solid line, parallel to the x or y axis, with a fixed thickness but unconstrained in length,
 /// suitable for use as a separator.
-public struct Rule: ProxyElement {
+public struct Rule: ProxyElement, Equatable, ComparableElement {
     /// Represents whether the rule is parallel to the x or y axis.
-    public enum Orientation {
+    public enum Orientation: Equatable {
         /// Indicates that the rule is parallel to the x axis.
         case horizontal
         /// Indicates that the rule is parallel to the y axis.
@@ -13,7 +13,7 @@ public struct Rule: ProxyElement {
     }
 
     /// Represents the thickness of a rule in the direction perpendicular to its orientation.
-    public enum Thickness {
+    public enum Thickness: Equatable {
         /// Indicates that the rule should be exactly 1 screen pixel thick,
         /// the thinnest possible line that can be drawn.
         case hairline

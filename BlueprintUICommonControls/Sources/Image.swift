@@ -3,7 +3,7 @@ import UIKit
 
 
 /// Displays an image within an element hierarchy.
-public struct Image: Element {
+public struct Image: Element, Equatable, ComparableElement {
 
     /// The image to be displayed
     public var image: UIImage?
