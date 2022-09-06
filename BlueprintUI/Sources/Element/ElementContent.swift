@@ -346,7 +346,7 @@ extension ElementContent {
 
                 return layout.measure(
                     in: constraint,
-                    items: layoutItems.toTuple()
+                    items: layoutItems
                 )
             }
         }
@@ -364,7 +364,7 @@ extension ElementContent {
 
             let childAttributes = layout.layout(
                 size: size,
-                items: layoutItems.toTuple()
+                items: layoutItems
             )
 
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
@@ -610,22 +610,22 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
     // MARK: Layout
 
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
+    func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
         precondition(items.count == 1)
 
         return wrapped.measure(
             in: constraint,
-            child: items[0].content
+            child: items.all[0].content
         )
     }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
+    func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
         precondition(items.count == 1)
 
         return [
             wrapped.layout(
                 size: size,
-                child: items[0].content
+                child: items.all[0].content
             ),
         ]
     }
@@ -650,13 +650,13 @@ fileprivate struct MeasurableLayout: Layout {
 
     let measurable: Measurable
 
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        precondition(items.isEmpty)
+    func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
+        precondition(items.all.isEmpty)
         return measurable.measure(in: constraint)
     }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.isEmpty)
+    func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
+        precondition(items.all.isEmpty)
         return []
     }
 }
