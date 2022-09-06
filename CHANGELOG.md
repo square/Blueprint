@@ -25,6 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [0.45.0]
+
+### Fixed
+
+- Fixed an issue where rounding was handled incorrectly for nested BlueprintViews.
+
+### Added
+
+- Added new logging option to expose aggregate measurements.
+
 ## [0.44.1]
 
 ### Fixed
@@ -875,7 +885,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.44.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.45.0...HEAD
+[0.45.0]: https://github.com/square/Blueprint/compare/0.44.1...0.45.0
 [0.44.1]: https://github.com/square/Blueprint/compare/0.44.0...0.44.1
 [0.44.0]: https://github.com/square/Blueprint/compare/0.43.0...0.44.0
 [0.43.0]: https://github.com/square/Blueprint/compare/0.42.0...0.43.0
