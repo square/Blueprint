@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Improve `AttributedLabel` measurement performance by avoiding normalizing it's string when not needed.
+- Improve `AttributedLabel` measurement performance by avoiding normalizing its string when not needed.
 
 ### Added
 
