@@ -28,15 +28,24 @@ class PerformancePlayground: XCTestCase {
     }
 
     func test_repeated_layouts() {
-        let element = Column { col in
-            for index in 1...1000 {
-                col.add(child: Label(text: "This is test label number #\(index)"))
+        let element = Column(alignment: .fill) {
+
+            for index in 1...500 {
+                Row(alignment: .fill) {
+                    Box(backgroundColor: .red)
+                        .constrainedTo(size: CGSize(width: 100, height: 100))
+                        .stackLayoutChild(priority: .fixed)
+
+                    Label(text: "This is test label number #\(index)")
+                        .stackLayoutChild(priority: .flexible)
+                }
             }
         }
+        .scrollable()
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
 
-        determineAverage(for: 10.0) {
+        determineAverage(for: 3.0) {
             view.element = element
             view.layoutIfNeeded()
         }
@@ -119,15 +128,17 @@ class PerformancePlayground: XCTestCase {
 
         var iterations: Int = 0
 
+        var lastUpdateDate = Date()
+
         repeat {
-            let iterationStart = Date()
             block()
-            let iterationEnd = Date()
-            let duration = iterationEnd.timeIntervalSince(iterationStart)
 
             iterations += 1
 
-            print("Iteration: \(iterations), Duration : \(duration)")
+            if Date().timeIntervalSince(lastUpdateDate) >= 1 {
+                lastUpdateDate = Date()
+                print("Continuing Test: \(iterations) Iterations...")
+            }
 
         } while Date() < start + seconds
 
