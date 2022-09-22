@@ -9,9 +9,12 @@ final class RenderPassCache: CacheTree {
     private var subcaches: [SubcacheKey: RenderPassCache] = [:]
     private var measurements: [SizeConstraint: CGSize] = [:]
 
-    init(name: String, signpostRef: AnyObject) {
+    var content: ElementContent
+
+    init(name: String, content: ElementContent, signpostRef: AnyObject) {
         self.name = name
         self.signpostRef = signpostRef
+        self.content = content
     }
 
     subscript(constraint: SizeConstraint) -> CGSize? {
@@ -23,12 +26,12 @@ final class RenderPassCache: CacheTree {
         }
     }
 
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
+    func subcache(key: SubcacheKey, content: () -> ElementContent, name: @autoclosure () -> String) -> CacheTree {
         if let subcache = subcaches[key] {
             return subcache
         }
 
-        let subcache = RenderPassCache(name: name(), signpostRef: signpostRef)
+        let subcache = RenderPassCache(name: name(), content: content(), signpostRef: signpostRef)
         subcaches[key] = subcache
         return subcache
     }

@@ -96,27 +96,40 @@ public struct AttributedLabel: Element, Hashable {
         configure(&self)
     }
 
-    public var content: ElementContent {
-        struct Measurer {
-            private static let prototypeLabel = LabelView()
+    // MARK: Element
 
-            func measure(model: AttributedLabel, in constraint: SizeConstraint, environment: Environment) -> CGSize {
-                let label = Self.prototypeLabel
-                label.update(model: model, environment: environment, isMeasuring: true)
-                return label.sizeThatFits(constraint.maximum)
-            }
+    var displayableAttributedText: NSAttributedString {
+        if needsTextNormalization {
+            return attributedText.normalizingForView(with: numberOfLines)
+        } else {
+            return attributedText
         }
+    }
 
-        return ElementContent { sizeConstraint, environment -> CGSize in
-            Measurer().measure(model: self, in: sizeConstraint, environment: environment)
+    @_spi(BlueprintAttributedLabel)
+    public var needsTextNormalization: Bool = true
+
+    private static let prototypeLabel = LabelView()
+
+    public var content: ElementContent {
+
+        let text = displayableAttributedText
+
+        return ElementContent { constraint, environment -> CGSize in
+            let label = Self.prototypeLabel
+            label.update(model: self, text: text, environment: environment, isMeasuring: true)
+            return label.sizeThatFits(constraint.maximum)
         }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        LabelView.describe { config in
+
+        let text = displayableAttributedText
+
+        return LabelView.describe { config in
             config.frameRoundingBehavior = .prioritizeSize
             config.apply { view in
-                view.update(model: self, environment: context.environment, isMeasuring: false)
+                view.update(model: self, text: text, environment: context.environment, isMeasuring: false)
             }
         }
     }
@@ -210,16 +223,14 @@ extension AttributedLabel {
 
         var urlHandler: URLHandler?
 
-        func update(model: AttributedLabel, environment: Environment, isMeasuring: Bool) {
-            let previousAttributedText = attributedText
+        func update(model: AttributedLabel, text: NSAttributedString, environment: Environment, isMeasuring: Bool) {
+            let previousAttributedText = isMeasuring ? nil : attributedText
 
             linkAttributes = model.linkAttributes
             activeLinkAttributes = model.activeLinkAttributes
             linkDetectionTypes = model.linkDetectionTypes ?? []
 
-            attributedText = model
-                .attributedText
-                .normalizingForView(with: model.numberOfLines)
+            attributedText = text
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
@@ -256,9 +267,8 @@ extension AttributedLabel {
                     layer.shouldRasterize = false
                 }
 
+                applyLinkColors()
             }
-
-            applyLinkColors()
         }
 
         private func updateFontFitting(with model: AttributedLabel) {
@@ -638,6 +648,36 @@ extension NSLineBreakMode {
 }
 
 extension NSAttributedString {
+
+    fileprivate static let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
+    fileprivate static let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
+
+    @_spi(BlueprintAttributedLabel)
+    public static func needsNormalizingForView(hasLinks: Bool, lineLimit: Int?, lineBreaks: NSLineBreakMode) -> Bool {
+        if hasLinks {
+            return true
+        }
+
+        let lines = lineLimit ?? 0
+
+        // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
+        // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
+        // only the last line with that mode. Normalize them to truncating tail instead.
+        if lines != 1 && Self.invalidMultiLineModes.contains(lineBreaks) {
+            return true
+        }
+
+        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
+        // Normalize them to clipping mode instead (which renders the same on one line anyway).
+        if lines == 1 && Self.invalidSingleLineModes.contains(lineBreaks) {
+            return true
+        }
+
+        return false
+    }
+}
+
+extension NSAttributedString {
     fileprivate var entireRange: NSRange {
         NSRange(location: 0, length: length)
     }
@@ -661,19 +701,17 @@ extension NSAttributedString {
         }
 
         if let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
-            let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
-            let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
             // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
             // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
             // only the last line with that mode. Normalize them to truncating tail instead.
-            if numberOfLines != 1 && invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
+            if numberOfLines != 1 && Self.invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
                 paragraphStyle.lineBreakMode = .byTruncatingTail
             }
 
             // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
             // Normalize them to clipping mode instead (which renders the same on one line anyway).
-            if numberOfLines == 1 && invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
+            if numberOfLines == 1 && Self.invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
                 paragraphStyle.lineBreakMode = .byClipping
             }
 

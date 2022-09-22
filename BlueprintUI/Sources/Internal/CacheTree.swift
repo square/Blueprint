@@ -12,11 +12,15 @@ protocol CacheTree: AnyObject {
     /// A reference to use for logging
     var signpostRef: AnyObject { get }
 
+    /// The `ElementContent` for the represented element. This should be cached
+    /// once during the layout cycle, to avoid calling `content` multiple times.
+    var content: ElementContent { get }
+
     /// The sizes that are contained in this cache, keyed by size constraint.
     subscript(constraint: SizeConstraint) -> CGSize? { get set }
 
     /// Gets a subcache identified by the given key, or creates a new one.
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree
+    func subcache(key: SubcacheKey, content: () -> ElementContent, name: @autoclosure () -> String) -> CacheTree
 }
 
 extension CacheTree {
@@ -34,6 +38,7 @@ extension CacheTree {
     func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
         subcache(
             key: index,
+            content: { element.content },
             name: childCount == 1
                 ? "\(name).\(type(of: element))"
                 : "\(name)[\(index)].\(type(of: element))"

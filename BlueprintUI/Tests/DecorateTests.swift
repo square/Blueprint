@@ -22,9 +22,12 @@ class Decorate_Position_Tests: XCTestCase {
 
         let layout = decorate
             .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-            .children[0].node // Decorate
-            .children[0].node // LayoutWriter
-            .children // LayoutWriter.Content
+            .children[0].node
+            .children[0].node
+            .children[0].node
+            .children[0].node
+            .children[0].node
+            .children
             .map { $0.node }
 
         XCTAssertEqual(layout.count, 2)

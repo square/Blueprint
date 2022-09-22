@@ -93,7 +93,8 @@ class ElementContentTests: XCTestCase {
                     builder.add(element: MeasureCountingSpacer(size: size, counts: counts))
                 }
             }
-            let cache = TestCache(name: "test")
+
+            let cache = TestCache(name: "test", content: container)
 
             _ = container
                 .performLayout(
@@ -181,7 +182,7 @@ class ElementContentTests: XCTestCase {
         _ = layout.performLayout(
             attributes: .init(size: size),
             environment: .empty,
-            cache: TestCache(name: "test")
+            cache: TestCache(name: "test", content: layout)
         )
 
         XCTAssertEqual(callCount, 2)
@@ -309,11 +310,14 @@ private class TestCache: CacheTree {
     var name: String
     var signpostRef: AnyObject { self }
 
+    var content: ElementContent
+
     var measurements: [SizeConstraint: CGSize] = [:]
     var subcaches: [SubcacheKey: TestCache] = [:]
 
-    init(name: String) {
+    init(name: String, content: ElementContent) {
         self.name = name
+        self.content = content
     }
 
     subscript(constraint: SizeConstraint) -> CGSize? {
@@ -321,11 +325,11 @@ private class TestCache: CacheTree {
         set { measurements[constraint] = newValue }
     }
 
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
+    func subcache(key: SubcacheKey, content: @autoclosure () -> ElementContent, name: @autoclosure () -> String) -> CacheTree {
         if let subcache = subcaches[key] {
             return subcache
         }
-        let subcache = TestCache(name: "\(self.name).\(name())")
+        let subcache = TestCache(name: "\(self.name).\(name())", content: content())
         subcaches[key] = subcache
         return subcache
     }

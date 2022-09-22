@@ -6,9 +6,12 @@ final class FakeCache: CacheTree {
     var name: String
     var signpostRef: AnyObject
 
-    init(name: String, signpostRef: AnyObject) {
+    var content: ElementContent
+
+    init(name: String, content: ElementContent, signpostRef: AnyObject) {
         self.name = name
         self.signpostRef = signpostRef
+        self.content = content
     }
 
     subscript(constraint: SizeConstraint) -> CGSize? {
@@ -16,7 +19,7 @@ final class FakeCache: CacheTree {
         set {}
     }
 
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        FakeCache(name: name(), signpostRef: signpostRef)
+    func subcache(key: SubcacheKey, content: @autoclosure () -> ElementContent, name: @autoclosure () -> String) -> CacheTree {
+        FakeCache(name: name(), content: content(), signpostRef: signpostRef)
     }
 }

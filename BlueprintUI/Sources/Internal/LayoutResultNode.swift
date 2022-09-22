@@ -46,12 +46,13 @@ struct LayoutResultNode {
     }
 
     init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+        let cache = CacheFactory.makeCache(name: "\(type(of: root))", content: { root.content })
+
         self.init(
             element: root,
             layoutAttributes: layoutAttributes,
             environment: environment,
-            children: root.content.performLayout(
+            children: cache.content.performLayout(
                 attributes: layoutAttributes,
                 environment: environment,
                 cache: cache
