@@ -96,27 +96,33 @@ public struct AttributedLabel: Element, Hashable {
         configure(&self)
     }
 
+    // MARK: Element
+
+    var displayableAttributedText: NSAttributedString {
+        attributedText.normalizingForView(with: numberOfLines)
+    }
+
+    private static let prototypeLabel = LabelView()
+
     public var content: ElementContent {
-        struct Measurer {
-            private static let prototypeLabel = LabelView()
 
-            func measure(model: AttributedLabel, in constraint: SizeConstraint, environment: Environment) -> CGSize {
-                let label = Self.prototypeLabel
-                label.update(model: model, environment: environment, isMeasuring: true)
-                return label.sizeThatFits(constraint.maximum)
-            }
-        }
+        let text = displayableAttributedText
 
-        return ElementContent { sizeConstraint, environment -> CGSize in
-            Measurer().measure(model: self, in: sizeConstraint, environment: environment)
+        return ElementContent { constraint, environment -> CGSize in
+            let label = Self.prototypeLabel
+            label.update(model: self, text: text, environment: environment, isMeasuring: true)
+            return label.sizeThatFits(constraint.maximum)
         }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        LabelView.describe { config in
+
+        let text = displayableAttributedText
+
+        return LabelView.describe { config in
             config.frameRoundingBehavior = .prioritizeSize
             config.apply { view in
-                view.update(model: self, environment: context.environment, isMeasuring: false)
+                view.update(model: self, text: text, environment: context.environment, isMeasuring: false)
             }
         }
     }
@@ -210,16 +216,14 @@ extension AttributedLabel {
 
         var urlHandler: URLHandler?
 
-        func update(model: AttributedLabel, environment: Environment, isMeasuring: Bool) {
+        func update(model: AttributedLabel, text: NSAttributedString, environment: Environment, isMeasuring: Bool) {
             let previousAttributedText = attributedText
 
             linkAttributes = model.linkAttributes
             activeLinkAttributes = model.activeLinkAttributes
             linkDetectionTypes = model.linkDetectionTypes ?? []
 
-            attributedText = model
-                .attributedText
-                .normalizingForView(with: model.numberOfLines)
+            attributedText = text
 
             numberOfLines = model.numberOfLines
             textRectOffset = model.textRectOffset
@@ -256,9 +260,8 @@ extension AttributedLabel {
                     layer.shouldRasterize = false
                 }
 
+                applyLinkColors()
             }
-
-            applyLinkColors()
         }
 
         private func updateFontFitting(with model: AttributedLabel) {
@@ -640,6 +643,11 @@ extension NSLineBreakMode {
 extension NSAttributedString {
     fileprivate var entireRange: NSRange {
         NSRange(location: 0, length: length)
+    }
+
+    @_spi(BlueprintAttributedLabel)
+    public func needsNormalizingForView() -> Bool {
+        fatalError()
     }
 
     fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {

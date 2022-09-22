@@ -24,7 +24,18 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
+    }
+
+    func test_simple() {
+        let element = Row(alignment: .fill) {
+            Label(text: "This is a label").stackLayoutChild(priority: .flexible)
+        }
+
+        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
+
+        view.element = element
+        view.layoutIfNeeded()
     }
 
     func test_repeated_layouts() {
@@ -36,7 +47,10 @@ class PerformancePlayground: XCTestCase {
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
 
-        determineAverage(for: 10.0) {
+        view.element = element
+        view.layoutIfNeeded()
+
+        determineAverage(for: 5.0) {
             view.element = element
             view.layoutIfNeeded()
         }

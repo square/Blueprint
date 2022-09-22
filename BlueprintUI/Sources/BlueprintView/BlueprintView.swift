@@ -214,7 +214,7 @@ public final class BlueprintView: UIView {
         let measurement = element.content.measure(
             in: constraint,
             environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: cacheName)
+            cache: CacheFactory.makeCache(name: cacheName, content: { element.content })
         )
 
         sizesThatFit[constraint] = measurement

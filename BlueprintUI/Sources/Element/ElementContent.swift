@@ -17,10 +17,7 @@ public struct ElementContent {
         layout: LayoutType,
         configure: (inout Builder<LayoutType>) -> Void = { _ in }
     ) {
-        var builder = Builder(layout: layout)
-        configure(&builder)
-
-        storage = builder
+        storage = Builder(layout: layout, configure: configure)
     }
 
     // MARK: Measurement & Children
@@ -34,7 +31,7 @@ public struct ElementContent {
         measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent")
+            cache: CacheFactory.makeCache(name: "ElementContent", content: { self })
         )
     }
 
@@ -212,8 +209,10 @@ extension ElementContent {
         /// Child elements.
         fileprivate var children: [Child] = []
 
-        init(layout: LayoutType) {
+        init(layout: LayoutType, configure: (inout Self) -> Void) {
             self.layout = layout
+
+            configure(&self)
         }
 
         /// Adds the given child element.
@@ -222,14 +221,13 @@ extension ElementContent {
             key: AnyHashable? = nil,
             element: Element
         ) {
-            let child = Child(
-                traits: traits,
-                key: key,
-                content: element.content,
-                element: element
+            children.append(
+                Child(
+                    traits: traits,
+                    key: key,
+                    element: element
+                )
             )
-
-            children.append(child)
         }
 
         // MARK: ContentStorage
@@ -286,7 +284,7 @@ extension ElementContent {
                     element: currentChild.element,
                     layoutAttributes: currentChildLayoutAttributes,
                     environment: environment,
-                    children: currentChild.content.performLayout(
+                    children: currentChildCache.content.performLayout(
                         attributes: currentChildLayoutAttributes,
                         environment: environment,
                         cache: currentChildCache
@@ -315,14 +313,14 @@ extension ElementContent {
             /// keep track of the index ourselves.
 
             children.indexedMap { index, child in
-                let childContent = child.content
+
                 let childCache = cache.subcache(
                     index: index,
                     of: children.count,
                     element: child.element
                 )
                 let measurable = Measurer { constraint -> CGSize in
-                    childContent.measure(
+                    childCache.content.measure(
                         in: constraint,
                         environment: environment,
                         cache: childCache
@@ -337,9 +335,7 @@ extension ElementContent {
 
             var traits: LayoutType.Traits
             var key: AnyHashable?
-            var content: ElementContent
             var element: Element
-
         }
     }
 }
@@ -370,7 +366,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performLayout(
+            children: cache.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -383,7 +379,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
             let environment = adapted(environment: environment)
-            return child.content.measure(
+            return cache.content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -419,7 +415,7 @@ private struct LazyStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performLayout(
+            children: cache.content.performLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -432,7 +428,7 @@ private struct LazyStorage: ContentStorage {
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
-            return child.content.measure(
+            return cache.content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -484,13 +480,16 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
     func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
         precondition(items.count == 1)
-        return wrapped.measure(in: constraint, child: items.map { $0.content }.first!)
+        // TODO: Is this the right content? Is it the cache?
+        return wrapped.measure(in: constraint, child: items[0].content)
     }
 
     func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
         precondition(items.count == 1)
+
+        // TODO: Is this the right content? Is it the cache?
         return [
-            wrapped.layout(size: size, child: items.map { $0.content }.first!),
+            wrapped.layout(size: size, child: items[0].content),
         ]
     }
 }
