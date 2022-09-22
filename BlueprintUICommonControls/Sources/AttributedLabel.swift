@@ -99,8 +99,15 @@ public struct AttributedLabel: Element, Hashable {
     // MARK: Element
 
     var displayableAttributedText: NSAttributedString {
-        attributedText.normalizingForView(with: numberOfLines)
+        if needsTextNormalization {
+            return attributedText.normalizingForView(with: numberOfLines)
+        } else {
+            return attributedText
+        }
     }
+
+    @_spi(BlueprintAttributedLabel)
+    public var needsTextNormalization: Bool = true
 
     private static let prototypeLabel = LabelView()
 
@@ -641,13 +648,38 @@ extension NSLineBreakMode {
 }
 
 extension NSAttributedString {
-    fileprivate var entireRange: NSRange {
-        NSRange(location: 0, length: length)
-    }
+
+    fileprivate static let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
+    fileprivate static let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
     @_spi(BlueprintAttributedLabel)
-    public func needsNormalizingForView() -> Bool {
-        fatalError()
+    public static func needsNormalizingForView(hasLinks: Bool, lineLimit: Int?, lineBreaks: NSLineBreakMode) -> Bool {
+        if hasLinks {
+            return true
+        }
+
+        let lines = lineLimit ?? 0
+
+        // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
+        // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
+        // only the last line with that mode. Normalize them to truncating tail instead.
+        if lines != 1 && Self.invalidMultiLineModes.contains(lineBreaks) {
+            return true
+        }
+
+        // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
+        // Normalize them to clipping mode instead (which renders the same on one line anyway).
+        if lines == 1 && Self.invalidSingleLineModes.contains(lineBreaks) {
+            return true
+        }
+
+        return false
+    }
+}
+
+extension NSAttributedString {
+    fileprivate var entireRange: NSRange {
+        NSRange(location: 0, length: length)
     }
 
     fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {
@@ -669,19 +701,17 @@ extension NSAttributedString {
         }
 
         if let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
-            let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
-            let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
             // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
             // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
             // only the last line with that mode. Normalize them to truncating tail instead.
-            if numberOfLines != 1 && invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
+            if numberOfLines != 1 && Self.invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
                 paragraphStyle.lineBreakMode = .byTruncatingTail
             }
 
             // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
             // Normalize them to clipping mode instead (which renders the same on one line anyway).
-            if numberOfLines == 1 && invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
+            if numberOfLines == 1 && Self.invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
                 paragraphStyle.lineBreakMode = .byClipping
             }
 

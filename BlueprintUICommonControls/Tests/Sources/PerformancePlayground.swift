@@ -133,15 +133,17 @@ class PerformancePlayground: XCTestCase {
 
         var iterations: Int = 0
 
+        var lastUpdateDate = Date()
+
         repeat {
-            let iterationStart = Date()
             block()
-            let iterationEnd = Date()
-            let duration = iterationEnd.timeIntervalSince(iterationStart)
 
             iterations += 1
 
-            print("Iteration: \(iterations), Duration : \(duration)")
+            if Date().timeIntervalSince(lastUpdateDate) >= 1 {
+                lastUpdateDate = Date()
+                print("Continuing Test: \(iterations) Iterations...")
+            }
 
         } while Date() < start + seconds
 
