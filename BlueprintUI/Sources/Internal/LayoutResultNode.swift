@@ -17,6 +17,10 @@ extension Element {
         )
     }
 
+    func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
+        // TODO: switch on layoutMode
+        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+    }
 }
 
 /// Represents a tree of elements with complete layout attributes

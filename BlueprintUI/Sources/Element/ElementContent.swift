@@ -34,11 +34,22 @@ public struct ElementContent {
         measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent")
+            cache: CacheFactory.makeCache(name: "ElementContent"),
+            layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
         )
     }
 
-    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree,
+        layoutMode: LayoutMode
+    ) -> CGSize {
+        // TODO: switch on layoutMode
+        storage.measure(in: constraint, environment: environment, cache: cache)
+    }
+
+    fileprivate func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         storage.measure(in: constraint, environment: environment, cache: cache)
     }
 

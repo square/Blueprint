@@ -99,6 +99,16 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
+    
+    /// An optional explicit layout mode for this view. If `nil`, this view will inherit the layout
+    /// mode of its nearest ancestor, or use ``LayoutMode/default``.
+    public var layoutMode: LayoutMode? {
+        didSet {
+            if layoutMode != oldValue {
+                setNeedsViewHierarchyUpdate()
+            }
+        }
+    }
 
     /// An optional name to help identify this view
     public var name: String?
@@ -211,11 +221,18 @@ public final class BlueprintView: UIView {
         )
         defer { Logger.logSizeThatFitsEnd(view: self) }
 
-        let measurement = element.content.measure(
-            in: constraint,
-            environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: cacheName)
-        )
+        let environment = makeEnvironment()
+        let layoutMode = environment.layoutMode
+        let renderContext = RenderContext(layoutMode: layoutMode)
+        
+        let measurement = renderContext.perform {
+            element.content.measure(
+                in: constraint,
+                environment: environment,
+                cache: CacheFactory.makeCache(name: cacheName),
+                layoutMode: layoutMode
+            )
+        }
 
         sizesThatFit[constraint] = measurement
 
@@ -338,11 +355,16 @@ public final class BlueprintView: UIView {
             origin: .zero,
             size: bounds.size + rootCorrection.size
         )
+        
+        let layoutMode = environment.layoutMode
+        let renderContext = RenderContext(layoutMode: layoutMode)
 
         /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
-            .resolve() ?? []
+        let viewNodes = renderContext.perform {
+            element?
+                .layout(frame: rootFrame, environment: environment, layoutMode: layoutMode)
+                .resolve() ?? []
+        }
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -427,6 +449,10 @@ public final class BlueprintView: UIView {
 
         if let window = window {
             environment.windowSize = window.bounds.size
+        }
+        
+        if let layoutMode = self.layoutMode ?? RenderContext.current?.layoutMode {
+            environment.layoutMode = layoutMode
         }
 
         return environment
