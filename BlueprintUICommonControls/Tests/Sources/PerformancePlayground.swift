@@ -27,17 +27,6 @@ class PerformancePlayground: XCTestCase {
         super.invokeTest()
     }
 
-    func test_simple() {
-        let element = Row(alignment: .fill) {
-            Label(text: "This is a label").stackLayoutChild(priority: .flexible)
-        }
-
-        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
-
-        view.element = element
-        view.layoutIfNeeded()
-    }
-
     func test_repeated_layouts() {
         let element = Column(alignment: .fill) {
 
@@ -175,3 +164,4 @@ private struct NonCachingLabel: UIViewElement {
         view.text = text
     }
 }
+

@@ -78,7 +78,7 @@ public struct AttributedLabel: Element, Hashable {
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     /// A set of data types to detect and automatically link in the label.
-    public var linkDetectionTypes: Set<LinkDetectionType>?
+    public var linkDetectionTypes: Set<LinkDetectionType> = []
 
     /// A set of attributes to apply to links in the string.
     public var linkAttributes: [NSAttributedString.Key: AnyHashable] = [
@@ -98,8 +98,9 @@ public struct AttributedLabel: Element, Hashable {
 
     // MARK: Element
 
+    /// The text to pass to the underlying `UILabel`, normalized for display if necessary.
     var displayableAttributedText: NSAttributedString {
-        if needsTextNormalization {
+        if needsTextNormalization || linkDetectionTypes.isEmpty == false {
             return attributedText.normalizingForView(with: numberOfLines)
         } else {
             return attributedText
@@ -107,12 +108,16 @@ public struct AttributedLabel: Element, Hashable {
     }
 
     @_spi(BlueprintAttributedLabel)
+    /// Set this if you can guarantee that your label implementation will not need string normalization.
+    /// For example, a custom label type wrapping `AttributedLabel` may set this to `false`.
+    /// You can check if this value should be false via `NSAttributedString.needsNormalizingForView(...)`
     public var needsTextNormalization: Bool = true
 
     private static let prototypeLabel = LabelView()
 
     public var content: ElementContent {
 
+        // We create this outside of the measurement block so it's called fewer times.
         let text = displayableAttributedText
 
         return ElementContent { constraint, environment -> CGSize in
@@ -124,6 +129,7 @@ public struct AttributedLabel: Element, Hashable {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 
+        // We create this outside of the application block so it's called fewer times.
         let text = displayableAttributedText
 
         return LabelView.describe { config in
@@ -228,7 +234,7 @@ extension AttributedLabel {
 
             linkAttributes = model.linkAttributes
             activeLinkAttributes = model.activeLinkAttributes
-            linkDetectionTypes = model.linkDetectionTypes ?? []
+            linkDetectionTypes = model.linkDetectionTypes
 
             attributedText = text
 
@@ -647,12 +653,15 @@ extension NSLineBreakMode {
     }
 }
 
+
 extension NSAttributedString {
 
     fileprivate static let invalidMultiLineModes: Set<NSLineBreakMode> = [.byTruncatingHead, .byTruncatingMiddle]
     fileprivate static let invalidSingleLineModes: Set<NSLineBreakMode> = [.byCharWrapping, .byWordWrapping]
 
     @_spi(BlueprintAttributedLabel)
+    /// Call this method to set `needsTextNormalization`, as an optimization in your custom label implementation
+    /// to avoid expensive string normalization calls if you can guarantee that normalization is not needed.
     public static func needsNormalizingForView(hasLinks: Bool, lineLimit: Int?, lineBreaks: NSLineBreakMode) -> Bool {
         if hasLinks {
             return true
@@ -675,9 +684,7 @@ extension NSAttributedString {
 
         return false
     }
-}
 
-extension NSAttributedString {
     fileprivate var entireRange: NSRange {
         NSRange(location: 0, length: length)
     }
@@ -733,3 +740,4 @@ extension NSTextCheckingResult.CheckingType {
         self = checkingType
     }
 }
+

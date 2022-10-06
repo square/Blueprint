@@ -91,7 +91,7 @@ public struct Label: ProxyElement {
     }
 
     public var elementRepresentation: Element {
-        var label = AttributedLabel(attributedText: attributedText) { label in
+        AttributedLabel(attributedText: attributedText) { label in
             label.numberOfLines = numberOfLines
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
@@ -113,15 +113,13 @@ public struct Label: ProxyElement {
                 // do nothing, use default behavior
                 break
             }
+
+            label.needsTextNormalization = NSAttributedString.needsNormalizingForView(
+                hasLinks: false,
+                lineLimit: numberOfLines,
+                lineBreaks: lineBreakMode
+            )
         }
-
-        label.needsTextNormalization = NSAttributedString.needsNormalizingForView(
-            hasLinks: false,
-            lineLimit: numberOfLines,
-            lineBreaks: lineBreakMode
-        )
-
-        return label
     }
 }
 
