@@ -57,6 +57,29 @@ public struct ElementContent {
     }
 }
 
+extension ElementContent {
+
+    // MARK: Measurement & Children
+    /// Measures the required size of this element's content.
+    /// - Parameters:
+    ///   - constraint: The size constraint.
+    ///   - environment: The environment to measure in.
+    /// - returns: The layout size needed by this content.
+    public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
+        MeasurementElement(content: self).detachedMeasure(in: constraint, with: environment)
+    }
+
+    private struct MeasurementElement: Element {
+
+        var content: ElementContent
+
+        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+            nil
+        }
+
+    }
+}
+
 
 extension Element {
 
