@@ -1,7 +1,7 @@
 import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
-public protocol SingleChildLayout {
+public protocol SingleChildLayout: SPSingleChildLayout {
 
     /// Computes the size that this layout requires
     ///
@@ -21,3 +21,21 @@ public protocol SingleChildLayout {
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes
 
 }
+
+public protocol SPSingleChildLayout {
+    
+    func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize
+    
+    func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview)
+}
+
+extension SingleChildLayout {
+    public func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+        fatalError()
+    }
+    
+    public func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+        fatalError()
+    }
+}
+

@@ -56,8 +56,13 @@ final class RootViewController: UIViewController {
 
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
-
+    
     var contents: Element {
+        Box(backgroundColor: .red)
+            .inset(horizontal: 70, vertical: 20)
+    }
+
+    var contents2: Element {
         Column { column in
             column.minimumVerticalSpacing = 20.0
             column.horizontalAlignment = .leading

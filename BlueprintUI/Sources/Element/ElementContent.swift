@@ -68,6 +68,14 @@ public struct ElementContent {
             cache: cache
         )
     }
+    
+    func performSinglePassLayout(
+        // TODO: Support special layout attributes type that allows unspecified dimensions?
+        attributes: LayoutAttributes,
+        environment: Environment
+    ) -> [IdentifiedNode] {
+        storage.performSinglePassLayout(attributes: attributes, environment: environment)
+    }
 }
 
 extension ElementContent {
@@ -195,7 +203,7 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage {
+fileprivate protocol ContentStorage: SPContentStorage {
     var childCount: Int { get }
 
     func measure(
@@ -209,6 +217,34 @@ fileprivate protocol ContentStorage {
         environment: Environment,
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+}
+
+extension ContentStorage {
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+        fatalError("\(type(of: self)) has not implemented single pass layout")
+    }
+    func performSinglePassLayout(
+        attributes: LayoutAttributes,
+        environment: Environment
+    ) -> [IdentifiedNode] {
+        fatalError("\(type(of: self)) has not implemented single pass layout")
+    }
+}
+
+//struct SPNodeLayout {
+//    var identifier: ElementIdentifier
+//    var node: LayoutResultNode
+//}
+
+typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
+
+protocol SPContentStorage {
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
+    
+    func performSinglePassLayout(
+        attributes: LayoutAttributes,
+        environment: Environment
+    ) -> [IdentifiedNode]
 }
 
 
@@ -355,6 +391,66 @@ extension ElementContent {
     }
 }
 
+extension ElementContent: Sizable {
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+        storage.sizeThatFits(proposal: proposal, environment: environment)
+    }
+}
+
+extension ElementContent.Builder {
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+        let subviews = children.map { child in
+            LayoutSubview(sizable: child.content, environment: environment)
+        }
+        return self.layout.sizeThatFits(proposal: proposal, subviews: subviews)
+    }
+    
+    func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
+        
+        let proposal = ProposedViewSize(attributes.bounds.size)
+        let subviews = children.map { child in
+            LayoutSubview(sizable: child.content, environment: environment)
+        }
+
+        layout.placeSubviews(
+            in: attributes.frame,
+            proposal: proposal,
+            subviews: subviews
+        )
+        
+        let childAttributesCollection: [LayoutAttributes] = subviews.map { subview in
+            let placement = subview.placement
+                ?? .init(position: attributes.center, anchor: .center, proposal: proposal)
+            let size = subview.sizeThatFits(placement.proposal)
+            return LayoutAttributes(frame: .init(
+                origin: placement.origin(for: size),
+                size: size
+            ))
+        }
+        
+        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+
+        let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
+            let childAttributes = childAttributesCollection[index]
+            let identifier = identifierFactory.nextIdentifier(
+                for: type(of: child.element),
+                key: child.key
+            )
+
+            let node = LayoutResultNode(
+                element: child.element,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                children: child.content.performSinglePassLayout(
+                    attributes: childAttributes,
+                    environment: environment
+                )
+            )
+            return (identifier: identifier, node: node)
+        }
+        return identifiedNodes
+    }
+}
 
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
@@ -504,6 +600,16 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        precondition(subviews.count == 1)
+        return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0])
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+        precondition(subviews.count == 1)
+        return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
+    }
 }
 
 
@@ -518,6 +624,13 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
         LayoutAttributes(size: size)
     }
 
+    func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+        subview.sizeThatFits(proposal)
+    }
+    
+    func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+        subview.place(at: .zero, proposal: proposal)
+    }
 }
 
 

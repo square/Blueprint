@@ -18,8 +18,26 @@ extension Element {
     }
 
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
-        // TODO: switch on layoutMode
-        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        switch layoutMode {
+        case .standard:
+            return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        case .singlePass:
+            return singlePassLayout(attributes: LayoutAttributes(frame: frame), environment: environment)
+        }
+    }
+    
+    func singlePassLayout(attributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
+        let layouts = self.content.performSinglePassLayout(
+            attributes: attributes,
+            environment: environment
+        )
+        
+        return LayoutResultNode(
+            element: self,
+            layoutAttributes: attributes,
+            environment: environment,
+            children: layouts.map { (identifier: $0.identifier, node: $0.node) }
+        )
     }
 }
 

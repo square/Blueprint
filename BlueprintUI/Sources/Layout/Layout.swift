@@ -1,7 +1,7 @@
 import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
-public protocol Layout {
+public protocol Layout: SPLayout {
 
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()
@@ -31,6 +31,15 @@ public protocol Layout {
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
 
+}
+
+extension Layout {
+    public func sizeThatFits(proposal: ProposedViewSize, subviews: LayoutSubviews) -> CGSize {
+        fatalError("\(type(of: self)) has not implemented single pass layout")
+    }
+    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: LayoutSubviews) {
+        fatalError("\(type(of: self)) has not implemented single pass layout")
+    }
 }
 
 extension Layout where Traits == () {
