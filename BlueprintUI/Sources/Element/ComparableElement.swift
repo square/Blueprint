@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 /// An `ComparableElement` is an element which can cache its

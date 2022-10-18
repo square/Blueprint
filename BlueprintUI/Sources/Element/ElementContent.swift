@@ -337,7 +337,6 @@ extension ElementContent {
             let child = Child(
                 traits: traits,
                 key: key,
-                content: element.content,
                 element: element
             )
 
@@ -456,7 +455,6 @@ extension ElementContent {
 
             var traits: LayoutType.Traits
             var key: AnyHashable?
-            var content: ElementContent
             var element: Element
 
         }

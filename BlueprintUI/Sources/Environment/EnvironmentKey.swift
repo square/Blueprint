@@ -1,3 +1,5 @@
+import Foundation
+
 /// Types conforming to this protocol can be used as keys in an `Environment`.
 ///
 /// Using a type as the key allows us to strongly type each value, with the

@@ -1017,6 +1017,8 @@ extension StackLayout {
                 }
             }
 
+            // TODO: Finish fixing element content caching. Remove the unused property
+
             fileprivate var shrinkPriority: CGFloat {
                 switch self {
                 case .fixed: return 0
