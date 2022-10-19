@@ -9,15 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- When stacks lay out with more `fixed` magnitude than is available for layout, `flexible` items will no longer receive a negative width.
-
 ### Added
 
 ### Removed
 
 ### Changed
-
-- `StackElement` layouts have been optimized for the case of one fixed and one flexible element to improve performance. This also fixes issues as described in https://github.com/square/Blueprint/pull/265 in many cases.
 
 ### Deprecated
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.46.0]
+
+### Fixed
+
+- When stacks lay out with more `fixed` magnitude than is available for layout, `flexible` items will no longer receive a negative width.
+
+### Changed
+
+- `StackElement` layouts have been optimized for the case of one fixed and one flexible element to improve performance. This also fixes issues as described in https://github.com/square/Blueprint/pull/265 in many cases.
 
 ## [0.45.1]
 
@@ -895,7 +901,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.45.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.46.0...HEAD
+[0.46.0]: https://github.com/square/Blueprint/compare/0.45.1...0.46.0
 [0.45.1]: https://github.com/square/Blueprint/compare/0.45.0...0.45.1
 [0.45.0]: https://github.com/square/Blueprint/compare/0.44.1...0.45.0
 [0.44.1]: https://github.com/square/Blueprint/compare/0.44.0...0.44.1
