@@ -494,9 +494,9 @@ extension StackLayout {
             let fixedMagnitude: CGFloat = measurements.reduce(0) { magnitude, measurement in
                 magnitude + (measurement.size?.axis(on: axis) ?? 0)
             }
-            
+
             // From that, determine how much space the flexible items will have
-            
+
             let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
 
             if flexibleMagnitude > 0 {
