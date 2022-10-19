@@ -54,7 +54,7 @@ struct NativeViewNode {
     ///   - correction: The amount of rounding correction to apply to the origin before rounding, to account for the
     ///     rounding applied to this node's parent.
     ///   - scale: The screen scale to use when rounding.
-    mutating func round(from origin: CGPoint, correction: CGPoint, scale: CGFloat) {
+    mutating func round(from origin: CGPoint, correction: CGRect, scale: CGFloat) {
         // Per the docs for UIView.frame:
         // > If the transform property is not the identity transform, the value of this property is undefined
         // > and therefore should be ignored.
@@ -71,6 +71,9 @@ struct NativeViewNode {
         )
 
         let childOrigin = origin + layoutAttributes.frame.origin
+
+        environment.roundingCorrection = childCorrection
+        environment.roundingOrigin = childOrigin
 
         for i in children.indices {
             children[i].node.round(from: childOrigin, correction: childCorrection, scale: scale)

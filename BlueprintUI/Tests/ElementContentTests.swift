@@ -118,26 +118,17 @@ class ElementContentTests: XCTestCase {
 
             XCTAssertEqual(
                 cache.measurements,
-                [
-                    SizeConstraint(CGSize(width: 30, height: 40)): CGSize(width: 30, height: 40),
-                    SizeConstraint(containerSize): CGSize(width: 30, height: 40),
-                ]
+                [SizeConstraint(containerSize): CGSize(width: 30, height: 40)]
             )
 
             XCTAssertEqual(cache.subcaches.count, 2)
             XCTAssertEqual(
                 cache.subcaches[0]!.measurements,
-                [
-                    SizeConstraint(size1): size1,
-                    SizeConstraint(halfSize): size1,
-                ]
+                [SizeConstraint(halfSize): size1]
             )
             XCTAssertEqual(
                 cache.subcaches[1]!.measurements,
-                [
-                    SizeConstraint(size2): size2,
-                    SizeConstraint(halfSize): size2,
-                ]
+                [SizeConstraint(halfSize): size2]
             )
 
             XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
@@ -152,19 +143,13 @@ class ElementContentTests: XCTestCase {
 
             XCTAssertEqual(
                 cache.measurements,
-                [
-                    SizeConstraint(size1): size1,
-                    SizeConstraint(containerSize): size1,
-                ]
+                [SizeConstraint(containerSize): size1]
             )
 
             XCTAssertEqual(cache.subcaches.count, 1)
             XCTAssertEqual(
                 cache.subcaches[0]!.measurements,
-                [
-                    SizeConstraint(size1): size1,
-                    SizeConstraint(halfSize): size1,
-                ]
+                [SizeConstraint(halfSize): size1]
             )
 
             XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)

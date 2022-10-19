@@ -7,6 +7,9 @@ enum Logger {}
 /// BlueprintView signposts
 extension Logger {
     static func logLayoutStart(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -18,6 +21,9 @@ extension Logger {
     }
 
     static func logLayoutEnd(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .end,
             log: .active,
@@ -27,6 +33,9 @@ extension Logger {
     }
 
     static func logViewUpdateStart(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -38,6 +47,9 @@ extension Logger {
     }
 
     static func logViewUpdateEnd(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .end,
             log: .active,
@@ -47,6 +59,9 @@ extension Logger {
     }
 
     static func logElementAssigned(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
         os_signpost(
             .event,
             log: .active,
@@ -56,11 +71,41 @@ extension Logger {
             view.name ?? "BlueprintView"
         )
     }
+
+    static func logSizeThatFitsStart(
+        view: BlueprintView,
+        description: String
+    ) {
+        guard BlueprintLogging.isEnabled else { return }
+
+        os_signpost(
+            .begin,
+            log: .active,
+            name: "View Sizing",
+            signpostID: OSSignpostID(log: .active, object: view),
+            "%{public}s",
+            description
+        )
+    }
+
+    static func logSizeThatFitsEnd(view: BlueprintView) {
+        guard BlueprintLogging.isEnabled else { return }
+
+        os_signpost(
+            .end,
+            log: .active,
+            name: "View Sizing",
+            signpostID: OSSignpostID(log: .active, object: view)
+        )
+    }
 }
 
 /// Measuring signposts
 extension Logger {
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
+
+        guard shouldRecordMeasurePass() else { return }
+
         os_signpost(
             .begin,
             log: .active,
@@ -75,11 +120,21 @@ extension Logger {
     }
 
     static func logMeasureEnd(object: AnyObject) {
+
+        guard shouldRecordMeasurePass() else { return }
+
         os_signpost(
             .end,
             log: .active,
             name: "Measuring",
             signpostID: OSSignpostID(log: .active, object: object)
         )
+    }
+
+    // MARK: Utilities
+
+    private static func shouldRecordMeasurePass() -> Bool {
+        BlueprintLogging.isEnabled &&
+            BlueprintLogging.config.recordElementMeasures
     }
 }
