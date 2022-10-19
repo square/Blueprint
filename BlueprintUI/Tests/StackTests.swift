@@ -1176,9 +1176,159 @@ class StackTests: XCTestCase {
             ],
             expectedSizes: [
                 StackLayout.Vector(axis: 10, cross: 10),
-                StackLayout.Vector(axis: 20, cross: 50), // 2 x 5
-                StackLayout.Vector(axis: 60, cross: 20), // 6 x 2
+                StackLayout.Vector(axis: 27, cross: 50), // 2 x 5
+                StackLayout.Vector(axis: 53, cross: 20), // 6 x 2
                 StackLayout.Vector(axis: 10, cross: 10)
+            ]
+        )
+    }
+
+    func test_measurementCounts() {
+
+        struct MeasurementCounter: Element {
+
+            var size: Size
+
+            enum Size {
+                case fixed(CGSize)
+                case area(total: CGFloat)
+            }
+
+            var onMeasure: (SizeConstraint) -> Void
+
+            var content: ElementContent {
+                ElementContent { constraint in
+                    onMeasure(constraint)
+
+                    switch size {
+                    case .fixed(let size):
+                        return size
+
+                    case .area(let total):
+                        switch constraint.width {
+                        case .atMost(let max):
+                            let width = min(total, max)
+                            return CGSize(width: width, height: round(total / width))
+                        case .unconstrained:
+                            return CGSize(width: total, height: 1)
+                        }
+
+                    }
+                }
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        var fixed1 = [SizeConstraint]()
+        var fixed2 = [SizeConstraint]()
+        var fixed3 = [SizeConstraint]()
+        var flexible1 = [SizeConstraint]()
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly) {
+
+            MeasurementCounter(
+                size: .fixed(CGSize(width: 20, height: 30))
+            ) { size in
+                fixed1.append(size)
+            }
+            .stackLayoutChild(priority: .fixed)
+
+            MeasurementCounter(
+                size: .fixed(CGSize(width: 21, height: 30))
+            ) { size in
+                fixed2.append(size)
+            }
+            .stackLayoutChild(priority: .fixed)
+
+            Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly) {
+
+                MeasurementCounter(
+                    size: .fixed(CGSize(width: 22, height: 30))
+                ) { size in
+                    fixed3.append(size)
+                }
+                .stackLayoutChild(priority: .fixed)
+
+                MeasurementCounter(
+                    size: .area(total: 1000)
+                ) { size in
+                    flexible1.append(size)
+                }
+                .stackLayoutChild(priority: .flexible)
+            }
+            .stackLayoutChild(priority: .flexible)
+        }
+
+        _ = row.content.measure(in: SizeConstraint(CGSize(width: 100, height: 30)))
+
+        XCTAssertEqual(fixed1.count, 2)
+
+        XCTAssertEqual(
+            fixed1,
+            [
+                SizeConstraint(width: .atMost(100), height: .atMost(30)),
+                SizeConstraint(width: .atMost(20), height: .atMost(30)),
+            ]
+        )
+
+        XCTAssertEqual(fixed2.count, 2)
+
+        XCTAssertEqual(
+            fixed2,
+            [
+                SizeConstraint(width: .atMost(100), height: .atMost(30)),
+                SizeConstraint(width: .atMost(21), height: .atMost(30)),
+            ]
+        )
+
+        XCTAssertEqual(fixed3.count, 2)
+
+        XCTAssertEqual(
+            fixed3,
+            [
+                SizeConstraint(width: .atMost(59), height: .atMost(30)),
+                SizeConstraint(width: .atMost(22), height: .atMost(30)),
+            ]
+        )
+
+        XCTAssertEqual(flexible1.count, 1)
+
+        XCTAssertEqual(
+            flexible1,
+            [
+                SizeConstraint(width: .atMost(37), height: .atMost(30)),
+            ]
+        )
+
+    }
+
+    func test_fixed_elements_overflow_behavior() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly) {
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .fixed)
+
+            Spacer(width: 10, height: 10).stackLayoutChild(priority: .flexible)
+        }
+
+        let sizes = row
+            .layout(frame: CGRect(x: 0, y: 0, width: 20, height: 10))
+            .children
+            .map { child -> CGSize in
+                child.node.layoutAttributes.frame.size.rounded()
+            }
+
+        XCTAssertEqual(
+            sizes,
+            [
+                CGSize(width: 10, height: 10),
+                CGSize(width: 10, height: 10),
+                CGSize(width: 10, height: 10),
+                CGSize(width: -10, height: 10),
             ]
         )
     }

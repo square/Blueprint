@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `StackElement` layouts have been optimized for the case of one fixed and one flexible element to improve performance. This also fixes issues as described in https://github.com/square/Blueprint/pull/265 in many cases.
+
 ### Deprecated
 
 ### Security

@@ -270,6 +270,7 @@ public struct StackLayout: Layout {
 
 }
 
+
 extension StackLayout {
 
     /// The direction of the stack.
@@ -448,16 +449,83 @@ extension StackLayout {
         for items: [(traits: Traits, content: Measurable)],
         in vectorConstraint: VectorConstraint
     ) -> [Segment] {
-        let constraint = vectorConstraint.constraint(axis: axis)
 
-        /// The measured sizes of each item, constrained as if each were the only element in the stack.
-        let basisSizes = items.map { $0.content.measure(in: constraint).axis(on: axis) }
+        let minimumTotalSpacing = CGFloat(items.count - 1) * minimumSpacing
+
+        func basisSizes() -> [CGFloat] {
+            let constraint = vectorConstraint.constraint(axis: axis)
+
+            final class Measurement {
+
+                let item: (traits: Traits, content: Measurable)
+                var size: CGSize?
+
+                let isFixed: Bool
+
+                var isFlexible: Bool {
+                    isFixed == false
+                }
+
+                init(item: (traits: StackLayout.Traits, content: Measurable)) {
+                    self.item = item
+                    size = nil
+
+                    isFixed = item.traits.growPriority == 0 && item.traits.shrinkPriority == 0
+                }
+            }
+
+            let measurements: [Measurement] = items.map { item in
+                Measurement(item: item)
+            }
+
+            // Measure fixed items
+
+            measurements.forEach { measurement in
+                guard measurement.isFixed else { return }
+
+                measurement.size = measurement
+                    .item
+                    .content
+                    .measure(in: constraint)
+            }
+
+            // Determine how much space the fixed items took up
+
+            let fixedMagnitude: CGFloat = measurements.reduce(0) { magnitude, measurement in
+                magnitude + (measurement.size?.axis(on: axis) ?? 0)
+            }
+
+            // From that, determine how much space the flexible items will have
+
+            let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
+
+            let flexibleConstraint: SizeConstraint = {
+                switch axis {
+                case .horizontal:
+                    return .init(width: flexibleMagnitude, height: constraint.height)
+                case .vertical:
+                    return .init(width: constraint.width, height: flexibleMagnitude)
+                }
+            }()
+
+            // Measure the flexible items within that constraint
+
+            measurements.forEach { measurement in
+                guard measurement.isFlexible else { return }
+
+                measurement.size = measurement
+                    .item
+                    .content
+                    .measure(in: flexibleConstraint)
+            }
+
+            return measurements.map { $0.size!.axis(on: axis) }
+        }
+
+        let basisSizes = basisSizes()
 
         func unconstrainedAxisSize() -> CGFloat {
-            let totalMeasuredAxis: CGFloat = basisSizes.reduce(0.0, +)
-            let minimumTotalSpacing = CGFloat(items.count - 1) * minimumSpacing
-
-            return totalMeasuredAxis + minimumTotalSpacing
+            basisSizes.reduce(0.0, +) + minimumTotalSpacing
         }
 
         switch vectorConstraint.axis {

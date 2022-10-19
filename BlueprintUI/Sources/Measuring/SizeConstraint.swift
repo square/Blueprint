@@ -4,7 +4,7 @@ import UIKit
 ///
 /// Currently this constraint type can only handles layout where
 /// the primary (breaking) axis is horizontal (row in CSS-speak).
-public struct SizeConstraint: Hashable {
+public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     /// The width constraint.
     @UnconstrainedInfiniteAxis public var width: Axis
@@ -15,6 +15,12 @@ public struct SizeConstraint: Hashable {
     public init(width: Axis, height: Axis) {
         self.width = width
         self.height = height
+    }
+
+    // MARK: CustomDebugStringConvertible
+
+    public var debugDescription: String {
+        "<SizeConstraint: \(width.debugDescription) x \(height.debugDescription)>"
     }
 }
 
@@ -56,7 +62,7 @@ extension SizeConstraint {
 extension SizeConstraint {
 
     /// Represents a size constraint for a single axis.
-    public enum Axis: Hashable {
+    public enum Axis: Hashable, CustomDebugStringConvertible {
 
         /// The measurement should treat the associated value as the largest
         /// possible size in the given dimension.
@@ -174,6 +180,16 @@ extension SizeConstraint {
             lhs = lhs * rhs
         }
 
+        // MARK: CustomDebugStringConvertible
+
+        public var debugDescription: String {
+            switch self {
+            case .atMost(let max):
+                return "atMost(\(max))"
+            case .unconstrained:
+                return "unconstrained"
+            }
+        }
     }
 }
 
