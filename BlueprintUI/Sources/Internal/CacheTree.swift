@@ -28,14 +28,7 @@ extension CacheTree {
         } else {
             let size = calculation(constraint)
 
-            /// 1) Cache the measured size for the given constraint.
             self[constraint] = size
-
-            /// 2) Optimization: Cache the measured size, so if we ask for this
-            /// exact size later on, we don't re-measure the element.
-            ///
-            /// This avoids a cache miss later on when a layout lays out an item with a measured size.
-            self[SizeConstraint(size)] = size
 
             return size
         }

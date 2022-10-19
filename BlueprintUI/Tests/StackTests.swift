@@ -1262,34 +1262,35 @@ class StackTests: XCTestCase {
             .stackLayoutChild(priority: .flexible)
         }
 
-        BlueprintStackUpdates.isOptimizedLayoutEnabled = true
-
         _ = row.content.measure(in: SizeConstraint(CGSize(width: 100, height: 30)))
 
-        XCTAssertEqual(fixed1.count, 1)
+        XCTAssertEqual(fixed1.count, 2)
 
         XCTAssertEqual(
             fixed1,
             [
                 SizeConstraint(width: .atMost(100), height: .atMost(30)),
+                SizeConstraint(width: .atMost(20), height: .atMost(30)),
             ]
         )
 
-        XCTAssertEqual(fixed2.count, 1)
+        XCTAssertEqual(fixed2.count, 2)
 
         XCTAssertEqual(
             fixed2,
             [
                 SizeConstraint(width: .atMost(100), height: .atMost(30)),
+                SizeConstraint(width: .atMost(21), height: .atMost(30)),
             ]
         )
 
-        XCTAssertEqual(fixed3.count, 1)
+        XCTAssertEqual(fixed3.count, 2)
 
         XCTAssertEqual(
             fixed3,
             [
                 SizeConstraint(width: .atMost(59), height: .atMost(30)),
+                SizeConstraint(width: .atMost(22), height: .atMost(30)),
             ]
         )
 

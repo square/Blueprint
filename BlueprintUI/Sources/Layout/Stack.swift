@@ -270,11 +270,6 @@ public struct StackLayout: Layout {
 
 }
 
-/// Temporary. Allows testing stack layout optimizations to compare performance.
-enum BlueprintStackUpdates {
-
-    static var isOptimizedLayoutEnabled: Bool = true
-}
 
 extension StackLayout {
 
@@ -460,84 +455,82 @@ extension StackLayout {
         func basisSizes() -> [CGFloat] {
             let constraint = vectorConstraint.constraint(axis: axis)
 
-            if BlueprintStackUpdates.isOptimizedLayoutEnabled {
-                final class Measurement {
+            final class Measurement {
 
-                    let item: (traits: Traits, content: Measurable)
-                    var size: CGSize?
+                let item: (traits: Traits, content: Measurable)
+                var size: CGSize?
 
-                    let isFixed: Bool
+                let isFixed: Bool
 
-                    var isFlexible: Bool {
-                        isFixed == false
-                    }
-
-                    init(item: (traits: StackLayout.Traits, content: Measurable)) {
-                        self.item = item
-                        size = nil
-
-                        isFixed = item.traits.growPriority == 0 && item.traits.shrinkPriority == 0
-                    }
+                var isFlexible: Bool {
+                    isFixed == false
                 }
 
-                let measurements: [Measurement] = items.map { item in
-                    Measurement(item: item)
+                init(item: (traits: StackLayout.Traits, content: Measurable)) {
+                    self.item = item
+                    size = nil
+
+                    isFixed = item.traits.growPriority == 0 && item.traits.shrinkPriority == 0
                 }
-
-                // Measure fixed items
-
-                measurements.forEach { measurement in
-                    guard measurement.isFixed else { return }
-
-                    measurement.size = measurement
-                        .item
-                        .content
-                        .measure(in: constraint)
-                }
-
-                // Determine how much space the fixed items took up
-
-                let fixedMagnitude: CGFloat = measurements.reduce(0) { magnitude, measurement in
-                    magnitude + (measurement.size?.axis(on: axis) ?? 0)
-                }
-
-                // From that, determine how much space the flexible items will have
-
-                let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
-
-                let flexibleConstraint: SizeConstraint = {
-                    switch axis {
-                    case .horizontal:
-                        return .init(width: flexibleMagnitude, height: constraint.height)
-                    case .vertical:
-                        return .init(width: constraint.width, height: flexibleMagnitude)
-                    }
-                }()
-
-                // Measure the flexible items within that constraint
-
-                measurements.forEach { measurement in
-                    guard measurement.isFlexible else { return }
-
-                    measurement.size = measurement
-                        .item
-                        .content
-                        .measure(in: flexibleConstraint)
-                }
-
-                return measurements.map { $0.size!.axis(on: axis) }
-            } else {
-                return items.map { $0.content.measure(in: constraint).axis(on: axis) }
             }
+
+            let measurements: [Measurement] = items.map { item in
+                Measurement(item: item)
+            }
+
+            // Measure fixed items
+
+            measurements.forEach { measurement in
+                guard measurement.isFixed else { return }
+
+                measurement.size = measurement
+                    .item
+                    .content
+                    .measure(in: constraint)
+            }
+
+            // Determine how much space the fixed items took up
+
+            let fixedMagnitude: CGFloat = measurements.reduce(0) { magnitude, measurement in
+                magnitude + (measurement.size?.axis(on: axis) ?? 0)
+            }
+
+            // From that, determine how much space the flexible items will have
+
+            let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
+
+            let flexibleConstraint: SizeConstraint = {
+                switch axis {
+                case .horizontal:
+                    return .init(width: flexibleMagnitude, height: constraint.height)
+                case .vertical:
+                    return .init(width: constraint.width, height: flexibleMagnitude)
+                }
+            }()
+
+            // Measure the flexible items within that constraint
+
+            measurements.forEach { measurement in
+                guard measurement.isFlexible else { return }
+
+                measurement.size = measurement
+                    .item
+                    .content
+                    .measure(in: flexibleConstraint)
+            }
+
+            return measurements.map { $0.size!.axis(on: axis) }
         }
 
         let basisSizes = basisSizes()
 
-        let unconstrainedAxisSize: CGFloat = basisSizes.reduce(0.0, +) + minimumTotalSpacing
+        func unconstrainedAxisSize() -> CGFloat {
+            basisSizes.reduce(0.0, +) + minimumTotalSpacing
+        }
 
         switch vectorConstraint.axis {
         case .exactly(let axisSize):
-            if unconstrainedAxisSize >= axisSize {
+            if unconstrainedAxisSize() >= axisSize {
                 // Overflow: compress to axis constraint
                 return _layoutOverflow(
                     basisSizes: basisSizes,
@@ -554,7 +547,7 @@ extension StackLayout {
             }
 
         case .atMost(let axisMax):
-            if unconstrainedAxisSize >= axisMax {
+            if unconstrainedAxisSize() >= axisMax {
                 // Overflow: compress to axis constraint
                 return _layoutOverflow(
                     basisSizes: basisSizes,

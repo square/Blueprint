@@ -83,8 +83,6 @@ class PerformancePlayground: XCTestCase {
         let view = BlueprintView()
         view.frame.size = CGSize(width: 300.0, height: size.height)
 
-        BlueprintStackUpdates.isOptimizedLayoutEnabled = true
-
         view.element = content
         view.layoutIfNeeded()
     }
@@ -133,15 +131,6 @@ class PerformancePlayground: XCTestCase {
 
         let view = BlueprintView()
         view.frame.size = CGSize(width: 300.0, height: size.height)
-
-        BlueprintStackUpdates.isOptimizedLayoutEnabled = false
-
-        determineAverage(for: 2.0) {
-            view.element = allRows
-            view.layoutIfNeeded()
-        }
-
-        BlueprintStackUpdates.isOptimizedLayoutEnabled = true
 
         determineAverage(for: 2.0) {
             view.element = allRows
