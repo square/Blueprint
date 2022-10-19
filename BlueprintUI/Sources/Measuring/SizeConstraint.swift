@@ -156,6 +156,16 @@ extension SizeConstraint {
             }
         }
 
+        /// Checks if the axis is greater than zero.
+        public static func > (lhs: SizeConstraint.Axis, rhs: CGFloat) -> Bool {
+            switch lhs {
+            case .atMost(let limit):
+                return limit > 0
+            case .unconstrained:
+                return true
+            }
+        }
+
         /// Adds a scalar value to an Axis. If the Axis is unconstrained the
         /// result will remain unconstrained.
         public static func += (lhs: inout SizeConstraint.Axis, rhs: CGFloat) {
