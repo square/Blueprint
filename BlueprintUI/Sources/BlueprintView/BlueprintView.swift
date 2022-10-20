@@ -304,8 +304,13 @@ public final class BlueprintView: UIView {
     }
 
     public override func layoutSubviews() {
+        let start = DispatchTime.now()
         super.layoutSubviews()
         updateViewHierarchyIfNeeded()
+        let end = DispatchTime.now()
+        let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
+        let timeInterval = Double(nanoTime) / 1_000_000_000
+        NSLog("total time: \(timeInterval)")
     }
 
     public override func didMoveToWindow() {

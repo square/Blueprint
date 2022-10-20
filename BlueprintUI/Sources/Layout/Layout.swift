@@ -45,13 +45,16 @@ public final class LayoutItems<Traits> {
 
     public let all: [Item]
 
-    public let count: Int
-    public let isEmpty: Bool
+    public var count: Int {
+        all.count
+    }
+
+    public var isEmpty: Bool {
+        all.isEmpty
+    }
 
     init(with all: [Item]) {
         self.all = all
-        count = all.count
-        isEmpty = all.isEmpty
     }
 
     public struct Item {

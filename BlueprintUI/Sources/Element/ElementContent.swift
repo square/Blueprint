@@ -27,9 +27,28 @@ public struct ElementContent {
         self.storage = storage
     }
 
-    func measure(
+    public func measure(
         in constraint: SizeConstraint,
-        with environment: Environment,
+        environment: Environment
+    ) -> CGSize {
+        let element = Empty()
+        return measure(
+            in: constraint,
+            environment: environment,
+            states: .init(
+                parent: nil,
+                identifier: .init(element: element, key: nil, count: 0),
+                element: element,
+                depth: 0,
+                signpostRef: NSObject(),
+                name: "stub"
+            )
+        )
+    }
+
+    public func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
         states: ElementState
     ) -> CGSize {
         autoreleasepool {
@@ -83,7 +102,7 @@ extension Element {
 
             return self.content.measure(
                 in: constraint,
-                with: environment,
+                environment: environment,
                 states: root.root!
             )
         }
@@ -125,7 +144,7 @@ extension ElementContent {
 
 
             return childState.measure(in: constraint, with: environment) { environment in
-                childState.elementContent.measure(in: constraint, with: environment, states: childState)
+                childState.elementContent.measure(in: constraint, environment: environment, states: childState)
             }
         }
 
@@ -416,7 +435,7 @@ extension ElementContent {
                 let measurable = Measurer { constraint in
                     childState.elementContent.measure(
                         in: constraint,
-                        with: environment,
+                        environment: environment,
                         states: childState
                     )
                 }
@@ -493,7 +512,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
             return childState.elementContent.measure(
                 in: constraint,
-                with: environment,
+                environment: environment,
                 states: childState
             )
         }
@@ -530,7 +549,7 @@ private struct LazyStorage: ContentStorage {
 
             return childState.elementContent.measure(
                 in: constraint,
-                with: environment,
+                environment: environment,
                 states: childState
             )
         }

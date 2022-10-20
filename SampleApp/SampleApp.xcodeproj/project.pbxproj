@@ -13,6 +13,7 @@
 		0AF36345246266AF0027E172 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36342246266AF0027E172 /* README.md */; };
 		0AF36346246266AF0027E172 /* RELEASING.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36343246266AF0027E172 /* RELEASING.md */; };
 		0AF36347246266AF0027E172 /* CHANGELOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 0AF36344246266AF0027E172 /* CHANGELOG.md */; };
+		1447EA0428FF49D600EB4037 /* PlaygroundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1447EA0328FF49D600EB4037 /* PlaygroundViewController.swift */; };
 		2009E82B0B9D98A685E8637B /* libPods-Tutorial 1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 237956659E4F5F4AEE53B303 /* libPods-Tutorial 1.a */; };
 		4EE23713D657C21C6806E771 /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDB22E4D9B4379A15C5AF69 /* libPods-SampleApp.a */; };
 		6B58C7884AE69FA55EA64E57 /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */; };
@@ -53,6 +54,7 @@
 		0AF36343246266AF0027E172 /* RELEASING.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = RELEASING.md; path = ../RELEASING.md; sourceTree = "<group>"; };
 		0AF36344246266AF0027E172 /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		0DA29F056002872418F7D2C9 /* Pods-SampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SampleApp.debug.xcconfig"; path = "Target Support Files/Pods-SampleApp/Pods-SampleApp.debug.xcconfig"; sourceTree = "<group>"; };
+		1447EA0328FF49D600EB4037 /* PlaygroundViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundViewController.swift; sourceTree = "<group>"; };
 		187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 2 (Completed).a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A147478D522E763BFC19F37 /* Pods-Tutorial 2 (Completed).debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2 (Completed).debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 2 (Completed)/Pods-Tutorial 2 (Completed).debug.xcconfig"; sourceTree = "<group>"; };
 		237956659E4F5F4AEE53B303 /* libPods-Tutorial 1.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tutorial 1.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -187,6 +189,7 @@
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
 				97545511223C12E9003E353F /* AppDelegate.swift */,
 				0AEF0C4D24463B880092248C /* XcodePreviewDemo.swift */,
+				1447EA0328FF49D600EB4037 /* PlaygroundViewController.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -588,6 +591,7 @@
 				97545519223C12E9003E353F /* PostsViewController.swift in Sources */,
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
 				7A4B688424DB3BE300E10D7A /* ResponsiveViewController.swift in Sources */,
+				1447EA0428FF49D600EB4037 /* PlaygroundViewController.swift in Sources */,
 				0AEF0C4E24463B880092248C /* XcodePreviewDemo.swift in Sources */,
 				C223C14227693D65002AF5C4 /* TextLinkViewController.swift in Sources */,
 			);

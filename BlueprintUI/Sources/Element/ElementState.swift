@@ -59,7 +59,7 @@ final class RootElementState {
 }
 
 
-final class ElementState {
+public final class ElementState {
 
     fileprivate(set) weak var root: RootElementState?
     private(set) weak var parent: ElementState?

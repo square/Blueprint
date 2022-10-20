@@ -30,6 +30,10 @@ final class RootViewController: UIViewController {
                 self?.push(ResponsiveViewController())
             }),
 
+            DemoItem(title: "Kareem's playground", onTap: { [weak self] in
+                self?.push(PlaygroundViewController())
+            }),
+
             EditingMenu { menu in
                 DemoItem(title: "Show A Menu Controller") {
                     menu.show()
