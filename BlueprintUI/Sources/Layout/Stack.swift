@@ -457,7 +457,7 @@ extension StackLayout {
 
             final class Measurement {
 
-                let item: (traits: Traits, content: Measurable)
+                let item: LayoutItems<StackLayout.Traits>.Item // (traits: Traits, content: Measurable)
                 var size: CGSize?
 
                 let isFixed: Bool
@@ -466,7 +466,7 @@ extension StackLayout {
                     isFixed == false
                 }
 
-                init(item: (traits: StackLayout.Traits, content: Measurable)) {
+                init(item: LayoutItems<StackLayout.Traits>.Item) {
                     self.item = item
                     size = nil
 
@@ -474,7 +474,7 @@ extension StackLayout {
                 }
             }
 
-            let measurements: [Measurement] = items.map { item in
+            let measurements: [Measurement] = items.all.map { item in
                 Measurement(item: item)
             }
 
@@ -532,7 +532,7 @@ extension StackLayout {
         }
 
         /// The measured sizes of each item, constrained as if each were the only element in the stack.
-        let basisSizes = items.all.map { $0.content.measure(in: constraint).axis(on: axis) }
+        let basisSizes = basisSizes() // items.all.map { $0.content.measure(in: constraint).axis(on: axis) }
 
         func unconstrainedAxisSize() -> CGFloat {
             basisSizes.reduce(0.0, +) + minimumTotalSpacing
