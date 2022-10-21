@@ -68,7 +68,7 @@ public struct ElementContent {
             cache: cache
         )
     }
-    
+
     func performSinglePassLayout(
         // TODO: Support special layout attributes type that allows unspecified dimensions?
         attributes: LayoutAttributes,
@@ -223,6 +223,7 @@ extension ContentStorage {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
         fatalError("\(type(of: self)) has not implemented single pass layout")
     }
+
     func performSinglePassLayout(
         attributes: LayoutAttributes,
         environment: Environment
@@ -231,16 +232,16 @@ extension ContentStorage {
     }
 }
 
-//struct SPNodeLayout {
+// struct SPNodeLayout {
 //    var identifier: ElementIdentifier
 //    var node: LayoutResultNode
-//}
+// }
 
 typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
 
 protocol SPContentStorage {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
-    
+
     func performSinglePassLayout(
         attributes: LayoutAttributes,
         environment: Environment
@@ -406,11 +407,11 @@ extension ElementContent.Builder {
                 environment: environment
             )
         }
-        return self.layout.sizeThatFits(proposal: proposal, subviews: subviews)
+        return layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
-    
+
     func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
-        
+
         let proposal = ProposedViewSize(attributes.bounds.size)
         let subviews = children.map { child in
             LayoutSubview(
@@ -420,30 +421,39 @@ extension ElementContent.Builder {
             )
         }
 
+        let bounds = CGRect(origin: .zero, size: attributes.bounds.size)
         layout.placeSubviews(
-            in: attributes.frame,
+            in: bounds,
             proposal: proposal,
             subviews: subviews
         )
-        
+
         let childAttributesCollection: [LayoutAttributes] = subviews.map { subview in
             let placement = subview.placement
-            ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
+                ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
 
             let size: CGSize
-            switch placement.size {
-            case .proposal(let proposal):
-                size = subview.sizeThatFits(proposal)
-            case .explicit(let explicitSize):
-                size = explicitSize
+            if let width = placement.size.width, let height = placement.size.height {
+                size = .init(width: width, height: height)
+                print("\(type(of: subview.element)) placed at fixed size \(size)")
+            } else {
+                let measuredSize = subview.sizeThatFits(placement.size.proposal)
+                size = .init(
+                    width: placement.size.width ?? measuredSize.width,
+                    height: placement.size.height ?? measuredSize.height
+                )
+                print("\(type(of: subview.element)) placed at measured \(measuredSize) and resolved to \(size)")
             }
 
-            return LayoutAttributes(frame: .init(
+            let frame = CGRect(
                 origin: placement.origin(for: size),
                 size: size
-            ))
+            )
+            print("\(type(of: subview.element)) frame \(frame)")
+
+            return LayoutAttributes(frame: frame)
         }
-        
+
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
         let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
@@ -462,6 +472,7 @@ extension ElementContent.Builder {
                     environment: environment
                 )
             )
+            print("\(type(of: child.element)) result \(node.layoutAttributes.frame)")
             return (identifier: identifier, node: node)
         }
         return identifiedNodes
@@ -592,12 +603,12 @@ private struct MeasurableStorage: ContentStorage {
             measurer(constraint, environment)
         }
     }
-    
+
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
         let constraint = SizeConstraint(proposal)
         return measurer(constraint, environment)
     }
-    
+
     func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
         []
     }
@@ -642,12 +653,12 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
-    
+
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
         precondition(subviews.count == 1)
         return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0])
     }
-    
+
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
         precondition(subviews.count == 1)
         return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
@@ -669,9 +680,9 @@ fileprivate struct PassthroughLayout: SingleChildLayout {
     func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
         subview.sizeThatFits(proposal)
     }
-    
+
     func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
-        subview.place(at: .zero, proposal: proposal)
+        subview.place(at: .zero, size: proposal.replacingUnspecifiedDimensions())
     }
 }
 

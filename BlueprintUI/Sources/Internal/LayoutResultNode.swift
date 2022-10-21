@@ -25,13 +25,14 @@ extension Element {
             return singlePassLayout(attributes: LayoutAttributes(frame: frame), environment: environment)
         }
     }
-    
+
     func singlePassLayout(attributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        let layouts = self.content.performSinglePassLayout(
+        print("\(type(of: self)) root layout in \(attributes.frame)")
+        let layouts = content.performSinglePassLayout(
             attributes: attributes,
             environment: environment
         )
-        
+
         return LayoutResultNode(
             element: self,
             layoutAttributes: attributes,

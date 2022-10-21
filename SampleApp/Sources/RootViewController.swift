@@ -50,19 +50,52 @@ final class RootViewController: UIViewController {
     }
 
     override func loadView() {
-        let blueprintView = BlueprintView(element: contents)
-        
-        blueprintView.layoutMode = .singlePass
+        let leftBlueprintView = BlueprintView(element: contents)
+        leftBlueprintView.backgroundColor = .clear
+        leftBlueprintView.layer.borderColor = UIColor.black.cgColor
+        leftBlueprintView.layer.borderWidth = 1
 
-        view = blueprintView
+        leftBlueprintView.layoutMode = .singlePass
+
+        let rightBlueprintView = BlueprintView(element: contents)
+        rightBlueprintView.backgroundColor = .clear
+        rightBlueprintView.layer.borderColor = UIColor.black.cgColor
+        rightBlueprintView.layer.borderWidth = 1
+
+        let stackView = UIStackView(arrangedSubviews: [
+            leftBlueprintView,
+            rightBlueprintView,
+        ])
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.alignment = .fill
+        view = stackView
 
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
-    
+
     var contents: Element {
-        Box(backgroundColor: .red)
+//        Row(alignment: .fill) {
+//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 100, height: 100))
+//
+//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 10, height: 10))
+//                .aligned(vertically: .top)
+//
+//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 10, height: 10))
+//                .aligned(vertically: .bottom)
+//        }
+//        .aligned(vertically: .center)
+        Spacer(width: 20, height: 20)
+            .box(background: .red)
             .aligned(vertically: .center, horizontally: .trailing)
-            .inset(horizontal: 70, vertical: 20)
+            .box(background: .blue)
+            .aligned(vertically: .center, horizontally: .fill)
+            .inset(
+                top: 40,
+                bottom: 15,
+                left: 70,
+                right: 25
+            )
     }
 
     var contents2: Element {

@@ -113,9 +113,61 @@ public struct Aligned: Element {
 
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            let x: CGFloat
+            let y: CGFloat
+
+            let width: CGFloat?
+            let height: CGFloat?
+
+            switch horizontalAlignment {
+            case .leading:
+                x = 0
+                width = nil
+            case .center:
+                x = 0.5
+                width = nil
+            case .trailing:
+                x = 1
+                width = nil
+            case .fill:
+                x = 0
+                width = bounds.width
+            }
+
+            switch verticalAlignment {
+            case .top:
+                y = 0
+                height = nil
+            case .center:
+                y = 0.5
+                height = nil
+            case .bottom:
+                y = 1
+                height = nil
+            case .fill:
+                y = 0
+                height = bounds.height
+            }
+
+            let position = CGPoint(x: bounds.minX + x * bounds.width, y: bounds.minY + y * bounds.height)
+
+            subview.place(
+                at: position,
+                anchor: UnitPoint(x: x, y: y),
+                proposal: proposal,
+                width: width,
+                height: height
+            )
+        }
     }
-    
-    
+
+
 }
 
 extension Element {

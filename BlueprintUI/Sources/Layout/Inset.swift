@@ -158,18 +158,22 @@ extension Inset {
             frame.size.height -= top + bottom
             return LayoutAttributes(frame: frame)
         }
-        
+
         func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
             let insetProposal = proposal.inset(by: edgeInsets)
             let childSize = subview.sizeThatFits(insetProposal)
             return childSize + CGSize(width: left + right, height: top + bottom)
         }
-        
+
         func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
             let insetProposal = proposal.inset(by: edgeInsets)
-            subview.place(at: bounds.center, anchor: .center, size: insetProposal.replacingUnspecifiedDimensions())
+            subview.place(
+                at: .init(x: edgeInsets.left, y: edgeInsets.top),
+                anchor: .topLeading,
+                size: insetProposal.replacingUnspecifiedDimensions()
+            )
         }
-        
+
         private var edgeInsets: UIEdgeInsets {
             .init(top: top, left: left, bottom: bottom, right: right)
         }

@@ -8,7 +8,7 @@ public protocol SPLayout {
         proposal: ProposedViewSize,
         subviews: Subviews
     ) -> CGSize
-    
+
     func placeSubviews(
         in bounds: CGRect,
         proposal: ProposedViewSize,
@@ -16,30 +16,33 @@ public protocol SPLayout {
     )
 }
 
-public struct ProposedViewSize: Equatable {
-    
+public struct ProposedViewSize: Equatable, CustomStringConvertible {
+
     static let zero = Self(.zero)
     static let infinity = Self(.infinity)
 
     var width: CGFloat?
     var height: CGFloat?
-    
+
     init(_ size: CGSize) {
-        self.width = size.width
-        self.height = size.height
+        width = size.width
+        height = size.height
     }
-    
+
     init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
     }
-    
+
     func replacingUnspecifiedDimensions(
         by size: CGSize = CGSize(width: 10, height: 10)
     ) -> CGSize {
-        CGSize(width: self.width ?? size.width, height: self.height ?? size.height)
+        CGSize(width: width ?? size.width, height: height ?? size.height)
     }
 
+    public var description: String {
+        "(\(width?.description ?? "nil"), \(height?.description ?? "nil"))"
+    }
 }
 
 public typealias LayoutSubviews = [LayoutSubview]
@@ -49,14 +52,20 @@ public struct LayoutSubview {
         var position: CGPoint
         var anchor: UnitPoint
 
-        enum Size {
-            case proposal(ProposedViewSize)
-            case explicit(CGSize)
+        struct Size {
+            var proposal: ProposedViewSize
+            var width: CGFloat?
+            var height: CGFloat?
+
+            static func proposal(_ proposal: ProposedViewSize) -> Self {
+                .init(proposal: proposal)
+            }
         }
+
         var size: Size
 //        var proposal: ProposedViewSize
 //        var size: CGSize?
-        
+
         func origin(for size: CGSize) -> CGPoint {
             position - CGPoint(
                 x: size.width * anchor.x,
@@ -64,16 +73,16 @@ public struct LayoutSubview {
             )
         }
     }
-    
+
     @Storage
     private(set) var placement: Placement?
-    
-    private var element: Element
+
+    var element: Element
     private var content: ElementContent
-    
+
     var sizable: Sizable { content }
     var environment: Environment
-    
+
     init(
         element: Element,
         content: ElementContent,
@@ -87,21 +96,30 @@ public struct LayoutSubview {
     func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
-        proposal: ProposedViewSize
+        proposal: ProposedViewSize,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
-        placement = Placement(position: position, anchor: anchor, size: .proposal(proposal))
+        placement = Placement(
+            position: position,
+            anchor: anchor,
+            size: .init(proposal: proposal, width: width, height: height)
+        )
     }
-    
+
     func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
         size: CGSize
     ) {
-        placement = Placement(position: position, anchor: anchor, size: .explicit(size))
+//        placement = Placement(position: position, anchor: anchor, size: .init(proposal: <#T##ProposedViewSize#>, width: <#T##CGFloat?#>, height: <#T##CGFloat?#>))
+        place(at: position, anchor: anchor, proposal: .init(size), width: size.width, height: size.height)
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
-        sizable.sizeThatFits(proposal: proposal, environment: environment)
+        let size = sizable.sizeThatFits(proposal: proposal, environment: environment)
+        print("\(type(of: element)) measures \(size) within \(proposal)")
+        return size
     }
 }
 
@@ -117,13 +135,14 @@ class Storage<T> {
 extension CGSize {
     static let infinity = Self(width: CGFloat.infinity, height: CGFloat.infinity)
 }
+
 extension CGRect {
     var center: CGPoint {
         CGPoint(x: midX, y: midY)
     }
 }
 
-public struct UnitPoint : Hashable {
+public struct UnitPoint: Hashable {
 
     public var x: CGFloat
     public var y: CGFloat
@@ -160,7 +179,7 @@ public struct UnitPoint : Hashable {
 
 struct Padding: SPLayout {
     var insets: UIEdgeInsets
-    
+
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
         assert(subviews.count == 1)
         let insetSize = CGSize(
@@ -174,7 +193,7 @@ struct Padding: SPLayout {
         let childSize = subviews[0].sizeThatFits(insetProposal)
         return childSize + insetSize
     }
-    
+
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
         assert(subviews.count == 1)
         subviews[0].place(at: bounds.center, anchor: .center, proposal: proposal)
