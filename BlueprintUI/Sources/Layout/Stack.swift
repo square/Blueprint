@@ -505,7 +505,7 @@ extension StackLayout {
 
             nextOrigin = origin + magnitude + minimumSpacing
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: true)
         }
     }
 
@@ -555,7 +555,7 @@ extension StackLayout {
 
             axisOrigin = origin + magnitude + minimumSpacing
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: sizeAdjustment.isZero)
         }
 
         return axisSegments
@@ -647,7 +647,7 @@ extension StackLayout {
 
             axisOrigin = origin + magnitude + space
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: sizeAdjustment.isZero)
         }
 
         return axisSegments
@@ -714,7 +714,7 @@ extension StackLayout {
 
             // Form segments that fill the available space
             let segments = Array(
-                repeating: Segment(origin: 0, magnitude: availableCross),
+                repeating: Segment(origin: 0, magnitude: availableCross, measured: false),
                 count: items.count
             )
 
@@ -775,7 +775,7 @@ extension StackLayout {
 
                 let origin = offset - alignmentValue
 
-                return Segment(origin: origin, magnitude: measuredCross)
+                return Segment(origin: origin, magnitude: measuredCross, measured: true)
             }
 
             return segments
@@ -857,20 +857,17 @@ extension StackLayout {
 
             let size = vectorFrame.size.size(axis: axis)
 
-//            switch axis {
-//             case .vertical:
-//                switch alignment {
-//                case .fill:
-//                    width = size.width
-//
-//                default:
-//                    width = nil
-//                }
-//             case .horizontal:
-//                 height = size.height
-//             }
+            switch axis {
+            case .vertical:
+                width = vectorFrame.crossMeasured ? nil : size.width
+                height = vectorFrame.axisMeasured ? nil : size.height
 
+            case .horizontal:
+                width = vectorFrame.axisMeasured ? nil : size.width
+                height = vectorFrame.crossMeasured ? nil : size.height
+            }
 
+            print("\(type(of: self)) subview \(width)x\(height)")
 
             let frame = vectorFrame.rect(axis: axis)
 
@@ -878,9 +875,8 @@ extension StackLayout {
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
                 proposal: proposal,
-                // TODO: Conditionally use nil if not in fill mode?
-                width: frame.width,
-                height: frame.height
+                width: width,
+                height: height
             )
         }
     }
@@ -894,6 +890,7 @@ extension StackLayout {
     struct Segment {
         var origin: CGFloat
         var magnitude: CGFloat
+        var measured: Bool
     }
 
     /// Represents a size or point with symbolic axes.
@@ -956,15 +953,19 @@ extension StackLayout {
     struct VectorFrame {
         var origin: Vector
         var size: Vector
+        var axisMeasured: Bool
+        var crossMeasured: Bool
 
-        init(origin: Vector, size: Vector) {
-            self.origin = origin
-            self.size = size
-        }
+//        init(origin: Vector, size: Vector) {
+//            self.origin = origin
+//            self.size = size
+//        }
 
         init(axis: Segment, cross: Segment) {
             origin = Vector(axis: axis.origin, cross: cross.origin)
             size = Vector(axis: axis.magnitude, cross: cross.magnitude)
+            axisMeasured = axis.measured
+            crossMeasured = cross.measured
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {
