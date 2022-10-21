@@ -24,7 +24,48 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        // super.invokeTest()
+        super.invokeTest()
+    }
+
+    func test_kareem() {
+
+        let gridSize = 50
+
+        let model: [[Int]] = {
+            var cols = [[Int]]()
+            for i in 0..<gridSize {
+                var row = [Int]()
+                for j in 0..<gridSize {
+                    row.append(0)
+                }
+                cols.append(row)
+            }
+            return cols
+        }()
+
+        let element = Column { col in
+            for (i, values) in model.enumerated() {
+                col.horizontalAlignment = .fill
+                let row = Row { row in
+                    for (j, value) in values.enumerated() {
+                        let label = Label(text: String(value))
+                            .centered()
+                            .constrainedTo(size: .init(width: 20, height: 20))
+                            .box(background: .red)
+                            .tappable {}
+                        row.add(child: label)
+                    }
+                }
+                col.add(child: row)
+            }
+        }.inset(uniform: 20)
+
+        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
+
+        determineAverage(for: 2.0) {
+            view.element = element
+            view.layoutIfNeeded()
+        }
     }
 
     func test_repeated_layouts() {
