@@ -76,6 +76,20 @@
                ReferencedContainer = "container:SampleApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3F0DBD15A7E34A7177B40DF27414BFF9"
+               BuildableName = "BlueprintUI-Unit-Tests.xctest"
+               BlueprintName = "BlueprintUI-Unit-Tests"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -97,10 +111,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F0DBD15A7E34A7177B40DF27414BFF9"
-               BuildableName = "BlueprintUI-Unit-Tests.xctest"
-               BlueprintName = "BlueprintUI-Unit-Tests"
-               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+               BlueprintIdentifier = "1447EA1D29031ED100EB4037"
+               BuildableName = "SampleAppTests.xctest"
+               BlueprintName = "SampleAppTests"
+               ReferencedContainer = "container:SampleApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

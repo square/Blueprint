@@ -107,3 +107,11 @@ public struct Row: StackElement {
     }
 
 }
+
+extension Row: ComparableElement {
+    public func isEquivalent(to other: Row) throws -> Bool {
+        // TODO: kareem implement properly
+        true
+//        false
+    }
+}

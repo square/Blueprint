@@ -31,6 +31,8 @@ public final class BlueprintView: UIView {
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
 
+    public static var equivTime: Double = 0.0
+
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
@@ -343,8 +345,11 @@ public final class BlueprintView: UIView {
             "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
         )
 
+        let watch = Stopwatch.start()
+
         isInsideUpdate = true
 
+        // kareem O(n)
         rootState.root?.viewSizeChanged(from: lastViewHierarchyUpdateBounds.size, to: bounds.size)
 
         needsViewHierarchyUpdate = false
@@ -355,6 +360,8 @@ public final class BlueprintView: UIView {
 
         let environment = makeEnvironment()
 
+        watch.tag("1")
+
         let rootCorrection = environment.roundingCorrection
         let rootOrigin = environment.roundingOrigin
         let rootFrame = CGRect(
@@ -362,11 +369,17 @@ public final class BlueprintView: UIView {
             size: bounds.size + rootCorrection.size
         )
 
+        watch.tag("2")
+
         /// Grab view descriptions
         let viewNodes = calculateNativeViewNodes(in: environment, states: rootState)
 
+        watch.tag("3")
+
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
+
+        watch.tag("4")
 
         // The root controller is fixed, and its layout attributes are never applied.
         rootController.view.frame = bounds
@@ -383,6 +396,8 @@ public final class BlueprintView: UIView {
         let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: rootOrigin, correction: rootCorrection, scale: scale)
 
+        watch.tag("5")
+
         Logger.logViewUpdateStart(view: self)
 
         let updateResult = rootController.update(
@@ -392,6 +407,8 @@ public final class BlueprintView: UIView {
                 viewIsVisible: isVisible
             )
         )
+
+        watch.tag("6")
 
         for callback in updateResult.lifecycleCallbacks {
             callback()
@@ -412,6 +429,8 @@ public final class BlueprintView: UIView {
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
         )
+
+        watch.tag("7")
     }
 
     /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
@@ -423,13 +442,26 @@ public final class BlueprintView: UIView {
     ) -> [(path: ElementPath, node: NativeViewNode)] {
         guard let element = self.element else { return [] }
 
+        let watch = Stopwatch.start()
+
+        // kareem: O(n)
         rootState.root?.prepareForLayout()
 
+        watch.tag("calc 1")
+
         defer {
+            watch.tag("calc 4")
+            // kareem: O(n)
             self.rootState.root?.finishedLayout()
+
+            watch.tag("calc end")
         }
 
+        // kareem: O(n)
         states.update(with: element, in: environment)
+
+        watch.tag("calc 2")
+        Self.equivTime = 0
 
         let laidOutNodes = LayoutResultNode(
             root: element,
@@ -437,6 +469,10 @@ public final class BlueprintView: UIView {
             environment: environment,
             states: states.root!
         )
+
+        print("equiv time: \(Self.equivTime)")
+
+        watch.tag("layout result node")
 
         return laidOutNodes.resolve()
     }
@@ -754,3 +790,22 @@ extension BlueprintView.NativeViewController {
     }
 }
 
+class Stopwatch {
+
+    private var time = DispatchTime.now()
+
+    class func start() -> Stopwatch {
+        Stopwatch()
+    }
+
+    func tag(_ tag: String) {
+        let end = DispatchTime.now()
+        let nanoTime = end.uptimeNanoseconds - time.uptimeNanoseconds
+        let timeInterval = Double(nanoTime) / 1_000_000_000
+        NSLog("\(tag): \(timeInterval)")
+
+        time = end
+    }
+
+    private init() {}
+}

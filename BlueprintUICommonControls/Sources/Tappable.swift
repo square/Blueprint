@@ -55,3 +55,10 @@ fileprivate final class TappableView: UIView {
     }
 
 }
+
+
+extension Tappable: ComparableElement {
+    public func isEquivalent(to other: Tappable) throws -> Bool {
+        true
+    }
+}

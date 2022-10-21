@@ -9,6 +9,10 @@ end
 
 target 'SampleApp' do
   blueprint_pods
+
+  target 'SampleAppTests' do
+    #inherit! :search_paths
+  end
 end
 
 target 'Tutorial 1' do

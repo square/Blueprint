@@ -10,6 +10,7 @@ import Foundation
 
 final class RootElementState {
 
+    // TODO: kareem rename to `state`
     private(set) var root: ElementState?
 
     private let signpostRef: SignpostToken = .init()

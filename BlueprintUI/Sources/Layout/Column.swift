@@ -131,3 +131,11 @@ public struct Column: StackElement {
         set { layout.minimumSpacing = newValue }
     }
 }
+
+extension Column: ComparableElement {
+    public func isEquivalent(to other: Column) throws -> Bool {
+        // TODO: kareem implement properly
+        true
+//        false
+    }
+}

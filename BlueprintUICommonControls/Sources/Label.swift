@@ -121,6 +121,16 @@ public struct Label: ProxyElement, ComparableElement, Equatable {
             )
         }
     }
+
+    public func isEquivalent(to other: Label) throws -> Bool {
+        let time = DispatchTime.now()
+        defer {
+            let end = DispatchTime.now()
+            BlueprintView.equivTime += Double(end.uptimeNanoseconds - time.uptimeNanoseconds) / 1_000_000_000.0
+        }
+        return self == other
+
+    }
 }
 
 extension Label {

@@ -190,3 +190,9 @@ extension ConstrainedSize {
     }
 
 }
+
+extension ConstrainedSize: ComparableElement {
+    public func isEquivalent(to other: ConstrainedSize) throws -> Bool {
+        width == other.width && height == other.height
+    }
+}
