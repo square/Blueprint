@@ -167,7 +167,7 @@ extension Inset {
         
         func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
             let insetProposal = proposal.inset(by: edgeInsets)
-            subview.place(at: bounds.center, anchor: .center, proposal: insetProposal)
+            subview.place(at: bounds.center, anchor: .center, size: insetProposal.replacingUnspecifiedDimensions())
         }
         
         private var edgeInsets: UIEdgeInsets {

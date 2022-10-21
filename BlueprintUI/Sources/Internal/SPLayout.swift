@@ -48,7 +48,14 @@ public struct LayoutSubview {
     struct Placement {
         var position: CGPoint
         var anchor: UnitPoint
-        var proposal: ProposedViewSize
+
+        enum Size {
+            case proposal(ProposedViewSize)
+            case explicit(CGSize)
+        }
+        var size: Size
+//        var proposal: ProposedViewSize
+//        var size: CGSize?
         
         func origin(for size: CGSize) -> CGPoint {
             position - CGPoint(
@@ -61,15 +68,36 @@ public struct LayoutSubview {
     @Storage
     private(set) var placement: Placement?
     
-    var sizable: Sizable
+    private var element: Element
+    private var content: ElementContent
+    
+    var sizable: Sizable { content }
     var environment: Environment
+    
+    init(
+        element: Element,
+        content: ElementContent,
+        environment: Environment
+    ) {
+        self.element = element
+        self.content = content
+        self.environment = environment
+    }
 
     func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
         proposal: ProposedViewSize
     ) {
-        placement = Placement(position: position, anchor: anchor, proposal: proposal)
+        placement = Placement(position: position, anchor: anchor, size: .proposal(proposal))
+    }
+    
+    func place(
+        at position: CGPoint,
+        anchor: UnitPoint = .topLeading,
+        size: CGSize
+    ) {
+        placement = Placement(position: position, anchor: anchor, size: .explicit(size))
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {

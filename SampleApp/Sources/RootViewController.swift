@@ -51,6 +51,8 @@ final class RootViewController: UIViewController {
 
     override func loadView() {
         let blueprintView = BlueprintView(element: contents)
+        
+        blueprintView.layoutMode = .singlePass
 
         view = blueprintView
 
@@ -59,6 +61,7 @@ final class RootViewController: UIViewController {
     
     var contents: Element {
         Box(backgroundColor: .red)
+            .aligned(vertically: .center, horizontally: .trailing)
             .inset(horizontal: 70, vertical: 20)
     }
 

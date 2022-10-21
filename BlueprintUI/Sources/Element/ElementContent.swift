@@ -400,7 +400,11 @@ extension ElementContent: Sizable {
 extension ElementContent.Builder {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
         let subviews = children.map { child in
-            LayoutSubview(sizable: child.content, environment: environment)
+            LayoutSubview(
+                element: child.element,
+                content: child.content,
+                environment: environment
+            )
         }
         return self.layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
@@ -409,7 +413,11 @@ extension ElementContent.Builder {
         
         let proposal = ProposedViewSize(attributes.bounds.size)
         let subviews = children.map { child in
-            LayoutSubview(sizable: child.content, environment: environment)
+            LayoutSubview(
+                element: child.element,
+                content: child.content,
+                environment: environment
+            )
         }
 
         layout.placeSubviews(
@@ -420,8 +428,16 @@ extension ElementContent.Builder {
         
         let childAttributesCollection: [LayoutAttributes] = subviews.map { subview in
             let placement = subview.placement
-                ?? .init(position: attributes.center, anchor: .center, proposal: proposal)
-            let size = subview.sizeThatFits(placement.proposal)
+            ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
+
+            let size: CGSize
+            switch placement.size {
+            case .proposal(let proposal):
+                size = subview.sizeThatFits(proposal)
+            case .explicit(let explicitSize):
+                size = explicitSize
+            }
+
             return LayoutAttributes(frame: .init(
                 origin: placement.origin(for: size),
                 size: size
@@ -574,6 +590,32 @@ private struct MeasurableStorage: ContentStorage {
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint in
             measurer(constraint, environment)
+        }
+    }
+    
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+        let constraint = SizeConstraint(proposal)
+        return measurer(constraint, environment)
+    }
+    
+    func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
+        []
+    }
+}
+
+extension SizeConstraint {
+    init(_ proposal: ProposedViewSize) {
+        width = .init(singlePassProposal: proposal.width)
+        height = .init(singlePassProposal: proposal.height)
+    }
+}
+
+extension SizeConstraint.Axis {
+    init(singlePassProposal: CGFloat?) {
+        if let singlePassProposal = singlePassProposal {
+            self = .atMost(singlePassProposal)
+        } else {
+            self = .unconstrained
         }
     }
 }

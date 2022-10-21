@@ -7,10 +7,12 @@ import UIKit
 public struct SizeConstraint: Hashable {
 
     /// The width constraint.
-    @UnconstrainedInfiniteAxis public var width: Axis
+//    @UnconstrainedInfiniteAxis
+    public var width: Axis
 
     /// The height constraint.
-    @UnconstrainedInfiniteAxis public var height: Axis
+//    @UnconstrainedInfiniteAxis
+    public var height: Axis
 
     public init(width: Axis, height: Axis) {
         self.width = width

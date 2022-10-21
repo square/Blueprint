@@ -49,6 +49,7 @@ public struct Box: Element {
         if let wrappedElement = wrappedElement {
             return ElementContent(child: wrappedElement)
         } else {
+//            return ElementContent(intrinsicSize: .init(width: 50, height: 50))
             return ElementContent(intrinsicSize: .zero)
         }
     }
