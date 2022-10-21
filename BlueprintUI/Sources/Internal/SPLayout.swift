@@ -118,7 +118,7 @@ public struct LayoutSubview {
 
     func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         let size = sizable.sizeThatFits(proposal: proposal, environment: environment)
-        print("\(type(of: element)) measures \(size) within \(proposal)")
+//        print("\(type(of: element)) measures \(size) within \(proposal)")
         return size
     }
 }

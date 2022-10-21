@@ -85,10 +85,12 @@ final class RootViewController: UIViewController {
 //                .aligned(vertically: .bottom)
 //        }
 //        .aligned(vertically: .center)
+
         Spacer(width: 20, height: 20)
             .box(background: .red)
             .aligned(vertically: .center, horizontally: .trailing)
             .box(background: .blue)
+            .constrainedTo(height: .atMost(10))
             .aligned(vertically: .center, horizontally: .fill)
             .inset(
                 top: 40,

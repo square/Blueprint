@@ -122,19 +122,22 @@ public struct Aligned: Element {
             let x: CGFloat
             let y: CGFloat
 
-            let width: CGFloat?
-            let height: CGFloat?
+            let size = subview.sizeThatFits(proposal)
+            let clampedSize = size.upperBounded(maxWidth: bounds.width, maxHeight: bounds.height)
+
+            let width: CGFloat
+            let height: CGFloat
 
             switch horizontalAlignment {
             case .leading:
                 x = 0
-                width = nil
+                width = clampedSize.width
             case .center:
                 x = 0.5
-                width = nil
+                width = clampedSize.width
             case .trailing:
                 x = 1
-                width = nil
+                width = clampedSize.width
             case .fill:
                 x = 0
                 width = bounds.width
@@ -143,13 +146,13 @@ public struct Aligned: Element {
             switch verticalAlignment {
             case .top:
                 y = 0
-                height = nil
+                height = clampedSize.height
             case .center:
                 y = 0.5
-                height = nil
+                height = clampedSize.height
             case .bottom:
                 y = 1
-                height = nil
+                height = clampedSize.height
             case .fill:
                 y = 0
                 height = bounds.height
@@ -160,14 +163,25 @@ public struct Aligned: Element {
             subview.place(
                 at: position,
                 anchor: UnitPoint(x: x, y: y),
-                proposal: proposal,
-                width: width,
-                height: height
+                size: CGSize(width: width, height: height)
             )
         }
     }
 
 
+}
+
+extension CGSize {
+    func upperBounded(maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
+        CGSize(width: min(width, maxWidth), height: min(height, maxHeight))
+    }
+}
+
+extension ProposedViewSize {
+    func map(transform: (CGFloat?, CGFloat?) -> (CGFloat?, CGFloat?)) -> Self {
+        let (width, height) = transform(width, height)
+        return ProposedViewSize(width: width, height: height)
+    }
 }
 
 extension Element {

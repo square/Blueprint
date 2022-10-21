@@ -22,20 +22,26 @@ extension Element {
         case .standard:
             return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
         case .singlePass:
-            return singlePassLayout(attributes: LayoutAttributes(frame: frame), environment: environment)
+            return singlePassLayout(
+                context: SPLayoutContext(
+                    proposal: .init(frame.size),
+                    attributes: LayoutAttributes(frame: frame)
+                ),
+                environment: environment
+            )
         }
     }
 
-    func singlePassLayout(attributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        print("\(type(of: self)) root layout in \(attributes.frame)")
+    func singlePassLayout(context: SPLayoutContext, environment: Environment) -> LayoutResultNode {
+        print("\(type(of: self)) root layout in \(context.attributes.frame)")
         let layouts = content.performSinglePassLayout(
-            attributes: attributes,
+            context: context,
             environment: environment
         )
 
         return LayoutResultNode(
             element: self,
-            layoutAttributes: attributes,
+            layoutAttributes: context.attributes,
             environment: environment,
             children: layouts.map { (identifier: $0.identifier, node: $0.node) }
         )

@@ -166,17 +166,27 @@ extension Inset {
         }
 
         func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
-            let insetProposal = proposal.inset(by: edgeInsets)
+            let insetSize = bounds.size.inset(by: edgeInsets)
+
             subview.place(
-                at: .init(x: edgeInsets.left, y: edgeInsets.top),
+                at: bounds.origin + CGPoint(x: edgeInsets.left, y: edgeInsets.top),
                 anchor: .topLeading,
-                size: insetProposal.replacingUnspecifiedDimensions()
+                size: insetSize
             )
         }
 
         private var edgeInsets: UIEdgeInsets {
             .init(top: top, left: left, bottom: bottom, right: right)
         }
+    }
+}
+
+extension CGSize {
+    func inset(by insets: UIEdgeInsets) -> Self {
+        CGSize(
+            width: width - insets.left - insets.right,
+            height: height - insets.top - insets.bottom
+        )
     }
 }
 

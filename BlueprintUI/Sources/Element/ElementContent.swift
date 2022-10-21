@@ -70,13 +70,18 @@ public struct ElementContent {
     }
 
     func performSinglePassLayout(
-        // TODO: Support special layout attributes type that allows unspecified dimensions?
-        attributes: LayoutAttributes,
+        context: SPLayoutContext,
         environment: Environment
     ) -> [IdentifiedNode] {
-        storage.performSinglePassLayout(attributes: attributes, environment: environment)
+        storage.performSinglePassLayout(context: context, environment: environment)
     }
 }
+
+public struct SPLayoutContext {
+    var proposal: ProposedViewSize
+    var attributes: LayoutAttributes
+}
+
 
 extension ElementContent {
 
@@ -225,7 +230,7 @@ extension ContentStorage {
     }
 
     func performSinglePassLayout(
-        attributes: LayoutAttributes,
+        context: SPLayoutContext,
         environment: Environment
     ) -> [IdentifiedNode] {
         fatalError("\(type(of: self)) has not implemented single pass layout")
@@ -243,7 +248,7 @@ protocol SPContentStorage {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
 
     func performSinglePassLayout(
-        attributes: LayoutAttributes,
+        context: SPLayoutContext,
         environment: Environment
     ) -> [IdentifiedNode]
 }
@@ -398,6 +403,7 @@ extension ElementContent: Sizable {
     }
 }
 
+
 extension ElementContent.Builder {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
         let subviews = children.map { child in
@@ -407,12 +413,17 @@ extension ElementContent.Builder {
                 environment: environment
             )
         }
-        return layout.sizeThatFits(proposal: proposal, subviews: subviews)
+        return self.layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
+    
+    
+    func performSinglePassLayout(context: SPLayoutContext, environment: Environment) -> [IdentifiedNode] {
+        
+//        let proposal = ProposedViewSize(attributes.bounds.size)
+        let attributes = context.attributes
+        let proposal = context.proposal
+        let frame = context.attributes.frame
 
-    func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
-
-        let proposal = ProposedViewSize(attributes.bounds.size)
         let subviews = children.map { child in
             LayoutSubview(
                 element: child.element,
@@ -420,47 +431,66 @@ extension ElementContent.Builder {
                 environment: environment
             )
         }
-
-        let bounds = CGRect(origin: .zero, size: attributes.bounds.size)
+        
+//        let bounds = CGRect(origin: .zero, size: attributes.bounds.size)
         layout.placeSubviews(
-            in: bounds,
+            in: frame,
             proposal: proposal,
             subviews: subviews
         )
+        
+        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        let childAttributesCollection: [LayoutAttributes] = subviews.map { subview in
+        let identifiedNodes: [IdentifiedNode] = zip(children, subviews).map { (child, subview) in
+
             let placement = subview.placement
                 ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
 
             let size: CGSize
             if let width = placement.size.width, let height = placement.size.height {
                 size = .init(width: width, height: height)
-                print("\(type(of: subview.element)) placed at fixed size \(size)")
+//                print("\(type(of: subview.element)) placed at fixed size \(size)")
             } else {
                 let measuredSize = subview.sizeThatFits(placement.size.proposal)
                 size = .init(
                     width: placement.size.width ?? measuredSize.width,
                     height: placement.size.height ?? measuredSize.height
                 )
-                print("\(type(of: subview.element)) placed at measured \(measuredSize) and resolved to \(size)")
+//                print("\(type(of: subview.element)) placed at measured \(measuredSize) and resolved to \(size)")
             }
+            let childOrigin = placement.origin(for: size)
 
-            let frame = CGRect(
-                origin: placement.origin(for: size),
+
+
                 size: size
             )
-            print("\(type(of: subview.element)) frame \(frame)")
+            let offsetFrame = CGRect(
+                origin: childOrigin - frame.origin,
+                size: size
+            )
+//            if (frame.origin != .zero) {
+//                print("origin not zero")
+//            }
+//            if (childOrigin != .zero){
+//                print("child origin not zero: \(childOrigin)")
+//            }
+            print("\(type(of: subview.element)) frame \(childFrame) within \(frame)")
 
-            return LayoutAttributes(frame: frame)
-        }
+            let childAttributes = LayoutAttributes(frame: offsetFrame)
 
-        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
-            let childAttributes = childAttributesCollection[index]
+
+
+
+
             let identifier = identifierFactory.nextIdentifier(
-                for: type(of: child.element),
+                for: type(of: subview.element),
                 key: child.key
+            )
+            
+            let childContext = SPLayoutContext(
+                proposal: placement.size.proposal,
+                attributes: LayoutAttributes(frame: offsetFrame)
             )
 
             let node = LayoutResultNode(
@@ -468,7 +498,7 @@ extension ElementContent.Builder {
                 layoutAttributes: childAttributes,
                 environment: environment,
                 children: child.content.performSinglePassLayout(
-                    attributes: childAttributes,
+                    context: childContext,
                     environment: environment
                 )
             )
@@ -609,7 +639,7 @@ private struct MeasurableStorage: ContentStorage {
         return measurer(constraint, environment)
     }
 
-    func performSinglePassLayout(attributes: LayoutAttributes, environment: Environment) -> [IdentifiedNode] {
+
         []
     }
 }
@@ -663,44 +693,31 @@ fileprivate struct SingleChildLayoutHost: Layout {
         precondition(subviews.count == 1)
         return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
     }
-}
 
 
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-
-    func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
-        subview.sizeThatFits(proposal)
-    }
-
-    func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
-        subview.place(at: .zero, size: proposal.replacingUnspecifiedDimensions())
-    }
-}
 
 
-// Used for empty elements with an intrinsic size
-fileprivate struct MeasurableLayout: Layout {
 
-    var measurable: Measurable
 
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        precondition(items.isEmpty)
-        return measurable.measure(in: constraint)
-    }
 
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.isEmpty)
-        return []
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
@@ -710,7 +727,6 @@ struct Measurer: Measurable {
         _measure(constraint)
     }
 }
-
 
 extension Array {
 

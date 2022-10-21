@@ -23,19 +23,19 @@ public protocol SingleChildLayout: SPSingleChildLayout {
 }
 
 public protocol SPSingleChildLayout {
-    
+
     func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize
-    
+
     func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview)
 }
 
 extension SingleChildLayout {
     public func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
-        fatalError()
+        fatalError("\(type(of: self)) has not implemented single pass layout")
     }
-    
+
     public func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
-        fatalError()
+        fatalError("\(type(of: self)) has not implemented single pass layout")
     }
 }
 
