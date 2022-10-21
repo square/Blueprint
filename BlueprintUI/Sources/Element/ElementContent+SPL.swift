@@ -1,19 +1,69 @@
 import Foundation
 
+typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
+
+protocol SPContentStorage {
+    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
+
+    func performSinglePassLayout(
+        context: SPLayoutContext,
+        environment: Environment
+    ) -> [IdentifiedNode]
+}
+
+enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
+    static var defaultValue: LayoutType.Traits {
+        LayoutType.defaultTraits
+    }
+}
+
 extension ElementContent: Sizable {
     func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
         storage.sizeThatFits(proposal: proposal, environment: environment)
     }
 }
 
+final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKey: Hashable {
+    typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
+
+    private var values: [Key: Value] = [:]
+    private var subcaches: [SubcacheKey: Subcache] = [:]
+
+    func get(key: Key, or create: (Key) -> Value) -> Value {
+        if let node = values[key] {
+            return node
+        }
+        let node = create(key)
+        values[key] = node
+        return node
+    }
+
+    func subcache(key: SubcacheKey) -> Subcache {
+        if let subcache = subcaches[key] {
+            return subcache
+        }
+        let subcache = Subcache()
+        subcaches[key] = subcache
+        return subcache
+    }
+}
+
+typealias SPCacheNode = SPCacheTree<ProposedViewSize, CGSize, Int>
+
+struct MeasureContext {
+    var cache: SPCacheNode
+    var environment: Environment
+}
 
 extension ElementContent.Builder {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        // TODO: wire in cache tree to here and layout
         let subviews = children.map { child in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
                 environment: environment,
+                sizeCache: .init(),
                 key: GenericLayoutValueKey<LayoutType>.self,
                 value: child.traits
             )
@@ -24,22 +74,21 @@ extension ElementContent.Builder {
 
     func performSinglePassLayout(context: SPLayoutContext, environment: Environment) -> [IdentifiedNode] {
 
-//        let proposal = ProposedViewSize(attributes.bounds.size)
-        let attributes = context.attributes
-        let proposal = context.proposal
-        let frame = context.attributes.frame
-
         let subviews = children.map { child in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
                 environment: environment,
+                sizeCache: LayoutSubview.SizeCache(),
                 key: GenericLayoutValueKey<LayoutType>.self,
                 value: child.traits
             )
         }
 
-//        let bounds = CGRect(origin: .zero, size: attributes.bounds.size)
+        let attributes = context.attributes
+        let proposal = context.proposal
+        let frame = context.attributes.frame
+
         layout.placeSubviews(
             in: frame,
             proposal: proposal,

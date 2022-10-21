@@ -45,8 +45,12 @@ public struct ElementContent {
         cache: CacheTree,
         layoutMode: LayoutMode
     ) -> CGSize {
-        // TODO: switch on layoutMode
-        storage.measure(in: constraint, environment: environment, cache: cache)
+        switch layoutMode {
+        case .standard:
+            return storage.measure(in: constraint, environment: environment, cache: cache)
+        case .singlePass:
+            return storage.sizeThatFits(proposal: ProposedViewSize(constraint), environment: environment)
+        }
     }
 
     fileprivate func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
@@ -240,27 +244,6 @@ extension ContentStorage {
     }
 }
 
-// struct SPNodeLayout {
-//    var identifier: ElementIdentifier
-//    var node: LayoutResultNode
-// }
-
-typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
-
-protocol SPContentStorage {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
-
-    func performSinglePassLayout(
-        context: SPLayoutContext,
-        environment: Environment
-    ) -> [IdentifiedNode]
-}
-
-enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
-    static var defaultValue: LayoutType.Traits {
-        LayoutType.defaultTraits
-    }
-}
 
 extension ElementContent {
 

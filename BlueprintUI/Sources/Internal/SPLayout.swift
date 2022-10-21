@@ -16,7 +16,7 @@ public protocol SPLayout {
     )
 }
 
-public struct ProposedViewSize: Equatable, CustomStringConvertible {
+public struct ProposedViewSize: Hashable, CustomStringConvertible {
 
     static let zero = Self(.zero)
     static let infinity = Self(.infinity)
@@ -82,6 +82,8 @@ public struct LayoutSubview {
     @Storage
     private(set) var placement: Placement?
 
+    private var sizeCache: SizeCache
+
     var element: Element
     private var content: ElementContent
 
@@ -94,12 +96,14 @@ public struct LayoutSubview {
         element: Element,
         content: ElementContent,
         environment: Environment,
+        sizeCache: SizeCache,
         key: Key.Type,
         value: Key.Value
     ) {
         self.element = element
         self.content = content
         self.environment = environment
+        self.sizeCache = sizeCache
         layoutValues = [ObjectIdentifier(key): value]
     }
 
@@ -134,9 +138,23 @@ public struct LayoutSubview {
     }
 
     func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
-        let size = sizable.sizeThatFits(proposal: proposal, environment: environment)
-//        print("\(type(of: element)) measures \(size) within \(proposal)")
-        return size
+        sizeCache.get(key: proposal) { proposal in
+            sizable.sizeThatFits(proposal: proposal, environment: environment)
+        }
+    }
+
+    class SizeCache {
+        typealias Key = ProposedViewSize
+        var sizes: [ProposedViewSize: CGSize] = [:]
+
+        func get(key: Key, or create: (ProposedViewSize) -> CGSize) -> CGSize {
+            if let size = sizes[key] {
+                return size
+            }
+            let size = create(key)
+            sizes[key] = size
+            return size
+        }
     }
 }
 
