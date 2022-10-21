@@ -47,6 +47,11 @@ public struct ProposedViewSize: Equatable, CustomStringConvertible {
 
 public typealias LayoutSubviews = [LayoutSubview]
 
+protocol LayoutValueKey {
+    associatedtype Value
+    static var defaultValue: Value { get }
+}
+
 public struct LayoutSubview {
     struct Placement {
         var position: CGPoint
@@ -83,14 +88,26 @@ public struct LayoutSubview {
     var sizable: Sizable { content }
     var environment: Environment
 
-    init(
+    var layoutValues: [ObjectIdentifier: Any] = [:]
+
+    init<Key: LayoutValueKey>(
         element: Element,
         content: ElementContent,
-        environment: Environment
+        environment: Environment,
+        key: Key.Type,
+        value: Key.Value
     ) {
         self.element = element
         self.content = content
         self.environment = environment
+        layoutValues = [ObjectIdentifier(key): value]
+    }
+
+    subscript<Key>(_ keyType: Key.Type) -> Key.Value where Key: LayoutValueKey {
+        if let value = layoutValues[ObjectIdentifier(keyType)] as? Key.Value {
+            return value
+        }
+        return keyType.defaultValue
     }
 
     func place(

@@ -788,9 +788,108 @@ extension StackLayout {
             return alignSegments(to: id)
         }
     }
+}
 
-    // MARK: - Layout types
+extension LayoutSubview {
+    var stackLayoutTraits: StackLayout.Traits {
+        self[GenericLayoutValueKey<StackLayout>.self]
+    }
+}
 
+extension ProposedViewSize {
+    init(_ sizeConstraint: SizeConstraint) {
+        width = sizeConstraint.width.constrainedValue
+        height = sizeConstraint.height.constrainedValue
+    }
+}
+
+extension StackLayout {
+    public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        let constraint = SizeConstraint(proposal).vectorConstraint(on: axis)
+
+        let items: [(Traits, Measurable)] = subviews.map { subview in
+            let traits = subview.stackLayoutTraits
+            let measurable = Measurer { constraint in
+                let proposal = ProposedViewSize(constraint)
+                return subview.sizeThatFits(proposal)
+            }
+            return (traits, measurable)
+        }
+
+        let frames = _frames(for: items, in: constraint)
+
+        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
+            Vector(
+                axis: max(vector.axis, frame.maxAxis),
+                cross: max(vector.cross, frame.maxCross)
+            )
+        }
+
+        return vector.size(axis: axis)
+    }
+
+    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+        // TODO:
+
+        let constraint = bounds.size.vectorConstraint(axis: axis)
+
+        var proposals: [ProposedViewSize] = Array(repeating: .zero, count: subviews.count)
+
+        let items: [(Traits, Measurable)] = zip(subviews, subviews.indices).map { subview, index in
+            let traits = subview.stackLayoutTraits
+            let measurable = Measurer { constraint in
+                let proposal = ProposedViewSize(constraint)
+                proposals[index] = proposal
+                return subview.sizeThatFits(proposal)
+            }
+            return (traits, measurable)
+        }
+
+        let frames = _frames(for: items, in: constraint)
+
+        for i in subviews.indices {
+            let vectorFrame = frames[i]
+            let subview = subviews[i]
+            let proposal = proposals[i]
+
+            var width: CGFloat?
+            var height: CGFloat?
+
+            let size = vectorFrame.size.size(axis: axis)
+
+//            switch axis {
+//             case .vertical:
+//                switch alignment {
+//                case .fill:
+//                    width = size.width
+//
+//                default:
+//                    width = nil
+//                }
+//             case .horizontal:
+//                 height = size.height
+//             }
+
+
+
+            let frame = vectorFrame.rect(axis: axis)
+
+            subview.place(
+                at: bounds.origin + frame.origin,
+                anchor: .topLeading,
+                proposal: proposal,
+                // TODO: Conditionally use nil if not in fill mode?
+                width: frame.width,
+                height: frame.height
+            )
+        }
+    }
+}
+
+
+// MARK: - Layout types
+
+extension StackLayout {
     /// Represents an origin and size value in a single axis.
     struct Segment {
         var origin: CGFloat

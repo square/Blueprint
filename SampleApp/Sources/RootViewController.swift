@@ -86,18 +86,54 @@ final class RootViewController: UIViewController {
 //        }
 //        .aligned(vertically: .center)
 
-        Spacer(width: 20, height: 20)
-            .box(background: .red)
-            .aligned(vertically: .center, horizontally: .trailing)
-            .box(background: .blue)
-            .constrainedTo(height: .atMost(10))
-            .aligned(vertically: .center, horizontally: .fill)
-            .inset(
-                top: 40,
-                bottom: 15,
-                left: 70,
-                right: 25
-            )
+//        Spacer(width: 20, height: 20)
+//            .box(background: .red)
+//            .aligned(vertically: .center, horizontally: .trailing)
+//            .box(background: .blue)
+//            .constrainedTo(height: .atMost(10))
+//            .aligned(vertically: .center, horizontally: .fill)
+//            .inset(
+//                top: 40,
+//                bottom: 15,
+//                left: 70,
+//                right: 25
+//            )
+
+        Column(alignment: .fill) {
+            Spacer(50)
+
+            Row(alignment: .fill, underflow: .growUniformly) {
+                Box(backgroundColor: .red)
+                    .constrainedTo(width: 60, height: 60)
+                    .stackLayoutChild(priority: .fixed)
+
+                Box(backgroundColor: .yellow)
+                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
+
+                Box(backgroundColor: .orange)
+                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
+
+            }
+
+            Spacer(50)
+
+            Row(alignment: .center, underflow: .growProportionally) {
+                Box(backgroundColor: .red)
+                    .constrainedTo(width: 60, height: 60)
+                    .stackLayoutChild(priority: .fixed)
+
+                Box(backgroundColor: .yellow)
+                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
+
+                Box(backgroundColor: .orange)
+                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
+
+            }
+
+            Spacer(50)
+
+        }
+
     }
 
     var contents2: Element {

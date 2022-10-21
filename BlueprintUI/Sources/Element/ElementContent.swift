@@ -253,6 +253,11 @@ protocol SPContentStorage {
     ) -> [IdentifiedNode]
 }
 
+enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
+    static var defaultValue: LayoutType.Traits {
+        LayoutType.defaultTraits
+    }
+}
 
 extension ElementContent {
 
@@ -410,7 +415,9 @@ extension ElementContent.Builder {
             LayoutSubview(
                 element: child.element,
                 content: child.content,
-                environment: environment
+                environment: environment,
+                key: GenericLayoutValueKey<LayoutType>.self,
+                value: child.traits
             )
         }
         return self.layout.sizeThatFits(proposal: proposal, subviews: subviews)
@@ -428,7 +435,9 @@ extension ElementContent.Builder {
             LayoutSubview(
                 element: child.element,
                 content: child.content,
-                environment: environment
+                environment: environment,
+                key: GenericLayoutValueKey<LayoutType>.self,
+                value: child.traits
             )
         }
         
