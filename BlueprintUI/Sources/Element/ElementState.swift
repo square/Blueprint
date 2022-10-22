@@ -330,7 +330,7 @@ private final class SignpostToken {}
 
 extension ElementState {
 
-    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?) throws -> Bool {
+    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?) -> Bool {
 
         if lhs == nil && rhs == nil { return true }
 

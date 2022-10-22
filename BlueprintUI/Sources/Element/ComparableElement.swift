@@ -28,7 +28,7 @@ public protocol ComparableElement: AnyComparableElement {
     ///
     /// If your element conforms to `Equatable`, this method is synthesized automatically.
     ///
-    func isEquivalent(to other: Self) throws -> Bool
+    func isEquivalent(to other: Self) -> Bool
 
     /// Return true if the layout and measurement caches should be cleared from the given size change.
     func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool
@@ -43,7 +43,7 @@ public protocol ComparableElement: AnyComparableElement {
 public protocol AnyComparableElement: Element {
 
     /// Returns true if the two elements are the same type, and are equivalent.
-    func anyIsEquivalent(to other: AnyComparableElement) throws -> Bool
+    func anyIsEquivalent(to other: AnyComparableElement) -> Bool
 
     /// Return true if the layout and measurement caches should be cleared from the given size change.
     func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool
@@ -63,7 +63,7 @@ extension ComparableElement where Self: Equatable {
 
 extension ComparableElement {
 
-    public func anyIsEquivalent(to other: AnyComparableElement) throws -> Bool {
+    public func anyIsEquivalent(to other: AnyComparableElement) -> Bool {
         guard let other = other as? Self else { return false }
 
         return try isEquivalent(to: other)
@@ -86,7 +86,7 @@ public enum ComparableElementNotEquivalent: Error {
 
 extension Array {
 
-    public func isEquivalent(to other: Self, using compare: (Element, Element) throws -> Bool) rethrows -> Bool {
+    public func isEquivalent(to other: Self, using compare: (Element, Element) -> Bool) -> Bool {
 
         guard count == other.count else { return false }
 
@@ -105,7 +105,7 @@ extension Array {
 
 extension Array where Self.Element == BlueprintUI.Element {
 
-    public func isEquivalent(to other: Self) throws -> Bool {
+    public func isEquivalent(to other: Self) -> Bool {
 
         guard count == other.count else { return false }
 
