@@ -135,7 +135,7 @@ public struct AttributedLabel: ComparableElement, Hashable {
         return LabelView.describe { config in
             config.frameRoundingBehavior = .prioritizeSize
             config.apply { view in
-                print("Measuring!")
+                // print("Measuring!")
                 view.update(model: self, text: text, environment: context.environment, isMeasuring: false)
             }
         }

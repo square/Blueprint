@@ -29,7 +29,7 @@ class PerformancePlayground: XCTestCase {
 
     func test_kareem() {
 
-        let gridSize = 4
+        let gridSize = 100
 
         let model: [[Int]] = {
             var cols = [[Int]]()
