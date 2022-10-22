@@ -29,7 +29,7 @@ class PerformancePlayground: XCTestCase {
 
     func test_kareem() {
 
-        let gridSize = 50
+        let gridSize = 4
 
         let model: [[Int]] = {
             var cols = [[Int]]()
@@ -69,16 +69,121 @@ class PerformancePlayground: XCTestCase {
     }
 
     func test_repeated_layouts() {
-        let element = Column { col in
-            for index in 1...1000 {
-                col.add(child: Label(text: "This is test label number #\(index)"))
+        let element = Column(alignment: .fill) {
+
+            for index in 1...500 {
+                Row(alignment: .fill) {
+                    Box(backgroundColor: .red)
+                        .constrainedTo(size: CGSize(width: 100, height: 100))
+                        .stackLayoutChild(priority: .fixed)
+
+                    Label(text: "This is test label number #\(index)")
+                        .stackLayoutChild(priority: .flexible)
+                }
             }
         }
+        .scrollable()
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 200.0, height: 500.0))
 
-        determineAverage(for: 10.0) {
+        determineAverage(for: 3.0) {
             view.element = element
+            view.layoutIfNeeded()
+        }
+    }
+
+    func test_rows_with_one_flexible_element_simple() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+            Box(backgroundColor: .red)
+                .constrainedTo(width: 80, height: 80)
+                .stackLayoutChild(priority: .fixed)
+
+            Column(alignment: .fill, underflow: .justifyToStart, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                let rows: [String] = [
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                ]
+
+                for rowText in rows {
+                    Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                        Box(backgroundColor: .blue)
+                            .constrainedTo(width: 40, height: 40)
+                            .stackLayoutChild(priority: .fixed)
+
+                        Label(text: rowText)
+                            .stackLayoutChild(priority: .flexible)
+                    }
+                    .stackLayoutChild(priority: .fixed)
+                }
+            }
+            .stackLayoutChild(priority: .flexible)
+        }
+
+        let content = Column(alignment: .fill) {
+            for _ in 1...10 {
+                row
+            }
+        }
+
+        let size = content.content.measure(in: .init(width: 300))
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 300.0, height: size.height)
+
+        view.element = content
+        view.layoutIfNeeded()
+    }
+
+    func test_rows_with_one_flexible_element() {
+
+        let row = Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+            Box(backgroundColor: .red)
+                .constrainedTo(width: 80, height: 80)
+                .stackLayoutChild(priority: .fixed)
+
+            Column(alignment: .fill, underflow: .justifyToStart, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                let rows: [String] = [
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                    "Fusce dignissim vitae leo sed pretium.",
+                    "Morbi molestie, nisl eget faucibus bibendum, magna orci congue ipsum.",
+                    "Eu tincidunt orci nunc ac nisl.",
+                    "Aenean facilisis nulla vitae nibh suscipit, id placerat est lacinia.",
+                ]
+
+                for rowText in rows {
+                    Row(alignment: .fill, underflow: .growUniformly, overflow: .condenseUniformly, minimumSpacing: 10) {
+
+                        Box(backgroundColor: .blue)
+                            .constrainedTo(width: 40, height: 40)
+                            .stackLayoutChild(priority: .fixed)
+
+                        Label(text: rowText)
+                            .stackLayoutChild(priority: .flexible)
+                    }
+                    .stackLayoutChild(priority: .fixed)
+                }
+            }
+            .stackLayoutChild(priority: .flexible)
+        }
+
+        let allRows = Column(alignment: .fill) {
+            for _ in 1...100 {
+                row
+            }
+        }
+
+        let size = allRows.content.measure(in: .init(width: 300))
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 300.0, height: size.height)
+
+        determineAverage(for: 2.0) {
+            view.element = allRows
             view.layoutIfNeeded()
         }
     }
@@ -194,3 +299,4 @@ private struct NonCachingLabel: UIViewElement {
         view.text = text
     }
 }
+

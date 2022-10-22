@@ -496,7 +496,12 @@ struct TextContainerBox: Element {
 
         func update(model: AttributedLabel, environment: Environment) {
             self.model = model
-            labelView.update(model: model, environment: environment, isMeasuring: false)
+            labelView.update(
+                model: model,
+                text: model.displayableAttributedText,
+                environment: environment,
+                isMeasuring: false
+            )
         }
     }
 }
