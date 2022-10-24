@@ -126,17 +126,7 @@ final class ElementState {
         precondition(self.identifier == identifier)
         precondition(type(of: newElement) == type(of: element))
 
-        let isEquivalent: Bool = {
-            do {
-                return try Self.elementsEquivalent(self.element, newElement)
-            } catch {
-                guard error is ComparableElementNotEquivalent else {
-                    fatalError("Can only throw `ComparableElementNotEquivalent` from `isEquivalent`.")
-                }
-
-                return false
-            }
-        }()
+        let isEquivalent = Self.elementsEquivalent(element, newElement)
 
         if isEquivalent == false {
             clearAllCachedData()
@@ -337,7 +327,7 @@ extension ElementState {
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        if try lhs.anyIsEquivalent(to: rhs) {
+        if lhs.anyIsEquivalent(to: rhs) {
             return true
         } else {
             return false

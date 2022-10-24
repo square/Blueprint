@@ -21,7 +21,7 @@ import Foundation
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        return try! lhs.anyIsEquivalent(to: rhs) // TODO: kill off the try!
+        return lhs.anyIsEquivalent(to: rhs)
     }
 }
 
@@ -39,6 +39,6 @@ import Foundation
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        return try! lhs.anyIsEquivalent(to: rhs) // TODO: kill off the try!
+        return lhs.anyIsEquivalent(to: rhs) // TODO: kill off the try!
     }
 }

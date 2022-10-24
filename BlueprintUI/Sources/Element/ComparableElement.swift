@@ -66,7 +66,7 @@ extension ComparableElement {
     public func anyIsEquivalent(to other: AnyComparableElement) -> Bool {
         guard let other = other as? Self else { return false }
 
-        return try isEquivalent(to: other)
+        return isEquivalent(to: other)
     }
 
     public func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool {
@@ -94,7 +94,7 @@ extension Array {
             let lhs = self[index]
             let rhs = other[index]
 
-            if try compare(lhs, rhs) == false {
+            if compare(lhs, rhs) == false {
                 return false
             }
         }
@@ -120,7 +120,7 @@ extension Array where Self.Element == BlueprintUI.Element {
                 return false
             }
 
-            if try lhs.anyIsEquivalent(to: rhs) == false {
+            if lhs.anyIsEquivalent(to: rhs) == false {
                 return false
             }
         }
