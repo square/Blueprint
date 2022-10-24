@@ -7,6 +7,8 @@ struct LayoutResultNode {
     /// The element that was laid out
     var element: Element
 
+    var identifier: ElementIdentifier
+
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
@@ -15,16 +17,18 @@ struct LayoutResultNode {
     var state: ElementState
 
     /// The element's children.
-    var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    var children: [LayoutResultNode]
 
     init(
         element: Element,
+        identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
         state: ElementState,
-        children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        children: [LayoutResultNode]
     ) {
         self.element = element
+        self.identifier = identifier
         self.layoutAttributes = layoutAttributes
         self.environment = environment
         self.state = state
@@ -35,12 +39,14 @@ struct LayoutResultNode {
 
     init(
         root: Element,
+        identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
         states: ElementState
     ) {
         self.init(
             element: root,
+            identifier: identifier,
             layoutAttributes: layoutAttributes,
             environment: environment,
             state: states,
@@ -64,13 +70,13 @@ extension LayoutResultNode {
         // complete layout data for all children is required to perform the
         // appropriate computations.
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
-            .flatMap { identifier, layoutResultNode in
+            .flatMap { layoutResultNode in
 
                 layoutResultNode
                     .resolve()
                     .map { path, viewDescriptionNode in
                         // Propagate the child identifier
-                        (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
+                        (path: path.prepending(identifier: layoutResultNode.identifier), node: viewDescriptionNode)
                     }
             }
 
@@ -78,7 +84,7 @@ extension LayoutResultNode {
         // the minimal-area rectangle containing all child frames.
         let subtreeExtent: CGRect? = children
             .reduce(into: nil) { rect, child in
-                rect = rect?.union(child.node.layoutAttributes.frame) ?? child.node.layoutAttributes.frame
+                rect = rect?.union(child.layoutAttributes.frame) ?? child.layoutAttributes.frame
             }
 
         // Get the backing view description for the current node (if any),

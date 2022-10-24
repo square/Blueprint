@@ -428,6 +428,7 @@ public final class BlueprintView: UIView {
 
         let laidOutNodes = LayoutResultNode(
             root: element,
+            identifier: .init(element: element, key: nil, count: 1),
             layoutAttributes: .init(frame: bounds),
             environment: environment,
             states: states.root!

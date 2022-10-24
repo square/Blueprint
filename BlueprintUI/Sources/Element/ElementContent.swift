@@ -45,7 +45,7 @@ public struct ElementContent {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] // TODO: Turn this into a reference type too
+    ) -> [LayoutResultNode] // TODO: Turn this into a reference type too
     {
         autoreleasepool {
             storage.performLayout(
@@ -155,7 +155,7 @@ extension ElementContent {
             in size: CGSize,
             with environment: Environment,
             states: ElementState
-        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        ) -> [LayoutResultNode] {
             []
         }
 
@@ -308,7 +308,7 @@ fileprivate protocol ContentStorage {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    ) -> [LayoutResultNode]
 }
 
 
@@ -378,7 +378,7 @@ extension ElementContent {
             in size: CGSize,
             with environment: Environment,
             states: ElementState
-        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        ) -> [LayoutResultNode] {
             guard children.isEmpty == false else {
                 return []
             }
@@ -390,7 +390,7 @@ extension ElementContent {
                 items: layoutItems
             )
 
-            var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+            var result: [LayoutResultNode] = []
             result.reserveCapacity(children.count)
 
             for index in 0..<children.count {
@@ -402,6 +402,7 @@ extension ElementContent {
 
                 let resultNode = LayoutResultNode(
                     element: currentChild.element,
+                    identifier: identifier,
                     layoutAttributes: currentChildLayoutAttributes,
                     environment: environment,
                     state: childState,
@@ -412,7 +413,7 @@ extension ElementContent {
                     )
                 )
 
-                result.append((identifier: identifier, node: resultNode))
+                result.append(resultNode)
             }
 
             return result
@@ -475,7 +476,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [LayoutResultNode] {
         let environment = adapted(environment: environment)
 
         let childAttributes = LayoutAttributes(size: size)
@@ -486,6 +487,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let node = LayoutResultNode(
             element: child,
+            identifier: identifier,
             layoutAttributes: childAttributes,
             environment: environment,
             state: childState,
@@ -496,7 +498,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             )
         )
 
-        return [(identifier, node)]
+        return [node]
     }
 
     func measure(
@@ -559,7 +561,7 @@ private struct LazyStorage: ContentStorage {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [LayoutResultNode] {
 
         let constraint = SizeConstraint(size)
         let child = buildChild(for: .layout, in: constraint, environment: environment)
@@ -572,6 +574,7 @@ private struct LazyStorage: ContentStorage {
 
         let node = LayoutResultNode(
             element: child,
+            identifier: identifier,
             layoutAttributes: childAttributes,
             environment: environment,
             state: childState,
@@ -582,7 +585,7 @@ private struct LazyStorage: ContentStorage {
             )
         )
 
-        return [(identifier, node)]
+        return [node]
     }
 
     private func buildChild(
@@ -604,7 +607,7 @@ private struct MeasurableStorage: ContentStorage {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [LayoutResultNode] {
         []
     }
 
