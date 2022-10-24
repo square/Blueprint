@@ -146,7 +146,6 @@ extension ElementContent {
 
             precondition(type(of: element) == type(of: childState.element))
 
-
             return childState.measure(in: constraint, with: environment) { environment in
                 childState.elementContent.measure(in: constraint, with: environment, states: childState)
             }
@@ -334,9 +333,11 @@ extension ElementContent {
             key: AnyHashable? = nil,
             element: Element
         ) {
+            let identifier = identifierFactory.nextIdentifier(for: element, key: key)
+
             let child = Child(
                 traits: traits,
-                key: key,
+                identifier: identifier,
                 element: element
             )
 
@@ -417,6 +418,8 @@ extension ElementContent {
             return result
         }
 
+        private var identifierFactory = ElementIdentifier.Factory(elementCount: 1)
+
         private func layoutItems(
             states: ElementState,
             environment: Environment
@@ -426,14 +429,9 @@ extension ElementContent {
             /// is an extremely hot codepath; this additional performance matters, so we will
             /// keep track of the index ourselves.
 
-            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+            LayoutItems(with: children.indexedMap { index, child in
 
-            return LayoutItems(with: children.indexedMap { index, child in
-                let identifier = identifierFactory.nextIdentifier(for: child.element, key: child.key)
-
-                // print("Enumerating Child \(identifier)")
-
-                let childState = states.childState(for: child.element, in: environment, with: identifier)
+                let childState = states.childState(for: child.element, in: environment, with: child.identifier)
 
                 let measurable = Measurer { constraint in
                     childState.elementContent.measure(
@@ -446,7 +444,7 @@ extension ElementContent {
                 return LayoutItems.Item(
                     traits: child.traits,
                     content: measurable,
-                    identifier: identifier
+                    identifier: child.identifier
                 )
             })
         }
@@ -454,7 +452,7 @@ extension ElementContent {
         fileprivate struct Child {
 
             var traits: LayoutType.Traits
-            var key: AnyHashable?
+            var identifier: ElementIdentifier
             var element: Element
 
         }
