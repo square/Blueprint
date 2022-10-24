@@ -141,7 +141,7 @@ extension ElementContent {
             let childState = states.childState(
                 for: element,
                 in: environment,
-                with: .init(element: element, key: nil, count: 1)
+                with: .identifier(for: element, key: nil, count: 1)
             )
 
             precondition(type(of: element) == type(of: childState.element))
@@ -481,7 +481,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
+        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
         let childState = states.childState(for: child, in: environment, with: identifier)
 
@@ -509,7 +509,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         states.measure(in: constraint, with: environment) { environment in
 
             let environment = self.adapted(environment: environment)
-            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
@@ -546,7 +546,7 @@ private struct LazyStorage: ContentStorage {
         states.measure(in: constraint, with: environment) { environment in
 
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
-            let identifier = ElementIdentifier(element: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
@@ -568,7 +568,7 @@ private struct LazyStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier(element: child, key: nil, count: 1)
+        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
         let childState = states.childState(for: child, in: environment, with: identifier)
 

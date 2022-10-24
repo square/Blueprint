@@ -41,7 +41,7 @@
 
  You will note that the identifiers remain stable, which ultimately ensures that views are reused.
  */
-struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
+final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
     let elementType: Element.Type
     let elementTypeIdentifier: ObjectIdentifier
@@ -50,11 +50,32 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
     private let hash: Int
 
-    init(element: Element, key: AnyHashable?, count: Int) {
-        self.init(elementType: type(of: element), key: key, count: count)
+    static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
+        identifier(for: type(of: element), key: key, count: count)
     }
 
-    init(elementType: Element.Type, key: AnyHashable?, count: Int) {
+    private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
+
+    static func identifier(for elementType: Element.Type, key: AnyHashable?, count: Int) -> ElementIdentifier {
+
+        guard key == nil else {
+            return ElementIdentifier(elementType: elementType, key: key, count: count)
+        }
+
+        let typeID = ObjectIdentifier(elementType)
+
+        if let id = cachedIdentifiers[typeID]?[count] {
+            return id
+        } else {
+            let id = ElementIdentifier(elementType: elementType, key: key, count: count)
+
+            cachedIdentifiers[typeID, default: [:]][count] = id
+
+            return id
+        }
+    }
+
+    private init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
         self.elementType = elementType
         elementTypeIdentifier = ObjectIdentifier(elementType)
@@ -82,7 +103,8 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     }
 
     static func == (lhs: ElementIdentifier, rhs: ElementIdentifier) -> Bool {
-        lhs.elementTypeIdentifier == rhs.elementTypeIdentifier &&
+        lhs === rhs ||
+            lhs.elementTypeIdentifier == rhs.elementTypeIdentifier &&
             lhs.key == rhs.key &&
             lhs.count == rhs.count
     }
@@ -102,8 +124,8 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
             let count = nextCount(for: type, key: key)
 
-            return ElementIdentifier(
-                elementType: type,
+            return ElementIdentifier.identifier(
+                for: type,
                 key: key,
                 count: count
             )

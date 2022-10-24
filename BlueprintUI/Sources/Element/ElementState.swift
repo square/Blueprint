@@ -33,7 +33,7 @@ final class RootElementState {
         func makeRoot(with element: Element) {
             root = ElementState(
                 parent: nil,
-                identifier: .init(element: element, key: nil, count: 1),
+                identifier: .identifier(for: element, key: nil, count: 1),
                 element: element,
                 depth: 0,
                 signpostRef: signpostRef,
