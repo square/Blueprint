@@ -499,7 +499,7 @@ extension StackLayout {
 
             let flexibleMagnitude: SizeConstraint.Axis = constraint.axis(on: axis) - fixedMagnitude - minimumTotalSpacing
 
-            if flexibleMagnitude > 0 {
+            if flexibleMagnitude.isGreaterThanZero {
                 let flexibleConstraint: SizeConstraint = {
                     switch axis {
                     case .horizontal:
