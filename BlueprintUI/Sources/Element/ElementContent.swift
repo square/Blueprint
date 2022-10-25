@@ -209,6 +209,10 @@ extension ElementContent {
         }
     }
 
+    public init(proxying element: Element) {
+        storage = ProxyElementStorage(element: element)
+    }
+
     /// Initializes a new `ElementContent` with the given element.
     ///
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
@@ -461,6 +465,49 @@ extension ElementContent {
 }
 
 
+private struct ProxyElementStorage: ContentStorage {
+
+    let childCount: Int = 1
+
+    var element: Element
+
+    func measure(in constraint: SizeConstraint, with environment: Environment, states: ElementState) -> CGSize {
+
+        states.measure(in: constraint, with: environment) { env in
+            let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
+
+            let child = states.childState(for: element, in: environment, with: identifier)
+
+            return child.elementContent.measure(in: constraint, with: environment, states: child)
+        }
+    }
+
+    func performLayout(in size: CGSize, with environment: Environment, states: ElementState) -> [LayoutResultNode] {
+
+        let childAttributes = LayoutAttributes(size: size)
+
+        let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
+
+        let childState = states.childState(for: element, in: environment, with: identifier)
+
+        let node = LayoutResultNode(
+            element: element,
+            identifier: identifier,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            state: childState,
+            children: childState.elementContent.performLayout(
+                in: size,
+                with: environment,
+                states: childState
+            )
+        )
+
+        return [node]
+    }
+}
+
+
 private struct EnvironmentAdaptingStorage: ContentStorage {
 
     let childCount = 1
@@ -494,7 +541,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             children: childState.elementContent.performLayout(
                 in: size,
                 with: environment,
-                states: childState.childState(for: child, in: environment, with: identifier)
+                states: childState
             )
         )
 

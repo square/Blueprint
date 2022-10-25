@@ -71,7 +71,7 @@ class PerformancePlayground: XCTestCase {
     func test_repeated_layouts() {
         let element = Column(alignment: .fill) {
 
-            for index in 1...500 {
+            for index in 1...1000 {
                 Row(alignment: .fill) {
                     Box(backgroundColor: .red)
                         .constrainedTo(size: CGSize(width: 100, height: 100))

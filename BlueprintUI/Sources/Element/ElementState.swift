@@ -72,12 +72,18 @@ final class ElementState {
 
     private(set) var element: Element
 
+    let isProxyElement: Bool
+
     let isElementComparable: Bool
+
     private(set) var appliesViewDescriptionIfEquivalent: Bool
 
     private(set) var wasVisited: Bool
     private(set) var hasUpdatedInCurrentCycle: Bool
     private(set) var wasUpdateEquivalent: Bool
+
+    private var measurements: [SizeConstraint: CachedMeasurement] = [:]
+    private var children: [ElementIdentifier: ElementState] = [:]
 
     init(
         parent: ElementState?,
@@ -90,6 +96,7 @@ final class ElementState {
         self.parent = parent
         self.identifier = identifier
         self.element = element
+        isProxyElement = self.element is ProxyElement
         isElementComparable = self.element is AnyComparableElement
         appliesViewDescriptionIfEquivalent = (element as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
 
@@ -160,8 +167,6 @@ final class ElementState {
         }
     }
 
-    private var measurements: [SizeConstraint: CachedMeasurement] = [:]
-
     private struct CachedMeasurement {
         var size: CGSize
         var dependencies: Environment.Subset?
@@ -202,13 +207,12 @@ final class ElementState {
         return (output, environment.subset(with: observedKeys))
     }
 
-    private var children: [ElementIdentifier: ElementState] = [:]
-
     func childState(
         for child: Element,
         in environment: Environment,
         with identifier: ElementIdentifier
     ) -> ElementState {
+
         if let existing = children[identifier] {
             existing.wasVisited = true
 

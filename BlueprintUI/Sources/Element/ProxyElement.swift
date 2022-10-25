@@ -16,7 +16,7 @@ extension ProxyElement {
 
     public var content: ElementContent {
         // elementRepresentation.content
-        ElementContent(child: elementRepresentation)
+        ElementContent(proxying: elementRepresentation)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
