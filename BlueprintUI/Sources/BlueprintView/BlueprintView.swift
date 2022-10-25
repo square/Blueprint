@@ -99,7 +99,7 @@ public final class BlueprintView: UIView {
             invalidateIntrinsicContentSize()
         }
     }
-    
+
     /// An optional explicit layout mode for this view. If `nil`, this view will inherit the layout
     /// mode of its nearest ancestor, or use ``LayoutMode/default``.
     public var layoutMode: LayoutMode? {
@@ -224,7 +224,7 @@ public final class BlueprintView: UIView {
         let environment = makeEnvironment()
         let layoutMode = environment.layoutMode
         let renderContext = RenderContext(layoutMode: layoutMode)
-        
+
         let measurement = renderContext.perform {
             element.content.measure(
                 in: constraint,
@@ -355,15 +355,24 @@ public final class BlueprintView: UIView {
             origin: .zero,
             size: bounds.size + rootCorrection.size
         )
-        
+
         let layoutMode = environment.layoutMode
         let renderContext = RenderContext(layoutMode: layoutMode)
 
-        /// Grab view descriptions
-        let viewNodes = renderContext.perform {
-            element?
-                .layout(frame: rootFrame, environment: environment, layoutMode: layoutMode)
-                .resolve() ?? []
+        // Perform layout
+        let viewNodes: [(path: ElementPath, node: NativeViewNode)] = renderContext.perform {
+            guard let element = element else { return [] }
+
+            let result = element.layout(
+                frame: rootFrame,
+                environment: environment,
+                layoutMode: layoutMode
+            )
+
+            // TODO: save the LayoutResultNode here for debugging
+
+            // Flatten into tree of view descriptions
+            return result.resolve()
         }
 
         let measurementEndDate = Date()
@@ -423,6 +432,13 @@ public final class BlueprintView: UIView {
         return rootController.children
     }
 
+    /// Forces a synchronous layout, for testing purposes.
+    @_spi(Debugging)
+    public func forceSynchronousLayout() {
+        setNeedsViewHierarchyUpdate()
+        updateViewHierarchyIfNeeded()
+    }
+
     private func makeEnvironment() -> Environment {
 
         let inherited: Environment = {
@@ -450,7 +466,7 @@ public final class BlueprintView: UIView {
         if let window = window {
             environment.windowSize = window.bounds.size
         }
-        
+
         if let layoutMode = self.layoutMode ?? RenderContext.current?.layoutMode {
             environment.layoutMode = layoutMode
         }
