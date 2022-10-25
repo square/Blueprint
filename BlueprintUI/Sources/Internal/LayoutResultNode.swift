@@ -23,26 +23,28 @@ extension Element {
             return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
         case .singlePass:
             return singlePassLayout(
+                proposal: .init(frame.size),
                 context: SPLayoutContext(
-                    proposal: .init(frame.size),
-                    attributes: LayoutAttributes(frame: frame)
-                ),
-                environment: environment
+                    attributes: LayoutAttributes(frame: frame),
+                    environment: environment,
+                    // TODO: Hoist up?
+                    cache: .init()
+                )
             )
         }
     }
 
-    func singlePassLayout(context: SPLayoutContext, environment: Environment) -> LayoutResultNode {
+    func singlePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> LayoutResultNode {
         print("\(type(of: self)) root layout in \(context.attributes.frame)")
         let layouts = content.performSinglePassLayout(
-            context: context,
-            environment: environment
+            proposal: proposal,
+            context: context
         )
 
         return LayoutResultNode(
             element: self,
             layoutAttributes: context.attributes,
-            environment: environment,
+            environment: context.environment,
             children: layouts.map { (identifier: $0.identifier, node: $0.node) }
         )
     }

@@ -53,6 +53,8 @@ protocol LayoutValueKey {
 }
 
 public struct LayoutSubview {
+    typealias SizeCache = SPValueCache<ProposedViewSize, CGSize>
+
     struct Placement {
         var position: CGPoint
         var anchor: UnitPoint
@@ -82,28 +84,29 @@ public struct LayoutSubview {
     @Storage
     private(set) var placement: Placement?
 
-    private var sizeCache: SizeCache
+    private var sizeCache: SizeCache { measureContext.cache.valueCache }
 
     var element: Element
     private var content: ElementContent
 
     var sizable: Sizable { content }
-    var environment: Environment
+    var environment: Environment { measureContext.environment }
+    var cache: SPCacheNode { measureContext.cache }
+
+    var measureContext: MeasureContext
 
     var layoutValues: [ObjectIdentifier: Any] = [:]
 
     init<Key: LayoutValueKey>(
         element: Element,
         content: ElementContent,
-        environment: Environment,
-        sizeCache: SizeCache,
+        measureContext: MeasureContext,
         key: Key.Type,
         value: Key.Value
     ) {
         self.element = element
         self.content = content
-        self.environment = environment
-        self.sizeCache = sizeCache
+        self.measureContext = measureContext
         layoutValues = [ObjectIdentifier(key): value]
     }
 
@@ -139,27 +142,16 @@ public struct LayoutSubview {
 
     func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         sizeCache.get(key: proposal) { proposal in
-            sizable.sizeThatFits(proposal: proposal, environment: environment)
-        }
-    }
-
-    class SizeCache {
-        typealias Key = ProposedViewSize
-        var sizes: [ProposedViewSize: CGSize] = [:]
-
-        func get(key: Key, or create: (ProposedViewSize) -> CGSize) -> CGSize {
-            if let size = sizes[key] {
-                return size
-            }
-            let size = create(key)
-            sizes[key] = size
-            return size
+            sizable.sizeThatFits(proposal: proposal, context: .init(
+                cache: cache,
+                environment: environment
+            ))
         }
     }
 }
 
 protocol Sizable {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize
 }
 
 @propertyWrapper

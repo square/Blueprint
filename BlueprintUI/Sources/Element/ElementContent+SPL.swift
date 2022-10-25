@@ -3,11 +3,14 @@ import Foundation
 typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
 
 protocol SPContentStorage {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        context: MeasureContext
+    ) -> CGSize
 
     func performSinglePassLayout(
-        context: SPLayoutContext,
-        environment: Environment
+        proposal: ProposedViewSize,
+        context: SPLayoutContext
     ) -> [IdentifiedNode]
 }
 
@@ -18,24 +21,19 @@ enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
 }
 
 extension ElementContent: Sizable {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
-        storage.sizeThatFits(proposal: proposal, environment: environment)
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        storage.sizeThatFits(proposal: proposal, context: context)
     }
 }
 
 final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKey: Hashable {
     typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
 
-    private var values: [Key: Value] = [:]
+    var valueCache: SPValueCache<Key, Value> = .init()
     private var subcaches: [SubcacheKey: Subcache] = [:]
 
     func get(key: Key, or create: (Key) -> Value) -> Value {
-        if let node = values[key] {
-            return node
-        }
-        let node = create(key)
-        values[key] = node
-        return node
+        valueCache.get(key: key, or: create)
     }
 
     func subcache(key: SubcacheKey) -> Subcache {
@@ -48,6 +46,19 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
     }
 }
 
+final class SPValueCache<Key: Hashable, Value> {
+    var values: [Key: Value] = [:]
+
+    func get(key: Key, or create: (Key) -> Value) -> Value {
+        if let size = values[key] {
+            return size
+        }
+        let size = create(key)
+        values[key] = size
+        return size
+    }
+}
+
 typealias SPCacheNode = SPCacheTree<ProposedViewSize, CGSize, Int>
 
 struct MeasureContext {
@@ -57,13 +68,14 @@ struct MeasureContext {
 
 extension ElementContent.Builder {
     func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
-        // TODO: wire in cache tree to here and layout
-        let subviews = children.map { child in
+        let subviews = zip(children, children.indices).map { child, index in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
-                environment: environment,
-                sizeCache: .init(),
+                measureContext: .init(
+                    cache: context.cache.subcache(key: index),
+                    environment: context.environment
+                ),
                 key: GenericLayoutValueKey<LayoutType>.self,
                 value: child.traits
             )
@@ -72,21 +84,22 @@ extension ElementContent.Builder {
     }
 
 
-    func performSinglePassLayout(context: SPLayoutContext, environment: Environment) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
 
-        let subviews = children.map { child in
+        let subviews = zip(children, children.indices).map { child, index in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
-                environment: environment,
-                sizeCache: LayoutSubview.SizeCache(),
+                measureContext: .init(
+                    cache: context.cache.subcache(key: index),
+                    environment: context.environment
+                ),
                 key: GenericLayoutValueKey<LayoutType>.self,
                 value: child.traits
             )
         }
 
         let attributes = context.attributes
-        let proposal = context.proposal
         let frame = context.attributes.frame
 
         layout.placeSubviews(
@@ -97,7 +110,9 @@ extension ElementContent.Builder {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        let identifiedNodes: [IdentifiedNode] = zip(children, subviews).map { child, subview in
+        let identifiedNodes: [IdentifiedNode] = children.indices.map { index in
+            let child = children[index]
+            let subview = subviews[index]
 
             let placement = subview.placement
                 ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
@@ -133,17 +148,18 @@ extension ElementContent.Builder {
             )
 
             let childContext = SPLayoutContext(
-                proposal: placement.size.proposal,
-                attributes: LayoutAttributes(frame: offsetFrame)
+                attributes: LayoutAttributes(frame: offsetFrame),
+                environment: context.environment,
+                cache: context.cache.subcache(key: index)
             )
 
             let node = LayoutResultNode(
                 element: child.element,
                 layoutAttributes: childAttributes,
-                environment: environment,
+                environment: context.environment,
                 children: child.content.performSinglePassLayout(
-                    context: childContext,
-                    environment: environment
+                    proposal: placement.size.proposal,
+                    context: childContext
                 )
             )
             print("\(type(of: child.element)) result \(node.layoutAttributes.frame)")

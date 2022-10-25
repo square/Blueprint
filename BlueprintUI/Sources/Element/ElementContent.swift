@@ -49,7 +49,14 @@ public struct ElementContent {
         case .standard:
             return storage.measure(in: constraint, environment: environment, cache: cache)
         case .singlePass:
-            return storage.sizeThatFits(proposal: ProposedViewSize(constraint), environment: environment)
+            return storage.sizeThatFits(
+                proposal: ProposedViewSize(constraint),
+                context: .init(
+                    // TODO: Hoist upward?
+                    cache: .init(),
+                    environment: environment
+                )
+            )
         }
     }
 
@@ -74,16 +81,20 @@ public struct ElementContent {
     }
 
     func performSinglePassLayout(
-        context: SPLayoutContext,
-        environment: Environment
+        proposal: ProposedViewSize,
+        context: SPLayoutContext
     ) -> [IdentifiedNode] {
-        storage.performSinglePassLayout(context: context, environment: environment)
+        storage.performSinglePassLayout(
+            proposal: proposal,
+            context: context
+        )
     }
 }
 
 public struct SPLayoutContext {
-    var proposal: ProposedViewSize
     var attributes: LayoutAttributes
+    var environment: Environment
+    var cache: SPCacheNode
 }
 
 
@@ -232,13 +243,16 @@ protocol ContentStorage: SPContentStorage {
 }
 
 extension ContentStorage {
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        context: MeasureContext
+    ) -> CGSize {
         fatalError("\(type(of: self)) has not implemented single pass layout")
     }
 
     func performSinglePassLayout(
-        context: SPLayoutContext,
-        environment: Environment
+        proposal: ProposedViewSize,
+        context: SPLayoutContext
     ) -> [IdentifiedNode] {
         fatalError("\(type(of: self)) has not implemented single pass layout")
     }
@@ -514,12 +528,12 @@ private struct MeasurableStorage: ContentStorage {
         }
     }
 
-    func sizeThatFits(proposal: ProposedViewSize, environment: Environment) -> CGSize {
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
         let constraint = SizeConstraint(proposal)
-        return measurer(constraint, environment)
+        return measurer(constraint, context.environment)
     }
 
-    func performSinglePassLayout(context: SPLayoutContext, environment: Environment) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
         []
     }
 }
