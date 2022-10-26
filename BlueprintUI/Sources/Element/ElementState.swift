@@ -85,6 +85,15 @@ final class ElementState {
     private var measurements: [SizeConstraint: CachedMeasurement] = [:]
     private var children: [ElementIdentifier: ElementState] = [:]
 
+    enum Kind {
+        case element(Element)
+        case proxy(Proxy)
+
+        final class Element {}
+
+        final class Proxy {}
+    }
+
     init(
         parent: ElementState?,
         identifier: ElementIdentifier,

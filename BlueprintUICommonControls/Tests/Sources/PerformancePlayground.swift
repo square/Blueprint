@@ -50,6 +50,19 @@ class PerformancePlayground: XCTestCase {
                     for (j, value) in values.enumerated() {
                         let label = Label(text: String(value))
                             .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
+                            .centered()
                             .constrainedTo(size: .init(width: 20, height: 20))
                             .box(background: .red)
                             .tappable {}
@@ -62,7 +75,7 @@ class PerformancePlayground: XCTestCase {
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
 
-        determineAverage(for: 2.0) {
+        determineAverage(for: 4.0) {
             view.element = element
             view.layoutIfNeeded()
         }
