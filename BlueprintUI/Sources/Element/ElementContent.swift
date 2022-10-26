@@ -158,8 +158,6 @@ extension ElementContent {
         ) -> [LayoutResultNode] {
             []
         }
-
-
     }
 }
 
@@ -209,10 +207,6 @@ extension ElementContent {
         }
     }
 
-    public init(proxying element: Element) {
-        storage = ProxyElementStorage(element: element)
-    }
-
     /// Initializes a new `ElementContent` with the given element.
     ///
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
@@ -221,10 +215,7 @@ extension ElementContent {
     public init(
         child: Element
     ) {
-        self = ElementContent(
-            child: child,
-            layout: PassthroughLayout()
-        )
+        storage = SingleChildStorage(element: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -465,7 +456,7 @@ extension ElementContent {
 }
 
 
-private struct ProxyElementStorage: ContentStorage {
+private struct SingleChildStorage: ContentStorage {
 
     let childCount: Int = 1
 
@@ -473,13 +464,11 @@ private struct ProxyElementStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, with environment: Environment, states: ElementState) -> CGSize {
 
-        states.measure(in: constraint, with: environment) { env in
-            let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
+        let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
 
-            let child = states.childState(for: element, in: environment, with: identifier)
+        let child = states.childState(for: element, in: environment, with: identifier)
 
-            return child.elementContent.measure(in: constraint, with: environment, states: child)
-        }
+        return child.elementContent.measure(in: constraint, with: environment, states: child)
     }
 
     func performLayout(in size: CGSize, with environment: Environment, states: ElementState) -> [LayoutResultNode] {

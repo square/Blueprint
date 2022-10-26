@@ -76,6 +76,7 @@ final class ElementState {
 
     let isElementComparable: Bool
 
+    // TODO: Broken with proxy elements, move to ViewDescription
     private(set) var appliesViewDescriptionIfEquivalent: Bool
 
     private(set) var wasVisited: Bool
@@ -156,8 +157,6 @@ final class ElementState {
 
         wasUpdateEquivalent = isEquivalent
         appliesViewDescriptionIfEquivalent = (element as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
-
-        // print("Setting `wasUpdateEquivalent` to \(wasUpdateEquivalent) for \(type(of: element))")
     }
 
     func setup() {
