@@ -7,7 +7,7 @@ import UIKit
 /// For other modes, the size of the content element is determined by calling `measure(in:)`
 /// on the content element – even if that size is larger than the wrapping element.
 ///
-public struct Aligned: Element, Equatable, ComparableElement {
+public struct Aligned: Element {
     /// The possible vertical alignment values.
     public enum VerticalAlignment: Equatable {
         /// Aligns the content to the top edge of the containing element.

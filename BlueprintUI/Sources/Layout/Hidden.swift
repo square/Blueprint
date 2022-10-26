@@ -3,7 +3,7 @@ import CoreGraphics
 /// `Hidden` conditionally hides its wrapped element.
 ///
 /// - Note: When an element is hidden, any elements within the wrapped element will be hidden.
-public struct Hidden: Element, Equatable, ComparableElement {
+public struct Hidden: Element {
     public var isHidden: Bool
     @ElementProperty public var wrappedElement: Element
 

@@ -4,7 +4,7 @@ import UIKit
 
 /// A simple element that wraps a child element and adds visual styling including
 /// background color.
-public struct Box: Element, Equatable, ComparableElement {
+public struct Box: Element {
 
     /// The background color to show in the box.
     public var backgroundColor: UIColor

@@ -73,12 +73,24 @@ class PerformancePlayground: XCTestCase {
             }
         }.inset(uniform: 20)
 
+//        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
+//
+//        view.element = element
+//
+//        let node = view.calculateLayoutNodes(for: element, in: .empty, states: view.rootState)
+//
+//        determineAverage(for: 3.0) {
+//            _ = node.resolve()
+//        }
+
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
 
         determineAverage(for: 4.0) {
             view.element = element
             view.layoutIfNeeded()
         }
+
+        print("\(Stopwatch.stopwatch.time)")
     }
 
     func test_repeated_layouts() {

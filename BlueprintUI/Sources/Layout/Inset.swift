@@ -4,7 +4,7 @@ import UIKit
 ///
 /// Commonly used to add padding around another element when displayed within a container.
 ///
-public struct Inset: Element, Equatable, ComparableElement {
+public struct Inset: Element {
 
     /// The wrapped element to be inset.
     @ElementProperty public var wrappedElement: Element

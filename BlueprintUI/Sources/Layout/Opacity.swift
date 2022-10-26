@@ -1,7 +1,7 @@
 import UIKit
 
 /// Changes the opacity of the wrapped element.
-public struct Opacity: Element, Equatable, ComparableElement {
+public struct Opacity: Element {
 
     /// The content element whose opacity is being affected.
     @ElementProperty public var wrappedElement: Element

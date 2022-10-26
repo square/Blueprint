@@ -39,7 +39,7 @@ public final class BlueprintView: UIView {
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
     /// The live, tracked state for each element in the element tree.
-    private let rootState: RootElementState
+    internal let rootState: RootElementState
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -416,7 +416,19 @@ public final class BlueprintView: UIView {
         in environment: Environment,
         states: RootElementState
     ) -> [(path: ElementPath, node: NativeViewNode)] {
+
         guard let element = self.element else { return [] }
+
+        let node = calculateLayoutNodes(for: element, in: environment, states: states)
+
+        return node.resolve()
+    }
+
+    internal func calculateLayoutNodes(
+        for element: Element,
+        in environment: Environment,
+        states: RootElementState
+    ) -> LayoutResultNode {
 
         rootState.root?.prepareForLayout()
 
@@ -426,15 +438,13 @@ public final class BlueprintView: UIView {
 
         states.update(with: element, in: environment)
 
-        let laidOutNodes = LayoutResultNode(
+        return LayoutResultNode(
             root: element,
             identifier: .identifier(for: element, key: nil, count: 1),
             layoutAttributes: .init(frame: bounds),
             environment: environment,
             states: states.root!
         )
-
-        return laidOutNodes.resolve()
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {

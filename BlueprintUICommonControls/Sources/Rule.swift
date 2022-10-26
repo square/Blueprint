@@ -3,7 +3,7 @@ import UIKit
 
 /// A solid line, parallel to the x or y axis, with a fixed thickness but unconstrained in length,
 /// suitable for use as a separator.
-public struct Rule: ProxyElement, Equatable, ComparableElement {
+public struct Rule: ProxyElement {
     /// Represents whether the rule is parallel to the x or y axis.
     public enum Orientation: Equatable {
         /// Indicates that the rule is parallel to the x axis.

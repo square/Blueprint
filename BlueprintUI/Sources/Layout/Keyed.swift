@@ -35,7 +35,7 @@ import UIKit
 ///     }
 /// }
 /// ```
-public struct Keyed: Element, Equatable, ComparableElement {
+public struct Keyed: Element {
 
     /// The key used to differentiate the element.
     public var key: AnyHashable?
