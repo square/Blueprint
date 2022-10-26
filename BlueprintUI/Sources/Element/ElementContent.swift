@@ -689,20 +689,6 @@ fileprivate struct SingleChildLayoutHost: Layout {
     }
 }
 
-
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-}
-
-
 // Used for empty elements with an intrinsic size
 fileprivate struct MeasurableLayout: Layout {
 
