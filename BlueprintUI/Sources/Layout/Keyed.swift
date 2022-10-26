@@ -69,6 +69,14 @@ public struct Keyed: Element {
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            // NO-OP
+        }
     }
 }
 

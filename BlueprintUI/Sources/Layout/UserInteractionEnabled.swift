@@ -32,7 +32,46 @@ public struct UserInteractionEnabled: Element {
             attributes.isUserInteractionEnabled = isEnabled
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            subview.attributes.isUserInteractionEnabled = isEnabled
+        }
     }
+}
+
+struct SPAttributes {
+
+    /// Corresponds to `UIView.layer.transform`.
+    public var transform: CATransform3D
+
+    /// Corresponds to `UIView.alpha`.
+    public var alpha: CGFloat
+
+    /// Corresponds to `UIView.isUserInteractionEnabled`.
+    public var isUserInteractionEnabled: Bool
+
+    /// Corresponds to `UIView.isHidden`.
+    public var isHidden: Bool
+
+    internal init(
+        transform: CATransform3D = CATransform3DIdentity,
+        alpha: CGFloat = 1,
+        isUserInteractionEnabled: Bool = true,
+        isHidden: Bool = false
+    ) {
+        self.transform = transform
+        self.alpha = alpha
+        self.isUserInteractionEnabled = isUserInteractionEnabled
+        self.isHidden = isHidden
+    }
+}
+
+protocol AttributeModifier {
+    func attributes() -> SPAttributes
 }
 
 extension Element {

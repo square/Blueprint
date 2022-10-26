@@ -21,6 +21,7 @@ public struct Hidden: Element {
     }
 
     private struct Layout: SingleChildLayout {
+
         var isHidden: Bool
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
@@ -31,6 +32,14 @@ public struct Hidden: Element {
             var attributes = LayoutAttributes(size: size)
             attributes.isHidden = isHidden
             return attributes
+        }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            subview.attributes.isHidden = isHidden
         }
     }
 }

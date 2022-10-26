@@ -18,18 +18,19 @@ public protocol SPLayout {
 
 public struct ProposedViewSize: Hashable, CustomStringConvertible {
 
-    static let zero = Self(.zero)
-    static let infinity = Self(.infinity)
+    public static let zero = Self(.zero)
+    public static let infinity = Self(.infinity)
+    public static let unspecified = Self(width: nil, height: nil)
 
-    var width: CGFloat?
-    var height: CGFloat?
+    public var width: CGFloat?
+    public var height: CGFloat?
 
-    init(_ size: CGSize) {
+    public init(_ size: CGSize) {
         width = size.width
         height = size.height
     }
 
-    init(width: CGFloat?, height: CGFloat?) {
+    public init(width: CGFloat?, height: CGFloat?) {
         self.width = width
         self.height = height
     }
@@ -81,6 +82,21 @@ public struct LayoutSubview {
         }
     }
 
+    class Attributes {
+
+        /// Corresponds to `UIView.layer.transform`.
+        var transform: CATransform3D = CATransform3DIdentity
+
+        /// Corresponds to `UIView.alpha`.
+        var alpha: CGFloat = 1
+
+        /// Corresponds to `UIView.isUserInteractionEnabled`.
+        var isUserInteractionEnabled: Bool = true
+
+        /// Corresponds to `UIView.isHidden`.
+        var isHidden: Bool = false
+    }
+
     @Storage
     private(set) var placement: Placement?
 
@@ -97,6 +113,8 @@ public struct LayoutSubview {
 
     var layoutValues: [ObjectIdentifier: Any] = [:]
 
+    var attributes: Attributes = .init()
+
     init<Key: LayoutValueKey>(
         element: Element,
         content: ElementContent,
@@ -110,6 +128,21 @@ public struct LayoutSubview {
         layoutValues = [ObjectIdentifier(key): value]
     }
 
+    init<LayoutType: Layout>(
+        element: Element,
+        content: ElementContent,
+        measureContext: MeasureContext,
+        traits: LayoutType.Traits,
+        type: LayoutType.Type = LayoutType.self
+    ) {
+        self.element = element
+        self.content = content
+        self.measureContext = measureContext
+        layoutValues = [
+            ObjectIdentifier(GenericLayoutValueKey<LayoutType>.self): traits,
+        ]
+    }
+
     subscript<Key>(_ keyType: Key.Type) -> Key.Value where Key: LayoutValueKey {
         if let value = layoutValues[ObjectIdentifier(keyType)] as? Key.Value {
             return value
@@ -117,7 +150,7 @@ public struct LayoutSubview {
         return keyType.defaultValue
     }
 
-    func place(
+    public func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
         proposal: ProposedViewSize,
@@ -131,16 +164,15 @@ public struct LayoutSubview {
         )
     }
 
-    func place(
+    public func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
         size: CGSize
     ) {
-//        placement = Placement(position: position, anchor: anchor, size: .init(proposal: <#T##ProposedViewSize#>, width: <#T##CGFloat?#>, height: <#T##CGFloat?#>))
         place(at: position, anchor: anchor, proposal: .init(size), width: size.width, height: size.height)
     }
 
-    func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
+    public func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         sizeCache.get(key: proposal) { proposal in
             sizable.sizeThatFits(proposal: proposal, context: .init(
                 cache: cache,

@@ -102,17 +102,19 @@ final class RootViewController: UIViewController {
         Column(alignment: .fill) {
             Spacer(50)
 
-            Row(alignment: .fill, underflow: .growUniformly) {
-                Box(backgroundColor: .red)
-                    .constrainedTo(width: 60, height: 60)
-                    .stackLayoutChild(priority: .fixed)
+            EnvironmentReader { env in
+                Row(alignment: .fill, underflow: .growUniformly) {
+                    Box(backgroundColor: .red)
+                        .constrainedTo(width: 60, height: 60)
+                        .stackLayoutChild(priority: .fixed)
 
-                Box(backgroundColor: .yellow)
-                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
+                    Box(backgroundColor: .yellow)
+                        .constrainedTo(width: .atLeast(10), height: .absolute(30))
 
-                Box(backgroundColor: .orange)
-                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
+                    Box(backgroundColor: .orange)
+                        .constrainedTo(width: .absolute(40), height: .atLeast(10))
 
+                }
             }
 
             Spacer(50)
@@ -133,6 +135,7 @@ final class RootViewController: UIViewController {
             Spacer(50)
 
         }
+        .scrollable()
 
     }
 

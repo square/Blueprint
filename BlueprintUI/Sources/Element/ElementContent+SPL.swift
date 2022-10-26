@@ -83,7 +83,6 @@ extension ElementContent.Builder {
         return layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
 
-
     func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
 
         let subviews = zip(children, children.indices).map { child, index in
@@ -141,14 +140,18 @@ extension ElementContent.Builder {
             )
             print("\(type(of: subview.element)) frame \(childFrame) within \(frame)")
 
-            let childAttributes = LayoutAttributes(frame: offsetFrame)
+            let childAttributes = LayoutAttributes(
+                frame: offsetFrame,
+                attributes: subview.attributes
+            )
+
             let identifier = identifierFactory.nextIdentifier(
                 for: type(of: subview.element),
                 key: child.key
             )
 
             let childContext = SPLayoutContext(
-                attributes: LayoutAttributes(frame: offsetFrame),
+                attributes: childAttributes,
                 environment: context.environment,
                 cache: context.cache.subcache(key: index)
             )
@@ -166,6 +169,19 @@ extension ElementContent.Builder {
             return (identifier: identifier, node: node)
         }
         return identifiedNodes
+    }
+}
+
+
+extension LayoutAttributes {
+
+    init(frame: CGRect, attributes: LayoutSubview.Attributes) {
+        var layoutAttributes = LayoutAttributes(frame: frame)
+        layoutAttributes.transform = attributes.transform
+        layoutAttributes.alpha = attributes.alpha
+        layoutAttributes.isUserInteractionEnabled = attributes.isUserInteractionEnabled
+        layoutAttributes.isHidden = attributes.isHidden
+        self = layoutAttributes
     }
 }
 

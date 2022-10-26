@@ -120,6 +120,28 @@ extension ScrollView {
             }
         }
 
+        func fittedSize(in proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            switch contentSize {
+            case .custom(let size):
+                return size
+
+            case .fittingContent:
+                return subview.sizeThatFits(.unspecified)
+
+            case .fittingHeight:
+                return subview.sizeThatFits(.init(
+                    width: proposal.width,
+                    height: nil
+                ))
+
+            case .fittingWidth:
+                return subview.sizeThatFits(.init(
+                    width: nil,
+                    height: proposal.width
+                ))
+            }
+        }
+
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             let adjustedConstraint = constraint.inset(
                 width: contentInset.left + contentInset.right,
@@ -164,8 +186,68 @@ extension ScrollView {
             return contentAttributes
         }
 
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            let adjustedProposal = proposal.inset(by: contentInset)
+
+            var result = fittedSize(in: adjustedProposal, subview: subview)
+
+            result.width += contentInset.left + contentInset.right
+            result.height += contentInset.top + contentInset.bottom
+
+            if let width = proposal.width {
+                result.width = min(result.width, width)
+            }
+
+            if let height = proposal.height {
+                result.height = min(result.height, height)
+            }
+
+            return result
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            let size = bounds.size
+            var insetSize = size
+            insetSize.width -= contentInset.left + contentInset.right
+            insetSize.height -= contentInset.top + contentInset.bottom
+
+            var itemSize = fittedSize(in: .init(insetSize), subview: subview)
+            if contentSize == .fittingHeight {
+                itemSize.width = insetSize.width
+            } else if contentSize == .fittingWidth {
+                itemSize.height = insetSize.height
+            }
+
+            var origin: CGPoint = bounds.origin
+
+            if centersUnderflow {
+                if itemSize.width < size.width {
+                    origin.x += (size.width - itemSize.width) / 2
+                }
+
+                if itemSize.height < size.height {
+                    origin.y += (size.height - itemSize.height) / 2
+                }
+            }
+
+            subview.place(at: origin, size: itemSize)
+        }
     }
 
+}
+
+extension ProposedViewSize {
+
+    fileprivate func inset(by insets: UIEdgeInsets) -> Self {
+        let insetSize = CGSize(
+            width: insets.left + insets.right,
+            height: insets.top + insets.bottom
+        )
+        return .init(
+            width: width.map { $0 - insetSize.width },
+            height: height.map { $0 - insetSize.height }
+        )
+    }
 }
 
 extension ScrollView {

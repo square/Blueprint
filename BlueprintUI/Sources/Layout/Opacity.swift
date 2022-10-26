@@ -42,6 +42,14 @@ public struct Opacity: Element {
             attributes.alpha = opacity
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            subview.attributes.alpha = opacity
+        }
     }
 }
 

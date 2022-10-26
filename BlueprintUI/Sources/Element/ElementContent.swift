@@ -242,22 +242,6 @@ protocol ContentStorage: SPContentStorage {
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)]
 }
 
-extension ContentStorage {
-    func sizeThatFits(
-        proposal: ProposedViewSize,
-        context: MeasureContext
-    ) -> CGSize {
-        fatalError("\(type(of: self)) has not implemented single pass layout")
-    }
-
-    func performSinglePassLayout(
-        proposal: ProposedViewSize,
-        context: SPLayoutContext
-    ) -> [IdentifiedNode] {
-        fatalError("\(type(of: self)) has not implemented single pass layout")
-    }
-}
-
 
 extension ElementContent {
 
@@ -456,6 +440,28 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     }
 }
 
+extension EnvironmentAdaptingStorage {
+
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        let environment = adapted(environment: context.environment)
+        let context = MeasureContext(
+            cache: context.cache,
+            environment: environment
+        )
+        return child.content.sizeThatFits(proposal: proposal, context: context)
+    }
+
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        let environment = adapted(environment: context.environment)
+        let context = SPLayoutContext(
+            attributes: context.attributes,
+            environment: environment,
+            cache: context.cache
+        )
+        return child.content.performSinglePassLayout(proposal: proposal, context: context)
+    }
+}
+
 /// Content storage that defers creation of its child until measurement or layout time.
 private struct LazyStorage: ContentStorage {
     let childCount = 1
@@ -504,6 +510,27 @@ private struct LazyStorage: ContentStorage {
         environment: Environment
     ) -> Element {
         builder(phase, constraint, environment)
+    }
+}
+
+extension LazyStorage {
+
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        let child = buildChild(
+            for: .measurement,
+            in: .init(proposal),
+            environment: context.environment
+        )
+        return child.content.sizeThatFits(proposal: proposal, context: context)
+    }
+
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        let child = buildChild(
+            for: .layout,
+            in: .init(proposal),
+            environment: context.environment
+        )
+        return child.content.performSinglePassLayout(proposal: proposal, context: context)
     }
 }
 
