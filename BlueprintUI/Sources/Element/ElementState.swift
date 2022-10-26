@@ -72,8 +72,6 @@ final class ElementState {
 
     private(set) var element: Element
 
-    let isProxyElement: Bool
-
     let isElementComparable: Bool
 
     // TODO: Broken with proxy elements, move to ViewDescription
@@ -106,7 +104,6 @@ final class ElementState {
         self.parent = parent
         self.identifier = identifier
         self.element = element
-        isProxyElement = self.element is ProxyElement
         isElementComparable = self.element is AnyComparableElement
         appliesViewDescriptionIfEquivalent = (element as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
 
@@ -203,6 +200,11 @@ final class ElementState {
         with environment: Environment,
         in toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
+
+        guard isElementComparable else {
+            return (toTrack(environment), nil)
+        }
+
         var environment = environment
         var observedKeys = Set<Environment.StorageKey>()
 
