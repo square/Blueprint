@@ -33,14 +33,14 @@ public protocol Layout: SPLayout {
 
 }
 
-extension Layout {
-    public func sizeThatFits(proposal: ProposedViewSize, subviews: LayoutSubviews) -> CGSize {
-        fatalError("\(type(of: self)) has not implemented single pass layout")
-    }
-    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: LayoutSubviews) {
-        fatalError("\(type(of: self)) has not implemented single pass layout")
-    }
-}
+// extension Layout {
+//    public func sizeThatFits(proposal: ProposedViewSize, subviews: LayoutSubviews) -> CGSize {
+//        fatalError("\(type(of: self)) has not implemented single pass layout")
+//    }
+//    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: LayoutSubviews) {
+//        fatalError("\(type(of: self)) has not implemented single pass layout")
+//    }
+// }
 
 extension Layout where Traits == () {
 

@@ -873,15 +873,10 @@ extension LayoutSubview {
     }
 }
 
-extension ProposedViewSize {
-    init(_ sizeConstraint: SizeConstraint) {
-        width = sizeConstraint.width.constrainedValue
-        height = sizeConstraint.height.constrainedValue
-    }
-}
-
 extension StackLayout {
     public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        guard subviews.isEmpty == false else { return .zero }
+
         let constraint = SizeConstraint(proposal).vectorConstraint(on: axis)
 
         let items: [(Traits, Measurable)] = subviews.map { subview in
@@ -906,7 +901,6 @@ extension StackLayout {
     }
 
     public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
-        // TODO:
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
 
@@ -944,7 +938,7 @@ extension StackLayout {
                 height = vectorFrame.crossMeasured ? nil : size.height
             }
 
-            print("\(type(of: self)) subview \(width)x\(height)")
+//            print("\(type(of: self)) subview \(width)x\(height)")
 
             let frame = vectorFrame.rect(axis: axis)
 

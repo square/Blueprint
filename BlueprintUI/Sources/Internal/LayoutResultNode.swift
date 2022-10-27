@@ -35,7 +35,7 @@ extension Element {
     }
 
     func singlePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> LayoutResultNode {
-        print("\(type(of: self)) root layout in \(context.attributes.frame)")
+//        print("\(type(of: self)) root layout in \(context.attributes.frame)")
         let layouts = content.performSinglePassLayout(
             proposal: proposal,
             context: context

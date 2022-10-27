@@ -14,8 +14,8 @@ protocol SPContentStorage {
     ) -> [IdentifiedNode]
 }
 
-enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
-    static var defaultValue: LayoutType.Traits {
+public enum GenericLayoutValueKey<LayoutType: Layout>: LayoutValueKey {
+    public static var defaultValue: LayoutType.Traits {
         LayoutType.defaultTraits
     }
 }
@@ -84,6 +84,7 @@ extension ElementContent.Builder {
     }
 
     func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        guard children.isEmpty == false else { return [] }
 
         let subviews = zip(children, children.indices).map { child, index in
             LayoutSubview(
@@ -130,15 +131,11 @@ extension ElementContent.Builder {
             }
             let childOrigin = placement.origin(for: size)
 
-            let childFrame = CGRect(
-                origin: childOrigin,
-                size: size
-            )
             let offsetFrame = CGRect(
                 origin: childOrigin - frame.origin,
                 size: size
             )
-            print("\(type(of: subview.element)) frame \(childFrame) within \(frame)")
+//            print("\(type(of: subview.element)) frame \(childFrame) within \(frame)")
 
             let childAttributes = LayoutAttributes(
                 frame: offsetFrame,
@@ -165,7 +162,7 @@ extension ElementContent.Builder {
                     context: childContext
                 )
             )
-            print("\(type(of: child.element)) result \(node.layoutAttributes.frame)")
+//            print("\(type(of: child.element)) result \(node.layoutAttributes.frame)")
             return (identifier: identifier, node: node)
         }
         return identifiedNodes

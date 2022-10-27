@@ -35,7 +35,7 @@ public struct ProposedViewSize: Hashable, CustomStringConvertible {
         self.height = height
     }
 
-    func replacingUnspecifiedDimensions(
+    public func replacingUnspecifiedDimensions(
         by size: CGSize = CGSize(width: 10, height: 10)
     ) -> CGSize {
         CGSize(width: width ?? size.width, height: height ?? size.height)
@@ -46,9 +46,16 @@ public struct ProposedViewSize: Hashable, CustomStringConvertible {
     }
 }
 
+extension ProposedViewSize {
+    public init(_ sizeConstraint: SizeConstraint) {
+        width = sizeConstraint.width.constrainedValue
+        height = sizeConstraint.height.constrainedValue
+    }
+}
+
 public typealias LayoutSubviews = [LayoutSubview]
 
-protocol LayoutValueKey {
+public protocol LayoutValueKey {
     associatedtype Value
     static var defaultValue: Value { get }
 }
@@ -143,7 +150,7 @@ public struct LayoutSubview {
         ]
     }
 
-    subscript<Key>(_ keyType: Key.Type) -> Key.Value where Key: LayoutValueKey {
+    public subscript<Key>(_ keyType: Key.Type) -> Key.Value where Key: LayoutValueKey {
         if let value = layoutValues[ObjectIdentifier(keyType)] as? Key.Value {
             return value
         }

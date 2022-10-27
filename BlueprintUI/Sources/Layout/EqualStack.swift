@@ -153,6 +153,76 @@ extension EqualStack {
             return result
         }
 
+        func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+            guard subviews.count > 0 else { return .zero }
+
+            let totalSpacing = (spacing * CGFloat(subviews.count - 1))
+            let itemProposal: ProposedViewSize
+            switch direction {
+            case .horizontal:
+                itemProposal = .init(
+                    width: proposal.width.map { ($0 - totalSpacing) / CGFloat(subviews.count) },
+                    height: proposal.height
+                )
+            case .vertical:
+                itemProposal = .init(
+                    width: proposal.width,
+                    height: proposal.height.map { ($0 - totalSpacing) / CGFloat(subviews.count) }
+                )
+            }
+            let itemSizes = subviews.map { $0.sizeThatFits(itemProposal) }
+
+            let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
+            let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
+
+            let totalSize: CGSize
+            switch direction {
+            case .horizontal:
+                totalSize = CGSize(
+                    width: maximumItemWidth * CGFloat(subviews.count) + spacing * CGFloat(subviews.count - 1),
+                    height: maximumItemHeight
+                )
+            case .vertical:
+                totalSize = CGSize(
+                    width: maximumItemWidth,
+                    height: maximumItemHeight * CGFloat(subviews.count) + spacing * CGFloat(subviews.count - 1)
+                )
+            }
+
+            return totalSize
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+            guard subviews.count > 0 else { return }
+            let size = bounds.size
+
+            let totalSpacing = (spacing * CGFloat(subviews.count - 1))
+            let itemSize: CGSize
+            switch direction {
+            case .horizontal:
+                itemSize = CGSize(
+                    width: (size.width - totalSpacing) / CGFloat(subviews.count),
+                    height: size.height
+                )
+            case .vertical:
+                itemSize = CGSize(
+                    width: size.width,
+                    height: (size.height - totalSpacing) / CGFloat(subviews.count)
+                )
+            }
+
+            for (subview, index) in zip(subviews, 0...) {
+                var origin = bounds.origin
+                switch direction {
+                case .horizontal:
+                    origin.x += (itemSize.width + spacing) * CGFloat(index)
+                case .vertical:
+                    origin.y += (itemSize.height + spacing) * CGFloat(index)
+                }
+
+                subview.place(at: origin, size: itemSize)
+            }
+        }
     }
 
 }

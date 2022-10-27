@@ -363,12 +363,17 @@ public final class BlueprintView: UIView {
         let viewNodes: [(path: ElementPath, node: NativeViewNode)] = renderContext.perform {
             guard let element = element else { return [] }
 
+            if let name = name, name == "MarketDemoScreen" {
+                print("stop")
+            }
             let result = element.layout(
                 frame: rootFrame,
                 environment: environment,
                 layoutMode: layoutMode
             )
 
+            print("XXX: \(self.name ?? nil) / \(type(of: element))")
+            result.dump()
             // TODO: save the LayoutResultNode here for debugging
 
             // Flatten into tree of view descriptions

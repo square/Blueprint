@@ -443,22 +443,40 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 extension EnvironmentAdaptingStorage {
 
     func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
-        let environment = adapted(environment: context.environment)
-        let context = MeasureContext(
-            cache: context.cache,
-            environment: environment
-        )
-        return child.content.sizeThatFits(proposal: proposal, context: context)
+        context.cache.get(key: proposal) { proposal in
+            let environment = adapted(environment: context.environment)
+            let context = MeasureContext(
+                cache: context.cache.subcache(key: 0),
+                environment: environment
+            )
+            return child.content.sizeThatFits(proposal: proposal, context: context)
+        }
     }
 
     func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
         let environment = adapted(environment: context.environment)
+
+        let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
         let context = SPLayoutContext(
             attributes: context.attributes,
             environment: environment,
-            cache: context.cache
+            cache: context.cache.subcache(key: 0)
         )
-        return child.content.performSinglePassLayout(proposal: proposal, context: context)
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performSinglePassLayout(
+                proposal: proposal,
+                context: context
+            )
+        )
+
+        return [(identifier, node)]
     }
 }
 
@@ -516,12 +534,18 @@ private struct LazyStorage: ContentStorage {
 extension LazyStorage {
 
     func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
-        let child = buildChild(
-            for: .measurement,
-            in: .init(proposal),
-            environment: context.environment
-        )
-        return child.content.sizeThatFits(proposal: proposal, context: context)
+        context.cache.get(key: proposal) { proposal in
+            let child = buildChild(
+                for: .measurement,
+                in: .init(proposal),
+                environment: context.environment
+            )
+            let context = MeasureContext(
+                cache: context.cache.subcache(key: 0),
+                environment: context.environment
+            )
+            return child.content.sizeThatFits(proposal: proposal, context: context)
+        }
     }
 
     func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -530,7 +554,28 @@ extension LazyStorage {
             in: .init(proposal),
             environment: context.environment
         )
-        return child.content.performSinglePassLayout(proposal: proposal, context: context)
+
+        let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let context = SPLayoutContext(
+            attributes: context.attributes,
+            environment: context.environment,
+            cache: context.cache.subcache(key: 0)
+        )
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: context.environment,
+            children: child.content.performSinglePassLayout(
+                proposal: proposal,
+                context: context
+            )
+        )
+
+        return [(identifier, node)]
     }
 }
 
@@ -566,14 +611,14 @@ private struct MeasurableStorage: ContentStorage {
 }
 
 extension SizeConstraint {
-    init(_ proposal: ProposedViewSize) {
+    public init(_ proposal: ProposedViewSize) {
         width = .init(singlePassProposal: proposal.width)
         height = .init(singlePassProposal: proposal.height)
     }
 }
 
 extension SizeConstraint.Axis {
-    init(singlePassProposal: CGFloat?) {
+    public init(singlePassProposal: CGFloat?) {
         if let singlePassProposal = singlePassProposal {
             self = .atMost(singlePassProposal)
         } else {

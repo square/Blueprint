@@ -61,7 +61,7 @@ final class RootViewController: UIViewController {
         rightBlueprintView.backgroundColor = .clear
         rightBlueprintView.layer.borderColor = UIColor.black.cgColor
         rightBlueprintView.layer.borderWidth = 1
-        
+
         rightBlueprintView.layoutMode = .standard
 
         let stackView = UIStackView(arrangedSubviews: [
@@ -88,8 +88,12 @@ final class RootViewController: UIViewController {
 //        }
 //        .aligned(vertically: .center)
 
-//        Spacer(width: 20, height: 20)
-//            .box(background: .red)
+        Spacer(width: 20, height: 20)
+            .box(background: .red)
+            .adaptedEnvironment(keyPath: \.feedTheme, value: .init(authorColor: .green))
+            .centered()
+//            .adaptedEnvironment(keyPath: \.feedTheme, value: .init(authorColor: .green))
+
 //            .aligned(vertically: .center, horizontally: .trailing)
 //            .box(background: .blue)
 //            .constrainedTo(height: .atMost(10))
@@ -101,46 +105,46 @@ final class RootViewController: UIViewController {
 //                right: 25
 //            )
 
-        Column(alignment: .fill) {
-            Spacer(50)
-
-            EnvironmentReader { env in
-                Row(alignment: .fill, underflow: .growUniformly) {
-                    Box(backgroundColor: .red)
-                        .constrainedTo(width: 60, height: 60)
-                        .stackLayoutChild(priority: .fixed)
-
-                    Box(backgroundColor: .yellow)
-                        .constrainedTo(width: .atLeast(10), height: .absolute(30))
-
-                    Box(backgroundColor: .orange)
-                        .constrainedTo(width: .absolute(40), height: .atLeast(10))
-
-                }
-            }
-
-            Spacer(50)
-
-            Row(alignment: .center, underflow: .growProportionally) {
-                Box(backgroundColor: .red)
-                    .constrainedTo(width: 60, height: 60)
-                    .stackLayoutChild(priority: .fixed)
-
-                Box(backgroundColor: .yellow)
-                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
-
-                Box(backgroundColor: .orange)
-                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
-
-            }
-
-            Spacer(50)
-
-        }
-        .scrollable { scrollView in
-            scrollView.contentInsetAdjustmentBehavior = .never
-        }
-        .inset()
+//        Column(alignment: .fill) {
+//            Spacer(50)
+//
+//            EnvironmentReader { env in
+//                Row(alignment: .fill, underflow: .growUniformly) {
+//                    Box(backgroundColor: .red)
+//                        .constrainedTo(width: 60, height: 60)
+//                        .stackLayoutChild(priority: .fixed)
+//
+//                    Box(backgroundColor: .yellow)
+//                        .constrainedTo(width: .atLeast(10), height: .absolute(30))
+//
+//                    Box(backgroundColor: .orange)
+//                        .constrainedTo(width: .absolute(40), height: .atLeast(10))
+//
+//                }
+//            }
+//
+//            Spacer(50)
+//
+//            Row(alignment: .center, underflow: .growProportionally) {
+//                Box(backgroundColor: .red)
+//                    .constrainedTo(width: 60, height: 60)
+//                    .stackLayoutChild(priority: .fixed)
+//
+//                Box(backgroundColor: .yellow)
+//                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
+//
+//                Box(backgroundColor: .orange)
+//                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
+//
+//            }
+//
+//            Spacer(50)
+//
+//        }
+//        .scrollable { scrollView in
+//            scrollView.contentInsetAdjustmentBehavior = .never
+//        }
+//        .inset()
 
     }
 
