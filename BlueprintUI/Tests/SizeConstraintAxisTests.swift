@@ -146,4 +146,12 @@ class SizeConstraintAxisTests: XCTestCase {
         }
 
     }
+
+    func test_isGreaterThanZero() {
+
+        XCTAssertFalse(SizeConstraint.Axis.atMost(-1).isGreaterThanZero)
+        XCTAssertFalse(SizeConstraint.Axis.atMost(0).isGreaterThanZero)
+        XCTAssertTrue(SizeConstraint.Axis.atMost(1).isGreaterThanZero)
+        XCTAssertTrue(SizeConstraint.Axis.unconstrained.isGreaterThanZero)
+    }
 }

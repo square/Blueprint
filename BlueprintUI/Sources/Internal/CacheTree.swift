@@ -22,12 +22,16 @@ protocol CacheTree: AnyObject {
 extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
     func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
+
         if let size = self[constraint] {
             return size
+        } else {
+            let size = calculation(constraint)
+
+            self[constraint] = size
+
+            return size
         }
-        let size = calculation(constraint)
-        self[constraint] = size
-        return size
     }
 
     /// Gets a subcache for an element with siblings.

@@ -113,6 +113,12 @@ public struct Label: ProxyElement {
                 // do nothing, use default behavior
                 break
             }
+
+            label.needsTextNormalization = NSAttributedString.needsNormalizingForView(
+                hasLinks: false,
+                lineLimit: numberOfLines,
+                lineBreaks: lineBreakMode
+            )
         }
     }
 }
