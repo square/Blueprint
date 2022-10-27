@@ -43,30 +43,38 @@ class PerformancePlayground: XCTestCase {
             return cols
         }()
 
+        struct LabeledBox: ProxyElement {
+
+            var text: String
+
+            var elementRepresentation: Element {
+                Label(text: text)
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .constrainedTo(size: .init(width: 20, height: 20))
+                    .box(background: .red)
+                    .tappable {}
+            }
+        }
+
         let element = Column { col in
             for (i, values) in model.enumerated() {
                 col.horizontalAlignment = .fill
                 let row = Row { row in
                     for (j, value) in values.enumerated() {
-                        let label = Label(text: String(value))
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .centered()
-                            .constrainedTo(size: .init(width: 20, height: 20))
-                            .box(background: .red)
-                            .tappable {}
-                        row.add(child: label)
+                        row.add(child: LabeledBox(text: String(value)))
                     }
                 }
                 col.add(child: row)
@@ -89,8 +97,6 @@ class PerformancePlayground: XCTestCase {
             view.element = element
             view.layoutIfNeeded()
         }
-
-        print("\(Stopwatch.stopwatch.time)")
     }
 
     func test_repeated_layouts() {
