@@ -43,7 +43,7 @@ class PerformancePlayground: XCTestCase {
             return cols
         }()
 
-        struct LabeledBox: ProxyElement {
+        struct LabeledBox: ProxyElement, ComparableElement, Equatable {
 
             var text: String
 
@@ -100,9 +100,12 @@ class PerformancePlayground: XCTestCase {
     }
 
     func test_repeated_layouts() {
-        let element = Column(alignment: .fill) {
 
-            for index in 1...1000 {
+        struct TextRow: ProxyElement, ComparableElement, Equatable {
+
+            var index: Int
+
+            var elementRepresentation: Element {
                 Row(alignment: .fill) {
                     Box(backgroundColor: .red)
                         .constrainedTo(size: CGSize(width: 100, height: 100))
@@ -111,6 +114,13 @@ class PerformancePlayground: XCTestCase {
                     Label(text: "This is test label number #\(index)")
                         .stackLayoutChild(priority: .flexible)
                 }
+            }
+        }
+
+        let element = Column(alignment: .fill) {
+
+            for index in 1...1000 {
+                TextRow(index: index)
             }
         }
         .scrollable()

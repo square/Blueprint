@@ -72,7 +72,7 @@ final class ElementState {
 
     private(set) var element: Element
 
-    let isElementComparable: Bool
+    let comparability: Comparability
 
     // TODO: Broken with proxy elements, move to ViewDescription
     private(set) var appliesViewDescriptionIfEquivalent: Bool
@@ -84,13 +84,22 @@ final class ElementState {
     private var measurements: [SizeConstraint: CachedMeasurement] = [:]
     private var children: [ElementIdentifier: ElementState] = [:]
 
-    enum Kind {
-        case element(Element)
-        case proxy(Proxy)
+    enum Comparability: Equatable {
+        /// The element is not comparable, and it is not the child of a comparable element.
+        case notComparable
+        /// The element is comarable itself.
+        case comparableElement
+        /// The element is the child of a comparable element, meaning its comparability
+        /// is determined by the comparability of that parent element.
+        case childOfComparableElement
 
-        final class Element {}
-
-        final class Proxy {}
+        var isComparable: Bool {
+            switch self {
+            case .notComparable: return false
+            case .comparableElement: return true
+            case .childOfComparableElement: return true
+            }
+        }
     }
 
     init(
@@ -104,8 +113,26 @@ final class ElementState {
         self.parent = parent
         self.identifier = identifier
         self.element = element
-        isElementComparable = self.element is AnyComparableElement
-        appliesViewDescriptionIfEquivalent = (element as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
+
+        if let element = element as? AnyComparableElement {
+            comparability = .comparableElement
+            appliesViewDescriptionIfEquivalent = element.appliesViewDescriptionIfEquivalent
+        } else {
+            appliesViewDescriptionIfEquivalent = false
+
+            if let parent = parent {
+                switch parent.comparability {
+                case .notComparable:
+                    comparability = .notComparable
+                case .comparableElement:
+                    comparability = .childOfComparableElement
+                case .childOfComparableElement:
+                    comparability = .childOfComparableElement
+                }
+            } else {
+                comparability = .notComparable
+            }
+        }
 
         self.depth = depth
         self.signpostRef = signpostRef
@@ -140,10 +167,29 @@ final class ElementState {
         precondition(self.identifier == identifier)
         precondition(type(of: newElement) == type(of: element))
 
-        let isEquivalent = Self.elementsEquivalent(element, newElement)
+        let isEquivalent: Bool
+
+        switch comparability {
+        case .notComparable:
+            isEquivalent = false
+
+        case .comparableElement:
+            isEquivalent = Self.elementsEquivalent(element, newElement)
+
+        case .childOfComparableElement:
+            /// **Note**: We're equivalent always, because our parent
+            /// determines our equatability from its own state.
+            isEquivalent = true
+        }
 
         if isEquivalent == false {
             clearAllCachedData()
+
+            if comparability == .comparableElement {
+                recursiveForEach {
+                    $0.clearAllCachedDataIfNotComparable()
+                }
+            }
         } else {
             measurements.removeAll { _, measurement in
                 newEnvironment.valuesEqual(to: measurement.dependencies) == false
@@ -201,7 +247,7 @@ final class ElementState {
         in toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
-        guard isElementComparable else {
+        guard comparability.isComparable else {
             return (toTrack(environment), nil)
         }
 
@@ -284,6 +330,12 @@ final class ElementState {
         measurements.removeAll()
     }
 
+    private func clearAllCachedDataIfNotComparable() {
+        if comparability != .comparableElement {
+            measurements.removeAll()
+        }
+    }
+
     func recursiveForEach(_ perform: (ElementState) -> Void) {
         perform(self)
 
@@ -310,7 +362,7 @@ final class ElementState {
 
     private func recursiveClearCaches() {
         recursiveForEach {
-            if $0.isElementComparable == false {
+            if $0.comparability.isComparable == false {
                 $0.clearAllCachedData()
             }
 
