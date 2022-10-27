@@ -179,6 +179,23 @@ extension SizeConstraint {
     }
 }
 
+extension SizeConstraint.Axis: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .atMost(let max):
+            return "\(max)"
+        case .unconstrained:
+            return "unc"
+        }
+    }
+}
+
+extension SizeConstraint: CustomStringConvertible {
+    public var description: String {
+        "(\(width) \(height))"
+    }
+}
+
 extension SizeConstraint {
     /// This property wrapper checks the value of `atMost` cases, and turns it into an
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.

@@ -61,6 +61,8 @@ final class RootViewController: UIViewController {
         rightBlueprintView.backgroundColor = .clear
         rightBlueprintView.layer.borderColor = UIColor.black.cgColor
         rightBlueprintView.layer.borderWidth = 1
+        
+        rightBlueprintView.layoutMode = .standard
 
         let stackView = UIStackView(arrangedSubviews: [
             leftBlueprintView,
@@ -135,7 +137,10 @@ final class RootViewController: UIViewController {
             Spacer(50)
 
         }
-        .scrollable()
+        .scrollable { scrollView in
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
+        .inset()
 
     }
 
