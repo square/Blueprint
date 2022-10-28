@@ -15,11 +15,11 @@ public protocol ProxyElement: Element {
 extension ProxyElement {
 
     public var content: ElementContent {
-        ElementContent(child: elementRepresentation)
+        elementRepresentation.content
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        nil
+        elementRepresentation.backingViewDescription(with: context)
     }
 
 }
