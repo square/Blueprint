@@ -82,6 +82,7 @@ final class ElementState {
     private(set) var wasUpdateEquivalent: Bool
 
     private var measurements: [SizeConstraint: CachedMeasurement] = [:]
+    private var layouts: [CGSize: CachedLayout] = [:]
     private var children: [ElementIdentifier: ElementState] = [:]
 
     enum Comparability: Equatable {
@@ -194,6 +195,10 @@ final class ElementState {
             measurements.removeAll { _, measurement in
                 newEnvironment.valuesEqual(to: measurement.dependencies) == false
             }
+
+            layouts.removeAll { _, layout in
+                newEnvironment.valuesEqual(to: layout.dependencies) == false
+            }
         }
 
         element = newElement
@@ -240,6 +245,38 @@ final class ElementState {
         )
 
         return size
+    }
+
+    private struct CachedLayout {
+        var layout: [LayoutResultNode]
+        var dependencies: Environment.Subset?
+    }
+
+    func layout(
+        in size: CGSize,
+        with environment: Environment,
+        using layout: (Environment) -> [LayoutResultNode]
+    ) -> [LayoutResultNode] {
+
+        guard comparability == .comparableElement else {
+            return layout(environment)
+        }
+
+        if let existing = layouts[size] {
+            return existing.layout
+        }
+
+        // TODO: Before merge: This should track recursive reads during layout because the layout
+        // itself is recursive. Not bothering now for simplicity.
+
+        let (layout, dependencies) = trackEnvironmentReads(with: environment, in: layout)
+
+        layouts[size] = .init(
+            layout: layout,
+            dependencies: dependencies
+        )
+
+        return layout
     }
 
     private func trackEnvironmentReads<Output>(
@@ -328,11 +365,12 @@ final class ElementState {
 
     private func clearAllCachedData() {
         measurements.removeAll()
+        layouts.removeAll()
     }
 
     private func clearAllCachedDataIfNotComparable() {
         if comparability != .comparableElement {
-            measurements.removeAll()
+            clearAllCachedData()
         }
     }
 

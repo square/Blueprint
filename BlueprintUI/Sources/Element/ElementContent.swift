@@ -378,40 +378,36 @@ extension ElementContent {
                 return []
             }
 
-            let layoutItems = self.layoutItems(states: states, environment: environment)
+            return states.layout(in: size, with: environment) { environment in
 
-            let childAttributes = layout.layout(
-                size: size,
-                items: layoutItems
-            )
+                let layoutItems = self.layoutItems(states: states, environment: environment)
 
-            var result: [LayoutResultNode] = []
-            result.reserveCapacity(children.count)
-
-            for index in 0..<children.count {
-                let currentChildLayoutAttributes = childAttributes[index]
-                let currentChild = children[index]
-                let identifier = layoutItems.all[index].identifier
-
-                let childState = states.childState(for: currentChild.element, in: environment, with: identifier)
-
-                let resultNode = LayoutResultNode(
-                    element: currentChild.element,
-                    identifier: identifier,
-                    layoutAttributes: currentChildLayoutAttributes,
-                    environment: environment,
-                    state: childState,
-                    children: childState.elementContent.performLayout(
-                        in: currentChildLayoutAttributes.frame.size,
-                        with: environment,
-                        states: childState
-                    )
+                let childAttributes = layout.layout(
+                    size: size,
+                    items: layoutItems
                 )
 
-                result.append(resultNode)
-            }
+                return childAttributes.indexedMap { index, currentChildLayoutAttributes in
 
-            return result
+                    let currentChild = children[index]
+                    let identifier = currentChild.identifier
+
+                    let childState = states.childState(for: currentChild.element, in: environment, with: identifier)
+
+                    return LayoutResultNode(
+                        element: currentChild.element,
+                        identifier: identifier,
+                        layoutAttributes: currentChildLayoutAttributes,
+                        environment: environment,
+                        state: childState,
+                        children: childState.elementContent.performLayout(
+                            in: currentChildLayoutAttributes.frame.size,
+                            with: environment,
+                            states: childState
+                        )
+                    )
+                }
+            }
         }
 
         private var identifierFactory = ElementIdentifier.Factory(elementCount: 1)
@@ -473,26 +469,28 @@ private struct SingleChildStorage: ContentStorage {
 
     func performLayout(in size: CGSize, with environment: Environment, states: ElementState) -> [LayoutResultNode] {
 
-        let childAttributes = LayoutAttributes(size: size)
+        states.layout(in: size, with: environment) { environment in
+            let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
 
-        let childState = states.childState(for: element, in: environment, with: identifier)
+            let childState = states.childState(for: element, in: environment, with: identifier)
 
-        let node = LayoutResultNode(
-            element: element,
-            identifier: identifier,
-            layoutAttributes: childAttributes,
-            environment: environment,
-            state: childState,
-            children: childState.elementContent.performLayout(
-                in: size,
-                with: environment,
-                states: childState
+            let node = LayoutResultNode(
+                element: element,
+                identifier: identifier,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                state: childState,
+                children: childState.elementContent.performLayout(
+                    in: size,
+                    with: environment,
+                    states: childState
+                )
             )
-        )
 
-        return [node]
+            return [node]
+        }
     }
 }
 
@@ -513,28 +511,30 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         with environment: Environment,
         states: ElementState
     ) -> [LayoutResultNode] {
-        let environment = adapted(environment: environment)
+        states.layout(in: size, with: environment) { environment in
+            let environment = adapted(environment: environment)
 
-        let childAttributes = LayoutAttributes(size: size)
+            let childAttributes = LayoutAttributes(size: size)
 
-        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
-        let childState = states.childState(for: child, in: environment, with: identifier)
+            let childState = states.childState(for: child, in: environment, with: identifier)
 
-        let node = LayoutResultNode(
-            element: child,
-            identifier: identifier,
-            layoutAttributes: childAttributes,
-            environment: environment,
-            state: childState,
-            children: childState.elementContent.performLayout(
-                in: size,
-                with: environment,
-                states: childState
+            let node = LayoutResultNode(
+                element: child,
+                identifier: identifier,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                state: childState,
+                children: childState.elementContent.performLayout(
+                    in: size,
+                    with: environment,
+                    states: childState
+                )
             )
-        )
 
-        return [node]
+            return [node]
+        }
     }
 
     func measure(
@@ -598,30 +598,31 @@ private struct LazyStorage: ContentStorage {
         with environment: Environment,
         states: ElementState
     ) -> [LayoutResultNode] {
+        states.layout(in: size, with: environment) { environment in
+            let constraint = SizeConstraint(size)
+            let child = buildChild(for: .layout, in: constraint, environment: environment)
 
-        let constraint = SizeConstraint(size)
-        let child = buildChild(for: .layout, in: constraint, environment: environment)
+            let childAttributes = LayoutAttributes(size: size)
 
-        let childAttributes = LayoutAttributes(size: size)
+            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
-        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let childState = states.childState(for: child, in: environment, with: identifier)
 
-        let childState = states.childState(for: child, in: environment, with: identifier)
-
-        let node = LayoutResultNode(
-            element: child,
-            identifier: identifier,
-            layoutAttributes: childAttributes,
-            environment: environment,
-            state: childState,
-            children: childState.elementContent.performLayout(
-                in: size,
-                with: environment,
-                states: childState
+            let node = LayoutResultNode(
+                element: child,
+                identifier: identifier,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                state: childState,
+                children: childState.elementContent.performLayout(
+                    in: size,
+                    with: environment,
+                    states: childState
+                )
             )
-        )
 
-        return [node]
+            return [node]
+        }
     }
 
     private func buildChild(
