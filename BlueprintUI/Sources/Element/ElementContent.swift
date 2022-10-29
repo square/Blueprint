@@ -144,7 +144,7 @@ extension ElementContent {
                 with: .identifier(for: element, key: nil, count: 1)
             )
 
-            precondition(type(of: element) == type(of: childState.element))
+            precondition(type(of: element) == type(of: childState.element.value))
 
             return childState.measure(in: constraint, with: environment) { environment in
                 childState.elementContent.measure(in: constraint, with: environment, states: childState)
@@ -395,7 +395,7 @@ extension ElementContent {
                     let childState = states.childState(for: currentChild.element, in: environment, with: identifier)
 
                     return LayoutResultNode(
-                        element: currentChild.element,
+                        element: childState.element,
                         identifier: identifier,
                         layoutAttributes: currentChildLayoutAttributes,
                         environment: environment,
@@ -477,7 +477,7 @@ private struct SingleChildStorage: ContentStorage {
             let childState = states.childState(for: element, in: environment, with: identifier)
 
             let node = LayoutResultNode(
-                element: element,
+                element: childState.element,
                 identifier: identifier,
                 layoutAttributes: childAttributes,
                 environment: environment,
@@ -521,7 +521,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
-                element: child,
+                element: childState.element,
                 identifier: identifier,
                 layoutAttributes: childAttributes,
                 environment: environment,
@@ -609,7 +609,7 @@ private struct LazyStorage: ContentStorage {
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
-                element: child,
+                element: childState.element,
                 identifier: identifier,
                 layoutAttributes: childAttributes,
                 environment: environment,

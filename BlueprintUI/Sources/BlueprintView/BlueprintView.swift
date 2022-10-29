@@ -439,7 +439,7 @@ public final class BlueprintView: UIView {
         states.update(with: element, in: environment)
 
         return LayoutResultNode(
-            root: element,
+            root: ElementSnapshot(element),
             identifier: .identifier(for: element, key: nil, count: 1),
             layoutAttributes: .init(frame: bounds),
             environment: environment,

@@ -5,7 +5,7 @@ import UIKit
 struct LayoutResultNode {
 
     /// The element that was laid out
-    var element: Element
+    var element: ElementSnapshot
 
     var identifier: ElementIdentifier
 
@@ -20,7 +20,7 @@ struct LayoutResultNode {
     var children: [LayoutResultNode]
 
     init(
-        element: Element,
+        element: ElementSnapshot,
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
@@ -34,11 +34,11 @@ struct LayoutResultNode {
         self.state = state
         self.children = children
 
-        precondition(type(of: element) == type(of: state.element))
+        precondition(type(of: element.value) == type(of: state.element.value))
     }
 
     init(
-        root: Element,
+        root: ElementSnapshot,
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
@@ -50,7 +50,7 @@ struct LayoutResultNode {
             layoutAttributes: layoutAttributes,
             environment: environment,
             state: states,
-            children: root.content.performLayout(
+            children: root.value.content.performLayout(
                 in: layoutAttributes.frame.size,
                 with: environment,
                 states: states
@@ -89,7 +89,7 @@ extension LayoutResultNode {
 
         // Get the backing view description for the current node (if any),
         // populated with relevant layout data.
-        let viewDescription = element.backingViewDescription(
+        let viewDescription = element.value.backingViewDescription(
             with: .init(
                 bounds: layoutAttributes.bounds,
                 subtreeExtent: subtreeExtent,
@@ -101,7 +101,7 @@ extension LayoutResultNode {
             // If this node has a backing view description, create a `NativeViewNode`
             // to represent it.
             let node = NativeViewNode(
-                element: element,
+                element: element.value,
                 content: viewDescription,
                 environment: environment,
                 layoutAttributes: layoutAttributes,

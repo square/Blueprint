@@ -49,13 +49,22 @@ final class RootElementState {
             root.teardown()
             self.root = nil
         } else if let root = self.root, let element = element {
-            if type(of: root.element) == type(of: element) {
+            if type(of: root.element.value) == type(of: element) {
                 root.update(with: element, in: environment, identifier: root.identifier)
             } else {
                 root.teardown()
                 makeRoot(with: element)
             }
         }
+    }
+}
+
+
+final class ElementSnapshot {
+    fileprivate(set) var value: Element
+
+    init(_ value: Element) {
+        self.value = value
     }
 }
 
@@ -70,7 +79,7 @@ final class ElementState {
     let signpostRef: AnyObject
     let name: String
 
-    private(set) var element: Element
+    let element: ElementSnapshot
 
     let comparability: Comparability
 
@@ -113,7 +122,7 @@ final class ElementState {
     ) {
         self.parent = parent
         self.identifier = identifier
-        self.element = element
+        self.element = ElementSnapshot(element)
 
         if let element = element as? AnyComparableElement {
             comparability = .comparableElement
@@ -154,7 +163,7 @@ final class ElementState {
         if let cachedContent = cachedContent {
             return cachedContent
         } else {
-            let content = element.content
+            let content = element.value.content
             cachedContent = content
             return content
         }
@@ -166,7 +175,7 @@ final class ElementState {
         identifier: ElementIdentifier
     ) {
         precondition(self.identifier == identifier)
-        precondition(type(of: newElement) == type(of: element))
+        precondition(type(of: newElement) == type(of: element.value))
 
         let isEquivalent: Bool
 
@@ -175,7 +184,7 @@ final class ElementState {
             isEquivalent = false
 
         case .comparableElement:
-            isEquivalent = Self.elementsEquivalent(element, newElement)
+            isEquivalent = Self.elementsEquivalent(element.value, newElement)
 
         case .childOfComparableElement:
             /// **Note**: We're equivalent always, because our parent
@@ -201,10 +210,10 @@ final class ElementState {
             }
         }
 
-        element = newElement
+        element.value = newElement
 
         wasUpdateEquivalent = isEquivalent
-        appliesViewDescriptionIfEquivalent = (element as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
+        appliesViewDescriptionIfEquivalent = (element.value as? AnyComparableElement)?.appliesViewDescriptionIfEquivalent ?? true
     }
 
     func setup() {
@@ -497,7 +506,7 @@ extension ElementState {
             objectIdentifier: ObjectIdentifier(self),
             depth: depth,
             identifier: identifier,
-            element: element,
+            element: element.value,
             measurements: measurements
         )
 

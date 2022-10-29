@@ -33,9 +33,9 @@ class PerformancePlayground: XCTestCase {
 
         let model: [[Int]] = {
             var cols = [[Int]]()
-            for i in 0..<gridSize {
+            for _ in 1...gridSize {
                 var row = [Int]()
-                for j in 0..<gridSize {
+                for _ in 1...gridSize {
                     row.append(0)
                 }
                 cols.append(row)

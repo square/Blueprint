@@ -53,7 +53,7 @@ struct NativeViewNode {
         self.children = children
 
         if let element = element, let state = state {
-            precondition(type(of: element) == type(of: state.element))
+            precondition(type(of: element) == type(of: state.element.value))
         }
     }
 
