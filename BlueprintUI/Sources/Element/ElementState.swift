@@ -237,7 +237,7 @@ final class ElementState {
             return existing.size
         }
 
-        let (size, dependencies) = trackEnvironmentReads(with: environment, in: measurer)
+        let (size, dependencies) = trackEnvironmentReads(for: .measurement, with: environment, in: measurer)
 
         measurements[constraint] = .init(
             size: size,
@@ -266,10 +266,7 @@ final class ElementState {
             return existing.layout
         }
 
-        // TODO: Before merge: This should track recursive reads during layout because the layout
-        // itself is recursive. Not bothering now for simplicity.
-
-        let (layout, dependencies) = trackEnvironmentReads(with: environment, in: layout)
+        let (layout, dependencies) = trackEnvironmentReads(for: .layout, with: environment, in: layout)
 
         layouts[size] = .init(
             layout: layout,
@@ -280,18 +277,30 @@ final class ElementState {
     }
 
     private func trackEnvironmentReads<Output>(
+        for layoutPass: Environment.LayoutPass,
         with environment: Environment,
         in toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
-        guard comparability.isComparable else {
-            return (toTrack(environment), nil)
+        switch layoutPass {
+        case .measurement:
+            if comparability.isComparable {
+                break
+            } else {
+                return (toTrack(environment), nil)
+            }
+        case .layout:
+            if comparability == .comparableElement {
+                break
+            } else {
+                return (toTrack(environment), nil)
+            }
         }
 
         var environment = environment
         var observedKeys = Set<Environment.StorageKey>()
 
-        environment.onDidRead = { key in
+        environment.subscribeToReads(for: layoutPass) { key in
             observedKeys.insert(key)
         }
 

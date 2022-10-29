@@ -44,18 +44,15 @@ public struct Environment: Equatable {
 
     private var values: [StorageKey: ValueBox] = [:]
 
-    typealias OnDidRead = (StorageKey) -> Void
-    var onDidRead: OnDidRead? = nil
-
-    var readNotificationsEnabled: Bool = true
-
     /// Gets or sets an environment value by its key.
     public subscript<KeyType: EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
 
             if readNotificationsEnabled {
-                onDidRead?(storageKey)
+                for reader in onDidRead {
+                    reader(storageKey)
+                }
             }
 
             if let value = values[storageKey] {
@@ -110,6 +107,28 @@ public struct Environment: Equatable {
         }
 
         return subset
+    }
+
+    typealias OnDidRead = (StorageKey) -> Void
+    private var onDidRead: [OnDidRead] = []
+
+    var readNotificationsEnabled: Bool = true
+
+    enum LayoutPass: Equatable {
+        case measurement
+        case layout
+    }
+
+    mutating func subscribeToReads(for layoutPass: LayoutPass, callback: @escaping (StorageKey) -> Void) {
+
+        switch layoutPass {
+        case .measurement:
+            onDidRead.removeAll()
+            onDidRead.append(callback)
+
+        case .layout:
+            onDidRead.append(callback)
+        }
     }
 
     /// Returns a new `Environment` by merging the values from `self` and the
