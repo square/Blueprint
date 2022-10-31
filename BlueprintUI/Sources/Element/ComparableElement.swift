@@ -30,10 +30,7 @@ public protocol ComparableElement: AnyComparableElement {
     ///
     func isEquivalent(to other: Self) -> Bool
 
-    /// Return true if the layout and measurement caches should be cleared from the given size change.
-    func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool
-
-    ///
+    // TODO: Move to ViewDescription.
     var appliesViewDescriptionIfEquivalent: Bool { get }
 }
 
@@ -45,10 +42,7 @@ public protocol AnyComparableElement: Element {
     /// Returns true if the two elements are the same type, and are equivalent.
     func anyIsEquivalent(to other: AnyComparableElement) -> Bool
 
-    /// Return true if the layout and measurement caches should be cleared from the given size change.
-    func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool
-
-    ///
+    // TODO: Move to ViewDescription
     var appliesViewDescriptionIfEquivalent: Bool { get }
 }
 
@@ -67,10 +61,6 @@ extension ComparableElement {
         guard let other = other as? Self else { return false }
 
         return isEquivalent(to: other)
-    }
-
-    public func willSizeChangeAffectLayout(from: CGSize, to: CGSize) -> Bool {
-        true
     }
 
     public var appliesViewDescriptionIfEquivalent: Bool {

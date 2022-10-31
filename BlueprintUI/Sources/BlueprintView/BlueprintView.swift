@@ -340,8 +340,6 @@ public final class BlueprintView: UIView {
 
         isInsideUpdate = true
 
-        rootState.root?.viewSizeChanged(from: lastViewHierarchyUpdateBounds.size, to: bounds.size)
-
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
 

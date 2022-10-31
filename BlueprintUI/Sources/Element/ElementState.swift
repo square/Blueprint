@@ -349,23 +349,6 @@ final class ElementState {
         }
     }
 
-    func viewSizeChanged(from: CGSize, to: CGSize) {
-
-        if from == to { return }
-
-        if let element = self.element as? AnyComparableElement {
-            if element.willSizeChangeAffectLayout(from: from, to: to) {
-                clearAllCachedData()
-            }
-        } else {
-            clearAllCachedData()
-        }
-
-        children.forEach { _, value in
-            value.viewSizeChanged(from: from, to: to)
-        }
-    }
-
     func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
