@@ -77,6 +77,9 @@ public struct AttributedLabel: Element, Hashable {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
+    public var accessibilityHint: String?
+
     /// A set of data types to detect and automatically link in the label.
     public var linkDetectionTypes: Set<LinkDetectionType> = []
 
@@ -246,6 +249,7 @@ extension AttributedLabel {
             }
 
             isAccessibilityElement = model.isAccessibilityElement
+            accessibilityHint = model.accessibilityHint
             updateAccessibilityTraits(with: model)
 
             urlHandler = environment.urlHandler
