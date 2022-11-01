@@ -120,13 +120,13 @@ extension ElementContent {
     ///
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
-    public static func byMeasuring(element: Element) -> Self {
-        .init(storage: Storage(element: element))
+    public init(byMeasuring element: Element) {
+        storage = MeasureNestedElementStorage(element: element)
     }
 
     // TODO: A way to pass this state down to the actual view
 
-    struct Storage: ContentStorage {
+    struct MeasureNestedElementStorage: ContentStorage {
 
         let element: Element
 
