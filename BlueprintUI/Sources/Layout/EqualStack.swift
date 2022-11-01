@@ -78,7 +78,11 @@ extension EqualStack {
         var direction: Direction
         var spacing: CGFloat
 
-        func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
+        func measure(
+            in constraint: SizeConstraint,
+            items: [LayoutItem<Void>],
+            with context: MeasurementContext
+        ) -> CGSize {
             guard items.count > 0 else { return .zero }
 
             let totalSpacing = (spacing * CGFloat(items.count - 1))
@@ -95,7 +99,7 @@ extension EqualStack {
                     height: (constraint.height - totalSpacing) / CGFloat(items.count)
                 )
             }
-            let itemSizes = items.all.map { $0.content.measure(in: itemConstraint) }
+            let itemSizes = items.map { $0.content.measure(in: itemConstraint) }
 
             let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
             let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
@@ -117,7 +121,11 @@ extension EqualStack {
             return totalSize
         }
 
-        func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
+        func layout(
+            in size: CGSize,
+            items: [LayoutItem<Void>],
+            with context: LayoutContext
+        ) -> [LayoutAttributes] {
             guard items.count > 0 else { return [] }
 
             let totalSpacing = (spacing * CGFloat(items.count - 1))

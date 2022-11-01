@@ -15,7 +15,11 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: The measured size for the given array of items.
-    func measure(in constraint: SizeConstraint, items: LayoutItems<Self.Traits>) -> CGSize
+    func measure(
+        in constraint: SizeConstraint,
+        items: [LayoutItem<Self.Traits>],
+        with context: MeasurementContext
+    ) -> CGSize
 
     /// Generates layout attributes for the given items.
     ///
@@ -26,7 +30,11 @@ public protocol Layout {
     ///   object and a `Measurable` value.
     ///
     /// - returns: Layout attributes for the given array of items.
-    func layout(size: CGSize, items: LayoutItems<Self.Traits>) -> [LayoutAttributes]
+    func layout(
+        in size: CGSize,
+        items: [LayoutItem<Self.Traits>],
+        with context: LayoutContext
+    ) -> [LayoutAttributes]
 
     /// Returns a default traits object.
     static var defaultTraits: Self.Traits { get }
@@ -41,30 +49,36 @@ extension Layout where Traits == () {
 }
 
 
-public final class LayoutItems<Traits> {
+public struct LayoutContext {
 
-    public let all: [Item]
+    public var environment: Environment
 
-    public let count: Int
-    public let isEmpty: Bool
-
-    init(with all: [Item]) {
-        self.all = all
-        count = all.count
-        isEmpty = all.isEmpty
+    public init(environment: Environment) {
+        self.environment = environment
     }
+}
 
-    public struct Item {
 
-        public let traits: Traits
-        public let content: Measurable
+public struct MeasurementContext {
 
-        let identifier: ElementIdentifier
+    public var environment: Environment
 
-        init(traits: Traits, content: Measurable, identifier: ElementIdentifier) {
-            self.traits = traits
-            self.content = content
-            self.identifier = identifier
-        }
+    public init(environment: Environment) {
+        self.environment = environment
+    }
+}
+
+
+public struct LayoutItem<Traits> {
+
+    public let traits: Traits
+    public let content: Measurable
+
+    let identifier: ElementIdentifier
+
+    init(traits: Traits, content: Measurable, identifier: ElementIdentifier) {
+        self.traits = traits
+        self.content = content
+        self.identifier = identifier
     }
 }

@@ -362,9 +362,12 @@ extension ElementContent {
 
                 let layoutItems = self.layoutItems(states: states, environment: environment)
 
+                let context = MeasurementContext(environment: environment)
+
                 return layout.measure(
                     in: constraint,
-                    items: layoutItems
+                    items: layoutItems,
+                    with: context
                 )
             }
         }
@@ -382,9 +385,12 @@ extension ElementContent {
 
                 let layoutItems = self.layoutItems(states: states, environment: environment)
 
+                let context = LayoutContext(environment: environment)
+
                 let childAttributes = layout.layout(
-                    size: size,
-                    items: layoutItems
+                    in: size,
+                    items: layoutItems,
+                    with: context
                 )
 
                 return childAttributes.indexedMap { index, currentChildLayoutAttributes in
@@ -415,13 +421,13 @@ extension ElementContent {
         private func layoutItems(
             states: ElementState,
             environment: Environment
-        ) -> LayoutItems<LayoutType.Traits> {
+        ) -> [LayoutItem<LayoutType.Traits>] {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
             /// here; because the enumerated version is about 25% slower. Because this
             /// is an extremely hot codepath; this additional performance matters, so we will
             /// keep track of the index ourselves.
 
-            LayoutItems(with: children.indexedMap { index, child in
+            children.indexedMap { index, child in
 
                 let childState = states.childState(for: child.element, in: environment, with: child.identifier)
 
@@ -433,12 +439,12 @@ extension ElementContent {
                     )
                 }
 
-                return LayoutItems.Item(
+                return LayoutItem(
                     traits: child.traits,
                     content: measurable,
                     identifier: child.identifier
                 )
-            })
+            }
         }
 
         fileprivate struct Child {
@@ -669,22 +675,32 @@ fileprivate struct SingleChildLayoutHost: Layout {
 
     // MARK: Layout
 
-    func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
+    func measure(
+        in constraint: SizeConstraint,
+        items: [LayoutItem<Void>],
+        with context: MeasurementContext
+    ) -> CGSize {
         precondition(items.count == 1)
 
         return wrapped.measure(
             in: constraint,
-            child: items.all[0].content
+            item: items[0],
+            with: context
         )
     }
 
-    func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
+    func layout(
+        in size: CGSize,
+        items: [LayoutItem<Void>],
+        with context: LayoutContext
+    ) -> [LayoutAttributes] {
         precondition(items.count == 1)
 
         return [
             wrapped.layout(
-                size: size,
-                child: items.all[0].content
+                in: size,
+                item: items[0],
+                with: context
             ),
         ]
     }
@@ -695,13 +711,21 @@ fileprivate struct MeasurableLayout: Layout {
 
     let measurable: Measurable
 
-    func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
-        precondition(items.all.isEmpty)
+    func measure(
+        in constraint: SizeConstraint,
+        items: [LayoutItem<Void>],
+        with context: MeasurementContext
+    ) -> CGSize {
+        precondition(items.isEmpty)
         return measurable.measure(in: constraint)
     }
 
-    func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
-        precondition(items.all.isEmpty)
+    func layout(
+        in size: CGSize,
+        items: [LayoutItem<Void>],
+        with context: LayoutContext
+    ) -> [LayoutAttributes] {
+        precondition(items.isEmpty)
         return []
     }
 }

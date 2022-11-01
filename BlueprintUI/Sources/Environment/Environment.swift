@@ -119,7 +119,7 @@ public struct Environment: Equatable {
         case layout
     }
 
-    mutating func subscribeToReads(for layoutPass: LayoutPass, callback: @escaping (StorageKey) -> Void) {
+    mutating func subscribeToReads(for layoutPass: LayoutPass, callback: @escaping OnDidRead) {
 
         switch layoutPass {
         case .measurement:

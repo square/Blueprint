@@ -263,11 +263,19 @@ extension LayoutWriter {
         private struct Layout: BlueprintUI.Layout {
             var builder: Builder
 
-            func measure(in constraint: SizeConstraint, items: LayoutItems<Void>) -> CGSize {
+            func measure(
+                in constraint: SizeConstraint,
+                items: [LayoutItem<Void>],
+                with context: MeasurementContext
+            ) -> CGSize {
                 builder.sizing.measure(with: builder)
             }
 
-            func layout(size: CGSize, items: LayoutItems<Void>) -> [LayoutAttributes] {
+            func layout(
+                in size: CGSize,
+                items: [LayoutItem<Void>],
+                with context: LayoutContext
+            ) -> [LayoutAttributes] {
                 builder.children.map { child in
                     .init(frame: child.frame)
                 }

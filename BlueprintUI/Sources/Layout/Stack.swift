@@ -259,12 +259,20 @@ public struct StackLayout: Layout {
         self.alignment = alignment
     }
 
-    public func measure(in constraint: SizeConstraint, items: LayoutItems<Traits>) -> CGSize {
+    public func measure(
+        in constraint: SizeConstraint,
+        items: [LayoutItem<Traits>],
+        with context: MeasurementContext
+    ) -> CGSize {
         let size = _measureIn(constraint: constraint, items: items)
         return size
     }
 
-    public func layout(size: CGSize, items: LayoutItems<Traits>) -> [LayoutAttributes] {
+    public func layout(
+        in size: CGSize,
+        items: [LayoutItem<Traits>],
+        with context: LayoutContext
+    ) -> [LayoutAttributes] {
         _layout(size: size, items: items)
     }
 
@@ -373,7 +381,7 @@ extension StackLayout {
 //
 extension StackLayout {
 
-    private func _layout(size: CGSize, items: LayoutItems<Traits>) -> [LayoutAttributes] {
+    private func _layout(size: CGSize, items: [LayoutItem<Traits>]) -> [LayoutAttributes] {
         guard items.count > 0 else { return [] }
 
         // During layout the constraints are always `.exactly` to fit the provided size
@@ -386,7 +394,7 @@ extension StackLayout {
         }
     }
 
-    private func _measureIn(constraint: SizeConstraint, items: LayoutItems<Traits>) -> CGSize {
+    private func _measureIn(constraint: SizeConstraint, items: [LayoutItem<Traits>]) -> CGSize {
         guard items.count > 0 else { return .zero }
 
         // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
@@ -405,7 +413,7 @@ extension StackLayout {
     }
 
     private func _frames(
-        for items: LayoutItems<Traits>,
+        for items: [LayoutItem<Traits>],
         in vectorConstraint: VectorConstraint
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
@@ -446,7 +454,7 @@ extension StackLayout {
     ///   - in: The constraint for all measurements.
     /// - Returns: The axis measurements as segments.
     private func _axisSegments(
-        for items: LayoutItems<Traits>,
+        for items: [LayoutItem<Traits>],
         in vectorConstraint: VectorConstraint
     ) -> [Segment] {
 
@@ -457,7 +465,7 @@ extension StackLayout {
 
             final class Measurement {
 
-                let item: LayoutItems<Traits>.Item
+                let item: LayoutItem<Traits>
                 var size: CGSize?
 
                 let isFixed: Bool
@@ -466,7 +474,7 @@ extension StackLayout {
                     isFixed == false
                 }
 
-                init(item: LayoutItems<Traits>.Item) {
+                init(item: LayoutItem<Traits>) {
                     self.item = item
                     size = nil
 
@@ -474,7 +482,7 @@ extension StackLayout {
                 }
             }
 
-            let measurements: [Measurement] = items.all.map { item in
+            let measurements: [Measurement] = items.map { item in
                 Measurement(item: item)
             }
 
@@ -543,14 +551,14 @@ extension StackLayout {
                 // Overflow: compress to axis constraint
                 return _layoutOverflow(
                     basisSizes: basisSizes,
-                    traits: items.all.map { $0.traits },
+                    traits: items.map { $0.traits },
                     layoutSize: axisSize
                 )
             } else {
                 // Underflow: expand to axis constraint
                 return _layoutUnderflow(
                     basisSizes: basisSizes,
-                    traits: items.all.map { $0.traits },
+                    traits: items.map { $0.traits },
                     layoutSize: axisSize
                 )
             }
@@ -560,7 +568,7 @@ extension StackLayout {
                 // Overflow: compress to axis constraint
                 return _layoutOverflow(
                     basisSizes: basisSizes,
-                    traits: items.all.map { $0.traits },
+                    traits: items.map { $0.traits },
                     layoutSize: axisMax
                 )
             } else {
@@ -756,13 +764,13 @@ extension StackLayout {
     ///   - crossConstraint: The cross component of the constraint for all measurements.
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
-        for items: LayoutItems<Traits>,
+        for items: [LayoutItem<Traits>],
         axisConstraints: [CGFloat],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
         // Measures cross magnitudes based on axis constraints
         func measureMagnitudes() -> [CGFloat] {
-            zip(items.all, axisConstraints).map { item, axisConstraint -> CGFloat in
+            zip(items, axisConstraints).map { item, axisConstraint -> CGFloat in
                 let vector = VectorConstraint(
                     axis: .atMost(axisConstraint),
                     cross: crossConstraint
@@ -802,13 +810,13 @@ extension StackLayout {
             let crossMagnitudes = measureMagnitudes()
 
             // Get the alignment values for each child
-            let alignmentValues = items.all.indices.map { i -> CGFloat in
+            let alignmentValues = items.indices.map { i -> CGFloat in
                 let measuredCross = crossMagnitudes[i]
                 let axisSize = axisConstraints[i]
 
                 let size = Vector(axis: axisSize, cross: measuredCross).size(axis: axis)
                 let dimensions = ElementDimensions(size: size)
-                let alignmentGuide = items.all[i].traits.alignmentGuide
+                let alignmentGuide = items[i].traits.alignmentGuide
 
                 let value = alignmentGuide?.computeValue(dimensions) ?? alignment.defaultValue(in: dimensions)
 
@@ -846,7 +854,7 @@ extension StackLayout {
             let offset = stackAnchor - contentsAnchor - minAlignedCross
 
             // Form segments from the alignment values and measured magnitudes
-            let segments = items.all.indices.map { i -> Segment in
+            let segments = items.indices.map { i -> Segment in
                 let measuredCross = crossMagnitudes[i]
                 let alignmentValue = alignmentValues[i]
 

@@ -94,7 +94,11 @@ extension GridRow {
             .absolute(0)
         }
 
-        func measure(in constraint: SizeConstraint, items: LayoutItems<Width>) -> CGSize {
+        func measure(
+            in constraint: SizeConstraint,
+            items: [LayoutItem<Width>],
+            with context: MeasurementContext
+        ) -> CGSize {
             guard items.count > 0 else {
                 return .zero
             }
@@ -109,7 +113,11 @@ extension GridRow {
             return size
         }
 
-        func layout(size: CGSize, items: LayoutItems<Width>) -> [LayoutAttributes] {
+        func layout(
+            in size: CGSize,
+            items: [LayoutItem<Width>],
+            with context: LayoutContext
+        ) -> [LayoutAttributes] {
             guard items.count > 0 else {
                 return []
             }
@@ -137,14 +145,14 @@ extension GridRow {
         private func _frames(
             in constraint: SizeConstraint,
             isExactConstraint: Bool = false,
-            items: LayoutItems<Width>
+            items: [LayoutItem<Width>]
         ) -> [CGRect] {
             var sizes: [CGSize] = Array(repeating: .zero, count: items.count)
 
             // Group children by their sizing. Maintain child order by also storing index.
             var absolutelySized: [(index: Int, width: CGFloat, content: Measurable)] = []
             var proportionallySized: [(index: Int, proportion: CGFloat, content: Measurable)] = []
-            items.all.indexedForEach { index, item in
+            items.indexedForEach { index, item in
                 switch item.traits {
                 case .absolute(let width):
                     absolutelySized.append((index, width, item.content))

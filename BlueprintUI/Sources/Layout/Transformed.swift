@@ -47,11 +47,19 @@ public struct Transformed: Element {
     private struct Layout: SingleChildLayout {
         var transform: CATransform3D
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
+        func measure(
+            in constraint: SizeConstraint,
+            item: LayoutItem<Void>,
+            with context: MeasurementContext
+        ) -> CGSize {
+            item.content.measure(in: constraint)
         }
 
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+        func layout(
+            in size: CGSize,
+            item: LayoutItem<Void>,
+            with context: LayoutContext
+        ) -> LayoutAttributes {
             var attributes = LayoutAttributes(size: size)
             attributes.transform = transform
             return attributes
