@@ -64,6 +64,14 @@ public struct LayoutSubview {
     typealias SizeCache = SPValueCache<ProposedViewSize, CGSize>
 
     struct Placement {
+        static func filling(frame: CGRect, proposal: ProposedViewSize) -> Self {
+            .init(
+                position: frame.center,
+                anchor: .center,
+                size: .init(proposal: proposal, width: frame.width, height: frame.height)
+            )
+        }
+
         var position: CGPoint
         var anchor: UnitPoint
 

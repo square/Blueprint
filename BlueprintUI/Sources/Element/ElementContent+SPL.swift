@@ -115,7 +115,7 @@ extension ElementContent.Builder {
             let subview = subviews[index]
 
             let placement = subview.placement
-                ?? .init(position: attributes.center, anchor: .center, size: .proposal(proposal))
+                ?? .filling(frame: attributes.frame, proposal: proposal)
 
             let size: CGSize
             if let width = placement.size.width, let height = placement.size.height {
@@ -182,3 +182,14 @@ extension LayoutAttributes {
     }
 }
 
+enum DebugScopeKey: EnvironmentKey {
+    static let defaultValue: [String] = []
+}
+
+extension Element {
+    public func debugScope(_ scope: String) -> Element {
+        adaptedEnvironment { environment in
+            environment[DebugScopeKey.self].append(scope)
+        }
+    }
+}
