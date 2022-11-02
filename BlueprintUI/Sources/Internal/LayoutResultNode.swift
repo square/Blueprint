@@ -170,8 +170,12 @@ extension LayoutResultNode {
     ) {
         for child in children {
             let attributes = child.node.layoutAttributes
+            
+            let debugScope = child.node.environment[DebugScopeKey.self]
+            
+            let name = (debugScope + ["\(child.identifier)"]).joined(separator: "/")
 
-            visit(depth, "\(child.identifier)", attributes.frame)
+            visit(depth, name, attributes.frame)
 
             child.node.dump(depth: depth + 1, visit: visit)
         }
