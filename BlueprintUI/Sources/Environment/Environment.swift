@@ -34,33 +34,103 @@ import UIKit
 ///             }
 ///         }
 ///     }
-public struct Environment {
+public struct Environment: Equatable {
+
+    typealias OnDidRead = (StorageKey) -> Void
+
+    enum LayoutPass: Equatable {
+        case measurement
+        case layout
+    }
 
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [ObjectIdentifier: Any] = [:]
-
-    /// Gets or sets an environment value by its key.
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
-        get {
-            let objectId = ObjectIdentifier(key)
-
-            if let value = values[objectId] {
-                return value as! Key.Value
-            }
-
-            return key.defaultValue
-        }
-        set {
-            values[ObjectIdentifier(key)] = newValue
-        }
-    }
+    /// When enabled, notify any subscribers when a value is read
+    /// from the environment
+    var readNotificationsEnabled: Bool = true
 
     /// If the `Environment` contains any values.
     var isEmpty: Bool {
         values.isEmpty
+    }
+
+    private var values: [StorageKey: ValueBox] = [:]
+
+    private var measurementDidRead: OnDidRead?
+    private var layoutDidRead: [OnDidRead] = []
+
+    /// Gets or sets an environment value by its key.
+    public subscript<KeyType: EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
+        get {
+            let storageKey = StorageKey(key)
+
+            if readNotificationsEnabled {
+                measurementDidRead?(storageKey)
+                for reader in layoutDidRead {
+                    reader(storageKey)
+                }
+            }
+
+            if let value = values[storageKey] {
+                return value.base as! KeyType.Value
+            }
+            return key.defaultValue
+        }
+        set {
+            values[StorageKey(key)] = ValueBox(newValue)
+        }
+    }
+
+    public static func == (lhs: Environment, rhs: Environment) -> Bool {
+        guard lhs.values.count == rhs.values.count else { return false }
+
+        for (key, value) in lhs.values {
+            if key.valuesEqual(value.base, rhs.values[key]?.base) == false {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    func valuesEqual(to subset: Environment.Subset?) -> Bool {
+
+        guard let subset = subset else { return true }
+
+        for (key, value) in subset.values {
+            if key.valuesEqual(value.base, values[key]?.base) == false {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    func subset(with keys: Set<StorageKey>) -> Environment.Subset? {
+
+        if keys.isEmpty { return nil }
+
+        var subset = Subset()
+        subset.values.reserveCapacity(keys.count)
+
+        for key in keys {
+            if let value = values[key] {
+                subset.values[key] = value
+            }
+        }
+
+        return subset
+    }
+
+    mutating func subscribeToReads(for layoutPass: LayoutPass, callback: @escaping OnDidRead) {
+        switch layoutPass {
+        case .measurement:
+            measurementDidRead = callback
+        case .layout:
+            layoutDidRead.append(callback)
+        }
     }
 
     /// Returns a new `Environment` by merging the values from `self` and the
@@ -73,6 +143,49 @@ public struct Environment {
     }
 }
 
+extension Environment {
+
+    /// A subset of `Environment.value`s that can be used for matching a set of
+    /// key-value pairs with other `Environment`s
+    struct Subset {
+        var values: [StorageKey: ValueBox] = [:]
+    }
+
+    /// Place values in the environment into a reference box, so that their storage is only allocated once
+    /// even when placed into an environment subset for change tracking.
+    final class ValueBox {
+        let base: Any
+
+        init(_ base: Any) {
+            self.base = base
+        }
+    }
+
+    struct StorageKey: Hashable {
+
+        private let identifier: ObjectIdentifier
+
+        private let isEqual: (Any?, Any?) -> Bool
+
+        init<KeyType: EnvironmentKey>(_ key: KeyType.Type) {
+            identifier = ObjectIdentifier(key)
+
+            isEqual = KeyType.areValuesEqual
+        }
+
+        fileprivate func valuesEqual(_ lhs: Any?, _ rhs: Any?) -> Bool {
+            isEqual(lhs, rhs)
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(identifier)
+        }
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.identifier == rhs.identifier
+        }
+    }
+}
 
 extension UIView {
 
@@ -84,7 +197,7 @@ extension UIView {
     var inheritedBlueprintEnvironment: Environment? {
         if let environment = nativeViewNodeBlueprintEnvironment {
             return environment
-        } else if let superview = self.superview {
+        } else if let superview = superview {
             return superview.inheritedBlueprintEnvironment
         } else {
             return nil
@@ -105,3 +218,4 @@ extension UIView {
 
     private static var environmentKey = NSObject()
 }
+
