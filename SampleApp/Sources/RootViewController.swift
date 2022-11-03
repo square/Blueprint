@@ -77,75 +77,16 @@ final class RootViewController: UIViewController {
     }
 
     var contents: Element {
-//        Row(alignment: .fill) {
-//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 100, height: 100))
-//
-//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 10, height: 10))
-//                .aligned(vertically: .top)
-//
-//            Box(backgroundColor: .red).constrainedTo(size: .init(width: 10, height: 10))
-//                .aligned(vertically: .bottom)
-//        }
-//        .aligned(vertically: .center)
+        Column(
+            alignment: .center,
+            underflow: .growUniformly
+        ) {
+            Label(text: "Test")
 
-        Spacer(width: 20, height: 20)
-            .box(background: .red)
-            .adaptedEnvironment(keyPath: \.feedTheme, value: .init(authorColor: .green))
-            .centered()
-//            .adaptedEnvironment(keyPath: \.feedTheme, value: .init(authorColor: .green))
-
-//            .aligned(vertically: .center, horizontally: .trailing)
-//            .box(background: .blue)
-//            .constrainedTo(height: .atMost(10))
-//            .aligned(vertically: .center, horizontally: .fill)
-//            .inset(
-//                top: 40,
-//                bottom: 15,
-//                left: 70,
-//                right: 25
-//            )
-
-//        Column(alignment: .fill) {
-//            Spacer(50)
-//
-//            EnvironmentReader { env in
-//                Row(alignment: .fill, underflow: .growUniformly) {
-//                    Box(backgroundColor: .red)
-//                        .constrainedTo(width: 60, height: 60)
-//                        .stackLayoutChild(priority: .fixed)
-//
-//                    Box(backgroundColor: .yellow)
-//                        .constrainedTo(width: .atLeast(10), height: .absolute(30))
-//
-//                    Box(backgroundColor: .orange)
-//                        .constrainedTo(width: .absolute(40), height: .atLeast(10))
-//
-//                }
-//            }
-//
-//            Spacer(50)
-//
-//            Row(alignment: .center, underflow: .growProportionally) {
-//                Box(backgroundColor: .red)
-//                    .constrainedTo(width: 60, height: 60)
-//                    .stackLayoutChild(priority: .fixed)
-//
-//                Box(backgroundColor: .yellow)
-//                    .constrainedTo(width: .atLeast(10), height: .absolute(30))
-//
-//                Box(backgroundColor: .orange)
-//                    .constrainedTo(width: .absolute(40), height: .atLeast(10))
-//
-//            }
-//
-//            Spacer(50)
-//
-//        }
-//        .scrollable { scrollView in
-//            scrollView.contentInsetAdjustmentBehavior = .never
-//        }
-//        .inset()
-
+            Label(text: "Test2")
+        }
+        .opacity(0.5)
+        .inset(uniform: 10)
     }
 
     var contents2: Element {

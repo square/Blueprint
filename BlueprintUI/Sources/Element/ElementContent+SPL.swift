@@ -29,8 +29,16 @@ extension ElementContent: Sizable {
 final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKey: Hashable {
     typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
 
-    var valueCache: SPValueCache<Key, Value> = .init()
+    var valueCache: SPValueCache<Key, Value>
     private var subcaches: [SubcacheKey: Subcache] = [:]
+
+    var path: String
+
+    init(path: String? = nil) {
+        let path = path ?? ""
+        self.path = path
+        valueCache = .init(path: path)
+    }
 
     func get(key: Key, or create: (Key) -> Value) -> Value {
         valueCache.get(key: key, or: create)
@@ -40,7 +48,7 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         if let subcache = subcaches[key] {
             return subcache
         }
-        let subcache = Subcache()
+        let subcache = Subcache(path: path + "/" + String(describing: key))
         subcaches[key] = subcache
         return subcache
     }
@@ -49,11 +57,19 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
 final class SPValueCache<Key: Hashable, Value> {
     var values: [Key: Value] = [:]
 
+    var path: String
+
+    init(path: String) {
+        self.path = path
+    }
+
     func get(key: Key, or create: (Key) -> Value) -> Value {
         if let size = values[key] {
+            print("XXX Hit at  \(path.padding(toLength: 8, withPad: " ", startingAt: 0))): \t\(String(describing: key).padding(toLength: 16, withPad: " ", startingAt: 0)) \t-> \t\(size)")
             return size
         }
         let size = create(key)
+        print("OOO Miss at \(path.padding(toLength: 8, withPad: " ", startingAt: 0)): \t\(String(describing: key).padding(toLength: 16, withPad: " ", startingAt: 0)) \t-> \t\(size)")
         values[key] = size
         return size
     }
