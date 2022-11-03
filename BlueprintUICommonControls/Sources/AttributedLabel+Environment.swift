@@ -15,18 +15,27 @@ import UIKit
 ///
 public protocol URLHandler {
     func onTap(url: URL)
+
+    func isEquivalent(to other: URLHandler) -> Bool
 }
 
 struct DefaultURLHandler: URLHandler {
+
     func onTap(url: URL) {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    }
+
+    func isEquivalent(to other: URLHandler) -> Bool {
+        guard other is Self else { return false }
+
+        return true
     }
 }
 
 public struct URLHandlerEnvironmentKey: EnvironmentKey {
 
     public static func equals(_ lhs: URLHandler, _ rhs: URLHandler) -> Bool {
-        false // TODO: We can optimize this, but for now, whatever.
+        lhs.isEquivalent(to: rhs)
     }
 
     public static let defaultValue: URLHandler = DefaultURLHandler()
@@ -45,5 +54,9 @@ struct ClosureURLHandler: URLHandler {
 
     func onTap(url: URL) {
         onTap(url)
+    }
+
+    func isEquivalent(to other: URLHandler) -> Bool {
+        false
     }
 }
