@@ -6,7 +6,7 @@ import CoreGraphics
 public struct UserInteractionEnabled: Element {
 
     public var isEnabled: Bool
-    @ElementProperty public var wrappedElement: Element
+    public var wrappedElement: Element
 
     public init(_ isEnabled: Bool, wrapping element: Element) {
         self.isEnabled = isEnabled

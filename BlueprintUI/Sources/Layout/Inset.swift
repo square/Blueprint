@@ -7,7 +7,7 @@ import UIKit
 public struct Inset: Element {
 
     /// The wrapped element to be inset.
-    @ElementProperty public var wrappedElement: Element
+    public var wrappedElement: Element
 
     /// The amount to inset the content element.
     public var top: CGFloat

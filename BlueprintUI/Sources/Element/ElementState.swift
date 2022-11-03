@@ -184,7 +184,8 @@ final class ElementState {
             isEquivalent = false
 
         case .comparableElement:
-            isEquivalent = Self.elementsEquivalent(element.value, newElement)
+            let context = ComparableElementContext(environment: newEnvironment)
+            isEquivalent = Self.elementsEquivalent(element.value, newElement, in: context)
 
         case .childOfComparableElement:
             /// **Note**: We're equivalent always, because our parent
@@ -425,14 +426,14 @@ private final class SignpostToken {}
 
 extension ElementState {
 
-    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?) -> Bool {
+    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?, in context: ComparableElementContext) -> Bool {
 
         if lhs == nil && rhs == nil { return true }
 
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        if lhs.anyIsEquivalent(to: rhs) {
+        if lhs.anyIsEquivalent(to: rhs, in: context) {
             return true
         } else {
             return false

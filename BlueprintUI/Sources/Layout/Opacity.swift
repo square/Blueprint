@@ -4,7 +4,7 @@ import UIKit
 public struct Opacity: Element {
 
     /// The content element whose opacity is being affected.
-    @ElementProperty public var wrappedElement: Element
+    public var wrappedElement: Element
 
     /// The opacity of the wrapped element.
     public var opacity: CGFloat

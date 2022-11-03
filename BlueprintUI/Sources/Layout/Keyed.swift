@@ -41,7 +41,7 @@ public struct Keyed: Element {
     public var key: AnyHashable?
 
     /// The wrapped element.
-    @ElementProperty public var wrapped: Element
+    public var wrapped: Element
 
     /// Creates a new `Keyed` element with the provided key and wrapped element.
     public init(key: AnyHashable?, wrapping: Element) {

@@ -24,7 +24,7 @@ public struct Box: Element {
     /// If content placed within the box should be clipped.
     public var clipsContent: Bool
 
-    @OptionalElementProperty public var wrappedElement: Element?
+    public var wrappedElement: Element?
 
     public init(
         backgroundColor: UIColor = .clear,

@@ -28,10 +28,22 @@ public protocol ComparableElement: AnyComparableElement {
     ///
     /// If your element conforms to `Equatable`, this method is synthesized automatically.
     ///
-    func isEquivalent(to other: Self) -> Bool
+    func isEquivalent(to other: Self, in context: ComparableElementContext) -> Bool
 
     // TODO: Move to ViewDescription.
     var appliesViewDescriptionIfEquivalent: Bool { get }
+}
+
+
+public struct ComparableElementContext {
+
+    public var environment: Environment
+
+    public init(
+        environment: Environment
+    ) {
+        self.environment = environment
+    }
 }
 
 
@@ -40,7 +52,7 @@ public protocol ComparableElement: AnyComparableElement {
 public protocol AnyComparableElement: Element {
 
     /// Returns true if the two elements are the same type, and are equivalent.
-    func anyIsEquivalent(to other: AnyComparableElement) -> Bool
+    func anyIsEquivalent(to other: AnyComparableElement, in context: ComparableElementContext) -> Bool
 
     // TODO: Move to ViewDescription
     var appliesViewDescriptionIfEquivalent: Bool { get }
@@ -49,7 +61,7 @@ public protocol AnyComparableElement: Element {
 
 extension ComparableElement where Self: Equatable {
 
-    public func isEquivalent(to other: Self) -> Bool {
+    public func isEquivalent(to other: Self, in context: ComparableElementContext) -> Bool {
         self == other
     }
 }
@@ -57,65 +69,13 @@ extension ComparableElement where Self: Equatable {
 
 extension ComparableElement {
 
-    public func anyIsEquivalent(to other: AnyComparableElement) -> Bool {
+    public func anyIsEquivalent(to other: AnyComparableElement, in context: ComparableElementContext) -> Bool {
         guard let other = other as? Self else { return false }
 
-        return isEquivalent(to: other)
+        return isEquivalent(to: other, in: context)
     }
 
     public var appliesViewDescriptionIfEquivalent: Bool {
         true
     }
 }
-
-
-public enum ComparableElementNotEquivalent: Error {
-    case nonEquivalentValue(Any, Any, AnyKeyPath)
-}
-
-
-extension Array {
-
-    public func isEquivalent(to other: Self, using compare: (Element, Element) -> Bool) -> Bool {
-
-        guard count == other.count else { return false }
-
-        for index in 0..<count {
-            let lhs = self[index]
-            let rhs = other[index]
-
-            if compare(lhs, rhs) == false {
-                return false
-            }
-        }
-
-        return true
-    }
-}
-
-extension Array where Self.Element == BlueprintUI.Element {
-
-    public func isEquivalent(to other: Self) -> Bool {
-
-        guard count == other.count else { return false }
-
-        for index in 0..<count {
-            let lhs = self[index]
-            let rhs = other[index]
-
-            guard
-                let lhs = lhs as? AnyComparableElement,
-                let rhs = rhs as? AnyComparableElement
-            else {
-                return false
-            }
-
-            if lhs.anyIsEquivalent(to: rhs) == false {
-                return false
-            }
-        }
-
-        return true
-    }
-}
-

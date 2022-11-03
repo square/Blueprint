@@ -35,7 +35,7 @@ public struct Aligned: Element {
     }
 
     /// The content element to be aligned.
-    @ElementProperty public var wrappedElement: Element
+    public var wrappedElement: Element
     /// The vertical alignment.
     public var verticalAlignment: VerticalAlignment
     /// The horizontal alignment.

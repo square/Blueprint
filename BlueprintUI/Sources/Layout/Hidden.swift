@@ -5,7 +5,7 @@ import CoreGraphics
 /// - Note: When an element is hidden, any elements within the wrapped element will be hidden.
 public struct Hidden: Element {
     public var isHidden: Bool
-    @ElementProperty public var wrappedElement: Element
+    public var wrappedElement: Element
 
     public init(_ isHidden: Bool = true, wrapping element: Element) {
         self.isHidden = isHidden
