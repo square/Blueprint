@@ -372,7 +372,8 @@ final class ElementState {
     /// an `Environment.Subset` that represents the measurement or layout's dependencies on the `Environment`.
     ///
     /// If there are no dependencies (`toTrack` did not read from the `Environment`), no subset is returned.
-    /// Additionally, if the element is not comparable, no subset is returned.
+    ///
+    /// Additionally, if the element is not comparable, no subset is returned or tracked.
     private func trackEnvironmentReads<Output>(
         for layoutPass: Environment.LayoutPass,
         with environment: Environment,
@@ -406,6 +407,11 @@ final class ElementState {
         return (output, environment.subset(with: observedKeys))
     }
 
+    /// Creates a new child `ElementState` for the provided `Element`,
+    /// or returns an existing one if it already exists.
+    ///
+    /// The first time the element is seen during a layout traversal, we will call `update`
+    /// on its backing `ElementState` to keep internal state in sync.
     func childState(
         for child: Element,
         in environment: Environment,
@@ -437,6 +443,8 @@ final class ElementState {
         }
     }
 
+    /// To be called at the beginning of the layout cycle by the owner
+    /// of the `ElementStateTree`, to set up the tree for a traversal.
     func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
@@ -444,22 +452,29 @@ final class ElementState {
         }
     }
 
+    /// To be called at the end of the layout cycle by the owner
+    /// of the `ElementStateTree`, to tear down any old state,
+    /// or throw out caches which should not be maintained across layout cycles.
     func finishedLayout() {
         recursiveRemoveOldChildren()
         recursiveClearCaches()
     }
 
+    /// Clears all cached measurements, layouts, etc.
     private func clearAllCachedData() {
         measurements.removeAll()
         layouts.removeAll()
     }
 
+    /// Clears all cached data, but only if the element is **not** a `ComparableElement`.
     private func clearAllCachedDataIfNotComparable() {
         if comparability != .comparableElement {
             clearAllCachedData()
         }
     }
 
+    /// Performs a depth-first enumeration of all elements in the tree,
+    /// _including_ the original reciever.
     func recursiveForEach(_ perform: (ElementState) -> Void) {
         perform(self)
 
@@ -468,6 +483,8 @@ final class ElementState {
         }
     }
 
+    /// Iterating the whole tree, garbage collects all children
+    /// which are no longer present in the tree.
     private func recursiveRemoveOldChildren() {
 
         for (key, state) in children {
@@ -484,6 +501,8 @@ final class ElementState {
         }
     }
 
+    /// Iterating the whole tree, clears caches which should
+    /// not be maintained after the current layout cycle.
     private func recursiveClearCaches() {
         recursiveForEach {
             if $0.comparability.isComparable == false {
@@ -510,6 +529,10 @@ private final class SignpostToken {}
 
 extension ElementState {
 
+    /// Checks if the two elements are equivalent in the given context.
+    ///
+    /// - If both values are nil, `true` is returned.
+    /// - If both values are different types, `false` is returned.
     static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?, in context: ComparableElementContext) -> Bool {
 
         if lhs == nil && rhs == nil { return true }
@@ -517,22 +540,18 @@ extension ElementState {
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        if lhs.anyIsEquivalent(to: rhs, in: context) {
-            return true
-        } else {
-            return false
-        }
+        return lhs.anyIsEquivalent(to: rhs, in: context)
     }
 }
 
 
 extension Dictionary {
 
+    /// Removes all values from the dictionary that pass the provided predicate.
     fileprivate mutating func removeAll(where shouldRemove: (Key, Value) -> Bool) {
 
         for (key, value) in self {
             if shouldRemove(key, value) {
-                print("Removing \(key)")
                 removeValue(forKey: key)
             }
         }
