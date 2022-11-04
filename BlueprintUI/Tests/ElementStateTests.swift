@@ -1,3 +1,4 @@
+// swiftformat:disable redundantReturn
 //
 //  ElementStateTests.swift
 //
@@ -118,6 +119,55 @@ class ElementStateTests: XCTestCase {
 }
 
 
+class ElementStateTree_IdentifierTree_Tests: XCTestCase {
+
+    func test_identifierTree() {
+
+        // TODO: Fix me once we have the ElementContent changes in.
+        return;
+
+        let tree = ElementStateTree(name: "Testing")
+
+        XCTAssertEqual(tree.identifierTree, nil)
+
+        let element = Row {
+            Column {
+                Empty()
+            }
+
+            Column {
+                Empty()
+                Empty()
+            }
+        }
+
+        tree.update(with: element, in: .empty)
+
+        XCTAssertEqual(
+            tree.identifierTree,
+            IdentifiedNode(Row.identifier(1)) {
+                IdentifiedNode(Column.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                }
+
+                IdentifiedNode(Column.identifier(2)) {
+                    IdentifiedNode(Empty.identifier(1))
+                    IdentifiedNode(Empty.identifier(2))
+                }
+            }
+        )
+    }
+}
+
+
+extension Element {
+
+    fileprivate static func identifier(_ count: Int) -> ElementIdentifier {
+        .init(elementType: self, key: nil, count: count)
+    }
+}
+
+
 fileprivate struct Element1: ProxyElement {
 
     var text: String
@@ -171,5 +221,39 @@ extension ElementStateTree {
         }
 
         return output
+    }
+}
+
+
+struct IdentifiedNode: Hashable {
+    var identifier: ElementIdentifier
+
+    var children: [IdentifiedNode]
+
+    init(
+        _ identifier: ElementIdentifier,
+        @Builder<IdentifiedNode> children: () -> [IdentifiedNode] = { [] }
+    ) {
+        self.identifier = identifier
+        self.children = children()
+    }
+}
+
+
+extension ElementStateTree {
+
+    var identifierTree: IdentifiedNode? {
+        root?.identifiedNode
+    }
+}
+
+
+extension ElementState {
+
+    var identifiedNode: IdentifiedNode {
+        .init(
+            identifier,
+            children: { orderedChildren.map(\.identifiedNode) }
+        )
     }
 }

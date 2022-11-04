@@ -89,8 +89,6 @@ final class ElementStateTree {
             }
         }
     }
-
-
 }
 
 
@@ -162,6 +160,10 @@ final class ElementState {
 
     /// The children of the `ElementState`, cached by element identifier.
     private var children: [ElementIdentifier: ElementState] = [:]
+
+    /// The children of the element state in the order they appear in the Layout.
+    /// This value is built dynamically as the element tree is enumerated.
+    private(set) var orderedChildren: [ElementState] = []
 
     /// Indicates the comparability behavior of the element.
     enum Comparability: Equatable {
@@ -480,6 +482,7 @@ final class ElementState {
         if let existing = children[identifier] {
 
             if existing.wasVisited == false {
+                orderedChildren.append(existing)
                 existing.update(with: child, in: environment, identifier: identifier)
             }
 
@@ -513,6 +516,8 @@ final class ElementState {
         recursiveForEach {
             $0.wasVisited = false
             $0.wasUpdateEquivalent = false
+
+            $0.orderedChildren.removeAll(keepingCapacity: true)
         }
     }
 
@@ -688,7 +693,6 @@ extension Optional where Wrapped == ElementStateTreeDelegate {
         #endif
     }
 }
-
 
 
 //

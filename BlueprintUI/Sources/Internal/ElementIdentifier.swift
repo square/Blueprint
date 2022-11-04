@@ -43,17 +43,30 @@
  */
 struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    let elementType: ObjectIdentifier
+    let elementType: Element.Type
+    let elementTypeID: ObjectIdentifier
     let key: AnyHashable?
 
     let count: Int
 
     init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
-        self.elementType = ObjectIdentifier(elementType)
+        self.elementType = elementType
+
+        elementTypeID = ObjectIdentifier(elementType)
         self.key = key
 
         self.count = count
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(elementTypeID)
+        hasher.combine(key)
+        hasher.combine(count)
+    }
+
+    static func == (lhs: ElementIdentifier, rhs: ElementIdentifier) -> Bool {
+        lhs.elementTypeID == rhs.elementTypeID && lhs.count == rhs.count && lhs.key == rhs.key
     }
 
     var debugDescription: String {
