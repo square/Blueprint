@@ -55,8 +55,8 @@ struct ReceiptElement: ProxyElement {
             label.font = .boldSystemFont(ofSize: 24.0)
             label.color = .darkGray
         }
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -82,8 +82,8 @@ struct ReceiptElement: ProxyElement {
             label.color = .darkGray
         }
         .inset(uniform: 24.0)
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -222,8 +222,8 @@ struct ReceiptElement: ProxyElement {
             title: "Total",
             price: purchase.total
         )
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -257,8 +257,8 @@ struct ReceiptElement: ProxyElement {
             )
         }
         .inset(uniform: 24)
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -291,8 +291,8 @@ struct ReceiptElement: ProxyElement {
             )
         }
         .inset(uniform: 24)
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -342,8 +342,8 @@ struct ReceiptElement: ProxyElement {
             )
         }
         .inset(uniform: 24)
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
@@ -522,8 +522,8 @@ struct ReceiptElement: ProxyElement {
             )
         }
         .inset(uniform: 24)
-        .scrollable { scrollable in
-            scrollable.alwaysBounceVertical = true
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
         }
     }
 
