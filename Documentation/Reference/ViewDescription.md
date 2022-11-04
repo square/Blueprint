@@ -57,7 +57,7 @@ UIView.describe { config in
 ### Specifying a subview that should contain any view-backed child elements
 
 ```swift
-private class MyCustomView {
+private class MyCustomView: UIView {
     let mySubview = UIView()
 }
 
