@@ -23,11 +23,11 @@ In Tutorial 1 we added Blueprint to a view controller, and created a new `HelloW
 struct HelloWorldElement: ProxyElement {
 
     var elementRepresentation: Element {
-        var label = Label(text: "Hello, world")
-        label.font = .boldSystemFont(ofSize: 24.0)
-        label.color = .darkGray
-
-        return Centered(label)
+        Label(text: "Hello, world") { label in
+            label.font = .boldSystemFont(ofSize: 24.0)
+            label.color = .darkGray
+        }
+        .centered()
     }
 
 }
@@ -51,14 +51,13 @@ Next, we'll configure the `ScrollView and return it.
 struct ReceiptElement: ProxyElement {
 
     var elementRepresentation: Element {
-        var label = Label(text: "Hello, world")
-        label.font = .boldSystemFont(ofSize: 24.0)
-        label.color = .darkGray
-
-        var scrollView = ScrollView(wrapping: label)
-        scrollView.contentSize = .fittingHeight // Stretches content to fill width, but sizes height to fit
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        Label(text: "Hello, world") { label in
+            label.font = .boldSystemFont(ofSize: 24.0)
+            label.color = .darkGray
+        }
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -78,18 +77,14 @@ We do this with the `Inset` element. We'll wrap the label in an `Inset` before w
 struct ReceiptElement: ProxyElement {
 
     var elementRepresentation: Element {
-        var label = Label(text: "Hello, world")
-        label.font = .boldSystemFont(ofSize: 24.0)
-        label.color = .darkGray
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: label)
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight // Stretches content to fill width, but sizes height to fit
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        Label(text: "Hello, world") { label in
+            label.font = .boldSystemFont(ofSize: 24.0)
+            label.color = .darkGray
+        }
+        .inset(uniform: 24.0)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -114,17 +109,17 @@ struct Purchase {
     var items: [Item]
 
     var subtotal: Double {
-        return items
+        items
             .map { $0.price }
             .reduce(0.0, +)
     }
 
     var tax: Double {
-        return subtotal * 0.085
+        subtotal * 0.085
     }
 
     var total: Double {
-        return subtotal + tax
+        subtotal + tax
     }
 
     struct Item {
@@ -133,7 +128,7 @@ struct Purchase {
     }
 
     static var sample: Purchase {
-        return Purchase(items: [
+        Purchase(items: [
             Item(name: "Burger", price: 7.99),
             Item(name: "Fries", price: 2.49),
             Item(name: "Soda", price: 1.49)
@@ -197,23 +192,18 @@ struct LineItemElement: ProxyElement {
     var price: Double
 
     var elementRepresentation: Element {
-        return Row { row in
+        Row(underflow: .spaceEvenly) {
+            Label(text: title)
 
-            row.horizontalUnderflow = .spaceEvenly
-
-            let titleLabel = Label(text: title)
-            row.add(child: titleLabel)
-
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            let formattedPrice = formatter.string(from: NSNumber(value: price)) ?? ""
-
-            let priceLabel = Label(text: formattedPrice)
-            row.add(child: priceLabel)
-
+            Label(text: formattedPrice)
         }
     }
 
+    private var formattedPrice: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        return formatter.string(from: NSNumber(value: price)) ?? ""
+    }
 }
 ```
 
@@ -228,14 +218,13 @@ We'll now replace the "Hello, World" label with a `LineItemElement`:
 struct ReceiptElement: ProxyElement {
 
     var elementRepresentation: Element {
-        let totalItem = LineItemElement(
+        LineItemElement(
             title: "Total",
-            price: purchase.total)
-
-        var scrollView = ScrollView(wrapping: totalItem)
-        scrollView.contentSize = .fittingHeight // Stretches content to fill width, but sizes height to fit
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+            price: purchase.total
+        )
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -261,25 +250,16 @@ struct ReceiptElement: ProxyElement {
     let purchase = Purchase.sample
 
     var elementRepresentation: Element {
-        let column = Column { col in
-
-            col.minimumVerticalSpacing = 16.0
-            col.horizontalAlignment = .fill
-
-            col.add(
-                child: LineItemElement(
-                    title: "Total",
-                    price: purchase.total))
+        Column(alignment: .fill, minimumSpacing: 16) {
+            LineItemElement(
+                title: "Total",
+                price: purchase.total
+            )
         }
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: column)
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        .inset(uniform: 24)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -294,35 +274,26 @@ struct ReceiptElement: ProxyElement {
     let purchase = Purchase.sample
 
     var elementRepresentation: Element {
-        let column = Column { col in
+        Column(alignment: .fill, minimumSpacing: 16) {
+            LineItemElement(
+                title: "Subtotal",
+                price: purchase.subtotal
+            )
 
-            col.minimumVerticalSpacing = 16.0
-            col.horizontalAlignment = .fill
+            LineItemElement(
+                title: "Tax",
+                price: purchase.tax
+            )
 
-            col.add(
-                child: LineItemElement(
-                    title: "Subtotal",
-                    price: purchase.subtotal))
-
-            col.add(
-                child: LineItemElement(
-                    title: "Tax",
-                    price: purchase.tax))
-
-            col.add(
-                child: LineItemElement(
-                    title: "Total",
-                    price: purchase.total))
+            LineItemElement(
+                title: "Total",
+                price: purchase.total
+            )
         }
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: column)
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        .inset(uniform: 24)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -345,42 +316,35 @@ struct ReceiptElement: ProxyElement {
     let purchase = Purchase.sample
 
     var elementRepresentation: Element {
-        let column = Column { col in
-
-            col.minimumVerticalSpacing = 16.0
-            col.horizontalAlignment = .fill
-
+        Column(alignment: .fill, minimumSpacing: 16) {
             for item in purchase.items {
-                col.add(
-                    child: LineItemElement(
-                        title: item.name,
-                        price: item.price))
+                LineItemElement(
+                    title: item.name,
+                    price: item.price
+                )
             }
 
-            col.add(
-                child: LineItemElement(
-                    title: "Subtotal",
-                    price: purchase.subtotal))
+            RuleElement()
 
-            col.add(
-                child: LineItemElement(
-                    title: "Tax",
-                    price: purchase.tax))
+            LineItemElement(
+                title: "Subtotal",
+                price: purchase.subtotal
+            )
 
-            col.add(
-                child: LineItemElement(
-                    title: "Total",
-                    price: purchase.total))
+            LineItemElement(
+                title: "Tax",
+                price: purchase.tax
+            )
+
+            LineItemElement(
+                title: "Total",
+                price: purchase.total
+            )
         }
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: column)
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        .inset(uniform: 24)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }
@@ -398,9 +362,8 @@ import BlueprintUICommonControls
 
 struct RuleElement: ProxyElement {
     var elementRepresentation: Element {
-        return ConstrainedSize(
-            height: .absolute(1.0),
-            wrapping: Box(backgroundColor: .black))
+        Box(backgroundColor: .black)
+            .constrainedTo(height: .absolute(1.0))
     }
 }
 ```
@@ -415,22 +378,23 @@ We can then add the rule in between the items and the extra info inside `Receipt
 // ...
 
 for item in purchase.items {
-    col.add(
-        child: LineItemElement(
-            title: item.name,
-            price: item.price))
+    LineItemElement(
+        title: item.name,
+        price: item.price
+    )
 }
 
-col.add(child: RuleElement())
+RuleElement()
 
-col.add(
-    child: LineItemElement(
-        title: "Subtotal",
-        price: purchase.subtotal))
+LineItemElement(
+    title: "Subtotal",
+    price: purchase.subtotal
+)
 
 // ...
 ```
 
+> Note: in a real app, you can drop in the `Rule` element from `BlueprintUICommonControls` to avoid re-implementing this.
 ### Styling
 
 Let's add some text styles to introduce visual contrast to our line items.
@@ -498,26 +462,23 @@ struct LineItemElement: ProxyElement {
     var price: Double
 
     var elementRepresentation: Element {
-        return Row { row in
+        Row(underflow: .spaceEvenly) {
+            Label(text: title) { label in 
+                label.font = style.titleFont
+                label.color = style.titleColor
+            }
 
-            row.horizontalUnderflow = .spaceEvenly
-
-            var titleLabel = Label(text: title)
-            titleLabel.font = style.titleFont
-            titleLabel.color = style.titleColor
-            row.add(child: titleLabel)
-
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.locale = .current
-            let formattedPrice = formatter.string(from: NSNumber(value: price))!
-
-            var priceLabel = Label(text: formattedPrice)
-            priceLabel.font = style.priceFont
-            priceLabel.color = style.priceColor
-            row.add(child: priceLabel)
-
+            Label(text: formattedPrice) { label in
+                label.font = style.priceFont
+                label.color = style.priceColor
+            }
         }
+    }
+
+    private var formattedPrice: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        return formatter.string(from: NSNumber(value: price)) ?? ""
     }
 
 }
@@ -531,50 +492,39 @@ struct ReceiptElement: ProxyElement {
     let purchase = Purchase.sample
 
     var elementRepresentation: Element {
-        let column = Column { col in
-            col.minimumVerticalSpacing = 16.0
-            col.horizontalAlignment = .fill
-
+        Column(alignment: .fill, minimumSpacing: 16) {
             for item in purchase.items {
-                col.add(
-                    child: LineItemElement(
-                        style: .regular,
-                        title: item.name,
-                        price: item.price))
+                LineItemElement(
+                    style: .regular,
+                    title: item.name,
+                    price: item.price
+                )
             }
 
-            // Add a rule below all of the line items
-            col.add(child: RuleElement())
+            RuleElement()
 
-            // Totals
-            col.add(
-                child: LineItemElement(
-                    style: .regular,
-                    title: "Subtotal",
-                    price: purchase.subtotal))
+            LineItemElement(
+                style: .regular,
+                title: "Subtotal",
+                price: purchase.subtotal
+            )
 
+            LineItemElement(
+                style: .regular,
+                title: "Tax",
+                price: purchase.tax
+            )
 
-            col.add(
-                child: LineItemElement(
-                    style: .regular,
-                    title: "Tax",
-                    price: purchase.tax))
-
-            col.add(
-                child: LineItemElement(
-                    style: .bold,
-                    title: "Total",
-                    price: purchase.total))
+            LineItemElement(
+                style: .bold,
+                title: "Total",
+                price: purchase.total
+            )
         }
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: column)
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        .inset(uniform: 24)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }

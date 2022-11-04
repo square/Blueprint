@@ -7,20 +7,20 @@ import UIKit
 import BlueprintUI
 import BlueprintUICommonControls
 
-private func makeHelloWorldElement() -> Element {
-    var label = Label(text: "Hello, world")
-    label.font = .boldSystemFont(ofSize: 18.0)
-    return Centered(label)
-}
-
 final class ViewController: UIViewController {
 
-    private let blueprintView = BlueprintView(element: makeHelloWorldElement())
+    private let blueprintView = BlueprintView(element: helloWorldElement)
 
     override func loadView() {
         self.view = blueprintView
     }
 
+    var helloWorldElement: Element {
+        Label(text: "Hello, world") { label in
+            label.font = .boldSystemFont(ofSize: 18.0)
+        }
+        .centered()
+    }
 }
 
 ```

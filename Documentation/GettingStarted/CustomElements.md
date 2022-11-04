@@ -31,18 +31,18 @@ struct TitleSubtitleElement: ProxyElement {
     var subtitle: String
 
     var elementRepresentation: Element {
-        return Column { col in
-            col.horizontalAlignment = .leading
-            col.minimumVerticalSpacing = 8.0
+        Column(
+            alignment: .leading,
+            minimumSpacing: 8.0
+        ) {
+            Label(text: title) { label in
+                label.font = .boldSystemFont(ofSize: 18.0)
+            }
 
-            var titleLabel = Label(text: title)
-            titleLabel.font = .boldSystemFont(ofSize: 18.0)
-            col.add(child: titleLabel)
-
-            var subtitleLabel = Label(text: title)
-            subtitleLabel.font = .systemFont(ofSize: 14.0)
-            subtitleLabel.color = .darkGray
-            col.add(child: subtitleLabel)        
+            Label(text: title) { label in
+                label.font = .systemFont(ofSize: 14.0)
+                label.color = .darkGray
+            }     
         }
     }
 }
@@ -106,14 +106,12 @@ You might simply define a function to turn input (in this case an image and some
 
 ```swift
 private func makeElement(image: UIImage, text: String) -> Element {
-
-    return Overlay(elements: [
-        Image(image: image),
-        Centered(
-          Label(text: text)
-        )   
-    ])
-
+    Overlay {
+        Image(image: image)
+        
+        Label(text: text)
+            .centered()   
+    }
 }
 ```
 
