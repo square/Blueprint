@@ -22,17 +22,8 @@ final class ElementStateTree {
     /// A human readable name that represents the tree. Useful for debugging.
     let name: String
 
-    /// The kind of the tree.
-    var kind: Kind
-
-    init(name: String, kind: Kind) {
+    init(name: String) {
         self.name = name
-        self.kind = kind
-    }
-
-    enum Kind {
-        case blueprintView(String)
-        case measurement
     }
 
     /// Updates, replaces, or removes the root node depending on the type of the new element.
@@ -52,17 +43,15 @@ final class ElementStateTree {
         if root == nil, let element = element {
             /// Transition from no root element, to root element.
             makeRoot(with: element)
-        } else if let root = self.root, element == nil {
+        } else if root != nil, element == nil {
             /// Transition from a root element, to no root element.
-            root.teardown()
-            self.root = nil
+            root = nil
         } else if let root = self.root, let element = element {
             if type(of: root.element.value) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
             } else {
                 /// The type of the root element changed, replace it.
-                root.teardown()
                 makeRoot(with: element)
             }
         }
@@ -107,6 +96,8 @@ final class ElementState {
     let name: String
 
     /// The element represented by this object.
+    /// This value is a reference type – the inner element value
+    /// will change after updates.
     let element: ElementSnapshot
 
     /// How and if the element should be compared during updates.
@@ -286,14 +277,6 @@ final class ElementState {
 
         /// If the update was equivalent. Used for debugging.
         wasUpdateEquivalent = isEquivalent
-    }
-
-    func setup() {
-        // TODO:
-    }
-
-    func teardown() {
-        // TODO:
     }
 
     /// Represents a cached measurement, which contains
@@ -490,8 +473,6 @@ final class ElementState {
         for (key, state) in children {
 
             if state.wasVisited { continue }
-
-            state.teardown()
 
             children.removeValue(forKey: key)
         }
