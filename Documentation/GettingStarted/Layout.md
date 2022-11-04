@@ -65,7 +65,7 @@ Label(text: "Hello, world")
 
 ### `Aligned`
 
-Aligns a single child horizontally and vertically to the left (leading edge), right (trailing edge), top, bottom, or center of the available space. Like `Center`, it delegates measuring to the child.
+Aligns a single child horizontally and vertically to the left (leading edge), right (trailing edge), top, bottom, or center of the available space. Like `Centered`, it delegates measuring to the child.
 
 ```swift
 Label(text: "Hello from the corner")
