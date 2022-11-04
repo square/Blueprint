@@ -41,42 +41,81 @@
 
  You will note that the identifiers remain stable, which ultimately ensures that views are reused.
  */
-struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
+final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    let elementType: ObjectIdentifier
+    let elementType: Element.Type
+    let elementTypeIdentifier: ObjectIdentifier
     let key: AnyHashable?
 
     let count: Int
 
-    init(elementType: Element.Type, key: AnyHashable?, count: Int) {
+    private let hash: Int
+    private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
 
-        self.elementType = ObjectIdentifier(elementType)
+    static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
+
+        let elementType = type(of: element)
+
+        guard key == nil else {
+            return ElementIdentifier(elementType: elementType, key: key, count: count)
+        }
+
+        let typeID = ObjectIdentifier(elementType)
+
+        if let id = cachedIdentifiers[typeID]?[count] {
+            return id
+        }
+        let id = ElementIdentifier(elementType: elementType, key: key, count: count)
+
+        cachedIdentifiers[typeID, default: [:]][count] = id
+
+        return id
+    }
+
+    private init(elementType: Element.Type, key: AnyHashable?, count: Int) {
+
+        self.elementType = elementType
+        elementTypeIdentifier = ObjectIdentifier(elementType)
         self.key = key
 
         self.count = count
+
+        var hasher = Hasher()
+        hasher.combine(elementTypeIdentifier)
+        hasher.combine(self.key)
+        hasher.combine(self.count)
+        hash = hasher.finalize()
     }
 
     var debugDescription: String {
-        if let key = self.key {
+        if let key = key {
             return "\(elementType).\(String(describing: key)).\(count)"
         } else {
             return "\(elementType).\(count)"
         }
     }
 
-    /**
-     Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
-     */
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(hash)
+    }
+
+    static func == (lhs: ElementIdentifier, rhs: ElementIdentifier) -> Bool {
+        lhs === rhs ||
+            lhs.elementTypeIdentifier == rhs.elementTypeIdentifier &&
+            lhs.key == rhs.key &&
+            lhs.count == rhs.count
+    }
+
+    /// Internal type used to create `ElementIdentifier` instances during view hierarchy updates.
     struct Factory {
 
         init(elementCount: Int) {
             countsByKey = Dictionary(minimumCapacity: elementCount)
         }
 
-        mutating func nextIdentifier(for type: Element.Type, key: AnyHashable?) -> ElementIdentifier {
-
+        mutating func nextIdentifier(for element: Element, key: AnyHashable?) -> ElementIdentifier {
+            let type = type(of: element)
             let count = nextCount(for: type, key: key)
-
             return ElementIdentifier(
                 elementType: type,
                 key: key,
