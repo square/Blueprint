@@ -19,6 +19,17 @@ final class ElementStateTree {
     /// A signpost token used for logging signposts to `os_log`.
     private let signpostRef: SignpostToken = .init()
 
+    /// An optional delegate to be informed about the layout process.
+    weak var delegate: ElementStateTreeDelegate? = nil {
+        didSet {
+            guard oldValue !== delegate else { return }
+
+            root?.recursiveForEach {
+                $0.delegate = delegate
+            }
+        }
+    }
+
     /// A human readable name that represents the tree. Useful for debugging.
     let name: String
 
@@ -29,33 +40,57 @@ final class ElementStateTree {
     /// Updates, replaces, or removes the root node depending on the type of the new element.
     func update(with element: Element?, in environment: Environment) {
 
-        func makeRoot(with element: Element) {
-            root = ElementState(
+        func makeRoot(with element: Element) -> ElementState {
+            let new = ElementState(
                 parent: nil,
+                delegate: delegate,
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
                 depth: 0,
                 signpostRef: signpostRef,
                 name: name
             )
+
+            root = new
+
+            return new
         }
 
         if root == nil, let element = element {
             /// Transition from no root element, to root element.
-            makeRoot(with: element)
+            let new = makeRoot(with: element)
+
+            delegate.perform {
+                $0.tree(self, didSetupRootState: new)
+            }
         } else if root != nil, element == nil {
             /// Transition from a root element, to no root element.
+            let old = root
             root = nil
+
+            delegate.perform {
+                $0.tree(self, didTeardownRootState: old!)
+            }
         } else if let root = self.root, let element = element {
             if type(of: root.element.value) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
+
+                delegate.perform {
+                    $0.tree(self, didUpdateRootState: root)
+                }
             } else {
                 /// The type of the root element changed, replace it.
-                makeRoot(with: element)
+                let new = makeRoot(with: element)
+
+                delegate.perform {
+                    $0.tree(self, didReplaceRootState: root, with: new)
+                }
             }
         }
     }
+
+
 }
 
 
@@ -82,6 +117,8 @@ final class ElementState {
 
     /// The parent element that owns this element.
     private(set) weak var parent: ElementState?
+
+    fileprivate(set) weak var delegate: ElementStateTreeDelegate? = nil
 
     /// The identifier of the element. Eg, `Inset.1` or `Inset.1.Key`.
     let identifier: ElementIdentifier
@@ -151,6 +188,7 @@ final class ElementState {
     /// Creates a new `ElementState` instance.
     init(
         parent: ElementState?,
+        delegate: ElementStateTreeDelegate?,
         identifier: ElementIdentifier,
         element: Element,
         depth: Int,
@@ -158,6 +196,7 @@ final class ElementState {
         name: String
     ) {
         self.parent = parent
+        self.delegate = delegate
         self.identifier = identifier
         self.element = ElementSnapshot(element)
 
@@ -198,6 +237,11 @@ final class ElementState {
         } else {
             let content = element.value.content
             cachedContent = content
+
+            delegate.perform {
+                $0.treeDidFetchElementContent(for: self)
+            }
+
             return content
         }
     }
@@ -277,12 +321,16 @@ final class ElementState {
 
         /// If the update was equivalent. Used for debugging.
         wasUpdateEquivalent = isEquivalent
+
+        delegate.perform {
+            $0.treeDidUpdateState(self)
+        }
     }
 
     /// Represents a cached measurement, which contains
     /// both the output measurements and the dependencies
     /// from the `Environment`, if any.
-    private struct CachedMeasurement {
+    struct CachedMeasurement {
         var size: CGSize
         var dependencies: Environment.Subset?
     }
@@ -296,6 +344,10 @@ final class ElementState {
     ) -> CGSize {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
+            delegate.perform {
+                $0.treeDidReturnCachedMeasurement(existing, for: self)
+            }
+
             return existing.size
         }
 
@@ -303,10 +355,17 @@ final class ElementState {
         let (size, dependencies) = trackEnvironmentReads(for: .measurement, with: environment, in: measurer)
 
         /// Save the measurement for next time.
-        measurements[constraint] = .init(
+
+        let measurement = CachedMeasurement(
             size: size,
             dependencies: dependencies
         )
+
+        measurements[constraint] = measurement
+
+        delegate.perform {
+            $0.treeDidPerformMeasurement(measurement, for: self)
+        }
 
         return size
     }
@@ -314,8 +373,8 @@ final class ElementState {
     /// Represents a cached `LayoutResultNode` tree of all children,
     /// which contains both child tree, and the dependencies
     /// from the `Environment`, if any.
-    private struct CachedLayout {
-        var layout: [LayoutResultNode]
+    struct CachedLayout {
+        var nodes: [LayoutResultNode]
         var dependencies: Environment.Subset?
     }
 
@@ -330,24 +389,41 @@ final class ElementState {
         /// Layout is only invoked once per cycle. If we're not a `ComparableElement`,
         /// there's no point in caching this value, so just return the `layout` directly.
         guard comparability == .comparableElement else {
-            return layout(environment)
+            let nodes = layout(environment)
+
+            delegate.perform {
+                $0.treeDidPerformLayout(nodes, for: self)
+            }
+
+            return nodes
         }
 
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
-            return existing.layout
+            delegate.perform {
+                $0.treeDidReturnCachedLayout(existing, for: self)
+            }
+
+            return existing.nodes
         }
 
         /// Perform the layout and track the environment dependencies.
-        let (layout, dependencies) = trackEnvironmentReads(for: .layout, with: environment, in: layout)
+        let (nodes, dependencies) = trackEnvironmentReads(for: .layout, with: environment, in: layout)
 
         /// Save the layout for next time.
-        layouts[size] = .init(
-            layout: layout,
+
+        let layout = CachedLayout(
+            nodes: nodes,
             dependencies: dependencies
         )
 
-        return layout
+        layouts[size] = layout
+
+        delegate.perform {
+            $0.treeDidPerformCachedLayout(layout, for: self)
+        }
+
+        return nodes
     }
 
     /// Used by measurement and layout to track the dependencies they have on the `Environment`.
@@ -413,6 +489,7 @@ final class ElementState {
         } else {
             let new = ElementState(
                 parent: self,
+                delegate: delegate,
                 identifier: identifier,
                 element: child,
                 depth: depth + 1,
@@ -421,6 +498,10 @@ final class ElementState {
             )
 
             children[identifier] = new
+
+            delegate.perform {
+                $0.treeDidCreateState(new)
+            }
 
             return new
         }
@@ -475,6 +556,10 @@ final class ElementState {
             if state.wasVisited { continue }
 
             children.removeValue(forKey: key)
+
+            delegate.perform {
+                $0.treeDidRemoveState(state)
+            }
         }
 
         children.forEach { _, state in
@@ -541,6 +626,69 @@ extension Dictionary {
         }
     }
 }
+
+//
+// MARK: ElementStateTreeDelegate
+//
+
+/// A delegate object that is called during layout to inspect the actions performed
+/// during the layout and measurement process.
+protocol ElementStateTreeDelegate: AnyObject {
+
+    /// Root `ElementState`
+
+    func tree(_ tree: ElementStateTree, didSetupRootState state: ElementState)
+    func tree(_ tree: ElementStateTree, didUpdateRootState state: ElementState)
+    func tree(_ tree: ElementStateTree, didTeardownRootState state: ElementState)
+    func tree(_ tree: ElementStateTree, didReplaceRootState state: ElementState, with new: ElementState)
+
+    /// Creating / Updating `ElementState`
+
+    func treeDidCreateState(_ state: ElementState)
+    func treeDidUpdateState(_ state: ElementState)
+    func treeDidRemoveState(_ state: ElementState)
+
+    func treeDidFetchElementContent(for state: ElementState)
+
+    /// Measuring & Laying Out
+
+    func treeDidReturnCachedMeasurement(
+        _ measurement: ElementState.CachedMeasurement,
+        for state: ElementState
+    )
+
+    func treeDidPerformMeasurement(
+        _ measurement: ElementState.CachedMeasurement,
+        for state: ElementState
+    )
+
+    func treeDidReturnCachedLayout(
+        _ layout: ElementState.CachedLayout,
+        for state: ElementState
+    )
+
+    func treeDidPerformLayout(
+        _ layout: [LayoutResultNode],
+        for state: ElementState
+    )
+
+    func treeDidPerformCachedLayout(
+        _ layout: ElementState.CachedLayout,
+        for state: ElementState
+    )
+}
+
+
+extension Optional where Wrapped == ElementStateTreeDelegate {
+    func perform(_ block: (Wrapped) -> Void) {
+        #if DEBUG
+            if let self = self {
+                block(self)
+            }
+        #endif
+    }
+}
+
 
 
 //

@@ -29,6 +29,8 @@ class ElementStateTreeTests: XCTestCase {
 
         let state1 = try XCTUnwrap(tree.root)
 
+        XCTAssertEqual((state1.element.value as! Element1).text, "1")
+
         // Updating with the same element of the same type should keep the same state.
 
         tree.testingUpdate {
@@ -71,6 +73,7 @@ class ElementStateTests: XCTestCase {
         testcase("default property values") {
             let state = ElementState(
                 parent: nil,
+                delegate: nil,
                 identifier: .init(elementType: Element1.self, key: nil, count: 1),
                 element: Element1(text: "1"),
                 depth: 0,
