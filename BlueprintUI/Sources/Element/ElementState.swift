@@ -44,7 +44,7 @@ final class ElementStateTree {
             let new = ElementState(
                 parent: nil,
                 delegate: delegate,
-                identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                identifier: .identifier(for: element, key: nil, count: 1),
                 element: element,
                 depth: 0,
                 signpostRef: signpostRef,
