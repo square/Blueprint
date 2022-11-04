@@ -34,7 +34,6 @@ final class ElementStateTree {
                 parent: nil,
                 identifier: .init(elementType: type(of: element), key: nil, count: 1),
                 element: element,
-                depth: 0,
                 signpostRef: signpostRef,
                 name: name
             )
@@ -46,7 +45,7 @@ final class ElementStateTree {
         } else if root != nil, element == nil {
             /// Transition from a root element, to no root element.
             root = nil
-        } else if let root = self.root, let element = element {
+        } else if let root = root, let element = element {
             if type(of: root.element.value) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
@@ -85,9 +84,6 @@ final class ElementState {
 
     /// The identifier of the element. Eg, `Inset.1` or `Inset.1.Key`.
     let identifier: ElementIdentifier
-
-    /// The depth of the element within the element tree.
-    let depth: Int
 
     /// The signpost ref used when logging to `os_log`.
     let signpostRef: AnyObject
@@ -153,7 +149,6 @@ final class ElementState {
         parent: ElementState?,
         identifier: ElementIdentifier,
         element: Element,
-        depth: Int,
         signpostRef: AnyObject,
         name: String
     ) {
@@ -176,7 +171,6 @@ final class ElementState {
             }
         }
 
-        self.depth = depth
         self.signpostRef = signpostRef
         self.name = name
 
@@ -415,7 +409,6 @@ final class ElementState {
                 parent: self,
                 identifier: identifier,
                 element: child,
-                depth: depth + 1,
                 signpostRef: signpostRef,
                 name: name
             )

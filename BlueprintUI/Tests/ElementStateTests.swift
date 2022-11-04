@@ -73,7 +73,6 @@ class ElementStateTests: XCTestCase {
                 parent: nil,
                 identifier: .init(elementType: Element1.self, key: nil, count: 1),
                 element: Element1(text: "1"),
-                depth: 0,
                 signpostRef: NSObject(),
                 name: ""
             )
