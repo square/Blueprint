@@ -25,7 +25,7 @@ By adding a `Centered` element into the hierarchy, the label will now be centere
 
 ## Layout Modifiers
 
-To customize an `Element`, you call methods called modifiers. Modifiers wrap an `Element` to change its display or other properties. Each modifier returns a new `Element`, so it’s common to chain multiple modifiers, stacked vertically.
+To customize an `Element`, you call methods called modifiers. Modifiers wrap an `Element` in another `Element` to change its display or other properties. Each modifier returns a new `Element`, so it’s common to chain multiple modifiers, stacked vertically.
 
 For example, an `Element` described as:
 
