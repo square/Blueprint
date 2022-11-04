@@ -509,6 +509,9 @@ final class ElementState {
                 $0.clearAllCachedData()
             }
 
+            /// **TODO:** Should we cache this across layout cycles too? I think no,
+            /// because we're already caching layout nodes, so this shouldn't even be called.
+            /// But we should verify that!
             $0.cachedContent = nil
         }
     }
