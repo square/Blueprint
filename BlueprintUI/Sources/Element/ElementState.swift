@@ -402,12 +402,12 @@ final class ElementState {
     ) -> ElementState {
 
         if let existing = children[identifier] {
-            existing.wasVisited = true
 
             if existing.wasVisited == false {
                 existing.update(with: child, in: environment, identifier: identifier)
-                existing.wasVisited = true
             }
+
+            existing.wasVisited = true
 
             return existing
         } else {
