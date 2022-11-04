@@ -16,11 +16,11 @@ public protocol Element {
 struct BlueSquare: Element {
 
     var content: ElementContent {
-        return ElementContent(intrinsicSize: CGSize(width: 90.0, height: 90.0))
+        ElementContent(intrinsicSize: CGSize(width: 90.0, height: 90.0))
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIView.describe { config in
+        UIView.describe { config in
             config[\.backgroundColor] = .blue
         }
     }
@@ -54,7 +54,7 @@ struct MyElement: Element {
     // ...
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        return UIImageView.describe { config in
+        UIImageView.describe { config in
             config[\.image] = UIImage(named: "cat")
             config[\.contentMode] = .scaleAspectFill
         }
@@ -105,7 +105,7 @@ extension ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
+    ElementContent(intrinsicSize: CGSize(width: 100, height: 100))
 }
 ```
 
@@ -113,7 +113,7 @@ var content: ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent(measurable: CustomMeasurer())
+    ElementContent(measurable: CustomMeasurer())
 }
 ```
 
@@ -121,8 +121,11 @@ var content: ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent { constraint in
-        return CGSize(width: constraint.max.width, height: 44.0)
+    ElementContent { constraint in
+        CGSize(
+            width: constraint.max.width,
+            height: 44.0
+        )
     }
 }
 ```
@@ -131,7 +134,7 @@ var content: ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent(child: WrappedElement())
+    ElementContent(child: WrappedElement())
 }
 ```
 
@@ -139,7 +142,7 @@ var content: ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent(child: WrappedElement(), layout: MyCustomLayout())
+    ElementContent(child: WrappedElement(), layout: MyCustomLayout())
 }
 ```
 
@@ -147,7 +150,7 @@ var content: ElementContent {
 
 ```swift
 var content: ElementContent {
-    return ElementContent(layout: MyCustomLayout()) { builder in
+    ElementContent(layout: MyCustomLayout()) { builder in
         builder.add(child: WrappedElementA())
         builder.add(child: WrappedElementB())
         builder.add(child: WrappedElementC())
