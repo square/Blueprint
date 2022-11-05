@@ -1,5 +1,36 @@
 import UIKit
 
+extension Element {
+
+    /// Build a fully laid out element tree with complete layout attributes
+    /// for each element.
+    ///
+    /// - Parameter layoutAttributes: The layout attributes to assign to the
+    ///   root element.
+    ///
+    /// - Returns: A layout result
+    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
+
+        let state = ElementState(
+            parent: nil,
+            delegate: nil,
+            identifier: .identifier(for: self, key: nil, count: 1),
+            element: self,
+            depth: 0,
+            signpostRef: NSObject(),
+            name: "Testing"
+        )
+
+        return LayoutResultNode(
+            root: ElementSnapshot(self),
+            identifier: .identifier(for: self, key: nil, count: 1),
+            layoutAttributes: layoutAttributes,
+            environment: environment,
+            states: state
+        )
+    }
+
+}
 
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {

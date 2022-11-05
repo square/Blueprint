@@ -20,8 +20,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .testLayout(attributes: LayoutAttributes(frame: .zero))
-            .map { $0.node }
+            .testLayout(in: .zero)
 
         XCTAssertEqual(children.count, 1)
 
@@ -44,8 +43,7 @@ class ElementContentTests: XCTestCase {
         }
 
         let children = container
-            .testLayout(attributes: LayoutAttributes(frame: .zero))
-            .map { $0.node }
+            .testLayout(in: .zero)
 
         XCTAssertEqual(children.count, 2)
 
@@ -77,86 +75,6 @@ class ElementContentTests: XCTestCase {
         XCTAssertEqual(size, CGSize(width: 10, height: 20))
     }
 
-    func test_cacheTree() {
-        let size1 = CGSize(width: 10, height: 15)
-        let size2 = CGSize(width: 20, height: 25)
-
-        let containerSize = CGSize(width: 600, height: 800)
-        let halfSize = CGSize(width: 300, height: 400)
-
-        func layout(sizes: [CGSize]) -> (TestCache, TestCounter) {
-            let counts = TestCounter()
-            let layout = MeasureCountingLayout(counts: counts, layout: HalfLayout())
-
-            let container = ElementContent(layout: layout) { builder in
-                for size in sizes {
-                    builder.add(element: MeasureCountingSpacer(size: size, counts: counts))
-                }
-            }
-            let cache = TestCache(name: "test")
-
-            _ = container
-                .performLayout(
-                    attributes: LayoutAttributes(size: containerSize),
-                    environment: .empty,
-                    cache: cache
-                )
-
-            _ = container.measure(
-                in: SizeConstraint(containerSize),
-                environment: .empty,
-                cache: cache
-            )
-
-            return (cache, counts)
-        }
-
-        // Multiple children
-        do {
-            let (cache, counts) = layout(sizes: [size1, size2])
-
-            XCTAssertEqual(
-                cache.measurements,
-                [SizeConstraint(containerSize): CGSize(width: 30, height: 40)]
-            )
-
-            XCTAssertEqual(cache.subcaches.count, 2)
-            XCTAssertEqual(
-                cache.subcaches[0]!.measurements,
-                [SizeConstraint(halfSize): size1]
-            )
-            XCTAssertEqual(
-                cache.subcaches[1]!.measurements,
-                [SizeConstraint(halfSize): size2]
-            )
-
-            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
-            XCTAssertTrue(cache.subcaches[1]!.subcaches.isEmpty)
-
-            XCTAssertEqual(counts.measures, 3)
-        }
-
-        // Single child
-        do {
-            let (cache, counts) = layout(sizes: [size1])
-
-            XCTAssertEqual(
-                cache.measurements,
-                [SizeConstraint(containerSize): size1]
-            )
-
-            XCTAssertEqual(cache.subcaches.count, 1)
-            XCTAssertEqual(
-                cache.subcaches[0]!.measurements,
-                [SizeConstraint(halfSize): size1]
-            )
-
-            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
-
-            XCTAssertEqual(counts.measures, 2)
-        }
-    }
-
     func test_layout_phase() {
 
         var callCount: Int = 0
@@ -177,11 +95,7 @@ class ElementContentTests: XCTestCase {
 
         let size = measure.measure(in: .unconstrained)
 
-        _ = layout.performLayout(
-            attributes: .init(size: size),
-            environment: .empty,
-            cache: TestCache(name: "test")
-        )
+        _ = layout.testLayout(in: size)
 
         XCTAssertEqual(callCount, 2)
     }

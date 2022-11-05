@@ -25,11 +25,33 @@ extension ElementContent {
 
     /// A convenience wrapper to perform layout during testing, using a default `Environment` and
     /// a new cache.
-    func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        performLayout(
-            attributes: attributes,
-            environment: .empty,
-            cache: CacheFactory.makeCache(name: "test")
+    func testLayout(in size: CGSize) -> [LayoutResultNode] {
+
+        let element = LayoutElement(content: self)
+
+        let state = ElementState(
+            parent: nil,
+            delegate: nil,
+            identifier: .identifier(for: element, key: nil, count: 1),
+            element: element,
+            depth: 0,
+            signpostRef: NSObject(),
+            name: "Testing"
         )
+
+        return performLayout(
+            in: size,
+            with: .empty,
+            states: state
+        )
+    }
+
+    private struct LayoutElement: Element {
+
+        var content: ElementContent
+
+        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+            nil
+        }
     }
 }
