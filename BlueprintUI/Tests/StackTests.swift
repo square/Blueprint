@@ -22,7 +22,6 @@ class StackTests: XCTestCase {
         let children = column
             .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 200))
             .children
-            .map { $0.node }
 
         XCTAssertEqual(children.count, 2)
 
@@ -41,7 +40,6 @@ class StackTests: XCTestCase {
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
             .children
-            .map { $0.node }
 
         XCTAssertEqual(children.count, 2)
 
@@ -61,7 +59,6 @@ class StackTests: XCTestCase {
         let children = row
             .layout(frame: CGRect(x: 0, y: 0, width: 210, height: 100))
             .children
-            .map { $0.node }
 
         XCTAssertEqual(children[0].layoutAttributes.frame, CGRect(x: 0, y: 0, width: 100, height: 100))
         XCTAssertEqual(children[1].layoutAttributes.frame, CGRect(x: 110, y: 0, width: 100, height: 100))
@@ -86,7 +83,6 @@ class StackTests: XCTestCase {
                 column
                     .layout(frame: CGRect(x: 0, y: 0, width: layoutCrossSize, height: 100))
                     .children[0]
-                    .node
                     .layoutAttributes
                     .frame,
                 CGRect(x: expectedOrigin, y: 0.0, width: expectedSize, height: 100),
@@ -128,7 +124,6 @@ class StackTests: XCTestCase {
                 row
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutCrossSize))
                     .children[0]
-                    .node
                     .layoutAttributes
                     .frame,
                 CGRect(x: 0.0, y: expectedOrigin, width: 100, height: expectedSize),
@@ -163,7 +158,7 @@ class StackTests: XCTestCase {
             let layoutResult = stack.layout(frame: CGRect(origin: .zero, size: layoutSize))
             let frames = layoutResult
                 .children
-                .map { child in child.node.layoutAttributes.frame }
+                .map { child in child.layoutAttributes.frame }
 
             let size = stack.content.measure(in: .unconstrained)
             XCTAssertEqual(size, expectedSize, "measured size", file: file, line: line)
@@ -382,7 +377,6 @@ class StackTests: XCTestCase {
                 let height = row
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: layoutSize))
                     .children[0]
-                    .node
                     .layoutAttributes
                     .frame
                     .height
@@ -404,7 +398,6 @@ class StackTests: XCTestCase {
                 let width = column
                     .layout(frame: CGRect(x: 0, y: 0, width: layoutSize, height: 100))
                     .children[0]
-                    .node
                     .layoutAttributes
                     .frame
                     .width
@@ -462,8 +455,8 @@ class StackTests: XCTestCase {
                     .children
                     .map {
                         ClosedRange(uncheckedBounds: (
-                            $0.node.layoutAttributes.frame.minX,
-                            $0.node.layoutAttributes.frame.maxX
+                            $0.layoutAttributes.frame.minX,
+                            $0.layoutAttributes.frame.maxX
                         ))
                     }
 
@@ -499,8 +492,8 @@ class StackTests: XCTestCase {
                     .children
                     .map {
                         ClosedRange(uncheckedBounds: (
-                            $0.node.layoutAttributes.frame.minY,
-                            $0.node.layoutAttributes.frame.maxY
+                            $0.layoutAttributes.frame.minY,
+                            $0.layoutAttributes.frame.maxY
                         ))
                     }
 
@@ -877,8 +870,8 @@ class StackTests: XCTestCase {
                     .layout(frame: CGRect(x: 0, y: 0, width: layoutLength, height: 100))
                     .children
                     .map { ClosedRange(uncheckedBounds: (
-                        $0.node.layoutAttributes.frame.minX,
-                        $0.node.layoutAttributes.frame.maxX
+                        $0.layoutAttributes.frame.minX,
+                        $0.layoutAttributes.frame.maxX
                     ))
                     }
 
@@ -914,8 +907,8 @@ class StackTests: XCTestCase {
                     .children
                     .map {
                         ClosedRange(uncheckedBounds: (
-                            $0.node.layoutAttributes.frame.minY,
-                            $0.node.layoutAttributes.frame.maxY
+                            $0.layoutAttributes.frame.minY,
+                            $0.layoutAttributes.frame.maxY
                         ))
                     }
 
@@ -1083,7 +1076,7 @@ class StackTests: XCTestCase {
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
                     .children
                     .map { child -> CGSize in
-                        child.node.layoutAttributes.frame.size.rounded()
+                        child.layoutAttributes.frame.size.rounded()
                     }
 
                 XCTAssertEqual(
@@ -1111,7 +1104,7 @@ class StackTests: XCTestCase {
                     .layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
                     .children
                     .map { child -> CGSize in
-                        child.node.layoutAttributes.frame.size.rounded()
+                        child.layoutAttributes.frame.size.rounded()
                     }
 
                 XCTAssertEqual(
@@ -1319,7 +1312,7 @@ class StackTests: XCTestCase {
             .layout(frame: CGRect(x: 0, y: 0, width: 20, height: 10))
             .children
             .map { child -> CGSize in
-                child.node.layoutAttributes.frame.size.rounded()
+                child.layoutAttributes.frame.size.rounded()
             }
 
         XCTAssertEqual(

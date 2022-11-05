@@ -22,7 +22,7 @@ class OverlayTests: XCTestCase {
             overlay
                 .layout(frame: CGRect(x: 0, y: 0, width: 456, height: 789))
                 .children
-                .map { $0.node.layoutAttributes.frame },
+                .map { $0.layoutAttributes.frame },
             Array(repeating: CGRect(x: 0, y: 0, width: 456, height: 789), count: 3)
         )
     }

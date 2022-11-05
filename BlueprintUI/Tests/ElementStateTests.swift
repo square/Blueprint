@@ -75,7 +75,7 @@ class ElementStateTests: XCTestCase {
             let state = ElementState(
                 parent: nil,
                 delegate: nil,
-                identifier: .init(elementType: Element1.self, key: nil, count: 1),
+                identifier: .identifier(for: Element1.self, key: nil, count: 1),
                 element: Element1(text: "1"),
                 depth: 0,
                 signpostRef: NSObject(),
@@ -163,7 +163,7 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
 extension Element {
 
     fileprivate static func identifier(_ count: Int) -> ElementIdentifier {
-        .init(elementType: self, key: nil, count: count)
+        .identifier(for: self, key: nil, count: count)
     }
 }
 

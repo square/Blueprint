@@ -261,7 +261,7 @@ extension GridRow {
     fileprivate func frames(in size: CGSize) -> [CGRect] {
         layout(frame: CGRect(x: 0, y: 0, width: size.width, height: size.height))
             .children
-            .map { $0.node.layoutAttributes.frame }
+            .map { $0.layoutAttributes.frame }
     }
 }
 

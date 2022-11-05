@@ -53,8 +53,10 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
     private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
 
     static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
+        .identifier(for: type(of: element), key: key, count: count)
+    }
 
-        let elementType = type(of: element)
+    static func identifier(for elementType: Element.Type, key: AnyHashable?, count: Int) -> ElementIdentifier {
 
         guard key == nil else {
             return ElementIdentifier(elementType: elementType, key: key, count: count)

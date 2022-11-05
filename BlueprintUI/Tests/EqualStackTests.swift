@@ -150,7 +150,7 @@ class EqualStackTests: XCTestCase {
             let childFrames = stack
                 .layout(frame: CGRect(x: 0, y: 0, width: 150, height: 150))
                 .children
-                .map { $0.node.layoutAttributes.frame }
+                .map { $0.layoutAttributes.frame }
 
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 50, height: 150),
@@ -169,7 +169,7 @@ class EqualStackTests: XCTestCase {
             let childFrames = stack
                 .layout(frame: CGRect(x: 0, y: 0, width: 700, height: 700))
                 .children
-                .map { $0.node.layoutAttributes.frame }
+                .map { $0.layoutAttributes.frame }
 
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 200, height: 700),
@@ -188,7 +188,7 @@ class EqualStackTests: XCTestCase {
             let childFrames = stack
                 .layout(frame: CGRect(x: 0, y: 0, width: 600, height: 600))
                 .children
-                .map { $0.node.layoutAttributes.frame }
+                .map { $0.layoutAttributes.frame }
 
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 600, height: 200),
@@ -207,7 +207,7 @@ class EqualStackTests: XCTestCase {
             let childFrames = stack
                 .layout(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
                 .children
-                .map { $0.node.layoutAttributes.frame }
+                .map { $0.layoutAttributes.frame }
 
             XCTAssertEqual(childFrames, [
                 CGRect(x: 0, y: 0, width: 200, height: 50),

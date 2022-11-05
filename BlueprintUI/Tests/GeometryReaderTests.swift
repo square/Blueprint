@@ -40,7 +40,7 @@ final class GeometryReaderTests: XCTestCase {
 
         /// Walk a node tree down each node's first child and return the frame of the first leaf node.
         func leafChildFrame(in node: LayoutResultNode) -> CGRect {
-            if let childNode = node.children.first?.node {
+            if let childNode = node.children.first {
                 return leafChildFrame(in: childNode)
             }
             return node.layoutAttributes.frame

@@ -101,7 +101,6 @@ class ElementContentTests: XCTestCase {
                     environment: .empty,
                     cache: cache
                 )
-                .map { $0.node }
 
             _ = container.measure(
                 in: SizeConstraint(containerSize),

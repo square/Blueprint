@@ -15,7 +15,7 @@ extension LayoutResultNode {
         }
 
         for child in children {
-            if let node = child.node.findLayout(of: elementType) {
+            if let node = child.findLayout(of: elementType) {
                 return node
             }
         }

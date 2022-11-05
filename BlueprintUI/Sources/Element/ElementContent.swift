@@ -58,7 +58,6 @@ public struct ElementContent {
 
 extension ElementContent {
 
-    // MARK: Measurement & Children
     /// Measures the required size of this element's content.
     /// - Parameters:
     ///   - constraint: The size constraint.
@@ -69,7 +68,7 @@ extension ElementContent {
         let element = MeasurementElement(content: self)
 
         return autoreleasepool {
-            let root = ElementStateTree(name: "\(type(of: self)).detachedMeasure")
+            let root = ElementStateTree(name: "ElementContent.measure")
 
             root.update(with: element, in: environment)
 
@@ -136,6 +135,15 @@ extension ElementContent {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
         }
+    }
+
+    /// Initializes a new `ElementContent` with the given element.
+    ///
+    /// The given element will be used for measuring, and it will always fill the extent of the parent element.
+    ///
+    /// - parameter element: The single child element.
+    public init(child: Element) {
+        self = ElementContent(child: child, layout: PassthroughLayout())
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -561,6 +569,19 @@ fileprivate struct SingleChildLayoutHost: Layout {
             ),
         ]
     }
+}
+
+// Used for elements with a single child that requires no custom layout
+fileprivate struct PassthroughLayout: SingleChildLayout {
+
+    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
+        child.measure(in: constraint)
+    }
+
+    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
+        LayoutAttributes(size: size)
+    }
+
 }
 
 // Used for empty elements with an intrinsic size

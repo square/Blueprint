@@ -17,7 +17,7 @@ class OpacityTests: XCTestCase {
         let element = Spacer()
         let transparent = element.opacity(0.88)
 
-        let children = transparent.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children.map { $0.node }
+        let children = transparent.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children
 
         XCTAssertEqual(children.count, 1)
         XCTAssertEqual(children[0].layoutAttributes.alpha, 0.88)

@@ -23,7 +23,7 @@ class TransformedTests: XCTestCase {
         let scaled = element.scaled(scaleX: 1.2, scaleY: 0.8)
 
         for element in [translated, rotated, scaled] {
-            let children = element.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children.map { $0.node }
+            let children = element.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children
 
             XCTAssertEqual(children.count, 1)
             XCTAssertEqual(children[0].layoutAttributes.transform, element.transform)
