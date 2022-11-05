@@ -14,6 +14,7 @@ import XCTest
 class ElementStateTreeTests: XCTestCase {
 
     func test_update() throws {
+        let delegate = TestDelegate()
 
         let tree = ElementStateTree(name: "Testing")
         let element1 = Element1(text: "1")
@@ -21,6 +22,8 @@ class ElementStateTreeTests: XCTestCase {
         let element2 = Element2(text: "2")
 
         XCTAssertNil(tree.root)
+
+        tree.delegate = delegate
 
         // Initial update should create a state.
 
@@ -31,6 +34,7 @@ class ElementStateTreeTests: XCTestCase {
         let state1 = try XCTUnwrap(tree.root)
 
         XCTAssertEqual((state1.element.value as! Element1).text, "1")
+        XCTAssertEqual(1, delegate.didSetupRootCalls.count)
 
         // Updating with the same element of the same type should keep the same state.
 
@@ -41,6 +45,8 @@ class ElementStateTreeTests: XCTestCase {
         let state2 = try XCTUnwrap(tree.root)
 
         XCTAssertTrue(state1 === state2)
+        XCTAssertEqual(1, delegate.didUpdateRootCalls.count)
+        XCTAssertEqual(1, delegate.didUpdateStateCalls.count)
 
         // Also make sure that we actually update the contained element.
 
@@ -55,6 +61,7 @@ class ElementStateTreeTests: XCTestCase {
         let state3 = try XCTUnwrap(tree.root)
 
         XCTAssertFalse(state2 === state3)
+        XCTAssertEqual(1, delegate.didReplaceRootCalls.count)
 
         // Updating with nil should tear down the state.
 
@@ -63,6 +70,7 @@ class ElementStateTreeTests: XCTestCase {
         }
 
         XCTAssertNil(tree.root)
+        XCTAssertEqual(1, delegate.didTeardownRootCalls.count)
     }
 }
 
@@ -101,20 +109,90 @@ class ElementStateTests: XCTestCase {
         // TODO:
     }
 
-    func test_childState() {
-        // TODO:
+    func test_childState() throws {
+        let delegate = TestDelegate()
+
+        let root = Element1(text: "root")
+        let child1 = Element1(text: "child1")
+        let child2 = Element1(text: "child2")
+
+        let tree = ElementStateTree(name: "test")
+        tree.delegate = delegate
+        let env = Environment.empty
+
+        XCTAssertEqual(0, delegate.didSetupRootCalls.count)
+        XCTAssertEqual(0, delegate.didUpdateRootCalls.count)
+
+        tree.update(with: root, in: env)
+
+
+        let rootState = try XCTUnwrap(tree.root)
+        XCTAssertTrue(rootState === delegate.didSetupRootCalls[0])
+
+        let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
+        XCTAssertTrue(childState1 === delegate.didCreateStateCalls[0])
+
+        let childState2 = try XCTUnwrap(childState1.childState(for: child2, in: env, with: child2.identifier))
+        XCTAssertTrue(childState2 === delegate.didCreateStateCalls[1])
+
+
+        XCTAssertNil(rootState.parent)
+        XCTAssertEqual(ObjectIdentifier(childState1.parent!), ObjectIdentifier(rootState))
+        XCTAssertEqual(ObjectIdentifier(childState2.parent!), ObjectIdentifier(childState1))
     }
 
-    func test_prepareForLayout() {
-        // TODO:
+    func test_prepareForLayout() throws {
+        let root = Element1(text: "root")
+        let child1 = Element1(text: "child1")
+        let child2 = Element1(text: "child2")
+
+        let tree = ElementStateTree(name: "test")
+        let env = Environment.empty
+
+        tree.update(with: root, in: env)
+
+        let rootState = try XCTUnwrap(tree.root)
+        let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
+        let childState2 = try XCTUnwrap(childState1.childState(for: child2, in: env, with: child2.identifier))
+
+        XCTAssertTrue(rootState.wasVisited)
+        XCTAssertTrue(childState1.wasVisited)
+        XCTAssertTrue(childState2.wasVisited)
+
+        rootState.prepareForLayout()
+
+        XCTAssertFalse(rootState.wasVisited)
+        XCTAssertFalse(childState1.wasVisited)
+        XCTAssertFalse(childState2.wasVisited)
     }
 
     func test_finishedLayout() {
         // TODO:
     }
 
-    func test_recursiveForEach() {
-        // TODO:
+    func test_recursiveForEach() throws {
+        let root = Element1(text: "root")
+        let child1 = Element1(text: "child1")
+        let child2 = Element1(text: "child2")
+
+        let tree = ElementStateTree(name: "test")
+        let env = Environment.empty
+
+        tree.update(with: root, in: env)
+
+        let rootState = try XCTUnwrap(tree.root)
+        let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
+        let childState2 = try XCTUnwrap(childState1.childState(for: child2, in: env, with: child2.identifier))
+
+        let expectedOrder = [rootState, childState1, childState2]
+
+        var count = 0
+        rootState.recursiveForEach { state in
+            XCTAssertEqual(ObjectIdentifier(expectedOrder[count]), ObjectIdentifier(state))
+            count += 1
+        }
+
+        XCTAssertEqual(3, count)
     }
 }
 
@@ -207,6 +285,104 @@ fileprivate struct EquatableElement2: ProxyElement, ComparableElement, Equatable
     }
 }
 
+/// Test element that can have children for building a hierarchy/tree of `Element`
+fileprivate struct ContainerElement: Element {
+
+    struct MockLayout: Layout {
+        func measure(in constraint: BlueprintUI.SizeConstraint, items: [(traits: (), content: BlueprintUI.Measurable)]) -> CGSize {
+            CGSize.zero
+        }
+
+        func layout(size: CGSize, items: [(traits: (), content: BlueprintUI.Measurable)]) -> [BlueprintUI.LayoutAttributes] {
+            []
+        }
+    }
+
+    private var children: [Element] = []
+
+    var content: BlueprintUI.ElementContent {
+        ElementContent(layout: MockLayout()) { builder in
+            children.forEach { builder.add(element: $0) }
+        }
+    }
+
+    public init() {}
+
+    public init(_ configure: (inout Self) -> Void) {
+        self.init()
+        configure(&self)
+    }
+
+    public mutating func add(_ child: Element) {
+        children.append(child)
+    }
+
+    func backingViewDescription(with context: BlueprintUI.ViewDescriptionContext) -> BlueprintUI.ViewDescription? {
+        nil
+    }
+}
+
+fileprivate final class TestDelegate: ElementStateTreeDelegate {
+
+    var didSetupRootCalls: [ElementState] = []
+    var didUpdateRootCalls: [ElementState] = []
+    var didTeardownRootCalls: [ElementState] = []
+    var didReplaceRootCalls: [ElementState] = []
+    var didCreateStateCalls: [ElementState] = []
+    var didUpdateStateCalls: [ElementState] = []
+    var didRemoveStateCalls: [ElementState] = []
+
+    func tree(_ tree: BlueprintUI.ElementStateTree, didSetupRootState state: BlueprintUI.ElementState) {
+        didSetupRootCalls.append(state)
+    }
+
+    func tree(_ tree: BlueprintUI.ElementStateTree, didUpdateRootState state: BlueprintUI.ElementState) {
+        didUpdateRootCalls.append(state)
+    }
+
+    func tree(_ tree: BlueprintUI.ElementStateTree, didTeardownRootState state: BlueprintUI.ElementState) {
+        didTeardownRootCalls.append(state)
+    }
+
+    func tree(
+        _ tree: BlueprintUI.ElementStateTree,
+        didReplaceRootState state: BlueprintUI.ElementState,
+        with new: BlueprintUI.ElementState
+    ) {
+        didReplaceRootCalls.append(state)
+    }
+
+    func treeDidCreateState(_ state: BlueprintUI.ElementState) {
+        didCreateStateCalls.append(state)
+    }
+
+    func treeDidUpdateState(_ state: BlueprintUI.ElementState) {
+        didUpdateStateCalls.append(state)
+    }
+
+    func treeDidRemoveState(_ state: BlueprintUI.ElementState) {
+        didRemoveStateCalls.append(state)
+    }
+
+    func treeDidFetchElementContent(for state: BlueprintUI.ElementState) {}
+
+    func treeDidReturnCachedMeasurement(
+        _ measurement: BlueprintUI.ElementState.CachedMeasurement,
+        for state: BlueprintUI.ElementState
+    ) {}
+
+    func treeDidPerformMeasurement(
+        _ measurement: BlueprintUI.ElementState.CachedMeasurement,
+        for state: BlueprintUI.ElementState
+    ) {}
+
+    func treeDidReturnCachedLayout(_ layout: BlueprintUI.ElementState.CachedLayout, for state: BlueprintUI.ElementState) {}
+
+    func treeDidPerformLayout(_ layout: [BlueprintUI.LayoutResultNode], for state: BlueprintUI.ElementState) {}
+
+    func treeDidPerformCachedLayout(_ layout: BlueprintUI.ElementState.CachedLayout, for state: BlueprintUI.ElementState) {}
+}
+
 
 extension ElementStateTree {
 
@@ -255,5 +431,12 @@ extension ElementState {
             identifier,
             children: { orderedChildren.map(\.identifiedNode) }
         )
+    }
+}
+
+
+extension Element {
+    var identifier: ElementIdentifier {
+        .init(elementType: type(of: self), key: nil, count: 0)
     }
 }
