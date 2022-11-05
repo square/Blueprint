@@ -38,6 +38,9 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    /// The live, tracked state for each element in the element tree.
+    internal let rootState: ElementStateTree
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -48,8 +51,7 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
-            // Shortcut: If both environments were empty, nothing changed.
-            if oldValue.isEmpty && environment.isEmpty { return }
+            guard oldValue != environment else { return }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -132,11 +134,13 @@ public final class BlueprintView: UIView {
                 content: UIView.describe { _ in },
                 // Because no layout update occurs here, passing an empty environment is fine;
                 // the correct environment will be passed during update.
-                environment: .empty,
+                environment: environment,
                 layoutAttributes: LayoutAttributes(),
                 children: []
             )
         )
+
+        rootState = .init(name: "BlueprintView")
 
         super.init(frame: CGRect.zero)
 
@@ -339,9 +343,7 @@ public final class BlueprintView: UIView {
         )
 
         /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
-            .resolve() ?? []
+        let viewNodes = calculateNativeViewNodes(in: environment, states: rootState)
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -387,6 +389,44 @@ public final class BlueprintView: UIView {
                 measureDuration: measurementEndDate.timeIntervalSince(start),
                 viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
             )
+        )
+    }
+
+    /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
+    /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
+    /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
+    private func calculateNativeViewNodes(
+        in environment: Environment,
+        states: ElementStateTree
+    ) -> [(path: ElementPath, node: NativeViewNode)] {
+
+        guard let element = self.element else { return [] }
+
+        let node = calculateLayoutNodes(for: element, in: environment, states: states)
+
+        return node.resolve()
+    }
+
+    internal func calculateLayoutNodes(
+        for element: Element,
+        in environment: Environment,
+        states: ElementStateTree
+    ) -> LayoutResultNode {
+
+        rootState.root?.prepareForLayout()
+
+        defer {
+            self.rootState.root?.finishedLayout()
+        }
+
+        states.update(with: element, in: environment)
+
+        return LayoutResultNode(
+            root: ElementSnapshot(element),
+            identifier: .identifier(for: element, key: nil, count: 1),
+            layoutAttributes: .init(frame: bounds),
+            environment: environment,
+            states: states.root!
         )
     }
 
@@ -686,4 +726,5 @@ extension BlueprintView.NativeViewController {
         }
     }
 }
+
 

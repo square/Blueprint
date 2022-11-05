@@ -45,8 +45,7 @@ public struct ElementContent {
         in size: CGSize,
         with environment: Environment,
         states: ElementState
-    ) -> [LayoutResultNode] // TODO: Turn this into a reference type too
-    {
+    ) -> [LayoutResultNode] {
         autoreleasepool {
             storage.performLayout(
                 in: size,
@@ -66,7 +65,20 @@ extension ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        MeasurementElement(content: self).detachedMeasure(in: constraint, with: environment)
+
+        let element = MeasurementElement(content: self)
+
+        return autoreleasepool {
+            let root = ElementStateTree(name: "\(type(of: self)).detachedMeasure")
+
+            root.update(with: element, in: environment)
+
+            return self.measure(
+                in: constraint,
+                with: environment,
+                states: root.root!
+            )
+        }
     }
 
     private struct MeasurementElement: Element {
@@ -77,88 +89,6 @@ extension ElementContent {
             nil
         }
 
-    }
-}
-
-
-extension Element {
-
-    // MARK: Measurement & Children
-
-    /// Measures the size needed to display the element within the provided size constraint.
-    ///
-    /// ### Usage
-    /// You usually call this method from within the `measure` method of a `Layout`, or within the
-    /// measurement function you provide to an `ElementContent` instance. In either of these cases,
-    /// you should pass through the `LayoutContext` provided to you to ensure the measured elements
-    /// downstream have full access to their measurement caches, environment, etc.
-    /// ```
-    /// public var content: ElementContent {
-    ///     ElementContent { constraint, context -> CGSize in
-    ///         self.wrapped.detachedMeasure(in: constraint, with: context)
-    ///     }
-    /// }
-    /// ```
-    public func detachedMeasure(in constraint: SizeConstraint, with environment: Environment) -> CGSize {
-        autoreleasepool {
-            let root = ElementStateTree(name: "\(type(of: self)).detachedMeasure")
-
-            root.update(with: self, in: environment)
-
-            return self.content.measure(
-                in: constraint,
-                with: environment,
-                states: root.root!
-            )
-        }
-    }
-}
-
-extension ElementContent {
-
-    /// Creates a new `ElementContent` which uses the provided element to measure its
-    /// size, but does not place the element as a child in the final, laid out hierarchy.
-    ///
-    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
-    /// to create a stateful element) and just need this element to be correctly sized.
-    public init(byMeasuring element: Element) {
-        storage = MeasureNestedElementStorage(element: element)
-    }
-
-    // TODO: A way to pass this state down to the actual view
-
-    struct MeasureNestedElementStorage: ContentStorage {
-
-        let element: Element
-
-        let childCount: Int = 0
-
-        func measure(
-            in constraint: SizeConstraint,
-            with environment: Environment,
-            states: ElementState
-        ) -> CGSize {
-
-            let childState = states.childState(
-                for: element,
-                in: environment,
-                with: .identifier(for: element, key: nil, count: 1)
-            )
-
-            precondition(type(of: element) == type(of: childState.element.value))
-
-            return childState.measure(in: constraint, with: environment) { environment in
-                childState.elementContent.measure(in: constraint, with: environment, states: childState)
-            }
-        }
-
-        func performLayout(
-            in size: CGSize,
-            with environment: Environment,
-            states: ElementState
-        ) -> [LayoutResultNode] {
-            []
-        }
     }
 }
 
@@ -206,17 +136,6 @@ extension ElementContent {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
         }
-    }
-
-    /// Initializes a new `ElementContent` with the given element.
-    ///
-    /// The given element will be used for measuring, and it will always fill the extent of the parent element.
-    ///
-    /// - parameter element: The single child element.
-    public init(
-        child: Element
-    ) {
-        storage = SingleChildStorage(element: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -444,49 +363,6 @@ extension ElementContent {
             var identifier: ElementIdentifier
             var element: Element
 
-        }
-    }
-}
-
-
-private struct SingleChildStorage: ContentStorage {
-
-    let childCount: Int = 1
-
-    var element: Element
-
-    func measure(in constraint: SizeConstraint, with environment: Environment, states: ElementState) -> CGSize {
-
-        let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
-
-        let child = states.childState(for: element, in: environment, with: identifier)
-
-        return child.elementContent.measure(in: constraint, with: environment, states: child)
-    }
-
-    func performLayout(in size: CGSize, with environment: Environment, states: ElementState) -> [LayoutResultNode] {
-
-        states.layout(in: size, with: environment) { environment in
-            let childAttributes = LayoutAttributes(size: size)
-
-            let identifier = ElementIdentifier.identifier(for: element, key: nil, count: 1)
-
-            let childState = states.childState(for: element, in: environment, with: identifier)
-
-            let node = LayoutResultNode(
-                element: childState.element,
-                identifier: identifier,
-                layoutAttributes: childAttributes,
-                environment: environment,
-                state: childState,
-                children: childState.elementContent.performLayout(
-                    in: size,
-                    with: environment,
-                    states: childState
-                )
-            )
-
-            return [node]
         }
     }
 }
