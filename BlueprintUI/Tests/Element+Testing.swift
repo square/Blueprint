@@ -32,7 +32,7 @@ extension ElementContent {
         let state = ElementState(
             parent: nil,
             delegate: nil,
-            identifier: .identifier(for: element, key: nil, count: 1),
+            identifier: .identifierFor(singleChild: element),
             element: element,
             depth: 0,
             signpostRef: NSObject(),

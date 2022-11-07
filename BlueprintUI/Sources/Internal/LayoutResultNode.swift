@@ -14,7 +14,7 @@ extension Element {
         let state = ElementState(
             parent: nil,
             delegate: nil,
-            identifier: .identifier(for: self, key: nil, count: 1),
+            identifier: .identifierFor(singleChild: self),
             element: self,
             depth: 0,
             signpostRef: NSObject(),
@@ -22,7 +22,7 @@ extension Element {
         )
 
         return LayoutResultNode(
-            identifier: .identifier(for: self, key: nil, count: 1),
+            identifier: .identifierFor(singleChild: self),
             layoutAttributes: layoutAttributes,
             environment: environment,
             state: state

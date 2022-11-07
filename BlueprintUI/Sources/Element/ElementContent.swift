@@ -396,7 +396,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
             let childAttributes = LayoutAttributes(size: size)
 
-            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
 
             let childState = state.childState(for: child, in: environment, with: identifier)
 
@@ -424,7 +424,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         state.measure(in: constraint, with: environment) { environment in
 
             let environment = self.adapted(environment: environment)
-            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
             let childState = state.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
@@ -461,7 +461,7 @@ private struct LazyStorage: ContentStorage {
         state.measure(in: constraint, with: environment) { environment in
 
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
-            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
             let childState = state.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
@@ -483,7 +483,7 @@ private struct LazyStorage: ContentStorage {
 
             let childAttributes = LayoutAttributes(size: size)
 
-            let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
 
             let childState = state.childState(for: child, in: environment, with: identifier)
 
