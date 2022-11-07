@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated minimum deployment target from iOS 12 to iOS 14.
+
 ### Deprecated
 
 ### Security

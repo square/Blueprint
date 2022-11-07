@@ -158,8 +158,6 @@ extension XCTestCase {
         block(window)
 
         window.isHidden = true
-        if #available(iOS 13, *) {
-            window.windowScene = nil
-        }
+        window.windowScene = nil
     }
 }
