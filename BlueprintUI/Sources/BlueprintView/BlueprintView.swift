@@ -102,8 +102,23 @@ public final class BlueprintView: UIView {
         }
     }
 
-    /// An optional name to help identify this view
-    public var name: String?
+    /// An optional name to help identify this view. Will be
+    /// present in signpost logs, for example.
+    public var name: String? {
+        didSet {
+            guard oldValue != name else { return }
+
+            didUpdateName()
+        }
+    }
+
+    private func didUpdateName() {
+        if let name = name, name.isEmpty == false {
+            rootState.name = "BlueprintView: \(name)"
+        } else {
+            rootState.name = "BlueprintView"
+        }
+    }
 
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate: BlueprintViewMetricsDelegate? = nil
@@ -140,7 +155,7 @@ public final class BlueprintView: UIView {
             )
         )
 
-        rootState = .init(name: "BlueprintView")
+        rootState = .init(name: "")
 
         super.init(frame: CGRect.zero)
 
@@ -148,6 +163,8 @@ public final class BlueprintView: UIView {
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        didUpdateName()
     }
 
     public convenience override init(frame: CGRect) {

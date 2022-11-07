@@ -31,7 +31,15 @@ final class ElementStateTree {
     }
 
     /// A human readable name that represents the tree. Useful for debugging.
-    let name: String
+    var name: String {
+        didSet {
+            guard oldValue == name else { return }
+
+            root?.recursiveForEach {
+                $0.name = name
+            }
+        }
+    }
 
     init(name: String) {
         self.name = name
@@ -128,7 +136,7 @@ final class ElementState {
     let signpostRef: AnyObject
 
     /// The name of the owning tree. Useful for debugging.
-    let name: String
+    var name: String
 
     /// The element represented by this object.
     /// This value is a reference type – the inner element value
