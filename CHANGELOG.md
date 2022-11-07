@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.  
+
 ### Removed
 
 ### Changed
