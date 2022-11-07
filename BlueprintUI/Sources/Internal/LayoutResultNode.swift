@@ -22,7 +22,6 @@ extension Element {
         )
 
         return LayoutResultNode(
-            root: ElementSnapshot(self),
             identifier: .identifier(for: self, key: nil, count: 1),
             layoutAttributes: layoutAttributes,
             environment: environment,
@@ -36,6 +35,7 @@ extension Element {
 struct LayoutResultNode {
 
     /// The element that was laid out
+    // TODO: remove either this or `state` below.
     var element: ElementSnapshot
 
     var identifier: ElementIdentifier
@@ -45,43 +45,36 @@ struct LayoutResultNode {
 
     var environment: Environment
 
-    var state: ElementState
-
     /// The element's children.
     var children: [LayoutResultNode]
 
     init(
-        element: ElementSnapshot,
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
-        state: ElementState,
+        element: ElementSnapshot,
         children: [LayoutResultNode]
     ) {
-        self.element = element
         self.identifier = identifier
         self.layoutAttributes = layoutAttributes
         self.environment = environment
-        self.state = state
-        self.children = children
+        self.element = element
 
-        precondition(type(of: element.value) == type(of: state.element.value))
+        self.children = children
     }
 
     init(
-        root: ElementSnapshot,
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
         states: ElementState
     ) {
         self.init(
-            element: root,
             identifier: identifier,
             layoutAttributes: layoutAttributes,
             environment: environment,
-            state: states,
-            children: root.value.content.performLayout(
+            element: states.element,
+            children: states.element.value.content.performLayout(
                 in: layoutAttributes.frame.size,
                 with: environment,
                 states: states

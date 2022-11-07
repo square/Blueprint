@@ -323,11 +323,10 @@ extension ElementContent {
                     let childState = states.childState(for: currentChild.element, in: environment, with: identifier)
 
                     return LayoutResultNode(
-                        element: childState.element,
                         identifier: identifier,
                         layoutAttributes: currentChildLayoutAttributes,
                         environment: environment,
-                        state: childState,
+                        element: childState.element,
                         children: childState.elementContent.performLayout(
                             in: currentChildLayoutAttributes.frame.size,
                             with: environment,
@@ -402,11 +401,10 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
-                element: childState.element,
                 identifier: identifier,
                 layoutAttributes: childAttributes,
                 environment: environment,
-                state: childState,
+                element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
                     with: environment,
@@ -490,11 +488,10 @@ private struct LazyStorage: ContentStorage {
             let childState = states.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
-                element: childState.element,
                 identifier: identifier,
                 layoutAttributes: childAttributes,
                 environment: environment,
-                state: childState,
+                element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
                     with: environment,
