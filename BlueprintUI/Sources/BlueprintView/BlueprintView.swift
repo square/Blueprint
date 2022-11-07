@@ -343,7 +343,7 @@ public final class BlueprintView: UIView {
         )
 
         /// Grab view descriptions
-        let viewNodes = calculateNativeViewNodes(in: environment, states: rootState)
+        let viewNodes = calculateNativeViewNodes(in: environment, state: rootState)
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -397,12 +397,12 @@ public final class BlueprintView: UIView {
     /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
     private func calculateNativeViewNodes(
         in environment: Environment,
-        states: ElementStateTree
+        state: ElementStateTree
     ) -> [(path: ElementPath, node: NativeViewNode)] {
 
         guard let element = self.element else { return [] }
 
-        let node = calculateLayoutNodes(for: element, in: environment, states: states)
+        let node = calculateLayoutNodes(for: element, in: environment, state: state)
 
         return node.resolve()
     }
@@ -410,7 +410,7 @@ public final class BlueprintView: UIView {
     internal func calculateLayoutNodes(
         for element: Element,
         in environment: Environment,
-        states: ElementStateTree
+        state: ElementStateTree
     ) -> LayoutResultNode {
 
         rootState.root?.prepareForLayout()
@@ -419,13 +419,13 @@ public final class BlueprintView: UIView {
             self.rootState.root?.finishedLayout()
         }
 
-        states.update(with: element, in: environment)
+        state.update(with: element, in: environment)
 
         return LayoutResultNode(
             identifier: .identifier(for: element, key: nil, count: 1),
             layoutAttributes: .init(frame: bounds),
             environment: environment,
-            states: states.root!
+            state: state.root!
         )
     }
 

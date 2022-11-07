@@ -430,7 +430,7 @@ searchField
 
 ### Added
 
-- [Introduce `Decorate`](https://github.com/square/Blueprint/pull/178) to allow placing a decoration element in front or behind of an `Element`, without affecting its layout. This is useful for rendering tap or selection states which should overflow the natural bounds of the `Element`, similar to a shadow, or useful for adding a badge to an `Element`.
+- [Introduce `Decorate`](https://github.com/square/Blueprint/pull/178) to allow placing a decoration element in front or behind of an `Element`, without affecting its layout. This is useful for rendering tap or selection state which should overflow the natural bounds of the `Element`, similar to a shadow, or useful for adding a badge to an `Element`.
 
 ## [0.21.0] - 2021-02-17
 

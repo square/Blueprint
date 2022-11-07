@@ -30,10 +30,10 @@ public struct ElementContent {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> CGSize {
         autoreleasepool {
-            self.storage.measure(in: constraint, with: environment, states: states)
+            self.storage.measure(in: constraint, with: environment, state: state)
         }
     }
 
@@ -44,13 +44,13 @@ public struct ElementContent {
     func performLayout(
         in size: CGSize,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> [LayoutResultNode] {
         autoreleasepool {
             storage.performLayout(
                 in: size,
                 with: environment,
-                states: states
+                state: state
             )
         }
     }
@@ -75,7 +75,7 @@ extension ElementContent {
             return self.measure(
                 in: constraint,
                 with: environment,
-                states: root.root!
+                state: root.root!
             )
         }
     }
@@ -224,13 +224,13 @@ fileprivate protocol ContentStorage {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> CGSize
 
     func performLayout(
         in size: CGSize,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> [LayoutResultNode]
 }
 
@@ -276,19 +276,19 @@ extension ElementContent {
         func measure(
             in constraint: SizeConstraint,
             with environment: Environment,
-            states: ElementState
+            state: ElementState
         ) -> CGSize {
-            states.measure(in: constraint, with: environment) { environment in
+            state.measure(in: constraint, with: environment) { environment in
 
                 Logger.logMeasureStart(
-                    object: states.signpostRef,
-                    description: states.name,
+                    object: state.signpostRef,
+                    description: state.name,
                     constraint: constraint
                 )
 
-                defer { Logger.logMeasureEnd(object: states.signpostRef) }
+                defer { Logger.logMeasureEnd(object: state.signpostRef) }
 
-                let layoutItems = self.layoutItems(states: states, environment: environment)
+                let layoutItems = self.layoutItems(state: state, environment: environment)
 
                 return layout.measure(
                     in: constraint,
@@ -300,15 +300,15 @@ extension ElementContent {
         func performLayout(
             in size: CGSize,
             with environment: Environment,
-            states: ElementState
+            state: ElementState
         ) -> [LayoutResultNode] {
             guard children.isEmpty == false else {
                 return []
             }
 
-            return states.layout(in: size, with: environment) { environment in
+            return state.layout(in: size, with: environment) { environment in
 
-                let layoutItems = self.layoutItems(states: states, environment: environment)
+                let layoutItems = self.layoutItems(state: state, environment: environment)
 
                 let childAttributes = layout.layout(
                     size: size,
@@ -320,7 +320,7 @@ extension ElementContent {
                     let currentChild = children[index]
                     let identifier = currentChild.identifier
 
-                    let childState = states.childState(for: currentChild.element, in: environment, with: identifier)
+                    let childState = state.childState(for: currentChild.element, in: environment, with: identifier)
 
                     return LayoutResultNode(
                         identifier: identifier,
@@ -330,7 +330,7 @@ extension ElementContent {
                         children: childState.elementContent.performLayout(
                             in: currentChildLayoutAttributes.frame.size,
                             with: environment,
-                            states: childState
+                            state: childState
                         )
                     )
                 }
@@ -340,7 +340,7 @@ extension ElementContent {
         private var identifierFactory = ElementIdentifier.Factory(elementCount: 1)
 
         private func layoutItems(
-            states: ElementState,
+            state: ElementState,
             environment: Environment
         ) -> [(traits: LayoutType.Traits, content: Measurable)] {
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
@@ -350,13 +350,13 @@ extension ElementContent {
 
             children.indexedMap { index, child in
 
-                let childState = states.childState(for: child.element, in: environment, with: child.identifier)
+                let childState = state.childState(for: child.element, in: environment, with: child.identifier)
 
                 let measurable = Measurer { constraint in
                     childState.elementContent.measure(
                         in: constraint,
                         with: environment,
-                        states: childState
+                        state: childState
                     )
                 }
 
@@ -389,16 +389,16 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func performLayout(
         in size: CGSize,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> [LayoutResultNode] {
-        states.layout(in: size, with: environment) { environment in
+        state.layout(in: size, with: environment) { environment in
             let environment = adapted(environment: environment)
 
             let childAttributes = LayoutAttributes(size: size)
 
             let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
-            let childState = states.childState(for: child, in: environment, with: identifier)
+            let childState = state.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
                 identifier: identifier,
@@ -408,7 +408,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
                 children: childState.elementContent.performLayout(
                     in: size,
                     with: environment,
-                    states: childState
+                    state: childState
                 )
             )
 
@@ -419,18 +419,18 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> CGSize {
-        states.measure(in: constraint, with: environment) { environment in
+        state.measure(in: constraint, with: environment) { environment in
 
             let environment = self.adapted(environment: environment)
             let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
-            let childState = states.childState(for: child, in: environment, with: identifier)
+            let childState = state.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
                 in: constraint,
                 with: environment,
-                states: childState
+                state: childState
             )
         }
     }
@@ -456,18 +456,18 @@ private struct LazyStorage: ContentStorage {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> CGSize {
-        states.measure(in: constraint, with: environment) { environment in
+        state.measure(in: constraint, with: environment) { environment in
 
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
             let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
-            let childState = states.childState(for: child, in: environment, with: identifier)
+            let childState = state.childState(for: child, in: environment, with: identifier)
 
             return childState.elementContent.measure(
                 in: constraint,
                 with: environment,
-                states: childState
+                state: childState
             )
         }
     }
@@ -475,9 +475,9 @@ private struct LazyStorage: ContentStorage {
     func performLayout(
         in size: CGSize,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> [LayoutResultNode] {
-        states.layout(in: size, with: environment) { environment in
+        state.layout(in: size, with: environment) { environment in
             let constraint = SizeConstraint(size)
             let child = buildChild(for: .layout, in: constraint, environment: environment)
 
@@ -485,7 +485,7 @@ private struct LazyStorage: ContentStorage {
 
             let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
-            let childState = states.childState(for: child, in: environment, with: identifier)
+            let childState = state.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
                 identifier: identifier,
@@ -495,7 +495,7 @@ private struct LazyStorage: ContentStorage {
                 children: childState.elementContent.performLayout(
                     in: size,
                     with: environment,
-                    states: childState
+                    state: childState
                 )
             )
 
@@ -521,14 +521,14 @@ private struct MeasurableStorage: ContentStorage {
     func performLayout(
         in size: CGSize,
         with environment: Environment,
-        states: ElementState
+        state: ElementState
     ) -> [LayoutResultNode] {
         []
     }
 
-    func measure(in constraint: SizeConstraint, with environment: Environment, states: ElementState) -> CGSize {
+    func measure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
 
-        states.measure(in: constraint, with: environment) { environment in
+        state.measure(in: constraint, with: environment) { environment in
             measurer(constraint, environment)
         }
     }

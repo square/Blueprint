@@ -25,7 +25,7 @@ extension Element {
             identifier: .identifier(for: self, key: nil, count: 1),
             layoutAttributes: layoutAttributes,
             environment: environment,
-            states: state
+            state: state
         )
     }
 
@@ -67,17 +67,17 @@ struct LayoutResultNode {
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
-        states: ElementState
+        state: ElementState
     ) {
         self.init(
             identifier: identifier,
             layoutAttributes: layoutAttributes,
             environment: environment,
-            element: states.element,
-            children: states.element.value.content.performLayout(
+            element: state.element,
+            children: state.element.value.content.performLayout(
                 in: layoutAttributes.frame.size,
                 with: environment,
-                states: states
+                state: state
             )
         )
     }
