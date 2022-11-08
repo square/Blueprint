@@ -110,15 +110,49 @@ final class ElementState {
     private var children: [ElementIdentifier: ElementState] = [:]
 
     /// Indicates the comparability behavior of the element.
+    /// See each case for details on behavior.
     enum Comparability: Equatable {
         /// The element is not comparable, and it is not the child of a comparable element.
+        ///
+        /// ### Measurement Pass
+        /// No measurements will be cached. Each render cycle will cause a new measurement pass.
+        ///
+        /// ### Layout Pass
+        /// No layouts will be cached. Each render cycle will cause a new layout pass.
         case notComparable
 
         /// The element is comparable itself; it conforms to `ComparableElement`.
+        ///
+        /// ### Measurement Pass
+        /// Measurements will be cached across render cycles if `isEquivalent` returns `true`,
+        /// and the `Environment` dependencies for the measurement are equivalent.
+        ///
+        /// ### Layout Pass
+        /// Layouts will be cached across render cycles if `isEquivalent` returns `true`,
+        /// and the `Environment` dependencies for the measurement are equivalent.
         case comparableElement
 
         /// The element is the child of a `ComparableElement`, meaning its comparability
-        /// is determined by the comparability of that parent element.
+        /// is determined by the comparability of that parent element. All direct and indirect
+        /// children of a `ComparableElement` are `.childOfComparableElement`,
+        /// meaning every element below `MyComparableElement` in the below example:
+        ///
+        /// ```
+        ///  MyComparableElement
+        ///    Inset
+        ///      Aligned
+        ///        ChildElement 📍 // You are here
+        /// ```
+        ///
+        /// ### Measurement Pass
+        /// Measurements will be cached across render cycles if `isEquivalent` for
+        /// the parent `ComparableElement` returns `true`, and
+        /// the `Environment` dependencies for the measurement are equivalent.
+        ///
+        /// ### Layout Pass
+        /// Layouts for this inner child element are not cached. Because layouts are a tree;
+        /// the parent `ComparableElement` will cache its layout tree. Our layout
+        /// function will not even be invoked as long as the parent remains `isEquivalent`.
         case childOfComparableElement
 
         /// If the element is either directly comparable, or the child of a `ComparableElement`.
@@ -309,9 +343,13 @@ final class ElementState {
 
         /// Layout is only invoked once per cycle. If we're not a `ComparableElement`,
         /// there's no point in caching this value, so just return the `layout` directly.
+        ///
+        /// We are **not** also applying this to `.childOfComparableElement` as well,
+        /// because that parent `ComparableElement` will perform the layout tree caching.
         guard comparability == .comparableElement else {
             return layout(environment)
         }
+
 
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
@@ -355,6 +393,8 @@ final class ElementState {
                 return (toTrack(environment), nil)
             }
         case .layout:
+            /// We are **not** also applying this to `.childOfComparableElement` as well,
+            /// because that parent `ComparableElement` will perform the layout tree caching.
             if comparability == .comparableElement {
                 break
             } else {
@@ -389,9 +429,8 @@ final class ElementState {
 
             if existing.wasVisited == false {
                 existing.update(with: child, in: environment, identifier: identifier)
+                existing.wasVisited = true
             }
-
-            existing.wasVisited = true
 
             return existing
         } else {
