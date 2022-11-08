@@ -7,11 +7,11 @@ import UIKit
 public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     /// The width constraint.
-//    @UnconstrainedInfiniteAxis
+    @UnconstrainedInfiniteAxis
     public var width: Axis
 
     /// The height constraint.
-//    @UnconstrainedInfiniteAxis
+    @UnconstrainedInfiniteAxis
     public var height: Axis
 
     public init(width: Axis, height: Axis) {
@@ -23,6 +23,13 @@ public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     public var debugDescription: String {
         "<SizeConstraint: \(width.debugDescription) x \(height.debugDescription)>"
+    }
+
+    var proposedViewSize: ProposedViewSize {
+        ProposedViewSize(
+            width: _width.correctedAxis.proposedViewSizeAxis,
+            height: _height.correctedAxis.proposedViewSizeAxis
+        )
     }
 }
 
@@ -226,10 +233,65 @@ extension SizeConstraint {
     /// This property wrapper checks the value of `atMost` cases, and turns it into an
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
     @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {
-        private var correctedAxis: Axis
+
+        enum CorrectedAxis: Equatable, Hashable {
+            case atMost(CGFloat)
+            case unconstrained
+            case infinite
+            case greatestFiniteMagnitude
+
+            var axis: Axis {
+                switch self {
+                case .atMost(let value):
+                    return .atMost(value)
+
+                case .unconstrained, .infinite, .greatestFiniteMagnitude:
+                    return .unconstrained
+                }
+            }
+
+            var proposedViewSizeAxis: CGFloat? {
+                switch self {
+                case .atMost(let value):
+                    return value
+
+                case .unconstrained:
+                    return nil
+
+                case .infinite:
+                    return .infinity
+
+                case .greatestFiniteMagnitude:
+                    return .greatestFiniteMagnitude
+                }
+            }
+
+            // Equatability based on the implementation before `ProposedViewSize` support was added.
+            static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+                lhs.axisValue == rhs.axisValue
+            }
+
+            // Hashability based on the implementation before `ProposedViewSize` support was added.
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(axisValue)
+            }
+
+            /// A value that represents the `Equatable`/`Hashable` behavior before `ProposedViewSize` support was added.
+            private var axisValue: CGFloat? {
+                switch self {
+                case .atMost(let value):
+                    return value
+
+                case .unconstrained, .infinite, .greatestFiniteMagnitude:
+                    return nil
+                }
+            }
+        }
+
+        var correctedAxis: CorrectedAxis
 
         public var wrappedValue: Axis {
-            get { correctedAxis }
+            get { correctedAxis.axis }
             set { correctedAxis = Self.correctedAxis(for: newValue) }
         }
 
@@ -237,16 +299,18 @@ extension SizeConstraint {
             correctedAxis = Self.correctedAxis(for: value)
         }
 
-        private static func correctedAxis(for axis: Axis) -> Axis {
+        private static func correctedAxis(for axis: Axis) -> CorrectedAxis {
             switch axis {
             case .atMost(let maxAxis):
-                if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
-                    return .unconstrained
+                if maxAxis.isInfinite {
+                    return .infinite
+                } else if maxAxis == .greatestFiniteMagnitude {
+                    return .greatestFiniteMagnitude
                 } else {
-                    return axis
+                    return .atMost(maxAxis)
                 }
             case .unconstrained:
-                return axis
+                return .unconstrained
             }
         }
     }
