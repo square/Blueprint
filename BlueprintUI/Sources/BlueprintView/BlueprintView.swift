@@ -417,33 +417,28 @@ public final class BlueprintView: UIView {
         state: ElementStateTree
     ) -> [(path: ElementPath, node: NativeViewNode)] {
 
-        guard let element = self.element else { return [] }
+        if let element = self.element {
 
-        let node = calculateLayoutNodes(for: element, in: environment, state: state)
+            rootState.root?.prepareForLayout()
 
-        return node.resolve()
-    }
+            defer {
+                self.rootState.root?.finishedLayout()
+            }
 
-    internal func calculateLayoutNodes(
-        for element: Element,
-        in environment: Environment,
-        state: ElementStateTree
-    ) -> LayoutResultNode {
+            let rootState = state.update(with: element, in: environment)
 
-        rootState.root?.prepareForLayout()
+            let node = LayoutResultNode(
+                identifier: .identifierFor(singleChild: element),
+                layoutAttributes: .init(frame: bounds),
+                environment: environment,
+                state: rootState
+            )
 
-        defer {
-            self.rootState.root?.finishedLayout()
+            return node.resolve()
+        } else {
+            _ = state.teardownRootElement()
+            return []
         }
-
-        state.update(with: element, in: environment)
-
-        return LayoutResultNode(
-            identifier: .identifierFor(singleChild: element),
-            layoutAttributes: .init(frame: bounds),
-            environment: environment,
-            state: state.root!
-        )
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {

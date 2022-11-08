@@ -45,8 +45,8 @@ final class ElementStateTree {
         self.name = name
     }
 
-    /// Updates, replaces, or removes the root node depending on the type of the new element.
-    func update(with element: Element?, in environment: Environment) {
+    /// Updates or replaces the root node depending on the type of the new element.
+    func update(with element: Element, in environment: Environment) -> ElementState {
 
         func makeRoot(with element: Element) -> ElementState {
             let new = ElementState(
@@ -64,22 +64,7 @@ final class ElementStateTree {
             return new
         }
 
-        if root == nil, let element = element {
-            /// Transition from no root element, to root element.
-            let new = makeRoot(with: element)
-
-            delegate.perform {
-                $0.tree(self, didSetupRootState: new)
-            }
-        } else if root != nil, element == nil {
-            /// Transition from a root element, to no root element.
-            let old = root
-            root = nil
-
-            delegate.perform {
-                $0.tree(self, didTeardownRootState: old!)
-            }
-        } else if let root = self.root, let element = element {
+        if let root = self.root {
             if type(of: root.element.value) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
@@ -87,6 +72,8 @@ final class ElementStateTree {
                 delegate.perform {
                     $0.tree(self, didUpdateRootState: root)
                 }
+
+                return root
             } else {
                 /// The type of the root element changed, replace it.
                 let new = makeRoot(with: element)
@@ -94,8 +81,32 @@ final class ElementStateTree {
                 delegate.perform {
                     $0.tree(self, didReplaceRootState: root, with: new)
                 }
+
+                return new
             }
+        } else {
+            /// Transition from no root element, to root element.
+            let new = makeRoot(with: element)
+
+            delegate.perform {
+                $0.tree(self, didSetupRootState: new)
+            }
+
+            return new
         }
+    }
+
+    func teardownRootElement() -> ElementState? {
+
+        guard let old = root else { return nil }
+
+        root = nil
+
+        delegate.perform {
+            $0.tree(self, didTeardownRootState: old)
+        }
+
+        return old
     }
 }
 

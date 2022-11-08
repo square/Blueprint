@@ -47,10 +47,6 @@ public struct Environment: Equatable {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    /// When enabled, notify any subscribers when a value is read
-    /// from the environment
-    var readNotificationsEnabled: Bool = true
-
     /// If the `Environment` contains any values.
     var isEmpty: Bool {
         values.isEmpty
@@ -66,11 +62,10 @@ public struct Environment: Equatable {
         get {
             let storageKey = StorageKey(key)
 
-            if readNotificationsEnabled {
-                measurementDidRead?(storageKey)
-                for reader in layoutDidRead {
-                    reader(storageKey)
-                }
+            measurementDidRead?(storageKey)
+
+            for reader in layoutDidRead {
+                reader(storageKey)
             }
 
             if let value = values[storageKey] {

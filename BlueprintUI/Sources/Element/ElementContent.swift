@@ -68,12 +68,12 @@ extension ElementContent {
             let element = MeasurementElement(content: self)
             let root = ElementStateTree(name: "ElementContent.measure")
 
-            root.update(with: element, in: environment)
+            let rootState = root.update(with: element, in: environment)
 
             return self.measure(
                 in: constraint,
                 with: environment,
-                state: root.root!
+                state: rootState
             )
         }
     }
@@ -439,13 +439,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     }
 
     private func adapted(environment: Environment) -> Environment {
-        var environment = environment
-
-        environment.readNotificationsEnabled = false
         adapter(&environment)
-        environment.readNotificationsEnabled = true
-
-        return environment
     }
 }
 
