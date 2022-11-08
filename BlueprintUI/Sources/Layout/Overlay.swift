@@ -88,7 +88,7 @@ fileprivate struct OverlayLayout: Layout {
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
         for subview in subviews {
-            subview.place(at: bounds.origin, size: bounds.size)
+            subview.place(at: bounds)
         }
     }
 }

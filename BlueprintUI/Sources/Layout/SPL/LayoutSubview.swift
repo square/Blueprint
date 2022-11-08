@@ -138,6 +138,13 @@ public struct LayoutSubview {
         place(at: position, anchor: anchor, proposal: .init(size), width: size.width, height: size.height)
     }
 
+    public func place(
+        at frame: CGRect,
+        anchor: UnitPoint = .topLeading
+    ) {
+        place(at: frame.origin, anchor: anchor, size: frame.size)
+    }
+
     public func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
         sizeCache.get(key: proposal) { proposal in
             sizable.sizeThatFits(proposal: proposal, context: .init(

@@ -75,7 +75,7 @@ public struct Keyed: Element {
         }
 
         func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
-            subview.place(at: bounds.origin, size: bounds.size)
+            subview.place(at: bounds)
         }
     }
 }
