@@ -21,10 +21,3 @@ public protocol SingleChildLayout: SPSingleChildLayout {
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes
 
 }
-
-public protocol SPSingleChildLayout {
-
-    func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize
-
-    func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview)
-}

@@ -120,28 +120,6 @@ extension ScrollView {
             }
         }
 
-        func fittedSize(in proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
-            switch contentSize {
-            case .custom(let size):
-                return size
-
-            case .fittingContent:
-                return subview.sizeThatFits(.unspecified)
-
-            case .fittingHeight:
-                return subview.sizeThatFits(.init(
-                    width: proposal.width,
-                    height: nil
-                ))
-
-            case .fittingWidth:
-                return subview.sizeThatFits(.init(
-                    width: nil,
-                    height: proposal.width
-                ))
-            }
-        }
-
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             let adjustedConstraint = constraint.inset(
                 width: contentInset.left + contentInset.right,
@@ -184,6 +162,28 @@ extension ScrollView {
                 }
             }
             return contentAttributes
+        }
+
+        func fittedSize(in proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            switch contentSize {
+            case .custom(let size):
+                return size
+
+            case .fittingContent:
+                return subview.sizeThatFits(.unspecified)
+
+            case .fittingHeight:
+                return subview.sizeThatFits(.init(
+                    width: proposal.width,
+                    height: nil
+                ))
+
+            case .fittingWidth:
+                return subview.sizeThatFits(.init(
+                    width: nil,
+                    height: proposal.width
+                ))
+            }
         }
 
         func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {

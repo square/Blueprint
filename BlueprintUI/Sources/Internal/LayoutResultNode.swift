@@ -35,7 +35,6 @@ extension Element {
     }
 
     func singlePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> LayoutResultNode {
-//        print("\(type(of: self)) root layout in \(context.attributes.frame)")
         let layouts = content.performSinglePassLayout(
             proposal: proposal,
             context: context
@@ -170,9 +169,9 @@ extension LayoutResultNode {
     ) {
         for child in children {
             let attributes = child.node.layoutAttributes
-            
+
             let debugScope = child.node.environment[DebugScopeKey.self]
-            
+
             let name = (debugScope + ["\(child.identifier)"]).joined(separator: "/")
 
             visit(depth, name, attributes.frame)

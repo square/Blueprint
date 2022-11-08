@@ -155,10 +155,6 @@ extension ElementContent {
     ///
     /// - parameter measurable: How to measure the `ElementContent`.
     public init(measurable: Measurable) {
-//        self = ElementContent(
-//            layout: MeasurableLayout(measurable: measurable),
-//            configure: { _ in }
-//        )
         storage = MeasurableStorage(measurer: { constraint, environment in
             measurable.measure(in: constraint)
         })
@@ -607,23 +603,6 @@ private struct MeasurableStorage: ContentStorage {
 
     func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
         []
-    }
-}
-
-extension SizeConstraint {
-    public init(_ proposal: ProposedViewSize) {
-        width = .init(singlePassProposal: proposal.width)
-        height = .init(singlePassProposal: proposal.height)
-    }
-}
-
-extension SizeConstraint.Axis {
-    public init(singlePassProposal: CGFloat?) {
-        if let singlePassProposal = singlePassProposal {
-            self = .atMost(singlePassProposal)
-        } else {
-            self = .unconstrained
-        }
     }
 }
 

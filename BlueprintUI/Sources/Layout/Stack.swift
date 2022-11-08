@@ -938,8 +938,6 @@ extension StackLayout {
                 height = vectorFrame.crossMeasured ? nil : size.height
             }
 
-//            print("\(type(of: self)) subview \(width)x\(height)")
-
             let frame = vectorFrame.rect(axis: axis)
 
             subview.place(
@@ -1026,11 +1024,6 @@ extension StackLayout {
         var size: Vector
         var axisMeasured: Bool
         var crossMeasured: Bool
-
-//        init(origin: Vector, size: Vector) {
-//            self.origin = origin
-//            self.size = size
-//        }
 
         init(axis: Segment, cross: Segment) {
             origin = Vector(axis: axis.origin, cross: cross.origin)
