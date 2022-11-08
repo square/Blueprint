@@ -71,7 +71,23 @@ class ElementIdentifierTests: XCTestCase {
         )
     }
 
-    func test_debugDescription() {}
+    func test_debugDescription() {
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: nil, count: 0).debugDescription,
+            "A.0"
+        )
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: nil, count: 1).debugDescription,
+            "A.1"
+        )
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: "Key", count: 1).debugDescription,
+            "A.Key.1"
+        )
+    }
 
     func test_elementIdentifierCaching() {
 
