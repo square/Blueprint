@@ -2,6 +2,9 @@ import QuartzCore
 @testable import BlueprintUI
 
 extension Element {
+
+    // TODO: Basically the method, collapse them
+
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///
@@ -10,6 +13,33 @@ extension Element {
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment = .empty) -> LayoutResultNode {
         layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+    }
+
+    /// Build a fully laid out element tree with complete layout attributes
+    /// for each element.
+    ///
+    /// - Parameter layoutAttributes: The layout attributes to assign to the
+    ///   root element.
+    ///
+    /// - Returns: A layout result
+    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
+
+        let state = ElementState(
+            parent: nil,
+            delegate: nil,
+            identifier: .identifierFor(singleChild: self),
+            element: self,
+            depth: 0,
+            signpostRef: NSObject(),
+            name: "Testing"
+        )
+
+        return LayoutResultNode(
+            identifier: .identifierFor(singleChild: self),
+            layoutAttributes: layoutAttributes,
+            environment: environment,
+            state: state
+        )
     }
 }
 

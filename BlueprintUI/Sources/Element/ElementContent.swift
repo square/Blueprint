@@ -23,6 +23,10 @@ public struct ElementContent {
         storage = builder
     }
 
+    public var childCount: Int {
+        storage.childCount
+    }
+
     fileprivate init(storage: ContentStorage) {
         self.storage = storage
     }
@@ -35,10 +39,6 @@ public struct ElementContent {
         autoreleasepool {
             self.storage.measure(in: constraint, with: environment, state: state)
         }
-    }
-
-    public var childCount: Int {
-        storage.childCount
     }
 
     func performLayout(
@@ -64,10 +64,8 @@ extension ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-
-        let element = MeasurementElement(content: self)
-
-        return autoreleasepool {
+        autoreleasepool {
+            let element = MeasurementElement(content: self)
             let root = ElementStateTree(name: "ElementContent.measure")
 
             root.update(with: element, in: environment)
@@ -80,6 +78,8 @@ extension ElementContent {
         }
     }
 
+    /// A private element we can use as the root of the `ElementStateTree`
+    /// when calling `ElementContent.measure`.
     private struct MeasurementElement: Element {
 
         var content: ElementContent
@@ -87,7 +87,6 @@ extension ElementContent {
         func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
             nil
         }
-
     }
 }
 
@@ -217,6 +216,7 @@ extension ElementContent {
 }
 
 
+/// The underlying type that backs the `ElementContent`.
 fileprivate protocol ContentStorage {
 
     var childCount: Int { get }
@@ -266,6 +266,8 @@ extension ElementContent {
 
             children.append(child)
         }
+
+        private var identifierFactory = ElementIdentifier.Factory(elementCount: 1)
 
         // MARK: ContentStorage
 
@@ -328,7 +330,7 @@ extension ElementContent {
                         environment: environment,
                         element: childState.element,
                         children: childState.elementContent.performLayout(
-                            in: currentChildLayoutAttributes.frame.size,
+                            in: currentChildLayoutAttributes.bounds.size,
                             with: environment,
                             state: childState
                         )
@@ -337,12 +339,11 @@ extension ElementContent {
             }
         }
 
-        private var identifierFactory = ElementIdentifier.Factory(elementCount: 1)
-
         private func layoutItems(
             state: ElementState,
             environment: Environment
         ) -> [(traits: LayoutType.Traits, content: Measurable)] {
+
             /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
             /// here; because the enumerated version is about 25% slower. Because this
             /// is an extremely hot codepath; this additional performance matters, so we will
@@ -375,13 +376,14 @@ extension ElementContent {
 }
 
 
+/// A type used to delay element creation until the `Environment` is available,
+/// used by the `AdaptedEnvironment` element.
 private struct EnvironmentAdaptingStorage: ContentStorage {
 
     let childCount = 1
 
     /// During measurement or layout, the environment adapter will be applied
-    /// to the environment before passing it
-    ///
+    /// to the environment before passing it to the wrapped child element.
     var adapter: (inout Environment) -> Void
 
     var child: Element
@@ -391,6 +393,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {
+
         state.layout(in: size, with: environment) { environment in
             let environment = adapted(environment: environment)
 
@@ -447,6 +450,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 }
 
 /// Content storage that defers creation of its child until measurement or layout time.
+/// This is used for types dependent on sizing, such as `GeometryReader`.
 private struct LazyStorage: ContentStorage {
 
     let childCount = 1
@@ -512,6 +516,8 @@ private struct LazyStorage: ContentStorage {
     }
 }
 
+/// Storage used to perform a measurement, but for an element
+/// that otherwise has no children.
 private struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
