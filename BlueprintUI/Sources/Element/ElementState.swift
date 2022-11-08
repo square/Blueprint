@@ -268,7 +268,7 @@ final class ElementState {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        using measurer: (Environment) -> CGSize
+        using measurement: (Environment) -> CGSize
     ) -> CGSize {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
@@ -276,7 +276,11 @@ final class ElementState {
         }
 
         /// Perform the measurement and track the environment dependencies.
-        let (size, dependencies) = trackEnvironmentReads(for: .measurement, with: environment, in: measurer)
+        let (size, dependencies) = trackDependenciesIfNeeded(
+            in: environment,
+            for: .measurement,
+            during: measurement
+        )
 
         /// Save the measurement for next time.
         measurements[constraint] = .init(
@@ -315,7 +319,11 @@ final class ElementState {
         }
 
         /// Perform the layout and track the environment dependencies.
-        let (layout, dependencies) = trackEnvironmentReads(for: .layout, with: environment, in: layout)
+        let (layout, dependencies) = trackDependenciesIfNeeded(
+            in: environment,
+            for: .layout,
+            during: layout
+        )
 
         /// Save the layout for next time.
         layouts[size] = .init(
@@ -333,10 +341,10 @@ final class ElementState {
     /// If there are no dependencies (`toTrack` did not read from the `Environment`), no subset is returned.
     ///
     /// Additionally, if the element is not comparable, no subset is returned or tracked.
-    private func trackEnvironmentReads<Output>(
+    private func trackDependenciesIfNeeded<Output>(
+        in environment: Environment,
         for layoutPass: Environment.LayoutPass,
-        with environment: Environment,
-        in toTrack: (Environment) -> Output
+        during toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
         switch layoutPass {
