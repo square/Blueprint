@@ -869,7 +869,7 @@ extension StackLayout {
 
 extension LayoutSubview {
     var stackLayoutTraits: StackLayout.Traits {
-        self[GenericLayoutValueKey<StackLayout>.self]
+        traits(forLayoutType: StackLayout.self)
     }
 }
 

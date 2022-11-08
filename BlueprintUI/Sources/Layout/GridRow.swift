@@ -332,7 +332,7 @@ extension GridRow {
 
 extension LayoutSubview {
     var gridRowLayoutTraits: GridRow.GridRowLayout.Traits {
-        self[GenericLayoutValueKey<GridRow.GridRowLayout>.self]
+        traits(forLayoutType: GridRow.GridRowLayout.self)
     }
 }
 

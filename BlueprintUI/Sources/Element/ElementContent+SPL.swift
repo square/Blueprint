@@ -20,8 +20,8 @@ extension ElementContent.Builder {
                     cache: context.cache.subcache(key: index),
                     environment: context.environment
                 ),
-                key: GenericLayoutValueKey<LayoutType>.self,
-                value: child.traits
+                traits: child.traits,
+                layoutType: LayoutType.self
             )
         }
         return layout.sizeThatFits(proposal: proposal, subviews: subviews)
@@ -38,8 +38,8 @@ extension ElementContent.Builder {
                     cache: context.cache.subcache(key: index),
                     environment: context.environment
                 ),
-                key: GenericLayoutValueKey<LayoutType>.self,
-                value: child.traits
+                traits: child.traits,
+                layoutType: LayoutType.self
             )
         }
 

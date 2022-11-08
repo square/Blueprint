@@ -77,43 +77,25 @@ public struct LayoutSubview {
 
     var measureContext: MeasureContext
 
-    var layoutValues: [ObjectIdentifier: Any] = [:]
-
     var attributes: Attributes = .init()
 
-    init<Key: LayoutValueKey>(
-        element: Element,
-        content: ElementContent,
-        measureContext: MeasureContext,
-        key: Key.Type,
-        value: Key.Value
-    ) {
-        self.element = element
-        self.content = content
-        self.measureContext = measureContext
-        layoutValues = [ObjectIdentifier(key): value]
-    }
+    private var layoutValues: [ObjectIdentifier: Any] = [:]
 
+    // Once we are able to fully deprecate the old layout API we can remove the `LayoutType.Traits` and the `traits`
+    // parameter, and instead rely on setting `LayoutValueKey`s where needed.
     init<LayoutType: Layout>(
         element: Element,
         content: ElementContent,
         measureContext: MeasureContext,
         traits: LayoutType.Traits,
-        type: LayoutType.Type = LayoutType.self
+        layoutType: LayoutType.Type = LayoutType.self
     ) {
         self.element = element
         self.content = content
         self.measureContext = measureContext
         layoutValues = [
-            ObjectIdentifier(GenericLayoutValueKey<LayoutType>.self): traits,
+            ObjectIdentifier(TraitsLayoutValueKey<LayoutType>.self): traits,
         ]
-    }
-
-    public subscript<Key>(_ keyType: Key.Type) -> Key.Value where Key: LayoutValueKey {
-        if let value = layoutValues[ObjectIdentifier(keyType)] as? Key.Value {
-            return value
-        }
-        return keyType.defaultValue
     }
 
     public func place(
@@ -152,5 +134,19 @@ public struct LayoutSubview {
                 environment: environment
             ))
         }
+    }
+
+    public func traits<LayoutType>(
+        forLayoutType layoutType: LayoutType.Type
+    ) -> LayoutType.Traits where LayoutType: Layout {
+        self[TraitsLayoutValueKey<LayoutType>.self]
+    }
+
+    // TODO: Make public and support extendible LayoutValueKeys
+    private subscript<Key>(_ key: Key.Type) -> Key.Value where Key: LayoutValueKey {
+        if let value = layoutValues[ObjectIdentifier(key)] as? Key.Value {
+            return value
+        }
+        return key.defaultValue
     }
 }
