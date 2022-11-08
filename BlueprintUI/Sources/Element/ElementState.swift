@@ -46,7 +46,7 @@ final class ElementStateTree {
             /// Transition from a root element, to no root element.
             root = nil
         } else if let root = root, let element = element {
-            if type(of: root.element.value) == type(of: element) {
+            if type(of: root.element.latest) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
             } else {
@@ -54,19 +54,6 @@ final class ElementStateTree {
                 makeRoot(with: element)
             }
         }
-    }
-}
-
-
-/// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
-/// so that even when returning cached layouts, we can get to the latest version of the element
-/// that their originating `ElementState` represents.
-final class ElementSnapshot {
-
-    fileprivate(set) var value: Element
-
-    init(_ value: Element) {
-        self.value = value
     }
 }
 
@@ -94,7 +81,7 @@ final class ElementState {
     /// The element represented by this object.
     /// This value is a reference type – the inner element value
     /// will change after updates.
-    let element: ElementSnapshot
+    let element: ElementState.LatestElement
 
     /// How and if the element should be compared during updates.
     let comparability: Comparability
@@ -154,7 +141,7 @@ final class ElementState {
     ) {
         self.parent = parent
         self.identifier = identifier
-        self.element = ElementSnapshot(element)
+        self.element = .init(element)
 
         if element is AnyComparableElement {
             comparability = .comparableElement
@@ -190,7 +177,7 @@ final class ElementState {
         if let cachedContent = cachedContent {
             return cachedContent
         } else {
-            let content = element.value.content
+            let content = element.latest.content
             cachedContent = content
             return content
         }
@@ -210,7 +197,7 @@ final class ElementState {
     ) {
         precondition(wasVisited == false)
         precondition(self.identifier == identifier)
-        precondition(type(of: newElement) == type(of: element.value))
+        precondition(type(of: newElement) == type(of: element.latest))
 
         let isEquivalent: Bool
 
@@ -219,12 +206,7 @@ final class ElementState {
             isEquivalent = false
 
         case .comparableElement:
-            isEquivalent = Self.elementsEquivalent(
-                element.value, newElement,
-                in: ComparableElementContext(
-                    environment: newEnvironment
-                )
-            )
+            isEquivalent = Self.elementsEquivalent(element.latest, newElement)
 
         case .childOfComparableElement:
             /// We're always, equivalent, because our parent
@@ -263,11 +245,11 @@ final class ElementState {
             }
         }
 
-        /// Update our `ElementSnapshot` to the element's new value.
+        /// Update our `LatestElement` to the element's new value.
         /// This will allow cached `LayoutResultNodes` to ensure they
         /// have access to the latest `backingViewDescription`.
 
-        element.value = newElement
+        element.latest = newElement
 
         /// If the update was equivalent. Used for debugging.
         wasUpdateEquivalent = isEquivalent
@@ -492,6 +474,22 @@ final class ElementState {
 }
 
 
+extension ElementState {
+
+    /// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
+    /// so that even when returning cached layouts, we can get to the latest version of the element
+    /// that their originating `ElementState` represents.
+    final class LatestElement {
+
+        fileprivate(set) var latest: Element
+
+        init(_ latest: Element) {
+            self.latest = latest
+        }
+    }
+}
+
+
 extension CGSize: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(width)
@@ -510,14 +508,14 @@ extension ElementState {
     ///
     /// - If both values are nil, `true` is returned.
     /// - If both values are different types, `false` is returned.
-    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?, in context: ComparableElementContext) -> Bool {
+    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?) -> Bool {
 
         if lhs == nil && rhs == nil { return true }
 
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        return lhs.anyIsEquivalent(to: rhs, in: context)
+        return lhs.anyIsEquivalent(to: rhs)
     }
 }
 
@@ -570,7 +568,7 @@ extension ElementState {
             objectIdentifier: ObjectIdentifier(self),
             depth: depth,
             identifier: identifier,
-            element: element.value,
+            element: element.latest,
             measurements: measurements
         )
 

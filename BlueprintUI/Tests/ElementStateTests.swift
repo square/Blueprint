@@ -41,7 +41,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Also make sure that we actually update the contained element.
 
-        XCTAssertEqual((state1.element.value as! Element1).text, "1.1")
+        XCTAssertEqual((state1.element.latest as! Element1).text, "1.1")
 
         // Updating with a new type should tear down the state.
 
