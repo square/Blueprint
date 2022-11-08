@@ -4,13 +4,13 @@
  and update operations.
 
  The identifier has three parts:
- 1) The type of the underlying element, represented by `elementType`.
+ 1) **The type** of the underlying element, represented by `elementType`.
 
- 2) The key. This is an optional value provided by developers using Blueprint to further
+ 2) **The key.** This is an optional value provided by developers using Blueprint to further
  disambiguate identical elements within a hierarchy. This is optional, and is rarely provided.
  When it is provided, `elementType` + ` key` is used to disambiguate elements.
 
- 3) The occurrence count of that type of `elementType` + `key` in the hierarchy.
+ 3) **The occurrence count** of that type of `elementType` + `key` in the hierarchy.
  For example, if I have a hierarchy of [A, B, B] the counts will be [1, 1, 2] respectively.
 
  A fully constructed `ElementIdentifier` would look like this:
@@ -43,19 +43,20 @@
  */
 final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    let elementType: Element.Type
-    let elementTypeIdentifier: ObjectIdentifier
-    let key: AnyHashable?
-
-    let count: Int
-
+    private let elementType: Element.Type
+    private let key: AnyHashable?
+    private let count: Int
     private let hash: Int
+
     private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
 
     static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
 
         let elementType = type(of: element)
 
+        /// There's no performance benefit to caching identifiers that have
+        /// a key because the lookup ends up being more expensive, so
+        /// just return a brand new identifier type.
         guard key == nil else {
             return ElementIdentifier(elementType: elementType, key: key, count: count)
         }
@@ -63,25 +64,28 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
         let typeID = ObjectIdentifier(elementType)
 
         if let id = cachedIdentifiers[typeID]?[count] {
+            /// We have an existing identifier, return it.
+            return id
+        } else {
+            /// We do not have an existing identifier, we need to make and store a new one.
+
+            let id = ElementIdentifier(elementType: elementType, key: key, count: count)
+
+            cachedIdentifiers[typeID, default: [:]][count] = id
+
             return id
         }
-        let id = ElementIdentifier(elementType: elementType, key: key, count: count)
-
-        cachedIdentifiers[typeID, default: [:]][count] = id
-
-        return id
     }
 
     private init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
         self.elementType = elementType
-        elementTypeIdentifier = ObjectIdentifier(elementType)
         self.key = key
 
         self.count = count
 
         var hasher = Hasher()
-        hasher.combine(elementTypeIdentifier)
+        hasher.combine(ObjectIdentifier(self.elementType))
         hasher.combine(self.key)
         hasher.combine(self.count)
         hash = hasher.finalize()
@@ -101,7 +105,7 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
     static func == (lhs: ElementIdentifier, rhs: ElementIdentifier) -> Bool {
         lhs === rhs ||
-            lhs.elementTypeIdentifier == rhs.elementTypeIdentifier &&
+            lhs.elementType == rhs.elementType &&
             lhs.key == rhs.key &&
             lhs.count == rhs.count
     }
