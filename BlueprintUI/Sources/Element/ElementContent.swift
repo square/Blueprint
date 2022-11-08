@@ -265,7 +265,7 @@ extension ElementContent {
                 return []
             }
 
-            let layoutItems = self.layoutItems(in: environment, cache: cache)
+            let layoutItems = layoutItems(in: environment, cache: cache)
             let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
@@ -294,7 +294,7 @@ extension ElementContent {
                 )
 
                 let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: currentChild.element),
+                    for: currentChild.element,
                     key: currentChild.key
                 )
 
@@ -364,7 +364,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -413,7 +413,7 @@ private struct LazyStorage: ContentStorage {
         let child = buildChild(for: .layout, in: constraint, environment: environment)
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let identifier = ElementIdentifier.identifier(for: child, key: nil, count: 1)
 
         let node = LayoutResultNode(
             element: child,
@@ -543,7 +543,7 @@ extension Array {
     /// to 25% for large collections, so prefer it when needing an indexed `map` in areas where performance is critical.
     @inlinable func indexedMap<Mapped>(_ map: (Int, Element) -> Mapped) -> [Mapped] {
 
-        let count = self.count
+        let count = count
 
         var mapped = [Mapped]()
         mapped.reserveCapacity(count)
