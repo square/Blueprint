@@ -36,8 +36,7 @@ public struct ProposedViewSize: Hashable, CustomStringConvertible {
 extension ProposedViewSize {
 
     public init(_ sizeConstraint: SizeConstraint) {
-        width = sizeConstraint.width.constrainedValue
-        height = sizeConstraint.height.constrainedValue
+        self = sizeConstraint.proposedViewSize
     }
 }
 
@@ -45,8 +44,10 @@ extension ProposedViewSize {
 extension SizeConstraint {
 
     public init(_ proposal: ProposedViewSize) {
-        width = .init(singlePassProposal: proposal.width)
-        height = .init(singlePassProposal: proposal.height)
+        self.init(
+            width: .init(singlePassProposal: proposal.width),
+            height: .init(singlePassProposal: proposal.height)
+        )
     }
 }
 
