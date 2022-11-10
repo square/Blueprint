@@ -7,10 +7,12 @@ import UIKit
 public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     /// The width constraint.
-    @UnconstrainedInfiniteAxis public var width: Axis
+    @UnconstrainedInfiniteAxis
+    public var width: Axis
 
     /// The height constraint.
-    @UnconstrainedInfiniteAxis public var height: Axis
+    @UnconstrainedInfiniteAxis
+    public var height: Axis
 
     public init(width: Axis, height: Axis) {
         self.width = width
@@ -21,6 +23,13 @@ public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     public var debugDescription: String {
         "<SizeConstraint: \(width.debugDescription) x \(height.debugDescription)>"
+    }
+
+    var proposedViewSize: ProposedViewSize {
+        ProposedViewSize(
+            width: _width.uncorrectedValue.constrainedValue,
+            height: _height.uncorrectedValue.constrainedValue
+        )
     }
 }
 
@@ -203,19 +212,42 @@ extension SizeConstraint {
     }
 }
 
+extension SizeConstraint.Axis: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .atMost(let max):
+            return "\(max)"
+        case .unconstrained:
+            return "unc"
+        }
+    }
+}
+
+extension SizeConstraint: CustomStringConvertible {
+    public var description: String {
+        "(\(width) \(height))"
+    }
+}
+
 extension SizeConstraint {
     /// This property wrapper checks the value of `atMost` cases, and turns it into an
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
     @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {
-        private var correctedAxis: Axis
+
+        var correctedAxis: Axis
+        var uncorrectedValue: Axis
 
         public var wrappedValue: Axis {
             get { correctedAxis }
-            set { correctedAxis = Self.correctedAxis(for: newValue) }
+            set {
+                correctedAxis = Self.correctedAxis(for: newValue)
+                uncorrectedValue = newValue
+            }
         }
 
         public init(wrappedValue value: Axis) {
             correctedAxis = Self.correctedAxis(for: value)
+            uncorrectedValue = value
         }
 
         private static func correctedAxis(for axis: Axis) -> Axis {
@@ -229,6 +261,16 @@ extension SizeConstraint {
             case .unconstrained:
                 return axis
             }
+        }
+        
+        // Equatability based on the implementation before `ProposedViewSize` support was added.
+        public static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+            lhs.correctedAxis == rhs.correctedAxis
+        }
+
+        // Hashability based on the implementation before `ProposedViewSize` support was added.
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(correctedAxis)
         }
     }
 }

@@ -32,6 +32,14 @@ public struct UserInteractionEnabled: Element {
             attributes.isUserInteractionEnabled = isEnabled
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            subview.attributes.isUserInteractionEnabled = isEnabled
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
-public protocol Layout {
+public protocol Layout: SPLayout {
 
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()

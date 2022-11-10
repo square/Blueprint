@@ -18,8 +18,34 @@ extension Element {
     }
 
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
-        // TODO: switch on layoutMode
-        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        switch layoutMode {
+        case .standard:
+            return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        case .singlePass:
+            return singlePassLayout(
+                proposal: .init(frame.size),
+                context: SPLayoutContext(
+                    attributes: LayoutAttributes(frame: frame),
+                    environment: environment,
+                    // TODO: Hoist up?
+                    cache: .init()
+                )
+            )
+        }
+    }
+
+    func singlePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> LayoutResultNode {
+        let layouts = content.performSinglePassLayout(
+            proposal: proposal,
+            context: context
+        )
+
+        return LayoutResultNode(
+            element: self,
+            layoutAttributes: context.attributes,
+            environment: context.environment,
+            children: layouts.map { (identifier: $0.identifier, node: $0.node) }
+        )
     }
 }
 
@@ -144,7 +170,11 @@ extension LayoutResultNode {
         for child in children {
             let attributes = child.node.layoutAttributes
 
-            visit(depth, "\(child.identifier)", attributes.frame)
+            let debugScope = child.node.environment[DebugScopeKey.self]
+
+            let name = (debugScope + ["\(child.identifier)"]).joined(separator: "/")
+
+            visit(depth, name, attributes.frame)
 
             child.node.dump(depth: depth + 1, visit: visit)
         }

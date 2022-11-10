@@ -3,7 +3,7 @@ import UIKit
 /// Represents the content of an element.
 public struct ElementContent {
 
-    private let storage: ContentStorage
+    let storage: ContentStorage
 
     //
     // MARK: Initialization
@@ -45,8 +45,19 @@ public struct ElementContent {
         cache: CacheTree,
         layoutMode: LayoutMode
     ) -> CGSize {
-        // TODO: switch on layoutMode
-        storage.measure(in: constraint, environment: environment, cache: cache)
+        switch layoutMode {
+        case .standard:
+            return storage.measure(in: constraint, environment: environment, cache: cache)
+        case .singlePass:
+            return storage.sizeThatFits(
+                proposal: ProposedViewSize(constraint),
+                context: .init(
+                    // TODO: Hoist upward?
+                    cache: .init(),
+                    environment: environment
+                )
+            )
+        }
     }
 
     fileprivate func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
@@ -68,7 +79,24 @@ public struct ElementContent {
             cache: cache
         )
     }
+
+    func performSinglePassLayout(
+        proposal: ProposedViewSize,
+        context: SPLayoutContext
+    ) -> [IdentifiedNode] {
+        storage.performSinglePassLayout(
+            proposal: proposal,
+            context: context
+        )
+    }
 }
+
+public struct SPLayoutContext {
+    var attributes: LayoutAttributes
+    var environment: Environment
+    var cache: SPCacheNode
+}
+
 
 extension ElementContent {
 
@@ -127,10 +155,9 @@ extension ElementContent {
     ///
     /// - parameter measurable: How to measure the `ElementContent`.
     public init(measurable: Measurable) {
-        self = ElementContent(
-            layout: MeasurableLayout(measurable: measurable),
-            configure: { _ in }
-        )
+        storage = MeasurableStorage(measurer: { constraint, environment in
+            measurable.measure(in: constraint)
+        })
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
@@ -195,7 +222,7 @@ extension ElementContent {
 }
 
 
-fileprivate protocol ContentStorage {
+protocol ContentStorage: SPContentStorage {
     var childCount: Int { get }
 
     func measure(
@@ -221,7 +248,7 @@ extension ElementContent {
         public var layout: LayoutType
 
         /// Child elements.
-        fileprivate var children: [Child] = []
+        var children: [Child] = []
 
         init(layout: LayoutType) {
             self.layout = layout
@@ -344,7 +371,7 @@ extension ElementContent {
             }
         }
 
-        fileprivate struct Child {
+        struct Child {
 
             var traits: LayoutType.Traits
             var key: AnyHashable?
@@ -409,6 +436,46 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     }
 }
 
+extension EnvironmentAdaptingStorage {
+
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        context.cache.get(key: proposal) { proposal in
+            let environment = adapted(environment: context.environment)
+            let context = MeasureContext(
+                cache: context.cache.subcache(key: 0),
+                environment: environment
+            )
+            return child.content.sizeThatFits(proposal: proposal, context: context)
+        }
+    }
+
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        let environment = adapted(environment: context.environment)
+
+        let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let context = SPLayoutContext(
+            attributes: context.attributes,
+            environment: environment,
+            cache: context.cache.subcache(key: 0)
+        )
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performSinglePassLayout(
+                proposal: proposal,
+                context: context
+            )
+        )
+
+        return [(identifier, node)]
+    }
+}
+
 /// Content storage that defers creation of its child until measurement or layout time.
 private struct LazyStorage: ContentStorage {
     let childCount = 1
@@ -460,6 +527,54 @@ private struct LazyStorage: ContentStorage {
     }
 }
 
+extension LazyStorage {
+
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        context.cache.get(key: proposal) { proposal in
+            let child = buildChild(
+                for: .measurement,
+                in: .init(proposal),
+                environment: context.environment
+            )
+            let context = MeasureContext(
+                cache: context.cache.subcache(key: 0),
+                environment: context.environment
+            )
+            return child.content.sizeThatFits(proposal: proposal, context: context)
+        }
+    }
+
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        let child = buildChild(
+            for: .layout,
+            in: .init(proposal),
+            environment: context.environment
+        )
+
+        let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let context = SPLayoutContext(
+            attributes: context.attributes,
+            environment: context.environment,
+            cache: context.cache.subcache(key: 0)
+        )
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: context.environment,
+            children: child.content.performSinglePassLayout(
+                proposal: proposal,
+                context: context
+            )
+        )
+
+        return [(identifier, node)]
+    }
+}
+
 
 private struct MeasurableStorage: ContentStorage {
 
@@ -479,6 +594,15 @@ private struct MeasurableStorage: ContentStorage {
         cache.get(constraint) { constraint in
             measurer(constraint, environment)
         }
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+        let constraint = SizeConstraint(proposal)
+        return measurer(constraint, context.environment)
+    }
+
+    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+        []
     }
 }
 
@@ -504,38 +628,16 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
-}
 
-
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        precondition(subviews.count == 1)
+        return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0])
     }
 
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+        precondition(subviews.count == 1)
+        return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
     }
-
-}
-
-
-// Used for empty elements with an intrinsic size
-fileprivate struct MeasurableLayout: Layout {
-
-    var measurable: Measurable
-
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        precondition(items.isEmpty)
-        return measurable.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.isEmpty)
-        return []
-    }
-
 }
 
 struct Measurer: Measurable {
@@ -544,7 +646,6 @@ struct Measurer: Measurable {
         _measure(constraint)
     }
 }
-
 
 extension Array {
 

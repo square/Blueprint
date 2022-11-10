@@ -113,6 +113,74 @@ public struct Aligned: Element {
 
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            let x: CGFloat
+            let y: CGFloat
+
+            let size = subview.sizeThatFits(proposal)
+            let clampedSize = size.upperBounded(maxWidth: bounds.width, maxHeight: bounds.height)
+
+            let width: CGFloat
+            let height: CGFloat
+
+            switch horizontalAlignment {
+            case .leading:
+                x = 0
+                width = clampedSize.width
+            case .center:
+                x = 0.5
+                width = clampedSize.width
+            case .trailing:
+                x = 1
+                width = clampedSize.width
+            case .fill:
+                x = 0
+                width = bounds.width
+            }
+
+            switch verticalAlignment {
+            case .top:
+                y = 0
+                height = clampedSize.height
+            case .center:
+                y = 0.5
+                height = clampedSize.height
+            case .bottom:
+                y = 1
+                height = clampedSize.height
+            case .fill:
+                y = 0
+                height = bounds.height
+            }
+
+            let position = CGPoint(x: bounds.minX + x * bounds.width, y: bounds.minY + y * bounds.height)
+
+            subview.place(
+                at: position,
+                anchor: UnitPoint(x: x, y: y),
+                size: CGSize(width: width, height: height)
+            )
+        }
+    }
+
+
+}
+
+extension CGSize {
+    func upperBounded(maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
+        CGSize(width: min(width, maxWidth), height: min(height, maxHeight))
+    }
+}
+
+extension ProposedViewSize {
+    func map(transform: (CGFloat?, CGFloat?) -> (CGFloat?, CGFloat?)) -> Self {
+        let (width, height) = transform(width, height)
+        return ProposedViewSize(width: width, height: height)
     }
 }
 

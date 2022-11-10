@@ -56,6 +56,14 @@ public struct Transformed: Element {
             attributes.transform = transform
             return attributes
         }
+
+        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+            subview.sizeThatFits(proposal)
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+            subview.attributes.transform = transform
+        }
     }
 }
 

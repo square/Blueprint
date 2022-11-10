@@ -369,6 +369,7 @@ public final class BlueprintView: UIView {
                 layoutMode: layoutMode
             )
 
+//            result.dump()
             // TODO: save the LayoutResultNode here for debugging
 
             // Flatten into tree of view descriptions

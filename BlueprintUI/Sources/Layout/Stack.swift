@@ -582,7 +582,7 @@ extension StackLayout {
 
             nextOrigin = origin + magnitude + minimumSpacing
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: true)
         }
     }
 
@@ -632,7 +632,7 @@ extension StackLayout {
 
             axisOrigin = origin + magnitude + minimumSpacing
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: sizeAdjustment.isZero)
         }
 
         return axisSegments
@@ -724,7 +724,7 @@ extension StackLayout {
 
             axisOrigin = origin + magnitude + space
 
-            return Segment(origin: origin, magnitude: magnitude)
+            return Segment(origin: origin, magnitude: magnitude, measured: sizeAdjustment.isZero)
         }
 
         return axisSegments
@@ -791,7 +791,7 @@ extension StackLayout {
 
             // Form segments that fill the available space
             let segments = Array(
-                repeating: Segment(origin: 0, magnitude: availableCross),
+                repeating: Segment(origin: 0, magnitude: availableCross, measured: false),
                 count: items.count
             )
 
@@ -852,7 +852,7 @@ extension StackLayout {
 
                 let origin = offset - alignmentValue
 
-                return Segment(origin: origin, magnitude: measuredCross)
+                return Segment(origin: origin, magnitude: measuredCross, measured: true)
             }
 
             return segments
@@ -865,13 +865,101 @@ extension StackLayout {
             return alignSegments(to: id)
         }
     }
+}
 
-    // MARK: - Layout types
+extension LayoutSubview {
+    var stackLayoutTraits: StackLayout.Traits {
+        traits(forLayoutType: StackLayout.self)
+    }
+}
 
+extension StackLayout {
+    public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        guard subviews.isEmpty == false else { return .zero }
+
+        let constraint = SizeConstraint(proposal).vectorConstraint(on: axis)
+
+        let items: [(Traits, Measurable)] = subviews.map { subview in
+            let traits = subview.stackLayoutTraits
+            let measurable = Measurer { constraint in
+                let proposal = ProposedViewSize(constraint)
+                return subview.sizeThatFits(proposal)
+            }
+            return (traits, measurable)
+        }
+
+        let frames = _frames(for: items, in: constraint)
+
+        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
+            Vector(
+                axis: max(vector.axis, frame.maxAxis),
+                cross: max(vector.cross, frame.maxCross)
+            )
+        }
+
+        return vector.size(axis: axis)
+    }
+
+    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+
+        let constraint = bounds.size.vectorConstraint(axis: axis)
+
+        var proposals: [ProposedViewSize] = Array(repeating: .zero, count: subviews.count)
+
+        let items: [(Traits, Measurable)] = zip(subviews, subviews.indices).map { subview, index in
+            let traits = subview.stackLayoutTraits
+            let measurable = Measurer { constraint in
+                let proposal = ProposedViewSize(constraint)
+                proposals[index] = proposal
+                return subview.sizeThatFits(proposal)
+            }
+            return (traits, measurable)
+        }
+
+        let frames = _frames(for: items, in: constraint)
+
+        for i in subviews.indices {
+            let vectorFrame = frames[i]
+            let subview = subviews[i]
+            let proposal = proposals[i]
+
+            var width: CGFloat?
+            var height: CGFloat?
+
+            let size = vectorFrame.size.size(axis: axis)
+
+            switch axis {
+            case .vertical:
+                width = vectorFrame.crossMeasured ? nil : size.width
+                height = vectorFrame.axisMeasured ? nil : size.height
+
+            case .horizontal:
+                width = vectorFrame.axisMeasured ? nil : size.width
+                height = vectorFrame.crossMeasured ? nil : size.height
+            }
+
+            let frame = vectorFrame.rect(axis: axis)
+
+            subview.place(
+                at: bounds.origin + frame.origin,
+                anchor: .topLeading,
+                proposal: proposal,
+                width: width,
+                height: height
+            )
+        }
+    }
+}
+
+
+// MARK: - Layout types
+
+extension StackLayout {
     /// Represents an origin and size value in a single axis.
     struct Segment {
         var origin: CGFloat
         var magnitude: CGFloat
+        var measured: Bool
     }
 
     /// Represents a size or point with symbolic axes.
@@ -934,15 +1022,14 @@ extension StackLayout {
     struct VectorFrame {
         var origin: Vector
         var size: Vector
-
-        init(origin: Vector, size: Vector) {
-            self.origin = origin
-            self.size = size
-        }
+        var axisMeasured: Bool
+        var crossMeasured: Bool
 
         init(axis: Segment, cross: Segment) {
             origin = Vector(axis: axis.origin, cross: cross.origin)
             size = Vector(axis: axis.magnitude, cross: cross.magnitude)
+            axisMeasured = axis.measured
+            crossMeasured = cross.measured
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {

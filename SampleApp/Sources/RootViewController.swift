@@ -50,14 +50,46 @@ final class RootViewController: UIViewController {
     }
 
     override func loadView() {
-        let blueprintView = BlueprintView(element: contents)
+        let leftBlueprintView = BlueprintView(element: contents)
+        leftBlueprintView.backgroundColor = .clear
+        leftBlueprintView.layer.borderColor = UIColor.black.cgColor
+        leftBlueprintView.layer.borderWidth = 1
 
-        view = blueprintView
+        leftBlueprintView.layoutMode = .singlePass
+
+        let rightBlueprintView = BlueprintView(element: contents)
+        rightBlueprintView.backgroundColor = .clear
+        rightBlueprintView.layer.borderColor = UIColor.black.cgColor
+        rightBlueprintView.layer.borderWidth = 1
+
+        rightBlueprintView.layoutMode = .standard
+
+        let stackView = UIStackView(arrangedSubviews: [
+            leftBlueprintView,
+            rightBlueprintView,
+        ])
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.alignment = .fill
+        view = stackView
 
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
     }
 
     var contents: Element {
+        Column(
+            alignment: .center,
+            underflow: .growUniformly
+        ) {
+            Label(text: "Test")
+
+            Label(text: "Test2")
+        }
+        .opacity(0.5)
+        .inset(uniform: 10)
+    }
+
+    var contents2: Element {
         Column { column in
             column.minimumVerticalSpacing = 20.0
             column.horizontalAlignment = .leading
