@@ -27,8 +27,8 @@ public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     var proposedViewSize: ProposedViewSize {
         ProposedViewSize(
-            width: _width.correctedAxis.proposedViewSizeAxis,
-            height: _height.correctedAxis.proposedViewSizeAxis
+            width: _width.uncorrectedValue.constrainedValue,
+            height: _height.uncorrectedValue.constrainedValue
         )
     }
 }
@@ -234,84 +234,43 @@ extension SizeConstraint {
     /// `unconstrained` axis if the value equals `greatestFiniteMagnitude` or `isInfinite`.
     @propertyWrapper public struct UnconstrainedInfiniteAxis: Equatable, Hashable {
 
-        enum CorrectedAxis: Equatable, Hashable {
-            case atMost(CGFloat)
-            case unconstrained
-            case infinite
-            case greatestFiniteMagnitude
-
-            var axis: Axis {
-                switch self {
-                case .atMost(let value):
-                    return .atMost(value)
-
-                case .unconstrained, .infinite, .greatestFiniteMagnitude:
-                    return .unconstrained
-                }
-            }
-
-            var proposedViewSizeAxis: CGFloat? {
-                switch self {
-                case .atMost(let value):
-                    return value
-
-                case .unconstrained:
-                    return nil
-
-                case .infinite:
-                    return .infinity
-
-                case .greatestFiniteMagnitude:
-                    return .greatestFiniteMagnitude
-                }
-            }
-
-            // Equatability based on the implementation before `ProposedViewSize` support was added.
-            static func == (_ lhs: Self, _ rhs: Self) -> Bool {
-                lhs.axisValue == rhs.axisValue
-            }
-
-            // Hashability based on the implementation before `ProposedViewSize` support was added.
-            func hash(into hasher: inout Hasher) {
-                hasher.combine(axisValue)
-            }
-
-            /// A value that represents the `Equatable`/`Hashable` behavior before `ProposedViewSize` support was added.
-            private var axisValue: CGFloat? {
-                switch self {
-                case .atMost(let value):
-                    return value
-
-                case .unconstrained, .infinite, .greatestFiniteMagnitude:
-                    return nil
-                }
-            }
-        }
-
-        var correctedAxis: CorrectedAxis
+        var correctedAxis: Axis
+        var uncorrectedValue: Axis
 
         public var wrappedValue: Axis {
-            get { correctedAxis.axis }
-            set { correctedAxis = Self.correctedAxis(for: newValue) }
+            get { correctedAxis }
+            set {
+                correctedAxis = Self.correctedAxis(for: newValue)
+                uncorrectedValue = newValue
+            }
         }
 
         public init(wrappedValue value: Axis) {
             correctedAxis = Self.correctedAxis(for: value)
+            uncorrectedValue = value
         }
 
-        private static func correctedAxis(for axis: Axis) -> CorrectedAxis {
+        private static func correctedAxis(for axis: Axis) -> Axis {
             switch axis {
             case .atMost(let maxAxis):
-                if maxAxis.isInfinite {
-                    return .infinite
-                } else if maxAxis == .greatestFiniteMagnitude {
-                    return .greatestFiniteMagnitude
+                if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
+                    return .unconstrained
                 } else {
-                    return .atMost(maxAxis)
+                    return axis
                 }
             case .unconstrained:
-                return .unconstrained
+                return axis
             }
+        }
+        
+        // Equatability based on the implementation before `ProposedViewSize` support was added.
+        public static func == (_ lhs: Self, _ rhs: Self) -> Bool {
+            lhs.correctedAxis == rhs.correctedAxis
+        }
+
+        // Hashability based on the implementation before `ProposedViewSize` support was added.
+        public func hash(into hasher: inout Hasher) {
+            hasher.combine(correctedAxis)
         }
     }
 }
