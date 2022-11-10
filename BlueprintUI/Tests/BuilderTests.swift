@@ -174,7 +174,7 @@ class BuilderTests: XCTestCase {
                 "2"
             }
 
-            if #available(iOS 11, *) {
+            if #available(iOS 14, *) {
                 "3"
             } else {
                 "4"

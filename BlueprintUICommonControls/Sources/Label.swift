@@ -57,6 +57,9 @@ public struct Label: ProxyElement {
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
+    /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
+    public var accessibilityHint: String?
+
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
@@ -95,6 +98,7 @@ public struct Label: ProxyElement {
             label.numberOfLines = numberOfLines
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
+            label.accessibilityHint = accessibilityHint
             label.accessibilityTraits = accessibilityTraits
             label.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
             label.minimumScaleFactor = minimumScaleFactor
