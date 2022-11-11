@@ -25,6 +25,10 @@ struct DefaultURLHandler: URLHandler {
 
 public struct URLHandlerEnvironmentKey: EnvironmentKey {
     public static let defaultValue: URLHandler = DefaultURLHandler()
+
+    public static func isEquivalent(_ lhs: URLHandler, _ rhs: URLHandler) -> Bool {
+        true
+    }
 }
 
 extension Environment {

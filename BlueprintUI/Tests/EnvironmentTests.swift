@@ -179,6 +179,124 @@ class EnvironmentTests: XCTestCase {
         enum RHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
     }
 
+    func test_subscribeToReads() throws {
+
+        var environment = Environment.empty
+
+        var reads1 = [Environment.StorageKey]()
+        var reads2 = [Environment.StorageKey]()
+
+        environment.subscribeToReads { key in
+            reads1.append(key)
+        }
+
+        environment.subscribeToReads { key in
+            reads2.append(key)
+        }
+
+        environment[TestKey.self] = .right
+
+        _ = environment[TestKey.self]
+
+        XCTAssertEqual(reads1.count, 1)
+        XCTAssertEqual(reads2.count, 1)
+
+        XCTAssertEqual(Environment.StorageKey(TestKey.self), try XCTUnwrap(reads1.first))
+        XCTAssertEqual(Environment.StorageKey(TestKey.self), try XCTUnwrap(reads2.first))
+    }
+
+    func test_equality() {
+
+        // Not equal
+        do {
+            var lhs = Environment.empty
+            lhs[TestKey.self] = .wrong
+            lhs[LHSTestKey.self] = 2
+
+
+            var rhs = Environment.empty
+            rhs[TestKey.self] = .right
+            rhs[RHSTestKey.self] = 3
+
+            XCTAssertNotEqual(lhs, rhs)
+
+        }
+
+        // Not equal
+        do {
+            var lhs = Environment.empty
+            lhs[TestKey.self] = .wrong
+            lhs[LHSTestKey.self] = 2
+
+
+            var rhs = Environment.empty
+            rhs[TestKey.self] = .wrong
+            rhs[RHSTestKey.self] = 2
+
+            XCTAssertNotEqual(lhs, rhs)
+        }
+
+        // Equal
+        do {
+            var lhs = Environment.empty
+            lhs[TestKey.self] = .wrong
+            lhs[LHSTestKey.self] = 2
+
+
+            var rhs = Environment.empty
+            rhs[TestKey.self] = .wrong
+            rhs[LHSTestKey.self] = 2
+
+            XCTAssertEqual(lhs, rhs)
+        }
+
+        enum LHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum RHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
+    }
+
+    func test_subset() {
+
+        var environment = Environment.empty
+
+        environment[Key1.self] = 1
+        environment[Key2.self] = 2
+        environment[Key3.self] = 3
+
+        let subset = environment.subset(with: Set([Key1.storageKey, Key2.storageKey, Key4.storageKey]))
+        XCTAssertEqual(subset?.values.count, 2)
+        let keys = Set(subset!.values.keys)
+        XCTAssertTrue(keys.contains(Key1.storageKey))
+        XCTAssertTrue(keys.contains(Key2.storageKey))
+        enum Key1: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum Key2: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum Key3: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum Key4: EnvironmentKey { static let defaultValue: Int? = nil }
+    }
+
+    func test_valuesEqual() {
+
+        var environment = Environment.empty
+
+        environment[Key1.self] = 1
+        environment[Key2.self] = 2
+        environment[Key3.self] = 3
+
+        let subset1 = environment.subset(with: Set([Key1.storageKey, Key2.storageKey]))
+        let subset2 = environment.subset(with: Set([Key1.storageKey, Key2.storageKey, Key3.storageKey]))
+
+        var matchEnvironment = Environment.empty
+        matchEnvironment[Key1.self] = 1
+        matchEnvironment[Key2.self] = 2
+
+        XCTAssertTrue(matchEnvironment.valuesEqual(to: subset1))
+        XCTAssertFalse(matchEnvironment.valuesEqual(to: subset2))
+
+
+        enum Key1: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum Key2: EnvironmentKey { static let defaultValue: Int? = nil }
+        enum Key3: EnvironmentKey { static let defaultValue: Int? = nil }
+    }
+
     func leafAttributes(in node: LayoutResultNode) -> LayoutAttributes {
         if let childNode = node.children.first?.node {
             return leafAttributes(in: childNode)
@@ -321,5 +439,12 @@ extension Environment {
     fileprivate var testValue: TestValue {
         get { self[TestKey.self] }
         set { self[TestKey.self] = newValue }
+    }
+}
+
+
+extension EnvironmentKey {
+    fileprivate static var storageKey: Environment.StorageKey {
+        .init(Self.self)
     }
 }
