@@ -578,7 +578,7 @@ extension ElementState: CustomDebugStringConvertible {
             Array(repeating: "  ", count: child.depth).joined() + child.debugDescription
         }
 
-        let all = ["<ElementState: \(address(of: self))>"] + strings
+        let all = ["<ElementState \(address(of: self)): \(identifier.debugDescription)>"] + strings
 
         return all.joined(separator: "\n")
     }
