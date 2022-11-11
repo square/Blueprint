@@ -59,16 +59,16 @@ final class ElementStateTree {
             /// Transition from no root element, to root element.
             let new = makeRoot(with: element)
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
             }
         } else if root != nil, element == nil {
             /// Transition from a root element, to no root element.
             let old = root
-            
+
             root = nil
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.tree(self, didTeardownRootState: old!)
             }
         } else if let root = root, let element = element {
@@ -76,14 +76,14 @@ final class ElementStateTree {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
 
-                delegate.perform {
+                delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
             } else {
                 /// The type of the root element changed, replace it.
                 let new = makeRoot(with: element)
 
-                delegate.perform {
+                delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
                 }
             }
@@ -251,7 +251,7 @@ final class ElementState {
             let content = element.latest.content
             cachedContent = content
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidFetchElementContent(for: self)
             }
 
@@ -327,7 +327,7 @@ final class ElementState {
 
         element.latest = newElement
 
-        delegate.perform {
+        delegate.ifDebug {
             $0.treeDidUpdateState(self)
         }
     }
@@ -349,7 +349,7 @@ final class ElementState {
     ) -> CGSize {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidReturnCachedMeasurement(existing, for: self)
             }
 
@@ -371,7 +371,7 @@ final class ElementState {
 
         measurements[constraint] = measurement
 
-        delegate.perform {
+        delegate.ifDebug {
             $0.treeDidPerformMeasurement(measurement, for: self)
         }
 
@@ -402,7 +402,7 @@ final class ElementState {
         guard comparability == .comparableElement else {
             let nodes = layout(environment)
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidPerformLayout(nodes, for: self)
             }
 
@@ -412,7 +412,7 @@ final class ElementState {
 
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidReturnCachedLayout(existing, for: self)
             }
 
@@ -435,7 +435,7 @@ final class ElementState {
 
         layouts[size] = layout
 
-        delegate.perform {
+        delegate.ifDebug {
             $0.treeDidPerformCachedLayout(layout, for: self)
         }
 
@@ -505,7 +505,7 @@ final class ElementState {
 
             children[identifier] = new
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidCreateState(new)
             }
 
@@ -563,7 +563,7 @@ final class ElementState {
 
             children.removeValue(forKey: key)
 
-            delegate.perform {
+            delegate.ifDebug {
                 $0.treeDidRemoveState(state)
             }
         }
@@ -702,7 +702,7 @@ protocol ElementStateTreeDelegate: AnyObject {
 
 
 extension Optional where Wrapped == ElementStateTreeDelegate {
-    func perform(_ block: (Wrapped) -> Void) {
+    func ifDebug(perform block: (Wrapped) -> Void) {
         #if DEBUG
             if let self = self {
                 block(self)
