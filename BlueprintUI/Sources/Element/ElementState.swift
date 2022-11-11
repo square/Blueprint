@@ -91,10 +91,6 @@ final class ElementState {
     /// at the end of the layout cycle.
     private(set) var wasVisited: Bool
 
-    /// If the update during this layout cycle was equivalent.
-    /// Useful for debugging.
-    private(set) var wasUpdateEquivalent: Bool
-
     /// The cached measurements for the current node.
     /// Measurements are cached by a `SizeConstraint` key, meaning that
     /// there can be multiple cached measurements for the same element.
@@ -196,7 +192,6 @@ final class ElementState {
         self.name = name
 
         wasVisited = true
-        wasUpdateEquivalent = false
     }
 
     /// Assigned once per layout cycle, this value represents the
@@ -284,9 +279,6 @@ final class ElementState {
         /// have access to the latest `backingViewDescription`.
 
         element.latest = newElement
-
-        /// If the update was equivalent. Used for debugging.
-        wasUpdateEquivalent = isEquivalent
     }
 
     /// Represents a cached measurement, which contains
@@ -382,6 +374,9 @@ final class ElementState {
         during toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
+        /// We only need to append a read observer if we are a `comparableElement`.
+        /// If we're a `.childOfComparableElement`, the read subscription
+        /// from the upstream comparable element will still be applied.
         guard comparability == .comparableElement else {
             return (toTrack(environment), nil)
         }
@@ -437,7 +432,6 @@ final class ElementState {
     func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
-            $0.wasUpdateEquivalent = false
         }
     }
 

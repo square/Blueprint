@@ -78,7 +78,6 @@ class ElementStateTests: XCTestCase {
             )
 
             XCTAssertTrue(state.wasVisited)
-            XCTAssertFalse(state.wasUpdateEquivalent)
         }
 
         // TODO: additional codepaths testing.
