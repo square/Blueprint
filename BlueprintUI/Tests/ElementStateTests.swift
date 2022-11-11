@@ -71,7 +71,7 @@ class ElementStateTests: XCTestCase {
         testcase("default property values") {
             let state = ElementState(
                 parent: nil,
-                identifier: .init(elementType: Element1.self, key: nil, count: 1),
+                identifier: .identifier(for: Element1(text: "test"), key: nil, count: 1),
                 element: Element1(text: "1"),
                 signpostRef: NSObject(),
                 name: ""

@@ -32,7 +32,7 @@ final class ElementStateTree {
         func makeRoot(with element: Element) {
             root = ElementState(
                 parent: nil,
-                identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                identifier: .identifier(for: element, key: nil, count: 1),
                 element: element,
                 signpostRef: signpostRef,
                 name: name
@@ -312,7 +312,6 @@ final class ElementState {
         /// Perform the measurement and track the environment dependencies.
         let (size, dependencies) = trackDependenciesIfNeeded(
             in: environment,
-            for: .measurement,
             during: measurement
         )
 
@@ -359,7 +358,6 @@ final class ElementState {
         /// Perform the layout and track the environment dependencies.
         let (layout, dependencies) = trackDependenciesIfNeeded(
             in: environment,
-            for: .layout,
             during: layout
         )
 
@@ -381,31 +379,17 @@ final class ElementState {
     /// Additionally, if the element is not comparable, no subset is returned or tracked.
     private func trackDependenciesIfNeeded<Output>(
         in environment: Environment,
-        for layoutPass: Environment.LayoutPass,
         during toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
-        switch layoutPass {
-        case .measurement:
-            if comparability.isComparable {
-                break
-            } else {
-                return (toTrack(environment), nil)
-            }
-        case .layout:
-            /// We are **not** also applying this to `.childOfComparableElement` as well,
-            /// because that parent `ComparableElement` will perform the layout tree caching.
-            if comparability == .comparableElement {
-                break
-            } else {
-                return (toTrack(environment), nil)
-            }
+        guard comparability == .comparableElement else {
+            return (toTrack(environment), nil)
         }
 
         var environment = environment
         var observedKeys = Set<Environment.StorageKey>()
 
-        environment.subscribeToReads(for: layoutPass) { key in
+        environment.subscribeToReads { key in
             observedKeys.insert(key)
         }
 
@@ -634,7 +618,7 @@ extension ElementState {
         var measurements: [SizeConstraint: CachedMeasurement]
 
         var debugDescription: String {
-            "\(type(of: element)) #\(identifier.count): \(measurements.count) Measurements"
+            "\(identifier.debugDescription): \(measurements.count) Measurements"
         }
     }
 }
