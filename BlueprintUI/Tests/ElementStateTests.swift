@@ -33,7 +33,7 @@ class ElementStateTreeTests: XCTestCase {
 
         let state1 = try XCTUnwrap(tree.root)
 
-        XCTAssertEqual((state1.element.value as! Element1).text, "1")
+        XCTAssertEqual((state1.element.latest as! Element1).text, "1")
         XCTAssertEqual(1, delegate.didSetupRootCalls.count)
 
         // Updating with the same element of the same type should keep the same state.
@@ -50,7 +50,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Also make sure that we actually update the contained element.
 
-        XCTAssertEqual((state1.element.value as! Element1).text, "1.1")
+        XCTAssertEqual((state1.element.latest as! Element1).text, "1.1")
 
         // Updating with a new type should tear down the state.
 
@@ -83,15 +83,13 @@ class ElementStateTests: XCTestCase {
             let state = ElementState(
                 parent: nil,
                 delegate: nil,
-                identifier: .init(elementType: Element1.self, key: nil, count: 1),
+                identifier: .identifier(for: Element1(text: "test"), key: nil, count: 1),
                 element: Element1(text: "1"),
-                depth: 0,
                 signpostRef: NSObject(),
                 name: ""
             )
 
             XCTAssertTrue(state.wasVisited)
-            XCTAssertFalse(state.wasUpdateEquivalent)
         }
 
         // TODO: additional codepaths testing.
@@ -241,7 +239,7 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
 extension Element {
 
     fileprivate static func identifier(_ count: Int) -> ElementIdentifier {
-        .init(elementType: self, key: nil, count: count)
+        .identifier(for: self, key: nil, count: count)
     }
 }
 
@@ -437,6 +435,6 @@ extension ElementState {
 
 extension Element {
     var identifier: ElementIdentifier {
-        .init(elementType: type(of: self), key: nil, count: 0)
+        .identifier(for: self, key: nil, count: 1)
     }
 }

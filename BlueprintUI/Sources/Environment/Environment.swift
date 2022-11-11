@@ -36,20 +36,9 @@ import UIKit
 ///     }
 public struct Environment: Equatable {
 
-    typealias OnDidRead = (StorageKey) -> Void
-
-    enum LayoutPass: Equatable {
-        case measurement
-        case layout
-    }
-
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static let empty = Environment()
-
-    /// When enabled, notify any subscribers when a value is read
-    /// from the environment
-    var readNotificationsEnabled: Bool = true
 
     /// If the `Environment` contains any values.
     var isEmpty: Bool {
@@ -58,19 +47,13 @@ public struct Environment: Equatable {
 
     private var values: [StorageKey: ValueBox] = [:]
 
-    private var measurementDidRead: OnDidRead?
-    private var layoutDidRead: [OnDidRead] = []
-
     /// Gets or sets an environment value by its key.
     public subscript<KeyType: EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
         get {
             let storageKey = StorageKey(key)
 
-            if readNotificationsEnabled {
-                measurementDidRead?(storageKey)
-                for reader in layoutDidRead {
-                    reader(storageKey)
-                }
+            for reader in readSubscriptions {
+                reader(storageKey)
             }
 
             if let value = values[storageKey] {
@@ -124,14 +107,19 @@ public struct Environment: Equatable {
         return subset
     }
 
-    mutating func subscribeToReads(for layoutPass: LayoutPass, callback: @escaping OnDidRead) {
-        switch layoutPass {
-        case .measurement:
-            measurementDidRead = callback
-        case .layout:
-            layoutDidRead.append(callback)
-        }
+    /// Callback for when an `EnvironmentKey` is read from the `Environment`.
+    typealias OnDidRead = (StorageKey) -> Void
+
+    /// When an `EnvironmentKey` is read from the `Environment`,
+    /// the provided callback is invoked, allowing the caller to track what is being
+    /// accessed in the environment. This is used by the measurement and layout
+    /// phases of the render pass in order to determine if cached measurements
+    /// and layouts can be reused.
+    mutating func subscribeToReads(with callback: @escaping OnDidRead) {
+        readSubscriptions.append(callback)
     }
+
+    private var readSubscriptions: [OnDidRead] = []
 
     /// Returns a new `Environment` by merging the values from `self` and the
     /// provided environment; keeping values from the provided environment when there
