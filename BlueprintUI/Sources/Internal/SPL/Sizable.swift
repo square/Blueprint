@@ -4,5 +4,5 @@ import Foundation
 
 protocol Sizable {
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize
 }

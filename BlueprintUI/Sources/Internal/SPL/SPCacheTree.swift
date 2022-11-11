@@ -53,4 +53,4 @@ final class SPValueCache<Key: Hashable, Value> {
 }
 
 
-typealias SPCacheNode = SPCacheTree<ProposedViewSize, CGSize, Int>
+typealias SPCacheNode = SPCacheTree<SizeConstraint, CGSize, Int>

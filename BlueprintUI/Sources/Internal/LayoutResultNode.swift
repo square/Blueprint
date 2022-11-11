@@ -34,7 +34,7 @@ extension Element {
         }
     }
 
-    func singlePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> LayoutResultNode {
+    func singlePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> LayoutResultNode {
         let layouts = content.performSinglePassLayout(
             proposal: proposal,
             context: context

@@ -50,7 +50,7 @@ public struct ElementContent {
             return storage.measure(in: constraint, environment: environment, cache: cache)
         case .singlePass:
             return storage.sizeThatFits(
-                proposal: ProposedViewSize(constraint),
+                proposal: constraint,
                 context: .init(
                     // TODO: Hoist upward?
                     cache: .init(),
@@ -81,7 +81,7 @@ public struct ElementContent {
     }
 
     func performSinglePassLayout(
-        proposal: ProposedViewSize,
+        proposal: SizeConstraint,
         context: SPLayoutContext
     ) -> [IdentifiedNode] {
         storage.performSinglePassLayout(
@@ -438,7 +438,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
 extension EnvironmentAdaptingStorage {
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         context.cache.get(key: proposal) { proposal in
             let environment = adapted(environment: context.environment)
             let context = MeasureContext(
@@ -449,7 +449,7 @@ extension EnvironmentAdaptingStorage {
         }
     }
 
-    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         let environment = adapted(environment: context.environment)
 
         let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
@@ -529,11 +529,11 @@ private struct LazyStorage: ContentStorage {
 
 extension LazyStorage {
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         context.cache.get(key: proposal) { proposal in
             let child = buildChild(
                 for: .measurement,
-                in: .init(proposal),
+                in: proposal,
                 environment: context.environment
             )
             let context = MeasureContext(
@@ -544,10 +544,10 @@ extension LazyStorage {
         }
     }
 
-    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         let child = buildChild(
             for: .layout,
-            in: .init(proposal),
+            in: proposal,
             environment: context.environment
         )
 
@@ -596,12 +596,11 @@ private struct MeasurableStorage: ContentStorage {
         }
     }
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
-        let constraint = SizeConstraint(proposal)
-        return measurer(constraint, context.environment)
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+        measurer(proposal, context.environment)
     }
 
-    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         []
     }
 }
@@ -629,12 +628,12 @@ fileprivate struct SingleChildLayoutHost: Layout {
         ]
     }
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
         precondition(subviews.count == 1)
         return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0])
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+    func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
         precondition(subviews.count == 1)
         return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
     }
