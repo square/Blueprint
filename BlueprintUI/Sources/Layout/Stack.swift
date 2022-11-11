@@ -874,16 +874,15 @@ extension LayoutSubview {
 }
 
 extension StackLayout {
-    public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+    public func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
         guard subviews.isEmpty == false else { return .zero }
 
-        let constraint = SizeConstraint(proposal).vectorConstraint(on: axis)
+        let constraint = proposal.vectorConstraint(on: axis)
 
         let items: [(Traits, Measurable)] = subviews.map { subview in
             let traits = subview.stackLayoutTraits
             let measurable = Measurer { constraint in
-                let proposal = ProposedViewSize(constraint)
-                return subview.sizeThatFits(proposal)
+                subview.sizeThatFits(constraint)
             }
             return (traits, measurable)
         }
@@ -900,18 +899,17 @@ extension StackLayout {
         return vector.size(axis: axis)
     }
 
-    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+    public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
 
-        var proposals: [ProposedViewSize] = Array(repeating: .zero, count: subviews.count)
+        var proposals: [SizeConstraint] = Array(repeating: .unconstrained, count: subviews.count)
 
         let items: [(Traits, Measurable)] = zip(subviews, subviews.indices).map { subview, index in
             let traits = subview.stackLayoutTraits
             let measurable = Measurer { constraint in
-                let proposal = ProposedViewSize(constraint)
-                proposals[index] = proposal
-                return subview.sizeThatFits(proposal)
+                proposals[index] = constraint
+                return subview.sizeThatFits(constraint)
             }
             return (traits, measurable)
         }

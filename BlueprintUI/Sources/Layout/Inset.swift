@@ -159,13 +159,13 @@ extension Inset {
             return LayoutAttributes(frame: frame)
         }
 
-        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
             let insetProposal = proposal.inset(by: edgeInsets)
             let childSize = subview.sizeThatFits(insetProposal)
             return childSize + CGSize(width: left + right, height: top + bottom)
         }
 
-        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             let insetSize = bounds.size.inset(by: edgeInsets)
 
             subview.place(
@@ -186,20 +186,6 @@ extension CGSize {
         CGSize(
             width: width - insets.left - insets.right,
             height: height - insets.top - insets.bottom
-        )
-    }
-}
-
-extension ProposedViewSize {
-
-    fileprivate func inset(by insets: UIEdgeInsets) -> Self {
-        let insetSize = CGSize(
-            width: insets.left + insets.right,
-            height: insets.top + insets.bottom
-        )
-        return .init(
-            width: width.map { $0 - insetSize.width },
-            height: height.map { $0 - insetSize.height }
         )
     }
 }

@@ -7,16 +7,16 @@ public typealias LayoutSubviews = [LayoutSubview]
 
 public struct LayoutSubview {
 
-    typealias SizeCache = SPValueCache<ProposedViewSize, CGSize>
+    typealias SizeCache = SPValueCache<SizeConstraint, CGSize>
 
     struct Placement {
 
         struct Size {
-            var proposal: ProposedViewSize
+            var proposal: SizeConstraint
             var width: CGFloat?
             var height: CGFloat?
 
-            static func proposal(_ proposal: ProposedViewSize) -> Self {
+            static func proposal(_ proposal: SizeConstraint) -> Self {
                 .init(proposal: proposal)
             }
         }
@@ -33,7 +33,7 @@ public struct LayoutSubview {
             )
         }
 
-        static func filling(frame: CGRect, proposal: ProposedViewSize) -> Self {
+        static func filling(frame: CGRect, proposal: SizeConstraint) -> Self {
             .init(
                 position: frame.center,
                 anchor: .center,
@@ -101,7 +101,7 @@ public struct LayoutSubview {
     public func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
-        proposal: ProposedViewSize,
+        proposal: SizeConstraint,
         width: CGFloat? = nil,
         height: CGFloat? = nil
     ) {
@@ -127,7 +127,7 @@ public struct LayoutSubview {
         place(at: frame.origin, anchor: anchor, size: frame.size)
     }
 
-    public func sizeThatFits(_ proposal: ProposedViewSize) -> CGSize {
+    public func sizeThatFits(_ proposal: SizeConstraint) -> CGSize {
         sizeCache.get(key: proposal) { proposal in
             sizable.sizeThatFits(proposal: proposal, context: .init(
                 cache: cache,

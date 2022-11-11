@@ -4,12 +4,12 @@ import Foundation
 
 protocol SPContentStorage {
     func sizeThatFits(
-        proposal: ProposedViewSize,
+        proposal: SizeConstraint,
         context: MeasureContext
     ) -> CGSize
 
     func performSinglePassLayout(
-        proposal: ProposedViewSize,
+        proposal: SizeConstraint,
         context: SPLayoutContext
     ) -> [IdentifiedNode]
 }

@@ -153,11 +153,11 @@ extension EqualStack {
             return result
         }
 
-        func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
             guard subviews.count > 0 else { return .zero }
 
             let totalSpacing = (spacing * CGFloat(subviews.count - 1))
-            let itemProposal: ProposedViewSize
+            let itemProposal: SizeConstraint
             switch direction {
             case .horizontal:
                 itemProposal = .init(
@@ -192,7 +192,7 @@ extension EqualStack {
             return totalSize
         }
 
-        func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
             guard subviews.count > 0 else { return }
             let size = bounds.size
 

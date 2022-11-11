@@ -124,21 +124,20 @@ extension GridRow {
             subviews.map { subview in
                 let traits = subview.gridRowLayoutTraits
                 let measurable = Measurer { constraint in
-                    let proposal = ProposedViewSize(constraint)
-                    return subview.sizeThatFits(proposal)
+                    subview.sizeThatFits(constraint)
                 }
                 return (traits, measurable)
             }
         }
 
-        func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
             guard subviews.count > 0 else {
                 return .zero
             }
 
             let items = items(subviews: subviews)
 
-            let frames = _frames(in: .init(proposal), items: items)
+            let frames = _frames(in: proposal, items: items)
 
             // Measure the the row to be as wide as the sum of its children and as tall as its tallest child.
             let size = frames.reduce(.zero) { size, frame in
@@ -148,14 +147,14 @@ extension GridRow {
             return size
         }
 
-        func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
             guard subviews.count > 0 else {
                 return
             }
 
             let items = items(subviews: subviews)
             let frames = _frames(
-                in: SizeConstraint(proposal),
+                in: proposal,
                 isExactConstraint: true,
                 items: items
             )

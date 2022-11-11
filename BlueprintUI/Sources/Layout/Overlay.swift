@@ -78,7 +78,7 @@ fileprivate struct OverlayLayout: Layout {
         )
     }
 
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
         subviews.reduce(into: CGSize.zero) { result, subview in
             let measuredSize = subview.sizeThatFits(proposal)
             result.width = max(result.width, measuredSize.width)
@@ -86,7 +86,7 @@ fileprivate struct OverlayLayout: Layout {
         }
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews) {
+    func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
         for subview in subviews {
             subview.place(at: bounds)
         }

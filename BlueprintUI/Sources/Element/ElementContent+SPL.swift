@@ -3,7 +3,7 @@ import Foundation
 
 extension ElementContent: Sizable {
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         storage.sizeThatFits(proposal: proposal, context: context)
     }
 }
@@ -11,7 +11,7 @@ extension ElementContent: Sizable {
 
 extension ElementContent.Builder {
 
-    func sizeThatFits(proposal: ProposedViewSize, context: MeasureContext) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         let subviews = zip(children, children.indices).map { child, index in
             LayoutSubview(
                 element: child.element,
@@ -27,7 +27,7 @@ extension ElementContent.Builder {
         return layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
 
-    func performSinglePassLayout(proposal: ProposedViewSize, context: SPLayoutContext) -> [IdentifiedNode] {
+    func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         guard children.isEmpty == false else { return [] }
 
         let subviews = zip(children, children.indices).map { child, index in

@@ -114,11 +114,11 @@ public struct Aligned: Element {
             return attributes
         }
 
-        func sizeThatFits(proposal: ProposedViewSize, subview: LayoutSubview) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
             subview.sizeThatFits(proposal)
         }
 
-        func placeSubview(in bounds: CGRect, proposal: ProposedViewSize, subview: LayoutSubview) {
+        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             let x: CGFloat
             let y: CGFloat
 
@@ -177,12 +177,6 @@ extension CGSize {
     }
 }
 
-extension ProposedViewSize {
-    func map(transform: (CGFloat?, CGFloat?) -> (CGFloat?, CGFloat?)) -> Self {
-        let (width, height) = transform(width, height)
-        return ProposedViewSize(width: width, height: height)
-    }
-}
 
 extension Element {
     /// Wraps the element in an `Aligned` element with the provided parameters.
