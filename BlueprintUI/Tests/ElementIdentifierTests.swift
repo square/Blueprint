@@ -14,8 +14,28 @@ class ElementIdentifierTests: XCTestCase {
         )
 
         XCTAssertEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 0)),
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 0))
+        )
+
+        XCTAssertEqual(
             ElementIdentifier.identifier(for: A(), key: "aKey", count: 0),
             ElementIdentifier.identifier(for: A(), key: "aKey", count: 0)
+        )
+
+        XCTAssertEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: "aKey", count: 0)),
+            hash(for: ElementIdentifier.identifier(for: A(), key: "aKey", count: 0))
+        )
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: "aKey", count: 1),
+            ElementIdentifier.identifier(for: A(), key: "aKey", count: 1)
+        )
+
+        XCTAssertEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: "aKey", count: 1)),
+            hash(for: ElementIdentifier.identifier(for: A(), key: "aKey", count: 1))
         )
 
         // Not Equal
@@ -26,38 +46,93 @@ class ElementIdentifierTests: XCTestCase {
         )
 
         XCTAssertNotEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 0)),
+            hash(for: ElementIdentifier.identifier(for: B(), key: nil, count: 0))
+        )
+
+        XCTAssertNotEqual(
             ElementIdentifier.identifier(for: A(), key: nil, count: 0),
             ElementIdentifier.identifier(for: A(), key: nil, count: 1)
+        )
+
+        XCTAssertNotEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 0)),
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 1))
         )
 
         XCTAssertNotEqual(
             ElementIdentifier.identifier(for: A(), key: nil, count: 0),
             ElementIdentifier.identifier(for: A(), key: "aKey", count: 0)
         )
+
+        XCTAssertNotEqual(
+            hash(for: ElementIdentifier.identifier(for: A(), key: nil, count: 0)),
+            hash(for: ElementIdentifier.identifier(for: A(), key: "aKey", count: 0))
+        )
+    }
+
+    func test_debugDescription() {
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: nil, count: 0).debugDescription,
+            "A.0"
+        )
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: nil, count: 1).debugDescription,
+            "A.1"
+        )
+
+        XCTAssertEqual(
+            ElementIdentifier.identifier(for: A(), key: "Key", count: 1).debugDescription,
+            "A.Key.1"
+        )
     }
 
     func test_elementIdentifierCaching() {
+
         let id1 = ElementIdentifier.identifier(for: A(), key: nil, count: 0)
         let id2 = ElementIdentifier.identifier(for: B(), key: nil, count: 0)
-        let id3 = ElementIdentifier.identifier(for: A(), key: "unique", count: 0)
         let id4 = ElementIdentifier.identifier(for: A(), key: nil, count: 1)
         let id5 = ElementIdentifier.identifier(for: A(), key: nil, count: 0)
         let id6 = ElementIdentifier.identifier(for: B(), key: nil, count: 0)
 
+        let uncachedId1 = ElementIdentifier.identifier(for: A(), key: "unique", count: 0)
+        let uncachedId2 = ElementIdentifier.identifier(for: A(), key: "unique", count: 0)
+
+        /// We'll use `ObjectIdentifier` to check the actual
+        /// pointer values of each `ElementIdentifier`.
+
         var set = Set([id1.objectIdentifier])
+
         XCTAssertFalse(set.contains(id2.objectIdentifier))
         set.insert(id2.objectIdentifier)
-        XCTAssertFalse(set.contains(id3.objectIdentifier))
-        set.insert(id3.objectIdentifier)
+
         XCTAssertFalse(set.contains(id4.objectIdentifier))
         set.insert(id4.objectIdentifier)
+
         XCTAssertTrue(set.contains(id5.objectIdentifier))
         set.insert(id5.objectIdentifier)
+
         XCTAssertTrue(set.contains(id6.objectIdentifier))
+
+        XCTAssertFalse(set.contains(uncachedId1.objectIdentifier))
+        set.insert(uncachedId1.objectIdentifier)
+
+        XCTAssertFalse(set.contains(uncachedId2.objectIdentifier))
+        set.insert(uncachedId2.objectIdentifier)
 
         XCTAssertEqual(id1.objectIdentifier, id5.objectIdentifier)
         XCTAssertEqual(id2.objectIdentifier, id6.objectIdentifier)
         XCTAssertNotEqual(id5.objectIdentifier, id6.objectIdentifier)
+
+        XCTAssertNotEqual(uncachedId1.objectIdentifier, uncachedId2.objectIdentifier)
+    }
+
+    func hash<Value: Hashable>(for value: Value) -> Int {
+        var hasher = Hasher()
+        hasher.combine(value)
+        return hasher.finalize()
     }
 }
 

@@ -5,7 +5,7 @@ struct LayoutResultNode {
 
     /// The element that was laid out
     // TODO: remove either this or `state` below.
-    var element: ElementSnapshot
+    var element: ElementState.LatestElement
 
     var identifier: ElementIdentifier
 
@@ -21,7 +21,7 @@ struct LayoutResultNode {
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
-        element: ElementSnapshot,
+        element: ElementState.LatestElement,
         children: [LayoutResultNode]
     ) {
         self.identifier = identifier
@@ -43,7 +43,7 @@ struct LayoutResultNode {
             layoutAttributes: layoutAttributes,
             environment: environment,
             element: state.element,
-            children: state.element.value.content.performLayout(
+            children: state.element.latest.content.performLayout(
                 in: layoutAttributes.frame.size,
                 with: environment,
                 state: state
@@ -82,7 +82,7 @@ extension LayoutResultNode {
 
         // Get the backing view description for the current node (if any),
         // populated with relevant layout data.
-        let viewDescription = element.value.backingViewDescription(
+        let viewDescription = element.latest.backingViewDescription(
             with: .init(
                 bounds: layoutAttributes.bounds,
                 subtreeExtent: subtreeExtent,

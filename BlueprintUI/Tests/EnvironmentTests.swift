@@ -179,94 +179,30 @@ class EnvironmentTests: XCTestCase {
         enum RHSTestKey: EnvironmentKey { static let defaultValue: Int? = nil }
     }
 
-    func test_onDidRead() throws {
+    func test_subscribeToReads() throws {
 
-        // Happy path
-        do {
-            var environment = Environment.empty
+        var environment = Environment.empty
 
-            var readKey: Environment.StorageKey? = nil
-            let exp = expectation(description: "onDidRead")
+        var reads1 = [Environment.StorageKey]()
+        var reads2 = [Environment.StorageKey]()
 
-            environment.subscribeToReads(for: .layout) { key in
-                readKey = key
-                exp.fulfill()
-            }
-
-            environment[TestKey.self] = .right
-            _ = environment[TestKey.self]
-
-            wait(for: [exp], timeout: 0.1)
-            XCTAssertNotNil(readKey)
-            let key = try XCTUnwrap(readKey)
-            XCTAssertEqual(Environment.StorageKey(TestKey.self), key)
+        environment.subscribeToReads { key in
+            reads1.append(key)
         }
 
-        // .measure `LayoutPass` only allows one `onDidRead`
-        do {
-            var environment = Environment.empty
-
-            var firstCallCount = 0
-            var secondCallCount = 0
-
-            environment.subscribeToReads(for: .measurement) { key in
-                firstCallCount += 1
-            }
-
-            environment.subscribeToReads(for: .measurement) { key in
-                secondCallCount += 1
-            }
-
-            environment[TestKey.self] = .right
-            _ = environment[TestKey.self]
-
-            XCTAssertEqual(firstCallCount, 0)
-            XCTAssertEqual(secondCallCount, 1)
+        environment.subscribeToReads { key in
+            reads2.append(key)
         }
 
-        // .layout `LayoutPass` allows multiple `onDidRead`s
-        do {
-            var environment = Environment.empty
+        environment[TestKey.self] = .right
 
-            var firstCallCount = 0
-            var secondCallCount = 0
+        _ = environment[TestKey.self]
 
-            environment.subscribeToReads(for: .layout) { key in
-                firstCallCount += 1
-            }
+        XCTAssertEqual(reads1.count, 1)
+        XCTAssertEqual(reads2.count, 1)
 
-            environment.subscribeToReads(for: .layout) { key in
-                secondCallCount += 1
-            }
-
-            environment[TestKey.self] = .right
-            _ = environment[TestKey.self]
-
-            XCTAssertEqual(firstCallCount, 1)
-            XCTAssertEqual(secondCallCount, 1)
-        }
-
-        // .measure subscription should not override .layout subscription
-        do {
-            var environment = Environment.empty
-
-            var firstCallCount = 0
-            var secondCallCount = 0
-
-            environment.subscribeToReads(for: .layout) { key in
-                firstCallCount += 1
-            }
-
-            environment.subscribeToReads(for: .measurement) { key in
-                secondCallCount += 1
-            }
-
-            environment[TestKey.self] = .right
-            _ = environment[TestKey.self]
-
-            XCTAssertEqual(firstCallCount, 1)
-            XCTAssertEqual(secondCallCount, 1)
-        }
+        XCTAssertEqual(Environment.StorageKey(TestKey.self), try XCTUnwrap(reads1.first))
+        XCTAssertEqual(Environment.StorageKey(TestKey.self), try XCTUnwrap(reads2.first))
     }
 
     func test_equality() {

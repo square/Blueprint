@@ -439,7 +439,9 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     }
 
     private func adapted(environment: Environment) -> Environment {
+        var environment = environment
         adapter(&environment)
+        return environment
     }
 }
 

@@ -29,7 +29,6 @@ extension Element {
             delegate: nil,
             identifier: .identifierFor(singleChild: self),
             element: self,
-            depth: 0,
             signpostRef: NSObject(),
             name: "Testing"
         )
@@ -64,7 +63,6 @@ extension ElementContent {
             delegate: nil,
             identifier: .identifierFor(singleChild: element),
             element: element,
-            depth: 0,
             signpostRef: NSObject(),
             name: "Testing"
         )
