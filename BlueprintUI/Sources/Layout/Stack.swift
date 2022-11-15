@@ -379,7 +379,7 @@ extension StackLayout {
         // During layout the constraints are always `.exactly` to fit the provided size
         let vectorConstraint = size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: items, in: vectorConstraint)
+        let frames = _frames(for: items.map(LayoutItem.init), in: vectorConstraint)
 
         return frames.map { frame in
             LayoutAttributes(frame: frame.rect(axis: axis))
@@ -392,7 +392,7 @@ extension StackLayout {
         // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
         let vectorConstraint = constraint.vectorConstraint(on: axis)
 
-        let frames = _frames(for: items, in: vectorConstraint)
+        let frames = _frames(for: items.map(LayoutItem.init), in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -405,7 +405,7 @@ extension StackLayout {
     }
 
     private func _frames(
-        for items: [(traits: Traits, content: Measurable)],
+        for items: [LayoutItem],
         in vectorConstraint: VectorConstraint
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
@@ -446,7 +446,7 @@ extension StackLayout {
     ///   - in: The constraint for all measurements.
     /// - Returns: The axis measurements as segments.
     private func _axisSegments(
-        for items: [(traits: Traits, content: Measurable)],
+        for items: [LayoutItem],
         in vectorConstraint: VectorConstraint
     ) -> [Segment] {
 
@@ -457,7 +457,7 @@ extension StackLayout {
 
             final class Measurement {
 
-                let item: (traits: Traits, content: Measurable)
+                let item: LayoutItem
                 var size: CGSize?
 
                 let isFixed: Bool
@@ -466,7 +466,7 @@ extension StackLayout {
                     isFixed == false
                 }
 
-                init(item: (traits: StackLayout.Traits, content: Measurable)) {
+                init(item: LayoutItem) {
                     self.item = item
                     size = nil
 
@@ -483,9 +483,7 @@ extension StackLayout {
             measurements.forEach { measurement in
                 guard measurement.isFixed else { return }
 
-                measurement.size = measurement
-                    .item
-                    .content
+                measurement.size = measurement.item
                     .measure(in: constraint)
             }
 
@@ -515,7 +513,6 @@ extension StackLayout {
 
                     measurement.size = measurement
                         .item
-                        .content
                         .measure(in: flexibleConstraint)
                 }
             } else {
@@ -756,7 +753,7 @@ extension StackLayout {
     ///   - crossConstraint: The cross component of the constraint for all measurements.
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
-        for items: [(traits: Traits, content: Measurable)],
+        for items: [LayoutItem],
         axisConstraints: [CGFloat],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
@@ -768,7 +765,7 @@ extension StackLayout {
                     cross: crossConstraint
                 )
                 let constraint = vector.constraint(axis: axis)
-                let measuredSize = item.content.measure(in: constraint)
+                let measuredSize = item.measure(in: constraint)
 
                 return measuredSize.cross(on: axis)
             }
@@ -878,14 +875,8 @@ extension StackLayout {
         guard subviews.isEmpty == false else { return .zero }
 
         let constraint = proposal.vectorConstraint(on: axis)
-
-        let items: [(Traits, Measurable)] = subviews.map { subview in
-            let traits = subview.stackLayoutTraits
-            let measurable = Measurer { constraint in
-                subview.sizeThatFits(constraint)
-            }
-            return (traits, measurable)
-        }
+        
+        let items = subviews.map(LayoutItem.init)
 
         let frames = _frames(for: items, in: constraint)
 
@@ -902,24 +893,16 @@ extension StackLayout {
     public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
-
-        var proposals: [SizeConstraint] = Array(repeating: .unconstrained, count: subviews.count)
-
-        let items: [(Traits, Measurable)] = zip(subviews, subviews.indices).map { subview, index in
-            let traits = subview.stackLayoutTraits
-            let measurable = Measurer { constraint in
-                proposals[index] = constraint
-                return subview.sizeThatFits(constraint)
-            }
-            return (traits, measurable)
-        }
+        
+        let items = subviews.map(LayoutItem.init)
 
         let frames = _frames(for: items, in: constraint)
 
         for i in subviews.indices {
             let vectorFrame = frames[i]
             let subview = subviews[i]
-            let proposal = proposals[i]
+            // TODO: Is this fallback right?
+            let proposal = items[i].constraint ?? proposal
 
             var width: CGFloat?
             var height: CGFloat?
@@ -945,6 +928,29 @@ extension StackLayout {
                 width: width,
                 height: height
             )
+        }
+    }
+    
+    class LayoutItem {
+        var traits: Traits
+        
+        private var sizeThatFits: (SizeConstraint) -> CGSize
+        
+        var constraint: SizeConstraint?
+        
+        init(_ tuple: (Traits, Measurable)) {
+            traits = tuple.0
+            sizeThatFits = tuple.1.measure(in:)
+        }
+        
+        init(subview: LayoutSubview) {
+            traits = subview.stackLayoutTraits
+            sizeThatFits = subview.sizeThatFits(_:)
+        }
+        
+        func measure(in constraint: SizeConstraint) -> CGSize {
+            self.constraint = constraint
+            return sizeThatFits(constraint)
         }
     }
 }
