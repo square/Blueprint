@@ -141,8 +141,10 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    public init(child: Element) {
-        self = ElementContent(child: child, layout: PassthroughLayout())
+    public init(
+        child: Element
+    ) {
+        storage = SingleChildStorage(element: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -375,6 +377,56 @@ extension ElementContent {
     }
 }
 
+/// Storage used to store "layout neutral" elements, where they will only have one child,
+/// and the measurement of the element is the same as the child.
+private struct SingleChildStorage: ContentStorage {
+
+    let childCount: Int = 1
+
+    var element: Element
+
+    func measure(
+        in constraint: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+
+        let identifier = ElementIdentifier.identifierFor(singleChild: element)
+
+        let child = state.childState(for: element, in: environment, with: identifier)
+
+        return child.elementContent.measure(in: constraint, with: environment, state: child)
+    }
+
+    func performLayout(
+        in size: CGSize,
+        with environment: Environment,
+        state: ElementState
+    ) -> [LayoutResultNode] {
+        state.layout(in: size, with: environment) { environment in
+            let childAttributes = LayoutAttributes(size: size)
+
+            let identifier = ElementIdentifier.identifierFor(singleChild: element)
+
+            let childState = state.childState(for: element, in: environment, with: identifier)
+
+            let node = LayoutResultNode(
+                identifier: identifier,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                element: childState.element,
+                children: childState.elementContent.performLayout(
+                    in: size,
+                    with: environment,
+                    state: childState
+                )
+            )
+
+            return [node]
+        }
+    }
+}
+
 
 /// A type used to delay element creation until the `Environment` is available,
 /// used by the `AdaptedEnvironment` element.
@@ -570,18 +622,6 @@ fileprivate struct SingleChildLayoutHost: Layout {
     }
 }
 
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-
-}
 
 // Used for empty elements with an intrinsic size
 fileprivate struct MeasurableLayout: Layout {
@@ -598,6 +638,7 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 }
+
 
 struct Measurer: Measurable {
 
