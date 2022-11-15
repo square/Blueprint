@@ -379,7 +379,7 @@ extension StackLayout {
         // During layout the constraints are always `.exactly` to fit the provided size
         let vectorConstraint = size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: items.map(MeasurableLayoutItem.init), in: vectorConstraint)
+        let frames = _frames(for: items.map(StackLayoutItem.init), in: vectorConstraint)
 
         return frames.map { frame in
             LayoutAttributes(frame: frame.rect(axis: axis))
@@ -392,7 +392,7 @@ extension StackLayout {
         // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
         let vectorConstraint = constraint.vectorConstraint(on: axis)
 
-        let frames = _frames(for: items.map(MeasurableLayoutItem.init), in: vectorConstraint)
+        let frames = _frames(for: items.map(StackLayoutItem.init), in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -891,7 +891,7 @@ extension StackLayout {
 
         let constraint = proposal.vectorConstraint(on: axis)
 
-        let frames = _frames(for: subviews, in: constraint)
+        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -907,7 +907,7 @@ extension StackLayout {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: subviews, in: constraint)
+        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
 
         for i in subviews.indices {
             let vectorFrame = frames[i]
@@ -940,36 +940,24 @@ extension StackLayout {
         }
     }
     
-    private struct MeasurableLayoutItem: StackLayoutItem {
+    private struct StackLayoutItem {
         
         let traits: Traits
-        let measurable: Measurable
+        private let measure: (SizeConstraint) -> CGSize
         
         init(_ tuple: (Traits, Measurable)) {
             traits = tuple.0
-            measurable = tuple.1
+            measure = tuple.1.measure(in:)
+        }
+        
+        init(_ subview: LayoutSubview) {
+            traits = subview.stackLayoutTraits
+            measure = subview.sizeThatFits(_:)
         }
         
         func measure(in constraint: SizeConstraint) -> CGSize {
-            measurable.measure(in: constraint)
+            measure(constraint)
         }
-    }
-}
-
-
-private protocol StackLayoutItem {
-    
-    var traits: StackLayout.Traits { get }
-    func measure(in constraint: SizeConstraint) -> CGSize
-}
-
-
-extension LayoutSubview: StackLayoutItem {
-    
-    var traits: StackLayout.Traits { stackLayoutTraits }
-    
-    func measure(in constraint: SizeConstraint) -> CGSize {
-        sizeThatFits(constraint)
     }
 }
 
