@@ -2,7 +2,7 @@ import BlueprintUI
 import Foundation
 import UIKit
 
-public struct AttributedLabel: Element, Hashable {
+public struct AttributedLabel: ComparableElement, Hashable {
 
     /// The attributed text to render in the label.
     ///
