@@ -46,6 +46,8 @@ final class ElementStateTree {
     }
 
     /// Updates or replaces the root node depending on the type of the new element.
+    ///
+    /// This method will also remove any `ElementState` for elements no longer present in the element tree.
     func update(with element: Element, in environment: Environment) -> ElementState {
 
         func makeRoot(with element: Element) -> ElementState {
@@ -64,32 +66,39 @@ final class ElementStateTree {
         }
 
         if let root = self.root {
+
             if type(of: root.element.latest) == type(of: element) {
-                /// The type of the new element is the same, update inline.
+
+                root.prepareForLayout()
+
                 root.update(with: element, in: environment, identifier: root.identifier)
 
                 delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
 
+                root.finishedLayout()
+
                 return root
             } else {
-                /// The type of the root element changed, replace it.
                 let new = makeRoot(with: element)
 
                 delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
                 }
 
+                root.finishedLayout()
+
                 return new
             }
         } else {
-            /// Transition from no root element, to root element.
             let new = makeRoot(with: element)
 
             delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
             }
+
+            new.finishedLayout()
 
             return new
         }
@@ -533,7 +542,7 @@ final class ElementState {
 
     /// To be called at the beginning of the layout cycle by the owner
     /// of the `ElementStateTree`, to set up the tree for a traversal.
-    func prepareForLayout() {
+    fileprivate func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
             $0.orderedChildren.removeAll(keepingCapacity: true)
@@ -543,7 +552,7 @@ final class ElementState {
     /// To be called at the end of the layout cycle by the owner
     /// of the `ElementStateTree`, to tear down any old state,
     /// or throw out caches which should not be maintained across layout cycles.
-    func finishedLayout() {
+    fileprivate func finishedLayout() {
         recursiveRemoveOldChildren()
         recursiveClearCaches()
     }

@@ -27,9 +27,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Initial update should create a state.
 
-        tree.testingUpdate {
-            tree.update(with: element1, in: .empty)
-        }
+        _ = tree.update(with: element1, in: .empty)
 
         let state1 = try XCTUnwrap(tree.root)
 
@@ -38,9 +36,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Updating with the same element of the same type should keep the same state.
 
-        tree.testingUpdate {
-            tree.update(with: element1b, in: .empty)
-        }
+        _ = tree.update(with: element1b, in: .empty)
 
         let state2 = try XCTUnwrap(tree.root)
 
@@ -54,9 +50,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Updating with a new type should tear down the state.
 
-        _ = tree.testingUpdate {
-            tree.update(with: element2, in: .empty)
-        }
+        _ = tree.update(with: element2, in: .empty)
 
         let state3 = try XCTUnwrap(tree.root)
 
@@ -65,9 +59,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Updating with nil should tear down the state.
 
-        _ = tree.testingUpdate {
-            tree.teardownRootElement()
-        }
+        _ = tree.teardownRootElement()
 
         XCTAssertNil(tree.root)
         XCTAssertEqual(1, delegate.didTeardownRootCalls.count)
@@ -121,7 +113,7 @@ class ElementStateTests: XCTestCase {
         XCTAssertEqual(0, delegate.didSetupRootCalls.count)
         XCTAssertEqual(0, delegate.didUpdateRootCalls.count)
 
-        tree.update(with: root, in: env)
+        _ = tree.update(with: root, in: env)
 
 
         let rootState = try XCTUnwrap(tree.root)
@@ -139,35 +131,6 @@ class ElementStateTests: XCTestCase {
         XCTAssertEqual(ObjectIdentifier(childState2.parent!), ObjectIdentifier(childState1))
     }
 
-    func test_prepareForLayout() throws {
-        let root = Element1(text: "root")
-        let child1 = Element1(text: "child1")
-        let child2 = Element1(text: "child2")
-
-        let tree = ElementStateTree(name: "test")
-        let env = Environment.empty
-
-        tree.update(with: root, in: env)
-
-        let rootState = try XCTUnwrap(tree.root)
-        let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
-        let childState2 = try XCTUnwrap(childState1.childState(for: child2, in: env, with: child2.identifier))
-
-        XCTAssertTrue(rootState.wasVisited)
-        XCTAssertTrue(childState1.wasVisited)
-        XCTAssertTrue(childState2.wasVisited)
-
-        rootState.prepareForLayout()
-
-        XCTAssertFalse(rootState.wasVisited)
-        XCTAssertFalse(childState1.wasVisited)
-        XCTAssertFalse(childState2.wasVisited)
-    }
-
-    func test_finishedLayout() {
-        // TODO:
-    }
-
     func test_recursiveForEach() throws {
         let root = Element1(text: "root")
         let child1 = Element1(text: "child1")
@@ -176,7 +139,7 @@ class ElementStateTests: XCTestCase {
         let tree = ElementStateTree(name: "test")
         let env = Environment.empty
 
-        tree.update(with: root, in: env)
+        _ = tree.update(with: root, in: env)
 
         let rootState = try XCTUnwrap(tree.root)
         let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
@@ -217,7 +180,7 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
             }
         }
 
-        tree.update(with: element, in: .empty)
+        _ = tree.update(with: element, in: .empty)
 
         XCTAssertEqual(
             tree.identifierTree,
@@ -379,23 +342,6 @@ fileprivate final class TestDelegate: ElementStateTreeDelegate {
     func treeDidPerformLayout(_ layout: [BlueprintUI.LayoutResultNode], for state: BlueprintUI.ElementState) {}
 
     func treeDidPerformCachedLayout(_ layout: BlueprintUI.ElementState.CachedLayout, for state: BlueprintUI.ElementState) {}
-}
-
-
-extension ElementStateTree {
-
-    func testingUpdate<Output>(_ block: () -> Output) -> Output {
-
-        root?.prepareForLayout()
-
-        let output = block()
-
-        defer {
-            self.root?.finishedLayout()
-        }
-
-        return output
-    }
 }
 
 
