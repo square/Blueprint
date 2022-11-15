@@ -3,8 +3,6 @@ import QuartzCore
 
 extension Element {
 
-    // TODO: Basically the method, collapse them
-
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///

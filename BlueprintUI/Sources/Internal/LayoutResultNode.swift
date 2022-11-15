@@ -3,15 +3,18 @@ import UIKit
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
 
-    /// The element that was laid out
-    // TODO: remove either this or `state` below.
+    /// The element that was laid out. This is a reference to a
+    /// `LatestElement` box, so that even in cached `LayoutResultNode` values,
+    /// we will recieve the latest element from the layout pass.
     var element: ElementState.LatestElement
 
+    /// The identifier for the element within its parent.
     var identifier: ElementIdentifier
 
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
+    /// The environment for the element.
     var environment: Environment
 
     /// The element's children.
