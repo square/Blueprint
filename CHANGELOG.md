@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `AccessibilityElement.CustomAction` to allow custom actions for use by assistive technologies. 
 - `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.  
 
 ### Removed

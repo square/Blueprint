@@ -3,6 +3,24 @@ import UIKit
 
 public struct AccessibilityElement: Element {
 
+    /// Used to provide additional functionality to assistive technologies beyond your accessible UI.
+    public struct CustomAction {
+        public typealias OnActivation = () -> Bool
+
+        /// A localized name that discribes the action.
+        public var name: String
+        /// An image representing the action to be shown with some assistive technologies such as Switch Control.
+        public var image: UIImage?
+        /// A Callback for when the action is activated. This should return a `bool` indicating success or failure of the action.
+        public var onActivation: OnActivation
+
+        public init(name: String, image: UIImage? = nil, onActivation: @escaping OnActivation) {
+            self.name = name
+            self.image = image
+            self.onActivation = onActivation
+        }
+    }
+
     public enum Trait {
         /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
         /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
@@ -45,6 +63,9 @@ public struct AccessibilityElement: Element {
     /// See [Accessibility Activate Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615165-accessibilityactivate) for further information.
     public var accessibilityActivate: (() -> Bool)? = nil
 
+    /// The array contains one or more `Custom Action`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
+    public var customActions: [CustomAction]? = nil
+
     public init(
         label: String?,
         value: String?,
@@ -53,6 +74,7 @@ public struct AccessibilityElement: Element {
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: Box.CornerStyle = .square,
+        customActions: [AccessibilityElement.CustomAction]? = nil,
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
@@ -63,6 +85,7 @@ public struct AccessibilityElement: Element {
         self.identifier = identifier
         self.accessibilityFrameSize = accessibilityFrameSize
         self.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
+        self.customActions = customActions
         wrappedElement = element
         configure(&self)
     }
@@ -86,6 +109,10 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityFrameSize] = accessibilityFrameSize
             config[\.accessibilityFrameCornerStyle] = accessibilityFrameCornerStyle
             config[\.activate] = accessibilityActivate
+            config[\.accessibilityCustomActions] = customActions?.map { action in
+                UIAccessibilityCustomAction(name: action.name, image: action.image) { _ in action.onActivation() }
+            }
+
 
             if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
                case let .adjustable(incrementAction, decrementAction) = adjustable
@@ -217,7 +244,8 @@ extension Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
-        accessibilityFrameCornerStyle: Box.CornerStyle = .square
+        accessibilityFrameCornerStyle: Box.CornerStyle = .square,
+        customActions: [AccessibilityElement.CustomAction]? = nil
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
@@ -227,6 +255,7 @@ extension Element {
             identifier: identifier,
             accessibilityFrameSize: accessibilityFrameSize,
             accessibilityFrameCornerStyle: accessibilityFrameCornerStyle,
+            customActions: customActions,
             wrapping: self
         )
     }
