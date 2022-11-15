@@ -379,7 +379,7 @@ extension StackLayout {
         // During layout the constraints are always `.exactly` to fit the provided size
         let vectorConstraint = size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: items.map(LayoutItem.init), in: vectorConstraint)
+        let frames = _frames(for: items.map(MeasurableLayoutItem.init), in: vectorConstraint)
 
         return frames.map { frame in
             LayoutAttributes(frame: frame.rect(axis: axis))
@@ -392,7 +392,7 @@ extension StackLayout {
         // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
         let vectorConstraint = constraint.vectorConstraint(on: axis)
 
-        let frames = _frames(for: items.map(LayoutItem.init), in: vectorConstraint)
+        let frames = _frames(for: items.map(MeasurableLayoutItem.init), in: vectorConstraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -405,21 +405,32 @@ extension StackLayout {
     }
 
     private func _frames(
-        for items: [LayoutItem],
+        for items: [StackLayoutItem],
         in vectorConstraint: VectorConstraint
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
         let axisSegments = _axisSegments(for: items, in: vectorConstraint)
+        
+        let axisConstraints = axisSegments.map { $0.magnitude }
 
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
             for: items,
-            axisConstraints: axisSegments.map { $0.magnitude },
+            axisConstraints: axisConstraints,
             crossConstraint: vectorConstraint.cross
         )
 
         // Finally, merge axis and cross segments into frames.
-        return zip(axisSegments, crossSegments).map(VectorFrame.init(axis:cross:))
+        return zip(axisSegments, crossSegments).map { axis, cross in
+            VectorFrame(
+                axis: axis,
+                cross: cross,
+                constraint: VectorConstraint(
+                    axis: .atMost(axis.magnitude),
+                    cross: vectorConstraint.cross
+                ).constraint(axis: self.axis)
+            )
+        }
     }
 
     /// Measures the given items under the given constraint, and returns their
@@ -446,7 +457,7 @@ extension StackLayout {
     ///   - in: The constraint for all measurements.
     /// - Returns: The axis measurements as segments.
     private func _axisSegments(
-        for items: [LayoutItem],
+        for items: [StackLayoutItem],
         in vectorConstraint: VectorConstraint
     ) -> [Segment] {
 
@@ -457,7 +468,7 @@ extension StackLayout {
 
             final class Measurement {
 
-                let item: LayoutItem
+                let item: StackLayoutItem
                 var size: CGSize?
 
                 let isFixed: Bool
@@ -466,7 +477,7 @@ extension StackLayout {
                     isFixed == false
                 }
 
-                init(item: LayoutItem) {
+                init(item: StackLayoutItem) {
                     self.item = item
                     size = nil
 
@@ -753,7 +764,7 @@ extension StackLayout {
     ///   - crossConstraint: The cross component of the constraint for all measurements.
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
-        for items: [LayoutItem],
+        for items: [StackLayoutItem],
         axisConstraints: [CGFloat],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
@@ -788,7 +799,11 @@ extension StackLayout {
 
             // Form segments that fill the available space
             let segments = Array(
-                repeating: Segment(origin: 0, magnitude: availableCross, measured: false),
+                repeating: Segment(
+                    origin: 0,
+                    magnitude: availableCross,
+                    measured: false
+                ),
                 count: items.count
             )
 
@@ -875,10 +890,8 @@ extension StackLayout {
         guard subviews.isEmpty == false else { return .zero }
 
         let constraint = proposal.vectorConstraint(on: axis)
-        
-        let items = subviews.map(LayoutItem.init)
 
-        let frames = _frames(for: items, in: constraint)
+        let frames = _frames(for: subviews, in: constraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -893,16 +906,12 @@ extension StackLayout {
     public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
-        
-        let items = subviews.map(LayoutItem.init)
 
-        let frames = _frames(for: items, in: constraint)
+        let frames = _frames(for: subviews, in: constraint)
 
         for i in subviews.indices {
             let vectorFrame = frames[i]
             let subview = subviews[i]
-            // TODO: Is this fallback right?
-            let proposal = items[i].constraint ?? proposal
 
             var width: CGFloat?
             var height: CGFloat?
@@ -924,34 +933,43 @@ extension StackLayout {
             subview.place(
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
-                proposal: proposal,
+                proposal: vectorFrame.constraint,
                 width: width,
                 height: height
             )
         }
     }
     
-    class LayoutItem {
-        var traits: Traits
+    private struct MeasurableLayoutItem: StackLayoutItem {
         
-        private var sizeThatFits: (SizeConstraint) -> CGSize
-        
-        var constraint: SizeConstraint?
+        let traits: Traits
+        let measurable: Measurable
         
         init(_ tuple: (Traits, Measurable)) {
             traits = tuple.0
-            sizeThatFits = tuple.1.measure(in:)
-        }
-        
-        init(subview: LayoutSubview) {
-            traits = subview.stackLayoutTraits
-            sizeThatFits = subview.sizeThatFits(_:)
+            measurable = tuple.1
         }
         
         func measure(in constraint: SizeConstraint) -> CGSize {
-            self.constraint = constraint
-            return sizeThatFits(constraint)
+            measurable.measure(in: constraint)
         }
+    }
+}
+
+
+private protocol StackLayoutItem {
+    
+    var traits: StackLayout.Traits { get }
+    func measure(in constraint: SizeConstraint) -> CGSize
+}
+
+
+extension LayoutSubview: StackLayoutItem {
+    
+    var traits: StackLayout.Traits { stackLayoutTraits }
+    
+    func measure(in constraint: SizeConstraint) -> CGSize {
+        sizeThatFits(constraint)
     }
 }
 
@@ -1028,12 +1046,14 @@ extension StackLayout {
         var size: Vector
         var axisMeasured: Bool
         var crossMeasured: Bool
+        var constraint: SizeConstraint
 
-        init(axis: Segment, cross: Segment) {
+        init(axis: Segment, cross: Segment, constraint: SizeConstraint) {
             origin = Vector(axis: axis.origin, cross: cross.origin)
             size = Vector(axis: axis.magnitude, cross: cross.magnitude)
             axisMeasured = axis.measured
             crossMeasured = cross.measured
+            self.constraint = constraint
         }
 
         func rect(axis: StackLayout.Axis) -> CGRect {
