@@ -18,12 +18,6 @@ jobs:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
       matrix:
         include:
-          - sdk: "12.4"
-            destination: platform=iOS Simulator,OS=12.4,name=iPhone 7
-
-          - sdk: "13.5"
-            destination: platform=iOS Simulator,OS=13.5,name=iPhone 8
-
           - sdk: "14.5"
             destination: platform=iOS Simulator,OS=14.5,name=iPhone 8
 
