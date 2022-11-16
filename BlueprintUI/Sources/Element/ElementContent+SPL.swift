@@ -13,17 +13,19 @@ extension ElementContent.Builder {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         
-        let subviews = children.indexedMap { index, child in
-            LayoutSubview(
-                element: child.element,
-                content: child.content,
-                measureContext: .init(
-                    cache: context.cache.subcache(key: index),
-                    environment: context.environment
-                ),
-                traits: child.traits,
-                layoutType: LayoutType.self
-            )
+        let subviews = context.cache.layoutSubviews {
+            children.indexedMap { index, child in
+                LayoutSubview(
+                    element: child.element,
+                    content: child.content,
+                    measureContext: .init(
+                        cache: context.cache.subcache(key: index),
+                        environment: context.environment
+                    ),
+                    traits: child.traits,
+                    layoutType: LayoutType.self
+                )
+            }
         }
         return layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
@@ -31,17 +33,19 @@ extension ElementContent.Builder {
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         guard children.isEmpty == false else { return [] }
 
-        let subviews = children.indexedMap { index, child in
-            LayoutSubview(
-                element: child.element,
-                content: child.content,
-                measureContext: .init(
-                    cache: context.cache.subcache(key: index),
-                    environment: context.environment
-                ),
-                traits: child.traits,
-                layoutType: LayoutType.self
-            )
+        let subviews = context.cache.layoutSubviews {
+            children.indexedMap { index, child in
+                LayoutSubview(
+                    element: child.element,
+                    content: child.content,
+                    measureContext: .init(
+                        cache: context.cache.subcache(key: index),
+                        environment: context.environment
+                    ),
+                    traits: child.traits,
+                    layoutType: LayoutType.self
+                )
+            }
         }
 
         let attributes = context.attributes

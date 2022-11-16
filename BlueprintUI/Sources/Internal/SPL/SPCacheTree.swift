@@ -29,6 +29,18 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         subcaches[key] = subcache
         return subcache
     }
+    
+    var layoutSubviews: [LayoutSubview]?
+    
+    // TODO: generalize hanging anything off this cache
+    func layoutSubviews(create: () -> [LayoutSubview]) -> [LayoutSubview] {
+        if let layoutSubviews = layoutSubviews {
+            return layoutSubviews
+        }
+        let layoutSubviews = create()
+        self.layoutSubviews = layoutSubviews
+        return layoutSubviews
+    }
 }
 
 
