@@ -132,10 +132,10 @@ extension ElementContent {
     /// - parameter element: The single child element.
     /// - parameter key: The key to use to unique the element during updates.
     /// - parameter layout: The layout that will be used.
-    public init(
+    public init<LayoutType: SingleChildLayout>(
         child: Element,
         key: AnyHashable? = nil,
-        layout: SingleChildLayout
+        layout: LayoutType
     ) {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
@@ -608,11 +608,13 @@ private struct MeasurableStorage: ContentStorage {
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
-fileprivate struct SingleChildLayoutHost: Layout {
+fileprivate struct SingleChildLayoutHost<LayoutType: SingleChildLayout>: Layout {
 
-    private var wrapped: SingleChildLayout
+    typealias Cache = LayoutType.Cache
 
-    init(wrapping layout: SingleChildLayout) {
+    private var wrapped: LayoutType
+
+    init(wrapping layout: LayoutType) {
         wrapped = layout
     }
 
@@ -628,14 +630,19 @@ fileprivate struct SingleChildLayoutHost: Layout {
         ]
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) -> CGSize {
         precondition(subviews.count == 1)
-        return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0])
+
+        return wrapped.sizeThatFits(proposal: proposal, subview: subviews[0], cache: &cache)
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
+    func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) {
         precondition(subviews.count == 1)
-        return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
+        return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0], cache: &cache)
+    }
+
+    func makeCache(subviews: Subviews) -> LayoutType.Cache {
+        wrapped.makeCache(subview: subviews[0])
     }
 }
 

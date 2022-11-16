@@ -12,7 +12,7 @@ extension ElementContent: Sizable {
 extension ElementContent.Builder {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        
+
         let subviews = context.cache.layoutSubviews {
             children.indexedMap { index, child in
                 LayoutSubview(
@@ -27,7 +27,15 @@ extension ElementContent.Builder {
                 )
             }
         }
-        return layout.sizeThatFits(proposal: proposal, subviews: subviews)
+
+        // TODO: reuse cache
+        var phaseCache = context.cache.phaseCache(create: { layout.makeCache(subviews: subviews) })
+
+        let size = layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &phaseCache)
+
+        context.cache.set(phaseCache: phaseCache)
+
+        return size
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -51,11 +59,17 @@ extension ElementContent.Builder {
         let attributes = context.attributes
         let frame = context.attributes.frame
 
+        // TODO: reuse cache
+        var phaseCache = context.cache.phaseCache(create: { layout.makeCache(subviews: subviews) })
+
         layout.placeSubviews(
             in: frame,
             proposal: proposal,
-            subviews: subviews
+            subviews: subviews,
+            cache: &phaseCache
         )
+
+        context.cache.set(phaseCache: phaseCache)
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 

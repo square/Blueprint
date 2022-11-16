@@ -130,7 +130,7 @@ extension GridRow {
             }
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) -> CGSize {
             guard subviews.count > 0 else {
                 return .zero
             }
@@ -147,7 +147,7 @@ extension GridRow {
             return size
         }
 
-        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
             guard subviews.count > 0 else {
                 return
             }

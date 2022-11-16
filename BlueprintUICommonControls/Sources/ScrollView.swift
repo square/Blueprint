@@ -190,7 +190,7 @@ extension ScrollView {
             }
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview, cache: inout Cache) -> CGSize {
             let adjustedProposal = proposal.inset(by: contentInset)
 
             var result = fittedSize(in: adjustedProposal, subview: subview)
@@ -204,7 +204,7 @@ extension ScrollView {
             return result
         }
 
-        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
+        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview, cache: inout ()) {
             let size = bounds.size
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right

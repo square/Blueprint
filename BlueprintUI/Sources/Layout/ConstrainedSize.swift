@@ -188,7 +188,7 @@ extension ConstrainedSize {
             LayoutAttributes(size: size)
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview, cache: inout Cache) -> CGSize {
             if case let .absolute(width) = width, case let .absolute(height) = height {
                 return CGSize(width: width, height: height)
             }
@@ -206,7 +206,7 @@ extension ConstrainedSize {
             )
         }
 
-        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
+        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview, cache: inout ()) {
             subview.place(at: bounds)
         }
     }

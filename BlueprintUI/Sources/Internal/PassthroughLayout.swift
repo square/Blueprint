@@ -11,11 +11,11 @@ struct PassthroughLayout: SingleChildLayout {
         LayoutAttributes(size: size)
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
+    func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview, cache: inout Cache) -> CGSize {
         subview.sizeThatFits(proposal)
     }
 
-    func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
+    func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview, cache: inout ()) {
         subview.place(at: bounds)
     }
 }
