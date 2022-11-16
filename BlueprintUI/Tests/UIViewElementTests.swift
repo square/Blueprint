@@ -112,6 +112,60 @@ class UIViewElementTests: XCTestCase {
         // Should have updated the view once for measurement.
         XCTAssertEqual(TestElement.updateUIView_isMeasuring_count, 1)
     }
+
+    func test_environment() {
+        enum TestKey: EnvironmentKey {
+            static var defaultValue: Void { () }
+        }
+
+        @propertyWrapper
+        final class Box<Value> {
+            var wrappedValue: Value
+
+            init(wrappedValue: Value) {
+                self.wrappedValue = wrappedValue
+            }
+        }
+
+        struct TestElement: UIViewElement {
+            @Box var environment: Environment?
+
+            func makeUIView() -> TestView {
+                TestView()
+            }
+
+            func updateUIView(_ view: TestView, with context: UIViewElementContext) {
+                environment = context.environment
+            }
+        }
+
+        var env = Environment.empty
+        env[TestKey.self] = ()
+
+        do {
+            // Environment is passed during measurement.
+            let element = TestElement()
+            _ = element.content.measure(
+                in: .unconstrained,
+                environment: env
+            )
+            XCTAssertNotNil(element.environment?[TestKey.self])
+        }
+
+        do {
+            // Enviroment is passed during apply.
+            let element = TestElement()
+            let description = element.backingViewDescription(
+                with: .init(
+                    bounds: .zero,
+                    subtreeExtent: nil,
+                    environment: env
+                )
+            )
+            description?.apply(to: element.makeUIView())
+            XCTAssertNotNil(element.environment?[TestKey.self])
+        }
+    }
 }
 
 fileprivate final class TestView: UIView {

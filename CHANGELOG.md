@@ -11,11 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `accessibilityHint` property for `Label` and `AttributedLabel`.
+- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.  
 
 ### Removed
 
 ### Changed
+
+- Updated minimum deployment target from iOS 12 to iOS 14.
 
 ### Deprecated
 
@@ -26,6 +28,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.47.0]
+
+### Added
+
+- `accessibilityHint` property for `Label` and `AttributedLabel`.
 
 ## [0.46.0]
 
@@ -903,7 +911,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.46.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.47.0...HEAD
+[0.47.0]: https://github.com/square/Blueprint/compare/0.46.0...0.47.0
 [0.46.0]: https://github.com/square/Blueprint/compare/0.45.1...0.46.0
 [0.45.1]: https://github.com/square/Blueprint/compare/0.45.0...0.45.1
 [0.45.0]: https://github.com/square/Blueprint/compare/0.44.1...0.45.0
