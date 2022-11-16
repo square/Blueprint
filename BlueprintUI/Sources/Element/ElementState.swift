@@ -65,7 +65,8 @@ final class ElementStateTree {
             return new
         }
 
-        if let root = self.root {
+        if let root = root {
+
             if type(of: root.element.latest) == type(of: element) {
 
                 root.prepareForLayout()
@@ -163,7 +164,7 @@ final class ElementState {
     /// we can preserve multiple layouts if the containing element or containing
     /// view's size changes, eg when rotating from portait to landscape.
     private var layouts: [CGSize: CachedLayout] = [:]
-    
+
     /// The kind of cache we're storing in the state. This is only used for debugging
     /// purposes to differentiate between regular state and state that is only used for
     /// measurement caching
@@ -231,14 +232,14 @@ final class ElementState {
             }
         }
     }
-    
+
     /// The kind of cache to be stored in this `ElementState`
     enum Kind {
-        
+
         /// Only measurement information is available to cache
         /// in this state
         case measurementOnly
-        
+
         /// All cachable information is stored in this state
         case regular
     }

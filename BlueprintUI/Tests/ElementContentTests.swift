@@ -99,15 +99,15 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(callCount, 2)
     }
-    
+
     func test_measurementOnlyChild() {
         let element = SingleChildElement(child: MeasurableElement())
         let content = ElementContent(byMeasuring: element)
-        
+
         let size = content.measure(in: SizeConstraint(width: .atMost(20.0), height: .atMost(20.0)))
         XCTAssertEqual(size.width, 20.0)
         XCTAssertEqual(size.height, 20.0)
-        
+
         let layouts = content.performLayout(
             in: size,
             with: .empty,
@@ -243,11 +243,11 @@ private struct MeasureCountingSpacer: Element {
 
 private struct SingleChildElement: Element {
     let child: Element
-    
+
     var content: ElementContent {
         .init(child: child)
     }
-    
+
     func backingViewDescription(with context: BlueprintUI.ViewDescriptionContext) -> BlueprintUI.ViewDescription? {
         nil
     }
