@@ -57,7 +57,8 @@ final class ElementStateTree {
                 identifier: .identifierFor(singleChild: element),
                 element: element,
                 signpostRef: signpostRef,
-                name: name
+                name: name,
+                kind: .regular
             )
 
             root = new
@@ -252,7 +253,7 @@ final class ElementState {
         element: Element,
         signpostRef: AnyObject,
         name: String,
-        kind: Kind = .regular
+        kind: Kind
     ) {
         self.parent = parent
         self.delegate = delegate

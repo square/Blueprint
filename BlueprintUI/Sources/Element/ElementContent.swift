@@ -102,7 +102,7 @@ extension ElementContent {
         storage = MeasureNestedElementStorage(element: element)
     }
 
-    struct MeasureNestedElementStorage: ContentStorage {
+    private struct MeasureNestedElementStorage: ContentStorage {
 
         let element: Element
 

@@ -117,7 +117,8 @@ class ElementContentTests: XCTestCase {
                 identifier: .identifier(for: element, key: nil, count: 0),
                 element: element,
                 signpostRef: NSObject(),
-                name: ""
+                name: "",
+                kind: .regular
             )
         )
         XCTAssertTrue(layouts.isEmpty)
