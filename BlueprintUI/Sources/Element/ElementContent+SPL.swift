@@ -12,7 +12,8 @@ extension ElementContent: Sizable {
 extension ElementContent.Builder {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        let subviews = zip(children, children.indices).map { child, index in
+        
+        let subviews = children.indexedMap { index, child in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
@@ -30,7 +31,7 @@ extension ElementContent.Builder {
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         guard children.isEmpty == false else { return [] }
 
-        let subviews = zip(children, children.indices).map { child, index in
+        let subviews = children.indexedMap { index, child in
             LayoutSubview(
                 element: child.element,
                 content: child.content,
@@ -54,8 +55,7 @@ extension ElementContent.Builder {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        let identifiedNodes: [IdentifiedNode] = children.indices.map { index in
-            let child = children[index]
+        let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
             let subview = subviews[index]
 
             let placement = subview.placement

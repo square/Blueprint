@@ -909,7 +909,7 @@ extension StackLayout {
 
         let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
 
-        for i in subviews.indices {
+        for i in 0..<subviews.count {
             let vectorFrame = frames[i]
             let subview = subviews[i]
 
