@@ -44,9 +44,8 @@ final class ElementStateTree {
             let new = ElementState(
                 parent: nil,
                 delegate: delegate,
-                identifier: .init(elementType: type(of: element), key: nil, count: 1),
+                identifier: .identifier(for: element, key: nil, count: 1),
                 element: element,
-                depth: 0,
                 signpostRef: signpostRef,
                 name: name
             )
@@ -72,7 +71,7 @@ final class ElementStateTree {
                 $0.tree(self, didTeardownRootState: old!)
             }
         } else if let root = self.root, let element = element {
-            if type(of: root.element.value) == type(of: element) {
+            if type(of: root.element.latest) == type(of: element) {
                 /// The type of the new element is the same, update inline.
                 root.update(with: element, in: environment, identifier: root.identifier)
 
@@ -88,19 +87,6 @@ final class ElementStateTree {
                 }
             }
         }
-    }
-}
-
-
-/// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
-/// so that even when returning cached layouts, we can get to the latest version of the element
-/// that their originating `ElementState` represents.
-final class ElementSnapshot {
-
-    fileprivate(set) var value: Element
-
-    init(_ value: Element) {
-        self.value = value
     }
 }
 
@@ -121,9 +107,6 @@ final class ElementState {
     /// The identifier of the element. Eg, `Inset.1` or `Inset.1.Key`.
     let identifier: ElementIdentifier
 
-    /// The depth of the element within the element tree.
-    let depth: Int
-
     /// The signpost ref used when logging to `os_log`.
     let signpostRef: AnyObject
 
@@ -133,7 +116,7 @@ final class ElementState {
     /// The element represented by this object.
     /// This value is a reference type – the inner element value
     /// will change after updates.
-    let element: ElementSnapshot
+    let element: ElementState.LatestElement
 
     /// How and if the element should be compared during updates.
     let comparability: Comparability
@@ -142,10 +125,6 @@ final class ElementState {
     /// If `false`, the node will be torn down and garbage collected
     /// at the end of the layout cycle.
     private(set) var wasVisited: Bool
-
-    /// If the update during this layout cycle was equivalent.
-    /// Useful for debugging.
-    private(set) var wasUpdateEquivalent: Bool
 
     /// The cached measurements for the current node.
     /// Measurements are cached by a `SizeConstraint` key, meaning that
@@ -166,15 +145,49 @@ final class ElementState {
     private(set) var orderedChildren: [ElementState] = []
 
     /// Indicates the comparability behavior of the element.
+    /// See each case for details on behavior.
     enum Comparability: Equatable {
         /// The element is not comparable, and it is not the child of a comparable element.
+        ///
+        /// ### Measurement Pass
+        /// No measurements will be cached. Each render cycle will cause a new measurement pass.
+        ///
+        /// ### Layout Pass
+        /// No layouts will be cached. Each render cycle will cause a new layout pass.
         case notComparable
 
         /// The element is comparable itself; it conforms to `ComparableElement`.
+        ///
+        /// ### Measurement Pass
+        /// Measurements will be cached across render cycles if `isEquivalent` returns `true`,
+        /// and the `Environment` dependencies for the measurement are equivalent.
+        ///
+        /// ### Layout Pass
+        /// Layouts will be cached across render cycles if `isEquivalent` returns `true`,
+        /// and the `Environment` dependencies for the measurement are equivalent.
         case comparableElement
 
         /// The element is the child of a `ComparableElement`, meaning its comparability
-        /// is determined by the comparability of that parent element.
+        /// is determined by the comparability of that parent element. All direct and indirect
+        /// children of a `ComparableElement` are `.childOfComparableElement`,
+        /// meaning every element below `MyComparableElement` in the below example:
+        ///
+        /// ```
+        ///  MyComparableElement
+        ///    Inset
+        ///      Aligned
+        ///        ChildElement 📍 // You are here
+        /// ```
+        ///
+        /// ### Measurement Pass
+        /// Measurements will be cached across render cycles if `isEquivalent` for
+        /// the parent `ComparableElement` returns `true`, and
+        /// the `Environment` dependencies for the measurement are equivalent.
+        ///
+        /// ### Layout Pass
+        /// Layouts for this inner child element are not cached. Because layouts are a tree;
+        /// the parent `ComparableElement` will cache its layout tree. Our layout
+        /// function will not even be invoked as long as the parent remains `isEquivalent`.
         case childOfComparableElement
 
         /// If the element is either directly comparable, or the child of a `ComparableElement`.
@@ -193,14 +206,13 @@ final class ElementState {
         delegate: ElementStateTreeDelegate?,
         identifier: ElementIdentifier,
         element: Element,
-        depth: Int,
         signpostRef: AnyObject,
         name: String
     ) {
         self.parent = parent
         self.delegate = delegate
         self.identifier = identifier
-        self.element = ElementSnapshot(element)
+        self.element = .init(element)
 
         if element is AnyComparableElement {
             comparability = .comparableElement
@@ -217,12 +229,10 @@ final class ElementState {
             }
         }
 
-        self.depth = depth
         self.signpostRef = signpostRef
         self.name = name
 
         wasVisited = true
-        wasUpdateEquivalent = false
     }
 
     /// Assigned once per layout cycle, this value represents the
@@ -237,7 +247,7 @@ final class ElementState {
         if let cachedContent = cachedContent {
             return cachedContent
         } else {
-            let content = element.value.content
+            let content = element.latest.content
             cachedContent = content
 
             delegate.perform {
@@ -262,7 +272,7 @@ final class ElementState {
     ) {
         precondition(wasVisited == false)
         precondition(self.identifier == identifier)
-        precondition(type(of: newElement) == type(of: element.value))
+        precondition(type(of: newElement) == type(of: element.latest))
 
         let isEquivalent: Bool
 
@@ -271,12 +281,7 @@ final class ElementState {
             isEquivalent = false
 
         case .comparableElement:
-            isEquivalent = Self.elementsEquivalent(
-                element.value, newElement,
-                in: ComparableElementContext(
-                    environment: newEnvironment
-                )
-            )
+            isEquivalent = Self.elementsEquivalent(element.latest, newElement)
 
         case .childOfComparableElement:
             /// We're always, equivalent, because our parent
@@ -315,14 +320,11 @@ final class ElementState {
             }
         }
 
-        /// Update our `ElementSnapshot` to the element's new value.
+        /// Update our `LatestElement` to the element's new value.
         /// This will allow cached `LayoutResultNodes` to ensure they
         /// have access to the latest `backingViewDescription`.
 
-        element.value = newElement
-
-        /// If the update was equivalent. Used for debugging.
-        wasUpdateEquivalent = isEquivalent
+        element.latest = newElement
 
         delegate.perform {
             $0.treeDidUpdateState(self)
@@ -342,7 +344,7 @@ final class ElementState {
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
-        using measurer: (Environment) -> CGSize
+        using measurement: (Environment) -> CGSize
     ) -> CGSize {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
@@ -354,7 +356,10 @@ final class ElementState {
         }
 
         /// Perform the measurement and track the environment dependencies.
-        let (size, dependencies) = trackEnvironmentReads(for: .measurement, with: environment, in: measurer)
+        let (size, dependencies) = trackDependenciesIfNeeded(
+            in: environment,
+            during: measurement
+        )
 
         /// Save the measurement for next time.
 
@@ -390,6 +395,9 @@ final class ElementState {
 
         /// Layout is only invoked once per cycle. If we're not a `ComparableElement`,
         /// there's no point in caching this value, so just return the `layout` directly.
+        ///
+        /// We are **not** also applying this to `.childOfComparableElement` as well,
+        /// because that parent `ComparableElement` will perform the layout tree caching.
         guard comparability == .comparableElement else {
             let nodes = layout(environment)
 
@@ -399,6 +407,7 @@ final class ElementState {
 
             return nodes
         }
+
 
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
@@ -410,7 +419,11 @@ final class ElementState {
         }
 
         /// Perform the layout and track the environment dependencies.
-        let (nodes, dependencies) = trackEnvironmentReads(for: .layout, with: environment, in: layout)
+        ///
+        let (nodes, dependencies) = trackDependenciesIfNeeded(
+            in: environment,
+            during: layout
+        )
 
         /// Save the layout for next time.
 
@@ -435,31 +448,22 @@ final class ElementState {
     /// If there are no dependencies (`toTrack` did not read from the `Environment`), no subset is returned.
     ///
     /// Additionally, if the element is not comparable, no subset is returned or tracked.
-    private func trackEnvironmentReads<Output>(
-        for layoutPass: Environment.LayoutPass,
-        with environment: Environment,
-        in toTrack: (Environment) -> Output
+    private func trackDependenciesIfNeeded<Output>(
+        in environment: Environment,
+        during toTrack: (Environment) -> Output
     ) -> (Output, Environment.Subset?) {
 
-        switch layoutPass {
-        case .measurement:
-            if comparability.isComparable {
-                break
-            } else {
-                return (toTrack(environment), nil)
-            }
-        case .layout:
-            if comparability == .comparableElement {
-                break
-            } else {
-                return (toTrack(environment), nil)
-            }
+        /// We only need to append a read observer if we are a `comparableElement`.
+        /// If we're a `.childOfComparableElement`, the read subscription
+        /// from the upstream comparable element will still be applied.
+        guard comparability == .comparableElement else {
+            return (toTrack(environment), nil)
         }
 
         var environment = environment
         var observedKeys = Set<Environment.StorageKey>()
 
-        environment.subscribeToReads(for: layoutPass) { key in
+        environment.subscribeToReads { key in
             observedKeys.insert(key)
         }
 
@@ -484,9 +488,8 @@ final class ElementState {
             if existing.wasVisited == false {
                 orderedChildren.append(existing)
                 existing.update(with: child, in: environment, identifier: identifier)
+                existing.wasVisited = true
             }
-
-            existing.wasVisited = true
 
             return existing
         } else {
@@ -495,7 +498,6 @@ final class ElementState {
                 delegate: delegate,
                 identifier: identifier,
                 element: child,
-                depth: depth + 1,
                 signpostRef: signpostRef,
                 name: name
             )
@@ -515,8 +517,6 @@ final class ElementState {
     func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
-            $0.wasUpdateEquivalent = false
-
             $0.orderedChildren.removeAll(keepingCapacity: true)
         }
     }
@@ -589,6 +589,22 @@ final class ElementState {
 }
 
 
+extension ElementState {
+
+    /// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
+    /// so that even when returning cached layouts, we can get to the latest version of the element
+    /// that their originating `ElementState` represents.
+    final class LatestElement {
+
+        fileprivate(set) var latest: Element
+
+        init(_ latest: Element) {
+            self.latest = latest
+        }
+    }
+}
+
+
 extension CGSize: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(width)
@@ -607,14 +623,14 @@ extension ElementState {
     ///
     /// - If both values are nil, `true` is returned.
     /// - If both values are different types, `false` is returned.
-    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?, in context: ComparableElementContext) -> Bool {
+    static func elementsEquivalent(_ lhs: Element?, _ rhs: Element?) -> Bool {
 
         if lhs == nil && rhs == nil { return true }
 
         guard let lhs = lhs as? AnyComparableElement else { return false }
         guard let rhs = rhs as? AnyComparableElement else { return false }
 
-        return lhs.anyIsEquivalent(to: rhs, in: context)
+        return lhs.anyIsEquivalent(to: rhs)
     }
 }
 
@@ -714,7 +730,7 @@ extension ElementState: CustomDebugStringConvertible {
             Array(repeating: "  ", count: child.depth).joined() + child.debugDescription
         }
 
-        let all = ["<ElementState: \(address(of: self))>"] + strings
+        let all = ["<ElementState \(address(of: self)): \(identifier.debugDescription)>"] + strings
 
         return all.joined(separator: "\n")
     }
@@ -729,7 +745,7 @@ extension ElementState {
             objectIdentifier: ObjectIdentifier(self),
             depth: depth,
             identifier: identifier,
-            element: element.value,
+            element: element.latest,
             measurements: measurements
         )
 
@@ -748,7 +764,7 @@ extension ElementState {
         var measurements: [SizeConstraint: CachedMeasurement]
 
         var debugDescription: String {
-            "\(type(of: element)) #\(identifier.count): \(measurements.count) Measurements"
+            "\(identifier.debugDescription): \(measurements.count) Measurements"
         }
     }
 }

@@ -7,55 +7,41 @@ struct ReceiptElement: ProxyElement {
     let purchase = Purchase.sample
 
     var elementRepresentation: Element {
-        let column = Column { col in
-            col.minimumVerticalSpacing = 16.0
-            col.horizontalAlignment = .fill
-
+        Column(alignment: .fill, minimumSpacing: 16) {
             for item in purchase.items {
-                col.add(
-                    child: LineItemElement(
-                        style: .regular,
-                        title: item.name,
-                        price: item.price
-                    ))
+                LineItemElement(
+                    style: .regular,
+                    title: item.name,
+                    price: item.price
+                )
             }
 
             // Add a rule below all of the line items
-            col.add(child: RuleElement())
+            RuleElement()
 
             // Totals
-            col.add(
-                child: LineItemElement(
-                    style: .regular,
-                    title: "Subtotal",
-                    price: purchase.subtotal
-                ))
+            LineItemElement(
+                style: .regular,
+                title: "Subtotal",
+                price: purchase.subtotal
+            )
 
+            LineItemElement(
+                style: .regular,
+                title: "Tax",
+                price: purchase.tax
+            )
 
-            col.add(
-                child: LineItemElement(
-                    style: .regular,
-                    title: "Tax",
-                    price: purchase.tax
-                ))
-
-            col.add(
-                child: LineItemElement(
-                    style: .bold,
-                    title: "Total",
-                    price: purchase.total
-                ))
+            LineItemElement(
+                style: .bold,
+                title: "Total",
+                price: purchase.total
+            )
         }
-
-        let inset = Inset(
-            uniformInset: 24.0,
-            wrapping: column
-        )
-
-        var scrollView = ScrollView(wrapping: inset)
-        scrollView.contentSize = .fittingHeight
-        scrollView.alwaysBounceVertical = true
-        return scrollView
+        .inset(uniform: 24)
+        .scrollable { scrollView in
+            scrollView.alwaysBounceVertical = true
+        }
     }
 
 }

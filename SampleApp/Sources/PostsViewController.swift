@@ -258,11 +258,7 @@ fileprivate struct FeedItemBody: ProxyElement {
     var post: Post
 
     let dateFormatter: Formatter = {
-        if #available(iOS 13.0, *) {
-            return RelativeDateTimeFormatter()
-        } else {
-            return DateFormatter()
-        }
+        RelativeDateTimeFormatter()
     }()
 
     var elementRepresentation: Element {

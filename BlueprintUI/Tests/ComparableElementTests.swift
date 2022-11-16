@@ -14,10 +14,8 @@ class ComparableElementTests: XCTestCase {
 
     func test_equatable_conformance() {
 
-        let context = ComparableElementContext(environment: .empty)
-
-        XCTAssertTrue(EquatableElement1(text: "1").isEquivalent(to: EquatableElement1(text: "1"), in: context))
-        XCTAssertFalse(EquatableElement1(text: "1").isEquivalent(to: EquatableElement1(text: "2"), in: context))
+        XCTAssertTrue(EquatableElement1(text: "1").isEquivalent(to: EquatableElement1(text: "1")))
+        XCTAssertFalse(EquatableElement1(text: "1").isEquivalent(to: EquatableElement1(text: "2")))
     }
 }
 
@@ -25,13 +23,11 @@ class ComparableElementTests: XCTestCase {
 class AnyComparableElementTests: XCTestCase {
 
     func test_anyIsEquivalent() {
-        let context = ComparableElementContext(environment: .empty)
+        XCTAssertTrue(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement1(text: "1")))
+        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement1(text: "2")))
 
-        XCTAssertTrue(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement1(text: "1"), in: context))
-        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement1(text: "2"), in: context))
-
-        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement2(text: "1"), in: context))
-        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement2(text: "2"), in: context))
+        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement2(text: "1")))
+        XCTAssertFalse(EquatableElement1(text: "1").anyIsEquivalent(to: EquatableElement2(text: "2")))
     }
 }
 

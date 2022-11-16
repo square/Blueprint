@@ -5,14 +5,14 @@ View Descriptions contain all the information needed to create an instance of a 
 ## Creating a view description
 
 ```swift
-let description = UILabel.describe { config in
+UILabel.describe { config in
     config[\.text] = "Hello, world"
     config[\.textColor] = .orange
 }
 
 // Or...
 
-let description = ViewDescription(UILabel.self) { config in
+ViewDescription(UILabel.self) { config in
     config[\.text] = "Hello, world"
     config[\.textColor] = .orange
 }
@@ -29,15 +29,17 @@ extension ViewDescription {
 ### Specifying how the view should be instantiated
 
 ```swift
-let description = UITableView.describe { config in
-    config.builder = { UITableView(frame: .zero, style: .plain) }
+UITableView.describe { config in
+    config.builder = {
+        UITableView(frame: .zero, style: .plain)
+    }
 }
 ```
 
 ### Assigning values to properties
 
 ```swift
-let description = UIView.describe { config in
+UIView.describe { config in
     config[\.backgroundColor] = .magenta
 }
 ```
@@ -45,7 +47,7 @@ let description = UIView.describe { config in
 ### Applying arbitrary update logic
 
 ```swift
-let description = UIView.describe { config in
+UIView.describe { config in
     config.apply { view in
         view.layer.masksToBounds = true
     }
@@ -55,15 +57,21 @@ let description = UIView.describe { config in
 ### Specifying a subview that should contain any view-backed child elements
 
 ```swift
-let description = MyCustomView.describe { config in
-    config.contentView = { $0.childContainerView }
+private class MyCustomView: UIView {
+    let mySubview = UIView()
+}
+
+MyCustomView.describe { config in
+    config.contentView = { myCustomView in
+        myCustomView.mySubview
+    }
 }
 ```
 
 ### Specifying transitions
 
 ```swift
-let description = UIView.describe { config in
+UIView.describe { config in
     config.layoutTransition = .specific(AnimationAttributes())
     config.appearingTransition = .scale
     config.disappearingTransition = .fade
