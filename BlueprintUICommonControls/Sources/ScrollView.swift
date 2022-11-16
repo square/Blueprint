@@ -424,19 +424,6 @@ extension ScrollView {
             finalContentInset.bottom -= safeAreaInsets.bottom
         }
 
-        if #available(iOS 13, *) {
-            // rdar://35866834
-            // On iOS 13, `UIRefreshControl` will change `adjustedContentInset` automatically as needed.
-            // No need to add extra `contentInset` manually.
-        } else {
-            // The refresh control lives above the content and adjusts the
-            // content inset for itself when visible and refreshing.
-            // Do the same adjustment to our expected content inset.
-            if case .refreshing = refreshControlState {
-                finalContentInset.top += refreshControlBounds?.size.height ?? 0.0
-            }
-        }
-
         return finalContentInset
     }
 }
@@ -465,8 +452,8 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
             scrollView.contentInset.bottom = contentInset.bottom
         }
 
-        if scrollView.scrollIndicatorInsets.bottom != contentInset.bottom {
-            scrollView.scrollIndicatorInsets.bottom = contentInset.bottom
+        if scrollView.verticalScrollIndicatorInsets.bottom != contentInset.bottom {
+            scrollView.verticalScrollIndicatorInsets.bottom = contentInset.bottom
         }
     }
 

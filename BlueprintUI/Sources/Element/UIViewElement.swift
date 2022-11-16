@@ -98,8 +98,12 @@ extension UIViewElement {
     /// Defer to the reused measurement view to provide the size of the element.
     public var content: ElementContent {
 
-        ElementContent {
-            UIViewElementMeasurer.shared.measure(element: self, in: $0)
+        ElementContent { constraint, environment in
+            UIViewElementMeasurer.shared.measure(
+                element: self,
+                constraint: constraint,
+                environment: environment
+            )
         }
     }
 
@@ -111,7 +115,13 @@ extension UIViewElement {
             }
 
             config.apply { view in
-                self.updateUIView(view, with: .init(isMeasuring: false))
+                self.updateUIView(
+                    view,
+                    with: .init(
+                        isMeasuring: false,
+                        environment: context.environment
+                    )
+                )
             }
         }
     }
@@ -122,6 +132,9 @@ public struct UIViewElementContext {
     /// This bool indicates whether the view being updated is the static measuring instance. You may
     /// not want to perform certain updates if it is (such as updating field trigger references).
     public var isMeasuring: Bool
+
+    /// The environment the element is rendered in.
+    public var environment: Environment
 }
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
@@ -131,13 +144,17 @@ private final class UIViewElementMeasurer {
     static let shared = UIViewElementMeasurer()
 
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement: UIViewElement>(element: ViewElement, in constraint: SizeConstraint) -> CGSize {
+    func measure<ViewElement: UIViewElement>(
+        element: ViewElement,
+        constraint: SizeConstraint,
+        environment: Environment
+    ) -> CGSize {
 
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
 
         let view = measurementView(for: element)
 
-        element.updateUIView(view, with: .init(isMeasuring: true))
+        element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
 
         return element.size(bounds.size, thatFits: view)
     }

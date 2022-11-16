@@ -181,7 +181,7 @@ class ElementBuilderTests: XCTestCase {
                 TestElement2()
             }
 
-            if #available(iOS 11.0, *) {
+            if #available(iOS 14.0, *) {
                 TestElement3()
             }
         }

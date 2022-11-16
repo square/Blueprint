@@ -70,10 +70,8 @@ public struct Box: Element {
                     view.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
-                if #available(iOS 13.0, *) {
-                    if self.cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
-                        view.layer.cornerCurve = self.cornerCurve.toLayerCornerCurve
-                    }
+                if self.cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
+                    view.layer.cornerCurve = self.cornerCurve.toLayerCornerCurve
                 }
 
                 if self.borderStyle.color?.cgColor != view.layer.borderColor {
