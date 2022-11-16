@@ -65,11 +65,33 @@ class PerformancePlayground: XCTestCase {
                     }
                 }
             }
-        }.inset(uniform: 20)
+        }// .inset(uniform: 20)
 
         let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
 
         determineAverage(for: 4.0) {
+            view.element = element
+            view.layoutIfNeeded()
+        }
+    }
+
+    func test_simple_shit() {
+
+        struct LabeledBox: ProxyElement, ComparableElement, Equatable {
+
+            var text: String
+
+            var elementRepresentation: Element {
+                Label(text: text)
+                    .box(background: .red)
+            }
+        }
+
+        let element = LabeledBox(text: "69")
+
+        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
+
+        determineAverage(for: 4000.0) {
             view.element = element
             view.layoutIfNeeded()
         }
@@ -285,6 +307,11 @@ class PerformancePlayground: XCTestCase {
         var iterations: Int = 0
 
         repeat {
+
+            if iterations == 1 {
+                print("Next")
+            }
+
             let iterationStart = Date()
             block()
             let iterationEnd = Date()

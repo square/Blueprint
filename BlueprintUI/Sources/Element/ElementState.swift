@@ -48,8 +48,11 @@ final class ElementStateTree {
     /// Updates or replaces the root node depending on the type of the new element.
     ///
     /// This method will also remove any `ElementState` for elements no longer present in the element tree.
-    func update(with element: Element, in environment: Environment) -> ElementState {
-
+    func update<Output>(
+        with element: Element,
+        in environment: Environment,
+        updates: (ElementState) -> Output
+    ) -> (ElementState, Output) {
         func makeRoot(with element: Element) -> ElementState {
             let new = ElementState(
                 parent: nil,
@@ -73,15 +76,19 @@ final class ElementStateTree {
 
                 root.update(with: element, in: environment, identifier: root.identifier)
 
+                let output = updates(root)
+
                 delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
 
                 root.finishedLayout()
 
-                return root
+                return (root, output)
             } else {
                 let new = makeRoot(with: element)
+
+                let output = updates(new)
 
                 delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
@@ -89,10 +96,12 @@ final class ElementStateTree {
 
                 root.finishedLayout()
 
-                return new
+                return (new, output)
             }
         } else {
             let new = makeRoot(with: element)
+
+            let output = updates(new)
 
             delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
@@ -100,7 +109,7 @@ final class ElementStateTree {
 
             new.finishedLayout()
 
-            return new
+            return (new, output)
         }
     }
 
@@ -263,6 +272,10 @@ final class ElementState {
         wasVisited = true
     }
 
+    deinit {
+        print("Deinit \(identifier)")
+    }
+
     /// Assigned once per layout cycle, this value represents the
     /// `Element.content` value from the represented element.
     /// This value is cached to improve performance (fewer allocations and
@@ -306,12 +319,20 @@ final class ElementState {
 
         switch comparability {
         case .notComparable:
+            wasVisited = true
             isEquivalent = false
 
         case .comparableElement:
+            wasVisited = true
+
+            recursiveForEach {
+                $0.wasVisited = true
+            }
+
             isEquivalent = Self.elementsEquivalent(element.latest, newElement)
 
         case .childOfComparableElement:
+            wasVisited = true
             /// We're always, equivalent, because our parent
             /// determines our equatability from its state.
             /// It will also invalidate and throw away _our_ caches if its
@@ -512,11 +533,11 @@ final class ElementState {
     ) -> ElementState {
 
         if let existing = children[identifier] {
+            existing.wasVisited = true
 
             if existing.wasVisited == false {
                 orderedChildren.append(existing)
                 existing.update(with: child, in: environment, identifier: identifier)
-                existing.wasVisited = true
             }
 
             return existing
@@ -584,20 +605,22 @@ final class ElementState {
     /// which are no longer present in the tree.
     private func recursiveRemoveOldChildren() {
 
-        for (key, state) in children {
-
-            if state.wasVisited { continue }
-
-            children.removeValue(forKey: key)
-
-            delegate.ifDebug {
-                $0.treeDidRemoveState(state)
-            }
-        }
-
-        children.forEach { _, state in
-            state.recursiveRemoveOldChildren()
-        }
+//        for (key, state) in children {
+//
+//            if state.wasVisited { continue }
+//
+//            print("Removing \(state.identifier)")
+//
+//            children.removeValue(forKey: key)
+//
+//            delegate.ifDebug {
+//                $0.treeDidRemoveState(state)
+//            }
+//        }
+//
+//        children.forEach { _, state in
+//            state.recursiveRemoveOldChildren()
+//        }
     }
 
     /// Iterating the whole tree, clears caches which should
@@ -747,20 +770,7 @@ extension Optional where Wrapped == ElementStateTreeDelegate {
 extension ElementState: CustomDebugStringConvertible {
 
     public var debugDescription: String {
-
-        var debugRepresentations = [ElementState.DebugRepresentation]()
-
-        children.values.forEach {
-            $0.appendDebugDescriptions(to: &debugRepresentations, at: 0)
-        }
-
-        let strings: [String] = debugRepresentations.map { child in
-            Array(repeating: "  ", count: child.depth).joined() + child.debugDescription
-        }
-
-        let all = ["<ElementState \(address(of: self)): \(identifier.debugDescription)>"] + strings
-
-        return all.joined(separator: "\n")
+        "<ElementState \(address(of: self)): \(identifier.debugDescription)>"
     }
 }
 

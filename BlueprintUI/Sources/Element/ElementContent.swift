@@ -68,13 +68,15 @@ extension ElementContent {
             let element = MeasurementElement(content: self)
             let root = ElementStateTree(name: "ElementContent.measure")
 
-            let rootState = root.update(with: element, in: environment)
+            let (_, size) = root.update(with: element, in: environment) { state in
+                self.measure(
+                    in: constraint,
+                    with: environment,
+                    state: state
+                )
+            }
 
-            return self.measure(
-                in: constraint,
-                with: environment,
-                state: rootState
-            )
+            return size
         }
     }
 
