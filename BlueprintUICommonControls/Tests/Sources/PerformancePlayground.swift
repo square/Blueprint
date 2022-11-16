@@ -73,8 +73,6 @@ class PerformancePlayground: XCTestCase {
             view.element = element
             view.layoutIfNeeded()
         }
-
-        print("")
     }
 
     func test_repeated_layouts() {

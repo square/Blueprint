@@ -145,7 +145,10 @@ class BlueprintViewTests: XCTestCase {
             ]
         )
 
+        blueprintView.layoutIfNeeded()
+
         tags = [1, 2]
+
         for index in blueprintView.currentNativeViewControllers.indices {
             let node = blueprintView.currentNativeViewControllers[index].node
 
@@ -161,7 +164,10 @@ class BlueprintViewTests: XCTestCase {
             ]
         )
 
+        blueprintView.layoutIfNeeded()
+
         tags = [3, 4]
+
         for index in blueprintView.currentNativeViewControllers.indices {
             let node = blueprintView.currentNativeViewControllers[index].node
 
