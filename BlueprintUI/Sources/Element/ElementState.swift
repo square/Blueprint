@@ -163,6 +163,11 @@ final class ElementState {
     /// we can preserve multiple layouts if the containing element or containing
     /// view's size changes, eg when rotating from portait to landscape.
     private var layouts: [CGSize: CachedLayout] = [:]
+    
+    /// The kind of cache we're storing in the state. This is only used for debugging
+    /// purposes to differentiate between regular state and state that is only used for
+    /// measurement caching
+    private var kind: Kind
 
     /// The children of the `ElementState`, cached by element identifier.
     private var children: [ElementIdentifier: ElementState] = [:]
@@ -226,6 +231,17 @@ final class ElementState {
             }
         }
     }
+    
+    /// The kind of cache to be stored in this `ElementState`
+    enum Kind {
+        
+        /// Only measurement information is available to cache
+        /// in this state
+        case measurementOnly
+        
+        /// All cachable information is stored in this state
+        case regular
+    }
 
     /// Creates a new `ElementState` instance.
     init(
@@ -234,12 +250,14 @@ final class ElementState {
         identifier: ElementIdentifier,
         element: Element,
         signpostRef: AnyObject,
-        name: String
+        name: String,
+        kind: Kind = .regular
     ) {
         self.parent = parent
         self.delegate = delegate
         self.identifier = identifier
         self.element = .init(element)
+        self.kind = kind
 
         if element is AnyComparableElement {
             comparability = .comparableElement
@@ -507,7 +525,8 @@ final class ElementState {
     func childState(
         for child: Element,
         in environment: Environment,
-        with identifier: ElementIdentifier
+        with identifier: ElementIdentifier,
+        kind: Kind = .regular
     ) -> ElementState {
 
         if let existing = children[identifier] {
@@ -526,7 +545,8 @@ final class ElementState {
                 identifier: identifier,
                 element: child,
                 signpostRef: signpostRef,
-                name: name
+                name: name,
+                kind: kind
             )
 
             children[identifier] = new
