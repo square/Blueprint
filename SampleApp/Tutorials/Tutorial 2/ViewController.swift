@@ -6,11 +6,11 @@ import UIKit
 struct HelloWorldElement: ProxyElement {
 
     var elementRepresentation: Element {
-        var label = Label(text: "Hello, world")
-        label.font = .boldSystemFont(ofSize: 24.0)
-        label.color = .darkGray
-
-        return Centered(label)
+        Label(text: "Hello, world") { label in
+            label.font = .boldSystemFont(ofSize: 24.0)
+            label.color = .darkGray
+        }
+        .centered()
     }
 
 }
