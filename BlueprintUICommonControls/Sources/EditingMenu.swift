@@ -644,12 +644,7 @@ extension EditingMenu {
 
             becomeFirstResponder()
 
-            if #available(iOS 13.0, *) {
-                menu.showMenu(from: self, rect: self.bounds)
-            } else {
-                menu.setTargetRect(bounds, in: self)
-                menu.setMenuVisible(true, animated: true)
-            }
+            menu.showMenu(from: self, rect: bounds)
 
             isShowingMenu = menu.isMenuVisible
 

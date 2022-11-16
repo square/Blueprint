@@ -234,24 +234,7 @@
             private func constrained(
                 element: Element
             ) -> some View {
-
-                /// `GeometryReader` differs between iOS 13 and iOS 14.
-                /// On iOS 13; the `GeometryReader` reports back the size
-                /// of its child. In iOS 14; it reports the size of the device within a preview.
-
-                if #available(iOS 14.0, *) {
-                    return AnyView(ElementView(element: element))
-                } else {
-                    return AnyView(SwiftUI.GeometryReader { info in
-                        ElementView(
-                            element: ConstrainedSize(
-                                width: .atMost(info.size.width),
-                                height: .atMost(info.size.height),
-                                wrapping: element
-                            )
-                        )
-                    })
-                }
+                AnyView(ElementView(element: element))
             }
         }
     }
@@ -275,11 +258,7 @@
         /// iPhone SE
 
         public static var iPhoneSE_1: PreviewDevice {
-            if #available(iOS 13.4.1, *) {
-                return PreviewDevice("iPhone SE (1st generation)")
-            } else {
-                return PreviewDevice("iPhone SE")
-            }
+            PreviewDevice("iPhone SE (1st generation)")
         }
 
         @available(iOS 13.4.1, *)
