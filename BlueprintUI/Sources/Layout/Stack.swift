@@ -886,12 +886,13 @@ extension LayoutSubview {
 }
 
 extension StackLayout {
-    public func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+
+    public func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) -> CGSize {
         guard subviews.isEmpty == false else { return .zero }
 
         let constraint = proposal.vectorConstraint(on: axis)
 
-        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
+        let frames = _frames(for: cache.stackLayoutItems(subviews: subviews), in: constraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -903,11 +904,11 @@ extension StackLayout {
         return vector.size(axis: axis)
     }
 
-    public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
+    public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
+        let frames = _frames(for: cache.stackLayoutItems(subviews: subviews), in: constraint)
 
         for i in 0..<subviews.count {
             let vectorFrame = frames[i]
@@ -940,7 +941,24 @@ extension StackLayout {
         }
     }
 
-    private struct StackLayoutItem {
+    public func makeCache(subviews: Subviews) -> Cache { .init() }
+
+    public struct Cache {
+
+        private var stackLayoutItems: [StackLayoutItem]?
+
+        mutating func stackLayoutItems(subviews: Subviews) -> [StackLayoutItem] {
+            if let stackLayoutItems = stackLayoutItems {
+                return stackLayoutItems
+            }
+
+            let items = subviews.map(StackLayoutItem.init)
+            stackLayoutItems = items
+            return items
+        }
+    }
+
+    struct StackLayoutItem {
 
         let traits: Traits
         private let measure: (SizeConstraint) -> CGSize
