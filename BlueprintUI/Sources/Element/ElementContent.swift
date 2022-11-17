@@ -61,7 +61,7 @@ public struct ElementContent {
         }
     }
 
-    fileprivate func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         storage.measure(in: constraint, environment: environment, cache: cache)
     }
 
@@ -420,7 +420,7 @@ extension ElementContent {
             element.content.sizeThatFits(
                 proposal: proposal,
                 context: .init(
-                    cache: context.cache.oobSubcache(key: 0),
+                    cache: .init(), // context.cache.oobSubcache(key: 0),
                     environment: context.environment
                 )
             )

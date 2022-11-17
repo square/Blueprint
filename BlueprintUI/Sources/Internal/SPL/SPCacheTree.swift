@@ -86,10 +86,11 @@ typealias SPCacheNode = SPCacheTree<SizeConstraint, CGSize, SPCacheNodeKey>
 
 struct SPCacheNodeKey: Hashable, CustomStringConvertible {
     var index: Int
+    var identifier: String
     var isOOB: Bool = false
 
     var description: String {
-        "\(index)\(isOOB ? ".oob" : "")"
+        "\(index)\(identifier.isEmpty ? "" : ".\(identifier)")\(isOOB ? ".oob" : "")"
     }
 }
 
@@ -97,10 +98,10 @@ struct SPCacheNodeKey: Hashable, CustomStringConvertible {
 extension SPCacheTree where SubcacheKey == SPCacheNodeKey {
 
     func subcache(key: Int) -> Subcache {
-        subcache(key: SPCacheNodeKey(index: key))
+        subcache(key: SPCacheNodeKey(index: key, identifier: ""))
     }
 
-    func oobSubcache(key: Int) -> Subcache {
-        subcache(key: SPCacheNodeKey(index: key, isOOB: true))
+    func oobSubcache(identifier: String) -> Subcache {
+        subcache(key: SPCacheNodeKey(index: 0, identifier: identifier, isOOB: true))
     }
 }
