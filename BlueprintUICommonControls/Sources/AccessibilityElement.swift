@@ -75,7 +75,7 @@ public struct AccessibilityElement: Element {
     public var accessibilityActivate: (() -> Bool)? = nil
 
     /// An array containing one or more `CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
-    public var customActions: [CustomAction]? = nil
+    public var customActions: [CustomAction] = []
 
     public init(
         label: String?,
@@ -85,7 +85,7 @@ public struct AccessibilityElement: Element {
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: Box.CornerStyle = .square,
-        customActions: [AccessibilityElement.CustomAction]? = nil,
+        customActions: [AccessibilityElement.CustomAction] = [],
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
@@ -120,7 +120,7 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityFrameSize] = accessibilityFrameSize
             config[\.accessibilityFrameCornerStyle] = accessibilityFrameCornerStyle
             config[\.activate] = accessibilityActivate
-            config[\.accessibilityCustomActions] = customActions?.map { action in
+            config[\.accessibilityCustomActions] = customActions.map { action in
                 UIAccessibilityCustomAction(name: action.name, image: action.image) { _ in action.onActivation() }
             }
 
@@ -256,7 +256,7 @@ extension Element {
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: Box.CornerStyle = .square,
-        customActions: [AccessibilityElement.CustomAction]? = nil
+        customActions: [AccessibilityElement.CustomAction] = []
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,

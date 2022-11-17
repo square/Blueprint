@@ -81,7 +81,7 @@ public struct AttributedLabel: Element, Hashable {
     public var accessibilityHint: String?
 
     /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
-    public var accessibilityCustomActions: [AccessibilityElement.CustomAction]? = nil
+    public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
     /// A set of data types to detect and automatically link in the label.
     public var linkDetectionTypes: Set<LinkDetectionType> = []
@@ -254,7 +254,7 @@ extension AttributedLabel {
             isAccessibilityElement = model.isAccessibilityElement
             accessibilityHint = model.accessibilityHint
             updateAccessibilityTraits(with: model)
-            accessibilityCustomActions = model.accessibilityCustomActions?.map { action in
+            accessibilityCustomActions = model.accessibilityCustomActions.map { action in
                 UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
             }
 

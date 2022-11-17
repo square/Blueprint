@@ -64,7 +64,7 @@ public struct Label: ProxyElement {
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
     /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
-    public var accessibilityCustomActions: [AccessibilityElement.CustomAction]? = nil
+    public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
 
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
