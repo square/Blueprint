@@ -63,6 +63,10 @@ public struct Label: ProxyElement {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
+    public var accessibilityCustomActions: [AccessibilityElement.CustomAction]? = nil
+
+
     public init(text: String, configure: (inout Label) -> Void = { _ in }) {
         self.text = text
         configure(&self)
@@ -100,6 +104,7 @@ public struct Label: ProxyElement {
             label.isAccessibilityElement = isAccessibilityElement
             label.accessibilityHint = accessibilityHint
             label.accessibilityTraits = accessibilityTraits
+            label.accessibilityCustomActions = accessibilityCustomActions
             label.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth
             label.minimumScaleFactor = minimumScaleFactor
             label.allowsDefaultTighteningForTruncation = allowsDefaultTighteningForTruncation

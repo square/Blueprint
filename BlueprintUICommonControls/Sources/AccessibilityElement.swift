@@ -4,7 +4,7 @@ import UIKit
 public struct AccessibilityElement: Element {
 
     /// Used to provide additional functionality to assistive technologies beyond your accessible UI.
-    public struct CustomAction {
+    public struct CustomAction: Equatable, Hashable {
         public typealias OnActivation = () -> Bool
 
         /// A localized name that discribes the action.
@@ -18,6 +18,17 @@ public struct AccessibilityElement: Element {
             self.name = name
             self.image = image
             self.onActivation = onActivation
+        }
+
+        public static func == (lhs: AccessibilityElement.CustomAction, rhs: AccessibilityElement.CustomAction) -> Bool {
+            // Disregard onActivation for equatablity pruposes.
+            lhs.name == rhs.name && lhs.image == rhs.image
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            // Disregard onActivation for hash pruposes.
+            hasher.combine(name)
+            hasher.combine(image)
         }
     }
 
@@ -63,7 +74,7 @@ public struct AccessibilityElement: Element {
     /// See [Accessibility Activate Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615165-accessibilityactivate) for further information.
     public var accessibilityActivate: (() -> Bool)? = nil
 
-    /// The array contains one or more `Custom Action`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
+    /// An array containing one or more `CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
     public var customActions: [CustomAction]? = nil
 
     public init(
