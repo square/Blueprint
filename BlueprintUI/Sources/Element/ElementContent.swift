@@ -35,6 +35,7 @@ public struct ElementContent {
             in: constraint,
             environment: environment,
             cache: CacheFactory.makeCache(name: "ElementContent"),
+            spCache: .init(),
             layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
         )
     }
@@ -43,6 +44,7 @@ public struct ElementContent {
         in constraint: SizeConstraint,
         environment: Environment,
         cache: CacheTree,
+        spCache: SPCacheNode,
         layoutMode: LayoutMode
     ) -> CGSize {
         switch layoutMode {
@@ -52,8 +54,7 @@ public struct ElementContent {
             return storage.sizeThatFits(
                 proposal: constraint,
                 context: .init(
-                    // TODO: Hoist upward?
-                    cache: .init(),
+                    cache: spCache,
                     environment: environment
                 )
             )
@@ -378,6 +379,55 @@ extension ElementContent {
             var content: ElementContent
             var element: Element
 
+        }
+    }
+}
+
+
+extension ElementContent {
+
+    public init(byMeasuring element: Element) {
+        storage = MeasureNestedElementStorage(element: element)
+    }
+
+    private struct MeasureNestedElementStorage: ContentStorage {
+
+        let element: Element
+
+        let childCount: Int = 0
+
+        func measure(
+            in constraint: SizeConstraint,
+            environment: Environment,
+            cache: CacheTree
+        ) -> CGSize {
+            element.content.measure(
+                in: constraint,
+                environment: environment,
+                cache: CacheFactory.makeCache(name: "MeasureNestedElement")// cache.subcache(element: element, isOOB: true)
+            )
+        }
+
+        func performLayout(
+            attributes: LayoutAttributes,
+            environment: Environment,
+            cache: CacheTree
+        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+            []
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+            element.content.sizeThatFits(
+                proposal: proposal,
+                context: .init(
+                    cache: context.cache.oobSubcache(key: 0),
+                    environment: context.environment
+                )
+            )
+        }
+
+        func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
+            []
         }
     }
 }

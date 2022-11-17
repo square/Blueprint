@@ -81,4 +81,26 @@ final class SPValueCache<Key: Hashable, Value> {
 }
 
 
-typealias SPCacheNode = SPCacheTree<SizeConstraint, CGSize, Int>
+typealias SPCacheNode = SPCacheTree<SizeConstraint, CGSize, SPCacheNodeKey>
+
+
+struct SPCacheNodeKey: Hashable, CustomStringConvertible {
+    var index: Int
+    var isOOB: Bool = false
+
+    var description: String {
+        "\(index)\(isOOB ? ".oob" : "")"
+    }
+}
+
+
+extension SPCacheTree where SubcacheKey == SPCacheNodeKey {
+
+    func subcache(key: Int) -> Subcache {
+        subcache(key: SPCacheNodeKey(index: key))
+    }
+
+    func oobSubcache(key: Int) -> Subcache {
+        subcache(key: SPCacheNodeKey(index: key, isOOB: true))
+    }
+}

@@ -35,17 +35,17 @@ extension CacheTree {
     }
 
     /// Gets a subcache for an element with siblings.
-    func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
-        subcache(
+    func subcache(index: Int, of childCount: Int, element: Element, isOOB: Bool = false) -> CacheTree {
+        let indexString = childCount == 1 ? "" : "[\(index)]"
+        let oobString = isOOB ? "[oob]" : ""
+        return subcache(
             key: index,
-            name: childCount == 1
-                ? "\(name).\(type(of: element))"
-                : "\(name)[\(index)].\(type(of: element))"
+            name: "\(name)\(indexString)\(oobString).\(type(of: element))"
         )
     }
 
     /// Gets a subcache for an element with no siblings.
-    func subcache(element: Element) -> CacheTree {
-        subcache(index: 0, of: 1, element: element)
+    func subcache(element: Element, isOOB: Bool = false) -> CacheTree {
+        subcache(index: 0, of: 1, element: element, isOOB: isOOB)
     }
 }

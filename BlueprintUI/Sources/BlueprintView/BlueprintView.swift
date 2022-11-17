@@ -230,6 +230,7 @@ public final class BlueprintView: UIView {
                 in: constraint,
                 environment: environment,
                 cache: CacheFactory.makeCache(name: cacheName),
+                spCache: .init(),
                 layoutMode: layoutMode
             )
         }
