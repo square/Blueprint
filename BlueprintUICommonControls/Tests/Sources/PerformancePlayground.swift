@@ -219,6 +219,61 @@ class PerformancePlayground: XCTestCase {
         }
     }
 
+    func test_increment_state_changes() {
+        let gridSize = 30
+
+        var model: [[Int]] = {
+            var cols = [[Int]]()
+            for _ in 0..<gridSize {
+                var row = [Int]()
+                for _ in 0..<gridSize {
+                    row.append(0)
+                }
+                cols.append(row)
+            }
+            return cols
+        }()
+
+        func element(for model: [[Int]]) -> Element {
+            Column { col in
+                for values in model {
+                    col.horizontalAlignment = .fill
+                    let row = Row { row in
+                        for value in values {
+                            let label = Label(text: String(value))
+                                .constrainedTo(size: .init(width: 20, height: 20))
+                                .centered()
+                                .inset(uniform: 10)
+                                .box(background: .red)
+                            row.add(child: label)
+                        }
+                    }
+                    col.add(child: row)
+                }
+            }.inset(uniform: 100)
+        }
+
+        let view = BlueprintView()
+        view.frame.size = CGSize(width: 1000.0, height: 10000)
+
+        var row = 0
+        var column = 0
+
+        determineAverage(for: 10.0) {
+
+            row = row % gridSize
+            column = column % gridSize
+
+            model[row][column] += model[row][column]
+
+            view.element = element(for: model)
+            view.layoutIfNeeded()
+
+            row += 1
+            column += 1
+        }
+    }
+
     func determineAverage(for seconds: TimeInterval, using block: () -> Void) {
         let start = Date()
 
