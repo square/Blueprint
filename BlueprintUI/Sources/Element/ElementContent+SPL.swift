@@ -12,17 +12,20 @@ extension ElementContent: Sizable {
 extension ElementContent.Builder {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        let subviews = zip(children, children.indices).map { child, index in
-            LayoutSubview(
-                element: child.element,
-                content: child.content,
-                measureContext: .init(
-                    cache: context.cache.subcache(key: index),
-                    environment: context.environment
-                ),
-                traits: child.traits,
-                layoutType: LayoutType.self
-            )
+        
+        let subviews = context.cache.layoutSubviews {
+            children.indexedMap { index, child in
+                LayoutSubview(
+                    element: child.element,
+                    content: child.content,
+                    measureContext: .init(
+                        cache: context.cache.subcache(key: index),
+                        environment: context.environment
+                    ),
+                    traits: child.traits,
+                    layoutType: LayoutType.self
+                )
+            }
         }
         return layout.sizeThatFits(proposal: proposal, subviews: subviews)
     }
@@ -30,17 +33,19 @@ extension ElementContent.Builder {
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         guard children.isEmpty == false else { return [] }
 
-        let subviews = zip(children, children.indices).map { child, index in
-            LayoutSubview(
-                element: child.element,
-                content: child.content,
-                measureContext: .init(
-                    cache: context.cache.subcache(key: index),
-                    environment: context.environment
-                ),
-                traits: child.traits,
-                layoutType: LayoutType.self
-            )
+        let subviews = context.cache.layoutSubviews {
+            children.indexedMap { index, child in
+                LayoutSubview(
+                    element: child.element,
+                    content: child.content,
+                    measureContext: .init(
+                        cache: context.cache.subcache(key: index),
+                        environment: context.environment
+                    ),
+                    traits: child.traits,
+                    layoutType: LayoutType.self
+                )
+            }
         }
 
         let attributes = context.attributes
@@ -54,8 +59,7 @@ extension ElementContent.Builder {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        let identifiedNodes: [IdentifiedNode] = children.indices.map { index in
-            let child = children[index]
+        let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
             let subview = subviews[index]
 
             let placement = subview.placement
