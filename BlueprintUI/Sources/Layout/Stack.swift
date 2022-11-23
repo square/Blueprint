@@ -184,7 +184,7 @@ extension StackElement {
 
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
-public struct StackLayout: Layout {
+public struct StackLayout: Layout, StrictLayout {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {

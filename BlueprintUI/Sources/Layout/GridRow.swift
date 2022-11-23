@@ -83,7 +83,7 @@ public struct GridRow: Element {
 
 // MARK: - layout -
 extension GridRow {
-    struct GridRowLayout: Layout {
+    struct GridRowLayout: Layout, StrictLayout {
         let verticalAlignment: Row.RowAlignment
         let spacing: CGFloat
 

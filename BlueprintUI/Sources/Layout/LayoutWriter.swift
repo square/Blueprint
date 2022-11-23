@@ -260,7 +260,7 @@ extension LayoutWriter {
 
         // MARK: Layout
 
-        private struct Layout: BlueprintUI.Layout {
+        private struct Layout: BlueprintUI.Layout, StrictLayout {
             var builder: Builder
 
             func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {

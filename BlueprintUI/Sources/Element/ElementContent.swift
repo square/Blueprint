@@ -89,6 +89,15 @@ public struct ElementContent {
             context: context
         )
     }
+    
+    func performStrictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> StrictSubtreeResult {
+        storage.strictLayout(in: context, environment: environment, cache: cache)
+    }
+
 }
 
 public struct SPLayoutContext {
@@ -222,7 +231,7 @@ extension ElementContent {
 }
 
 
-protocol ContentStorage: SPContentStorage {
+protocol ContentStorage: SPContentStorage, StrictContentStorage {
     var childCount: Int { get }
 
     func measure(
@@ -241,7 +250,7 @@ protocol ContentStorage: SPContentStorage {
 
 extension ElementContent {
 
-    public struct Builder<LayoutType: Layout>: ContentStorage {
+    public struct Builder<LayoutType: Layout & StrictLayout>: ContentStorage {
 
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
@@ -605,10 +614,132 @@ private struct MeasurableStorage: ContentStorage {
     }
 }
 
+// MARK: - Strict SPL extensions
+
+extension ElementContent.Builder {
+    func identifiers(in context: StrictLayoutContext) -> [ElementIdentifier] {
+
+        var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
+
+        return children.map { child in
+            identifierFactory.nextIdentifier(for: type(of: child.element), key: child.key)
+        }
+    }
+
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> StrictSubtreeResult {
+
+        let identifiers = self.identifiers(in: context)
+        let nodes = children.indices.map { (index: Int) -> StrictLayoutNode in
+            let child = children[index].element
+            let id = identifiers[index]
+
+            return StrictLayoutNode(
+                path: context.path,
+                id: id,
+                element: child,
+                mode: context.mode,
+                environment: environment,
+                cache: cache.subcache(index: index, of: childCount, element: child)
+            )
+        }
+
+        let intermediateResult = layout.layout(
+            in: context,
+            children: children.indices.map { (traits: children[$0].traits, layoutable: nodes[$0]) }
+        )
+
+        return StrictSubtreeResult(
+            intermediate: intermediateResult,
+            children: nodes
+        )
+    }
+}
+
+
+extension EnvironmentAdaptingStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> StrictSubtreeResult {
+        let environment = adapted(environment: environment)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let cache = cache.subcache(element: child)
+
+        let node = StrictLayoutNode(
+            path: context.path,
+            id: identifier,
+            element: child,
+            mode: context.mode,
+            environment: environment,
+            cache: cache
+        )
+
+        return StrictSubtreeResult(
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
+        )
+    }
+}
+
+extension LazyStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> StrictSubtreeResult {
+        let child = buildChild(
+            for: .layout,
+            in: .init(context.proposedSize),
+            environment: environment
+        )
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let cache = cache.subcache(element: child)
+
+        let node = StrictLayoutNode(
+            path: context.path,
+            id: identifier,
+            element: child,
+            mode: context.mode,
+            environment: environment,
+            cache: cache
+        )
+
+        return StrictSubtreeResult(
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
+        )
+    }
+}
+
+extension MeasurableStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment,
+        cache: CacheTree
+    ) -> StrictSubtreeResult {
+        let size = measure(
+            in: .init(context.proposedSize),
+            environment: environment,
+            cache: cache
+        )
+        return StrictSubtreeResult(
+            intermediate: StrictLayoutAttributes(
+                size: size,
+                childPositions: []
+            ),
+            children: []
+        )
+    }
+}
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
-fileprivate struct SingleChildLayoutHost: Layout {
+fileprivate struct SingleChildLayoutHost: Layout, StrictLayout {
 
     private var wrapped: SingleChildLayout
 
@@ -637,6 +768,12 @@ fileprivate struct SingleChildLayoutHost: Layout {
         precondition(subviews.count == 1)
         return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
     }
+
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        precondition(children.count == 1)
+        return wrapped.layout(in: context, child: children[0].layoutable)
+    }
+    
 }
 
 struct Measurer: Measurable {

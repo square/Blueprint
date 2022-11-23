@@ -61,7 +61,7 @@ public struct Overlay: Element {
 
 /// A layout implementation that places all children on top of each other with
 /// the same frame (filling the container’s bounds).
-fileprivate struct OverlayLayout: Layout {
+fileprivate struct OverlayLayout: Layout, StrictLayout {
 
     func measure(in constraint: SizeConstraint, items: [(traits: Void, content: Measurable)]) -> CGSize {
         items.reduce(into: CGSize.zero) { result, item in

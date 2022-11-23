@@ -1,7 +1,7 @@
 import UIKit
 
 /// Conforming types can calculate layout attributes for an array of children.
-public protocol SingleChildLayout: SPSingleChildLayout {
+public protocol SingleChildLayout: SPSingleChildLayout, StrictSingleChildLayout {
 
     /// Computes the size that this layout requires
     ///
@@ -20,4 +20,10 @@ public protocol SingleChildLayout: SPSingleChildLayout {
     /// - returns: Layout attributes for the child of this layout.
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes
 
+}
+
+extension SingleChildLayout {
+    public func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+        fatalError("TODO: not implemented")
+    }
 }

@@ -73,7 +73,7 @@ extension EqualStack {
 
 extension EqualStack {
 
-    fileprivate struct EqualLayout: Layout {
+    fileprivate struct EqualLayout: Layout, StrictLayout {
 
         var direction: Direction
         var spacing: CGFloat
