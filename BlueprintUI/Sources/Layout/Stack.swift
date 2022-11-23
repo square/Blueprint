@@ -408,14 +408,22 @@ extension StackLayout {
         for items: [StackLayoutItem],
         in vectorConstraint: VectorConstraint
     ) -> [VectorFrame] {
+        _frames(axisItems: items, crossItems: items, in: vectorConstraint)
+    }
+
+    private func _frames(
+        axisItems: [StackLayoutItem],
+        crossItems: [StackLayoutItem],
+        in vectorConstraint: VectorConstraint
+    ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
-        let axisSegments = _axisSegments(for: items, in: vectorConstraint)
+        let axisSegments = _axisSegments(for: axisItems, in: vectorConstraint)
         
         let axisConstraints = axisSegments.map { $0.magnitude }
 
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
-            for: items,
+            for: crossItems,
             axisConstraints: axisConstraints,
             crossConstraint: vectorConstraint.cross
         )
@@ -955,9 +963,75 @@ extension StackLayout {
             measure = subview.sizeThatFits(_:)
         }
         
+        init(_ child: StrictLayoutChild, options: StrictLayoutOptions) {
+            traits = child.traits
+            measure = { constraint in
+                child.layoutable.layout(
+                    in: constraint.strictSize,
+                    options: options
+                )
+            }
+        }
+        
         func measure(in constraint: SizeConstraint) -> CGSize {
             measure(constraint)
         }
+    }
+}
+
+extension StackLayout {
+    public func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        guard !children.isEmpty else {
+            return .init(size: .zero)
+        }
+
+        let vectorConstraint = context.vectorConstraint(on: axis)
+
+
+        func items(axisPressure: StrictPressureMode?) -> [StackLayoutItem] {
+            let mode: AxisVarying<StrictPressureMode?>
+            switch axis {
+            case .horizontal:
+                mode = AxisVarying(
+                    horizontal: axisPressure,
+                    vertical: alignment.layoutMode(in: context.mode.vertical)
+                )
+            case .vertical:
+                mode = AxisVarying(
+                    horizontal: alignment.layoutMode(in: context.mode.horizontal),
+                    vertical: axisPressure
+                )
+            }
+            let options = StrictLayoutOptions(
+                maxAllowedLayoutCount: 2,
+                mode: mode
+            )
+            return children.map { child in
+                return StackLayoutItem(child, options: options)
+            }
+        }
+
+        // First pass, use natural to get a measurement
+        let axisItems = items(axisPressure: .natural)
+        // Second pass, inherit mode so that we fill properly
+        let crossItems = items(axisPressure: nil)
+
+        let frames = _frames(axisItems: axisItems, crossItems: crossItems, in: vectorConstraint)
+
+        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
+            Vector(
+                axis: max(vector.axis, frame.maxAxis),
+                cross: max(vector.cross, frame.maxCross)
+            )
+        }
+
+        let size = vector.size(axis: axis)
+
+        return StrictLayoutAttributes(
+            size: size,
+            childPositions: frames.map { $0.origin.point(axis: axis) }
+        )
+
     }
 }
 
@@ -1152,6 +1226,48 @@ extension SizeConstraint.Axis {
         }
     }
 }
+
+extension StackLayout.Alignment {
+    func layoutMode(in contextMode: StrictPressureMode) -> StrictPressureMode {
+        switch (self, contextMode) {
+        case (.fill, .fill):
+            return .fill
+        default:
+            return .natural
+        }
+    }
+}
+
+extension StrictLayoutContext {
+    func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
+        let width: StackLayout.VectorConstraint.Axis
+        let height: StackLayout.VectorConstraint.Axis
+
+        if !proposedSize.width.isFinite {
+            width = .unconstrained
+        } else if mode.horizontal == .fill {
+            width = .exactly(proposedSize.width)
+        } else {
+            width = .atMost(proposedSize.width)
+        }
+
+        if !proposedSize.height.isFinite {
+            height = .unconstrained
+        } else if mode.vertical == .fill {
+            height = .exactly(proposedSize.height)
+        } else {
+            height = .atMost(proposedSize.height)
+        }
+
+        switch axis {
+        case .horizontal:
+            return StackLayout.VectorConstraint(axis: width, cross: height)
+        case .vertical:
+            return StackLayout.VectorConstraint(axis: height, cross: width)
+        }
+    }
+}
+
 
 // MARK: - Result Builders
 

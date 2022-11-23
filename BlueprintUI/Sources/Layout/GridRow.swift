@@ -163,6 +163,10 @@ extension GridRow {
                 subview.place(at: bounds.origin + frame.origin, size: frame.size)
             }
         }
+        
+        func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+            fatalError("TODO")
+        }
 
         /// Compute child frames in a given layout space.
         ///

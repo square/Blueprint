@@ -91,6 +91,23 @@ fileprivate struct OverlayLayout: Layout, StrictLayout {
             subview.place(at: bounds)
         }
     }
+    
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        func maxSize(lhs: CGSize, rhs: CGSize) -> CGSize {
+            CGSize(
+                width: max(lhs.width, rhs.width),
+                height: max(lhs.height, rhs.height)
+            )
+        }
+
+        return StrictLayoutAttributes(
+            size: children
+                .map { $1.layout(in: context.proposedSize) }
+                .reduce(.zero, maxSize),
+            childPositions: Array(repeating: .zero, count: children.count)
+        )
+
+    }
 }
 
 extension Overlay {

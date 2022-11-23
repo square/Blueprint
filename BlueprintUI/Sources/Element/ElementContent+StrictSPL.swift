@@ -18,15 +18,6 @@ public protocol StrictLayout: Layout {
     ) -> StrictLayoutAttributes
 }
 
-extension StrictLayout {
-    public func layout(
-        in context: StrictLayoutContext,
-        children: [StrictLayoutChild]
-    ) -> StrictLayoutAttributes {
-        fatalError("TODO: not implemented")
-    }
-}
-
 public protocol StrictSingleChildLayout {
     func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes
 }

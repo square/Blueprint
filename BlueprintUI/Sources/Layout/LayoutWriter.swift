@@ -285,6 +285,24 @@ extension LayoutWriter {
                     )
                 }
             }
+            
+            func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+                let options = StrictLayoutOptions(mode: .init(horizontal: .fill, vertical: .fill))
+                let size = builder.sizing.measure(with: builder)
+
+                for (layoutChild, builderChild) in zip(children, builder.children) {
+                    _ = layoutChild.layoutable.layout(
+                        in: builderChild.frame.size
+//                        options: options
+                    )
+                }
+
+                return StrictLayoutAttributes(
+                    size: size,
+                    childPositions: builder.children.map { $0.frame.origin }
+                )
+
+            }
         }
     }
 }

@@ -223,6 +223,10 @@ extension EqualStack {
                 subview.place(at: origin, size: itemSize)
             }
         }
+        
+        func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+            fatalError("TODO")
+        }
     }
 
 }
