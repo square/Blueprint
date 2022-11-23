@@ -5,4 +5,5 @@ public enum LayoutMode: Equatable {
 
     case standard
     case singlePass
+    case strictSinglePass
 }

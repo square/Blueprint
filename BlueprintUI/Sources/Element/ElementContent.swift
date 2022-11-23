@@ -57,6 +57,20 @@ public struct ElementContent {
                     environment: environment
                 )
             )
+        case .strictSinglePass:
+            let context = StrictLayoutContext(
+                path: .empty,
+                proposedSize: constraint.strictSize,
+                mode: AxisVarying(horizontal: .natural, vertical: .natural)
+            )
+            let subtree = performStrictLayout(
+                in: context,
+                environment: environment,
+                cache: cache
+            )
+            return subtree
+                .intermediate
+                .size
         }
     }
 
