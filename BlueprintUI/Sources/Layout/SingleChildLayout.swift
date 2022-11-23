@@ -21,9 +21,3 @@ public protocol SingleChildLayout: SPSingleChildLayout, StrictSingleChildLayout 
     func layout(size: CGSize, child: Measurable) -> LayoutAttributes
 
 }
-
-extension SingleChildLayout {
-    public func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
-        fatalError("TODO: not implemented")
-    }
-}

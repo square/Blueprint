@@ -249,3 +249,21 @@ extension SizeConstraint {
         }
     }
 }
+
+extension SizeConstraint {
+    public var strictSize: CGSize {
+        CGSize(width: width.strictValue, height: height.strictValue)
+    }
+}
+
+extension SizeConstraint.Axis {
+    var strictValue: CGFloat {
+        switch self {
+        case .atMost(let max):
+            return max
+        case .unconstrained:
+            return .infinity
+        }
+    }
+}
+

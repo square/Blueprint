@@ -171,6 +171,10 @@ public struct ConstrainedAspectRatio: Element {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.place(at: bounds)
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            fatalError("TODO")
+        }
     }
 }
 

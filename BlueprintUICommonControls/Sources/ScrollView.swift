@@ -231,8 +231,33 @@ extension ScrollView {
 
             subview.place(at: origin, size: itemSize)
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            let measurable = Measurer { constraint in
+                child.layout(in: constraint.strictSize)
+            }
+
+            let attributes = layout(size: context.proposedSize, child: measurable)
+
+            let size = CGSize(
+                width: min(context.proposedSize.width, attributes.bounds.size.width),
+                height: min(context.proposedSize.height, attributes.bounds.size.height)
+            )
+
+            return StrictLayoutAttributes(
+                size: size,
+                childPositions: [attributes.frame.origin]
+            )
+        }
     }
 
+}
+
+struct Measurer: Measurable {
+    var _measure: (SizeConstraint) -> CGSize
+    func measure(in constraint: SizeConstraint) -> CGSize {
+        _measure(constraint)
+    }
 }
 
 

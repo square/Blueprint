@@ -209,6 +209,26 @@ extension ConstrainedSize {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.place(at: bounds)
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            let constrainedSize = CGSize(
+                width: width.applied(to: context.proposedSize.width),
+                height: height.applied(to: context.proposedSize.height)
+            )
+
+            let measuredSize = child.layout(in: constrainedSize)
+
+            let childSize = CGSize(
+                width: width.applied(to: measuredSize.width),
+                height: height.applied(to: measuredSize.height)
+            )
+
+            return StrictLayoutAttributes(
+                size: childSize,
+                childPositions: [.zero]
+            )
+
+        }
     }
 
 }
