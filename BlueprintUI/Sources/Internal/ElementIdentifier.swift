@@ -46,7 +46,7 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
     private let elementType: Element.Type
     private let key: AnyHashable?
     private let count: Int
-    
+
     private let hash: Int
 
     private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
@@ -54,7 +54,7 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
     static func identifierFor(singleChild element: Element) -> ElementIdentifier {
         .identifier(for: element, key: nil, count: 1)
     }
-    
+
     static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
         .identifier(for: type(of: element), key: key, count: count)
     }
