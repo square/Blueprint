@@ -69,11 +69,10 @@ final class ElementStateTree {
         }
 
         if let root = self.root {
-
             if type(of: root.element.latest) == type(of: element) {
 
                 root.prepareForLayout()
-
+                
                 root.update(with: element, in: environment, identifier: root.identifier)
 
                 let output = updates(root)
@@ -488,7 +487,7 @@ final class ElementState {
         }
 
         /// Perform the layout and track the environment dependencies.
-
+        
         let (nodes, dependencies) = trackDependenciesIfNeeded(
             in: environment,
             during: layout
