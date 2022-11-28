@@ -54,6 +54,24 @@ public struct ElementContent {
             )
         }
     }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode) -> Void
+    ) {
+        autoreleasepool {
+            storage.forEachElement(
+                in: size,
+                with: environment,
+                children: childNodes,
+                state: state,
+                forEach: forEach
+            )
+        }
+    }
 }
 
 extension ElementContent {
@@ -68,13 +86,15 @@ extension ElementContent {
             let element = MeasurementElement(content: self)
             let root = ElementStateTree(name: "ElementContent.measure")
 
-            let rootState = root.update(with: element, in: environment)
+            let (_, size) = root.performUpdate(with: element, in: environment) { state in
+                self.measure(
+                    in: constraint,
+                    with: environment,
+                    state: state
+                )
+            }
 
-            return self.measure(
-                in: constraint,
-                with: environment,
-                state: rootState
-            )
+            return size
         }
     }
 
@@ -232,6 +252,14 @@ fileprivate protocol ContentStorage {
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode]
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode) -> Void
+    )
 }
 
 
@@ -339,6 +367,23 @@ extension ElementContent {
             }
         }
 
+        func forEachElement(
+            in size: CGSize,
+            with environment: Environment,
+            children childNodes: [LayoutResultNode],
+            state: ElementState,
+            forEach: (ElementState, Element, LayoutResultNode) -> Void
+        ) {
+            precondition(childNodes.count == children.count)
+
+            children.indexedForEach { index, child in
+
+                let childState = state.childState(for: child.element, in: environment, with: child.identifier)
+
+                forEach(childState, child.element, childNodes[index])
+            }
+        }
+
         private func layoutItems(
             state: ElementState,
             environment: Environment
@@ -387,6 +432,23 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     var adapter: (inout Environment) -> Void
 
     var child: Element
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode) -> Void
+    ) {
+        precondition(childNodes.count == 1)
+
+        var environment = environment
+        adapter(&environment)
+
+        let childState = state.childState(for: child, in: environment, with: .identifierFor(singleChild: child))
+
+        forEach(childState, child, childNodes[0])
+    }
 
     func performLayout(
         in size: CGSize,
@@ -503,6 +565,22 @@ private struct LazyStorage: ContentStorage {
         }
     }
 
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode) -> Void
+    ) {
+        precondition(childNodes.count == 1)
+
+        let element = builder(.layout, SizeConstraint(size), environment)
+
+        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+        forEach(childState, element, childNodes[0])
+    }
+
     private func buildChild(
         for phase: ElementContent.LayoutPhase,
         in constraint: SizeConstraint,
@@ -533,6 +611,16 @@ private struct MeasurableStorage: ContentStorage {
         state.measure(in: constraint, with: environment) { environment in
             measurer(constraint, environment)
         }
+    }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode) -> Void
+    ) {
+        // No-op; we have no children.
     }
 }
 

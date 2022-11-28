@@ -117,7 +117,7 @@ class UIViewElementTests: XCTestCase {
         
         enum TestKey: EnvironmentKey {
             static var defaultValue: Void { () }
-            
+
             static func isEquivalent(_ lhs: (), _ rhs: ()) -> Bool {
                 true
             }

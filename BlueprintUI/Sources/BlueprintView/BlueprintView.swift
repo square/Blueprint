@@ -417,14 +417,14 @@ public final class BlueprintView: UIView {
     ) -> [(path: ElementPath, node: NativeViewNode)] {
 
         if let element = self.element {
-            let elementState = rootState.update(with: element, in: environment)
-
-            let node = LayoutResultNode(
-                identifier: .identifierFor(singleChild: element),
-                layoutAttributes: .init(frame: bounds),
-                environment: environment,
-                state: elementState
-            )
+            let (_, node) = rootState.performUpdate(with: element, in: environment) { state in
+                LayoutResultNode(
+                    identifier: .identifierFor(singleChild: element),
+                    layoutAttributes: .init(frame: bounds),
+                    environment: environment,
+                    state: state
+                )
+            }
 
             return node.resolve()
         } else {

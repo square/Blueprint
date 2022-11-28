@@ -48,8 +48,11 @@ final class ElementStateTree {
     /// Updates or replaces the root node depending on the type of the new element.
     ///
     /// This method will also remove any `ElementState` for elements no longer present in the element tree.
-    func update(with element: Element, in environment: Environment) -> ElementState {
-
+    func performUpdate<Output>(
+        with element: Element,
+        in environment: Environment,
+        updates: (ElementState) -> Output
+    ) -> (ElementState, Output) {
         func makeRoot(with element: Element) -> ElementState {
             let new = ElementState(
                 parent: nil,
@@ -72,15 +75,19 @@ final class ElementStateTree {
                 
                 root.update(with: element, in: environment, identifier: root.identifier)
 
+                let output = updates(root)
+
                 delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
 
                 root.finishedLayout()
 
-                return root
+                return (root, output)
             } else {
                 let new = makeRoot(with: element)
+
+                let output = updates(new)
 
                 delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
@@ -88,10 +95,12 @@ final class ElementStateTree {
 
                 root.finishedLayout()
 
-                return new
+                return (new, output)
             }
         } else {
             let new = makeRoot(with: element)
+
+            let output = updates(new)
 
             delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
@@ -99,7 +108,7 @@ final class ElementStateTree {
 
             new.finishedLayout()
 
-            return new
+            return (new, output)
         }
     }
 
@@ -149,9 +158,17 @@ final class ElementState {
     let comparability: Comparability
 
     /// If the node has been visited this layout cycle.
-    /// If `false`, the node will be torn down and garbage collected
-    /// at the end of the layout cycle.
+    /// This is used to ensure we only `update` the `ElementState`
+    /// for an `Element` once per layout cycle.
+    ///
+    /// If this value is `false`, at the end of a layout cycle, the
+    /// `ElementState` will be torn down; indicating it  is no longer part
+    /// of the element tree.
     private(set) var wasVisited: Bool
+
+    /// If the node has updated its children with their latest `ElementContent`
+    /// while returning a cached layout.
+    private(set) var hasUpdatedChildrenDuringLayout: Bool
 
     /// The cached measurements for the current node.
     /// Measurements are cached by a `SizeConstraint` key, meaning that
@@ -260,6 +277,7 @@ final class ElementState {
         self.name = name
 
         wasVisited = true
+        hasUpdatedChildrenDuringLayout = true
     }
 
     /// Assigned once per layout cycle, this value represents the
@@ -332,7 +350,6 @@ final class ElementState {
                 }
             }
         } else {
-
             /// If we are equivalent, we still need to throw out any measurements
             /// and layouts that are dependent on the `Environment`. Compare
             /// the stored `Environment.Subset` values to see if any
@@ -435,11 +452,35 @@ final class ElementState {
             return nodes
         }
 
-
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
             delegate.ifDebug {
                 $0.treeDidReturnCachedLayout(existing, for: self)
+            }
+
+            if hasUpdatedChildrenDuringLayout == false {
+                hasUpdatedChildrenDuringLayout = true
+
+                /// Because we're returning a cached layout, we're not going to be
+                /// enumerating every child element in the tree during layout. To resolve
+                /// this, we'll perform an enumeration over the tree using our cached layout values.
+                /// This allows us to update the cached `element.latest`, in case the
+                /// `backingViewDescription` has changed.
+                elementContent.forEachElement(
+                    in: size,
+                    with: environment,
+                    children: existing.nodes,
+                    state: self,
+                    forEach: { state, element, node in
+                        state.element.latest = element
+
+                        /// Because we won't be visiting any child elements
+                        /// for a `ComparableElement` during either
+                        /// measurement or layout, mark all our child nodes
+                        /// as visited so they are not torn down.
+                        state.wasVisited = true
+                    }
+                )
             }
 
             return existing.nodes
@@ -531,6 +572,8 @@ final class ElementState {
 
             children[identifier] = new
 
+            orderedChildren.append(new)
+
             delegate.ifDebug {
                 $0.treeDidCreateState(new)
             }
@@ -544,6 +587,7 @@ final class ElementState {
     fileprivate func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
+            $0.hasUpdatedChildrenDuringLayout = false
             $0.orderedChildren.removeAll(keepingCapacity: true)
         }
     }
@@ -746,7 +790,10 @@ extension Optional where Wrapped == ElementStateTreeDelegate {
 extension ElementState: CustomDebugStringConvertible {
 
     public var debugDescription: String {
+        "<ElementState \(address(of: self)): \(identifier.debugDescription)>"
+    }
 
+    public var recursiveDebugDescription: String {
         var debugRepresentations = [ElementState.DebugRepresentation]()
 
         children.values.forEach {
