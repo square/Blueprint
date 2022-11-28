@@ -46,13 +46,20 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
     private let elementType: Element.Type
     private let key: AnyHashable?
     private let count: Int
+    
     private let hash: Int
 
     private static var cachedIdentifiers: [ObjectIdentifier: [Int: ElementIdentifier]] = [:]
 
+    static func identifierFor(singleChild element: Element) -> ElementIdentifier {
+        .identifier(for: element, key: nil, count: 1)
+    }
+    
     static func identifier(for element: Element, key: AnyHashable?, count: Int) -> ElementIdentifier {
+        .identifier(for: type(of: element), key: key, count: count)
+    }
 
-        let elementType = type(of: element)
+    static func identifier(for elementType: Element.Type, key: AnyHashable?, count: Int) -> ElementIdentifier {
 
         /// There's no performance benefit to caching identifiers that have
         /// a key because the lookup ends up being more expensive, so
@@ -81,7 +88,6 @@ final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
         self.elementType = elementType
         self.key = key
-
         self.count = count
 
         var hasher = Hasher()

@@ -1,3 +1,4 @@
+// swiftformat:disable redundantReturn
 //
 //  ElementStateTests.swift
 //
@@ -28,6 +29,8 @@ class ElementStateTreeTests: XCTestCase {
         }
 
         let state1 = try XCTUnwrap(tree.root)
+
+        XCTAssertEqual((state1.element.latest as! Element1).text, "1")
 
         // Updating with the same element of the same type should keep the same state.
 
@@ -71,7 +74,8 @@ class ElementStateTests: XCTestCase {
         testcase("default property values") {
             let state = ElementState(
                 parent: nil,
-                identifier: .identifier(for: Element1(text: "test"), key: nil, count: 1),
+                delegate: nil,
+                identifier: .identifier(for: Element1.self, key: nil, count: 1),
                 element: Element1(text: "1"),
                 signpostRef: NSObject(),
                 name: ""
@@ -109,6 +113,55 @@ class ElementStateTests: XCTestCase {
 
     func test_recursiveForEach() {
         // TODO:
+    }
+}
+
+
+class ElementStateTree_IdentifierTree_Tests: XCTestCase {
+
+    func test_identifierTree() {
+
+        // TODO: Fix me once we have the ElementContent changes in.
+        return;
+
+        let tree = ElementStateTree(name: "Testing")
+
+        XCTAssertEqual(tree.identifierTree, nil)
+
+        let element = Row {
+            Column {
+                Empty()
+            }
+
+            Column {
+                Empty()
+                Empty()
+            }
+        }
+
+        tree.update(with: element, in: .empty)
+
+        XCTAssertEqual(
+            tree.identifierTree,
+            IdentifiedNode(Row.identifier(1)) {
+                IdentifiedNode(Column.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                }
+
+                IdentifiedNode(Column.identifier(2)) {
+                    IdentifiedNode(Empty.identifier(1))
+                    IdentifiedNode(Empty.identifier(2))
+                }
+            }
+        )
+    }
+}
+
+
+extension Element {
+
+    fileprivate static func identifier(_ count: Int) -> ElementIdentifier {
+        .identifier(for: self, key: nil, count: count)
     }
 }
 
@@ -166,5 +219,39 @@ extension ElementStateTree {
         }
 
         return output
+    }
+}
+
+
+struct IdentifiedNode: Hashable {
+    var identifier: ElementIdentifier
+
+    var children: [IdentifiedNode]
+
+    init(
+        _ identifier: ElementIdentifier,
+        @Builder<IdentifiedNode> children: () -> [IdentifiedNode] = { [] }
+    ) {
+        self.identifier = identifier
+        self.children = children()
+    }
+}
+
+
+extension ElementStateTree {
+
+    var identifierTree: IdentifiedNode? {
+        root?.identifiedNode
+    }
+}
+
+
+extension ElementState {
+
+    var identifiedNode: IdentifiedNode {
+        .init(
+            identifier,
+            children: { orderedChildren.map(\.identifiedNode) }
+        )
     }
 }
