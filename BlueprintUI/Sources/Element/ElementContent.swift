@@ -23,7 +23,9 @@ public struct ElementContent {
         storage = builder
     }
 
-    public var childCount: Int {
+    /// The number of children the `ElementContent` has.
+    /// Delegates to `storage` (`ContentStorage`).
+    var childCount: Int {
         storage.childCount
     }
 
@@ -31,6 +33,8 @@ public struct ElementContent {
         self.storage = storage
     }
 
+    /// Measures the content, returning the desired size.
+    /// Delegates to `storage` (`ContentStorage`).
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
@@ -41,6 +45,10 @@ public struct ElementContent {
         }
     }
 
+    /// Lays out the content, returning a tree of `LayoutResultNode` values
+    /// that can be  used to drive a layout process.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
     func performLayout(
         in size: CGSize,
         with environment: Environment,
@@ -55,12 +63,21 @@ public struct ElementContent {
         }
     }
 
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
     func forEachElement(
         in size: CGSize,
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode) -> Void
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
     ) {
         autoreleasepool {
             storage.forEachElement(
@@ -72,11 +89,36 @@ public struct ElementContent {
             )
         }
     }
+
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    fileprivate func forEachElement(
+        with node: LayoutResultNode,
+        environment: Environment,
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+    ) {
+        forEachElement(
+            in: node.layoutAttributes.bounds.size,
+            with: environment,
+            children: node.children,
+            state: state,
+            forEach: forEach
+        )
+    }
 }
 
 extension ElementContent {
 
     /// Measures the required size of this element's content.
+    ///
     /// - Parameters:
     ///   - constraint: The size constraint.
     ///   - environment: The environment to measure in.
@@ -102,7 +144,7 @@ extension ElementContent {
     /// when calling `ElementContent.measure`.
     private struct MeasurementElement: Element {
 
-        var content: ElementContent
+        let content: ElementContent
 
         func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
             nil
@@ -161,8 +203,10 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    public init(child: Element) {
-        self = ElementContent(child: child, layout: PassthroughLayout())
+    public init(
+        child: Element
+    ) {
+        storage = SingleChildStorage(element: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -258,7 +302,7 @@ fileprivate protocol ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode) -> Void
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
     )
 }
 
@@ -372,7 +416,7 @@ extension ElementContent {
             with environment: Environment,
             children childNodes: [LayoutResultNode],
             state: ElementState,
-            forEach: (ElementState, Element, LayoutResultNode) -> Void
+            forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
         ) {
             precondition(childNodes.count == children.count)
 
@@ -380,7 +424,16 @@ extension ElementContent {
 
                 let childState = state.childState(for: child.element, in: environment, with: child.identifier)
 
-                forEach(childState, child.element, childNodes[index])
+                let childNode = childNodes[index]
+
+                forEach(childState, child.element, childNode, childNode.children)
+
+                childState.elementContent.forEachElement(
+                    with: childNode,
+                    environment: environment,
+                    state: childState,
+                    forEach: forEach
+                )
             }
         }
 
@@ -420,6 +473,79 @@ extension ElementContent {
     }
 }
 
+/// Storage used to store "layout neutral" elements, where they will only have one child,
+/// and the measurement of the element is the same as the child.
+private struct SingleChildStorage: ContentStorage {
+
+    let childCount: Int = 1
+
+    var element: Element
+
+    func measure(
+        in constraint: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+
+        let identifier = ElementIdentifier.identifierFor(singleChild: element)
+
+        let child = state.childState(for: element, in: environment, with: identifier)
+
+        return child.elementContent.measure(in: constraint, with: environment, state: child)
+    }
+
+    func performLayout(
+        in size: CGSize,
+        with environment: Environment,
+        state: ElementState
+    ) -> [LayoutResultNode] {
+        state.layout(in: size, with: environment) { environment in
+            let childAttributes = LayoutAttributes(size: size)
+
+            let identifier = ElementIdentifier.identifierFor(singleChild: element)
+
+            let childState = state.childState(for: element, in: environment, with: identifier)
+
+            let node = LayoutResultNode(
+                identifier: identifier,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                element: childState.element,
+                children: childState.elementContent.performLayout(
+                    in: size,
+                    with: environment,
+                    state: childState
+                )
+            )
+
+            return [node]
+        }
+    }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+    ) {
+        precondition(childNodes.count == 1)
+
+        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+        let childNode = childNodes[0]
+
+        forEach(childState, element, childNode, childNode.children)
+
+        childState.elementContent.forEachElement(
+            with: childNode,
+            environment: environment,
+            state: childState,
+            forEach: forEach
+        )
+    }
+}
+
 
 /// A type used to delay element creation until the `Environment` is available,
 /// used by the `AdaptedEnvironment` element.
@@ -438,7 +564,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode) -> Void
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
     ) {
         precondition(childNodes.count == 1)
 
@@ -447,7 +573,16 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childState = state.childState(for: child, in: environment, with: .identifierFor(singleChild: child))
 
-        forEach(childState, child, childNodes[0])
+        let childNode = childNodes[0]
+
+        forEach(childState, child, childNode, childNode.children)
+
+        childState.elementContent.forEachElement(
+            with: childNode,
+            environment: environment,
+            state: childState,
+            forEach: forEach
+        )
     }
 
     func performLayout(
@@ -570,7 +705,7 @@ private struct LazyStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode) -> Void
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
     ) {
         precondition(childNodes.count == 1)
 
@@ -578,7 +713,16 @@ private struct LazyStorage: ContentStorage {
 
         let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
 
-        forEach(childState, element, childNodes[0])
+        let childNode = childNodes[0]
+
+        forEach(childState, element, childNode, childNode.children)
+
+        childState.elementContent.forEachElement(
+            with: childNode,
+            environment: environment,
+            state: childState,
+            forEach: forEach
+        )
     }
 
     private func buildChild(
@@ -618,7 +762,7 @@ private struct MeasurableStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode) -> Void
+        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
     ) {
         // No-op; we have no children.
     }
@@ -658,18 +802,6 @@ fileprivate struct SingleChildLayoutHost: Layout {
     }
 }
 
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-
-}
 
 // Used for empty elements with an intrinsic size
 fileprivate struct MeasurableLayout: Layout {
@@ -686,6 +818,7 @@ fileprivate struct MeasurableLayout: Layout {
         return []
     }
 }
+
 
 struct Measurer: Measurable {
 

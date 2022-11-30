@@ -99,6 +99,85 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(callCount, 2)
     }
+
+    func test_forEachElement() {
+
+        enum TestKey: EnvironmentKey, Equatable {
+            static let defaultValue: Int = 0
+        }
+
+        struct SingleChildElement: Element {
+
+            var child: Element
+
+            var content: ElementContent {
+                .init(child: child)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        /// The below element contains child element of every `ContentStorage`
+        /// type, to ensure they all implement `forEachElement` correctly.
+
+        let element = AdaptedEnvironment( /// `EnvironmentAdaptingStorage`
+            key: TestKey.self,
+            value: 1,
+            wrapping: Row { /// `Builder`
+
+                Column {
+                    Empty() /// `MeasurableStorage`
+                }
+
+                Column {}
+
+                GeometryReader { proxy in /// `LazyStorage`
+                    Spacer()
+                }
+
+                SingleChildElement( /// `SingleChildStorage`
+                    child: Empty()
+                )
+            }
+        )
+
+        let tree = ElementStateTree(name: "Testing")
+
+        let state = tree.performLayout(with: element)
+
+        let size = CGSize(width: 100, height: 100)
+
+        let nodes = state.layout(in: size, with: .empty) { env in
+            element.content.performLayout(in: size, with: env, state: state)
+        }
+
+        var identifiers = [ElementIdentifier]()
+
+        element.content.forEachElement(
+            in: size,
+            with: .empty,
+            children: nodes,
+            state: state,
+            forEach: { state, element, node, children in
+                identifiers.append(node.identifier)
+            }
+        )
+
+        XCTAssertEqual(
+            identifiers, [
+                .identifier(for: Row.self, key: nil, count: 1),
+                .identifier(for: Column.self, key: nil, count: 1),
+                .identifier(for: Empty.self, key: nil, count: 1),
+                .identifier(for: Column.self, key: nil, count: 2),
+                .identifier(for: GeometryReader.self, key: nil, count: 1),
+                .identifier(for: Spacer.self, key: nil, count: 1),
+                .identifier(for: SingleChildElement.self, key: nil, count: 1),
+                .identifier(for: Empty.self, key: nil, count: 1),
+            ]
+        )
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
