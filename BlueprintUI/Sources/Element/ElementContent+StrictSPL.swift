@@ -180,6 +180,7 @@ class StrictLayoutNode: StrictLayoutable {
         path: ElementPath,
         id: ElementIdentifier,
         element: Element,
+        content: ElementContent,
         mode: AxisVarying<StrictPressureMode>,
         environment: Environment,
         cache: CacheTree
@@ -187,6 +188,7 @@ class StrictLayoutNode: StrictLayoutable {
         self.path = path
         self.id = id
         self.element = element
+        self.content = content
         self.mode = mode
         self.environment = environment
         self.cache = cache
@@ -195,6 +197,7 @@ class StrictLayoutNode: StrictLayoutable {
     var path: ElementPath
     var id: ElementIdentifier
     var element: Element
+    var content: ElementContent
     var mode: AxisVarying<StrictPressureMode>
     var environment: Environment
     var cache: CacheTree
@@ -251,7 +254,7 @@ class StrictLayoutNode: StrictLayoutable {
             environment.debugElementPath = nil
         }
 
-        var layoutResult = element.content.performStrictLayout(
+        var layoutResult = content.performStrictLayout(
             in: StrictLayoutContext(
                 path: path,
                 proposedSize: proposedSize,
@@ -265,7 +268,7 @@ class StrictLayoutNode: StrictLayoutable {
         if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
             let oldWidth = layoutResult.intermediate.size.width
             if oldWidth != width {
-                print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
+//                print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
                 correction.width = width - oldWidth
                 layoutResult.intermediate.size.width = width
             }
@@ -273,7 +276,7 @@ class StrictLayoutNode: StrictLayoutable {
         if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
             let oldHeight = layoutResult.intermediate.size.height
             if oldHeight != height {
-                print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
+//                print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")
                 correction.height = height - oldHeight
                 layoutResult.intermediate.size.height = height
             }

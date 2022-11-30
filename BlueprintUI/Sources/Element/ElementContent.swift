@@ -646,24 +646,36 @@ extension ElementContent.Builder {
         cache: CacheTree
     ) -> StrictSubtreeResult {
 
-        let identifiers = self.identifiers(in: context)
-        let nodes = children.indices.map { (index: Int) -> StrictLayoutNode in
-            let child = children[index].element
-            let id = identifiers[index]
+        var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
 
-            return StrictLayoutNode(
+        var nodes: [StrictLayoutNode] = []
+        nodes.reserveCapacity(children.count)
+        
+        var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
+        layoutChildren.reserveCapacity(children.count)
+                
+        for index in 0..<children.count {
+            let child = children[index]
+            let childElement = child.element
+            let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
+            
+            let node = StrictLayoutNode(
                 path: context.path,
                 id: id,
-                element: child,
+                element: childElement,
+                content: childElement.content,
                 mode: context.mode,
                 environment: environment,
-                cache: cache.subcache(index: index, of: childCount, element: child)
+                cache: cache.subcache(index: index, of: childCount, element: childElement)
             )
+            
+            nodes.append(node)
+            layoutChildren.append((traits: child.traits, layoutable: node))
         }
 
         let intermediateResult = layout.layout(
             in: context,
-            children: children.indices.map { (traits: children[$0].traits, layoutable: nodes[$0]) }
+            children: layoutChildren
         )
 
         return StrictSubtreeResult(
@@ -688,6 +700,7 @@ extension EnvironmentAdaptingStorage {
             path: context.path,
             id: identifier,
             element: child,
+            content: child.content,
             mode: context.mode,
             environment: environment,
             cache: cache
@@ -718,6 +731,7 @@ extension LazyStorage {
             path: context.path,
             id: identifier,
             element: child,
+            content: child.content,
             mode: context.mode,
             environment: environment,
             cache: cache
