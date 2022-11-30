@@ -10,12 +10,12 @@ import XCTest
 
 extension LayoutResultNode {
     func findLayout(of elementType: Element.Type) -> LayoutResultNode? {
-        if type(of: element) == elementType {
+        if type(of: element.latest) == elementType {
             return self
         }
 
         for child in children {
-            if let node = child.node.findLayout(of: elementType) {
+            if let node = child.findLayout(of: elementType) {
                 return node
             }
         }

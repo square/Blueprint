@@ -298,7 +298,7 @@ class EnvironmentTests: XCTestCase {
     }
 
     func leafAttributes(in node: LayoutResultNode) -> LayoutAttributes {
-        if let childNode = node.children.first?.node {
+        if let childNode = node.children.first {
             return leafAttributes(in: childNode)
         }
         return node.layoutAttributes

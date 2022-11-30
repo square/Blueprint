@@ -1,64 +1,58 @@
 import UIKit
 
-extension Element {
-
-    /// Build a fully laid out element tree with complete layout attributes
-    /// for each element.
-    ///
-    /// - Parameter layoutAttributes: The layout attributes to assign to the
-    ///   root element.
-    ///
-    /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        LayoutResultNode(
-            root: self,
-            layoutAttributes: layoutAttributes,
-            environment: environment
-        )
-    }
-
-}
-
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
 
-    /// The element that was laid out
-    var element: Element
+    /// The element that was laid out. This is a reference to a
+    /// `LatestElement` box, so that even in cached `LayoutResultNode` values,
+    /// we will recieve the latest element from the layout pass.
+    var element: ElementState.LatestElement
+
+    /// The identifier for the element within its parent.
+    var identifier: ElementIdentifier
 
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
+    /// The environment for the element.
     var environment: Environment
 
     /// The element's children.
-    var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+    var children: [LayoutResultNode]
 
     init(
-        element: Element,
+        identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
-        children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
+        element: ElementState.LatestElement,
+        children: [LayoutResultNode]
     ) {
-        self.element = element
+        self.identifier = identifier
         self.layoutAttributes = layoutAttributes
         self.environment = environment
+        self.element = element
+
         self.children = children
     }
 
-    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
+    init(
+        identifier: ElementIdentifier,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        state: ElementState
+    ) {
         self.init(
-            element: root,
+            identifier: identifier,
             layoutAttributes: layoutAttributes,
             environment: environment,
-            children: root.content.performLayout(
-                attributes: layoutAttributes,
-                environment: environment,
-                cache: cache
+            element: state.element,
+            children: state.element.latest.content.performLayout(
+                in: layoutAttributes.frame.size,
+                with: environment,
+                state: state
             )
         )
     }
-
 }
 
 
@@ -72,27 +66,26 @@ extension LayoutResultNode {
         // complete layout data for all children is required to perform the
         // appropriate computations.
         let resolvedChildContent: [(path: ElementPath, node: NativeViewNode)] = children
-            .flatMap { identifier, layoutResultNode in
+            .flatMap { layoutResultNode in
 
                 layoutResultNode
                     .resolve()
                     .map { path, viewDescriptionNode in
                         // Propagate the child identifier
-                        (path: path.prepending(identifier: identifier), node: viewDescriptionNode)
+                        (path: path.prepending(identifier: layoutResultNode.identifier), node: viewDescriptionNode)
                     }
             }
 
         // Determine the 'extent' of any child nodes. This is
         // the minimal-area rectangle containing all child frames.
         let subtreeExtent: CGRect? = children
-            .map { $0.node }
-            .reduce(into: nil) { rect, node in
-                rect = rect?.union(node.layoutAttributes.frame) ?? node.layoutAttributes.frame
+            .reduce(into: nil) { rect, child in
+                rect = rect?.union(child.layoutAttributes.frame) ?? child.layoutAttributes.frame
             }
 
         // Get the backing view description for the current node (if any),
         // populated with relevant layout data.
-        let viewDescription = element.backingViewDescription(
+        let viewDescription = element.latest.backingViewDescription(
             with: .init(
                 bounds: layoutAttributes.bounds,
                 subtreeExtent: subtreeExtent,
@@ -123,7 +116,6 @@ extension LayoutResultNode {
                 return (path, transformedNode)
             }
         }
-
     }
-
 }
+

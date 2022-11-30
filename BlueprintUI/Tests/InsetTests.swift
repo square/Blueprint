@@ -17,7 +17,7 @@ class InsetTests: XCTestCase {
         let element = TestElement()
         let inset = Inset(uniformInset: 20.0, wrapping: element)
 
-        let children = inset.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children.map { $0.node }
+        let children = inset.layout(frame: CGRect(x: 0, y: 0, width: 100, height: 100)).children
 
         XCTAssertEqual(children.count, 1)
         XCTAssertEqual(children[0].layoutAttributes.frame, CGRect(x: 20, y: 20, width: 60, height: 60))

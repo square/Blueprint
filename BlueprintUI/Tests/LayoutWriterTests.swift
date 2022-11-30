@@ -84,10 +84,10 @@ class LayoutWriterTests: XCTestCase {
             layout.add(with: CGRect(x: 20, y: 10, width: 20, height: 100), child: TestElement())
         }
 
-        let layoutResult = writer.content.testLayout(attributes: LayoutAttributes(size: CGSize(width: 100, height: 100)))
+        let layoutResult = writer.content.testLayout(in: CGSize(width: 100, height: 100))
         let innerElement = layoutResult[0]
 
-        let nodes = innerElement.node.children.map(\.node)
+        let nodes = innerElement.children
 
         XCTAssertEqual(nodes.count, 2)
 

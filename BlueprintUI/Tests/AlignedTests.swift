@@ -16,7 +16,6 @@ class AlignedTests: XCTestCase {
         let children = element
             .layout(frame: layoutFrame)
             .children
-            .map { $0.node }
         return children
     }
 
@@ -34,7 +33,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minX, 0)
         XCTAssertEqual(frame.maxX, 100)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_horizontalCenter() {
@@ -44,7 +43,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minX, 2450)
         XCTAssertEqual(frame.maxX, 2550)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_horizontalTrailing() {
@@ -54,7 +53,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minX, 4900)
         XCTAssertEqual(frame.maxX, 5000)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_horizontalFill() {
@@ -64,7 +63,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minX, 0.0)
         XCTAssertEqual(frame.maxX, 5000)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_verticalTop() {
@@ -74,7 +73,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minY, 0)
         XCTAssertEqual(frame.maxY, 200)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_verticalCenter() {
@@ -84,7 +83,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minY, 2900)
         XCTAssertEqual(frame.maxY, 3100)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_verticalBottom() {
@@ -94,7 +93,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minY, 5800)
         XCTAssertEqual(frame.maxY, 6000)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 
     func test_verticalFill() {
@@ -104,7 +103,7 @@ class AlignedTests: XCTestCase {
         let frame = children[0].layoutAttributes.frame
         XCTAssertEqual(frame.minY, 0)
         XCTAssertEqual(frame.maxY, 6000)
-        XCTAssertTrue(children[0].element is TestElement)
+        XCTAssertTrue(children[0].element.latest is TestElement)
     }
 }
 
