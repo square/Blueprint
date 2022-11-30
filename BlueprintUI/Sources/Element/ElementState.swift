@@ -75,11 +75,11 @@ final class ElementStateTree {
 
                 root.update(with: element, in: environment, identifier: root.identifier)
 
-                let output = updates(root)
-
                 delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
+
+                let output = updates(root)
 
                 root.finishedLayout()
 
@@ -87,11 +87,11 @@ final class ElementStateTree {
             } else {
                 let new = makeRoot(with: element)
 
-                let output = updates(new)
-
                 delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
                 }
+
+                let output = updates(new)
 
                 root.finishedLayout()
 
@@ -100,11 +100,11 @@ final class ElementStateTree {
         } else {
             let new = makeRoot(with: element)
 
-            let output = updates(new)
-
             delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
             }
+
+            let output = updates(new)
 
             new.finishedLayout()
 
@@ -393,7 +393,7 @@ final class ElementState {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
             delegate.ifDebug {
-                $0.treeDidReturnCachedMeasurement(existing, for: self)
+                $0.treeDidReturnCachedMeasurement(existing, constraint: constraint, for: self)
             }
 
             return existing.size
@@ -415,7 +415,7 @@ final class ElementState {
         measurements[constraint] = measurement
 
         delegate.ifDebug {
-            $0.treeDidPerformMeasurement(measurement, for: self)
+            $0.treeDidPerformMeasurement(measurement, constraint: constraint, for: self)
         }
 
         return size
@@ -446,7 +446,7 @@ final class ElementState {
             let nodes = layout(environment)
 
             delegate.ifDebug {
-                $0.treeDidPerformLayout(nodes, for: self)
+                $0.treeDidPerformLayout(nodes, size: size, for: self)
             }
 
             return nodes
@@ -455,7 +455,7 @@ final class ElementState {
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
             delegate.ifDebug {
-                $0.treeDidReturnCachedLayout(existing, for: self)
+                $0.treeDidReturnCachedLayout(existing, size: size, for: self)
             }
 
             if hasUpdatedChildrenDuringLayout == false {
@@ -746,21 +746,25 @@ protocol ElementStateTreeDelegate: AnyObject {
 
     func treeDidReturnCachedMeasurement(
         _ measurement: ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: ElementState
     )
 
     func treeDidPerformMeasurement(
         _ measurement: ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: ElementState
     )
 
     func treeDidReturnCachedLayout(
         _ layout: ElementState.CachedLayout,
+        size: CGSize,
         for state: ElementState
     )
 
     func treeDidPerformLayout(
         _ layout: [LayoutResultNode],
+        size: CGSize,
         for state: ElementState
     )
 

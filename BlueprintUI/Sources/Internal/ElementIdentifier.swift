@@ -43,9 +43,9 @@
  */
 final class ElementIdentifier: Hashable, CustomDebugStringConvertible {
 
-    private let elementType: Element.Type
-    private let key: AnyHashable?
-    private let count: Int
+    let elementType: Element.Type
+    let key: AnyHashable?
+    let count: Int
 
     private let hash: Int
 

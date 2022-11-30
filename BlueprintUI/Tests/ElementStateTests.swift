@@ -32,17 +32,174 @@ extension ElementStateTree {
 
 class ElementStateTreeTests: XCTestCase {
 
-    func test_update() throws {
-        let delegate = TestDelegate()
+    func test_integration() {
 
+        // Verify that updating a BlueprintView's state tree round trips correctly.
+
+        let fixture = LayoutPassTestFixture()
+        let blueprintView = BlueprintView(frame: .init(origin: .zero, size: .init(width: 100, height: 200)))
+        blueprintView.rootState.delegate = fixture
+
+        let element1 = Empty()
+
+        let element2 = Row(alignment: .fill) {
+            Column(alignment: .fill) {
+                Empty()
+            }
+
+            Column(alignment: .fill) {}
+        }
+
+        let element3 = Column(alignment: .fill) {
+            Row(alignment: .fill) {
+                Empty()
+            }
+        }
+
+        blueprintView.element = element1
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Empty.identifier(1))
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didSetupRootState(.identifier(for: Empty.self, key: nil, count: 1)),
+        ])
+
+        fixture.removeAll()
+
+        blueprintView.element = element2
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Row.identifier(1)) {
+                IdentifiedNode(Column.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                }
+
+                IdentifiedNode(Column.identifier(2))
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didReplaceRootState(
+                old: .identifier(for: Empty.self, key: nil, count: 1),
+                new: .identifier(for: Row.self, key: nil, count: 1)
+            ),
+            .elementState_treeDidCreateState(.identifier(for: Column.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Column.self, key: nil, count: 2)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Column.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(0.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Column.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidFetchElementContent(.identifier(for: Column.self, key: nil, count: 2)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Column.self, key: nil, count: 2),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(0.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Column.self, key: nil, count: 1),
+                CGSize(width: 0.0, height: 200.0)
+            ),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Row.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+        ])
+
+        fixture.removeAll()
+
+        blueprintView.element = element3
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Column.identifier(1)) {
+                IdentifiedNode(Row.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                }
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didReplaceRootState(
+                old: .identifier(for: Row.self, key: nil, count: 1),
+                new: .identifier(for: Column.self, key: nil, count: 1)
+            ),
+            .elementState_treeDidCreateState(.identifier(for: Row.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Row.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(0.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Row.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(200.0))
+            ),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(100.0), height: .atMost(0.0))
+            ),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Row.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 0.0)
+            ),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Column.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+        ])
+
+        fixture.removeAll()
+
+        blueprintView.element = nil
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            nil
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didTeardownRootState(.identifier(for: Column.self, key: nil, count: 1)),
+        ])
+    }
+
+    func test_performUpdate() throws {
+
+        let fixture = LayoutPassTestFixture()
         let tree = ElementStateTree(name: "Testing")
+        tree.delegate = fixture
+
         let element1 = Element1(text: "1")
         let element1b = Element1(text: "1.1")
         let element2 = Element2(text: "2")
 
         XCTAssertNil(tree.root)
-
-        tree.delegate = delegate
 
         // Initial update should create a state.
 
@@ -51,7 +208,6 @@ class ElementStateTreeTests: XCTestCase {
         let state1 = try XCTUnwrap(tree.root)
 
         XCTAssertEqual((state1.element.latest as! Element1).text, "1")
-        XCTAssertEqual(1, delegate.didSetupRootCalls.count)
 
         // Updating with the same element of the same type should keep the same state.
 
@@ -60,8 +216,6 @@ class ElementStateTreeTests: XCTestCase {
         let state2 = try XCTUnwrap(tree.root)
 
         XCTAssertTrue(state1 === state2)
-        XCTAssertEqual(1, delegate.didUpdateRootCalls.count)
-        XCTAssertEqual(1, delegate.didUpdateStateCalls.count)
 
         // Also make sure that we actually update the contained element.
 
@@ -74,14 +228,23 @@ class ElementStateTreeTests: XCTestCase {
         let state3 = try XCTUnwrap(tree.root)
 
         XCTAssertFalse(state2 === state3)
-        XCTAssertEqual(1, delegate.didReplaceRootCalls.count)
 
         // Updating with nil should tear down the state.
 
         _ = tree.teardownRootElement()
 
         XCTAssertNil(tree.root)
-        XCTAssertEqual(1, delegate.didTeardownRootCalls.count)
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didSetupRootState(.identifier(for: Element1.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: Element1.self, key: nil, count: 1)),
+            .elementStateTree_didUpdateRootState(.identifier(for: Element1.self, key: nil, count: 1)),
+            .elementStateTree_didReplaceRootState(
+                old: .identifier(for: Element1.self, key: nil, count: 1),
+                new: .identifier(for: Element2.self, key: nil, count: 1)
+            ),
+            .elementStateTree_didTeardownRootState(.identifier(for: Element2.self, key: nil, count: 1)),
+        ])
     }
 }
 
@@ -101,6 +264,7 @@ class ElementStateTests: XCTestCase {
             )
 
             XCTAssertTrue(state.wasVisited)
+            XCTAssertTrue(state.hasUpdatedChildrenDuringLayout)
         }
 
         // TODO: additional codepaths testing.
@@ -133,7 +297,6 @@ class ElementStateTests: XCTestCase {
         XCTAssertEqual(0, delegate.didUpdateRootCalls.count)
 
         _ = tree.performUpdate(with: root, in: env) { _ in }
-
 
         let rootState = try XCTUnwrap(tree.root)
         XCTAssertTrue(rootState === delegate.didSetupRootCalls[0])
@@ -344,17 +507,27 @@ fileprivate final class TestDelegate: ElementStateTreeDelegate {
 
     func treeDidReturnCachedMeasurement(
         _ measurement: BlueprintUI.ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: BlueprintUI.ElementState
     ) {}
 
     func treeDidPerformMeasurement(
         _ measurement: BlueprintUI.ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: BlueprintUI.ElementState
     ) {}
 
-    func treeDidReturnCachedLayout(_ layout: BlueprintUI.ElementState.CachedLayout, for state: BlueprintUI.ElementState) {}
+    func treeDidReturnCachedLayout(
+        _ layout: BlueprintUI.ElementState.CachedLayout,
+        size: CGSize,
+        for state: BlueprintUI.ElementState
+    ) {}
 
-    func treeDidPerformLayout(_ layout: [BlueprintUI.LayoutResultNode], for state: BlueprintUI.ElementState) {}
+    func treeDidPerformLayout(
+        _ layout: [BlueprintUI.LayoutResultNode],
+        size: CGSize,
+        for state: BlueprintUI.ElementState
+    ) {}
 
     func treeDidPerformCachedLayout(_ layout: BlueprintUI.ElementState.CachedLayout, for state: BlueprintUI.ElementState) {}
 }
