@@ -287,12 +287,12 @@ extension LayoutWriter {
             }
             
             func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
-                let options = StrictLayoutOptions(mode: .init(horizontal: .fill, vertical: .fill))
+//                let options = StrictLayoutOptions(mode: .init(horizontal: .fill, vertical: .fill))
                 let size = builder.sizing.measure(with: builder)
 
                 for (layoutChild, builderChild) in zip(children, builder.children) {
                     _ = layoutChild.layoutable.layout(
-                        in: builderChild.frame.size
+                        in: .init(builderChild.frame.size)
 //                        options: options
                     )
                 }

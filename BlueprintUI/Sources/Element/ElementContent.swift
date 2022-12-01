@@ -60,7 +60,7 @@ public struct ElementContent {
         case .strictSinglePass:
             let context = StrictLayoutContext(
                 path: .empty,
-                proposedSize: constraint.strictSize,
+                proposedSize: constraint,
                 mode: AxisVarying(horizontal: .natural, vertical: .natural)
             )
             let subtree = performStrictLayout(
@@ -721,7 +721,7 @@ extension LazyStorage {
     ) -> StrictSubtreeResult {
         let child = buildChild(
             for: .layout,
-            in: .init(context.proposedSize),
+            in: context.proposedSize,
             environment: environment
         )
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
@@ -751,7 +751,7 @@ extension MeasurableStorage {
         cache: CacheTree
     ) -> StrictSubtreeResult {
         let size = measure(
-            in: .init(context.proposedSize),
+            in: context.proposedSize,
             environment: environment,
             cache: cache
         )

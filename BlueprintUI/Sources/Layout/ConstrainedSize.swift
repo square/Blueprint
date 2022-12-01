@@ -211,12 +211,13 @@ extension ConstrainedSize {
         }
         
         func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
-            let constrainedSize = CGSize(
-                width: width.applied(to: context.proposedSize.width),
-                height: height.applied(to: context.proposedSize.height)
+            // TODO: We can do better
+            let constrainedProposal = SizeConstraint(
+                width: .init(width.applied(to: context.proposedSize.width.maximum)),
+                height: .init(height.applied(to: context.proposedSize.height.maximum))
             )
 
-            let measuredSize = child.layout(in: constrainedSize)
+            let measuredSize = child.layout(in: constrainedProposal)
 
             let childSize = CGSize(
                 width: width.applied(to: measuredSize.width),

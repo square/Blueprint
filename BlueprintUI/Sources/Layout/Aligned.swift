@@ -204,36 +204,36 @@ public struct Aligned: Element {
 
             let x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat
 
-            if context.mode.vertical == .natural || proposedSize.height.isInfinite {
+            if let proposedHeight = proposedSize.height.constrainedValue, context.mode.vertical == .fill {
+               // In `fill` mode, we fill the space and position the child within it.
+               height = proposedHeight
+               switch verticalAlignment {
+               case .top, .fill:
+                   y = 0
+               case .center:
+                   y = (proposedHeight - childSize.height) / 2.0
+               case .bottom:
+                   y = proposedHeight - childSize.height
+               }
+           } else {
                 // In `natural` mode, Aligned is layout-neutral.
                 height = childSize.height
                 y = 0
-            } else {
-                // In `fill` mode, we fill the space and position the child within it.
-                height = proposedSize.height
-                switch verticalAlignment {
-                case .top, .fill:
-                    y = 0
-                case .center:
-                    y = (proposedSize.height - childSize.height) / 2.0
-                case .bottom:
-                    y = proposedSize.height - childSize.height
-                }
             }
 
-            if context.mode.horizontal == .natural || proposedSize.width.isInfinite {
-                width = childSize.width
-                x = 0
-            } else {
-                width = proposedSize.width
+            if let proposedWidth = proposedSize.width.constrainedValue, context.mode.horizontal == .fill {
+                width = proposedWidth
                 switch horizontalAlignment {
                 case .leading, .fill:
                     x = 0
                 case .center:
-                    x = (proposedSize.width - childSize.width) / 2.0
+                    x = (proposedWidth - childSize.width) / 2.0
                 case .trailing:
-                    x = proposedSize.width - childSize.width
+                    x = proposedWidth - childSize.width
                 }
+            } else {
+                width = childSize.width
+                x = 0
             }
 
             return StrictLayoutAttributes(

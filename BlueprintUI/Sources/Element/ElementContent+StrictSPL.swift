@@ -24,12 +24,12 @@ public protocol StrictSingleChildLayout {
 
 public struct StrictLayoutContext: CustomStringConvertible {
     var path: ElementPath
-    public var proposedSize: CGSize
+    public var proposedSize: SizeConstraint
     public var mode: AxisVarying<StrictPressureMode>
 
     init(
         path: ElementPath,
-        proposedSize: CGSize,
+        proposedSize: SizeConstraint,
         mode: AxisVarying<StrictPressureMode>
     ) {
         self.path = path
@@ -130,13 +130,13 @@ public struct StrictLayoutAttributes {
 /// SPL version of `Measurable`
 public protocol StrictLayoutable {
     func layout(
-        in proposedSize: CGSize,
+        in proposedSize: SizeConstraint,
         options: StrictLayoutOptions
     ) -> CGSize
 }
 
 extension StrictLayoutable {
-    public func layout(in proposedSize: CGSize) -> CGSize {
+    public func layout(in proposedSize: SizeConstraint) -> CGSize {
         layout(in: proposedSize, options: .default)
     }
 }
@@ -204,7 +204,7 @@ class StrictLayoutNode: StrictLayoutable {
 
     // These values are initially unset, and captured when the child is laid out:
     var layoutResult: StrictSubtreeResult?
-    var proposedSize: CGSize?
+    var proposedSize: SizeConstraint?
     var proposedMode: AxisVarying<StrictPressureMode>?
     var correction: CGSize = .zero
 
@@ -218,7 +218,7 @@ class StrictLayoutNode: StrictLayoutable {
     }
 
     // saved proposed size, for debugging
-    var ensuredProposedSize: CGSize {
+    var ensuredProposedSize: SizeConstraint {
         guard let proposedSize = proposedSize else {
             fatalError("child was not laid out")
         }
@@ -230,7 +230,7 @@ class StrictLayoutNode: StrictLayoutable {
         StrictLayoutContext(path: path, proposedSize: ensuredProposedSize, mode: proposedMode!)
     }
 
-    func layout(in proposedSize: CGSize, options: StrictLayoutOptions) -> CGSize {
+    func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
         layoutCount += 1
         if layoutCount > options.maxAllowedLayoutCount {
             fatalError("\(type(of: element)) layout called \(layoutCount) times")
@@ -241,10 +241,10 @@ class StrictLayoutNode: StrictLayoutable {
             vertical: options.mode.vertical ?? mode.vertical
         )
 
-        precondition(
-            proposedSize.width != .greatestFiniteMagnitude && proposedSize.height != .greatestFiniteMagnitude,
-            "GFM detected"
-        )
+//        precondition(
+//            proposedSize.width != .greatestFiniteMagnitude && proposedSize.height != .greatestFiniteMagnitude,
+//            "GFM detected"
+//        )
 
         var environment = environment
         let path = path.appending(identifier: id)
@@ -265,7 +265,7 @@ class StrictLayoutNode: StrictLayoutable {
         )
 
         // Apply size overrides when we are in fill mode.
-        if layoutMode.horizontal == .fill, let width = proposedSize.finiteWidth {
+        if layoutMode.horizontal == .fill, let width = proposedSize.width.constrainedValue {
             let oldWidth = layoutResult.intermediate.size.width
             if oldWidth != width {
 //                print("Applying width override to \(type(of: element)), \(oldWidth) -> \(width)")
@@ -273,7 +273,7 @@ class StrictLayoutNode: StrictLayoutable {
                 layoutResult.intermediate.size.width = width
             }
         }
-        if layoutMode.vertical == .fill, let height = proposedSize.finiteHeight {
+        if layoutMode.vertical == .fill, let height = proposedSize.height.constrainedValue {
             let oldHeight = layoutResult.intermediate.size.height
             if oldHeight != height {
 //                print("Applying height override to \(type(of: element)), \(oldHeight) -> \(height)")

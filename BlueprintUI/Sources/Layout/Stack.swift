@@ -967,7 +967,7 @@ extension StackLayout {
             traits = child.traits
             measure = { constraint in
                 child.layoutable.layout(
-                    in: constraint.strictSize,
+                    in: constraint,
                     options: options
                 )
             }
@@ -1243,20 +1243,24 @@ extension StrictLayoutContext {
         let width: StackLayout.VectorConstraint.Axis
         let height: StackLayout.VectorConstraint.Axis
 
-        if !proposedSize.width.isFinite {
+        if let proposedWidth = proposedSize.width.constrainedValue {
+            if mode.horizontal == .fill {
+                width = .exactly(proposedWidth)
+            } else {
+                width = .atMost(proposedWidth)
+            }
+        } else {
             width = .unconstrained
-        } else if mode.horizontal == .fill {
-            width = .exactly(proposedSize.width)
-        } else {
-            width = .atMost(proposedSize.width)
         }
-
-        if !proposedSize.height.isFinite {
-            height = .unconstrained
-        } else if mode.vertical == .fill {
-            height = .exactly(proposedSize.height)
+        
+        if let proposedHeight = proposedSize.height.constrainedValue {
+            if mode.vertical == .fill {
+                height = .exactly(proposedHeight)
+            } else {
+                height = .atMost(proposedHeight)
+            }
         } else {
-            height = .atMost(proposedSize.height)
+            height = .unconstrained
         }
 
         switch axis {

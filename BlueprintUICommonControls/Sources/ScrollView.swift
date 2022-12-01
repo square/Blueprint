@@ -233,15 +233,39 @@ extension ScrollView {
         }
         
         func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            // TODO: avoid conversion
             let measurable = Measurer { constraint in
-                child.layout(in: constraint.strictSize)
+                child.layout(in: constraint)
             }
 
-            let attributes = layout(size: context.proposedSize, child: measurable)
+            let insetConstraint = context.proposedSize.inset(
+                width: contentInset.left + contentInset.right,
+                height: contentInset.top + contentInset.bottom
+            )
+
+            var itemSize = fittedSize(in: insetConstraint, child: measurable)
+
+            if contentSize == .fittingHeight, let insetWidth = insetConstraint.width.constrainedValue {
+                itemSize.width = insetWidth
+            } else if contentSize == .fittingWidth, let insetHeight = insetConstraint.height.constrainedValue {
+                itemSize.height = insetHeight
+            }
+
+            var attributes = LayoutAttributes(frame: CGRect(origin: .zero, size: itemSize))
+
+            if centersUnderflow {
+                if let width = context.proposedSize.width.constrainedValue, attributes.bounds.width < width {
+                    attributes.center.x = width / 2.0
+                }
+
+                if let height = context.proposedSize.height.constrainedValue, attributes.bounds.height < height {
+                    attributes.center.y = height / 2.0
+                }
+            }
 
             let size = CGSize(
-                width: min(context.proposedSize.width, attributes.bounds.size.width),
-                height: min(context.proposedSize.height, attributes.bounds.size.height)
+                width: min(context.proposedSize.width.maximum, attributes.bounds.size.width),
+                height: min(context.proposedSize.height.maximum, attributes.bounds.size.height)
             )
 
             return StrictLayoutAttributes(

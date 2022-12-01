@@ -54,7 +54,7 @@ extension Element {
         let attributes = LayoutAttributes(frame: frame)
         let context = StrictLayoutContext(
             path: .empty,
-            proposedSize: frame.size,
+            proposedSize: .init(frame.size),
             mode: AxisVarying(horizontal: .fill, vertical: .fill)
         )
         let cache = CacheFactory.makeCache(name: "\(type(of: self))")
