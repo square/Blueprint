@@ -3,8 +3,7 @@ import Foundation
 protocol StrictContentStorage {
     func strictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult
 }
 
@@ -24,15 +23,18 @@ public protocol StrictSingleChildLayout {
 
 public struct StrictLayoutContext: CustomStringConvertible {
     var path: ElementPath
+    var cache: StrictCacheNode
     public var proposedSize: SizeConstraint
     public var mode: AxisVarying<StrictPressureMode>
 
     init(
         path: ElementPath,
+        cache: StrictCacheNode,
         proposedSize: SizeConstraint,
         mode: AxisVarying<StrictPressureMode>
     ) {
         self.path = path
+        self.cache = cache
         self.proposedSize = proposedSize
         self.mode = mode
     }
@@ -183,7 +185,7 @@ class StrictLayoutNode: StrictLayoutable {
         content: ElementContent,
         mode: AxisVarying<StrictPressureMode>,
         environment: Environment,
-        cache: CacheTree
+        cache: StrictCacheNode
     ) {
         self.path = path
         self.id = id
@@ -200,7 +202,7 @@ class StrictLayoutNode: StrictLayoutable {
     var content: ElementContent
     var mode: AxisVarying<StrictPressureMode>
     var environment: Environment
-    var cache: CacheTree
+    var cache: StrictCacheNode
 
     // These values are initially unset, and captured when the child is laid out:
     var layoutResult: StrictSubtreeResult?
@@ -227,7 +229,7 @@ class StrictLayoutNode: StrictLayoutable {
 
     // effective context, for debugging
     var context: StrictLayoutContext {
-        StrictLayoutContext(path: path, proposedSize: ensuredProposedSize, mode: proposedMode!)
+        StrictLayoutContext(path: path, cache: cache, proposedSize: ensuredProposedSize, mode: proposedMode!)
     }
 
     func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
@@ -257,11 +259,11 @@ class StrictLayoutNode: StrictLayoutable {
         var layoutResult = content.performStrictLayout(
             in: StrictLayoutContext(
                 path: path,
+                cache: cache,
                 proposedSize: proposedSize,
                 mode: layoutMode
             ),
-            environment: environment,
-            cache: cache
+            environment: environment
         )
 
         // Apply size overrides when we are in fill mode.
@@ -299,6 +301,50 @@ class StrictLayoutNode: StrictLayoutable {
         return layoutResult.intermediate.size
     }
 
+}
+
+protocol StrictCacheTreeKey {
+    associatedtype Value
+}
+
+final class StrictCacheTree<SubcacheKey> where SubcacheKey: Hashable {
+
+    typealias Subcache = StrictCacheTree<SubcacheKey>
+
+    private var caches: [ObjectIdentifier: Any] = [:]
+    private var subcaches: [SubcacheKey: Subcache] = [:]
+
+    var path: String
+
+    init(path: String? = nil) {
+        let path = path ?? ""
+        self.path = path
+    }
+
+    func get<Key>(keyType: Key.Type, or create: () -> Key.Value) -> Key.Value where Key: StrictCacheTreeKey {
+        let key = ObjectIdentifier(keyType)
+        if let value = caches[key] as? Key.Value {
+            return value
+        }
+        let value = create()
+        caches[key] = value
+        return value
+    }
+
+    func subcache(key: SubcacheKey) -> Subcache {
+        if let subcache = subcaches[key] {
+            return subcache
+        }
+        let subcache = Subcache(path: path + "/" + String(describing: key))
+        subcaches[key] = subcache
+        return subcache
+    }
+}
+
+typealias StrictCacheNode = StrictCacheTree<Int>
+
+enum StrictLayoutNodesCacheTreeKey: StrictCacheTreeKey {
+    typealias Value = [StrictLayoutNode]
 }
 
 /// Enables legacy behavior, and "top-down" cascading effects

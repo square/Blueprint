@@ -52,17 +52,17 @@ extension Element {
     
     func strictLayout(frame: CGRect, environment: Environment) -> LayoutResultNode {
         let attributes = LayoutAttributes(frame: frame)
+        let cache = StrictCacheNode()
         let context = StrictLayoutContext(
             path: .empty,
+            cache: cache,
             proposedSize: .init(frame.size),
             mode: AxisVarying(horizontal: .fill, vertical: .fill)
         )
-        let cache = CacheFactory.makeCache(name: "\(type(of: self))")
 
         let subtree = content.performStrictLayout(
             in: context,
-            environment: environment,
-            cache: cache
+            environment: environment
         )
 
 //        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)

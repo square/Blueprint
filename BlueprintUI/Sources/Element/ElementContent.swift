@@ -60,13 +60,13 @@ public struct ElementContent {
         case .strictSinglePass:
             let context = StrictLayoutContext(
                 path: .empty,
+                cache: .init(),
                 proposedSize: constraint,
                 mode: AxisVarying(horizontal: .natural, vertical: .natural)
             )
             let subtree = performStrictLayout(
                 in: context,
-                environment: environment,
-                cache: cache
+                environment: environment
             )
             return subtree
                 .intermediate
@@ -106,10 +106,9 @@ public struct ElementContent {
     
     func performStrictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult {
-        storage.strictLayout(in: context, environment: environment, cache: cache)
+        storage.strictLayout(in: context, environment: environment)
     }
 
 }
@@ -631,19 +630,9 @@ private struct MeasurableStorage: ContentStorage {
 // MARK: - Strict SPL extensions
 
 extension ElementContent.Builder {
-    func identifiers(in context: StrictLayoutContext) -> [ElementIdentifier] {
-
-        var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
-
-        return children.map { child in
-            identifierFactory.nextIdentifier(for: type(of: child.element), key: child.key)
-        }
-    }
-
     func strictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
@@ -653,7 +642,7 @@ extension ElementContent.Builder {
         
         var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
         layoutChildren.reserveCapacity(children.count)
-                
+        
         for index in 0..<children.count {
             let child = children[index]
             let childElement = child.element
@@ -666,7 +655,7 @@ extension ElementContent.Builder {
                 content: childElement.content,
                 mode: context.mode,
                 environment: environment,
-                cache: cache.subcache(index: index, of: childCount, element: childElement)
+                cache: context.cache.subcache(key: index)
             )
             
             nodes.append(node)
@@ -689,12 +678,11 @@ extension ElementContent.Builder {
 extension EnvironmentAdaptingStorage {
     func strictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult {
         let environment = adapted(environment: environment)
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let cache = cache.subcache(element: child)
+        let cache = context.cache.subcache(key: 0)
 
         let node = StrictLayoutNode(
             path: context.path,
@@ -716,8 +704,7 @@ extension EnvironmentAdaptingStorage {
 extension LazyStorage {
     func strictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult {
         let child = buildChild(
             for: .layout,
@@ -725,7 +712,7 @@ extension LazyStorage {
             environment: environment
         )
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let cache = cache.subcache(element: child)
+        let cache = context.cache.subcache(key: 0)
 
         let node = StrictLayoutNode(
             path: context.path,
@@ -747,14 +734,9 @@ extension LazyStorage {
 extension MeasurableStorage {
     func strictLayout(
         in context: StrictLayoutContext,
-        environment: Environment,
-        cache: CacheTree
+        environment: Environment
     ) -> StrictSubtreeResult {
-        let size = measure(
-            in: context.proposedSize,
-            environment: environment,
-            cache: cache
-        )
+        let size = measurer(context.proposedSize, environment)
         return StrictSubtreeResult(
             intermediate: StrictLayoutAttributes(
                 size: size,
