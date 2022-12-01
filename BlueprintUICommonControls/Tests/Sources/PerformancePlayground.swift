@@ -27,10 +27,61 @@ class PerformancePlayground: XCTestCase {
         super.invokeTest()
     }
 
-    func test_repeated_layouts() {
-        let element = Column(alignment: .fill) {
+    func test_deep_and_wide_grid() {
 
-            for index in 1...500 {
+        let gridSize = 100
+
+        struct LabeledBox: ProxyElement, ComparableElement, Equatable {
+
+            var text: String
+
+            var elementRepresentation: Element {
+                Label(text: text)
+                    .centered() // We have a bunch of these proxy elements
+                    .centered() // to ensure that deep trees of
+                    .centered() // proxy elements do not impact performance.
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .centered()
+                    .constrainedTo(size: .init(width: 20, height: 20))
+                    .box(background: .red)
+                    .tappable {}
+            }
+        }
+
+        let element = Column(alignment: .fill) {
+            for _ in 1...gridSize {
+                Row {
+                    for row in 1...gridSize {
+                        LabeledBox(text: String(row))
+                    }
+                }
+            }
+        }.inset(uniform: 20)
+
+        let view = BlueprintView(frame: CGRect(x: 0.0, y: 0.0, width: 1000.0, height: 1000.0))
+
+        determineAverage(for: 4.0) {
+            view.element = element
+            view.layoutIfNeeded()
+        }
+    }
+
+    func test_repeated_layouts() {
+
+        struct TextRow: ProxyElement, ComparableElement, Equatable {
+
+            var index: Int
+
+            var elementRepresentation: Element {
                 Row(alignment: .fill) {
                     Box(backgroundColor: .red)
                         .constrainedTo(size: CGSize(width: 100, height: 100))
@@ -39,6 +90,13 @@ class PerformancePlayground: XCTestCase {
                     Label(text: "This is test label number #\(index)")
                         .stackLayoutChild(priority: .flexible)
                 }
+            }
+        }
+
+        let element = Column(alignment: .fill) {
+
+            for index in 1...1000 {
+                TextRow(index: index)
             }
         }
         .scrollable()
@@ -224,17 +282,15 @@ class PerformancePlayground: XCTestCase {
 
         var iterations: Int = 0
 
-        var lastUpdateDate = Date()
-
         repeat {
+            let iterationStart = Date()
             block()
+            let iterationEnd = Date()
+            let duration = iterationEnd.timeIntervalSince(iterationStart)
 
             iterations += 1
 
-            if Date().timeIntervalSince(lastUpdateDate) >= 1 {
-                lastUpdateDate = Date()
-                print("Continuing Test: \(iterations) Iterations...")
-            }
+            print("Iteration: \(iterations), Duration : \(duration)")
 
         } while Date() < start + seconds
 
@@ -260,4 +316,5 @@ private struct NonCachingLabel: UIViewElement {
         view.text = text
     }
 }
+
 
