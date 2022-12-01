@@ -189,6 +189,207 @@ class ElementStateTreeTests: XCTestCase {
         ])
     }
 
+    func test_integration_comparable() {
+
+        struct ComparableTestElement1: ComparableElement, ProxyElement, Equatable {
+
+            var value: Int
+
+            var elementRepresentation: Element {
+                Row(alignment: .fill, underflow: .growUniformly) {
+                    Empty()
+                    Spacer()
+                }
+            }
+        }
+
+        struct ComparableTestElement2: ComparableElement, ProxyElement, Equatable {
+
+            var value: Int
+
+            var elementRepresentation: Element {
+                Column(alignment: .fill, underflow: .growUniformly) {
+                    Spacer()
+                    Empty()
+                }
+            }
+        }
+
+        let fixture = LayoutPassTestFixture()
+        let blueprintView = BlueprintView(frame: .init(origin: .zero, size: .init(width: 100, height: 200)))
+        blueprintView.rootState.delegate = fixture
+
+        let element1 = ComparableTestElement1(value: 1).inset(uniform: 10)
+        let element2 = ComparableTestElement1(value: 2).inset(uniform: 15)
+        let element3 = ComparableTestElement2(value: 3).inset(uniform: 15)
+
+        blueprintView.element = element1
+        blueprintView.layoutIfNeeded()
+
+        /// **Note**: The `Row` is intentionally not present here,
+        /// because `ComparableTestElement1` is a `ProxyElement`,
+        /// meaning it returns the `content` of its inner `Row` as its own content:
+        ///
+        /// ```
+        /// public var content: ElementContent {
+        ///     elementRepresentation.content
+        /// }
+        /// ```
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Inset.identifier(1)) {
+                IdentifiedNode(ComparableTestElement1.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                    IdentifiedNode(Spacer.identifier(1))
+                }
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementStateTree_didSetupRootState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(80.0), height: .atMost(180.0))
+            ),
+            .elementState_treeDidFetchElementContent(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Spacer.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(80.0), height: .atMost(180.0))
+            ),
+            .elementState_treeDidPerformCachedLayout(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Inset.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+        ])
+
+        /// Lay out again, ensure we hit the cache.
+
+        fixture.removeAll()
+
+        blueprintView.element = element1
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Inset.identifier(1)) {
+                IdentifiedNode(ComparableTestElement1.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                    IdentifiedNode(Spacer.identifier(1))
+                }
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementState_treeDidUpdateState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementStateTree_didUpdateRootState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidReturnCachedLayout(
+                .identifier(for: ComparableTestElement1.self, key: nil, count: 1),
+                CGSize(width: 80.0, height: 180.0)
+            ),
+            .elementState_treeDidUpdateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Inset.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+        ])
+
+        /// Replace the root element with an element of the same type
+        /// but it's not equivalent. We expect measurements and layouts
+
+        fixture.removeAll()
+
+        blueprintView.element = element2
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Inset.identifier(1)) {
+                IdentifiedNode(ComparableTestElement1.identifier(1)) {
+                    IdentifiedNode(Empty.identifier(1))
+                    IdentifiedNode(Spacer.identifier(1))
+                }
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementState_treeDidUpdateState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementStateTree_didUpdateRootState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidUpdateState(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(70.0), height: .atMost(170.0))
+            ),
+            .elementState_treeDidFetchElementContent(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Spacer.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(70.0), height: .atMost(170.0))
+            ),
+            .elementState_treeDidPerformCachedLayout(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Inset.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+        ])
+
+        /// Replace the root element with an element of a new type.
+
+        fixture.removeAll()
+
+        blueprintView.element = element3
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(Inset.identifier(1)) {
+                IdentifiedNode(ComparableTestElement2.identifier(1)) {
+                    IdentifiedNode(Spacer.identifier(1))
+                    IdentifiedNode(Empty.identifier(1))
+                }
+            }
+        )
+
+        XCTAssertEqual(fixture.events, [
+            .elementState_treeDidUpdateState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementStateTree_didUpdateRootState(.identifier(for: Inset.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: ComparableTestElement2.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: ComparableTestElement2.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidCreateState(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidFetchElementContent(.identifier(for: Spacer.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Spacer.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(70.0), height: .atMost(170.0))
+            ),
+            .elementState_treeDidFetchElementContent(.identifier(for: Empty.self, key: nil, count: 1)),
+            .elementState_treeDidPerformMeasurement(
+                .identifier(for: Empty.self, key: nil, count: 1),
+                SizeConstraint(width: .atMost(70.0), height: .atMost(170.0))
+            ),
+            .elementState_treeDidPerformCachedLayout(.identifier(for: ComparableTestElement2.self, key: nil, count: 1)),
+            .elementState_treeDidPerformLayout(
+                .identifier(for: Inset.self, key: nil, count: 1),
+                CGSize(width: 100.0, height: 200.0)
+            ),
+            .elementState_treeDidRemoveState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
+        ])
+    }
+
     func test_layout_caching_updates_elements() throws {
 
         struct OuterTestElement: ProxyElement, ComparableElement {
