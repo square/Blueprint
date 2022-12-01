@@ -485,6 +485,7 @@ extension ElementContent {
     }
 }
 
+
 /// Storage used to store "layout neutral" elements, where they will only have one child,
 /// and the measurement of the element is the same as the child.
 private struct SingleChildStorage: ContentStorage {
