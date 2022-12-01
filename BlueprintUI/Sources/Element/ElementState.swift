@@ -469,23 +469,23 @@ final class ElementState {
                     with: environment,
                     children: existing.nodes,
                     state: self,
-                    forEach: { state, element, node, childNodes in
+                    forEach: { context in
 
                         /// Guarantees that the latest element is present in the tree.
                         /// in case its `backingViewDescription` has changed,
                         /// for example (while remaining equivalent), eg it needs to apply
                         /// a new callback closure to the view.
-                        state.element.latest = element
+                        context.state.element.latest = context.element
 
                         /// Because we won't be visiting any child elements
                         /// for a `ComparableElement` during either
                         /// measurement or layout, mark all our child nodes
                         /// as visited so they are not torn down.
-                        state.wasVisited = true
+                        context.state.wasVisited = true
 
                         /// Because we're returning a cached layout, we need to build our
                         /// ordered children based on the layout nodes.
-                        state.buildOrderedChildrenIfNeeded(from: childNodes)
+                        context.state.buildOrderedChildrenIfNeeded(from: context.layoutNode.children)
                     }
                 )
 

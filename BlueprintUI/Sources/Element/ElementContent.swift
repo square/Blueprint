@@ -77,7 +77,7 @@ public struct ElementContent {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ForEachElementContext) -> Void
     ) {
         autoreleasepool {
             storage.forEachElement(
@@ -103,7 +103,7 @@ public struct ElementContent {
         with node: LayoutResultNode,
         environment: Environment,
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ForEachElementContext) -> Void
     ) {
         forEachElement(
             in: node.layoutAttributes.bounds.size,
@@ -280,6 +280,18 @@ extension ElementContent {
 }
 
 
+extension ElementContent {
+
+    struct ForEachElementContext {
+
+        var state: ElementState
+        var element: Element
+        var layoutNode: LayoutResultNode
+
+    }
+}
+
+
 /// The underlying type that backs the `ElementContent`.
 fileprivate protocol ContentStorage {
 
@@ -302,7 +314,7 @@ fileprivate protocol ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ElementContent.ForEachElementContext) -> Void
     )
 }
 
@@ -416,7 +428,7 @@ extension ElementContent {
             with environment: Environment,
             children childNodes: [LayoutResultNode],
             state: ElementState,
-            forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+            forEach: (ElementContent.ForEachElementContext) -> Void
         ) {
             precondition(childNodes.count == children.count)
 
@@ -426,7 +438,7 @@ extension ElementContent {
 
                 let childNode = childNodes[index]
 
-                forEach(childState, child.element, childNode, childNode.children)
+                forEach(.init(state: childState, element: child.element, layoutNode: childNode))
 
                 childState.elementContent.forEachElement(
                     with: childNode,
@@ -527,7 +539,7 @@ private struct SingleChildStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
         precondition(childNodes.count == 1)
 
@@ -535,7 +547,7 @@ private struct SingleChildStorage: ContentStorage {
 
         let childNode = childNodes[0]
 
-        forEach(childState, element, childNode, childNode.children)
+        forEach(.init(state: childState, element: element, layoutNode: childNode))
 
         childState.elementContent.forEachElement(
             with: childNode,
@@ -564,7 +576,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
         precondition(childNodes.count == 1)
 
@@ -575,7 +587,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
         let childNode = childNodes[0]
 
-        forEach(childState, child, childNode, childNode.children)
+        forEach(.init(state: childState, element: child, layoutNode: childNode))
 
         childState.elementContent.forEachElement(
             with: childNode,
@@ -705,7 +717,7 @@ private struct LazyStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
         precondition(childNodes.count == 1)
 
@@ -715,7 +727,7 @@ private struct LazyStorage: ContentStorage {
 
         let childNode = childNodes[0]
 
-        forEach(childState, element, childNode, childNode.children)
+        forEach(.init(state: childState, element: element, layoutNode: childNode))
 
         childState.elementContent.forEachElement(
             with: childNode,
@@ -762,7 +774,7 @@ private struct MeasurableStorage: ContentStorage {
         with environment: Environment,
         children childNodes: [LayoutResultNode],
         state: ElementState,
-        forEach: (ElementState, Element, LayoutResultNode, [LayoutResultNode]) -> Void
+        forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
         // No-op; we have no children.
     }

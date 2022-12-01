@@ -160,8 +160,8 @@ class ElementContentTests: XCTestCase {
             with: .empty,
             children: nodes,
             state: state,
-            forEach: { state, element, node, children in
-                identifiers.append(node.identifier)
+            forEach: { context in
+                identifiers.append(context.layoutNode.identifier)
             }
         )
 
