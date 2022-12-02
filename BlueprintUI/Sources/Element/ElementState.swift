@@ -77,11 +77,11 @@ final class ElementStateTree {
 
                 root.update(with: element, in: environment, identifier: root.identifier)
 
-                let output = updates(root)
-
                 delegate.ifDebug {
                     $0.tree(self, didUpdateRootState: root)
                 }
+
+                let output = updates(root)
 
                 root.finishedLayout()
 
@@ -89,11 +89,11 @@ final class ElementStateTree {
             } else {
                 let new = makeRoot(with: element)
 
-                let output = updates(new)
-
                 delegate.ifDebug {
                     $0.tree(self, didReplaceRootState: root, with: new)
                 }
+
+                let output = updates(new)
 
                 root.finishedLayout()
 
@@ -102,11 +102,11 @@ final class ElementStateTree {
         } else {
             let new = makeRoot(with: element)
 
-            let output = updates(new)
-
             delegate.ifDebug {
                 $0.tree(self, didSetupRootState: new)
             }
+
+            let output = updates(new)
 
             new.finishedLayout()
 
@@ -413,7 +413,7 @@ final class ElementState {
         /// We already have a cached measurement, reuse that.
         if let existing = measurements[constraint] {
             delegate.ifDebug {
-                $0.treeDidReturnCachedMeasurement(existing, for: self)
+                $0.treeDidReturnCachedMeasurement(existing, constraint: constraint, for: self)
             }
 
             return existing.size
@@ -435,7 +435,7 @@ final class ElementState {
         measurements[constraint] = measurement
 
         delegate.ifDebug {
-            $0.treeDidPerformMeasurement(measurement, for: self)
+            $0.treeDidPerformMeasurement(measurement, constraint: constraint, for: self)
         }
 
         return size
@@ -466,7 +466,7 @@ final class ElementState {
             let nodes = layout(environment)
 
             delegate.ifDebug {
-                $0.treeDidPerformLayout(nodes, for: self)
+                $0.treeDidPerformLayout(nodes, size: size, for: self)
             }
 
             return nodes
@@ -475,7 +475,7 @@ final class ElementState {
         /// We already have a cached layout, reuse that.
         if let existing = layouts[size] {
             delegate.ifDebug {
-                $0.treeDidReturnCachedLayout(existing, for: self)
+                $0.treeDidReturnCachedLayout(existing, size: size, for: self)
             }
 
             if hasUpdatedChildrenDuringLayout == false {
@@ -484,23 +484,34 @@ final class ElementState {
                 /// Because we're returning a cached layout, we're not going to be
                 /// enumerating every child element in the tree during layout. To resolve
                 /// this, we'll perform an enumeration over the tree using our cached layout values.
-                /// This allows us to update the cached `element.latest`, in case the
-                /// `backingViewDescription` has changed.
                 elementContent.forEachElement(
                     in: size,
                     with: environment,
                     children: existing.nodes,
                     state: self,
-                    forEach: { state, element, node in
-                        state.element.latest = element
+                    forEach: { context in
+
+                        /// Guarantees that the latest element is present in the tree.
+                        /// in case its `backingViewDescription` has changed,
+                        /// for example (while remaining equivalent), eg it needs to apply
+                        /// a new callback closure to the view.
+                        context.state.element.latest = context.element
 
                         /// Because we won't be visiting any child elements
                         /// for a `ComparableElement` during either
                         /// measurement or layout, mark all our child nodes
                         /// as visited so they are not torn down.
-                        state.wasVisited = true
+                        context.state.wasVisited = true
+
+                        /// Because we're returning a cached layout, we need to build our
+                        /// ordered children based on the layout nodes.
+                        context.state.buildOrderedChildrenIfNeeded(from: context.layoutNode.children)
                     }
                 )
+
+                /// Because we're returning a cached layout, we need to build our
+                /// ordered children based on the layout nodes.
+                buildOrderedChildrenIfNeeded(from: existing.nodes)
             }
 
             return existing.nodes
@@ -610,7 +621,7 @@ final class ElementState {
         recursiveForEach {
             $0.wasVisited = false
             $0.hasUpdatedChildrenDuringLayout = false
-            $0.orderedChildren.removeAll(keepingCapacity: true)
+            $0.clearOrderedChildren()
         }
     }
 
@@ -635,6 +646,10 @@ final class ElementState {
         }
     }
 
+    private func clearOrderedChildren() {
+        orderedChildren.removeAll(keepingCapacity: true)
+    }
+
     /// Performs a depth-first enumeration of all elements in the tree,
     /// _including_ the original reciever.
     func recursiveForEach(_ perform: (ElementState) -> Void) {
@@ -642,6 +657,19 @@ final class ElementState {
 
         children.forEach { _, child in
             child.recursiveForEach(perform)
+        }
+    }
+
+    private func buildOrderedChildrenIfNeeded(from nodes: [LayoutResultNode]) {
+
+        guard orderedChildren.isEmpty else { return }
+
+        for node in nodes {
+            guard let child = children[node.identifier] else {
+                fatalError("\(identifier) had a missing child \(node.identifier) which was present in the layout.")
+            }
+
+            orderedChildren.append(child)
         }
     }
 
@@ -768,21 +796,25 @@ protocol ElementStateTreeDelegate: AnyObject {
 
     func treeDidReturnCachedMeasurement(
         _ measurement: ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: ElementState
     )
 
     func treeDidPerformMeasurement(
         _ measurement: ElementState.CachedMeasurement,
+        constraint: SizeConstraint,
         for state: ElementState
     )
 
     func treeDidReturnCachedLayout(
         _ layout: ElementState.CachedLayout,
+        size: CGSize,
         for state: ElementState
     )
 
     func treeDidPerformLayout(
         _ layout: [LayoutResultNode],
+        size: CGSize,
         for state: ElementState
     )
 
