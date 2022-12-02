@@ -28,7 +28,8 @@ extension Element {
             identifier: .identifierFor(singleChild: self),
             element: self,
             signpostRef: NSObject(),
-            name: "Testing"
+            name: "Testing",
+            kind: .regular
         )
 
         return LayoutResultNode(
@@ -62,7 +63,8 @@ extension ElementContent {
             identifier: .identifierFor(singleChild: element),
             element: element,
             signpostRef: NSObject(),
-            name: "Testing"
+            name: "Testing",
+            kind: .regular
         )
 
         return performLayout(
