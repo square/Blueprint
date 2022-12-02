@@ -53,7 +53,7 @@ public struct ElementContent {
                 proposal: constraint,
                 context: .init(
                     // TODO: Hoist upward?
-                    cache: .init(),
+                    cache: .init(path: "m"),
                     environment: environment
                 )
             )
@@ -463,8 +463,9 @@ extension EnvironmentAdaptingStorage {
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         context.cache.get(key: proposal) { proposal in
             let environment = adapted(environment: context.environment)
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
-                cache: context.cache.subcache(key: 0),
+                cache: context.cache.subcache(key: identifier),
                 environment: environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
@@ -481,7 +482,7 @@ extension EnvironmentAdaptingStorage {
         let context = SPLayoutContext(
             attributes: context.attributes,
             environment: environment,
-            cache: context.cache.subcache(key: 0)
+            cache: context.cache.subcache(key: identifier)
         )
 
         let node = LayoutResultNode(
@@ -558,8 +559,9 @@ extension LazyStorage {
                 in: proposal,
                 environment: context.environment
             )
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
-                cache: context.cache.subcache(key: 0),
+                cache: context.cache.subcache(key: identifier),
                 environment: context.environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
@@ -580,7 +582,7 @@ extension LazyStorage {
         let context = SPLayoutContext(
             attributes: context.attributes,
             environment: context.environment,
-            cache: context.cache.subcache(key: 0)
+            cache: context.cache.subcache(key: identifier)
         )
 
         let node = LayoutResultNode(
@@ -619,7 +621,9 @@ private struct MeasurableStorage: ContentStorage {
     }
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        measurer(proposal, context.environment)
+//        context.cache.get(key: proposal) { proposal in
+            measurer(proposal, context.environment)
+//        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {

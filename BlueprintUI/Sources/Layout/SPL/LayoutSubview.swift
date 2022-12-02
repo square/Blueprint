@@ -68,6 +68,7 @@ public struct LayoutSubview {
 
     private var sizeCache: SizeCache { measureContext.cache.valueCache }
 
+    var identifier: ElementIdentifier
     var element: Element
     private var content: ElementContent
 
@@ -84,12 +85,14 @@ public struct LayoutSubview {
     // Once we are able to fully deprecate the old layout API we can remove the `LayoutType.Traits` and the `traits`
     // parameter, and instead rely on setting `LayoutValueKey`s where needed.
     init<LayoutType: Layout>(
+        identifier: ElementIdentifier,
         element: Element,
         content: ElementContent,
         measureContext: MeasureContext,
         traits: LayoutType.Traits,
         layoutType: LayoutType.Type = LayoutType.self
     ) {
+        self.identifier = identifier
         self.element = element
         self.content = content
         self.measureContext = measureContext

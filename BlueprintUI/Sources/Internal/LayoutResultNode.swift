@@ -28,7 +28,7 @@ extension Element {
                     attributes: LayoutAttributes(frame: frame),
                     environment: environment,
                     // TODO: Hoist up?
-                    cache: .init()
+                    cache: .init(path: "")
                 )
             )
         case .strictSinglePass:
