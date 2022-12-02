@@ -254,7 +254,7 @@ class PerformancePlayground: XCTestCase {
         }
 
         let view = BlueprintView()
-        view.frame.size = CGSize(width: 1000.0, height: 10000)
+        view.frame.size = CGSize(width: 1000.0, height: 1000.0)
 
         var row = 0
         var column = 0
