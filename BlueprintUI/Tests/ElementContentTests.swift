@@ -1,5 +1,5 @@
 import XCTest
-@testable import BlueprintUI
+@testable @_spi(BlueprintElementContent) import BlueprintUI
 
 class ElementContentTests: XCTestCase {
 

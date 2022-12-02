@@ -160,6 +160,7 @@ extension ElementContent {
     ///
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
+    @_spi(BlueprintElementContent)
     public init(byMeasuring element: Element) {
         storage = MeasureNestedElementStorage(element: element)
     }
