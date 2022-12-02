@@ -24,9 +24,9 @@ let package = Package(
     targets: [
         .target(
             name: "BlueprintUI",
-            path: "BlueprintUI/Sources"
+            path: "BlueprintUI/Sources",
             // Enable this setting to allow running tests in release mode.
-            // swiftSettings: [.unsafeFlags(["-enable-testing"])]
+            swiftSettings: [.unsafeFlags(["-enable-testing"])]
         ),
         .testTarget(
             name: "BlueprintUITests",
@@ -36,9 +36,9 @@ let package = Package(
         .target(
             name: "BlueprintUICommonControls",
             dependencies: ["BlueprintUI"],
-            path: "BlueprintUICommonControls/Sources"
+            path: "BlueprintUICommonControls/Sources",
             // Enable this setting to allow running tests in release mode.
-            // swiftSettings: [.unsafeFlags(["-enable-testing"])]
+            swiftSettings: [.unsafeFlags(["-enable-testing"])]
         ),
         .testTarget(
             name: "BlueprintUICommonControlsTests",

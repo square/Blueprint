@@ -11,6 +11,25 @@ import XCTest
 @testable import BlueprintUI
 
 
+extension ElementStateTree {
+
+    func performLayout(
+        with element: Element,
+        with size: CGSize = UIScreen.main.bounds.size,
+        in environment: Environment = .empty
+    ) -> ElementState {
+
+        XCTAssertNotEqual(size, .zero, "Layout size cannot be zero.")
+
+        let (state, _) = performUpdate(with: element, in: environment) { state in
+            state.elementContent.performLayout(in: size, with: environment, state: state)
+        }
+
+        return state
+    }
+}
+
+
 class ElementStateTreeTests: XCTestCase {
 
     func test_update() throws {
@@ -27,7 +46,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Initial update should create a state.
 
-        _ = tree.update(with: element1, in: .empty)
+        _ = tree.performUpdate(with: element1, in: .empty) { _ in }
 
         let state1 = try XCTUnwrap(tree.root)
 
@@ -36,7 +55,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Updating with the same element of the same type should keep the same state.
 
-        _ = tree.update(with: element1b, in: .empty)
+        _ = tree.performUpdate(with: element1b, in: .empty) { _ in }
 
         let state2 = try XCTUnwrap(tree.root)
 
@@ -50,7 +69,7 @@ class ElementStateTreeTests: XCTestCase {
 
         // Updating with a new type should tear down the state.
 
-        _ = tree.update(with: element2, in: .empty)
+        _ = tree.performUpdate(with: element2, in: .empty) { _ in }
 
         let state3 = try XCTUnwrap(tree.root)
 
@@ -114,7 +133,7 @@ class ElementStateTests: XCTestCase {
         XCTAssertEqual(0, delegate.didSetupRootCalls.count)
         XCTAssertEqual(0, delegate.didUpdateRootCalls.count)
 
-        _ = tree.update(with: root, in: env)
+        _ = tree.performUpdate(with: root, in: env) { _ in }
 
 
         let rootState = try XCTUnwrap(tree.root)
@@ -125,7 +144,6 @@ class ElementStateTests: XCTestCase {
 
         let childState2 = try XCTUnwrap(childState1.childState(for: child2, in: env, with: child2.identifier))
         XCTAssertTrue(childState2 === delegate.didCreateStateCalls[1])
-
 
         XCTAssertNil(rootState.parent)
         XCTAssertEqual(ObjectIdentifier(childState1.parent!), ObjectIdentifier(rootState))
@@ -140,7 +158,7 @@ class ElementStateTests: XCTestCase {
         let tree = ElementStateTree(name: "test")
         let env = Environment.empty
 
-        _ = tree.update(with: root, in: env)
+        _ = tree.performUpdate(with: root, in: env) { _ in }
 
         let rootState = try XCTUnwrap(tree.root)
         let childState1 = try XCTUnwrap(rootState.childState(for: child1, in: env, with: child1.identifier))
@@ -163,9 +181,6 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
 
     func test_identifierTree() {
 
-        // TODO: Fix me once we have the ElementContent changes in.
-        return;
-
         let tree = ElementStateTree(name: "Testing")
 
         XCTAssertEqual(tree.identifierTree, nil)
@@ -181,7 +196,7 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
             }
         }
 
-        _ = tree.update(with: element, in: .empty)
+        _ = tree.performLayout(with: element)
 
         XCTAssertEqual(
             tree.identifierTree,
