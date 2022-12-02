@@ -155,6 +155,18 @@ extension ElementContent {
         ) -> [LayoutResultNode] {
             []
         }
+
+        func forEachElement(
+            in size: CGSize,
+            with environment: Environment,
+            children childNodes: [LayoutResultNode],
+            state: ElementState,
+            forEach: (ElementState, Element, LayoutResultNode) -> Void
+        ) {
+            let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+            forEach(childState, element, childNodes[0])
+        }
     }
 }
 
