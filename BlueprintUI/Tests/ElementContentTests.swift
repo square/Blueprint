@@ -119,6 +119,17 @@ class ElementContentTests: XCTestCase {
             }
         }
 
+        struct ByMeasuringElement: Element {
+
+            var content: ElementContent {
+                .init(byMeasuring: Empty())
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
         /// The below element contains child element of every `ContentStorage`
         /// type, to ensure they all implement `forEachElement` correctly.
 
@@ -140,10 +151,12 @@ class ElementContentTests: XCTestCase {
                 SingleChildElement( /// `SingleChildStorage`
                     child: Empty()
                 )
+
+                ByMeasuringElement() /// `MeasureNestedElementStorage`
             }
         )
-        
-        // TODO MeasureNestedElementStorage
+
+        // TODO: MeasureNestedElementStorage
 
         let tree = ElementStateTree(name: "Testing")
 
@@ -177,6 +190,7 @@ class ElementContentTests: XCTestCase {
                 .identifier(for: Spacer.self, key: nil, count: 1),
                 .identifier(for: SingleChildElement.self, key: nil, count: 1),
                 .identifier(for: Empty.self, key: nil, count: 1),
+                .identifier(for: ByMeasuringElement.self, key: nil, count: 1),
             ]
         )
     }

@@ -197,7 +197,7 @@ extension ElementContent {
         ) -> [LayoutResultNode] {
             []
         }
-        
+
         func forEachElement(
             in size: CGSize,
             with environment: Environment,
@@ -206,7 +206,7 @@ extension ElementContent {
             forEach: (ElementContent.ForEachElementContext) -> Void
         ) {
             precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
-            
+
             /// No-op; we have no children so we won't enumerate them.
             ///
             /// Important: This means we also won't update measurement-only children
