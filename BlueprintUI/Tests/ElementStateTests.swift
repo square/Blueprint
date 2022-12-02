@@ -97,7 +97,8 @@ class ElementStateTests: XCTestCase {
                 identifier: .identifier(for: Element1.self, key: nil, count: 1),
                 element: Element1(text: "1"),
                 signpostRef: NSObject(),
-                name: ""
+                name: "",
+                kind: .regular
             )
 
             XCTAssertTrue(state.wasVisited)

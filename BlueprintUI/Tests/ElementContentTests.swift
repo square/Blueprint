@@ -99,6 +99,30 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(callCount, 2)
     }
+
+    func test_measurementOnlyChild() {
+        let element = SingleChildElement(child: MeasurableElement())
+        let content = ElementContent(byMeasuring: element)
+
+        let size = content.measure(in: SizeConstraint(width: .atMost(20.0), height: .atMost(20.0)))
+        XCTAssertEqual(size.width, 20.0)
+        XCTAssertEqual(size.height, 20.0)
+
+        let layouts = content.performLayout(
+            in: size,
+            with: .empty,
+            state: ElementState(
+                parent: nil,
+                delegate: nil,
+                identifier: .identifier(for: element, key: nil, count: 0),
+                element: element,
+                signpostRef: NSObject(),
+                name: "",
+                kind: .regular
+            )
+        )
+        XCTAssertTrue(layouts.isEmpty)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -215,5 +239,17 @@ private struct MeasureCountingSpacer: Element {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             []
         }
+    }
+}
+
+private struct SingleChildElement: Element {
+    let child: Element
+
+    var content: ElementContent {
+        .init(child: child)
+    }
+
+    func backingViewDescription(with context: BlueprintUI.ViewDescriptionContext) -> BlueprintUI.ViewDescription? {
+        nil
     }
 }
