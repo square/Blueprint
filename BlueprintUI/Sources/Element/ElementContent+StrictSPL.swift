@@ -209,6 +209,8 @@ class StrictLayoutNode: StrictLayoutable {
     var proposedSize: SizeConstraint?
     var proposedMode: AxisVarying<StrictPressureMode>?
     var correction: CGSize = .zero
+    
+    var results: [LayoutResultKey: StrictSubtreeResult] = [:]
 
     private var layoutCount = 0
 
@@ -233,28 +235,37 @@ class StrictLayoutNode: StrictLayoutable {
     }
 
     func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
-        layoutCount += 1
-        if layoutCount > options.maxAllowedLayoutCount {
-            fatalError("\(type(of: element)) layout called \(layoutCount) times")
-        }
 
         let layoutMode = AxisVarying(
             horizontal: options.mode.horizontal ?? mode.horizontal,
             vertical: options.mode.vertical ?? mode.vertical
         )
 
-//        precondition(
-//            proposedSize.width != .greatestFiniteMagnitude && proposedSize.height != .greatestFiniteMagnitude,
-//            "GFM detected"
-//        )
-
-        var environment = environment
         let path = path.appending(identifier: id)
 
-        if let debugElementPath = environment.debugElementPath, path.matches(expression: debugElementPath) {
-            print("Debugging triggered for path \(path)")
-            environment.debugElementPath = nil
+        let resultKey = LayoutResultKey(proposedSize: proposedSize, proposedMode: layoutMode)
+        if let layoutResult = results[resultKey] {
+            self.proposedSize = proposedSize
+            self.proposedMode = layoutMode
+            self.layoutResult = layoutResult
+
+            return layoutResult.intermediate.size
         }
+        
+        // TODO: this is not enforceable with cached layout nodes -- elements nested within
+        // multiple stacks will get hit (2 * stack depth) times. We can disable it entirely, or
+        // try to track this some other way.
+        layoutCount += 1
+        if layoutCount > options.maxAllowedLayoutCount {
+//            print("warning: \(path) layout called \(layoutCount) times")
+//            fatalError("\(type(of: element)) layout called \(layoutCount) times")
+        }
+
+//        var environment = environment
+//        if let debugElementPath = environment.debugElementPath, path.matches(expression: debugElementPath) {
+//            print("Debugging triggered for path \(path)")
+//            environment.debugElementPath = nil
+//        }
 
         var layoutResult = content.performStrictLayout(
             in: StrictLayoutContext(
@@ -297,8 +308,16 @@ class StrictLayoutNode: StrictLayoutable {
             layoutResult.intermediate.childPositions.allSatisfy { $0.isFinite },
             "\(type(of: element)) child positions must be finite"
         )
+        
+        results[resultKey] = layoutResult
 
         return layoutResult.intermediate.size
+    }
+    
+    
+    struct LayoutResultKey: Hashable {
+        var proposedSize: SizeConstraint
+        var proposedMode: AxisVarying<StrictPressureMode>
     }
 
 }
@@ -343,10 +362,6 @@ final class StrictCacheTree<SubcacheKey> where SubcacheKey: Hashable {
 
 typealias StrictCacheNode = StrictCacheTree<Int>
 
-enum StrictLayoutNodesCacheTreeKey: StrictCacheTreeKey {
-    typealias Value = [StrictLayoutNode]
-}
-
 /// Enables legacy behavior, and "top-down" cascading effects
 public struct StrictLayoutOptions {
     public static let `default` = StrictLayoutOptions()
@@ -375,6 +390,8 @@ public struct AxisVarying<T> {
         self.vertical = vertical
     }
 }
+
+extension AxisVarying: Hashable, Equatable where T: Hashable { }
 
 extension CGFloat {
     var finiteValue: CGFloat? {

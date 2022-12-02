@@ -630,36 +630,44 @@ private struct MeasurableStorage: ContentStorage {
 // MARK: - Strict SPL extensions
 
 extension ElementContent.Builder {
+    
+    enum NodesKey: StrictCacheTreeKey {
+        typealias Value = ([StrictLayoutNode], [(traits: LayoutType.Traits, layoutable: StrictLayoutable)])
+    }
+
     func strictLayout(
         in context: StrictLayoutContext,
         environment: Environment
     ) -> StrictSubtreeResult {
 
-        var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
-
-        var nodes: [StrictLayoutNode] = []
-        nodes.reserveCapacity(children.count)
-        
-        var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
-        layoutChildren.reserveCapacity(children.count)
-        
-        for index in 0..<children.count {
-            let child = children[index]
-            let childElement = child.element
-            let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
+        let (nodes, layoutChildren) = context.cache.get(keyType: NodesKey.self) {
+            var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
+            var nodes: [StrictLayoutNode] = []
+            nodes.reserveCapacity(children.count)
             
-            let node = StrictLayoutNode(
-                path: context.path,
-                id: id,
-                element: childElement,
-                content: childElement.content,
-                mode: context.mode,
-                environment: environment,
-                cache: context.cache.subcache(key: index)
-            )
+            var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
+            layoutChildren.reserveCapacity(children.count)
             
-            nodes.append(node)
-            layoutChildren.append((traits: child.traits, layoutable: node))
+            for index in 0..<children.count {
+                let child = children[index]
+                let childElement = child.element
+                let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
+                
+                let node = StrictLayoutNode(
+                    path: context.path,
+                    id: id,
+                    element: childElement,
+                    content: childElement.content,
+                    mode: context.mode,
+                    environment: environment,
+                    cache: context.cache.subcache(key: index)
+                )
+                
+                nodes.append(node)
+                layoutChildren.append((traits: child.traits, layoutable: node))
+            }
+            
+            return (nodes, layoutChildren)
         }
 
         let intermediateResult = layout.layout(

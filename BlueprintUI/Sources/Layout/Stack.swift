@@ -987,7 +987,6 @@ extension StackLayout {
 
         let vectorConstraint = context.vectorConstraint(on: axis)
 
-
         func items(axisPressure: StrictPressureMode?) -> [StackLayoutItem] {
             let mode: AxisVarying<StrictPressureMode?>
             switch axis {
@@ -1027,10 +1026,12 @@ extension StackLayout {
 
         let size = vector.size(axis: axis)
 
-        return StrictLayoutAttributes(
+        let attributes = StrictLayoutAttributes(
             size: size,
             childPositions: frames.map { $0.origin.point(axis: axis) }
         )
+        
+        return attributes
 
     }
 }
