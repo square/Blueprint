@@ -28,7 +28,7 @@ extension Element {
                     attributes: LayoutAttributes(frame: frame),
                     environment: environment,
                     // TODO: Hoist up?
-                    cache: .init(path: "")
+                    cache: .init(path: "\(type(of: self))")
                 )
             )
         case .strictSinglePass:
@@ -52,7 +52,7 @@ extension Element {
     
     func strictLayout(frame: CGRect, environment: Environment) -> LayoutResultNode {
         let attributes = LayoutAttributes(frame: frame)
-        let cache = StrictCacheNode()
+        let cache = StrictCacheNode(path: "\(type(of: self))")
         let context = StrictLayoutContext(
             path: .empty,
             cache: cache,

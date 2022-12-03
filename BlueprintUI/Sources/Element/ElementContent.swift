@@ -304,12 +304,6 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             cache.get(constraint) { constraint -> CGSize in
-                Logger.logMeasureStart(
-                    object: cache.signpostRef,
-                    description: cache.name,
-                    constraint: constraint
-                )
-                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
                 let layoutItems = self.layoutItems(in: environment, cache: cache)
                 return layout.measure(in: constraint, items: layoutItems)

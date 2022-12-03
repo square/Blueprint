@@ -71,6 +71,36 @@ extension Logger {
             view.name ?? "BlueprintView"
         )
     }
+    
+    static func logCacheHit(object: AnyObject, description: String, constraint: SizeConstraint) {
+        guard BlueprintLogging.isEnabled else { return }
+        
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Cache hit",
+            signpostID: OSSignpostID(log: .active, object: object),
+            "%{public}s in %{public}s×%{public}s",
+            description,
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+        )
+    }
+
+    static func logCacheMiss(object: AnyObject, description: String, constraint: SizeConstraint) {
+        guard BlueprintLogging.isEnabled else { return }
+        
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Cache miss",
+            signpostID: OSSignpostID(log: .active, object: object),
+            "%{public}s in %{public}s×%{public}s",
+            description,
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+        )
+    }
 
     static func logSizeThatFitsStart(
         view: BlueprintView,
@@ -111,11 +141,10 @@ extension Logger {
             log: .active,
             name: "Measuring",
             signpostID: OSSignpostID(log: .active, object: object),
-            // nb: os_signpost seems to ignore precision specifiers
-            "%{public}s in %.1f×%.1f",
+            "%{public}s in %{public}s×%{public}s",
             description,
-            constraint.width.constrainedValue ?? .infinity,
-            constraint.height.constrainedValue ?? .infinity
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
         )
     }
 

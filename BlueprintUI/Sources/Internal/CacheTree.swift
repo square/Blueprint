@@ -23,10 +23,25 @@ extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
     func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
 
+//        print("measure \(name)")
+//        if (name == "Row/Column.0/Spacer.0") {
+//            print("xxx")
+//        }
         if let size = self[constraint] {
+            Logger.logCacheHit(object: self.signpostRef, description: name, constraint: constraint)
             return size
         } else {
+            Logger.logCacheMiss(object: signpostRef, description: name, constraint: constraint)
+            
+            Logger.logMeasureStart(
+                object: signpostRef,
+                description: name,
+                constraint: constraint
+            )
+
             let size = calculation(constraint)
+
+            Logger.logMeasureEnd(object: signpostRef)
 
             self[constraint] = size
 
@@ -38,9 +53,7 @@ extension CacheTree {
     func subcache(index: Int, of childCount: Int, element: Element) -> CacheTree {
         subcache(
             key: index,
-            name: childCount == 1
-                ? "\(name).\(type(of: element))"
-                : "\(name)[\(index)].\(type(of: element))"
+            name: "\(name)/\(type(of: element)).\(index)"
         )
     }
 

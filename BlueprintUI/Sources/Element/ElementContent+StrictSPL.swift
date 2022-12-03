@@ -248,9 +248,13 @@ class StrictLayoutNode: StrictLayoutable {
             self.proposedSize = proposedSize
             self.proposedMode = layoutMode
             self.layoutResult = layoutResult
+            
+            Logger.logCacheHit(object: self, description: "\(path)", constraint: proposedSize)
 
             return layoutResult.intermediate.size
         }
+        
+        Logger.logCacheMiss(object: self, description: "\(path)", constraint: proposedSize)
         
         // TODO: this is not enforceable with cached layout nodes -- elements nested within
         // multiple stacks will get hit (2 * stack depth) times. We can disable it entirely, or
@@ -266,6 +270,8 @@ class StrictLayoutNode: StrictLayoutable {
 //            print("Debugging triggered for path \(path)")
 //            environment.debugElementPath = nil
 //        }
+        
+        Logger.logMeasureStart(object: self, description: "\(path)", constraint: proposedSize)
 
         var layoutResult = content.performStrictLayout(
             in: StrictLayoutContext(
@@ -294,6 +300,8 @@ class StrictLayoutNode: StrictLayoutable {
                 layoutResult.intermediate.size.height = height
             }
         }
+        
+        Logger.logMeasureEnd(object: self)
 
         self.proposedSize = proposedSize
         self.proposedMode = layoutMode

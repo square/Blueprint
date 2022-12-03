@@ -59,8 +59,11 @@ extension SPValueCache where Key == SizeConstraint {
 
     func get(key: Key, or create: (Key) -> Value) -> Value {
         if let size = values[key] {
+            Logger.logCacheHit(object: self, description: path, constraint: key)
             return size
         }
+        
+        Logger.logCacheMiss(object: self, description: path, constraint: key)
         
         Logger.logMeasureStart(object: self, description: path, constraint: key)
         let size = create(key)
