@@ -121,8 +121,15 @@ class ElementContentTests: XCTestCase {
 
         struct ByMeasuringElement: Element {
 
+            static let element = Row {
+                Column {
+                    Spacer()
+                    Empty()
+                }
+            }
+
             var content: ElementContent {
-                .init(byMeasuring: Empty())
+                .init(byMeasuring: Self.element)
             }
 
             func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

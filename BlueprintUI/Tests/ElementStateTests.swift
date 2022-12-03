@@ -8,7 +8,7 @@
 
 import Foundation
 import XCTest
-@testable import BlueprintUI
+@testable @_spi(BlueprintElementContent) import BlueprintUI
 
 
 extension ElementStateTree {
@@ -388,6 +388,82 @@ class ElementStateTreeTests: XCTestCase {
             ),
             .elementState_treeDidRemoveState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
         ])
+    }
+
+    func test_integration_byMeasuring() {
+
+        struct ComparableTestElement: ComparableElement, ProxyElement, Equatable {
+
+            var elementRepresentation: Element {
+                Row(alignment: .fill, underflow: .growUniformly) {
+                    Empty()
+                    Spacer()
+                    ByMeasuringElement()
+                }
+            }
+        }
+
+        struct ByMeasuringElement: Element {
+
+            static let element = Row {
+                Column {
+                    Spacer()
+                    Empty()
+                }
+            }
+
+            var content: ElementContent {
+                .init(byMeasuring: Self.element)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        let fixture = LayoutPassTestFixture()
+        let blueprintView = BlueprintView(frame: .init(origin: .zero, size: .init(width: 100, height: 200)))
+        blueprintView.rootState.delegate = fixture
+
+        blueprintView.element = ComparableTestElement()
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(ComparableTestElement.identifier(1)) {
+                IdentifiedNode(Empty.identifier(1))
+                IdentifiedNode(Spacer.identifier(1))
+
+                IdentifiedNode(ByMeasuringElement.identifier(1)) {
+                    IdentifiedNode(Row.identifier(1)) {
+                        IdentifiedNode(Column.identifier(1)) {
+                            IdentifiedNode(Spacer.identifier(1))
+                            IdentifiedNode(Empty.identifier(1))
+                        }
+                    }
+                }
+            }
+        )
+
+        blueprintView.element = ComparableTestElement()
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(ComparableTestElement.identifier(1)) {
+                IdentifiedNode(Empty.identifier(1))
+                IdentifiedNode(Spacer.identifier(1))
+
+                IdentifiedNode(ByMeasuringElement.identifier(1)) {
+                    IdentifiedNode(Row.identifier(1)) {
+                        IdentifiedNode(Column.identifier(1)) {
+                            IdentifiedNode(Spacer.identifier(1))
+                            IdentifiedNode(Empty.identifier(1))
+                        }
+                    }
+                }
+            }
+        )
     }
 
     func test_layout_caching_updates_elements() throws {
