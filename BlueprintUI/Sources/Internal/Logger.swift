@@ -71,32 +71,32 @@ extension Logger {
             view.name ?? "BlueprintView"
         )
     }
-    
-    static func logCacheHit(object: AnyObject, description: String, constraint: SizeConstraint) {
-        guard BlueprintLogging.isEnabled else { return }
-        
+
+    static func logCacheHit(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
+        guard shouldRecordMeasurePass() else { return }
+
         os_signpost(
             .event,
             log: .active,
             name: "Cache hit",
             signpostID: OSSignpostID(log: .active, object: object),
             "%{public}s in %{public}s×%{public}s",
-            description,
+            description(),
             String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
             String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
         )
     }
 
-    static func logCacheMiss(object: AnyObject, description: String, constraint: SizeConstraint) {
-        guard BlueprintLogging.isEnabled else { return }
-        
+    static func logCacheMiss(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
+        guard shouldRecordMeasurePass() else { return }
+
         os_signpost(
             .event,
             log: .active,
             name: "Cache miss",
             signpostID: OSSignpostID(log: .active, object: object),
             "%{public}s in %{public}s×%{public}s",
-            description,
+            description(),
             String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
             String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
         )
@@ -104,7 +104,7 @@ extension Logger {
 
     static func logSizeThatFitsStart(
         view: BlueprintView,
-        description: String
+        description: @autoclosure () -> String
     ) {
         guard BlueprintLogging.isEnabled else { return }
 
@@ -114,7 +114,7 @@ extension Logger {
             name: "View Sizing",
             signpostID: OSSignpostID(log: .active, object: view),
             "%{public}s",
-            description
+            description()
         )
     }
 
@@ -132,7 +132,7 @@ extension Logger {
 
 /// Measuring signposts
 extension Logger {
-    static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
+    static func logMeasureStart(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
 
         guard shouldRecordMeasurePass() else { return }
 
@@ -142,7 +142,7 @@ extension Logger {
             name: "Measuring",
             signpostID: OSSignpostID(log: .active, object: object),
             "%{public}s in %{public}s×%{public}s",
-            description,
+            description(),
             String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
             String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
         )
