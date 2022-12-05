@@ -35,6 +35,7 @@ extension Element {
         return LayoutResultNode(
             identifier: .identifierFor(singleChild: self),
             layoutAttributes: layoutAttributes,
+            appearsInFinalLayout: true,
             environment: environment,
             state: state
         )
@@ -69,6 +70,7 @@ extension ElementContent {
 
         return performLayout(
             in: size,
+            appearsInFinalLayout: true,
             with: .empty,
             state: state
         )

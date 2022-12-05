@@ -14,6 +14,10 @@ struct LayoutResultNode {
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
 
+    /// If the layout node and its children appear in the final layout.
+    /// For measurement-only nodes, this is false.
+    var appearsInFinalLayout: Bool
+
     /// The environment for the element.
     var environment: Environment
 
@@ -23,12 +27,14 @@ struct LayoutResultNode {
     init(
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
+        appearsInFinalLayout: Bool,
         environment: Environment,
         element: ElementState.LatestElement,
         children: [LayoutResultNode]
     ) {
         self.identifier = identifier
         self.layoutAttributes = layoutAttributes
+        self.appearsInFinalLayout = appearsInFinalLayout
         self.environment = environment
         self.element = element
 
@@ -38,16 +44,19 @@ struct LayoutResultNode {
     init(
         identifier: ElementIdentifier,
         layoutAttributes: LayoutAttributes,
+        appearsInFinalLayout: Bool,
         environment: Environment,
         state: ElementState
     ) {
         self.init(
             identifier: identifier,
             layoutAttributes: layoutAttributes,
+            appearsInFinalLayout: appearsInFinalLayout,
             environment: environment,
             element: state.element,
             children: state.element.latest.content.performLayout(
                 in: layoutAttributes.frame.size,
+                appearsInFinalLayout: appearsInFinalLayout,
                 with: environment,
                 state: state
             )
@@ -61,6 +70,10 @@ extension LayoutResultNode {
     /// Returns the flattened tree of view descriptions (any element that does not return
     /// a view description will be skipped, and relevant layout attributes will be propagated).
     func resolve() -> [(path: ElementPath, node: NativeViewNode)] {
+
+        guard appearsInFinalLayout else {
+            return []
+        }
 
         // Recursively resolve child nodes in a depth-first manner, as
         // complete layout data for all children is required to perform the

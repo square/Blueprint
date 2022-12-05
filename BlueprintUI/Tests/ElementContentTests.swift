@@ -1,5 +1,5 @@
 import XCTest
-@testable @_spi(BlueprintElementContent) import BlueprintUI
+@testable import BlueprintUI
 
 class ElementContentTests: XCTestCase {
 
@@ -167,12 +167,12 @@ class ElementContentTests: XCTestCase {
 
         let tree = ElementStateTree(name: "Testing")
 
-        let state = tree.performLayout(with: element)
+        let state = tree.performLayout(with: element, appearsInFinalLayout: true)
 
         let size = CGSize(width: 100, height: 100)
 
         let nodes = state.layout(in: size, with: .empty) { env in
-            element.content.performLayout(in: size, with: env, state: state)
+            element.content.performLayout(in: size, appearsInFinalLayout: true, with: env, state: state)
         }
 
         var identifiers = [ElementIdentifier]()
@@ -212,6 +212,7 @@ class ElementContentTests: XCTestCase {
 
         let layouts = content.performLayout(
             in: size,
+            appearsInFinalLayout: false,
             with: .empty,
             state: ElementState(
                 parent: nil,

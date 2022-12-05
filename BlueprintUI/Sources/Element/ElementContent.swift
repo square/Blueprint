@@ -51,12 +51,14 @@ public struct ElementContent {
     /// Delegates to `storage` (`ContentStorage`).
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {
         autoreleasepool {
             storage.performLayout(
                 in: size,
+                appearsInFinalLayout: appearsInFinalLayout,
                 with: environment,
                 state: state
             )
@@ -160,7 +162,6 @@ extension ElementContent {
     ///
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
-    @_spi(BlueprintElementContent)
     public init(byMeasuring element: Element) {
         storage = MeasureNestedElementStorage(element: element)
     }
@@ -193,10 +194,35 @@ extension ElementContent {
 
         func performLayout(
             in size: CGSize,
+            appearsInFinalLayout: Bool,
             with environment: Environment,
             state: ElementState
         ) -> [LayoutResultNode] {
-            []
+
+            state.layout(in: size, with: environment) { environment in
+
+                let childAttributes = LayoutAttributes(size: size)
+
+                let identifier = ElementIdentifier.identifierFor(singleChild: element)
+
+                let childState = state.childState(for: element, in: environment, with: identifier)
+
+                let node = LayoutResultNode(
+                    identifier: identifier,
+                    layoutAttributes: childAttributes,
+                    appearsInFinalLayout: false,
+                    environment: environment,
+                    element: childState.element,
+                    children: childState.elementContent.performLayout(
+                        in: size,
+                        appearsInFinalLayout: false,
+                        with: environment,
+                        state: childState
+                    )
+                )
+
+                return [node]
+            }
         }
 
         func forEachElement(
@@ -208,14 +234,18 @@ extension ElementContent {
         ) {
             precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
 
-            /// No-op; we have no children so we won't enumerate them.
-            ///
-            /// Important: This means we also won't update measurement-only children
-            /// with their latest instance versions, but that's OK, since we're also not applying
-            /// them to real views anyway – that happens in the nested blueprint view.
-            ///
-            /// Once we're able to share this measurement and layout across blueprint views,
-            /// we will be able to finish the bridge here.
+            let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+            let childNode = childNodes[0]
+
+            forEach(.init(state: childState, element: element, layoutNode: childNode))
+
+            childState.elementContent.forEachElement(
+                with: childNode,
+                environment: environment,
+                state: childState,
+                forEach: forEach
+            )
         }
     }
 }
@@ -372,6 +402,7 @@ fileprivate protocol ContentStorage {
 
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode]
@@ -452,6 +483,7 @@ extension ElementContent {
 
         func performLayout(
             in size: CGSize,
+            appearsInFinalLayout: Bool,
             with environment: Environment,
             state: ElementState
         ) -> [LayoutResultNode] {
@@ -478,10 +510,12 @@ extension ElementContent {
                     return LayoutResultNode(
                         identifier: identifier,
                         layoutAttributes: currentChildLayoutAttributes,
+                        appearsInFinalLayout: appearsInFinalLayout,
                         environment: environment,
                         element: childState.element,
                         children: childState.elementContent.performLayout(
                             in: currentChildLayoutAttributes.bounds.size,
+                            appearsInFinalLayout: appearsInFinalLayout,
                             with: environment,
                             state: childState
                         )
@@ -566,16 +600,18 @@ private struct SingleChildStorage: ContentStorage {
         with environment: Environment,
         state: ElementState
     ) -> CGSize {
+        state.measure(in: constraint, with: environment) { env in
+            let identifier = ElementIdentifier.identifierFor(singleChild: element)
 
-        let identifier = ElementIdentifier.identifierFor(singleChild: element)
+            let child = state.childState(for: element, in: environment, with: identifier)
 
-        let child = state.childState(for: element, in: environment, with: identifier)
-
-        return child.elementContent.measure(in: constraint, with: environment, state: child)
+            return child.elementContent.measure(in: constraint, with: environment, state: child)
+        }
     }
 
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {
@@ -589,10 +625,12 @@ private struct SingleChildStorage: ContentStorage {
             let node = LayoutResultNode(
                 identifier: identifier,
                 layoutAttributes: childAttributes,
+                appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
+                    appearsInFinalLayout: appearsInFinalLayout,
                     with: environment,
                     state: childState
                 )
@@ -667,6 +705,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {
@@ -683,10 +722,12 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
             let node = LayoutResultNode(
                 identifier: identifier,
                 layoutAttributes: childAttributes,
+                appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
+                    appearsInFinalLayout: appearsInFinalLayout,
                     with: environment,
                     state: childState
                 )
@@ -751,6 +792,7 @@ private struct LazyStorage: ContentStorage {
 
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {
@@ -767,10 +809,12 @@ private struct LazyStorage: ContentStorage {
             let node = LayoutResultNode(
                 identifier: identifier,
                 layoutAttributes: childAttributes,
+                appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
+                    appearsInFinalLayout: appearsInFinalLayout,
                     with: environment,
                     state: childState
                 )
@@ -824,6 +868,7 @@ private struct MeasurableStorage: ContentStorage {
 
     func performLayout(
         in size: CGSize,
+        appearsInFinalLayout: Bool,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode] {

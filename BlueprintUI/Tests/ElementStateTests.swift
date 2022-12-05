@@ -8,7 +8,7 @@
 
 import Foundation
 import XCTest
-@testable @_spi(BlueprintElementContent) import BlueprintUI
+@testable import BlueprintUI
 
 
 extension ElementStateTree {
@@ -16,13 +16,19 @@ extension ElementStateTree {
     func performLayout(
         with element: Element,
         with size: CGSize = UIScreen.main.bounds.size,
+        appearsInFinalLayout: Bool,
         in environment: Environment = .empty
     ) -> ElementState {
 
         XCTAssertNotEqual(size, .zero, "Layout size cannot be zero.")
 
         let (state, _) = performUpdate(with: element, in: environment) { state in
-            state.elementContent.performLayout(in: size, with: environment, state: state)
+            state.elementContent.performLayout(
+                in: size,
+                appearsInFinalLayout: appearsInFinalLayout,
+                with: environment,
+                state: state
+            )
         }
 
         return state
@@ -693,7 +699,7 @@ class ElementStateTree_IdentifierTree_Tests: XCTestCase {
             }
         }
 
-        _ = tree.performLayout(with: element)
+        _ = tree.performLayout(with: element, appearsInFinalLayout: true)
 
         XCTAssertEqual(
             tree.identifierTree,

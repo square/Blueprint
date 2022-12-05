@@ -425,6 +425,7 @@ public final class BlueprintView: UIView {
                 LayoutResultNode(
                     identifier: .identifierFor(singleChild: element),
                     layoutAttributes: .init(frame: rootFrame),
+                    appearsInFinalLayout: true,
                     environment: environment,
                     state: state
                 )
