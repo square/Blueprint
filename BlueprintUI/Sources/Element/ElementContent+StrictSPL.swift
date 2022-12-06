@@ -331,7 +331,14 @@ class StrictLayoutNode: StrictLayoutable {
 
 }
 
-protocol StrictCacheTreeKey {
+
+
+enum Unit: Hashable {
+    case value
+}
+
+protocol StrictCacheTreeEntry {
+    associatedtype Key: Hashable = Unit
     associatedtype Value
 }
 
@@ -339,7 +346,7 @@ final class StrictCacheTree<SubcacheKey> where SubcacheKey: Hashable {
 
     typealias Subcache = StrictCacheTree<SubcacheKey>
 
-    private var caches: [ObjectIdentifier: Any] = [:]
+    private var caches: [CacheKey: Any] = [:]
     private var subcaches: [SubcacheKey: Subcache] = [:]
 
     var path: String
@@ -349,14 +356,30 @@ final class StrictCacheTree<SubcacheKey> where SubcacheKey: Hashable {
         self.path = path
     }
 
-    func get<Key>(keyType: Key.Type, or create: () -> Key.Value) -> Key.Value where Key: StrictCacheTreeKey {
-        let key = ObjectIdentifier(keyType)
-        if let value = caches[key] as? Key.Value {
+    struct CacheKey: Hashable {
+        var entryType: ObjectIdentifier
+        var entryKey: AnyHashable
+    }
+
+    func get<Entry>(
+        entryType: Entry.Type,
+        key: Entry.Key,
+        or create: () -> Entry.Value
+    ) -> Entry.Value where Entry: StrictCacheTreeEntry {
+        let key = CacheKey(entryType: ObjectIdentifier(entryType), entryKey: key)
+        if let value = caches[key] as? Entry.Value {
             return value
         }
         let value = create()
         caches[key] = value
         return value
+    }
+
+    func get<Entry>(
+        entryType: Entry.Type,
+        or create: () -> Entry.Value
+    ) -> Entry.Value where Entry: StrictCacheTreeEntry, Entry.Key == Unit {
+        get(entryType: entryType, key: .value, or: create)
     }
 
     func subcache(key: SubcacheKey) -> Subcache {

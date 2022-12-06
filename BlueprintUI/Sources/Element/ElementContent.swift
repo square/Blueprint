@@ -103,7 +103,7 @@ public struct ElementContent {
             context: context
         )
     }
-    
+
     func performStrictLayout(
         in context: StrictLayoutContext,
         environment: Environment
@@ -616,7 +616,7 @@ private struct MeasurableStorage: ContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
 //        context.cache.get(key: proposal) { proposal in
-            measurer(proposal, context.environment)
+        measurer(proposal, context.environment)
 //        }
     }
 
@@ -628,8 +628,8 @@ private struct MeasurableStorage: ContentStorage {
 // MARK: - Strict SPL extensions
 
 extension ElementContent.Builder {
-    
-    enum NodesKey: StrictCacheTreeKey {
+
+    enum NodesEntry: StrictCacheTreeEntry {
         typealias Value = ([StrictLayoutNode], [(traits: LayoutType.Traits, layoutable: StrictLayoutable)])
     }
 
@@ -638,19 +638,19 @@ extension ElementContent.Builder {
         environment: Environment
     ) -> StrictSubtreeResult {
 
-        let (nodes, layoutChildren) = context.cache.get(keyType: NodesKey.self) {
+        let (nodes, layoutChildren) = context.cache.get(entryType: NodesEntry.self) {
             var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
             var nodes: [StrictLayoutNode] = []
             nodes.reserveCapacity(children.count)
-            
+
             var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
             layoutChildren.reserveCapacity(children.count)
-            
+
             for index in 0..<children.count {
                 let child = children[index]
                 let childElement = child.element
                 let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
-                
+
                 let node = StrictLayoutNode(
                     path: context.path,
                     id: id,
@@ -660,11 +660,11 @@ extension ElementContent.Builder {
                     environment: environment,
                     cache: context.cache.subcache(key: index)
                 )
-                
+
                 nodes.append(node)
                 layoutChildren.append((traits: child.traits, layoutable: node))
             }
-            
+
             return (nodes, layoutChildren)
         }
 
@@ -789,7 +789,7 @@ fileprivate struct SingleChildLayoutHost: Layout, StrictLayout {
         precondition(children.count == 1)
         return wrapped.layout(in: context, child: children[0].layoutable)
     }
-    
+
 }
 
 struct Measurer: Measurable {
