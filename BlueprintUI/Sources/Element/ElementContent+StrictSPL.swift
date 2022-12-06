@@ -90,7 +90,7 @@ struct StrictSubtreeResult {
 
         for (child, childPosition) in zip(children, intermediate.childPositions) {
             child.ensuredResult.dump(
-                depth: depth+1,
+                depth: depth + 1,
                 id: "\(child.id)",
                 position: childPosition,
                 context: child.context,
@@ -164,9 +164,8 @@ public struct StrictNeutralLayout: SingleChildLayout {
     public func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
         subview.sizeThatFits(proposal)
     }
-    
-    public func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
-    }
+
+    public func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {}
 
     public func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
         StrictLayoutAttributes(
@@ -194,6 +193,8 @@ class StrictLayoutNode: StrictLayoutable {
         self.mode = mode
         self.environment = environment
         self.cache = cache
+
+        fullPath = path.appending(identifier: id)
     }
 
     var path: ElementPath
@@ -204,12 +205,14 @@ class StrictLayoutNode: StrictLayoutable {
     var environment: Environment
     var cache: StrictCacheNode
 
+    var fullPath: ElementPath
+
     // These values are initially unset, and captured when the child is laid out:
     var layoutResult: StrictSubtreeResult?
     var proposedSize: SizeConstraint?
     var proposedMode: AxisVarying<StrictPressureMode>?
     var correction: CGSize = .zero
-    
+
     var results: [LayoutResultKey: StrictSubtreeResult] = [:]
 
     private var layoutCount = 0
@@ -241,21 +244,19 @@ class StrictLayoutNode: StrictLayoutable {
             vertical: options.mode.vertical ?? mode.vertical
         )
 
-        let path = path.appending(identifier: id)
-
         let resultKey = LayoutResultKey(proposedSize: proposedSize, proposedMode: layoutMode)
         if let layoutResult = results[resultKey] {
             self.proposedSize = proposedSize
-            self.proposedMode = layoutMode
+            proposedMode = layoutMode
             self.layoutResult = layoutResult
-            
-            Logger.logCacheHit(object: self, description: "\(path)", constraint: proposedSize)
+
+            Logger.logCacheHit(object: self, description: "\(fullPath)", constraint: proposedSize)
 
             return layoutResult.intermediate.size
         }
-        
-        Logger.logCacheMiss(object: self, description: "\(path)", constraint: proposedSize)
-        
+
+        Logger.logCacheMiss(object: self, description: "\(fullPath)", constraint: proposedSize)
+
         // TODO: this is not enforceable with cached layout nodes -- elements nested within
         // multiple stacks will get hit (2 * stack depth) times. We can disable it entirely, or
         // try to track this some other way.
@@ -270,12 +271,12 @@ class StrictLayoutNode: StrictLayoutable {
 //            print("Debugging triggered for path \(path)")
 //            environment.debugElementPath = nil
 //        }
-        
-        Logger.logMeasureStart(object: self, description: "\(path)", constraint: proposedSize)
+
+        Logger.logMeasureStart(object: self, description: "\(fullPath)", constraint: proposedSize)
 
         var layoutResult = content.performStrictLayout(
             in: StrictLayoutContext(
-                path: path,
+                path: fullPath,
                 cache: cache,
                 proposedSize: proposedSize,
                 mode: layoutMode
@@ -300,11 +301,11 @@ class StrictLayoutNode: StrictLayoutable {
                 layoutResult.intermediate.size.height = height
             }
         }
-        
+
         Logger.logMeasureEnd(object: self)
 
         self.proposedSize = proposedSize
-        self.proposedMode = layoutMode
+        proposedMode = layoutMode
         self.layoutResult = layoutResult
 
         assert(
@@ -316,13 +317,13 @@ class StrictLayoutNode: StrictLayoutable {
             layoutResult.intermediate.childPositions.allSatisfy { $0.isFinite },
             "\(type(of: element)) child positions must be finite"
         )
-        
+
         results[resultKey] = layoutResult
 
         return layoutResult.intermediate.size
     }
-    
-    
+
+
     struct LayoutResultKey: Hashable {
         var proposedSize: SizeConstraint
         var proposedMode: AxisVarying<StrictPressureMode>
@@ -399,7 +400,7 @@ public struct AxisVarying<T> {
     }
 }
 
-extension AxisVarying: Hashable, Equatable where T: Hashable { }
+extension AxisVarying: Hashable, Equatable where T: Hashable {}
 
 extension CGFloat {
     var finiteValue: CGFloat? {
