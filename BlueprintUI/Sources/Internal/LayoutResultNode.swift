@@ -8,6 +8,9 @@ struct LayoutResultNode {
     /// we will recieve the latest element from the layout pass.
     var element: ElementState.LatestElement
 
+    /// The element state that this node represents.
+    unowned var state: ElementState
+
     /// The identifier for the element within its parent.
     var identifier: ElementIdentifier
 
@@ -29,6 +32,7 @@ struct LayoutResultNode {
         layoutAttributes: LayoutAttributes,
         appearsInFinalLayout: Bool,
         environment: Environment,
+        state: ElementState,
         element: ElementState.LatestElement,
         children: [LayoutResultNode]
     ) {
@@ -36,6 +40,7 @@ struct LayoutResultNode {
         self.layoutAttributes = layoutAttributes
         self.appearsInFinalLayout = appearsInFinalLayout
         self.environment = environment
+        self.state = state
         self.element = element
 
         self.children = children
@@ -53,6 +58,7 @@ struct LayoutResultNode {
             layoutAttributes: layoutAttributes,
             appearsInFinalLayout: appearsInFinalLayout,
             environment: environment,
+            state: state,
             element: state.element,
             children: state.element.latest.content.performLayout(
                 in: layoutAttributes.frame.size,

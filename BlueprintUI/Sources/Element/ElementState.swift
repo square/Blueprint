@@ -45,6 +45,33 @@ final class ElementStateTree {
         self.name = name
     }
 
+    func performUpdate<Output>(
+        with state: ElementState,
+        in environment: Environment,
+        updates: (ElementState) -> Output
+    ) -> (ElementState, Output) {
+
+        if let root = root {
+
+            if state === root {
+                let output = updates(state)
+                return (state, output)
+            } else {
+                self.root = state
+
+                let output = updates(state)
+                return (state, output)
+            }
+        } else {
+            root = state
+
+            let output = updates(state)
+
+            return (state, output)
+        }
+
+    }
+
     /// Updates or replaces the root node depending on the type of the new element.
     ///
     /// This method will also remove any `ElementState` for elements no longer present in the element tree.

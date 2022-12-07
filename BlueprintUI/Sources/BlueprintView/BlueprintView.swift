@@ -8,7 +8,7 @@ import UIKit
 /// ```
 /// final class HelloWorldViewController: UIViewController {
 ///
-///    private var blueprintView = BlueprintView(element: nil)
+///    private lazy var blueprintView = BlueprintView()
 ///
 ///    override func viewDidLoad() {
 ///        super.viewDidLoad()
@@ -81,15 +81,27 @@ public final class BlueprintView: UIView {
 
     /// The root element that is displayed within the view.
     public var element: Element? {
-        didSet {
+
+        get {
+            switch source {
+            case .element(let element):
+                return element
+
+            case .parent(let state):
+                return state?.element.latest
+            }
+        }
+
+        set {
             // Minor performance optimization: We do not need to update anything if the element remains nil.
-            if oldValue == nil && element == nil {
+            if
+                case let .element(oldValue) = source,
+                oldValue == nil && newValue == nil
+            {
                 return
             }
 
-            Logger.logElementAssigned(view: self)
-
-            setNeedsViewHierarchyUpdate()
+            source = .element(newValue)
         }
     }
 
@@ -141,7 +153,7 @@ public final class BlueprintView: UIView {
     /// - parameter environment: A base environment to render elements with. Defaults to `.empty`.
     public required init(element: Element?, environment: Environment = .empty) {
 
-        self.element = element
+        source = .element(element)
         self.environment = environment
 
         rootController = NativeViewController(
@@ -318,6 +330,32 @@ public final class BlueprintView: UIView {
         setNeedsViewHierarchyUpdate()
     }
 
+    var source: Source = .element(nil) {
+        didSet {
+            switch oldValue {
+            case .element:
+                switch source {
+                case .element:
+                    fatalError("Same Kind")
+                case .parent:
+                    fatalError("Diff Kind")
+                }
+
+            case .parent(let oldState):
+                switch source {
+                case .element:
+                    fatalError("Diff Kind")
+                case .parent:
+                    fatalError("Same Kind")
+                }
+            }
+
+            Logger.logElementAssigned(view: self)
+
+            setNeedsViewHierarchyUpdate()
+        }
+    }
+
     /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
     /// view, and marks the view as needing a layout.
     private func setNeedsViewHierarchyUpdate() {
@@ -359,82 +397,114 @@ public final class BlueprintView: UIView {
             size: bounds.size + rootCorrection.size
         )
 
-        /// Grab view descriptions
-        let viewNodes = calculateNativeViewNodes(
-            in: environment,
-            rootFrame: rootFrame
-        )
+        performUpdate(in: environment, rootFrame: rootFrame) { viewNodes in
 
-        let measurementEndDate = Date()
-        Logger.logLayoutEnd(view: self)
+            let measurementEndDate = Date()
+            Logger.logLayoutEnd(view: self)
 
-        // The root controller is fixed, and its layout attributes are never applied.
-        rootController.view.frame = bounds
+            // The root controller is fixed, and its layout attributes are never applied.
+            rootController.view.frame = bounds
 
-        var rootNode = NativeViewNode(
-            content: UIView.describe { _ in },
-            environment: environment,
-            layoutAttributes: LayoutAttributes(frame: rootFrame),
-            children: viewNodes
-        )
-
-        let scale = window?.screen.scale ?? UIScreen.main.scale
-        rootNode.round(from: rootOrigin, correction: rootCorrection, scale: scale)
-
-        Logger.logViewUpdateStart(view: self)
-
-        let updateResult = rootController.update(
-            node: rootNode,
-            context: .init(
-                appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
-                viewIsVisible: isVisible
+            var rootNode = NativeViewNode(
+                content: UIView.describe { _ in },
+                environment: environment,
+                layoutAttributes: LayoutAttributes(frame: rootFrame),
+                children: viewNodes
             )
-        )
 
-        for callback in updateResult.lifecycleCallbacks {
-            callback()
+            let scale = window?.screen.scale ?? UIScreen.main.scale
+            rootNode.round(from: rootOrigin, correction: rootCorrection, scale: scale)
+
+            Logger.logViewUpdateStart(view: self)
+
+            let updateResult = rootController.update(
+                node: rootNode,
+                context: .init(
+                    appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
+                    viewIsVisible: isVisible
+                )
+            )
+
+            for callback in updateResult.lifecycleCallbacks {
+                callback()
+            }
+
+            Logger.logViewUpdateEnd(view: self)
+            let viewUpdateEndDate = Date()
+
+            hasUpdatedViewHierarchy = true
+
+            isInsideUpdate = false
+
+            metricsDelegate?.blueprintView(
+                self,
+                completedUpdateWith: .init(
+                    totalDuration: viewUpdateEndDate.timeIntervalSince(start),
+                    measureDuration: measurementEndDate.timeIntervalSince(start),
+                    viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
+                )
+            )
         }
-
-        Logger.logViewUpdateEnd(view: self)
-        let viewUpdateEndDate = Date()
-
-        hasUpdatedViewHierarchy = true
-
-        isInsideUpdate = false
-
-        metricsDelegate?.blueprintView(
-            self,
-            completedUpdateWith: .init(
-                totalDuration: viewUpdateEndDate.timeIntervalSince(start),
-                measureDuration: measurementEndDate.timeIntervalSince(start),
-                viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
-            )
-        )
     }
 
     /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
     /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
     /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
-    private func calculateNativeViewNodes(
+    private func performUpdate(
         in environment: Environment,
-        rootFrame: CGRect
-    ) -> [(path: ElementPath, node: NativeViewNode)] {
-
-        if let element = self.element {
-            let (_, node) = rootState.performUpdate(with: element, in: environment) { state in
-                LayoutResultNode(
-                    identifier: .identifierFor(singleChild: element),
-                    layoutAttributes: .init(frame: rootFrame),
-                    appearsInFinalLayout: true,
-                    environment: environment,
-                    state: state
-                )
-            }
+        rootFrame: CGRect,
+        perform: ([(path: ElementPath, node: NativeViewNode)]) -> Void
+    ) {
+        func nativeViewNodes(
+            with id: ElementIdentifier,
+            rootFrame: CGRect,
+            state: ElementState
+        ) -> [(path: ElementPath, node: NativeViewNode)] {
+            let node = LayoutResultNode(
+                identifier: state.identifier,
+                layoutAttributes: .init(frame: rootFrame),
+                appearsInFinalLayout: true,
+                environment: environment,
+                state: state
+            )
 
             return node.resolve()
-        } else {
-            _ = rootState.teardownRootElement()
-            return []
+        }
+
+        switch source {
+        case .element(let element):
+            if let element = element {
+                _ = rootState.performUpdate(with: element, in: environment) { state in
+
+                    let nodes = nativeViewNodes(
+                        with: .identifierFor(singleChild: element),
+                        rootFrame: rootFrame,
+                        state: state
+                    )
+
+                    perform(nodes)
+                }
+            } else {
+                _ = rootState.teardownRootElement()
+
+                perform([])
+            }
+        case .parent(let state):
+            if let state = state {
+                _ = rootState.performUpdate(with: state, in: environment) { state in
+                    let nodes = nativeViewNodes(
+                        with: state.identifier,
+                        rootFrame: rootFrame,
+                        state: state
+                    )
+
+                    perform(nodes)
+                }
+            } else {
+                _ = rootState.teardownRootElement()
+
+                perform([])
+            }
         }
     }
 
@@ -509,6 +579,15 @@ public struct BlueprintViewUpdateMetrics {
     public var measureDuration: TimeInterval
     /// The time it took to update the on-screen views for the element.
     public var viewUpdateDuration: TimeInterval
+}
+
+
+extension BlueprintView {
+
+    enum Source {
+        case element(Element?)
+        case parent(ElementState?)
+    }
 }
 
 
@@ -702,6 +781,7 @@ extension BlueprintView {
         }
     }
 }
+
 
 extension BlueprintView.NativeViewController {
 

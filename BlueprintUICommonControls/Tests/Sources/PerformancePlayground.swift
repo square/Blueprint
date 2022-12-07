@@ -101,10 +101,10 @@ class PerformancePlayground: XCTestCase {
             for _ in 1...gridSize {
                 Row {
                     for row in 1...gridSize {
-                        NestedBlueprintViewBox(text: String(row))
+                        // NestedBlueprintViewBox(text: String(row))
                         // NestedBlueprintViewBox_Legacy(text: String(row))
 
-                        // LabeledBox(text: String(row))
+                        LabeledBox(text: String(row))
                     }
                 }
             }

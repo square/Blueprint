@@ -212,6 +212,7 @@ extension ElementContent {
                     layoutAttributes: childAttributes,
                     appearsInFinalLayout: false,
                     environment: environment,
+                    state: childState,
                     element: childState.element,
                     children: childState.elementContent.performLayout(
                         in: size,
@@ -249,6 +250,108 @@ extension ElementContent {
         }
     }
 }
+
+
+extension ElementContent {
+
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    init(withInteractiveElement element: any InteractiveViewElement) {
+        storage = InteractiveElementStorage(element: element)
+    }
+
+    private struct InteractiveElementStorage: ContentStorage {
+
+        let element: any InteractiveViewElement
+
+        let childCount: Int = 0
+
+        func measure(
+            in constraint: SizeConstraint,
+            with environment: Environment,
+            state: ElementState
+        ) -> CGSize {
+
+            let contentElement = element.measurementContent
+
+            let childState = state.childState(
+                for: contentElement,
+                in: environment,
+                with: .identifier(for: contentElement, key: nil, count: 1),
+                kind: .measurementOnly
+            )
+
+            precondition(type(of: contentElement) == type(of: childState.element.latest))
+
+            return childState.measure(in: constraint, with: environment) { environment in
+                childState.elementContent.measure(in: constraint, with: environment, state: childState)
+            }
+        }
+
+        func performLayout(
+            in size: CGSize,
+            appearsInFinalLayout: Bool,
+            with environment: Environment,
+            state: ElementState
+        ) -> [LayoutResultNode] {
+
+            state.layout(in: size, with: environment) { environment in
+
+                let contentElement = element.measurementContent
+
+                let childAttributes = LayoutAttributes(size: size)
+
+                let identifier = ElementIdentifier.identifierFor(singleChild: contentElement)
+
+                let childState = state.childState(for: contentElement, in: environment, with: identifier)
+
+                let node = LayoutResultNode(
+                    identifier: identifier,
+                    layoutAttributes: childAttributes,
+                    appearsInFinalLayout: false,
+                    environment: environment,
+                    state: childState,
+                    element: childState.element,
+                    children: childState.elementContent.performLayout(
+                        in: size,
+                        appearsInFinalLayout: false,
+                        with: environment,
+                        state: childState
+                    )
+                )
+
+                return [node]
+            }
+        }
+
+        func forEachElement(
+            in size: CGSize,
+            with environment: Environment,
+            children childNodes: [LayoutResultNode],
+            state: ElementState,
+            forEach: (ElementContent.ForEachElementContext) -> Void
+        ) {
+            precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
+
+            let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+            let childNode = childNodes[0]
+
+            forEach(.init(state: childState, element: element, layoutNode: childNode))
+
+            childState.elementContent.forEachElement(
+                with: childNode,
+                environment: environment,
+                state: childState,
+                forEach: forEach
+            )
+        }
+    }
+}
+
 
 extension ElementContent {
 
@@ -512,6 +615,7 @@ extension ElementContent {
                         layoutAttributes: currentChildLayoutAttributes,
                         appearsInFinalLayout: appearsInFinalLayout,
                         environment: environment,
+                        state: childState,
                         element: childState.element,
                         children: childState.elementContent.performLayout(
                             in: currentChildLayoutAttributes.bounds.size,
@@ -627,6 +731,7 @@ private struct SingleChildStorage: ContentStorage {
                 layoutAttributes: childAttributes,
                 appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
+                state: childState,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
@@ -724,6 +829,7 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
                 layoutAttributes: childAttributes,
                 appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
+                state: childState,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
@@ -811,6 +917,7 @@ private struct LazyStorage: ContentStorage {
                 layoutAttributes: childAttributes,
                 appearsInFinalLayout: appearsInFinalLayout,
                 environment: environment,
+                state: childState,
                 element: childState.element,
                 children: childState.elementContent.performLayout(
                     in: size,
