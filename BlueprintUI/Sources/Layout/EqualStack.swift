@@ -225,6 +225,23 @@ extension EqualStack {
         }
         
         func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+            guard !children.isEmpty else { return .init(size: .zero) }
+            
+            let totalSpacing = (spacing * CGFloat(children.count - 1))
+            
+            if
+                context.mode.horizontal == .fill,
+                let proposedWidth = context.proposedSize.width.constrainedValue
+            {
+                let itemWidth = (proposedWidth - totalSpacing) / CGFloat(children.count)
+                let itemProposal = SizeConstraint(
+                    width: .atMost(itemWidth),
+                    height: context.proposedSize.height
+                )
+                let childSizes = children.map { (traits: Void, layoutable: StrictLayoutable) in
+                    layoutable.layout(in: itemProposal)
+                }
+            }
             fatalError("TODO")
         }
     }

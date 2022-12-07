@@ -164,8 +164,56 @@ extension GridRow {
             }
         }
         
+        private typealias GridRowLayoutItem = (traits: Width, content: Measurable)
+        
         func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
-            fatalError("TODO")
+            guard !children.isEmpty else {
+                return .init(size: .zero)
+            }
+            
+            func items(axisPressure: StrictPressureMode?) -> [GridRowLayoutItem] {
+                let mode = AxisVarying(
+                    horizontal: axisPressure,
+                    vertical: verticalAlignment
+                        .stackAlignment
+                        .layoutMode(in: context.mode.vertical)
+                )
+                let options = StrictLayoutOptions(
+                    maxAllowedLayoutCount: 2,
+                    mode: mode
+                )
+                return children.map { child in
+                    return (
+                        traits: child.traits,
+                        content: Measurer { constraint in
+                            child.layoutable.layout(in: constraint, options: options)
+                        }
+                    )
+                }
+            }
+
+            let crossItems = items(axisPressure: nil)
+            
+            let isExactConstraint = context.proposedSize.height != .unconstrained
+                && context.mode.vertical == .fill
+
+            let frames = _frames(
+                in: context.proposedSize,
+                isExactConstraint: isExactConstraint,
+                items: crossItems
+            )
+
+            let size = frames.reduce(CGSize.zero) { size, frame in
+                CGSize(
+                    width: frame.maxX,
+                    height: max(size.height, frame.height)
+                )
+            }
+            
+            return StrictLayoutAttributes(
+                size: size,
+                childPositions: frames.map { $0.origin }
+            )
         }
 
         /// Compute child frames in a given layout space.

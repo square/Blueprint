@@ -173,7 +173,16 @@ public struct ConstrainedAspectRatio: Element {
         }
         
         func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
-            fatalError("TODO")
+            let contentSize = child.layout(in: context.proposedSize)
+            
+            return StrictLayoutAttributes(
+                size: contentMode.constrain(
+                    contentSize: contentSize,
+                    in: context.proposedSize,
+                    to: aspectRatio
+                ),
+                childPositions: [.zero]
+            )
         }
     }
 }
