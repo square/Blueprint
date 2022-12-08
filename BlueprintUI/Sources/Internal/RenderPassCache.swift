@@ -7,6 +7,7 @@ final class RenderPassCache: CacheTree {
     let signpostRef: AnyObject
 
     private var subcaches: [SubcacheKey: RenderPassCache] = [:]
+    private var outOfBandCaches: [AnyHashable: RenderPassCache] = [:]
     private var measurements: [SizeConstraint: CGSize] = [:]
 
     init(name: String, signpostRef: AnyObject) {
@@ -31,5 +32,15 @@ final class RenderPassCache: CacheTree {
         let subcache = RenderPassCache(name: name(), signpostRef: signpostRef)
         subcaches[key] = subcache
         return subcache
+    }
+    
+    func outOfBandCache(key: AnyHashable) -> CacheTree {
+        if let outOfBandCache = outOfBandCaches[key] {
+            return outOfBandCache
+        }
+        
+        let outOfBandCache = RenderPassCache(name: "OOB \(key)", signpostRef: signpostRef)
+        outOfBandCaches[key] = outOfBandCache
+        return outOfBandCache
     }
 }

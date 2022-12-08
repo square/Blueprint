@@ -76,3 +76,11 @@ extension SPValueCache where Key == SizeConstraint {
 
 
 typealias SPCacheNode = SPCacheTree<SizeConstraint, CGSize, ElementIdentifier>
+
+extension SPCacheNode {
+    private enum OutOfBandCacheKey { }
+
+    func outOfBandCache(for key: AnyHashable) -> Subcache {
+        subcache(key: .init(elementType: OutOfBandCacheKey.self, key: key, count: 0))
+    }
+}

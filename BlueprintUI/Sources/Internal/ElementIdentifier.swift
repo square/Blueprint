@@ -48,7 +48,7 @@ struct ElementIdentifier: Hashable, CustomStringConvertible {
 
     let count: Int
 
-    init(elementType: Element.Type, key: AnyHashable?, count: Int) {
+    init(elementType: Any.Type, key: AnyHashable?, count: Int) {
 
         self.elementType = Metatype(elementType)
         self.key = key

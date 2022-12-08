@@ -47,7 +47,7 @@ public struct LayoutWriter: Element {
     //
 
     public var content: ElementContent {
-        ElementContent { phase, size, env -> Element in
+        ElementContent { phase, size, env, _ -> Element in
 
             func layoutPhase() -> Context.LayoutPhase {
                 switch phase {

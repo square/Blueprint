@@ -386,13 +386,21 @@ final class StrictCacheTree<SubcacheKey> where SubcacheKey: Hashable {
         if let subcache = subcaches[key] {
             return subcache
         }
-        let subcache = Subcache(path: path + "/" + String(describing: key))
+        let subcache = Subcache(path: "\(path)/\(key)")
         subcaches[key] = subcache
         return subcache
     }
 }
 
-typealias StrictCacheNode = StrictCacheTree<Int>
+typealias StrictCacheNode = StrictCacheTree<ElementIdentifier>
+
+extension StrictCacheNode {
+    private enum OutOfBandCacheKey { }
+
+    func outOfBandCache(for key: AnyHashable) -> Subcache {
+        subcache(key: .init(elementType: OutOfBandCacheKey.self, key: key, count: 0))
+    }
+}
 
 /// Enables legacy behavior, and "top-down" cascading effects
 public struct StrictLayoutOptions {

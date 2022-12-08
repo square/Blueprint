@@ -31,36 +31,42 @@ public struct ElementContent {
     ///   - environment: The environment to measure in.
     /// - returns: The layout size needed by this content.
     public func measure(in constraint: SizeConstraint, environment: Environment) -> CGSize {
-        measure(
+        let layoutMode = RenderContext.current?.layoutMode ?? environment.layoutMode
+        let cachePrefix = "content.measure"
+        let cache = LayoutModeDependentCache(
+            mode: layoutMode,
+            standard: CacheFactory.makeCache(name: cachePrefix),
+            singlePass: .init(path: cachePrefix),
+            strict: .init(path: cachePrefix)
+        )
+
+        return measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent"),
-            layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
+            layoutModeCache: cache
         )
     }
-
+    
     func measure(
         in constraint: SizeConstraint,
         environment: Environment,
-        cache: CacheTree,
-        layoutMode: LayoutMode
+        layoutModeCache: LayoutModeDependentCache
     ) -> CGSize {
-        switch layoutMode {
-        case .standard:
+        switch layoutModeCache {
+        case .standard(let cache):
             return storage.measure(in: constraint, environment: environment, cache: cache)
-        case .singlePass:
+        case .singlePass(let cache):
             return storage.sizeThatFits(
                 proposal: constraint,
                 context: .init(
-                    // TODO: Hoist upward?
-                    cache: .init(path: "m"),
+                    cache: cache,
                     environment: environment
                 )
             )
-        case .strictSinglePass:
+        case .strict(let cache):
             let context = StrictLayoutContext(
                 path: .empty,
-                cache: .init(),
+                cache: cache,
                 proposedSize: constraint,
                 mode: AxisVarying(horizontal: .natural, vertical: .natural)
             )
@@ -130,14 +136,12 @@ extension ElementContent {
     public init(
         build builder: @escaping (SizeConstraint, Environment) -> Element
     ) {
-        storage = LazyStorage { _, size, env in
+        storage = LazyStorage { _, size, env, _ in
             builder(size, env)
         }
     }
 
-    init(
-        build builder: @escaping (LayoutPhase, SizeConstraint, Environment) -> Element
-    ) {
+    init(build builder: @escaping LazyStorage.BuildChild) {
         storage = LazyStorage(builder: builder)
     }
 
@@ -494,10 +498,17 @@ extension EnvironmentAdaptingStorage {
 }
 
 /// Content storage that defers creation of its child until measurement or layout time.
-private struct LazyStorage: ContentStorage {
+struct LazyStorage: ContentStorage {
+    typealias BuildChild = (
+        ElementContent.LayoutPhase,
+        SizeConstraint,
+        Environment,
+        LayoutModeDependentCache
+    ) -> Element
+
     let childCount = 1
 
-    var builder: (ElementContent.LayoutPhase, SizeConstraint, Environment) -> Element
+    var builder: BuildChild
 
     func performLayout(
         attributes: LayoutAttributes,
@@ -505,7 +516,7 @@ private struct LazyStorage: ContentStorage {
         cache: CacheTree
     ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         let constraint = SizeConstraint(attributes.bounds.size)
-        let child = buildChild(for: .layout, in: constraint, environment: environment)
+        let child = buildChild(for: .layout, in: constraint, environment: environment, layoutModeCache: .standard(cache))
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
@@ -526,7 +537,7 @@ private struct LazyStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            let child = buildChild(for: .measurement, in: constraint, environment: environment)
+            let child = buildChild(for: .measurement, in: constraint, environment: environment, layoutModeCache: .standard(cache))
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -538,9 +549,10 @@ private struct LazyStorage: ContentStorage {
     private func buildChild(
         for phase: ElementContent.LayoutPhase,
         in constraint: SizeConstraint,
-        environment: Environment
+        environment: Environment,
+        layoutModeCache: LayoutModeDependentCache
     ) -> Element {
-        builder(phase, constraint, environment)
+        builder(phase, constraint, environment, layoutModeCache)
     }
 }
 
@@ -551,7 +563,8 @@ extension LazyStorage {
             let child = buildChild(
                 for: .measurement,
                 in: proposal,
-                environment: context.environment
+                environment: context.environment,
+                layoutModeCache: .singlePass(context.cache)
             )
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
@@ -566,7 +579,8 @@ extension LazyStorage {
         let child = buildChild(
             for: .layout,
             in: proposal,
-            environment: context.environment
+            environment: context.environment,
+            layoutModeCache: .singlePass(context.cache)
         )
 
         let childAttributes = LayoutAttributes(size: context.attributes.bounds.size)
@@ -615,9 +629,9 @@ private struct MeasurableStorage: ContentStorage {
     }
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-//        context.cache.get(key: proposal) { proposal in
-        measurer(proposal, context.environment)
-//        }
+        context.cache.get(key: proposal) { proposal in
+            measurer(proposal, context.environment)
+        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -658,7 +672,7 @@ extension ElementContent.Builder {
                     content: childElement.content,
                     mode: context.mode,
                     environment: environment,
-                    cache: context.cache.subcache(key: index)
+                    cache: context.cache.subcache(key: id)
                 )
 
                 nodes.append(node)
@@ -688,7 +702,7 @@ extension EnvironmentAdaptingStorage {
     ) -> StrictSubtreeResult {
         let environment = adapted(environment: environment)
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let cache = context.cache.subcache(key: 0)
+        let cache = context.cache.subcache(key: identifier)
 
         let node = StrictLayoutNode(
             path: context.path,
@@ -715,10 +729,12 @@ extension LazyStorage {
         let child = buildChild(
             for: .layout,
             in: context.proposedSize,
-            environment: environment
+            environment: environment,
+            layoutModeCache: .strict(context.cache)
         )
+
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let cache = context.cache.subcache(key: 0)
+        let cache = context.cache.subcache(key: identifier)
 
         let node = StrictLayoutNode(
             path: context.path,

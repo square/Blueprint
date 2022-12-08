@@ -19,4 +19,8 @@ final class FakeCache: CacheTree {
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
         FakeCache(name: name(), signpostRef: signpostRef)
     }
+    
+    func outOfBandCache(key: AnyHashable) -> CacheTree {
+        FakeCache(name: "out of band \(key)", signpostRef: signpostRef)
+    }
 }

@@ -213,24 +213,29 @@ public final class BlueprintView: UIView {
             return cachedSize
         }
 
-        let cacheName = "sizeThatFits:\(type(of: element))"
+        let cachePrefix = "sizeThatFits:\(type(of: element))"
 
         Logger.logSizeThatFitsStart(
             view: self,
-            description: cacheName
+            description: cachePrefix
         )
         defer { Logger.logSizeThatFitsEnd(view: self) }
 
         let environment = makeEnvironment()
         let layoutMode = environment.layoutMode
         let renderContext = RenderContext(layoutMode: layoutMode)
+        let cache = LayoutModeDependentCache(
+            mode: layoutMode,
+            standard: CacheFactory.makeCache(name: cachePrefix),
+            singlePass: .init(path: cachePrefix),
+            strict: .init(path: cachePrefix)
+        )
 
         let measurement = renderContext.perform {
             element.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: CacheFactory.makeCache(name: cacheName),
-                layoutMode: layoutMode
+                layoutModeCache: cache
             )
         }
 

@@ -17,6 +17,8 @@ protocol CacheTree: AnyObject {
 
     /// Gets a subcache identified by the given key, or creates a new one.
     func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree
+    
+    func outOfBandCache(key: AnyHashable) -> CacheTree
 }
 
 extension CacheTree {
