@@ -56,13 +56,15 @@ public struct ElementContent {
         case .standard(let cache):
             return storage.measure(in: constraint, environment: environment, cache: cache)
         case .singlePass(let cache):
-            return storage.sizeThatFits(
-                proposal: constraint,
-                context: .init(
-                    cache: cache,
-                    environment: environment
+            return cache.get(key: constraint) { constraint in
+                return storage.sizeThatFits(
+                    proposal: constraint,
+                    context: .init(
+                        cache: cache,
+                        environment: environment
+                    )
                 )
-            )
+            }
         case .strict(let cache):
             let context = StrictLayoutContext(
                 path: .empty,
@@ -175,6 +177,13 @@ extension ElementContent {
     /// - parameter element: The single child element.
     public init(child: Element) {
         self = ElementContent(child: child, layout: PassthroughLayout())
+    }
+    
+    public init(measuring element: Element) {
+        storage = WrappedContentStorage(
+            identifier: .init(elementType: type(of: element), key: nil, count: 0),
+            wrappedContent: element.content
+        )
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -459,7 +468,8 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 extension EnvironmentAdaptingStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        context.cache.get(key: proposal) { proposal in
+//        context.cache.get(key: proposal) { proposal in
+        // this should be cached by LayoutSubviews
             let environment = adapted(environment: context.environment)
             let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
@@ -467,7 +477,7 @@ extension EnvironmentAdaptingStorage {
                 environment: environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
-        }
+//        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -559,7 +569,8 @@ struct LazyStorage: ContentStorage {
 extension LazyStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        context.cache.get(key: proposal) { proposal in
+//        context.cache.get(key: proposal) { proposal in
+        // this is wrapped in LayoutSubview which caches
             let child = buildChild(
                 for: .measurement,
                 in: proposal,
@@ -572,7 +583,7 @@ extension LazyStorage {
                 environment: context.environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
-        }
+//        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -629,13 +640,65 @@ private struct MeasurableStorage: ContentStorage {
     }
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        context.cache.get(key: proposal) { proposal in
+//        context.cache.get(key: proposal) { proposal in
             measurer(proposal, context.environment)
-        }
+//        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
         []
+    }
+}
+
+private struct WrappedContentStorage: ContentStorage {
+    let childCount = 0
+    
+    let identifier: ElementIdentifier
+    let wrappedContent: ElementContent
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment,
+        cache: CacheTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+        []
+    }
+
+    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
+        cache.get(constraint) { constraint in
+            wrappedContent.measure(
+                in: constraint,
+                environment: environment,
+                // TODO: can we avoid this subcache?
+                cache: cache.subcache(key: 0, name: "wrapped(\(identifier))")
+            )
+        }
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+//        context.cache.get(key: proposal) { proposal in
+        // this should be wrapped in a cache from LayoutSubview
+            wrappedContent.sizeThatFits(
+                proposal: proposal,
+                context: MeasureContext(
+                    cache: context.cache.subcache(key: identifier),
+                    environment: context.environment
+                )
+            )
+//        }
+    }
+
+    func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
+        []
+    }
+    
+    func strictLayout(in context: StrictLayoutContext, environment: Environment) -> StrictSubtreeResult {
+        StrictSubtreeResult(
+            intermediate: wrappedContent
+                .performStrictLayout(in: context, environment: environment)
+                .intermediate,
+            children: []
+        )
     }
 }
 
