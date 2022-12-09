@@ -41,6 +41,15 @@ public struct Hidden: Element {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.attributes.isHidden = isHidden
         }
+
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            var attributes = StrictLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
+            attributes.isHidden = isHidden
+            return attributes
+        }
     }
 }
 

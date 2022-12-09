@@ -18,6 +18,15 @@ public struct Aligned: Element {
         case bottom
         /// The content fills the full vertical height of the containing element.
         case fill
+
+        func layoutMode(in mode: StrictPressureMode) -> StrictPressureMode {
+            switch (self, mode) {
+            case (.fill, .fill):
+                return .fill
+            default:
+                return .natural
+            }
+        }
     }
 
     /// The possible horizontal alignment values.
@@ -32,6 +41,15 @@ public struct Aligned: Element {
         case trailing
         /// The content fills the full horizontal width of the containing element.
         case fill
+
+        func layoutMode(in mode: StrictPressureMode) -> StrictPressureMode {
+            switch (self, mode) {
+            case (.fill, .fill):
+                return .fill
+            default:
+                return .natural
+            }
+        }
     }
 
     /// The content element to be aligned.
@@ -164,6 +182,63 @@ public struct Aligned: Element {
                 at: position,
                 anchor: UnitPoint(x: x, y: y),
                 size: CGSize(width: width, height: height)
+            )
+        }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+
+            let proposedSize = context.proposedSize
+
+            // each axis will be `fill` if both are true:
+            // - context is already `fill`
+            // - the alignment is `fill`
+            // otherwise, use `natural`
+            let options = StrictLayoutOptions(
+                mode: AxisVarying(
+                    horizontal: horizontalAlignment.layoutMode(in: context.mode.horizontal),
+                    vertical: verticalAlignment.layoutMode(in: context.mode.vertical)
+                )
+            )
+
+            let childSize = child.layout(in: proposedSize, options: options)
+
+            let x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat
+
+            if let proposedHeight = proposedSize.height.constrainedValue, context.mode.vertical == .fill {
+               // In `fill` mode, we fill the space and position the child within it.
+               height = proposedHeight
+               switch verticalAlignment {
+               case .top, .fill:
+                   y = 0
+               case .center:
+                   y = (proposedHeight - childSize.height) / 2.0
+               case .bottom:
+                   y = proposedHeight - childSize.height
+               }
+           } else {
+                // In `natural` mode, Aligned is layout-neutral.
+                height = childSize.height
+                y = 0
+            }
+
+            if let proposedWidth = proposedSize.width.constrainedValue, context.mode.horizontal == .fill {
+                width = proposedWidth
+                switch horizontalAlignment {
+                case .leading, .fill:
+                    x = 0
+                case .center:
+                    x = (proposedWidth - childSize.width) / 2.0
+                case .trailing:
+                    x = proposedWidth - childSize.width
+                }
+            } else {
+                width = childSize.width
+                x = 0
+            }
+
+            return StrictLayoutAttributes(
+                size: CGSize(width: width, height: height),
+                childPositions: [CGPoint(x: x, y: y)]
             )
         }
     }

@@ -28,9 +28,11 @@ extension Element {
                     attributes: LayoutAttributes(frame: frame),
                     environment: environment,
                     // TODO: Hoist up?
-                    cache: .init()
+                    cache: .init(path: "\(type(of: self))")
                 )
             )
+        case .strictSinglePass:
+            return strictLayout(frame: frame, environment: environment)
         }
     }
 
@@ -46,6 +48,37 @@ extension Element {
             environment: context.environment,
             children: layouts.map { (identifier: $0.identifier, node: $0.node) }
         )
+    }
+    
+    func strictLayout(frame: CGRect, environment: Environment) -> LayoutResultNode {
+        let attributes = LayoutAttributes(frame: frame)
+        let cache = StrictCacheNode(path: "\(type(of: self))")
+        let context = StrictLayoutContext(
+            path: .empty,
+            cache: cache,
+            proposedSize: .init(frame.size),
+            mode: AxisVarying(horizontal: .fill, vertical: .fill)
+        )
+
+        let subtree = content.performStrictLayout(
+            in: context,
+            environment: environment
+        )
+
+//        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
+
+        let children = subtree
+            .resolve()
+
+        let root = LayoutResultNode(
+            element: self,
+            layoutAttributes: attributes,
+            environment: environment,
+            children: children
+        )
+
+//        root.dump()
+        return root
     }
 }
 

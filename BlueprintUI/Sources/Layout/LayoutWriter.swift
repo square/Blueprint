@@ -260,7 +260,7 @@ extension LayoutWriter {
 
         // MARK: Layout
 
-        private struct Layout: BlueprintUI.Layout {
+        private struct Layout: BlueprintUI.Layout, StrictLayout {
             var builder: Builder
 
             func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
@@ -284,6 +284,20 @@ extension LayoutWriter {
                         size: child.frame.size
                     )
                 }
+            }
+            
+            func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+                let size = builder.sizing.measure(with: builder)
+
+                for (layoutChild, builderChild) in zip(children, builder.children) {
+                    _ = layoutChild.layoutable.layout(in: .init(builderChild.frame.size))
+                }
+
+                return StrictLayoutAttributes(
+                    size: size,
+                    childPositions: builder.children.map { $0.frame.origin }
+                )
+
             }
         }
     }

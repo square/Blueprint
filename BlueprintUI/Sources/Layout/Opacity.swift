@@ -50,6 +50,13 @@ public struct Opacity: Element {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.attributes.alpha = opacity
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            StrictLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
+        }
     }
 }
 

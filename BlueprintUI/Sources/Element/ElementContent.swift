@@ -53,10 +53,24 @@ public struct ElementContent {
                 proposal: constraint,
                 context: .init(
                     // TODO: Hoist upward?
-                    cache: .init(),
+                    cache: .init(path: "m"),
                     environment: environment
                 )
             )
+        case .strictSinglePass:
+            let context = StrictLayoutContext(
+                path: .empty,
+                cache: .init(),
+                proposedSize: constraint,
+                mode: AxisVarying(horizontal: .natural, vertical: .natural)
+            )
+            let subtree = performStrictLayout(
+                in: context,
+                environment: environment
+            )
+            return subtree
+                .intermediate
+                .size
         }
     }
 
@@ -89,6 +103,14 @@ public struct ElementContent {
             context: context
         )
     }
+
+    func performStrictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment
+    ) -> StrictSubtreeResult {
+        storage.strictLayout(in: context, environment: environment)
+    }
+
 }
 
 public struct SPLayoutContext {
@@ -222,7 +244,7 @@ extension ElementContent {
 }
 
 
-protocol ContentStorage: SPContentStorage {
+protocol ContentStorage: SPContentStorage, StrictContentStorage {
     var childCount: Int { get }
 
     func measure(
@@ -241,7 +263,7 @@ protocol ContentStorage: SPContentStorage {
 
 extension ElementContent {
 
-    public struct Builder<LayoutType: Layout>: ContentStorage {
+    public struct Builder<LayoutType: Layout & StrictLayout>: ContentStorage {
 
         /// The layout object that is ultimately responsible for measuring
         /// and layout tasks.
@@ -282,12 +304,6 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             cache.get(constraint) { constraint -> CGSize in
-                Logger.logMeasureStart(
-                    object: cache.signpostRef,
-                    description: cache.name,
-                    constraint: constraint
-                )
-                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
                 let layoutItems = self.layoutItems(in: environment, cache: cache)
                 return layout.measure(in: constraint, items: layoutItems)
@@ -441,8 +457,9 @@ extension EnvironmentAdaptingStorage {
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         context.cache.get(key: proposal) { proposal in
             let environment = adapted(environment: context.environment)
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
-                cache: context.cache.subcache(key: 0),
+                cache: context.cache.subcache(key: identifier),
                 environment: environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
@@ -459,7 +476,7 @@ extension EnvironmentAdaptingStorage {
         let context = SPLayoutContext(
             attributes: context.attributes,
             environment: environment,
-            cache: context.cache.subcache(key: 0)
+            cache: context.cache.subcache(key: identifier)
         )
 
         let node = LayoutResultNode(
@@ -536,8 +553,9 @@ extension LazyStorage {
                 in: proposal,
                 environment: context.environment
             )
+            let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
             let context = MeasureContext(
-                cache: context.cache.subcache(key: 0),
+                cache: context.cache.subcache(key: identifier),
                 environment: context.environment
             )
             return child.content.sizeThatFits(proposal: proposal, context: context)
@@ -558,7 +576,7 @@ extension LazyStorage {
         let context = SPLayoutContext(
             attributes: context.attributes,
             environment: context.environment,
-            cache: context.cache.subcache(key: 0)
+            cache: context.cache.subcache(key: identifier)
         )
 
         let node = LayoutResultNode(
@@ -597,7 +615,9 @@ private struct MeasurableStorage: ContentStorage {
     }
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+//        context.cache.get(key: proposal) { proposal in
         measurer(proposal, context.environment)
+//        }
     }
 
     func performSinglePassLayout(proposal: SizeConstraint, context: SPLayoutContext) -> [IdentifiedNode] {
@@ -605,10 +625,137 @@ private struct MeasurableStorage: ContentStorage {
     }
 }
 
+// MARK: - Strict SPL extensions
+
+extension ElementContent.Builder {
+
+    enum NodesEntry: StrictCacheTreeEntry {
+        typealias Value = ([StrictLayoutNode], [(traits: LayoutType.Traits, layoutable: StrictLayoutable)])
+    }
+
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment
+    ) -> StrictSubtreeResult {
+
+        let (nodes, layoutChildren) = context.cache.get(entryType: NodesEntry.self) {
+            var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
+            var nodes: [StrictLayoutNode] = []
+            nodes.reserveCapacity(children.count)
+
+            var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
+            layoutChildren.reserveCapacity(children.count)
+
+            for index in 0..<children.count {
+                let child = children[index]
+                let childElement = child.element
+                let id = identifierFactory.nextIdentifier(for: type(of: childElement), key: child.key)
+
+                let node = StrictLayoutNode(
+                    path: context.path,
+                    id: id,
+                    element: childElement,
+                    content: childElement.content,
+                    mode: context.mode,
+                    environment: environment,
+                    cache: context.cache.subcache(key: index)
+                )
+
+                nodes.append(node)
+                layoutChildren.append((traits: child.traits, layoutable: node))
+            }
+
+            return (nodes, layoutChildren)
+        }
+
+        let intermediateResult = layout.layout(
+            in: context,
+            children: layoutChildren
+        )
+
+        return StrictSubtreeResult(
+            intermediate: intermediateResult,
+            children: nodes
+        )
+    }
+}
+
+
+extension EnvironmentAdaptingStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment
+    ) -> StrictSubtreeResult {
+        let environment = adapted(environment: environment)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let cache = context.cache.subcache(key: 0)
+
+        let node = StrictLayoutNode(
+            path: context.path,
+            id: identifier,
+            element: child,
+            content: child.content,
+            mode: context.mode,
+            environment: environment,
+            cache: cache
+        )
+
+        return StrictSubtreeResult(
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
+        )
+    }
+}
+
+extension LazyStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment
+    ) -> StrictSubtreeResult {
+        let child = buildChild(
+            for: .layout,
+            in: context.proposedSize,
+            environment: environment
+        )
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let cache = context.cache.subcache(key: 0)
+
+        let node = StrictLayoutNode(
+            path: context.path,
+            id: identifier,
+            element: child,
+            content: child.content,
+            mode: context.mode,
+            environment: environment,
+            cache: cache
+        )
+
+        return StrictSubtreeResult(
+            intermediate: NeutralLayout().layout(in: context, child: node),
+            children: [node]
+        )
+    }
+}
+
+extension MeasurableStorage {
+    func strictLayout(
+        in context: StrictLayoutContext,
+        environment: Environment
+    ) -> StrictSubtreeResult {
+        let size = measurer(context.proposedSize, environment)
+        return StrictSubtreeResult(
+            intermediate: StrictLayoutAttributes(
+                size: size,
+                childPositions: []
+            ),
+            children: []
+        )
+    }
+}
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
-fileprivate struct SingleChildLayoutHost: Layout {
+fileprivate struct SingleChildLayoutHost: Layout, StrictLayout {
 
     private var wrapped: SingleChildLayout
 
@@ -637,6 +784,12 @@ fileprivate struct SingleChildLayoutHost: Layout {
         precondition(subviews.count == 1)
         return wrapped.placeSubview(in: bounds, proposal: proposal, subview: subviews[0])
     }
+
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        precondition(children.count == 1)
+        return wrapped.layout(in: context, child: children[0].layoutable)
+    }
+
 }
 
 struct Measurer: Measurable {

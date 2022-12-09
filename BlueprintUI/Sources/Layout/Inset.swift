@@ -174,6 +174,22 @@ extension Inset {
                 size: insetSize
             )
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            var proposedSize = context.proposedSize
+            proposedSize.width -= left + right
+            proposedSize.height -= top + bottom
+
+            var size = child.layout(in: proposedSize)
+            size.width += left + right
+            size.height += top + bottom
+
+            return StrictLayoutAttributes(
+                size: size,
+                childPositions: [CGPoint(x: left, y: top)]
+            )
+
+        }
 
         private var edgeInsets: UIEdgeInsets {
             .init(top: top, left: left, bottom: bottom, right: right)

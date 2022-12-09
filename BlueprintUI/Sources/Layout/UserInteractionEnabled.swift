@@ -40,6 +40,15 @@ public struct UserInteractionEnabled: Element {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.attributes.isUserInteractionEnabled = isEnabled
         }
+
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            var attributes = StrictLayoutAttributes(
+                size: child.layout(in: context.proposedSize),
+                childPositions: [.zero]
+            )
+            attributes.isUserInteractionEnabled = isEnabled
+            return attributes
+        }
     }
 }
 

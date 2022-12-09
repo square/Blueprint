@@ -18,4 +18,11 @@ struct PassthroughLayout: SingleChildLayout {
     func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
         subview.place(at: bounds)
     }
+    
+    func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+        StrictLayoutAttributes(
+            size: child.layout(in: context.proposedSize),
+            childPositions: [.zero]
+        )
+    }
 }

@@ -171,6 +171,19 @@ public struct ConstrainedAspectRatio: Element {
         func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {
             subview.place(at: bounds)
         }
+        
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            let contentSize = child.layout(in: context.proposedSize)
+            
+            return StrictLayoutAttributes(
+                size: contentMode.constrain(
+                    contentSize: contentSize,
+                    in: context.proposedSize,
+                    to: aspectRatio
+                ),
+                childPositions: [.zero]
+            )
+        }
     }
 }
 

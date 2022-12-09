@@ -72,9 +72,39 @@ extension Logger {
         )
     }
 
+    static func logCacheHit(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
+        guard shouldRecordMeasurePass() else { return }
+
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Cache hit",
+            signpostID: OSSignpostID(log: .active, object: object),
+            "%{public}s in %{public}s×%{public}s",
+            description(),
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+        )
+    }
+
+    static func logCacheMiss(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
+        guard shouldRecordMeasurePass() else { return }
+
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Cache miss",
+            signpostID: OSSignpostID(log: .active, object: object),
+            "%{public}s in %{public}s×%{public}s",
+            description(),
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+        )
+    }
+
     static func logSizeThatFitsStart(
         view: BlueprintView,
-        description: String
+        description: @autoclosure () -> String
     ) {
         guard BlueprintLogging.isEnabled else { return }
 
@@ -84,7 +114,7 @@ extension Logger {
             name: "View Sizing",
             signpostID: OSSignpostID(log: .active, object: view),
             "%{public}s",
-            description
+            description()
         )
     }
 
@@ -102,7 +132,7 @@ extension Logger {
 
 /// Measuring signposts
 extension Logger {
-    static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
+    static func logMeasureStart(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
 
         guard shouldRecordMeasurePass() else { return }
 
@@ -111,11 +141,10 @@ extension Logger {
             log: .active,
             name: "Measuring",
             signpostID: OSSignpostID(log: .active, object: object),
-            // nb: os_signpost seems to ignore precision specifiers
-            "%{public}s in %.1f×%.1f",
-            description,
-            constraint.width.constrainedValue ?? .infinity,
-            constraint.height.constrainedValue ?? .infinity
+            "%{public}s in %{public}s×%{public}s",
+            description(),
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
         )
     }
 
