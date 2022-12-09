@@ -24,11 +24,6 @@ protocol CacheTree: AnyObject {
 extension CacheTree {
     /// Convenience method to get a cached size, or compute and store one if it is not in the cache.
     func get(_ constraint: SizeConstraint, orStore calculation: (SizeConstraint) -> CGSize) -> CGSize {
-
-//        print("measure \(name)")
-//        if (name == "Row/Column.0/Spacer.0") {
-//            print("xxx")
-//        }
         if let size = self[constraint] {
             Logger.logCacheHit(object: self.signpostRef, description: name, constraint: constraint)
             return size
