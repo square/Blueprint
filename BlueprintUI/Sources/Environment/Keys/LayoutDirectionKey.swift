@@ -19,7 +19,8 @@ extension Environment {
 
     private enum LayoutDirectionKey: EnvironmentKey {
         static var defaultValue: LayoutDirection {
-            LayoutDirection(UIApplication.shared.userInterfaceLayoutDirection)
+            // This will be updated in BlueprintView.makeEnvironment()
+            .leftToRight
         }
     }
 
