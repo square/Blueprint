@@ -96,8 +96,25 @@ public struct AttributedLabel: Element, Hashable {
         .foregroundColor: UIColor.systemBlue.withAlphaComponent(0.3),
     ]
 
+    /// This is the fallback value used when the environment has no URL handler
+    private var defaultURLHandler: URLHandler
+
+    @available(iOSApplicationExtension, unavailable, message: "This cannot be used in application extensions")
     public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
+        self.init(
+            attributedText: attributedText,
+            defaultURLHandler: DefaultURLHandler(),
+            configure: configure
+        )
+    }
+
+    public init(
+        attributedText: NSAttributedString,
+        defaultURLHandler: URLHandler,
+        configure: (inout Self) -> Void = { _ in }
+    ) {
         self.attributedText = attributedText
+        self.defaultURLHandler = defaultURLHandler
 
         configure(&self)
     }
@@ -258,7 +275,7 @@ extension AttributedLabel {
                 UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
             }
 
-            urlHandler = environment.urlHandler
+            urlHandler = environment.urlHandler ?? model.defaultURLHandler
             layoutDirection = environment.layoutDirection
 
             if !isMeasuring {
@@ -750,4 +767,3 @@ extension NSTextCheckingResult.CheckingType {
         self = checkingType
     }
 }
-
