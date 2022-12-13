@@ -15,12 +15,24 @@ extension Environment {
                 self = .leftToRight
             }
         }
+
+        init(_ direction: UITraitEnvironmentLayoutDirection) {
+            switch direction {
+            case .leftToRight:
+                self = .leftToRight
+            case .rightToLeft:
+                self = .rightToLeft
+            case .unspecified:
+                self = .leftToRight
+            @unknown default:
+                self = .leftToRight
+            }
+        }
     }
 
     private enum LayoutDirectionKey: EnvironmentKey {
         static var defaultValue: LayoutDirection {
-            // This will be updated in BlueprintView.makeEnvironment()
-            .leftToRight
+            LayoutDirection(UITraitCollection.current.layoutDirection)
         }
     }
 
