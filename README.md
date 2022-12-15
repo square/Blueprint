@@ -45,24 +45,6 @@ pod 'BlueprintUI'
 pod 'BlueprintUICommonControls'
 ```
 
-#### Note for use in Extensions
-
-If you intend to use `BlueprintUICommonControls` within an extension, there is one known caveat.
-The default behavior in Label and AttributedLabel is to use `UIApplication.main` to open URLs.
-This is not "extension safe" and disallowed by Apple.
-
-The safest thing would be to provide a no-op default.
-
-```swift
-import BlueprintUICommonControls
-
-struct NullURLHandler: URLHandler {
-    func onTap(url: URL) {}
-}
-
-URLHandlerEnvironmentKey.defaultValue = NullURLHandler()
-```
-
 ---
 
 ##### What does this library do?

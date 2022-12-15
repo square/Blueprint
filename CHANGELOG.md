@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated minimum deployment target from iOS 12 to iOS 14.
-- `URLHandlerEnvironmentKey.defaultValue` is now settable.
+- `URLHandlerEnvironmentKey.defaultValue` should now be a no-op in extensions.
 - Marks pod as `APPLICATION_EXTENSION_API_ONLY`
 
 ### Deprecated
