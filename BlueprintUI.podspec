@@ -19,6 +19,10 @@ Pod::Spec.new do |s|
 
   s.weak_framework = 'SwiftUI'
 
+  s.pod_target_xcconfig = {
+    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+  }
+
   s.test_spec 'Tests' do |test_spec|
     test_spec.library = 'swiftsimd'
     test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'

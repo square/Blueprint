@@ -18,4 +18,8 @@ Pod::Spec.new do |s|
   s.source_files = 'BlueprintUICommonControls/Sources/**/*.swift'
 
   s.dependency 'BlueprintUI', BLUEPRINT_VERSION
+
+  s.pod_target_xcconfig = {
+    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+  }
 end
