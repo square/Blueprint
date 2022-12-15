@@ -11,15 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `AccessibilityElement.CustomAction` to allow custom actions for use by assistive technologies. 
+- Added `AccessibilityElement.CustomAction` to allow custom actions for use by assistive technologies.
 - Added `accessibilityCustomActions` property to `Label` and `AttributedLabel`.
-- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.  
+- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.
 
 ### Removed
 
 ### Changed
 
 - Updated minimum deployment target from iOS 12 to iOS 14.
+- `URLHandlerEnvironmentKey.defaultValue` should now be a no-op in extensions.
+- Marks pod as `APPLICATION_EXTENSION_API_ONLY`
 
 ### Deprecated
 
@@ -295,9 +297,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 - Row, Column, EqualStack, and GridRow can now be initialized declaratively using result builders. ([#220])
-  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure. 
-  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters. 
-  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`. 
+  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure.
+  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters.
+  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`.
   ```swift
   let row = Row(alignment: .fill) {
     TestElement()
