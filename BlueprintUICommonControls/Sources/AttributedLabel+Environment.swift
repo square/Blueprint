@@ -17,14 +17,19 @@ public protocol URLHandler {
     func onTap(url: URL)
 }
 
-struct DefaultURLHandler: URLHandler {
-    func onTap(url: URL) {
+class NullURLHandler: URLHandler {
+    func onTap(url: URL) {}
+}
+
+class DefaultURLHandler: NullURLHandler {
+    @available(iOSApplicationExtension, unavailable)
+    override func onTap(url: URL) {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 }
 
 public struct URLHandlerEnvironmentKey: EnvironmentKey {
-    public static let defaultValue: URLHandler = DefaultURLHandler()
+    public static var defaultValue: URLHandler = DefaultURLHandler()
 }
 
 extension Environment {
