@@ -31,7 +31,7 @@ class DefaultURLHandler: NullURLHandler {
 public struct URLHandlerEnvironmentKey: EnvironmentKey {
     public static let defaultValue: URLHandler = {
         // This is our best guess for "is this executable an extension?"
-        if let _ = Bundle.main.infoDictionary["NSExtension"] {
+        if let _ = Bundle.main.infoDictionary?["NSExtension"] {
             return NullURLHandler()
         } else if Bundle.main.bundlePath.hasSuffix(".appex") {
             return NullURLHandler()
