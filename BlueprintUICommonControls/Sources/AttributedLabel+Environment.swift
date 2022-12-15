@@ -17,7 +17,6 @@ public protocol URLHandler {
     func onTap(url: URL)
 }
 
-@available(iOSApplicationExtension, unavailable, message: "This cannot be used in application extensions")
 struct DefaultURLHandler: URLHandler {
     func onTap(url: URL) {
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -25,12 +24,12 @@ struct DefaultURLHandler: URLHandler {
 }
 
 public struct URLHandlerEnvironmentKey: EnvironmentKey {
-    public static let defaultValue: URLHandler? = nil
+    public static let defaultValue: URLHandler = DefaultURLHandler()
 }
 
 extension Environment {
     /// The link handler to use to open links tapped in an `AttributedLabel`.
-    public var urlHandler: URLHandler? {
+    public var urlHandler: URLHandler {
         get { self[URLHandlerEnvironmentKey.self] }
         set { self[URLHandlerEnvironmentKey.self] = newValue }
     }
