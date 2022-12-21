@@ -26,6 +26,13 @@ import UIKit
 /// }
 /// ```
 public final class BlueprintView: UIView {
+    
+    public static var useCrossLayoutCaching: Bool = false {
+        didSet {
+            ElementState.useCaching = useCrossLayoutCaching
+        }
+    }
+
 
     private(set) var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false

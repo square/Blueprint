@@ -136,6 +136,8 @@ final class ElementStateTree {
 /// and layouts either to the end of the layout pass, or until the equivalency of the `Element`
 /// changes, for comparable elements.
 final class ElementState {
+    
+    static var useCaching = false
 
     /// The parent element that owns this element.
     private(set) weak var parent: ElementState?
@@ -456,6 +458,16 @@ final class ElementState {
         with environment: Environment,
         using layout: (Environment) -> [LayoutResultNode]
     ) -> [LayoutResultNode] {
+        
+        if !Self.useCaching {
+            let nodes = layout(environment)
+
+            delegate.ifDebug {
+                $0.treeDidPerformLayout(nodes, size: size, for: self)
+            }
+
+            return nodes
+        }
 
         /// Layout is only invoked once per cycle. If we're not a `ComparableElement`,
         /// there's no point in caching this value, so just return the `layout` directly.
@@ -622,6 +634,9 @@ final class ElementState {
             $0.wasVisited = false
             $0.hasUpdatedChildrenDuringLayout = false
             $0.clearOrderedChildren()
+            if !Self.useCaching {
+                $0.clearAllCachedData()
+            }
         }
     }
 

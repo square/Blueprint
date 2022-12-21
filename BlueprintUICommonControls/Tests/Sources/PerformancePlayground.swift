@@ -26,6 +26,14 @@ class PerformancePlayground: XCTestCase {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
         super.invokeTest()
     }
+    
+    override func setUp() {
+        BlueprintView.useCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.useCrossLayoutCaching = false
+    }
 
     func test_deep_and_wide_grid() {
 
