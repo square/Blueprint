@@ -10,6 +10,14 @@ import XCTest
 
 
 class KeyedTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_measure() {
         let element = TestElement().keyed("the-key")

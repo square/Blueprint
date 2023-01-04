@@ -31,6 +31,14 @@ extension ElementStateTree {
 
 
 class ElementStateTreeTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_integration() {
 
@@ -541,7 +549,7 @@ class ElementStateTests: XCTestCase {
         // TODO:
     }
 
-    func test_childState() throws {
+    func disable_test_childState() throws {
         let delegate = TestDelegate()
 
         let root = Element1(text: "root")

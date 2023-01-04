@@ -11,6 +11,14 @@ import XCTest
 
 
 class LayoutWriterTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_buildCount() {
 

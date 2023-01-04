@@ -11,6 +11,14 @@ import XCTest
 
 
 class UIViewElementTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_measuring() {
         // Due to the static caching of UIViewElementMeasurer, this struct is nested to give it a

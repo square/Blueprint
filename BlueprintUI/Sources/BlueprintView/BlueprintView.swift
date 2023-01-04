@@ -27,9 +27,9 @@ import UIKit
 /// ```
 public final class BlueprintView: UIView {
     
-    public static var useCrossLayoutCaching: Bool = false {
+    public static var enableCrossLayoutCaching: Bool = false {
         didSet {
-            ElementState.useCaching = useCrossLayoutCaching
+            ElementState.enableCrossLayoutCaching = enableCrossLayoutCaching
         }
     }
 

@@ -4,6 +4,14 @@ import XCTest
 
 
 class AttributedLabelTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_accessibilityTraits() {
 

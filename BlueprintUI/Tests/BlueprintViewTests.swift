@@ -2,6 +2,14 @@ import XCTest
 @testable import BlueprintUI
 
 class BlueprintViewTests: XCTestCase {
+    
+    override func setUp() {
+        BlueprintView.enableCrossLayoutCaching = true
+    }
+    
+    override func tearDown() {
+        BlueprintView.enableCrossLayoutCaching = false
+    }
 
     func test_sizeThatFits() {
 
