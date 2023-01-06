@@ -3,11 +3,11 @@ import BlueprintUICommonControls
 import XCTest
 
 final class PixelBoundarySnapshotTests: XCTestCase {
-    
+
     override func setUp() {
         BlueprintView.enableCrossLayoutCaching = true
     }
-    
+
     override func tearDown() {
         BlueprintView.enableCrossLayoutCaching = false
     }

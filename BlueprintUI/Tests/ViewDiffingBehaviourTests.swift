@@ -11,11 +11,11 @@ import XCTest
 @testable import BlueprintUI
 
 class ViewDiffingBehaviourTests: XCTestCase {
-    
+
     override func setUp() {
         BlueprintView.enableCrossLayoutCaching = true
     }
-    
+
     override func tearDown() {
         BlueprintView.enableCrossLayoutCaching = false
     }

@@ -10,11 +10,11 @@ import XCTest
 
 
 class AdaptedEnvironmentTests: XCTestCase {
-    
+
     override func setUp() {
         BlueprintView.enableCrossLayoutCaching = true
     }
-    
+
     override func tearDown() {
         BlueprintView.enableCrossLayoutCaching = false
     }

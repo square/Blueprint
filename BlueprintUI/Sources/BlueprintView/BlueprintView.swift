@@ -26,7 +26,7 @@ import UIKit
 /// }
 /// ```
 public final class BlueprintView: UIView {
-    
+
     public static var enableCrossLayoutCaching: Bool = false {
         didSet {
             ElementState.enableCrossLayoutCaching = enableCrossLayoutCaching
@@ -427,7 +427,7 @@ public final class BlueprintView: UIView {
         rootFrame: CGRect
     ) -> [(path: ElementPath, node: NativeViewNode)] {
 
-        if let element = self.element {
+        if let element = element {
             let (_, node) = rootState.performUpdate(with: element, in: environment) { state in
                 LayoutResultNode(
                     identifier: .identifierFor(singleChild: element),
@@ -467,7 +467,7 @@ public final class BlueprintView: UIView {
             }
         }()
 
-        var environment = inherited.merged(prioritizing: self.environment)
+        var environment = inherited.merged(prioritizing: environment)
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale

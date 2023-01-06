@@ -136,7 +136,7 @@ final class ElementStateTree {
 /// and layouts either to the end of the layout pass, or until the equivalency of the `Element`
 /// changes, for comparable elements.
 final class ElementState {
-    
+
     static var enableCrossLayoutCaching = false
 
     /// The parent element that owns this element.
@@ -458,7 +458,7 @@ final class ElementState {
         with environment: Environment,
         using layout: (Environment) -> [LayoutResultNode]
     ) -> [LayoutResultNode] {
-        
+
         if !Self.enableCrossLayoutCaching {
             let nodes = layout(environment)
 

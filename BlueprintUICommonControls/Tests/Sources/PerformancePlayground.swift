@@ -26,11 +26,11 @@ class PerformancePlayground: XCTestCase {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
         super.invokeTest()
     }
-    
+
     override func setUp() {
         BlueprintView.enableCrossLayoutCaching = true
     }
-    
+
     override func tearDown() {
         BlueprintView.enableCrossLayoutCaching = false
     }
@@ -309,7 +309,7 @@ class PerformancePlayground: XCTestCase {
 
         print("Iterations: \(iterations), Average Time: \(average)")
     }
-    
+
     func test_increment_state_changes() {
         let gridSize = 30
 

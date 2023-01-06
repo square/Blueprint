@@ -2,11 +2,11 @@ import XCTest
 @testable import BlueprintUI
 
 class BlueprintViewTests: XCTestCase {
-    
+
     override func setUp() {
         BlueprintView.enableCrossLayoutCaching = true
     }
-    
+
     override func tearDown() {
         BlueprintView.enableCrossLayoutCaching = false
     }
@@ -390,7 +390,7 @@ class BlueprintViewTests: XCTestCase {
             var child: Element?
 
             var content: ElementContent {
-                if let child = self.child {
+                if let child = child {
                     return .init(child: child)
                 } else {
                     return .init(intrinsicSize: .zero)
@@ -398,7 +398,7 @@ class BlueprintViewTests: XCTestCase {
             }
 
             func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-                guard let view = self.view else {
+                guard let view = view else {
                     return nil
                 }
 
