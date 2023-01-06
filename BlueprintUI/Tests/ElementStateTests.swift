@@ -549,7 +549,7 @@ class ElementStateTests: XCTestCase {
         // TODO:
     }
 
-    func disable_test_childState() throws {
+    func test_childState() throws {
         let delegate = TestDelegate()
 
         let root = Element1(text: "root")
