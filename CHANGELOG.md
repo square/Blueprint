@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [0.48.1]
+
+### Fixed
+
+- Fix Catalyst version specifier in SPM package.
+
 ## [0.48.0]
 
 ### Added
@@ -921,7 +927,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.48.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.48.1...HEAD
+[0.48.1]: https://github.com/square/Blueprint/compare/0.48.0...0.48.1
 [0.48.0]: https://github.com/square/Blueprint/compare/0.47.0...0.48.0
 [0.47.0]: https://github.com/square/Blueprint/compare/0.46.0...0.47.0
 [0.46.0]: https://github.com/square/Blueprint/compare/0.45.1...0.46.0
