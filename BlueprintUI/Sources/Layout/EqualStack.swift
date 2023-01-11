@@ -229,20 +229,118 @@ extension EqualStack {
             
             let totalSpacing = (spacing * CGFloat(children.count - 1))
             
-            if
-                context.mode.horizontal == .fill,
-                let proposedWidth = context.proposedSize.width.constrainedValue
-            {
-                let itemWidth = (proposedWidth - totalSpacing) / CGFloat(children.count)
-                let itemProposal = SizeConstraint(
-                    width: .atMost(itemWidth),
+            let itemProposal: SizeConstraint
+
+            if context.mode.horizontal == .fill {
+                print("fill")
+            }
+
+            switch direction {
+            case .horizontal:
+                let width: SizeConstraint.Axis
+                if
+//                    context.mode.horizontal == .fill,
+                    let proposedWidth = context.proposedSize.width.constrainedValue
+                {
+                    width = .atMost((proposedWidth - totalSpacing) / CGFloat(children.count))
+                } else {
+                    width = .unconstrained
+                }
+                
+
+                itemProposal = SizeConstraint(
+                    width: width,
                     height: context.proposedSize.height
                 )
-                let childSizes = children.map { (traits: Void, layoutable: StrictLayoutable) in
-                    layoutable.layout(in: itemProposal)
+                
+            case .vertical:
+                let height: SizeConstraint.Axis
+                if
+//                    context.mode.vertical == .fill,
+                    let proposedHeight = context.proposedSize.height.constrainedValue
+                {
+                    height = .atMost((proposedHeight - totalSpacing) / CGFloat(children.count))
+                } else {
+                    height = .unconstrained
+                }
+                
+                itemProposal = SizeConstraint(
+                    width: context.proposedSize.width,
+                    height: height
+                )
+            }
+            
+            let options: StrictLayoutOptions
+            switch direction {
+            case .horizontal:
+                options = StrictLayoutOptions(
+                    mode: .init(
+                        horizontal: nil,
+                        vertical: context.mode.vertical == .fill ? .fill : nil
+                    )
+                )
+            case .vertical:
+                options = StrictLayoutOptions(
+                    mode: .init(
+                        horizontal: context.mode.horizontal == .fill ? .fill : nil,
+                        vertical: nil
+                    )
+                )
+            }
+            
+            let childSizes = children.map { (traits: Void, layoutable: StrictLayoutable) in
+                layoutable.layout(
+                    in: itemProposal,
+                    options: options
+                )
+            }
+            
+            let childWidth = (context.mode.horizontal == .fill ? itemProposal.width.constrainedValue : nil)
+//            let childWidth = itemProposal.width.constrainedValue
+                ?? childSizes.map(\.width).max()
+                ?? 0
+            let childHeight = (context.mode.vertical == .fill ?  itemProposal.height.constrainedValue : nil)
+                ?? childSizes.map(\.height).max()
+                ?? 0
+            
+            let itemSize = CGSize(
+                width: childWidth,
+                height: childHeight
+            )
+
+            let totalSize: CGSize
+            switch direction {
+            case .horizontal:
+                totalSize = CGSize(
+                    width: itemSize.width * CGFloat(children.count) + totalSpacing,
+                    height: itemSize.height
+                )
+            case .vertical:
+                totalSize = CGSize(
+                    width: itemSize.width,
+                    height: itemSize.height * CGFloat(children.count) + totalSpacing
+                )
+            }
+            
+            let childPositions = (0..<children.count).map { index in
+                switch direction {
+                case .horizontal:
+                    return CGPoint(
+                        x: (itemSize.width + spacing) * CGFloat(index),
+                        y: 0
+                    )
+                case .vertical:
+                    return CGPoint(
+                        x: 0,
+                        y: (itemSize.height + spacing) * CGFloat(index)
+                    )
                 }
             }
-            fatalError("TODO")
+
+            return StrictLayoutAttributes(
+                size: totalSize,
+                childPositions: childPositions
+            )
         }
     }
 

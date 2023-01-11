@@ -65,7 +65,7 @@ extension Element {
             environment: environment
         )
 
-//        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
+        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
 
         let children = subtree
             .resolve()
