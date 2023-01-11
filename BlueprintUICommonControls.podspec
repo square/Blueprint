@@ -20,6 +20,6 @@ Pod::Spec.new do |s|
   s.dependency 'BlueprintUI', BLUEPRINT_VERSION
 
   s.pod_target_xcconfig = {
-    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+    'APPLICATION_EXTENSION_API_ONLY' => EXTENSION_API_ONLY,
   }
 end

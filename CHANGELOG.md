@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The pod will now inherit `APPLICATION_EXTENSION_API_ONLY`
+    - This can be optionally set in version.rb for local development
+
 ### Deprecated
 
 ### Security

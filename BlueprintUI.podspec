@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.weak_framework = 'SwiftUI'
 
   s.pod_target_xcconfig = {
-    'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+    'APPLICATION_EXTENSION_API_ONLY' => EXTENSION_API_ONLY,
   }
 
   s.test_spec 'Tests' do |test_spec|
