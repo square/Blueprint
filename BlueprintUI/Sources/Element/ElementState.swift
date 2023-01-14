@@ -137,7 +137,8 @@ final class ElementStateTree {
 /// changes, for comparable elements.
 final class ElementState {
 
-    static var enableCrossLayoutCaching = false
+    static var enableCrossLayoutCaching: Bool?
+    private var isCrossLayoutCachingEnabled: Bool { Self.enableCrossLayoutCaching ?? false }
 
     /// The parent element that owns this element.
     private(set) weak var parent: ElementState?
@@ -459,7 +460,7 @@ final class ElementState {
         using layout: (Environment) -> [LayoutResultNode]
     ) -> [LayoutResultNode] {
 
-        if !Self.enableCrossLayoutCaching {
+        if !isCrossLayoutCachingEnabled {
             let nodes = layout(environment)
 
             delegate.ifDebug {
@@ -634,7 +635,7 @@ final class ElementState {
             $0.wasVisited = false
             $0.hasUpdatedChildrenDuringLayout = false
             $0.clearOrderedChildren()
-            if !Self.enableCrossLayoutCaching {
+            if !isCrossLayoutCachingEnabled {
                 $0.clearAllCachedData()
             }
         }

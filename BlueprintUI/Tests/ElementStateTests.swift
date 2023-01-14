@@ -33,11 +33,11 @@ extension ElementStateTree {
 class ElementStateTreeTests: XCTestCase {
 
     override func setUp() {
-        BlueprintView.enableCrossLayoutCaching = true
+        BlueprintView.enableCrossLayoutCachingGlobally = true
     }
 
     override func tearDown() {
-        BlueprintView.enableCrossLayoutCaching = false
+        BlueprintView.enableCrossLayoutCachingGlobally = false
     }
 
     func test_integration() {

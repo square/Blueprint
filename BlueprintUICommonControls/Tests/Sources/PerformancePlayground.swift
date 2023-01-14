@@ -28,11 +28,11 @@ class PerformancePlayground: XCTestCase {
     }
 
     override func setUp() {
-        BlueprintView.enableCrossLayoutCaching = true
+        BlueprintView.enableCrossLayoutCachingGlobally = true
     }
 
     override func tearDown() {
-        BlueprintView.enableCrossLayoutCaching = false
+        BlueprintView.enableCrossLayoutCachingGlobally = false
     }
 
     func test_deep_and_wide_grid() {
