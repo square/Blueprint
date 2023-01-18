@@ -307,6 +307,16 @@ extension EqualStack {
                 width: childWidth,
                 height: childHeight
             )
+            
+            for child in children {
+                _ = child.layoutable.layout(
+                    in: SizeConstraint(itemSize),
+                    options: StrictLayoutOptions(
+                        maxAllowedLayoutCount: 2,
+                        mode: .init(horizontal: .fill, vertical: .fill)
+                    )
+                )
+            }
 
             let totalSize: CGSize
             switch direction {

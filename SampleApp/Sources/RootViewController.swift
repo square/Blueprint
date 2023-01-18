@@ -55,7 +55,7 @@ final class RootViewController: UIViewController {
         leftBlueprintView.layer.borderColor = UIColor.black.cgColor
         leftBlueprintView.layer.borderWidth = 1
 
-        leftBlueprintView.layoutMode = .singlePass
+        leftBlueprintView.layoutMode = .strictSinglePass
 
         let rightBlueprintView = BlueprintView(element: contents)
         rightBlueprintView.backgroundColor = .clear
@@ -77,16 +77,88 @@ final class RootViewController: UIViewController {
     }
 
     var contents: Element {
-        Column(
-            alignment: .center,
-            underflow: .growUniformly
-        ) {
-            Label(text: "Test")
+        demoScreenWrapper
+    }
+    
+    var demoScreenWrapper: Element {
+        Column(alignment: .leading, underflow: .justifyToCenter) {
+            Label(text: "Date Picker") { label in
+                label.font = .preferredFont(forTextStyle: .caption1)
+            }
 
-            Label(text: "Test2")
+            datePicker
+                .box(borders: .solid(color: .blue, width: 1))
         }
-        .opacity(0.5)
-        .inset(uniform: 10)
+    }
+    
+    var datePicker: Element {
+        var daySegment: Element {
+            Spacer(5)
+                .box(background: .red, borders: .solid(color: .black, width: 1))
+        }
+        
+        var weekdaySymbols: Element {
+            EqualStack(direction: .horizontal) {
+                for weekday in ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] {
+                    Label(text: weekday) { label in
+                        label.font = .preferredFont(forTextStyle: .body)
+                    }
+                    .box(borders: .solid(color: .green, width: 1))
+                }
+            }
+            .constrainedTo(height: .atLeast(40))
+        }
+        
+        var header: Element {
+            Row(
+                alignment: .center,
+                underflow: .growProportionally,
+                minimumSpacing: 8
+            ) {
+                Label(text: "Jan 2023") { label in
+                    label.font = .preferredFont(forTextStyle: .title2)
+                }
+
+                Spacer(40)
+                    .box(background: .lightGray, corners: .rounded(radius: 6))
+                    .stackLayoutChild(priority: .fixed)
+
+                Spacer(40)
+                    .box(background: .lightGray, corners: .rounded(radius: 6))
+                    .stackLayoutChild(priority: .fixed)
+            }
+        }
+
+
+        var monthGrid: Element {
+            return Column(alignment: .fill, minimumSpacing: 8) {
+
+                weekdaySymbols
+                    .box(borders: .solid(color: .brown, width: 1))
+
+                for _ in 0..<4 {
+                    EqualStack(direction: .horizontal) {
+                        for _ in 0..<7 {
+                            daySegment
+                        }
+                    }
+                    .constrainedTo(height: .atLeast(40))
+                    .box(borders: .solid(color: .brown, width: 1))
+                }
+            }
+
+        }
+
+        return Column(
+            alignment: .fill,
+            underflow: .justifyToStart,
+            minimumSpacing: 8
+        ) {
+            header.stackLayoutChild(priority: .fixed)
+            monthGrid.stackLayoutChild(priority: .flexible)
+        }
+        .box(borders: .solid(color: .yellow, width: 1))
+        .constrainedTo(width: .atLeast(280))
     }
 
     var contents2: Element {
