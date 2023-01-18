@@ -634,9 +634,6 @@ final class ElementState {
             $0.wasVisited = false
             $0.hasUpdatedChildrenDuringLayout = false
             $0.clearOrderedChildren()
-            if !Self.enableCrossLayoutCaching {
-                $0.clearAllCachedData()
-            }
         }
     }
 
@@ -645,7 +642,12 @@ final class ElementState {
     /// or throw out caches which should not be maintained across layout cycles.
     fileprivate func finishedLayout() {
         recursiveRemoveOldChildren()
-        recursiveClearCaches()
+
+        if Self.enableCrossLayoutCaching {
+            recursiveClearCaches()
+        } else {
+            clearAllCachedData()
+        }
     }
 
     /// Clears all cached measurements, layouts, etc.
