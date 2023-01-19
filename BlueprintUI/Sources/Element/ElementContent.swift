@@ -638,7 +638,8 @@ extension ElementContent.Builder {
         environment: Environment
     ) -> StrictSubtreeResult {
 
-        let (nodes, layoutChildren) = context.cache.get(entryType: NodesEntry.self) {
+        // TODO: fix caching
+        let (nodes, layoutChildren) = { // } context.cache.get(entryType: NodesEntry.self) {
             var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
             var nodes: [StrictLayoutNode] = []
             nodes.reserveCapacity(children.count)
@@ -666,7 +667,12 @@ extension ElementContent.Builder {
             }
 
             return (nodes, layoutChildren)
-        }
+        }()
+
+        // Update mode on cached node
+//        for node in nodes {
+//            node.mode = context.mode
+//        }
 
         let intermediateResult = layout.layout(
             in: context,
