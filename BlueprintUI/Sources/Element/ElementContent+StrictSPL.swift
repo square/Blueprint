@@ -266,11 +266,11 @@ class StrictLayoutNode: StrictLayoutable {
 //            fatalError("\(type(of: element)) layout called \(layoutCount) times")
         }
 
-//        var environment = environment
-//        if let debugElementPath = environment.debugElementPath, path.matches(expression: debugElementPath) {
-//            print("Debugging triggered for path \(path)")
-//            environment.debugElementPath = nil
-//        }
+        var environment = environment
+        if let debugElementPath = environment.debugElementPath, fullPath.matches(expression: debugElementPath) {
+            print("Debugging triggered for path \(fullPath)")
+            environment.debugElementPath = nil
+        }
 
         Logger.logMeasureStart(object: self, description: "\(fullPath)", constraint: proposedSize)
 
@@ -449,5 +449,11 @@ extension Environment {
     public var debugElementPath: String? {
         get { self[DebugElementPathKey.self] }
         set { self[DebugElementPathKey.self] = newValue }
+    }
+}
+
+extension Element {
+    public func debugPath(_ path: String) -> Element {
+        adaptedEnvironment(keyPath: \.debugElementPath, value: path)
     }
 }
