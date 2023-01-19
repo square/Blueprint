@@ -49,20 +49,23 @@ final class RootViewController: UIViewController {
         ]
     }
 
+    let leftBlueprintView = BlueprintView()
+    let rightBlueprintView = BlueprintView()
+
     override func loadView() {
-        let leftBlueprintView = BlueprintView(element: contents)
         leftBlueprintView.backgroundColor = .clear
         leftBlueprintView.layer.borderColor = UIColor.black.cgColor
         leftBlueprintView.layer.borderWidth = 1
 
         leftBlueprintView.layoutMode = .strictSinglePass
+        leftBlueprintView.element = contents
 
-        let rightBlueprintView = BlueprintView(element: contents)
         rightBlueprintView.backgroundColor = .clear
         rightBlueprintView.layer.borderColor = UIColor.black.cgColor
         rightBlueprintView.layer.borderWidth = 1
 
         rightBlueprintView.layoutMode = .standard
+        rightBlueprintView.element = contents
 
         let stackView = UIStackView(arrangedSubviews: [
             leftBlueprintView,
@@ -74,12 +77,23 @@ final class RootViewController: UIViewController {
         view = stackView
 
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
+
+        let tapRecognizer = UITapGestureRecognizer()
+        tapRecognizer.addTarget(self, action: #selector(viewTapped))
+        stackView.addGestureRecognizer(tapRecognizer)
+    }
+
+    @objc
+    func viewTapped() {
+        // trigger a layout
+        leftBlueprintView.element = leftBlueprintView.element
+        rightBlueprintView.element = rightBlueprintView.element
     }
 
     var contents: Element {
         demoScreenWrapper
     }
-    
+
     var demoScreenWrapper: Element {
         Column(alignment: .leading, underflow: .justifyToCenter) {
             Label(text: "Date Picker") { label in
@@ -90,13 +104,13 @@ final class RootViewController: UIViewController {
                 .box(borders: .solid(color: .blue, width: 1))
         }
     }
-    
+
     var datePicker: Element {
         var daySegment: Element {
             Spacer(5)
                 .box(background: .red, borders: .solid(color: .black, width: 1))
         }
-        
+
         var weekdaySymbols: Element {
             EqualStack(direction: .horizontal) {
                 for weekday in ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] {
@@ -108,7 +122,7 @@ final class RootViewController: UIViewController {
             }
             .constrainedTo(height: .atLeast(40))
         }
-        
+
         var header: Element {
             Row(
                 alignment: .center,
@@ -131,7 +145,7 @@ final class RootViewController: UIViewController {
 
 
         var monthGrid: Element {
-            return Column(alignment: .fill, minimumSpacing: 8) {
+            Column(alignment: .fill, minimumSpacing: 8) {
 
                 weekdaySymbols
                     .box(borders: .solid(color: .brown, width: 1))
@@ -159,6 +173,7 @@ final class RootViewController: UIViewController {
         }
         .box(borders: .solid(color: .yellow, width: 1))
         .constrainedTo(width: .atLeast(280))
+//        .debugPath("ConstrainedSize")
     }
 
     var contents2: Element {
