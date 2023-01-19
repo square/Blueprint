@@ -223,53 +223,42 @@ extension EqualStack {
                 subview.place(at: origin, size: itemSize)
             }
         }
-        
+
         func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
             guard !children.isEmpty else { return .init(size: .zero) }
-            
-            let totalSpacing = (spacing * CGFloat(children.count - 1))
-            
-            let itemProposal: SizeConstraint
 
-            if context.mode.horizontal == .fill {
-                print("fill")
-            }
+            let totalSpacing = (spacing * CGFloat(children.count - 1))
+
+            let itemProposal: SizeConstraint
 
             switch direction {
             case .horizontal:
                 let width: SizeConstraint.Axis
-                if
-//                    context.mode.horizontal == .fill,
-                    let proposedWidth = context.proposedSize.width.constrainedValue
-                {
+                if let proposedWidth = context.proposedSize.width.constrainedValue {
                     width = .atMost((proposedWidth - totalSpacing) / CGFloat(children.count))
                 } else {
                     width = .unconstrained
                 }
-                
 
                 itemProposal = SizeConstraint(
                     width: width,
                     height: context.proposedSize.height
                 )
-                
+
             case .vertical:
                 let height: SizeConstraint.Axis
-                if
-//                    context.mode.vertical == .fill,
-                    let proposedHeight = context.proposedSize.height.constrainedValue
-                {
+                if let proposedHeight = context.proposedSize.height.constrainedValue {
                     height = .atMost((proposedHeight - totalSpacing) / CGFloat(children.count))
                 } else {
                     height = .unconstrained
                 }
-                
+
                 itemProposal = SizeConstraint(
                     width: context.proposedSize.width,
                     height: height
                 )
             }
-            
+
             let options: StrictLayoutOptions
             switch direction {
             case .horizontal:
@@ -287,27 +276,26 @@ extension EqualStack {
                     )
                 )
             }
-            
+
             let childSizes = children.map { (traits: Void, layoutable: StrictLayoutable) in
                 layoutable.layout(
                     in: itemProposal,
                     options: options
                 )
             }
-            
+
             let childWidth = (context.mode.horizontal == .fill ? itemProposal.width.constrainedValue : nil)
-//            let childWidth = itemProposal.width.constrainedValue
                 ?? childSizes.map(\.width).max()
                 ?? 0
-            let childHeight = (context.mode.vertical == .fill ?  itemProposal.height.constrainedValue : nil)
+            let childHeight = (context.mode.vertical == .fill ? itemProposal.height.constrainedValue : nil)
                 ?? childSizes.map(\.height).max()
                 ?? 0
-            
+
             let itemSize = CGSize(
                 width: childWidth,
                 height: childHeight
             )
-            
+
             for child in children {
                 _ = child.layoutable.layout(
                     in: SizeConstraint(itemSize),
@@ -331,7 +319,7 @@ extension EqualStack {
                     height: itemSize.height * CGFloat(children.count) + totalSpacing
                 )
             }
-            
+
             let childPositions = (0..<children.count).map { index in
                 switch direction {
                 case .horizontal:
