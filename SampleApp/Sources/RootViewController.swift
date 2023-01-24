@@ -91,17 +91,7 @@ final class RootViewController: UIViewController {
     }
 
     var contents: Element {
-        test
-    }
-    
-    var test: Element {
-        Column(alignment: .fill) {
-            Spacer(10).box(background: .blue)
-            Spacer(100).box(background: .red)
-        }
-        .constrainedTo(width: .atLeast(100))
-        .aligned(vertically: .center, horizontally: .leading)
-        .debugPath("Column")
+        demoScreenWrapper
     }
 
     var demoScreenWrapper: Element {
@@ -155,35 +145,21 @@ final class RootViewController: UIViewController {
 
 
         var monthGrid: Element {
-//            Column(alignment: .fill, minimumSpacing: 8) {
+            Column(alignment: .fill, minimumSpacing: 8) {
 
-//                weekdaySymbols
-//                    .box(borders: .solid(color: .brown, width: 1))
+                weekdaySymbols
+                    .box(borders: .solid(color: .brown, width: 1))
 
-//                for _ in 0..<3 {
-//                    EqualStack(direction: .horizontal) {
-//                        for _ in 0..<7 {
-//                            daySegment
-//                        }
-//                    }
-//                    .constrainedTo(height: .atLeast(40))
-//                    .box(borders: .solid(color: .brown, width: 1))
-//                }
-                
-//                EqualStack(direction: .horizontal) {
-////                    for _ in 0..<3 {
-////                        daySegment
-////                    }
-//                    for _ in 0..<7 {
-//                        Spacer(40)
-//                            .box(background: .red, borders: .solid(color: .black, width: 1))
-//
-//                    }
-//                }
-//                .constrainedTo(height: .atLeast(40))
-            Spacer(width: 281, height: 25)
-                .box(borders: .solid(color: .brown, width: 1))
-//            }
+                for _ in 0..<4 {
+                    EqualStack(direction: .horizontal) {
+                        for _ in 0..<7 {
+                            daySegment
+                        }
+                    }
+                    .constrainedTo(height: .atLeast(40))
+                    .box(borders: .solid(color: .brown, width: 1))
+                }
+            }
 
         }
 
@@ -195,7 +171,6 @@ final class RootViewController: UIViewController {
             header.stackLayoutChild(priority: .fixed)
             monthGrid.stackLayoutChild(priority: .flexible)
         }
-        .debugPath("Column")
         .box(borders: .solid(color: .yellow, width: 1))
         .constrainedTo(width: .atLeast(280))
 //        .debugPath("ConstrainedSize")

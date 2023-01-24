@@ -65,14 +65,10 @@ extension Element {
             environment: environment
         )
 
-//        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
+        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
 
-//        print("StrictLayoutNode dump")
-//        for child in subtree.children {
-//            child.dump()
-//        }
-
-        let children = subtree.resolve() //in: context.proposedSize, mode: context.mode)
+        let children = subtree
+            .resolve()
 
         let root = LayoutResultNode(
             element: self,
