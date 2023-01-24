@@ -93,6 +93,16 @@ final class RootViewController: UIViewController {
     var contents: Element {
         demoScreenWrapper
     }
+    
+    var test: Element {
+        Column(alignment: .fill) {
+            Spacer(10).box(background: .blue)
+            Spacer(100).box(background: .red)
+        }
+//        .constrainedTo(width: .atLeast(100))
+        .aligned(vertically: .center, horizontally: .leading)
+        .debugPath("Column")
+    }
 
     var demoScreenWrapper: Element {
         Column(alignment: .leading, underflow: .justifyToCenter) {
@@ -173,7 +183,6 @@ final class RootViewController: UIViewController {
         }
         .box(borders: .solid(color: .yellow, width: 1))
         .constrainedTo(width: .atLeast(280))
-//        .debugPath("ConstrainedSize")
     }
 
     var contents2: Element {
