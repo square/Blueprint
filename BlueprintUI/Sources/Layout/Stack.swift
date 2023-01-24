@@ -1016,6 +1016,31 @@ extension StackLayout {
         let crossItems = items(axisPressure: nil)
 
         let frames = _frames(axisItems: axisItems, crossItems: crossItems, in: vectorConstraint)
+        
+        let crossPressure: StrictPressureMode = {
+            switch axis {
+            case .horizontal:
+                return context.mode.vertical
+            case .vertical:
+                return context.mode.horizontal
+            }
+        }()
+        
+        switch (alignment, crossPressure) {
+        case (.fill, .natural):
+            for (child, frame) in zip(children, frames) {
+                let sizeConstraint = SizeConstraint(frame.size.size(axis: axis))
+                _ = child.layoutable.layout(
+                    in: sizeConstraint,
+                    options: .init(
+                        mode: .init(horizontal: .fill, vertical: .fill)
+                    )
+                )
+            }
+            
+        default: break
+        }
+        
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
