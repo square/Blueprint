@@ -52,7 +52,9 @@ final class RootViewController: UIViewController {
     let leftBlueprintView = BlueprintView()
     let rightBlueprintView = BlueprintView()
 
-    override func loadView() {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
         leftBlueprintView.backgroundColor = .clear
         leftBlueprintView.layer.borderColor = UIColor.black.cgColor
         leftBlueprintView.layer.borderWidth = 1
@@ -67,20 +69,24 @@ final class RootViewController: UIViewController {
         rightBlueprintView.layoutMode = .standard
         rightBlueprintView.element = contents
 
-        let stackView = UIStackView(arrangedSubviews: [
-            leftBlueprintView,
-            rightBlueprintView,
-        ])
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.alignment = .fill
-        view = stackView
-
+        view.addSubview(leftBlueprintView)
+        view.addSubview(rightBlueprintView)
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
 
         let tapRecognizer = UITapGestureRecognizer()
         tapRecognizer.addTarget(self, action: #selector(viewTapped))
-        stackView.addGestureRecognizer(tapRecognizer)
+        view.addGestureRecognizer(tapRecognizer)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        var frame = view.bounds
+        frame.size.width = frame.width / 2
+        leftBlueprintView.frame = frame
+
+        frame.origin.x = frame.width
+        rightBlueprintView.frame = frame
     }
 
     @objc
@@ -99,11 +105,37 @@ final class RootViewController: UIViewController {
             Spacer(10).box(background: .blue)
             Spacer(100).box(background: .red)
         }
-//        .constrainedTo(width: .atLeast(100))
+        .constrainedTo(width: .atLeast(100))
         .aligned(vertically: .center, horizontally: .leading)
         .debugPath("Column")
     }
+    
+    var test2: Element {
+        Column(alignment: .leading, underflow: .justifyToCenter) {
 
+            Column(
+                alignment: .fill,
+                underflow: .justifyToStart,
+                minimumSpacing: 8
+            ) {
+                EqualStack(direction: .horizontal) {
+//                    for _ in 0..<1 {
+                        Spacer(20)
+                            .box(background: .red)
+//                    }
+                }
+                .constrainedTo(height: .atLeast(40))
+                .box(borders: .solid(color: .brown, width: 2))
+//                .stackLayoutChild(priority: .flexible)
+            }
+//            .debugPath("Column")
+            .box(borders: .solid(color: .yellow, width: 2))
+            .constrainedTo(width: .atLeast(280))
+            .box(borders: .solid(color: .blue, width: 2))
+        }
+
+    }
+    
     var demoScreenWrapper: Element {
         Column(alignment: .leading, underflow: .justifyToCenter) {
             Label(text: "Date Picker") { label in
@@ -169,8 +201,8 @@ final class RootViewController: UIViewController {
                     .constrainedTo(height: .atLeast(40))
                     .box(borders: .solid(color: .brown, width: 1))
                 }
-            }
 
+            }
         }
 
         return Column(
@@ -181,6 +213,7 @@ final class RootViewController: UIViewController {
             header.stackLayoutChild(priority: .fixed)
             monthGrid.stackLayoutChild(priority: .flexible)
         }
+//        .debugPath("Column")
         .box(borders: .solid(color: .yellow, width: 1))
         .constrainedTo(width: .atLeast(280))
     }
