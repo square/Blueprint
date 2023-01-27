@@ -189,11 +189,7 @@ final class ElementState {
     private var kind: Kind
 
     /// The children of the `ElementState`, cached by element identifier.
-    private var children: [ElementIdentifier: ElementState] = [:]
-
-    /// The children of the element state in the order they appear in the Layout.
-    /// This value is built dynamically as the element tree is enumerated.
-    private(set) var orderedChildren: [ElementState] = []
+    private(set) var children: [ElementIdentifier: ElementState] = [:]
 
     /// Indicates the comparability behavior of the element.
     /// See each case for details on behavior.
@@ -307,13 +303,22 @@ final class ElementState {
     private var cachedContent: ElementContent?
 
     /// Allows the layout system in `ElementContent` to access the `ElementContent`
-    /// of the element, returning a cached version after the first access during a layout cycle.
+    /// of the element, returning a cached version after the first access during a layout cycle if
+    /// caching is allowed.
+    ///
+    /// ### Note
+    /// Caching is disabled for elements like `GeometryReader` and `EnvironmentReader`,
+    /// as these may arbitrarily change the returned children based on layout size, environment
+    /// contents, etc.
     var elementContent: ElementContent {
         if let cachedContent = cachedContent {
             return cachedContent
         } else {
             let content = element.latest.content
-            cachedContent = content
+
+            if content.allowsElementContentCaching {
+                cachedContent = content
+            }
 
             delegate.ifDebug {
                 $0.treeDidFetchElementContent(for: self)
@@ -483,35 +488,26 @@ final class ElementState {
 
                 /// Because we're returning a cached layout, we're not going to be
                 /// enumerating every child element in the tree during layout. To resolve
-                /// this, we'll perform an enumeration over the tree using our cached layout values.
-                elementContent.forEachElement(
-                    in: size,
-                    with: environment,
-                    children: existing.nodes,
-                    state: self,
-                    forEach: { context in
+                /// this, we'll perform an enumeration over the tree.
+                forEach { state in
 
-                        /// Guarantees that the latest element is present in the tree.
-                        /// in case its `backingViewDescription` has changed,
-                        /// for example (while remaining equivalent), eg it needs to apply
-                        /// a new callback closure to the view.
-                        context.state.element.latest = context.element
+                    /// Guarantees that the latest element is present in the tree.
+                    /// in case its `backingViewDescription` has changed,
+                    /// for example (while remaining equivalent), eg it needs to apply
+                    /// a new callback closure to the view.
+                    state.element.latest = element
 
-                        /// Because we won't be visiting any child elements
-                        /// for a `ComparableElement` during either
-                        /// measurement or layout, mark all our child nodes
-                        /// as visited so they are not torn down.
-                        context.state.wasVisited = true
+                    /// Also ensure we update our element content.
+                    /// TODO: Do we need to do this?
+                    state.cachedContent = element.content
 
-                        /// Because we're returning a cached layout, we need to build our
-                        /// ordered children based on the layout nodes.
-                        context.state.buildOrderedChildrenIfNeeded(from: context.layoutNode.children)
-                    }
-                )
+                    /// Because we won't be visiting any child elements
+                    /// for a `ComparableElement` during either
+                    /// measurement or layout, mark all our child nodes
+                    /// as visited so they are not torn down.
+                    state.wasVisited = true
 
-                /// Because we're returning a cached layout, we need to build our
-                /// ordered children based on the layout nodes.
-                buildOrderedChildrenIfNeeded(from: existing.nodes)
+                }
             }
 
             return existing.nodes
@@ -586,7 +582,6 @@ final class ElementState {
         if let existing = children[identifier] {
 
             if existing.wasVisited == false {
-                orderedChildren.append(existing)
                 existing.update(with: child, in: environment, identifier: identifier)
                 existing.wasVisited = true
             }
@@ -605,13 +600,23 @@ final class ElementState {
 
             children[identifier] = new
 
-            orderedChildren.append(new)
-
             delegate.ifDebug {
                 $0.treeDidCreateState(new)
             }
 
             return new
+        }
+    }
+
+    func forEach(
+        _ forEach: (ElementState, Element) -> Void
+    ) {
+        // TODO: Track if we're in a layout, assert if we're not, since measurements will be removed.
+
+        forEach(self, element.latest)
+
+        for (_, child) in children {
+            child.forEach(forEach)
         }
     }
 
@@ -621,7 +626,6 @@ final class ElementState {
         recursiveForEach {
             $0.wasVisited = false
             $0.hasUpdatedChildrenDuringLayout = false
-            $0.clearOrderedChildren()
         }
     }
 
@@ -646,10 +650,6 @@ final class ElementState {
         }
     }
 
-    private func clearOrderedChildren() {
-        orderedChildren.removeAll(keepingCapacity: true)
-    }
-
     /// Performs a depth-first enumeration of all elements in the tree,
     /// _including_ the original reciever.
     func recursiveForEach(_ perform: (ElementState) -> Void) {
@@ -657,19 +657,6 @@ final class ElementState {
 
         children.forEach { _, child in
             child.recursiveForEach(perform)
-        }
-    }
-
-    private func buildOrderedChildrenIfNeeded(from nodes: [LayoutResultNode]) {
-
-        guard orderedChildren.isEmpty else { return }
-
-        for node in nodes {
-            guard let child = children[node.identifier] else {
-                fatalError("\(identifier) had a missing child \(node.identifier) which was present in the layout.")
-            }
-
-            orderedChildren.append(child)
         }
     }
 
@@ -722,6 +709,79 @@ extension ElementState {
         init(_ latest: Element) {
             self.latest = latest
         }
+    }
+
+    /// A "last instance" cache, returning a cached value, or creating a new value
+    struct Cache<Key: Hashable, Value> {
+
+        /// The cache behavior. See `CacheKind` for more.
+        let kind: CacheKind
+
+        /// If the cached value will vary by the provided key,
+        /// or if the key is ignored.
+        var variesByKey: Bool {
+            didSet {
+                if oldValue != variesByKey {
+                    removeAll()
+                }
+            }
+        }
+
+        private var byKeyValues: [Key: Value] = [:]
+        private var singleValue: Value? = nil
+
+        init(kind: CacheKind, variesByKey: Bool) {
+            self.kind = kind
+            self.variesByKey = variesByKey
+        }
+
+        mutating func removeAll() {
+            byKeyValues.removeAll(keepingCapacity: true)
+            singleValue = nil
+        }
+
+        mutating func removeValue(forKey key: Key) {
+            byKeyValues.removeValue(forKey: key)
+            singleValue = nil
+        }
+
+        func hasValue(for key: Key) -> Bool {
+            if variesByKey {
+                return byKeyValues[key] != nil
+            } else {
+                return singleValue != nil
+            }
+        }
+
+        mutating func get(_ key: Key, provider: () -> Value) -> Value {
+
+            if variesByKey {
+                singleValue = nil
+
+                if let value = byKeyValues[key] {
+                    return value
+                } else {
+                    let value = provider()
+                    byKeyValues[key] = value
+                    return value
+                }
+            } else {
+                byKeyValues.removeAll(keepingCapacity: false)
+
+                if let singleValue {
+                    return singleValue
+                } else {
+                    let value = provider()
+                    singleValue = value
+                    return value
+                }
+            }
+        }
+    }
+
+    enum CacheKind {
+        case cacheAll
+        case cacheLatest
     }
 }
 

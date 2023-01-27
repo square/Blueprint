@@ -31,6 +31,46 @@ class PerformancePlayground: XCTestCase {
 
         let gridSize = 100
 
+        struct NestedBlueprintViewBox: Element {
+
+            var text: String
+
+            var content: ElementContent {
+                .init(byMeasuring: makeElement())
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                BlueprintView.describe { config in
+                    config[\.element] = makeElement()
+                }
+            }
+
+            private func makeElement() -> Element {
+                LabeledBox(text: text)
+            }
+        }
+
+        struct NestedBlueprintViewBox_Legacy: Element {
+
+            var text: String
+
+            var content: ElementContent {
+                ElementContent { size, env in
+                    makeElement().content.measure(in: size, environment: env)
+                }
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                BlueprintView.describe { config in
+                    config[\.element] = makeElement()
+                }
+            }
+
+            private func makeElement() -> Element {
+                LabeledBox(text: text)
+            }
+        }
+
         struct LabeledBox: ProxyElement, ComparableElement, Equatable {
 
             var text: String
@@ -61,7 +101,10 @@ class PerformancePlayground: XCTestCase {
             for _ in 1...gridSize {
                 Row {
                     for row in 1...gridSize {
-                        LabeledBox(text: String(row))
+                        NestedBlueprintViewBox(text: String(row))
+                        // NestedBlueprintViewBox_Legacy(text: String(row))
+
+                        // LabeledBox(text: String(row))
                     }
                 }
             }

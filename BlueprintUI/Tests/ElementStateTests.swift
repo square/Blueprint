@@ -22,7 +22,11 @@ extension ElementStateTree {
         XCTAssertNotEqual(size, .zero, "Layout size cannot be zero.")
 
         let (state, _) = performUpdate(with: element, in: environment) { state in
-            state.elementContent.performLayout(in: size, with: environment, state: state)
+            state.elementContent.performLayout(
+                in: size,
+                with: environment,
+                state: state
+            )
         }
 
         return state
@@ -388,6 +392,90 @@ class ElementStateTreeTests: XCTestCase {
             ),
             .elementState_treeDidRemoveState(.identifier(for: ComparableTestElement1.self, key: nil, count: 1)),
         ])
+    }
+
+    func test_integration_byMeasuring() {
+
+        struct ComparableTestElement: ComparableElement, ProxyElement, Equatable {
+
+            var elementRepresentation: Element {
+                Row(alignment: .fill, underflow: .growUniformly) {
+                    Empty()
+                    Spacer()
+                    ByMeasuringElement()
+                }
+            }
+        }
+
+        struct ByMeasuringElement: Element {
+
+            static let element = Row {
+                Column {
+                    Spacer()
+                    Empty()
+                }
+            }
+
+            var content: ElementContent {
+                .init(byMeasuring: Self.element)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        let fixture = LayoutPassTestFixture()
+        let blueprintView = BlueprintView(frame: .init(origin: .zero, size: .init(width: 100, height: 200)))
+        blueprintView.rootState.delegate = fixture
+
+        blueprintView.element = ComparableTestElement()
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(ComparableTestElement.identifier(1)) {
+                IdentifiedNode(Empty.identifier(1))
+                IdentifiedNode(Spacer.identifier(1))
+
+                IdentifiedNode(ByMeasuringElement.identifier(1)) {
+                    IdentifiedNode(Row.identifier(1)) {
+                        IdentifiedNode(Column.identifier(1)) {
+                            IdentifiedNode(Spacer.identifier(1))
+                            IdentifiedNode(Empty.identifier(1))
+                        }
+                    }
+                }
+            }
+        )
+
+        blueprintView.element = ComparableTestElement()
+        blueprintView.layoutIfNeeded()
+
+        XCTAssertEqual(
+            blueprintView.rootState.identifierTree,
+            IdentifiedNode(ComparableTestElement.identifier(1)) {
+                IdentifiedNode(Empty.identifier(1))
+                IdentifiedNode(Spacer.identifier(1))
+
+                IdentifiedNode(ByMeasuringElement.identifier(1)) {
+                    IdentifiedNode(Row.identifier(1)) {
+                        IdentifiedNode(Column.identifier(1)) {
+                            IdentifiedNode(Spacer.identifier(1))
+                            IdentifiedNode(Empty.identifier(1))
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    func test_dynamic_element_geometry_reader() {
+        XCTFail()
+    }
+
+    func test_dynamic_element_environment_reader() {
+        XCTFail()
     }
 
     func test_layout_caching_updates_elements() throws {
@@ -795,14 +883,14 @@ fileprivate final class TestDelegate: ElementStateTreeDelegate {
 struct IdentifiedNode: Hashable {
     var identifier: ElementIdentifier
 
-    var children: [IdentifiedNode]
+    var children: Set<IdentifiedNode>
 
     init(
         _ identifier: ElementIdentifier,
         @Builder<IdentifiedNode> children: () -> [IdentifiedNode] = { [] }
     ) {
         self.identifier = identifier
-        self.children = children()
+        self.children = Set(children())
     }
 }
 
@@ -820,7 +908,7 @@ extension ElementState {
     var identifiedNode: IdentifiedNode {
         .init(
             identifier,
-            children: { orderedChildren.map(\.identifiedNode) }
+            children: { children.values.map(\.identifiedNode) }
         )
     }
 }
