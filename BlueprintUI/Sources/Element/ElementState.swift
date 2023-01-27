@@ -699,6 +699,15 @@ final class ElementState {
 
 extension ElementState {
 
+    struct LayoutState {
+
+        var wasVisited: Bool = false
+
+        var wasUpdated: Cache<SizeConstraint, Bool> = .init(kind: .cacheAll, variesByKey: true)
+
+
+    }
+
     /// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
     /// so that even when returning cached layouts, we can get to the latest version of the element
     /// that their originating `ElementState` represents.

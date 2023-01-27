@@ -471,6 +471,43 @@ class ElementStateTreeTests: XCTestCase {
     }
 
     func test_dynamic_element_geometry_reader() {
+
+        struct ChildElement1: ProxyElement {
+
+            var identifier: String
+
+            var elementRepresentation: Element {
+                Empty()
+            }
+        }
+
+        struct ChildElement2: ProxyElement {
+
+            var identifier: String
+
+            var elementRepresentation: Element {
+                Empty()
+            }
+        }
+
+        struct DynamicElement: ProxyElement {
+            var elementRepresentation: Element {
+                GeometryReader { proxy in
+                    if proxy.constraint.width < 100 {
+                        return ChildElement1(identifier: "small")
+                    } else {
+                        return ChildElement1(identifier: "large")
+                    }
+                }
+            }
+        }
+
+        let row = Row(underflow: .growUniformly) {
+            DynamicElement()
+            DynamicElement()
+            DynamicElement()
+        }
+
         XCTFail()
     }
 
