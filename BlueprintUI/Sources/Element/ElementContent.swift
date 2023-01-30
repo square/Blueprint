@@ -29,20 +29,20 @@ public struct ElementContent {
         storage.childCount
     }
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         storage.measurementChildElements(in: size, environment: environment)
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         storage.layoutChildElements(in: size, environment: environment)
     }
 
-    var variesChildrenBySize: Bool {
-        storage.variesChildrenBySize
+    var dynamicallyGeneratesContent: Bool {
+        storage.dynamicallyGeneratesContent
     }
 
-    var allowsElementContentCaching: Bool {
-        true
+    var isMeasurementOnlyNode: Bool {
+        storage.isMeasurementOnlyNode
     }
 
     fileprivate init(storage: ContentStorage) {
@@ -76,6 +76,77 @@ public struct ElementContent {
                 with: environment,
                 state: state
             )
+        }
+    }
+
+    enum EnumerateAllNodesParameters {
+        case regular(Regular)
+
+        case measurementOnly(MeasurementOnly)
+
+        struct Regular {
+            var size: CGSize
+            var childNodes: [LayoutResultNode]
+            var element: Element
+            var environment: Environment
+        }
+
+        struct MeasurementOnly {}
+    }
+
+    func enumerateAllNodes(
+        size: CGSize,
+        childNodes: [LayoutResultNode],
+        element: Element,
+        environment: Environment,
+        state: ElementState,
+        forEachLayoutNode: (ElementState, Element) -> Void,
+        forEachMeasurementOnlyNode: (ElementState) -> Void
+    ) {
+        switch state.kind {
+        case .regular:
+            forEachLayoutNode(state, element)
+
+            let children = storage.layoutChildElements(
+                in: .init(size),
+                environment: environment
+            )
+
+            children.indexedForEach { index, element in
+                let childNode = childNodes[index]
+                let childState = state.childState(
+                    for: element.element,
+                    in: childNode.environment,
+                    with: element.identifier
+                )
+
+                childState.elementContent.enumerateAllNodes(
+                    size: childNode.layoutAttributes.frame.size,
+                    childNodes: childNodes,
+                    element: element.element,
+                    environment: childNode.environment,
+                    state: childState,
+                    forEachLayoutNode: forEachLayoutNode,
+                    forEachMeasurementOnlyNode: forEachMeasurementOnlyNode
+                )
+            }
+
+        case .measurementOnly:
+
+            for (_, child) in state.children {
+                forEachMeasurementOnlyNode(child)
+
+                child.elementContent.enumerateAllNodes(
+                    size: .zero,
+                    childNodes: childNodes,
+                    element: child.element.latest,
+                    environment: .empty,
+                    state: child,
+                    forEachLayoutNode: forEachLayoutNode,
+                    forEachMeasurementOnlyNode: forEachMeasurementOnlyNode
+                )
+            }
+
         }
     }
 }
@@ -126,24 +197,31 @@ extension ElementContent {
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
     public init(byMeasuring element: Element) {
-        storage = MeasureNestedElementStorage(element: element)
+        storage = MeasureNestedElementStorage(child: element)
     }
 
     private struct MeasureNestedElementStorage: ContentStorage {
 
-        let element: Element
+        let child: Element
 
         let childCount: Int = 0
 
-        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-            [element]
+        let dynamicallyGeneratesContent: Bool = false
+
+        let isMeasurementOnlyNode: Bool = true
+
+        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+            [
+                .init(
+                    identifier: .identifierFor(singleChild: child),
+                    element: child
+                ),
+            ]
         }
 
-        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
+        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
             []
         }
-
-        let variesChildrenBySize: Bool = false
 
         func measure(
             in constraint: SizeConstraint,
@@ -152,13 +230,12 @@ extension ElementContent {
         ) -> CGSize {
 
             let childState = state.childState(
-                for: element,
+                for: child,
                 in: environment,
-                with: .identifier(for: element, key: nil, count: 1),
-                kind: .measurementOnly
+                with: .identifierFor(singleChild: child)
             )
 
-            precondition(type(of: element) == type(of: childState.element.latest))
+            precondition(type(of: child) == type(of: childState.element.latest))
 
             return childState.measure(in: constraint, with: environment) { environment in
                 childState.elementContent.measure(in: constraint, with: environment, state: childState)
@@ -172,6 +249,28 @@ extension ElementContent {
         ) -> [LayoutResultNode] {
             []
         }
+
+//        func enumerateAllNodes(
+//            in size: CGSize,
+//            for element: Element,
+//            with state: ElementState,
+//            forEachLayoutNode: (ElementState, Element) -> Void,
+//            forEachMeasurementOnlyNode: (ElementState) -> Void
+//        ) {
+//            precondition(state.kind == .measurementOnly)
+//
+//            forEachMeasurementOnlyNode(state)
+//
+//            let childState = state.children[.identifierFor(singleChild: child)]!
+//
+//            childState.elementContent.enumerateAllNodes(
+//                in: .zero,
+//                for: child,
+//                with: childState,
+//                forEachLayoutNode: forEachLayoutNode,
+//                forEachMeasurementOnlyNode: forEachMeasurementOnlyNode
+//            )
+//        }
     }
 }
 
@@ -228,7 +327,7 @@ extension ElementContent {
     public init(
         child: Element
     ) {
-        storage = SingleChildStorage(element: child)
+        storage = SingleChildStorage(child: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -279,8 +378,8 @@ extension ElementContent {
         environment adapter: @escaping (inout Environment) -> Void
     ) {
         storage = EnvironmentAdaptingStorage(
-            adapter: adapter,
-            child: child
+            child: child,
+            adapter: adapter
         )
     }
 
@@ -306,10 +405,12 @@ fileprivate protocol ContentStorage {
 
     var childCount: Int { get }
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element]
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element]
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
 
-    var variesChildrenBySize: Bool { get }
+    var dynamicallyGeneratesContent: Bool { get }
+
+    var isMeasurementOnlyNode: Bool { get }
 
     func measure(
         in constraint: SizeConstraint,
@@ -322,6 +423,20 @@ fileprivate protocol ContentStorage {
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode]
+
+//    func enumerateAllNodes(
+//        in size : CGSize,
+//        for element : Element,
+//        with state : ElementState,
+//        forEachLayoutNode : (ElementState, Element) -> Void,
+//        forEachMeasurementOnlyNode : (ElementState) -> Void
+//    )
+}
+
+
+struct IdentifiedElement {
+    var identifier: ElementIdentifier
+    var element: Element
 }
 
 
@@ -335,8 +450,6 @@ extension ElementContent {
 
         /// Child elements.
         fileprivate var children: [Child] = []
-
-        let variesChildrenBySize: Bool = false
 
         init(layout: LayoutType) {
             self.layout = layout
@@ -367,12 +480,20 @@ extension ElementContent {
             children.count
         }
 
-        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-            children.map(\.element)
+        let dynamicallyGeneratesContent: Bool = false
+
+        let isMeasurementOnlyNode: Bool = false
+
+        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+            children.map {
+                .init(identifier: $0.identifier, element: $0.element)
+            }
         }
 
-        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-            children.map(\.element)
+        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+            children.map {
+                .init(identifier: $0.identifier, element: $0.element)
+            }
         }
 
         func measure(
@@ -480,19 +601,31 @@ extension ElementContent {
 /// and the measurement of the element is the same as the child.
 private struct SingleChildStorage: ContentStorage {
 
+    let child: Element
+
     let childCount: Int = 1
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [element]
+    let dynamicallyGeneratesContent: Bool = false
+
+    let isMeasurementOnlyNode: Bool = false
+
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [element]
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
     }
-
-    let variesChildrenBySize: Bool = false
-
-    var element: Element
 
     func measure(
         in constraint: SizeConstraint,
@@ -500,9 +633,9 @@ private struct SingleChildStorage: ContentStorage {
         state: ElementState
     ) -> CGSize {
 
-        let identifier = ElementIdentifier.identifierFor(singleChild: element)
+        let identifier = ElementIdentifier.identifierFor(singleChild: child)
 
-        let child = state.childState(for: element, in: environment, with: identifier)
+        let child = state.childState(for: child, in: environment, with: identifier)
 
         return child.elementContent.measure(in: constraint, with: environment, state: child)
     }
@@ -515,9 +648,9 @@ private struct SingleChildStorage: ContentStorage {
         state.layout(in: size, with: environment) { environment in
             let childAttributes = LayoutAttributes(size: size)
 
-            let identifier = ElementIdentifier.identifierFor(singleChild: element)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
 
-            let childState = state.childState(for: element, in: environment, with: identifier)
+            let childState = state.childState(for: child, in: environment, with: identifier)
 
             let node = LayoutResultNode(
                 identifier: identifier,
@@ -541,23 +674,35 @@ private struct SingleChildStorage: ContentStorage {
 /// used by the `AdaptedEnvironment` element.
 private struct EnvironmentAdaptingStorage: ContentStorage {
 
+    let child: Element
+
     let childCount = 1
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [child]
+    let dynamicallyGeneratesContent: Bool = false
+
+    let isMeasurementOnlyNode: Bool = false
+
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [child]
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
     }
-
-    let variesChildrenBySize: Bool = false
 
     /// During measurement or layout, the environment adapter will be applied
     /// to the environment before passing it to the wrapped child element.
     var adapter: (inout Environment) -> Void
-
-    var child: Element
 
     func performLayout(
         in size: CGSize,
@@ -622,15 +767,34 @@ private struct LazyStorage: ContentStorage {
 
     let childCount = 1
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [builder(.measurement, size, environment)]
+    let dynamicallyGeneratesContent: Bool = true
+
+    let isMeasurementOnlyNode: Bool = false
+
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+
+        let child = builder(.measurement, size, environment)
+
+        return [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
-        [builder(.layout, size, environment)]
-    }
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
 
-    let variesChildrenBySize: Bool = true
+        let child = builder(.layout, size, environment)
+
+        return [
+            .init(
+                identifier: .identifierFor(singleChild: child),
+                element: child
+            ),
+        ]
+
+    }
 
     var builder: (ElementContent.LayoutPhase, SizeConstraint, Environment) -> Element
 
@@ -699,15 +863,17 @@ private struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
+    let dynamicallyGeneratesContent: Bool = false
+
+    let isMeasurementOnlyNode: Bool = true
+
+    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         []
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [Element] {
+    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         []
     }
-
-    let variesChildrenBySize: Bool = false
 
     let measurer: (SizeConstraint, Environment) -> CGSize
 

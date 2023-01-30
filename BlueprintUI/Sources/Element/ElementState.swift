@@ -54,14 +54,14 @@ final class ElementStateTree {
         updates: (ElementState) -> Output
     ) -> (ElementState, Output) {
         func makeRoot(with element: Element) -> ElementState {
+
             let new = ElementState(
                 parent: nil,
                 delegate: delegate,
                 identifier: .identifierFor(singleChild: element),
                 element: element,
                 signpostRef: signpostRef,
-                name: name,
-                kind: .regular
+                name: name
             )
 
             root = new
@@ -159,14 +159,24 @@ final class ElementState {
     /// How and if the element should be compared during updates.
     let comparability: Comparability
 
+    /// If the element enables any caching. Dynamic elements such as
+    /// `GeometryReader` or `EnvironmentReader` will disable caching.
+    let isCachingEnabled: Bool
+
     /// If the node has been visited this layout cycle.
-    /// This is used to ensure we only `update` the `ElementState`
-    /// for an `Element` once per layout cycle.
     ///
     /// If this value is `false`, at the end of a layout cycle, the
     /// `ElementState` will be torn down; indicating it  is no longer part
     /// of the element tree.
     private(set) var wasVisited: Bool
+
+    /// If the node has been updated this layout cycle.
+    ///
+    /// This is used to ensure we only `update` the `ElementState`
+    /// for an `Element` once per layout cycle. There are some exceptions
+    /// to this, for example a dynamic element such as a `GeometryReader` or
+    /// `EnvironmentReader` will update this child nodes on each build of its content.
+    private(set) var hasUpdated: Bool
 
     /// If the node has updated its children with their latest `ElementContent`
     /// while returning a cached layout.
@@ -186,7 +196,7 @@ final class ElementState {
     /// The kind of cache we're storing in the state. This is only used for debugging
     /// purposes to differentiate between regular state and state that is only used for
     /// measurement caching
-    private var kind: Kind
+    private(set) var kind: Kind
 
     /// The children of the `ElementState`, cached by element identifier.
     private(set) var children: [ElementIdentifier: ElementState] = [:]
@@ -256,6 +266,22 @@ final class ElementState {
 
         /// All cachable information is stored in this state
         case regular
+
+        init(parent: ElementState?, content: ElementContent) {
+            if let parent {
+                if parent.elementContent.isMeasurementOnlyNode || content.isMeasurementOnlyNode {
+                    self = .measurementOnly
+                } else {
+                    self = .regular
+                }
+            } else {
+                if content.isMeasurementOnlyNode {
+                    self = .measurementOnly
+                } else {
+                    self = .regular
+                }
+            }
+        }
     }
 
     /// Creates a new `ElementState` instance.
@@ -265,34 +291,39 @@ final class ElementState {
         identifier: ElementIdentifier,
         element: Element,
         signpostRef: AnyObject,
-        name: String,
-        kind: Kind
+        name: String
     ) {
         self.parent = parent
         self.delegate = delegate
         self.identifier = identifier
         self.element = .init(element)
-        self.kind = kind
+
+        let elementContent = self.element.latest.content
+
+        cachedContent = elementContent
+
+        kind = .init(parent: parent, content: elementContent)
 
         if element is AnyComparableElement {
             comparability = .comparableElement
-        } else {
-            if let parent = parent {
-                switch parent.comparability {
-                case .notComparable:
-                    comparability = .notComparable
-                case .comparableElement, .childOfComparableElement:
-                    comparability = .childOfComparableElement
-                }
-            } else {
+        } else if let parent = parent {
+            switch parent.comparability {
+            case .notComparable:
                 comparability = .notComparable
+            case .comparableElement, .childOfComparableElement:
+                comparability = .childOfComparableElement
             }
+        } else {
+            comparability = .notComparable
         }
+
+        isCachingEnabled = elementContent.dynamicallyGeneratesContent == false
 
         self.signpostRef = signpostRef
         self.name = name
 
         wasVisited = true
+        hasUpdated = true
         hasUpdatedChildrenDuringLayout = true
     }
 
@@ -316,7 +347,9 @@ final class ElementState {
         } else {
             let content = element.latest.content
 
-            if content.allowsElementContentCaching {
+            /// TODO: Can we cache this? I think perhaps, the main thing is not caching the _updates_
+            /// in the child state method... right?
+            if isCachingEnabled {
                 cachedContent = content
             }
 
@@ -340,7 +373,6 @@ final class ElementState {
         in newEnvironment: Environment,
         identifier: ElementIdentifier
     ) {
-        precondition(wasVisited == false)
         precondition(self.identifier == identifier)
         precondition(type(of: newElement) == type(of: element.latest))
 
@@ -394,6 +426,8 @@ final class ElementState {
         /// have access to the latest `backingViewDescription`.
 
         element.latest = newElement
+
+        hasUpdated = true
 
         delegate.ifDebug {
             $0.treeDidUpdateState(self)
@@ -489,25 +523,35 @@ final class ElementState {
                 /// Because we're returning a cached layout, we're not going to be
                 /// enumerating every child element in the tree during layout. To resolve
                 /// this, we'll perform an enumeration over the tree.
-                forEach { state in
 
-                    /// Guarantees that the latest element is present in the tree.
-                    /// in case its `backingViewDescription` has changed,
-                    /// for example (while remaining equivalent), eg it needs to apply
-                    /// a new callback closure to the view.
-                    state.element.latest = element
+                elementContent.enumerateAllNodes(
+                    in: size,
+                    with: existing.nodes,
+                    for: element.latest,
+                    with: self,
+                    environment: environment,
+                    forEachLayoutNode: { state, element in
 
-                    /// Also ensure we update our element content.
-                    /// TODO: Do we need to do this?
-                    state.cachedContent = element.content
+                        /// Guarantees that the latest element is present in the tree.
+                        /// in case its `backingViewDescription` has changed,
+                        /// for example (while remaining equivalent), eg it needs to apply
+                        /// a new callback closure to the view.
+                        state.element.latest = element
 
-                    /// Because we won't be visiting any child elements
-                    /// for a `ComparableElement` during either
-                    /// measurement or layout, mark all our child nodes
-                    /// as visited so they are not torn down.
-                    state.wasVisited = true
+                        /// Also ensure we update our element content.
+                        /// TODO: Do we need to do this?
+                        state.cachedContent = element.content
 
-                }
+                        /// Because we won't be visiting any child elements
+                        /// for a `ComparableElement` during either
+                        /// measurement or layout, mark all our child nodes
+                        /// as visited so they are not torn down.
+                        state.wasVisited = true
+                    },
+                    forEachMeasurementOnlyNode: { state in
+                        state.wasVisited = true
+                    }
+                )
             }
 
             return existing.nodes
@@ -575,15 +619,28 @@ final class ElementState {
     func childState(
         for child: Element,
         in environment: Environment,
-        with identifier: ElementIdentifier,
-        kind: Kind = .regular
+        with identifier: ElementIdentifier
     ) -> ElementState {
 
         if let existing = children[identifier] {
 
-            if existing.wasVisited == false {
+            existing.wasVisited = true
+
+            if existing.elementContent.dynamicallyGeneratesContent {
+
+                /// Our element content is entirely dependent on dynamic layout
+                /// tree attributes like the `SizeConstraint` or `Environment`
+                /// content, eg we're a `GeometryReader` or `EnvironmentReader`.
+                /// Rather than being clever about when we can and can't update the child during
+                /// tree enumeration, just update it on every pass.
+
                 existing.update(with: child, in: environment, identifier: identifier)
-                existing.wasVisited = true
+            } else if existing.hasUpdated == false {
+
+                /// We are not a dynamic element, so we only need to update if we've not
+                /// been seen before.
+
+                existing.update(with: child, in: environment, identifier: identifier)
             }
 
             return existing
@@ -594,8 +651,7 @@ final class ElementState {
                 identifier: identifier,
                 element: child,
                 signpostRef: signpostRef,
-                name: name,
-                kind: kind
+                name: name
             )
 
             children[identifier] = new
@@ -608,23 +664,12 @@ final class ElementState {
         }
     }
 
-    func forEach(
-        _ forEach: (ElementState, Element) -> Void
-    ) {
-        // TODO: Track if we're in a layout, assert if we're not, since measurements will be removed.
-
-        forEach(self, element.latest)
-
-        for (_, child) in children {
-            child.forEach(forEach)
-        }
-    }
-
     /// To be called at the beginning of the layout cycle by the owner
     /// of the `ElementStateTree`, to set up the tree for a traversal.
     fileprivate func prepareForLayout() {
         recursiveForEach {
             $0.wasVisited = false
+            $0.hasUpdated = false
             $0.hasUpdatedChildrenDuringLayout = false
         }
     }
@@ -699,15 +744,6 @@ final class ElementState {
 
 extension ElementState {
 
-    struct LayoutState {
-
-        var wasVisited: Bool = false
-
-        var wasUpdated: Cache<SizeConstraint, Bool> = .init(kind: .cacheAll, variesByKey: true)
-
-
-    }
-
     /// A reference type passed through to `LayoutResultNode` and `NativeViewNode`,
     /// so that even when returning cached layouts, we can get to the latest version of the element
     /// that their originating `ElementState` represents.
@@ -720,6 +756,7 @@ extension ElementState {
         }
     }
 
+    /// TODO: Delete
     /// A "last instance" cache, returning a cached value, or creating a new value
     struct Cache<Key: Hashable, Value> {
 

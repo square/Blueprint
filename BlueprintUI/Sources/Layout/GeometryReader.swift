@@ -22,10 +22,10 @@ import UIKit
 /// }
 /// ```
 ///
-/// ## ⚠️ Important Note
+/// ## ⚠️ Important Performance Note
 /// Depending on the structure of your `GeometryReader` return value
 /// and parent elements that the reader is contained within, you may end up invalidating
-/// caching used during layouts, for example when the reader is measured multiple times
+/// caching used during layouts. For example: when the reader is measured multiple times
 /// to determine the final layout or size of a parent element such as a `Row` with
 /// multiple flexible elements.
 ///
@@ -37,7 +37,7 @@ import UIKit
 /// ```swift
 /// GeometryReader { proxy in
 ///
-///     // 🚫 If measured in two or more sizes, above and below
+///     // 🚫 If measured in two or more sizes above and below
 ///     // 100 pts, the cache for Label.1 will be thrown out
 ///     // due to differing content.
 ///
