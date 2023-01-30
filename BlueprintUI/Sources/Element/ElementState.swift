@@ -538,6 +538,10 @@ final class ElementState {
                         state.wasVisited = true
                     },
                     forEachMeasurementOnlyNode: { state in
+                        /// Because we won't be visiting any child elements
+                        /// for a `ComparableElement` during either
+                        /// measurement or layout, mark all our child nodes
+                        /// as visited so they are not torn down.
                         state.wasVisited = true
                     }
                 )
@@ -627,7 +631,7 @@ final class ElementState {
             } else if existing.hasUpdated == false {
 
                 /// We are not a dynamic element, so we only need to update if we've not
-                /// been seen before.
+                /// been seen before during this layout cycle.
 
                 existing.update(with: child, in: environment, identifier: identifier)
             }
@@ -743,80 +747,6 @@ extension ElementState {
         init(_ latest: Element) {
             self.latest = latest
         }
-    }
-
-    /// TODO: Delete
-    /// A "last instance" cache, returning a cached value, or creating a new value
-    struct Cache<Key: Hashable, Value> {
-
-        /// The cache behavior. See `CacheKind` for more.
-        let kind: CacheKind
-
-        /// If the cached value will vary by the provided key,
-        /// or if the key is ignored.
-        var variesByKey: Bool {
-            didSet {
-                if oldValue != variesByKey {
-                    removeAll()
-                }
-            }
-        }
-
-        private var byKeyValues: [Key: Value] = [:]
-        private var singleValue: Value? = nil
-
-        init(kind: CacheKind, variesByKey: Bool) {
-            self.kind = kind
-            self.variesByKey = variesByKey
-        }
-
-        mutating func removeAll() {
-            byKeyValues.removeAll(keepingCapacity: true)
-            singleValue = nil
-        }
-
-        mutating func removeValue(forKey key: Key) {
-            byKeyValues.removeValue(forKey: key)
-            singleValue = nil
-        }
-
-        func hasValue(for key: Key) -> Bool {
-            if variesByKey {
-                return byKeyValues[key] != nil
-            } else {
-                return singleValue != nil
-            }
-        }
-
-        mutating func get(_ key: Key, provider: () -> Value) -> Value {
-
-            if variesByKey {
-                singleValue = nil
-
-                if let value = byKeyValues[key] {
-                    return value
-                } else {
-                    let value = provider()
-                    byKeyValues[key] = value
-                    return value
-                }
-            } else {
-                byKeyValues.removeAll(keepingCapacity: false)
-
-                if let singleValue {
-                    return singleValue
-                } else {
-                    let value = provider()
-                    singleValue = value
-                    return value
-                }
-            }
-        }
-    }
-
-    enum CacheKind {
-        case cacheAll
-        case cacheLatest
     }
 }
 
