@@ -159,10 +159,6 @@ final class ElementState {
     /// How and if the element should be compared during updates.
     let comparability: Comparability
 
-    /// If the element enables any caching. Dynamic elements such as
-    /// `GeometryReader` or `EnvironmentReader` will disable caching.
-    let isCachingEnabled: Bool
-
     /// If the node has been visited this layout cycle.
     ///
     /// If this value is `false`, at the end of a layout cycle, the
@@ -317,8 +313,6 @@ final class ElementState {
             comparability = .notComparable
         }
 
-        isCachingEnabled = elementContent.dynamicallyGeneratesContent == false
-
         self.signpostRef = signpostRef
         self.name = name
 
@@ -347,11 +341,7 @@ final class ElementState {
         } else {
             let content = element.latest.content
 
-            /// TODO: Can we cache this? I think perhaps, the main thing is not caching the _updates_
-            /// in the child state method... right?
-            if isCachingEnabled {
-                cachedContent = content
-            }
+            cachedContent = content
 
             delegate.ifDebug {
                 $0.treeDidFetchElementContent(for: self)
