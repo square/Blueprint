@@ -525,11 +525,11 @@ final class ElementState {
                 /// this, we'll perform an enumeration over the tree.
 
                 elementContent.enumerateAllNodes(
-                    in: size,
-                    with: existing.nodes,
-                    for: element.latest,
-                    with: self,
+                    size: size,
+                    childNodes: existing.nodes,
+                    element: element.latest,
                     environment: environment,
+                    state: self,
                     forEachLayoutNode: { state, element in
 
                         /// Guarantees that the latest element is present in the tree.
@@ -539,7 +539,6 @@ final class ElementState {
                         state.element.latest = element
 
                         /// Also ensure we update our element content.
-                        /// TODO: Do we need to do this?
                         state.cachedContent = element.content
 
                         /// Because we won't be visiting any child elements

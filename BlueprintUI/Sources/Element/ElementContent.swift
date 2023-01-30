@@ -29,10 +29,6 @@ public struct ElementContent {
         storage.childCount
     }
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-        storage.measurementChildElements(in: size, environment: environment)
-    }
-
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         storage.layoutChildElements(in: size, environment: environment)
     }
@@ -79,21 +75,6 @@ public struct ElementContent {
         }
     }
 
-    enum EnumerateAllNodesParameters {
-        case regular(Regular)
-
-        case measurementOnly(MeasurementOnly)
-
-        struct Regular {
-            var size: CGSize
-            var childNodes: [LayoutResultNode]
-            var element: Element
-            var environment: Environment
-        }
-
-        struct MeasurementOnly {}
-    }
-
     func enumerateAllNodes(
         size: CGSize,
         childNodes: [LayoutResultNode],
@@ -133,22 +114,35 @@ public struct ElementContent {
 
         case .measurementOnly:
 
-            for (_, child) in state.children {
-                forEachMeasurementOnlyNode(child)
+            /// Once we've reached a measurement only node, every node
+            /// down from there will be measurement only. Switch to the simpler
+            /// method with fewer arguments; the additional context is not
+            /// available for measurement-only nodes because they do not have
+            /// an associated layout.
 
-                child.elementContent.enumerateAllNodes(
-                    size: .zero,
-                    childNodes: childNodes,
-                    element: child.element.latest,
-                    environment: .empty,
-                    state: child,
-                    forEachLayoutNode: forEachLayoutNode,
-                    forEachMeasurementOnlyNode: forEachMeasurementOnlyNode
-                )
-            }
-
+            enumerateMeasurementOnlyNodes(
+                state: state,
+                forEachNode: forEachMeasurementOnlyNode
+            )
         }
     }
+
+    private func enumerateMeasurementOnlyNodes(
+        state: ElementState,
+        forEachNode: (ElementState) -> Void
+    ) {
+        precondition(state.kind == .measurementOnly)
+
+        forEachNode(state)
+
+        for (_, child) in state.children {
+            child.elementContent.enumerateMeasurementOnlyNodes(
+                state: child,
+                forEachNode: forEachNode
+            )
+        }
+    }
+
 }
 
 extension ElementContent {
@@ -209,15 +203,6 @@ extension ElementContent {
         let dynamicallyGeneratesContent: Bool = false
 
         let isMeasurementOnlyNode: Bool = true
-
-        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-            [
-                .init(
-                    identifier: .identifierFor(singleChild: child),
-                    element: child
-                ),
-            ]
-        }
 
         func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
             []
@@ -405,7 +390,6 @@ fileprivate protocol ContentStorage {
 
     var childCount: Int { get }
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
 
     var dynamicallyGeneratesContent: Bool { get }
@@ -483,12 +467,6 @@ extension ElementContent {
         let dynamicallyGeneratesContent: Bool = false
 
         let isMeasurementOnlyNode: Bool = false
-
-        func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-            children.map {
-                .init(identifier: $0.identifier, element: $0.element)
-            }
-        }
 
         func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
             children.map {
@@ -609,15 +587,6 @@ private struct SingleChildStorage: ContentStorage {
 
     let isMeasurementOnlyNode: Bool = false
 
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-        [
-            .init(
-                identifier: .identifierFor(singleChild: child),
-                element: child
-            ),
-        ]
-    }
-
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         [
             .init(
@@ -681,15 +650,6 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
     let dynamicallyGeneratesContent: Bool = false
 
     let isMeasurementOnlyNode: Bool = false
-
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-        [
-            .init(
-                identifier: .identifierFor(singleChild: child),
-                element: child
-            ),
-        ]
-    }
 
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         [
@@ -770,18 +730,6 @@ private struct LazyStorage: ContentStorage {
     let dynamicallyGeneratesContent: Bool = true
 
     let isMeasurementOnlyNode: Bool = false
-
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-
-        let child = builder(.measurement, size, environment)
-
-        return [
-            .init(
-                identifier: .identifierFor(singleChild: child),
-                element: child
-            ),
-        ]
-    }
 
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
 
@@ -866,10 +814,6 @@ private struct MeasurableStorage: ContentStorage {
     let dynamicallyGeneratesContent: Bool = false
 
     let isMeasurementOnlyNode: Bool = true
-
-    func measurementChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-        []
-    }
 
     func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         []
