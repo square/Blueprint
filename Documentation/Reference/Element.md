@@ -78,7 +78,7 @@ public struct ElementContent : Measurable {
 
     public func measure(in constraint: SizeConstraint) -> CGSize
 
-    public var childCount: Int { get }
+    public var layoutChildrenCount: Int { get }
 
 }
 

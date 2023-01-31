@@ -619,7 +619,7 @@ final class ElementState {
 
             existing.wasVisited = true
 
-            if existing.elementContent.dynamicallyGeneratesContent {
+            if existing.elementContent.isDynamicElement {
 
                 /// Our element content is entirely dependent on dynamic layout
                 /// tree attributes like the `SizeConstraint` or `Environment`

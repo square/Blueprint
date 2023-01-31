@@ -5,7 +5,7 @@ class ElementContentTests: XCTestCase {
 
     func test_noChildren() {
         let container = ElementContent(layout: FrameLayout())
-        XCTAssertEqual(container.childCount, 0)
+        XCTAssertEqual(container.layoutChildrenCount, 0)
         XCTAssertEqual(
             container.measure(in: SizeConstraint(CGSize(width: 100, height: 100)), environment: .empty),
             CGSize.zero

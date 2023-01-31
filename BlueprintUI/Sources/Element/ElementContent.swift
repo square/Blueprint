@@ -23,20 +23,30 @@ public struct ElementContent {
         storage = builder
     }
 
-    /// The number of children the `ElementContent` has.
-    /// Delegates to `storage` (`ContentStorage`).
-    var childCount: Int {
-        storage.childCount
+    /// The number of children present for a layout pass. This number should usually be less
+    /// than or equal to the number of elements present for a measurement pass.
+    var layoutChildrenCount: Int {
+        storage.layoutChildrenCount
     }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
-        storage.layoutChildElements(in: size, environment: environment)
+    /// The elements present for a layout pass in the given size and environment.
+    /// Must match the count returned from `layoutChildrenCount`.
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        storage.childElementsForLayout(in: size, environment: environment)
     }
 
-    var dynamicallyGeneratesContent: Bool {
-        storage.dynamicallyGeneratesContent
+    /// If the element dynamically generates its content based on a `SizeConstraint`
+    /// or `Environment`. Elements such as `GeometryReader` or `EnvironmentReader`
+    /// do this. Blueprint internally uses this information to avoid caching and optimizations
+    /// that this dynamic element generation renders moot.
+    var isDynamicElement: Bool {
+        storage.isDynamicElement
     }
 
+    /// If the node represents an element that is used for measurement only, and will never go
+    /// through a layout pass. Eg, the `ElementContent` for the element is created via
+    /// `init(byMeasuring:)`. This is commonly used by elements which will
+    /// nest another BlueprintView for rendering, but otherwise do not lay out children.
     var isMeasurementOnlyNode: Bool {
         storage.isMeasurementOnlyNode
     }
@@ -86,9 +96,11 @@ public struct ElementContent {
     ) {
         switch state.kind {
         case .regular:
+            precondition(state.kind == .regular)
+
             forEachLayoutNode(state, element)
 
-            let children = storage.layoutChildElements(
+            let children = storage.childElementsForLayout(
                 in: .init(size),
                 environment: environment
             )
@@ -124,6 +136,8 @@ public struct ElementContent {
                 state: state,
                 forEachNode: forEachMeasurementOnlyNode
             )
+
+
         }
     }
 
@@ -198,13 +212,13 @@ extension ElementContent {
 
         let child: Element
 
-        let childCount: Int = 0
+        let layoutChildrenCount: Int = 0
 
-        let dynamicallyGeneratesContent: Bool = false
+        let isDynamicElement: Bool = false
 
         let isMeasurementOnlyNode: Bool = true
 
-        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
             []
         }
 
@@ -234,28 +248,6 @@ extension ElementContent {
         ) -> [LayoutResultNode] {
             []
         }
-
-//        func enumerateAllNodes(
-//            in size: CGSize,
-//            for element: Element,
-//            with state: ElementState,
-//            forEachLayoutNode: (ElementState, Element) -> Void,
-//            forEachMeasurementOnlyNode: (ElementState) -> Void
-//        ) {
-//            precondition(state.kind == .measurementOnly)
-//
-//            forEachMeasurementOnlyNode(state)
-//
-//            let childState = state.children[.identifierFor(singleChild: child)]!
-//
-//            childState.elementContent.enumerateAllNodes(
-//                in: .zero,
-//                for: child,
-//                with: childState,
-//                forEachLayoutNode: forEachLayoutNode,
-//                forEachMeasurementOnlyNode: forEachMeasurementOnlyNode
-//            )
-//        }
     }
 }
 
@@ -385,36 +377,44 @@ extension ElementContent {
     }
 }
 
-/// The underlying type that backs the `ElementContent`.
+/// The underlying type that backs the `ElementContent`. You should rarely
+/// need to create your own type that conforms to `ContentStorage` unless you're
+/// introducing a new type of `Element`, or you're optimizing a common case.
 fileprivate protocol ContentStorage {
 
-    var childCount: Int { get }
+    /// The number of children present for a layout pass. This number should usually be less
+    /// than or equal to the number of elements present for a measurement pass.
+    var layoutChildrenCount: Int { get }
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
+    /// The elements present for a layout pass in the given size and environment.
+    /// Must match the count returned from `layoutChildrenCount`.
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement]
 
-    var dynamicallyGeneratesContent: Bool { get }
+    /// If the element dynamically generates its content based on a `SizeConstraint`
+    /// or `Environment`. Elements such as `GeometryReader` or `EnvironmentReader`
+    /// do this. Blueprint internally uses this information to avoid caching and optimizations
+    /// that this dynamic element generation renders moot.
+    var isDynamicElement: Bool { get }
 
+    /// If the node represents an element that is used for measurement only, and will never go
+    /// through a layout pass. Eg, the `ElementContent` for the element is created via
+    /// `init(byMeasuring:)`. This is commonly used by elements which will
+    /// nest another BlueprintView for rendering, but otherwise do not lay out children.
     var isMeasurementOnlyNode: Bool { get }
 
+    /// Measures the element and returns the size in the provided constraint. This method is intended to be recursive.
     func measure(
         in constraint: SizeConstraint,
         with environment: Environment,
         state: ElementState
     ) -> CGSize
 
+    /// Lays out the element and returns all children. This method is intended to be recursive.
     func performLayout(
         in size: CGSize,
         with environment: Environment,
         state: ElementState
     ) -> [LayoutResultNode]
-
-//    func enumerateAllNodes(
-//        in size : CGSize,
-//        for element : Element,
-//        with state : ElementState,
-//        forEachLayoutNode : (ElementState, Element) -> Void,
-//        forEachMeasurementOnlyNode : (ElementState) -> Void
-//    )
 }
 
 
@@ -460,15 +460,15 @@ extension ElementContent {
 
         // MARK: ContentStorage
 
-        var childCount: Int {
+        var layoutChildrenCount: Int {
             children.count
         }
 
-        let dynamicallyGeneratesContent: Bool = false
+        let isDynamicElement: Bool = false
 
         let isMeasurementOnlyNode: Bool = false
 
-        func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+        func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
             children.map {
                 .init(identifier: $0.identifier, element: $0.element)
             }
@@ -581,13 +581,13 @@ private struct SingleChildStorage: ContentStorage {
 
     let child: Element
 
-    let childCount: Int = 1
+    let layoutChildrenCount: Int = 1
 
-    let dynamicallyGeneratesContent: Bool = false
+    let isDynamicElement: Bool = false
 
     let isMeasurementOnlyNode: Bool = false
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         [
             .init(
                 identifier: .identifierFor(singleChild: child),
@@ -645,13 +645,13 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
     let child: Element
 
-    let childCount = 1
+    let layoutChildrenCount = 1
 
-    let dynamicallyGeneratesContent: Bool = false
+    let isDynamicElement: Bool = false
 
     let isMeasurementOnlyNode: Bool = false
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         [
             .init(
                 identifier: .identifierFor(singleChild: child),
@@ -725,13 +725,13 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 /// This is used for types dependent on sizing, such as `GeometryReader`.
 private struct LazyStorage: ContentStorage {
 
-    let childCount = 1
+    let layoutChildrenCount = 1
 
-    let dynamicallyGeneratesContent: Bool = true
+    let isDynamicElement: Bool = true
 
     let isMeasurementOnlyNode: Bool = false
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
 
         let child = builder(.layout, size, environment)
 
@@ -809,13 +809,13 @@ private struct LazyStorage: ContentStorage {
 /// that otherwise has no children.
 private struct MeasurableStorage: ContentStorage {
 
-    let childCount = 0
+    let layoutChildrenCount = 0
 
-    let dynamicallyGeneratesContent: Bool = false
+    let isDynamicElement: Bool = false
 
     let isMeasurementOnlyNode: Bool = true
 
-    func layoutChildElements(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
+    func childElementsForLayout(in size: SizeConstraint, environment: Environment) -> [IdentifiedElement] {
         []
     }
 
