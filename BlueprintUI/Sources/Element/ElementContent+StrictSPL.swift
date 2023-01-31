@@ -176,11 +176,11 @@ public struct StrictNeutralLayout: SingleChildLayout {
         LayoutAttributes(size: size)
     }
 
-    public func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview) -> CGSize {
+    public func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview, cache: inout Void) -> CGSize {
         subview.sizeThatFits(proposal)
     }
 
-    public func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview) {}
+    public func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview, cache: inout Void) {}
 
     public func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
         StrictLayoutAttributes(

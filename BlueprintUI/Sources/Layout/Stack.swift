@@ -312,12 +312,23 @@ extension StackLayout {
     }
 
     /// Determines the cross-axis layout (height for a horizontal stack, width for a vertical stack).
-    public enum Alignment {
+    public enum Alignment: Equatable {
         /// Children will be stretched to the size of the stack.
         case fill
         /// Children will be aligned relatively to each other, and then all the contents will be
         /// aligned to the stack's bounding box, according to the specified alignment.
         case align(to: AlignmentID.Type)
+        
+        public static func == (lhs: StackLayout.Alignment, rhs: StackLayout.Alignment) -> Bool {
+            switch (lhs, rhs) {
+            case (.fill, .fill):
+                return true
+            case let (.align(to: leftId), .align(to: rightId)):
+                return leftId == rightId
+            default:
+                return false
+            }
+        }
     }
 
 }
@@ -424,7 +435,7 @@ extension StackLayout {
         // Then measure cross axis for each item based on the space it was allocated.
         let crossSegments = _crossSegments(
             for: crossItems,
-            axisConstraints: axisConstraints,
+            axisSegments: axisSegments,
             crossConstraint: vectorConstraint.cross
         )
 
@@ -773,14 +784,22 @@ extension StackLayout {
     /// - Returns: The cross measurements as segments.
     private func _crossSegments(
         for items: [StackLayoutItem],
-        axisConstraints: [CGFloat],
+        axisSegments: [Segment],
         crossConstraint: VectorConstraint.Axis
     ) -> [Segment] {
         // Measures cross magnitudes based on axis constraints
         func measureMagnitudes() -> [CGFloat] {
-            zip(items, axisConstraints).map { item, axisConstraint -> CGFloat in
+            zip(items, axisSegments).map { item, axisSegment -> CGFloat in
+                // if in fill mode, and the axis magnitude here is the value from its measurement,
+                // then we should be able to skip this measurement by using the cross magnitude
+                // from the first measure -- but it needs to be plumbed in here
+                if case .fill = alignment, axisSegment.measured {
+                    // TODO:
+                    // return cross from axis "segment"
+                }
+
                 let vector = VectorConstraint(
-                    axis: .atMost(axisConstraint),
+                    axis: .atMost(axisSegment.magnitude),
                     cross: crossConstraint
                 )
                 let constraint = vector.constraint(axis: axis)
@@ -824,7 +843,7 @@ extension StackLayout {
             // Get the alignment values for each child
             let alignmentValues = items.indices.map { i -> CGFloat in
                 let measuredCross = crossMagnitudes[i]
-                let axisSize = axisConstraints[i]
+                let axisSize = axisSegments[i].magnitude
 
                 let size = Vector(axis: axisSize, cross: measuredCross).size(axis: axis)
                 let dimensions = ElementDimensions(size: size)
@@ -854,7 +873,7 @@ extension StackLayout {
                 availableCross = min(maxConstraint, normalizedCrossMagnitude)
             }
 
-            let availableAxis = axisConstraints.reduce(0, +)
+            let availableAxis = axisSegments.reduce(0) { sum, segment in sum + segment.magnitude }
             let availableSize = Vector(axis: availableAxis, cross: availableCross).size(axis: axis)
             let contentsSize = Vector(axis: availableAxis, cross: normalizedCrossMagnitude).size(axis: axis)
 
@@ -894,12 +913,29 @@ extension LayoutSubview {
 }
 
 extension StackLayout {
-    public func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
+    public final class PhaseCache {
+        var sizeCaches: [LayoutSubview.SizeCache]
+
+        init(count: Int) {
+            sizeCaches = (0..<count).map { i in
+                .init(path: "StackLayout.PhaseCache[\(i)]")
+            }
+        }
+    }
+    
+    public func makeCache(subviews: Subviews) -> PhaseCache {
+        PhaseCache(count: subviews.count)
+    }
+
+    public func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout PhaseCache) -> CGSize {
         guard subviews.isEmpty == false else { return .zero }
 
         let constraint = proposal.vectorConstraint(on: axis)
 
-        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
+        let items = subviews.indexedMap { index, subview in
+            StackLayoutItem(subview: subview, cache: cache.sizeCaches[index])
+        }
+        let frames = _frames(for: items, in: constraint)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -911,11 +947,14 @@ extension StackLayout {
         return vector.size(axis: axis)
     }
 
-    public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
+    public func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout PhaseCache) {
 
         let constraint = bounds.size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: subviews.map(StackLayoutItem.init), in: constraint)
+        let items = subviews.indexedMap { index, subview in
+            StackLayoutItem(subview: subview, cache: cache.sizeCaches[index])
+        }
+        let frames = _frames(for: items, in: constraint)
 
         for i in 0..<subviews.count {
             let vectorFrame = frames[i]
@@ -947,20 +986,28 @@ extension StackLayout {
             )
         }
     }
-    
+
     private struct StackLayoutItem {
-        
+
         let traits: Traits
         private let measure: (SizeConstraint) -> CGSize
-        
+
         init(_ tuple: (Traits, Measurable)) {
             traits = tuple.0
             measure = tuple.1.measure(in:)
         }
-        
-        init(_ subview: LayoutSubview) {
+
+        init(subview: LayoutSubview, cache: LayoutSubview.SizeCache) {
             traits = subview.stackLayoutTraits
             measure = subview.sizeThatFits(_:)
+//            measure = { constraint in
+//                cache.get(key: constraint) { constraint in
+//                    let size = subview.sizeThatFits(constraint)
+//                    // "hint" exact constraint matches
+//                    cache.values[SizeConstraint(size)] = size
+//                    return size
+//                }
+//            }
         }
         
         init(_ child: StrictLayoutChild, options: StrictLayoutOptions) {
@@ -972,7 +1019,7 @@ extension StackLayout {
                 )
             }
         }
-        
+
         func measure(in constraint: SizeConstraint) -> CGSize {
             measure(constraint)
         }
@@ -1069,6 +1116,9 @@ extension StackLayout {
     struct Segment {
         var origin: CGFloat
         var magnitude: CGFloat
+        // TODO: save
+        // the value along the other axis, that we found when deriving this segment
+        //  var perpendicular: CGFloat
         var measured: Bool
     }
 

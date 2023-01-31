@@ -153,7 +153,7 @@ extension EqualStack {
             return result
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews) -> CGSize {
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout Cache) -> CGSize {
             guard subviews.count > 0 else { return .zero }
 
             let totalSpacing = (spacing * CGFloat(subviews.count - 1))
@@ -192,7 +192,7 @@ extension EqualStack {
             return totalSize
         }
 
-        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews) {
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
             guard subviews.count > 0 else { return }
             let size = bounds.size
 

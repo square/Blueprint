@@ -59,7 +59,7 @@ final class RootViewController: UIViewController {
         leftBlueprintView.layer.borderColor = UIColor.black.cgColor
         leftBlueprintView.layer.borderWidth = 1
 
-        leftBlueprintView.layoutMode = .strictSinglePass
+        leftBlueprintView.layoutMode = .singlePass
         leftBlueprintView.element = contents
 
         rightBlueprintView.backgroundColor = .clear

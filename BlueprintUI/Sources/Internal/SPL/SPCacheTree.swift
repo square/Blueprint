@@ -3,19 +3,23 @@ import Foundation
 
 
 final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKey: Hashable {
-
+    
     typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
-
+    
     var valueCache: SPValueCache<Key, Value>
     private var subcaches: [SubcacheKey: Subcache] = [:]
-
+    
     var path: String
-
+    
+    private var layoutSubviews: [LayoutSubview]?
+    
+    private var _phaseCache: Any?
+    
     init(path: String) {
         self.path = path
         valueCache = .init(path: path)
     }
-
+    
     func subcache(key: SubcacheKey) -> Subcache {
         if let subcache = subcaches[key] {
             return subcache
@@ -25,9 +29,6 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         return subcache
     }
     
-    var layoutSubviews: [LayoutSubview]?
-    
-    // TODO: generalize hanging anything off this cache
     func layoutSubviews(create: () -> [LayoutSubview]) -> [LayoutSubview] {
         if let layoutSubviews = layoutSubviews {
             return layoutSubviews
@@ -36,6 +37,22 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         self.layoutSubviews = layoutSubviews
         return layoutSubviews
     }
+    
+    // TODO: Generalize using a EnvironmentKey system for better type safety?
+    func phaseCache<PhaseCache>(create: () -> PhaseCache) -> PhaseCache {
+        if let phaseCache = _phaseCache as? PhaseCache {
+            return phaseCache
+        }
+        
+        let phaseCache = create()
+        _phaseCache = phaseCache
+        return phaseCache
+    }
+
+    func `set`<PhaseCache>(phaseCache: PhaseCache) {
+        _phaseCache = phaseCache
+    }
+
 }
 
 extension SPCacheTree where Key == SizeConstraint {
