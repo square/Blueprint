@@ -55,7 +55,7 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
 
 }
 
-extension SPCacheTree where Key == SizeConstraint {
+extension SPCacheTree where Key == SizeConstraint, Value == CGSize {
     func get(key: Key, or create: (Key) -> Value) -> Value {
         valueCache.get(key: key, or: create)
     }
@@ -72,7 +72,7 @@ final class SPValueCache<Key: Hashable, Value> {
     }
 }
 
-extension SPValueCache where Key == SizeConstraint {
+extension SPValueCache where Key == SizeConstraint, Value == CGSize {
 
     func get(key: Key, or create: (Key) -> Value) -> Value {
         if let size = values[key] {
@@ -87,6 +87,40 @@ extension SPValueCache where Key == SizeConstraint {
         Logger.logMeasureEnd(object: self)
 
         values[key] = size
+        
+        
+        switch (key.width, key.height) {
+        case (.unconstrained, .unconstrained):
+            values[SizeConstraint(width: .unconstrained, height: .atMost(size.height))] = size
+            values[SizeConstraint(width: .atMost(size.width), height: .unconstrained)] = size
+            values[SizeConstraint(size)] = size
+
+        case (.unconstrained, .atMost(let maxHeight)):
+            if size.height < maxHeight {
+                values[SizeConstraint(width: .unconstrained, height: .atMost(size.height))] = size
+                values[SizeConstraint(size)] = size
+            }
+            values[SizeConstraint(width: .atMost(size.width), height: key.height)] = size
+
+        case (.atMost(let maxWidth), .unconstrained):
+            if size.width < maxWidth {
+                values[SizeConstraint(width: .atMost(size.width), height: .unconstrained)] = size
+                values[SizeConstraint(size)] = size
+            }
+            values[SizeConstraint(width: key.width, height: .atMost(size.height))] = size
+            
+        case (.atMost(let maxWidth), .atMost(let maxHeight)):
+            if size.width < maxWidth {
+                values[SizeConstraint(width: .atMost(size.width), height: key.height)] = size
+            }
+            if size.height < maxHeight {
+                values[SizeConstraint(width: key.width, height: .atMost(size.height))] = size
+            }
+            if size.height < maxWidth && size.width < maxWidth {
+                values[SizeConstraint(size)] = size
+            }
+        }
+
         return size
     }
 }
