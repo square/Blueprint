@@ -80,6 +80,40 @@ extension SPValueCache where Key == SizeConstraint, Value == CGSize {
             return size
         }
         
+        // TODO:
+        // This has a negative perf impact on deep stack tests. Need to determine what the impact
+        // is on a wider variety of tests, and if there is a way we can avoid this for cases
+        // where it doesn't help (e.g. not in a scroll view).
+        if
+            case .atMost(let maxHeight) = key.height,
+            let size = values[.init(width: key.width, height: .unconstrained)],
+            size.height <= maxHeight
+        {
+            values[key] = size
+            return size
+        }
+        
+        if
+            case .atMost(let maxWidth) = key.width,
+            let size = values[.init(width: .unconstrained, height: key.height)],
+            size.width <= maxWidth
+        {
+            // TODO: test with and without caching this
+            values[key] = size
+            return size
+        }
+
+        if
+            case .atMost(let maxWidth) = key.width,
+            case .atMost(let maxHeight) = key.height,
+            let size = values[.init(width: .unconstrained, height: .unconstrained)],
+            size.width <= maxWidth,
+            size.height <= maxHeight
+        {
+            values[key] = size
+            return size
+        }
+           
         Logger.logCacheMiss(object: self, description: path, constraint: key)
         
         Logger.logMeasureStart(object: self, description: path, constraint: key)
