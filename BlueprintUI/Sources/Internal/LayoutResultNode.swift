@@ -28,7 +28,13 @@ extension Element {
                     attributes: LayoutAttributes(frame: frame),
                     environment: environment,
                     // TODO: Hoist up?
-                    cache: .init(path: "\(type(of: self))")
+                    cache: SPCacheNode(
+                        path: "\(type(of: self))",
+                        options: SPCacheOptions(
+                            hintRangeBoundaries: true,
+                            searchUnconstrainedKeys: true
+                        )
+                    )
                 )
             )
         case .strictSinglePass:

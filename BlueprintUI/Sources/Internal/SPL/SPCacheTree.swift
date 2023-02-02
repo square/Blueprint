@@ -6,7 +6,7 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
     
     typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
     
-    var valueCache: SPValueCache<Key, Value>
+    private var valueCache: SPValueCache<Key, Value>
     private var subcaches: [SubcacheKey: Subcache] = [:]
     
     var path: String
@@ -15,16 +15,16 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
     
     private var _associatedCache: Any?
     
-    init(path: String) {
+    init(path: String, options: SPCacheOptions) {
         self.path = path
-        valueCache = .init(path: path)
+        valueCache = .init(path: path, options: options)
     }
     
     func subcache(key: SubcacheKey) -> Subcache {
         if let subcache = subcaches[key] {
             return subcache
         }
-        let subcache = Subcache(path: "\(path)/\(key)")
+        let subcache = Subcache(path: "\(path)/\(key)", options: valueCache.options)
         subcaches[key] = subcache
         return subcache
     }
@@ -63,13 +63,22 @@ extension SPCacheTree where Key == SizeConstraint, Value == CGSize {
 
 final class SPValueCache<Key: Hashable, Value> {
     
+    typealias Options = SPCacheOptions
+
     var values: [Key: Value] = [:]
     
     var path: String
+    var options: Options
     
-    init(path: String) {
+    init(path: String, options: Options) {
         self.path = path
+        self.options = options
     }
+}
+
+struct SPCacheOptions {
+    var hintRangeBoundaries: Bool
+    var searchUnconstrainedKeys: Bool
 }
 
 extension SPValueCache where Key == SizeConstraint, Value == CGSize {
@@ -84,36 +93,56 @@ extension SPValueCache where Key == SizeConstraint, Value == CGSize {
         // This has a negative perf impact on deep stack tests. Need to determine what the impact
         // is on a wider variety of tests, and if there is a way we can avoid this for cases
         // where it doesn't help (e.g. not in a scroll view).
-        if
-            case .atMost(let maxHeight) = key.height,
-            let size = values[.init(width: key.width, height: .unconstrained)],
-            size.height <= maxHeight
-        {
-            values[key] = size
-            return size
+        if options.searchUnconstrainedKeys {
+            if
+                case .atMost(let maxHeight) = key.height,
+                let size = values[.init(width: key.width, height: .unconstrained)],
+                size.height <= maxHeight
+            {
+                Logger.logCacheUnconstrainedSearchMatch(
+                    object: self,
+                    description: path,
+                    constraint: key,
+                    match: .init(width: key.width, height: .unconstrained)
+                )
+                values[key] = size
+                return size
+            }
+            
+            if
+                case .atMost(let maxWidth) = key.width,
+                let size = values[.init(width: .unconstrained, height: key.height)],
+                size.width <= maxWidth
+            {
+                Logger.logCacheUnconstrainedSearchMatch(
+                    object: self,
+                    description: path,
+                    constraint: key,
+                    match: .init(width: .unconstrained, height: key.height)
+                )
+                // TODO: test with and without caching this
+                values[key] = size
+                return size
+            }
+            
+            if
+                case .atMost(let maxWidth) = key.width,
+                case .atMost(let maxHeight) = key.height,
+                let size = values[.unconstrained],
+                size.width <= maxWidth,
+                size.height <= maxHeight
+            {
+                Logger.logCacheUnconstrainedSearchMatch(
+                    object: self,
+                    description: path,
+                    constraint: key,
+                    match: .unconstrained
+                )
+                values[key] = size
+                return size
+            }
         }
         
-        if
-            case .atMost(let maxWidth) = key.width,
-            let size = values[.init(width: .unconstrained, height: key.height)],
-            size.width <= maxWidth
-        {
-            // TODO: test with and without caching this
-            values[key] = size
-            return size
-        }
-
-        if
-            case .atMost(let maxWidth) = key.width,
-            case .atMost(let maxHeight) = key.height,
-            let size = values[.init(width: .unconstrained, height: .unconstrained)],
-            size.width <= maxWidth,
-            size.height <= maxHeight
-        {
-            values[key] = size
-            return size
-        }
-           
         Logger.logCacheMiss(object: self, description: path, constraint: key)
         
         Logger.logMeasureStart(object: self, description: path, constraint: key)
@@ -122,39 +151,40 @@ extension SPValueCache where Key == SizeConstraint, Value == CGSize {
 
         values[key] = size
         
-        
-        switch (key.width, key.height) {
-        case (.unconstrained, .unconstrained):
-            values[SizeConstraint(width: .unconstrained, height: .atMost(size.height))] = size
-            values[SizeConstraint(width: .atMost(size.width), height: .unconstrained)] = size
-            values[SizeConstraint(size)] = size
-
-        case (.unconstrained, .atMost(let maxHeight)):
-            if size.height < maxHeight {
+        if options.hintRangeBoundaries {
+            switch (key.width, key.height) {
+            case (.unconstrained, .unconstrained):
                 values[SizeConstraint(width: .unconstrained, height: .atMost(size.height))] = size
-                values[SizeConstraint(size)] = size
-            }
-            values[SizeConstraint(width: .atMost(size.width), height: key.height)] = size
-
-        case (.atMost(let maxWidth), .unconstrained):
-            if size.width < maxWidth {
                 values[SizeConstraint(width: .atMost(size.width), height: .unconstrained)] = size
                 values[SizeConstraint(size)] = size
-            }
-            values[SizeConstraint(width: key.width, height: .atMost(size.height))] = size
-            
-        case (.atMost(let maxWidth), .atMost(let maxHeight)):
-            if size.width < maxWidth {
+                
+            case (.unconstrained, .atMost(let maxHeight)):
+                if size.height < maxHeight {
+                    values[SizeConstraint(width: .unconstrained, height: .atMost(size.height))] = size
+                    values[SizeConstraint(size)] = size
+                }
                 values[SizeConstraint(width: .atMost(size.width), height: key.height)] = size
-            }
-            if size.height < maxHeight {
+                
+            case (.atMost(let maxWidth), .unconstrained):
+                if size.width < maxWidth {
+                    values[SizeConstraint(width: .atMost(size.width), height: .unconstrained)] = size
+                    values[SizeConstraint(size)] = size
+                }
                 values[SizeConstraint(width: key.width, height: .atMost(size.height))] = size
-            }
-            if size.height < maxWidth && size.width < maxWidth {
-                values[SizeConstraint(size)] = size
+                
+            case (.atMost(let maxWidth), .atMost(let maxHeight)):
+                if size.width < maxWidth {
+                    values[SizeConstraint(width: .atMost(size.width), height: key.height)] = size
+                }
+                if size.height < maxHeight {
+                    values[SizeConstraint(width: key.width, height: .atMost(size.height))] = size
+                }
+                if size.height < maxWidth && size.width < maxWidth {
+                    values[SizeConstraint(size)] = size
+                }
             }
         }
-
+        
         return size
     }
 }
