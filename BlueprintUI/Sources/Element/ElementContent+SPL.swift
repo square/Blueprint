@@ -39,11 +39,11 @@ extension ElementContent.Builder {
         
         let subviews = subviews(from: context.cache, environment: context.environment)
         
-        var phaseCache = context.cache.phaseCache(create: { layout.makeCache(subviews: subviews) })
+        var associatedCache = context.cache.associatedCache(create: { layout.makeCache(subviews: subviews) })
         
-        let size = layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &phaseCache)
+        let size = layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &associatedCache)
         
-        context.cache.set(phaseCache: phaseCache)
+        context.cache.set(associatedCache: associatedCache)
         
         return size
     }
@@ -56,16 +56,16 @@ extension ElementContent.Builder {
         let attributes = context.attributes
         let frame = context.attributes.frame
 
-        var phaseCache = context.cache.phaseCache(create: { layout.makeCache(subviews: subviews) })
+        var associatedCache = context.cache.associatedCache(create: { layout.makeCache(subviews: subviews) })
 
         layout.placeSubviews(
             in: frame,
             proposal: proposal,
             subviews: subviews,
-            cache: &phaseCache
+            cache: &associatedCache
         )
 
-        context.cache.set(phaseCache: phaseCache)
+        context.cache.set(associatedCache: associatedCache)
 
         let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
             let subview = subviews[index]

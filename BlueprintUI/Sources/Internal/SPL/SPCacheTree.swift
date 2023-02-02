@@ -13,7 +13,7 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
     
     private var layoutSubviews: [LayoutSubview]?
     
-    private var _phaseCache: Any?
+    private var _associatedCache: Any?
     
     init(path: String) {
         self.path = path
@@ -39,18 +39,18 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
     }
     
     // TODO: Generalize using a EnvironmentKey system for better type safety?
-    func phaseCache<PhaseCache>(create: () -> PhaseCache) -> PhaseCache {
-        if let phaseCache = _phaseCache as? PhaseCache {
-            return phaseCache
+    func associatedCache<AssociatedCache>(create: () -> AssociatedCache) -> AssociatedCache {
+        if let associatedCache = _associatedCache as? AssociatedCache {
+            return associatedCache
         }
         
-        let phaseCache = create()
-        _phaseCache = phaseCache
-        return phaseCache
+        let associatedCache = create()
+        _associatedCache = associatedCache
+        return associatedCache
     }
 
-    func `set`<PhaseCache>(phaseCache: PhaseCache) {
-        _phaseCache = phaseCache
+    func `set`<AssociatedCache>(associatedCache: AssociatedCache) {
+        _associatedCache = associatedCache
     }
 
 }
