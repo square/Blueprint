@@ -3,19 +3,23 @@ import Foundation
 
 
 final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKey: Hashable {
-
+    
     typealias Subcache = SPCacheTree<Key, Value, SubcacheKey>
-
+    
     var valueCache: SPValueCache<Key, Value>
     private var subcaches: [SubcacheKey: Subcache] = [:]
-
+    
     var path: String
-
+    
+    private var layoutSubviews: [LayoutSubview]?
+    
+    private var _associatedCache: Any?
+    
     init(path: String) {
         self.path = path
         valueCache = .init(path: path)
     }
-
+    
     func subcache(key: SubcacheKey) -> Subcache {
         if let subcache = subcaches[key] {
             return subcache
@@ -25,9 +29,6 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         return subcache
     }
     
-    var layoutSubviews: [LayoutSubview]?
-    
-    // TODO: generalize hanging anything off this cache
     func layoutSubviews(create: () -> [LayoutSubview]) -> [LayoutSubview] {
         if let layoutSubviews = layoutSubviews {
             return layoutSubviews
@@ -36,6 +37,22 @@ final class SPCacheTree<Key, Value, SubcacheKey> where Key: Hashable, SubcacheKe
         self.layoutSubviews = layoutSubviews
         return layoutSubviews
     }
+    
+    // TODO: Generalize using a EnvironmentKey system for better type safety?
+    func associatedCache<AssociatedCache>(create: () -> AssociatedCache) -> AssociatedCache {
+        if let associatedCache = _associatedCache as? AssociatedCache {
+            return associatedCache
+        }
+        
+        let associatedCache = create()
+        _associatedCache = associatedCache
+        return associatedCache
+    }
+
+    func `set`<AssociatedCache>(associatedCache: AssociatedCache) {
+        _associatedCache = associatedCache
+    }
+
 }
 
 extension SPCacheTree where Key == SizeConstraint {
