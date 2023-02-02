@@ -11,13 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.  
-
 ### Removed
 
 ### Changed
-
-- Updated minimum deployment target from iOS 12 to iOS 14.
 
 ### Deprecated
 
@@ -28,6 +24,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 # Past Releases
+
+## [0.48.1]
+
+### Fixed
+
+- Fix Catalyst version specifier in SPM package.
+
+## [0.48.0]
+
+### Added
+
+- Added `AccessibilityElement.CustomAction` to allow custom actions for use by assistive technologies.
+- Added `accessibilityCustomActions` property to `Label` and `AttributedLabel`.
+- `UIViewElementContext` now passes through an `environment` property, enabling environment-dependent measurements and layouts.
+
+### Changed
+
+- Updated minimum deployment target from iOS 12 to iOS 14.
+- `URLHandlerEnvironmentKey.defaultValue` should now be a no-op in extensions.
+- Marks pod as `APPLICATION_EXTENSION_API_ONLY`
 
 ## [0.47.0]
 
@@ -293,9 +309,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   }
   ```
 - Row, Column, EqualStack, and GridRow can now be initialized declaratively using result builders. ([#220])
-  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure. 
-  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters. 
-  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`. 
+  - To declare one of these containers, simply include the elements inside the `ElementBuilder` trailing closure.
+  - To customize the container, pass values through the containers `init` or leave out to use the provided defaults parameters.
+  - To customize one of the child element's container specific properties (key, priority, etc), tack on a corresponding modifier such as `stackLayoutChild()` and `gridRowChild()`.
   ```swift
   let row = Row(alignment: .fill) {
     TestElement()
@@ -911,7 +927,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.47.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.48.1...HEAD
+[0.48.1]: https://github.com/square/Blueprint/compare/0.48.0...0.48.1
+[0.48.0]: https://github.com/square/Blueprint/compare/0.47.0...0.48.0
 [0.47.0]: https://github.com/square/Blueprint/compare/0.46.0...0.47.0
 [0.46.0]: https://github.com/square/Blueprint/compare/0.45.1...0.46.0
 [0.45.1]: https://github.com/square/Blueprint/compare/0.45.0...0.45.1
