@@ -53,7 +53,13 @@ public struct ElementContent {
                 proposal: constraint,
                 context: .init(
                     // TODO: Hoist upward?
-                    cache: .init(path: "m"),
+                    cache: SPCacheNode(
+                        path: "m",
+                        options: SPCacheOptions(
+                            hintRangeBoundaries: true,
+                            searchUnconstrainedKeys: false
+                        )
+                    ),
                     environment: environment
                 )
             )

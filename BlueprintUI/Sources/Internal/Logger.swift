@@ -87,6 +87,30 @@ extension Logger {
         )
     }
 
+    static func logCacheUnconstrainedSearchMatch(
+        object: AnyObject,
+        description: @autoclosure () -> String,
+        constraint: SizeConstraint,
+        match: @autoclosure () -> SizeConstraint
+    ) {
+        guard shouldRecordMeasurePass() else { return }
+
+        let match = match()
+
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Cache unconstrained search match",
+            signpostID: OSSignpostID(log: .active, object: object),
+            "%{public}s in %{public}s×%{public}s matched %{public}s×%{public}s",
+            description(),
+            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity),
+            String(format: "%.1f", match.width.constrainedValue ?? .infinity),
+            String(format: "%.1f", match.height.constrainedValue ?? .infinity)
+        )
+    }
+
     static func logCacheMiss(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
         guard shouldRecordMeasurePass() else { return }
 

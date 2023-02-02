@@ -66,15 +66,13 @@ public struct LayoutSubview {
     @Storage
     private(set) var placement: Placement?
 
-    private var sizeCache: SizeCache { measureContext.cache.valueCache }
-
     var identifier: ElementIdentifier
     var element: Element
     private var content: ElementContent
 
     var sizable: Sizable { content }
     var environment: Environment { measureContext.environment }
-    var cache: SPCacheNode { measureContext.cache }
+    private var cache: SPCacheNode { measureContext.cache }
 
     var measureContext: MeasureContext
 
@@ -131,7 +129,7 @@ public struct LayoutSubview {
     }
 
     public func sizeThatFits(_ proposal: SizeConstraint) -> CGSize {
-        sizeCache.get(key: proposal) { proposal in
+        cache.get(key: proposal) { proposal in
             sizable.sizeThatFits(proposal: proposal, context: .init(
                 cache: cache,
                 environment: environment
