@@ -630,7 +630,7 @@ private struct MeasurableStorage: ContentStorage {
 extension ElementContent.Builder {
 
     enum NodesEntry: StrictCacheTreeEntry {
-        typealias Value = ([StrictLayoutNode], [(traits: LayoutType.Traits, layoutable: StrictLayoutable)])
+        typealias Value = [StrictLayoutNode]
     }
 
     func strictLayout(
@@ -638,13 +638,11 @@ extension ElementContent.Builder {
         environment: Environment
     ) -> StrictSubtreeResult {
 
-        let (nodes, layoutChildren) = context.cache.get(entryType: NodesEntry.self) {
+        func makeNodes() -> [StrictLayoutNode] {
             var identifierFactory = ElementIdentifier.Factory(elementCount: childCount)
             var nodes: [StrictLayoutNode] = []
             nodes.reserveCapacity(children.count)
 
-            var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
-            layoutChildren.reserveCapacity(children.count)
 
             for index in 0..<children.count {
                 let child = children[index]
@@ -656,16 +654,45 @@ extension ElementContent.Builder {
                     id: id,
                     element: childElement,
                     content: childElement.content,
-                    mode: context.mode,
                     environment: environment,
                     cache: context.cache.subcache(key: index)
                 )
 
                 nodes.append(node)
-                layoutChildren.append((traits: child.traits, layoutable: node))
             }
 
-            return (nodes, layoutChildren)
+            return nodes
+        }
+        
+        let layoutNodes = context.cache.get(entryType: NodesEntry.self, or: makeNodes)
+        
+        func makeProposalCaptureNodes() -> [StrictProposalCaptureNode] {
+            var nodes: [StrictProposalCaptureNode] = []
+            nodes.reserveCapacity(children.count)
+
+            for index in 0..<children.count {
+                let layoutNode = layoutNodes[index]
+                let node = StrictProposalCaptureNode(
+                    mode: context.mode,
+                    layoutNode: layoutNode
+                )
+                nodes.append(node)
+            }
+            
+            return nodes
+        }
+        
+        let nodes = makeProposalCaptureNodes()
+        
+        var layoutChildren: [(traits: LayoutType.Traits, layoutable: StrictLayoutable)] = []
+        layoutChildren.reserveCapacity(children.count)
+
+        for index in (0..<childCount) {
+            let node = nodes[index]
+
+            let traits = children[index].traits
+            let layoutable = node
+            layoutChildren.append((traits, layoutable))
         }
 
         let intermediateResult = layout.layout(
@@ -690,15 +717,15 @@ extension EnvironmentAdaptingStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let cache = context.cache.subcache(key: 0)
 
-        let node = StrictLayoutNode(
+        let layoutNode = StrictLayoutNode(
             path: context.path,
             id: identifier,
             element: child,
             content: child.content,
-            mode: context.mode,
             environment: environment,
             cache: cache
         )
+        let node = StrictProposalCaptureNode(mode: context.mode, layoutNode: layoutNode)
 
         return StrictSubtreeResult(
             intermediate: NeutralLayout().layout(in: context, child: node),
@@ -720,15 +747,15 @@ extension LazyStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let cache = context.cache.subcache(key: 0)
 
-        let node = StrictLayoutNode(
+        let layoutNode = StrictLayoutNode(
             path: context.path,
             id: identifier,
             element: child,
             content: child.content,
-            mode: context.mode,
             environment: environment,
             cache: cache
         )
+        let node = StrictProposalCaptureNode(mode: context.mode, layoutNode: layoutNode)
 
         return StrictSubtreeResult(
             intermediate: NeutralLayout().layout(in: context, child: node),

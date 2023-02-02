@@ -48,26 +48,29 @@ typealias LayoutResultChildren = [(identifier: ElementIdentifier, node: LayoutRe
 
 struct StrictSubtreeResult {
     var intermediate: StrictLayoutAttributes
-    var children: [StrictLayoutNode]
+    var children: [StrictProposalCaptureNode]
 
     func resolve() -> LayoutResultChildren {
         zip(intermediate.childPositions, children).map { position, node in
-            let subtreeResult = node.ensuredResult
+
+            let proposal = node.lastProposal!
+
+            let layoutNode = node.layoutNode
+            let subtreeResult = layoutNode.results[proposal]!
             let childSize = subtreeResult.intermediate.size
             let childFrame = CGRect(
                 origin: position,
                 size: childSize
             )
             let nodeAttributes = LayoutAttributes(frame: childFrame)
-
             let result = LayoutResultNode(
-                element: node.element,
+                element: layoutNode.element,
                 layoutAttributes: nodeAttributes,
-                environment: node.environment,
+                environment: layoutNode.environment,
                 children: subtreeResult.resolve()
             )
 
-            return (node.id, result)
+            return (layoutNode.id, result)
         }
     }
 
@@ -89,16 +92,22 @@ struct StrictSubtreeResult {
         }
 
         for (child, childPosition) in zip(children, intermediate.childPositions) {
-            child.ensuredResult.dump(
+            let proposal = child.lastProposal!
+            let result = child.layoutNode.results[proposal]!
+            result.dump(
                 depth: depth + 1,
-                id: "\(child.id)",
+                id: "\(child.layoutNode.id)",
                 position: childPosition,
-                context: child.context,
-                correction: child.correction
+                context: StrictLayoutContext(
+                    path: context.path.appending(identifier:  child.layoutNode.id),
+                    cache: child.layoutNode.cache,
+                    proposedSize: proposal.proposedSize,
+                    mode: proposal.proposedMode
+                ),
+                correction: child.layoutNode.correction
             )
         }
     }
-
 }
 
 public enum StrictPressureMode: Equatable, CustomStringConvertible {
@@ -114,7 +123,7 @@ public enum StrictPressureMode: Equatable, CustomStringConvertible {
 }
 
 /// SPL version of `LayoutAttributes`.
-public struct StrictLayoutAttributes {
+public struct StrictLayoutAttributes: Equatable {
     public var size: CGSize
     public var childPositions: [CGPoint]
 
@@ -126,6 +135,12 @@ public struct StrictLayoutAttributes {
     public init(size: CGSize, childPositions: [CGPoint] = []) {
         self.size = size
         self.childPositions = childPositions
+    }
+}
+
+extension CATransform3D: Equatable {
+    public static func == (lhs: CATransform3D, rhs: CATransform3D) -> Bool {
+        CATransform3DEqualToTransform(lhs, rhs)
     }
 }
 
@@ -176,13 +191,44 @@ public struct StrictNeutralLayout: SingleChildLayout {
 }
 
 
-class StrictLayoutNode: StrictLayoutable {
+class StrictProposalCaptureNode: StrictLayoutable {
+    let contextMode: AxisVarying<StrictPressureMode>
+    let layoutNode: StrictLayoutNode
+    
+    var lastProposal: StrictLayoutResultKey?
+    
+    init(
+        mode: AxisVarying<StrictPressureMode>,
+        layoutNode: StrictLayoutNode
+    ) {
+        self.contextMode = mode
+        self.layoutNode = layoutNode
+    }
+    
+    func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
+        
+        let layoutMode = AxisVarying(
+            horizontal: options.mode.horizontal ?? contextMode.horizontal,
+            vertical: options.mode.vertical ?? contextMode.vertical
+        )
+
+        let proposal = StrictLayoutResultKey(
+            proposedSize: proposedSize,
+            proposedMode: layoutMode
+        )
+
+        lastProposal = proposal
+
+        return layoutNode.layout(in: proposedSize, mode: layoutMode)
+    }
+}
+
+class StrictLayoutNode {
     init(
         path: ElementPath,
         id: ElementIdentifier,
         element: Element,
         content: ElementContent,
-        mode: AxisVarying<StrictPressureMode>,
         environment: Environment,
         cache: StrictCacheNode
     ) {
@@ -190,7 +236,6 @@ class StrictLayoutNode: StrictLayoutable {
         self.id = id
         self.element = element
         self.content = content
-        self.mode = mode
         self.environment = environment
         self.cache = cache
 
@@ -201,54 +246,28 @@ class StrictLayoutNode: StrictLayoutable {
     var id: ElementIdentifier
     var element: Element
     var content: ElementContent
-    var mode: AxisVarying<StrictPressureMode>
     var environment: Environment
     var cache: StrictCacheNode
 
     var fullPath: ElementPath
 
-    // These values are initially unset, and captured when the child is laid out:
-    var layoutResult: StrictSubtreeResult?
-    var proposedSize: SizeConstraint?
-    var proposedMode: AxisVarying<StrictPressureMode>?
     var correction: CGSize = .zero
 
     var results: [LayoutResultKey: StrictSubtreeResult] = [:]
 
     private var layoutCount = 0
-
-    var ensuredResult: StrictSubtreeResult {
-        guard let layoutResult = layoutResult else {
-            fatalError("child was not laid out")
-        }
-        return layoutResult
+    
+    func result(in proposedSize: SizeConstraint, mode: AxisVarying<StrictPressureMode>) -> StrictSubtreeResult {
+        results[LayoutResultKey(proposedSize: proposedSize, proposedMode: mode)]!
     }
 
-    // saved proposed size, for debugging
-    var ensuredProposedSize: SizeConstraint {
-        guard let proposedSize = proposedSize else {
-            fatalError("child was not laid out")
-        }
-        return proposedSize
-    }
+    func layout(in proposedSize: SizeConstraint, mode: AxisVarying<StrictPressureMode>) -> CGSize {
 
-    // effective context, for debugging
-    var context: StrictLayoutContext {
-        StrictLayoutContext(path: path, cache: cache, proposedSize: ensuredProposedSize, mode: proposedMode!)
-    }
-
-    func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
-
-        let layoutMode = AxisVarying(
-            horizontal: options.mode.horizontal ?? mode.horizontal,
-            vertical: options.mode.vertical ?? mode.vertical
-        )
+        let layoutMode = mode
 
         let resultKey = LayoutResultKey(proposedSize: proposedSize, proposedMode: layoutMode)
+
         if let layoutResult = results[resultKey] {
-            self.proposedSize = proposedSize
-            proposedMode = layoutMode
-            self.layoutResult = layoutResult
 
             Logger.logCacheHit(object: self, description: "\(fullPath)", constraint: proposedSize)
 
@@ -261,16 +280,16 @@ class StrictLayoutNode: StrictLayoutable {
         // multiple stacks will get hit (2 * stack depth) times. We can disable it entirely, or
         // try to track this some other way.
         layoutCount += 1
-        if layoutCount > options.maxAllowedLayoutCount {
+//        if layoutCount > options.maxAllowedLayoutCount {
 //            print("warning: \(path) layout called \(layoutCount) times")
 //            fatalError("\(type(of: element)) layout called \(layoutCount) times")
-        }
-
-//        var environment = environment
-//        if let debugElementPath = environment.debugElementPath, path.matches(expression: debugElementPath) {
-//            print("Debugging triggered for path \(path)")
-//            environment.debugElementPath = nil
 //        }
+
+        var environment = environment
+        if let debugElementPath = environment.debugElementPath, fullPath.matches(expression: debugElementPath) {
+            print("Debugging triggered for path \(fullPath)")
+            environment.debugElementPath = nil
+        }
 
         Logger.logMeasureStart(object: self, description: "\(fullPath)", constraint: proposedSize)
 
@@ -304,10 +323,6 @@ class StrictLayoutNode: StrictLayoutable {
 
         Logger.logMeasureEnd(object: self)
 
-        self.proposedSize = proposedSize
-        proposedMode = layoutMode
-        self.layoutResult = layoutResult
-
         assert(
             layoutResult.intermediate.size.isFinite,
             "\(type(of: element)) layout size must be finite"
@@ -317,21 +332,35 @@ class StrictLayoutNode: StrictLayoutable {
             layoutResult.intermediate.childPositions.allSatisfy { $0.isFinite },
             "\(type(of: element)) child positions must be finite"
         )
+        
+        
 
         results[resultKey] = layoutResult
 
         return layoutResult.intermediate.size
     }
 
+    typealias LayoutResultKey = StrictLayoutResultKey
 
-    struct LayoutResultKey: Hashable {
-        var proposedSize: SizeConstraint
-        var proposedMode: AxisVarying<StrictPressureMode>
+    func dump(depth: Int = 0) {
+        let indent = String(repeating: "  ", count: depth)
+        
+        print("\(indent)- \(id)")
+//        print("\(indent)    \(context)")
+
+        for (resultKey, resultValue) in results {
+            print("\(indent)    * (\(resultKey.proposedMode), \(resultKey.proposedSize)): \(resultValue.intermediate.size)")
+            for child in resultValue.children {
+                child.layoutNode.dump(depth: depth + 1)
+            }
+        }
     }
-
 }
 
-
+struct StrictLayoutResultKey: Hashable {
+    var proposedSize: SizeConstraint
+    var proposedMode: AxisVarying<StrictPressureMode>
+}
 
 enum Unit: Hashable {
     case value
@@ -425,6 +454,12 @@ public struct AxisVarying<T> {
 
 extension AxisVarying: Hashable, Equatable where T: Hashable {}
 
+extension AxisVarying: CustomStringConvertible {
+    public var description: String {
+        "\(horizontal)-\(vertical)"
+    }
+}
+
 extension CGFloat {
     var finiteValue: CGFloat? {
         isFinite ? self : nil
@@ -449,5 +484,11 @@ extension Environment {
     public var debugElementPath: String? {
         get { self[DebugElementPathKey.self] }
         set { self[DebugElementPathKey.self] = newValue }
+    }
+}
+
+extension Element {
+    public func debugPath(_ path: String) -> Element {
+        adaptedEnvironment(keyPath: \.debugElementPath, value: path)
     }
 }

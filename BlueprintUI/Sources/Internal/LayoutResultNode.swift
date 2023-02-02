@@ -67,8 +67,7 @@ extension Element {
 
 //        subtree.dump(id: "\(type(of: self))", position: .zero, context: context, correction: .zero)
 
-        let children = subtree
-            .resolve()
+        let children = subtree.resolve()
 
         let root = LayoutResultNode(
             element: self,

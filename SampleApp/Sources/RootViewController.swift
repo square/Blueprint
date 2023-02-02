@@ -49,44 +49,173 @@ final class RootViewController: UIViewController {
         ]
     }
 
-    override func loadView() {
-        let leftBlueprintView = BlueprintView(element: contents)
+    let leftBlueprintView = BlueprintView()
+    let rightBlueprintView = BlueprintView()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
         leftBlueprintView.backgroundColor = .clear
         leftBlueprintView.layer.borderColor = UIColor.black.cgColor
         leftBlueprintView.layer.borderWidth = 1
 
-        leftBlueprintView.layoutMode = .singlePass
+        leftBlueprintView.layoutMode = .strictSinglePass
+        leftBlueprintView.element = contents
 
-        let rightBlueprintView = BlueprintView(element: contents)
         rightBlueprintView.backgroundColor = .clear
         rightBlueprintView.layer.borderColor = UIColor.black.cgColor
         rightBlueprintView.layer.borderWidth = 1
 
         rightBlueprintView.layoutMode = .standard
+        rightBlueprintView.element = contents
 
-        let stackView = UIStackView(arrangedSubviews: [
-            leftBlueprintView,
-            rightBlueprintView,
-        ])
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.alignment = .fill
-        view = stackView
-
+        view.addSubview(leftBlueprintView)
+        view.addSubview(rightBlueprintView)
         view.backgroundColor = .init(white: 0.9, alpha: 1.0)
+
+        let tapRecognizer = UITapGestureRecognizer()
+        tapRecognizer.addTarget(self, action: #selector(viewTapped))
+        view.addGestureRecognizer(tapRecognizer)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        var frame = view.bounds
+        frame.size.width = frame.width / 2
+        leftBlueprintView.frame = frame
+
+        frame.origin.x = frame.width
+        rightBlueprintView.frame = frame
+    }
+
+    @objc
+    func viewTapped() {
+        // trigger a layout
+        leftBlueprintView.element = leftBlueprintView.element
+        rightBlueprintView.element = rightBlueprintView.element
     }
 
     var contents: Element {
-        Column(
-            alignment: .center,
-            underflow: .growUniformly
-        ) {
-            Label(text: "Test")
-
-            Label(text: "Test2")
+        demoScreenWrapper
+    }
+    
+    var test: Element {
+        Column(alignment: .fill) {
+            Spacer(10).box(background: .blue)
+            Spacer(100).box(background: .red)
         }
-        .opacity(0.5)
-        .inset(uniform: 10)
+        .constrainedTo(width: .atLeast(100))
+        .aligned(vertically: .center, horizontally: .leading)
+        .debugPath("Column")
+    }
+    
+    var test2: Element {
+        Column(alignment: .leading, underflow: .justifyToCenter) {
+
+            Column(
+                alignment: .fill,
+                underflow: .justifyToStart,
+                minimumSpacing: 8
+            ) {
+                EqualStack(direction: .horizontal) {
+//                    for _ in 0..<1 {
+                        Spacer(20)
+                            .box(background: .red)
+//                    }
+                }
+                .constrainedTo(height: .atLeast(40))
+                .box(borders: .solid(color: .brown, width: 2))
+//                .stackLayoutChild(priority: .flexible)
+            }
+//            .debugPath("Column")
+            .box(borders: .solid(color: .yellow, width: 2))
+            .constrainedTo(width: .atLeast(280))
+            .box(borders: .solid(color: .blue, width: 2))
+        }
+
+    }
+    
+    var demoScreenWrapper: Element {
+        Column(alignment: .leading, underflow: .justifyToCenter) {
+            Label(text: "Date Picker") { label in
+                label.font = .preferredFont(forTextStyle: .caption1)
+            }
+
+            datePicker
+                .box(borders: .solid(color: .blue, width: 1))
+        }
+    }
+
+    var datePicker: Element {
+        var daySegment: Element {
+            Spacer(5)
+                .box(background: .red, borders: .solid(color: .black, width: 1))
+        }
+
+        var weekdaySymbols: Element {
+            EqualStack(direction: .horizontal) {
+                for weekday in ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] {
+                    Label(text: weekday) { label in
+                        label.font = .preferredFont(forTextStyle: .body)
+                    }
+                    .box(borders: .solid(color: .green, width: 1))
+                }
+            }
+            .constrainedTo(height: .atLeast(40))
+        }
+
+        var header: Element {
+            Row(
+                alignment: .center,
+                underflow: .growProportionally,
+                minimumSpacing: 8
+            ) {
+                Label(text: "Jan 2023") { label in
+                    label.font = .preferredFont(forTextStyle: .title2)
+                }
+
+                Spacer(40)
+                    .box(background: .lightGray, corners: .rounded(radius: 6))
+                    .stackLayoutChild(priority: .fixed)
+
+                Spacer(40)
+                    .box(background: .lightGray, corners: .rounded(radius: 6))
+                    .stackLayoutChild(priority: .fixed)
+            }
+        }
+
+
+        var monthGrid: Element {
+            Column(alignment: .fill, minimumSpacing: 8) {
+
+                weekdaySymbols
+                    .box(borders: .solid(color: .brown, width: 1))
+
+                for _ in 0..<4 {
+                    EqualStack(direction: .horizontal) {
+                        for _ in 0..<7 {
+                            daySegment
+                        }
+                    }
+                    .constrainedTo(height: .atLeast(40))
+                    .box(borders: .solid(color: .brown, width: 1))
+                }
+
+            }
+        }
+
+        return Column(
+            alignment: .fill,
+            underflow: .justifyToStart,
+            minimumSpacing: 8
+        ) {
+            header.stackLayoutChild(priority: .fixed)
+            monthGrid.stackLayoutChild(priority: .flexible)
+        }
+//        .debugPath("Column")
+        .box(borders: .solid(color: .yellow, width: 1))
+        .constrainedTo(width: .atLeast(280))
     }
 
     var contents2: Element {
