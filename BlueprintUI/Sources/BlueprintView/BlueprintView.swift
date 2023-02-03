@@ -35,6 +35,8 @@ public final class BlueprintView: UIView {
     private var isInsideUpdate: Bool = false
 
     private let rootController: NativeViewController
+    
+    private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
@@ -360,21 +362,17 @@ public final class BlueprintView: UIView {
         let renderContext = RenderContext(layoutMode: layoutMode)
 
         // Perform layout
-        let viewNodes: [(path: ElementPath, node: NativeViewNode)] = renderContext.perform {
-            guard let element = element else { return [] }
-
-            let result = element.layout(
+        let layoutResult = renderContext.perform {
+            element?.layout(
                 frame: rootFrame,
                 environment: environment,
                 layoutMode: layoutMode
             )
-
-//            result.dump()
-            // TODO: save the LayoutResultNode here for debugging
-
-            // Flatten into tree of view descriptions
-            return result.resolve()
         }
+        self.layoutResult = layoutResult
+        
+        // Flatten into tree of view descriptions
+        let viewNodes = layoutResult?.resolve() ?? []
 
         let measurementEndDate = Date()
         Logger.logLayoutEnd(view: self)
@@ -438,6 +436,18 @@ public final class BlueprintView: UIView {
     public func forceSynchronousLayout() {
         setNeedsViewHierarchyUpdate()
         updateViewHierarchyIfNeeded()
+    }
+    
+    @_spi(Debugging)
+    public func dumpLayoutResult(
+        visit: ((_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void) = { depth, identifier, frame in
+            let origin = "x \(frame.origin.x), y \(frame.origin.y)"
+            let size = "\(frame.size.width) × \(frame.size.height)"
+            let indent = String(repeating: "  ", count: depth)
+            print("\(indent)\(identifier) \(origin), \(size)")
+        }
+    ) {
+        self.layoutResult?.dump(visit: visit)
     }
 
     private func makeEnvironment() -> Environment {
