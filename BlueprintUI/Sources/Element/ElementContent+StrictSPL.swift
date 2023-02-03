@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 protocol StrictContentStorage {
@@ -99,7 +100,7 @@ struct StrictSubtreeResult {
                 id: "\(child.layoutNode.id)",
                 position: childPosition,
                 context: StrictLayoutContext(
-                    path: context.path.appending(identifier:  child.layoutNode.id),
+                    path: context.path.appending(identifier: child.layoutNode.id),
                     cache: child.layoutNode.cache,
                     proposedSize: proposal.proposedSize,
                     mode: proposal.proposedMode
@@ -194,19 +195,19 @@ public struct StrictNeutralLayout: SingleChildLayout {
 class StrictProposalCaptureNode: StrictLayoutable {
     let contextMode: AxisVarying<StrictPressureMode>
     let layoutNode: StrictLayoutNode
-    
+
     var lastProposal: StrictLayoutResultKey?
-    
+
     init(
         mode: AxisVarying<StrictPressureMode>,
         layoutNode: StrictLayoutNode
     ) {
-        self.contextMode = mode
+        contextMode = mode
         self.layoutNode = layoutNode
     }
-    
+
     func layout(in proposedSize: SizeConstraint, options: StrictLayoutOptions) -> CGSize {
-        
+
         let layoutMode = AxisVarying(
             horizontal: options.mode.horizontal ?? contextMode.horizontal,
             vertical: options.mode.vertical ?? contextMode.vertical
@@ -256,7 +257,7 @@ class StrictLayoutNode {
     var results: [LayoutResultKey: StrictSubtreeResult] = [:]
 
     private var layoutCount = 0
-    
+
     func result(in proposedSize: SizeConstraint, mode: AxisVarying<StrictPressureMode>) -> StrictSubtreeResult {
         results[LayoutResultKey(proposedSize: proposedSize, proposedMode: mode)]!
     }
@@ -332,8 +333,8 @@ class StrictLayoutNode {
             layoutResult.intermediate.childPositions.allSatisfy { $0.isFinite },
             "\(type(of: element)) child positions must be finite"
         )
-        
-        
+
+
 
         results[resultKey] = layoutResult
 
@@ -344,7 +345,7 @@ class StrictLayoutNode {
 
     func dump(depth: Int = 0) {
         let indent = String(repeating: "  ", count: depth)
-        
+
         print("\(indent)- \(id)")
 //        print("\(indent)    \(context)")
 
