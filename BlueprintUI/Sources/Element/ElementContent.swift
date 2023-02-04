@@ -48,17 +48,14 @@ public struct ElementContent {
         switch layoutMode {
         case .standard:
             return storage.measure(in: constraint, environment: environment, cache: cache)
-        case .singlePass:
+        case .singlePass(let options):
             return storage.sizeThatFits(
                 proposal: constraint,
                 context: .init(
                     // TODO: Hoist upward?
                     cache: SPCacheNode(
                         path: "m",
-                        options: SPCacheOptions(
-                            hintRangeBoundaries: true,
-                            searchUnconstrainedKeys: false
-                        )
+                        options: options
                     ),
                     environment: environment
                 )

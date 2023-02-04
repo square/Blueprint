@@ -4,6 +4,6 @@ public enum LayoutMode: Equatable {
     public static let `default`: Self = .strictSinglePass
 
     case standard
-    case singlePass
+    case singlePass(options: SPCacheOptions = .default)
     case strictSinglePass
 }
