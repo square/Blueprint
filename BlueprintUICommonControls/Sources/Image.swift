@@ -122,17 +122,28 @@ extension Image {
 
             let mode: Mode
 
-            switch contentMode {
-            case .center, .stretch:
+            switch (contentMode, constraint.width, constraint.height) {
+            case (.center, _, _),
+                 (.stretch, _, _):
                 mode = .useImageSize
-            case .aspectFit, .aspectFill:
-                if case .atMost(let width) = constraint.width, case .atMost(let height) = constraint.height {
-                    if CGSize(width: width, height: height).aspectRatio > imageSize.aspectRatio {
-                        mode = .fitWidth(width)
-                    } else {
-                        mode = .fitHeight(height)
-                    }
-                } else if case .atMost(let width) = constraint.width {
+
+            case (.aspectFill, .atMost(let width), .atMost(let height)):
+                if CGSize(width: width, height: height).aspectRatio > imageSize.aspectRatio {
+                    mode = .fitWidth(width)
+                } else {
+                    mode = .fitHeight(height)
+                }
+
+            case (.aspectFit, .atMost(let width), .atMost(let height)):
+                if CGSize(width: width, height: height).aspectRatio < imageSize.aspectRatio {
+                    mode = .fitWidth(width)
+                } else {
+                    mode = .fitHeight(height)
+                }
+
+            case (.aspectFill, _, _),
+                 (.aspectFit, _, _):
+                if case .atMost(let width) = constraint.width {
                     mode = .fitWidth(width)
                 } else if case .atMost(let height) = constraint.height {
                     mode = .fitHeight(height)
