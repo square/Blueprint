@@ -942,8 +942,8 @@ extension StackLayout {
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
                 proposal: vectorFrame.constraint,
-                width: width,
-                height: height
+                width: size.width,
+                height: size.height
             )
         }
     }
