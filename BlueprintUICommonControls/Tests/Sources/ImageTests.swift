@@ -87,6 +87,12 @@ class ImageTests: XCTestCase {
 
         validate(
             size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
+            expectedValue: .init(width: 40, height: 20)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .atMost(100)),
             expectedValue: .init(width: 200, height: 100)
         )
@@ -127,6 +133,12 @@ class ImageTests: XCTestCase {
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(40), height: .atMost(40)),
             expectedValue: .init(width: 40, height: 80)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(10), height: .atMost(40)),
+            expectedValue: .init(width: 20, height: 40)
         )
 
         validate(
@@ -192,6 +204,12 @@ class ImageTests: XCTestCase {
 
         validate(
             size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .atMost(100)),
             expectedValue: .init(width: 200, height: 100)
         )
@@ -232,6 +250,12 @@ class ImageTests: XCTestCase {
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(40), height: .atMost(40)),
             expectedValue: .init(width: 20, height: 40)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(10), height: .atMost(40)),
+            expectedValue: .init(width: 10, height: 20)
         )
 
         validate(
@@ -297,6 +321,12 @@ class ImageTests: XCTestCase {
 
         validate(
             size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .atMost(100)),
             expectedValue: .init(width: 20, height: 10)
         )
@@ -336,6 +366,12 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(40), height: .atMost(40)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
             expectedValue: .init(width: 10, height: 20)
         )
 
