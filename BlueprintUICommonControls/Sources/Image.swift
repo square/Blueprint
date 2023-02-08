@@ -141,15 +141,17 @@ extension Image {
                     mode = .fitHeight(height)
                 }
 
+            case (.aspectFill, .atMost(let width), _),
+                 (.aspectFit, .atMost(let width), _):
+                mode = .fitWidth(width)
+
+            case (.aspectFill, _, .atMost(let height)),
+                 (.aspectFit, _, .atMost(let height)):
+                mode = .fitHeight(height)
+
             case (.aspectFill, _, _),
                  (.aspectFit, _, _):
-                if case .atMost(let width) = constraint.width {
-                    mode = .fitWidth(width)
-                } else if case .atMost(let height) = constraint.height {
-                    mode = .fitHeight(height)
-                } else {
-                    mode = .useImageSize
-                }
+                mode = .useImageSize
             }
 
             switch mode {
