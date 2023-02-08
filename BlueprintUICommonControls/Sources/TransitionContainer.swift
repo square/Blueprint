@@ -1,4 +1,4 @@
-import BlueprintUI
+@_spi(BlueprintPassthroughView) import BlueprintUI
 import UIKit
 
 

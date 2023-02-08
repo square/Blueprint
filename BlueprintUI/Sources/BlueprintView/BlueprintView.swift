@@ -370,16 +370,20 @@ public final class BlueprintView: UIView {
             )
         )
 
+        hasUpdatedViewHierarchy = true
+        isInsideUpdate = false
+
+        /// We intentionally deliver our lifecycle callbacks (eg, `onAppear`,
+        /// `onDisappear`, etc, _after_ we've marked our view as updated.
+        /// This is inc ase the `onAppear` callback triggers a re-render,
+        /// we don't hit our recurisve update precondition.
+
         for callback in updateResult.lifecycleCallbacks {
             callback()
         }
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
-
-        hasUpdatedViewHierarchy = true
-
-        isInsideUpdate = false
 
         metricsDelegate?.blueprintView(
             self,

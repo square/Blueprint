@@ -691,6 +691,36 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(view.sizeThatFits(CGSize(width: 150, height: 200)), size)
         XCTAssertEqual(measureCount, 3)
     }
+
+    func test_lifecycleCallbacks_dont_cause_crash() {
+
+        let expectation = self.expectation(description: "Re-rendered")
+
+        withHostedView { view in
+
+            var hasRerendered = false
+
+            func render() {
+                view.element = SimpleViewElement(color: .black).onAppear {
+
+                    /// Simulate an onAppear event triggering a re-render.
+
+                    if hasRerendered == false {
+                        hasRerendered = true
+                        render()
+
+                        expectation.fulfill()
+                    }
+                }
+
+                view.layoutIfNeeded()
+            }
+
+            render()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
