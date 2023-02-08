@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 
 
@@ -10,7 +11,7 @@ extension ElementContent: Sizable {
 
 
 extension ElementContent.Builder {
-    
+
     private func subviews(from cache: SPCacheNode, environment: Environment) -> LayoutSubviews {
 
         cache.layoutSubviews {
@@ -36,15 +37,15 @@ extension ElementContent.Builder {
     }
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        
+
         let subviews = subviews(from: context.cache, environment: context.environment)
-        
+
         var associatedCache = context.cache.associatedCache(create: { layout.makeCache(subviews: subviews) })
-        
+
         let size = layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &associatedCache)
-        
+
         context.cache.set(associatedCache: associatedCache)
-        
+
         return size
     }
 

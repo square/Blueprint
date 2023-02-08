@@ -320,7 +320,7 @@ extension EqualStack {
                 )
             }
 
-            let childPositions = (0..<children.count).map { index in
+            let childPositions = (0..<children.count).map { index -> CGPoint in
                 switch direction {
                 case .horizontal:
                     return CGPoint(
