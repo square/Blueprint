@@ -921,29 +921,14 @@ extension StackLayout {
             let vectorFrame = frames[i]
             let subview = subviews[i]
 
-            var width: CGFloat?
-            var height: CGFloat?
-
-            let size = vectorFrame.size.size(axis: axis)
-
-            switch axis {
-            case .vertical:
-                width = vectorFrame.crossMeasured ? nil : size.width
-                height = vectorFrame.axisMeasured ? nil : size.height
-
-            case .horizontal:
-                width = vectorFrame.axisMeasured ? nil : size.width
-                height = vectorFrame.crossMeasured ? nil : size.height
-            }
-
             let frame = vectorFrame.rect(axis: axis)
 
             subview.place(
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
                 proposal: vectorFrame.constraint,
-                width: size.width,
-                height: size.height
+                width: frame.width,
+                height: frame.height
             )
         }
     }
