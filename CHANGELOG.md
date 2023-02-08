@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed unexpected measurement results that could occur from `Image`s using the `aspectFit` `contentMode`.
+
 ### Added
 
 ### Removed
