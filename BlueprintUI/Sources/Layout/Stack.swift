@@ -921,29 +921,14 @@ extension StackLayout {
             let vectorFrame = frames[i]
             let subview = subviews[i]
 
-            var width: CGFloat?
-            var height: CGFloat?
-
-            let size = vectorFrame.size.size(axis: axis)
-
-            switch axis {
-            case .vertical:
-                width = vectorFrame.crossMeasured ? nil : size.width
-                height = vectorFrame.axisMeasured ? nil : size.height
-
-            case .horizontal:
-                width = vectorFrame.axisMeasured ? nil : size.width
-                height = vectorFrame.crossMeasured ? nil : size.height
-            }
-
             let frame = vectorFrame.rect(axis: axis)
 
             subview.place(
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
                 proposal: vectorFrame.constraint,
-                width: width,
-                height: height
+                width: frame.width,
+                height: frame.height
             )
         }
     }
@@ -1012,22 +997,17 @@ extension StackLayout {
 
         // First pass, use natural to get a measurement
         let axisItems = items(axisPressure: .natural)
-        // Second pass, inherit mode so that we fill properly
-        let crossItems = items(axisPressure: nil)
+        // Second pass, fill assigned space on axis
+        let crossItems = items(axisPressure: .fill)
 
         let frames = _frames(axisItems: axisItems, crossItems: crossItems, in: vectorConstraint)
         
-        let crossPressure: StrictPressureMode = {
-            switch axis {
-            case .horizontal:
-                return context.mode.vertical
-            case .vertical:
-                return context.mode.horizontal
-            }
-        }()
-        
-        switch (alignment, crossPressure) {
-        case (.fill, .natural):
+        // If we're in fill mode, we'll do an additional pass to ensure we fill the assigned space,
+        // in case:
+        // - cross pressure is natural, so we still need to fill the calculated size
+        // - we skipped a pass during cross segments, and didn't fill along axis yet
+        switch alignment {
+        case .fill:
             for (child, frame) in zip(children, frames) {
                 let sizeConstraint = SizeConstraint(frame.size.size(axis: axis))
                 _ = child.layoutable.layout(
@@ -1040,7 +1020,6 @@ extension StackLayout {
             
         default: break
         }
-        
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(

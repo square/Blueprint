@@ -76,9 +76,20 @@ final class SPValueCache<Key: Hashable, Value> {
     }
 }
 
-struct SPCacheOptions {
-    var hintRangeBoundaries: Bool
-    var searchUnconstrainedKeys: Bool
+public struct SPCacheOptions: Equatable {
+    
+    public static let `default` = SPCacheOptions(
+        hintRangeBoundaries: true,
+        searchUnconstrainedKeys: true
+    )
+
+    public var hintRangeBoundaries: Bool
+    public var searchUnconstrainedKeys: Bool
+
+    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool) {
+        self.hintRangeBoundaries = hintRangeBoundaries
+        self.searchUnconstrainedKeys = searchUnconstrainedKeys
+    }
 }
 
 extension SPValueCache where Key == SizeConstraint, Value == CGSize {

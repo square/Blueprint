@@ -21,7 +21,7 @@ extension Element {
         switch layoutMode {
         case .standard:
             return layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
-        case .singlePass:
+        case .singlePass(let options):
             return singlePassLayout(
                 proposal: .init(frame.size),
                 context: SPLayoutContext(
@@ -30,10 +30,7 @@ extension Element {
                     // TODO: Hoist up?
                     cache: SPCacheNode(
                         path: "\(type(of: self))",
-                        options: SPCacheOptions(
-                            hintRangeBoundaries: true,
-                            searchUnconstrainedKeys: true
-                        )
+                        options: options
                     )
                 )
             )

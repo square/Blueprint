@@ -99,6 +99,10 @@ public struct LayoutSubview {
         ]
     }
 
+    // TODO:
+    // - make the positioning relative to bounds origin so that it's not necessary to manually
+    //   offset by bounds.origin
+    // - remove optional width/height, since nothing uses it and there is no advantage in our layout semantics
     public func place(
         at position: CGPoint,
         anchor: UnitPoint = .topLeading,
