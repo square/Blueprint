@@ -362,24 +362,32 @@ public final class BlueprintView: UIView {
 
         Logger.logViewUpdateStart(view: self)
 
-        let updateResult = rootController.update(
-            node: rootNode,
-            context: .init(
-                appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
-                viewIsVisible: isVisible
+        BlueprintView.performHierarchyUpdate { callbacks in
+            rootController.update(
+                node: rootNode,
+                context: .init(
+                    appearanceTransitionsEnabled: hasUpdatedViewHierarchy,
+                    viewIsVisible: isVisible,
+                    callbacks: callbacks
+                )
             )
-        )
 
-        for callback in updateResult.lifecycleCallbacks {
-            callback()
+            hasUpdatedViewHierarchy = true
+            isInsideUpdate = false
+
+        } onCompletion: { callbacks in
+
+            /// The entire hierarchy of `BlueprintView`s have finished
+            /// their updates; even parent/child ones – we can finally trigger
+            /// our callbacks safely.
+
+            for callback in callbacks.callbacks {
+                callback()
+            }
         }
 
         Logger.logViewUpdateEnd(view: self)
         let viewUpdateEndDate = Date()
-
-        hasUpdatedViewHierarchy = true
-
-        isInsideUpdate = false
 
         metricsDelegate?.blueprintView(
             self,
@@ -490,6 +498,7 @@ extension BlueprintView {
             children = []
 
             view = node.viewDescription.build()
+
             view.nativeViewNodeBlueprintEnvironment = node.environment
         }
 
@@ -501,7 +510,7 @@ extension BlueprintView {
             node.viewDescription.viewType == type(of: view)
         }
 
-        fileprivate func update(node: NativeViewNode, context: UpdateContext) -> UpdateResult {
+        fileprivate func update(node: NativeViewNode, context: UpdateContext) {
 
             assert(node.viewDescription.viewType == type(of: view))
 
@@ -518,13 +527,11 @@ extension BlueprintView {
                 view.layoutIfNeeded()
             }
 
-            var result = UpdateResult()
-
             // Bail out fast if we do not have any children to manage.
             // This is a performance optimization for leaf elements, as the below update
             // pass is otherwise expensive to perform for empty elements.
             if children.isEmpty && node.children.isEmpty {
-                return result
+                return
             }
 
             var oldChildren: [ElementPath: NativeViewController] = [:]
@@ -578,8 +585,7 @@ extension BlueprintView {
                             contentView.insertSubview(controller.view, at: index)
                         }
 
-                        let childResult = controller.update(node: child, context: context)
-                        result.merge(childResult)
+                        controller.update(node: child, context: context)
                     }
                 } else {
                     var controller: NativeViewController!
@@ -593,16 +599,15 @@ extension BlueprintView {
                         contentView.insertSubview(controller.view, at: index)
 
                         if context.viewIsVisible, let onAppear = controller.onAppear {
-                            result.lifecycleCallbacks.append(onAppear)
+                            context.callbacks.callbacks.append(onAppear)
                         }
 
-                        let childResult = controller.update(
+                        controller.update(
                             node: child,
                             context: context.modified {
                                 $0.appearanceTransitionsEnabled = false
                             }
                         )
-                        result.merge(childResult)
                     }
 
                     newChildren.append((path: path, node: controller))
@@ -625,7 +630,7 @@ extension BlueprintView {
                 if context.viewIsVisible {
                     controller.traverse { node in
                         if let onDisappear = node.onDisappear {
-                            result.lifecycleCallbacks.append(onDisappear)
+                            context.callbacks.callbacks.append(onDisappear)
                         }
                     }
                 }
@@ -642,8 +647,6 @@ extension BlueprintView {
             }
 
             children = newChildren
-
-            return result
         }
 
         /// Perform a depth-first traversal of the view-backing tree from this node.
@@ -653,6 +656,45 @@ extension BlueprintView {
                 child.traverse(visitor: visitor)
             }
         }
+    }
+}
+
+extension BlueprintView {
+
+    private static var updateCount: Int = 0
+
+    private static var isInsideUpdate: Bool {
+        Self.updateCount > 0
+    }
+
+    static func performHierarchyUpdate<Output>(
+        _ update: (Callbacks) -> Output,
+        onCompletion: (Callbacks) -> Void
+    ) -> Output {
+
+        let callbacks = self.callbacks ?? .init()
+
+        self.callbacks = callbacks
+
+        Self.updateCount += 1
+
+        defer {
+            Self.updateCount -= 1
+
+            if isInsideUpdate == false {
+                onCompletion(callbacks)
+
+                self.callbacks = nil
+            }
+        }
+
+        return update(callbacks)
+    }
+
+    private static var callbacks: Callbacks? = nil
+
+    final class Callbacks {
+        var callbacks: [LifecycleCallback] = []
     }
 }
 
@@ -668,22 +710,14 @@ extension BlueprintView.NativeViewController {
         /// True if the hosting view is in the view hierarchy
         var viewIsVisible: Bool
 
+        /// The various view appearance callbacks to perform.
+        var callbacks: BlueprintView.Callbacks
+
         /// Returns a copy of the update context, modified by the changes provided.
         func modified(_ modify: (inout Self) -> Void) -> Self {
             var modified = self
             modify(&modified)
             return modified
-        }
-    }
-
-    /// The result of a native view update, including all child updates.
-    struct UpdateResult {
-        /// The lifecycle callbacks accumulated during the view update.
-        var lifecycleCallbacks: [LifecycleCallback] = []
-
-        /// Merges another update result (such as from a child) into this result.
-        mutating func merge(_ other: UpdateResult) {
-            lifecycleCallbacks += other.lifecycleCallbacks
         }
     }
 }
