@@ -327,7 +327,7 @@ public final class BlueprintView: UIView {
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
 
-        let start = Date()
+        let start = CACurrentMediaTime()
         Logger.logLayoutStart(view: self)
 
         let environment = makeEnvironment()
@@ -344,7 +344,7 @@ public final class BlueprintView: UIView {
             .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
             .resolve() ?? []
 
-        let measurementEndDate = Date()
+        let measurementEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
 
         // The root controller is fixed, and its layout attributes are never applied.
@@ -375,7 +375,7 @@ public final class BlueprintView: UIView {
         }
 
         Logger.logViewUpdateEnd(view: self)
-        let viewUpdateEndDate = Date()
+        let viewUpdateEndTime = CACurrentMediaTime()
 
         hasUpdatedViewHierarchy = true
 
@@ -383,10 +383,10 @@ public final class BlueprintView: UIView {
 
         metricsDelegate?.blueprintView(
             self,
-            completedUpdateWith: .init(
-                totalDuration: viewUpdateEndDate.timeIntervalSince(start),
-                measureDuration: measurementEndDate.timeIntervalSince(start),
-                viewUpdateDuration: viewUpdateEndDate.timeIntervalSince(measurementEndDate)
+            completedRenderWith: .init(
+                totalDuration: viewUpdateEndTime - start,
+                layoutDuration: measurementEndTime - start,
+                viewUpdateDuration: viewUpdateEndTime - measurementEndTime
             )
         )
     }
@@ -449,7 +449,7 @@ public final class BlueprintView: UIView {
 /// Provides performance information for blueprint measurements and updates.
 public protocol BlueprintViewMetricsDelegate: AnyObject {
 
-    func blueprintView(_ view: BlueprintView, completedUpdateWith metrics: BlueprintViewUpdateMetrics)
+    func blueprintView(_ view: BlueprintView, completedRenderWith metrics: BlueprintViewUpdateMetrics)
 
 }
 
@@ -459,7 +459,7 @@ public struct BlueprintViewUpdateMetrics {
     /// The total time it took to apply a new element.
     public var totalDuration: TimeInterval
     /// The time it took to lay out and measure the new element.
-    public var measureDuration: TimeInterval
+    public var layoutDuration: TimeInterval
     /// The time it took to update the on-screen views for the element.
     public var viewUpdateDuration: TimeInterval
 }
