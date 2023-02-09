@@ -375,7 +375,7 @@ public final class BlueprintView: UIView {
 
         /// We intentionally deliver our lifecycle callbacks (eg, `onAppear`,
         /// `onDisappear`, etc, _after_ we've marked our view as updated.
-        /// This is inc ase the `onAppear` callback triggers a re-render,
+        /// This is in case the `onAppear` callback triggers a re-render,
         /// we don't hit our recurisve update precondition.
 
         for callback in updateResult.lifecycleCallbacks {
