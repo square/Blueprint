@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [0.49.1]
+
+### Fixed
+
+- `Image`'s `aspectFill` `contentMode` now measures the same as `aspectFit` to avoid aggressively taking up space when not necessary.
+
 ## [0.49.0]
 
 ### Fixed
@@ -933,7 +939,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.49.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.49.1...HEAD
+[0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
 [0.49.0]: https://github.com/square/Blueprint/compare/0.48.1...0.49.0
 [0.48.1]: https://github.com/square/Blueprint/compare/0.48.0...0.48.1
 [0.48.0]: https://github.com/square/Blueprint/compare/0.47.0...0.48.0
