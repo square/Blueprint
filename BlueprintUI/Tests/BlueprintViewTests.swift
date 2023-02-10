@@ -852,11 +852,11 @@ private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
 
 private class TestMetricsDelegate: BlueprintViewMetricsDelegate {
 
-    var metrics: [BlueprintUI.BlueprintViewUpdateMetrics] = []
+    var metrics: [BlueprintUI.BlueprintViewRenderMetrics] = []
 
     func blueprintView(
         _ view: BlueprintUI.BlueprintView,
-        completedRenderWith metrics: BlueprintUI.BlueprintViewUpdateMetrics
+        completedRenderWith metrics: BlueprintUI.BlueprintViewRenderMetrics
     ) {
         self.metrics.append(metrics)
     }

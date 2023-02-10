@@ -446,15 +446,15 @@ public final class BlueprintView: UIView {
 }
 
 
-/// Provides performance information for blueprint measurements and updates.
+/// Provides performance information for blueprint layouts and updates.
 public protocol BlueprintViewMetricsDelegate: AnyObject {
 
-    func blueprintView(_ view: BlueprintView, completedRenderWith metrics: BlueprintViewUpdateMetrics)
+    func blueprintView(_ view: BlueprintView, completedRenderWith metrics: BlueprintViewRenderMetrics)
 
 }
 
 
-public struct BlueprintViewUpdateMetrics {
+public struct BlueprintViewRenderMetrics {
 
     /// The total time it took to apply a new element.
     public var totalDuration: TimeInterval

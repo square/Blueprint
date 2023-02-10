@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Renamed `BlueprintViewUpdateMetrics` to `BlueprintViewRenderMetrics`.
+- Renamed `BlueprintViewRenderMetrics.measureDuration` to `layoutDuration`.
+- Renamed `BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)` to `blueprintView(_:completedRenderWith:)`.
+- `BlueprintViewRenderMetrics` values are now calculated using `CACurrentMediaTime` instead of `Date`.
+
 ### Deprecated
 
 ### Security
