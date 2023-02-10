@@ -327,7 +327,7 @@ public final class BlueprintView: UIView {
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
 
-        let start = CACurrentMediaTime()
+        let startTime = CACurrentMediaTime()
         Logger.logLayoutStart(view: self)
 
         let environment = makeEnvironment()
@@ -384,8 +384,8 @@ public final class BlueprintView: UIView {
         metricsDelegate?.blueprintView(
             self,
             completedRenderWith: .init(
-                totalDuration: viewUpdateEndTime - start,
-                layoutDuration: measurementEndTime - start,
+                totalDuration: viewUpdateEndTime - startTime,
+                layoutDuration: measurementEndTime - startTime,
                 viewUpdateDuration: viewUpdateEndTime - measurementEndTime
             )
         )
