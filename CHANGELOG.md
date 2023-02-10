@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Image`'s `aspectFill` `contentMode` now measures the same as `aspectFit` to avoid aggressively taking up space when not necessary.
+
 ### Added
 
 ### Removed

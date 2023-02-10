@@ -76,19 +76,19 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .atMost(5), height: .atMost(5)),
-            expectedValue: .init(width: 10, height: 5)
+            expectedValue: .init(width: 5, height: 2.5)
         )
 
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .atMost(40), height: .atMost(40)),
-            expectedValue: .init(width: 80, height: 40)
+            expectedValue: .init(width: 40, height: 20)
         )
 
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .atMost(40), height: .atMost(10)),
-            expectedValue: .init(width: 40, height: 20)
+            expectedValue: .init(width: 20, height: 10)
         )
 
         validate(
@@ -126,19 +126,19 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(5), height: .atMost(5)),
-            expectedValue: .init(width: 5, height: 10)
+            expectedValue: .init(width: 2.5, height: 5)
         )
 
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(40), height: .atMost(40)),
-            expectedValue: .init(width: 40, height: 80)
+            expectedValue: .init(width: 20, height: 40)
         )
 
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .atMost(10), height: .atMost(40)),
-            expectedValue: .init(width: 20, height: 40)
+            expectedValue: .init(width: 10, height: 20)
         )
 
         validate(
@@ -280,6 +280,123 @@ class ImageTests: XCTestCase {
         ) {
             self.validate(
                 contentMode: .center,
+                imageSize: size,
+                constraint: constraint,
+                expectedValue: expectedValue,
+                line: line
+            )
+        }
+
+        // Wide aspect ratio image
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .unconstrained),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(10), height: .unconstrained),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(8), height: .atMost(8)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .atMost(40)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .unconstrained, height: .atMost(100)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .unconstrained, height: .atMost(1)),
+            expectedValue: .init(width: 20, height: 10)
+        )
+
+        // Tall aspect ratio image
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(100), height: .unconstrained),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(5), height: .unconstrained),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(5), height: .atMost(8)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(40), height: .atMost(40)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .atMost(40), height: .atMost(10)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .unconstrained, height: .atMost(100)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .unconstrained, height: .atMost(4)),
+            expectedValue: .init(width: 10, height: 20)
+        )
+    }
+
+    func test_measure_stretch() {
+        func validate(
+            size: CGSize,
+            constraint: SizeConstraint,
+            expectedValue: CGSize,
+            line: UInt = #line
+        ) {
+            self.validate(
+                contentMode: .stretch,
                 imageSize: size,
                 constraint: constraint,
                 expectedValue: expectedValue,
