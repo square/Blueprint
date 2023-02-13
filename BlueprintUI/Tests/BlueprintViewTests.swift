@@ -767,13 +767,28 @@ private struct TestContainer: Element {
         nil
     }
 
-    private class TestLayout: Layout {
+    private class TestLayout: Layout, StrictLayout {
+
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
             .zero
         }
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+            .zero
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
+            for subview in subviews {
+                subview.place(at: .zero)
+            }
+        }
+
+        func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+            fatalError()
         }
     }
 }

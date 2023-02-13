@@ -215,7 +215,7 @@ fileprivate struct SimpleElement: Element {
 }
 
 
-fileprivate struct FrameLayout: Layout {
+fileprivate struct FrameLayout: Layout, StrictLayout {
 
     typealias Traits = CGRect
 
@@ -230,13 +230,36 @@ fileprivate struct FrameLayout: Layout {
         items.map { LayoutAttributes(frame: $0.traits) }
     }
 
+    func sizeThatFits(proposal: BlueprintUI.SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+        subviews.reduce(into: CGSize.zero) { result, subview in
+            let traits = subview.traits(forLayoutType: FrameLayout.self)
+            result.width = max(result.width, traits.maxX)
+            result.height = max(result.height, traits.maxY)
+        }
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: BlueprintUI.SizeConstraint, subviews: Subviews, cache: inout ()) {
+        for subview in subviews {
+            let frame = subview.traits(forLayoutType: FrameLayout.self)
+            subview.place(
+                at: frame.origin + bounds.origin,
+                size: frame.size
+            )
+        }
+    }
+
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        fatalError()
+    }
+
     static var defaultTraits: CGRect {
         CGRect.zero
     }
 
 }
 
-private struct HalfLayout: Layout {
+private struct HalfLayout: Layout, StrictLayout {
+
     func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
         let halfConstraint = SizeConstraint(
             width: constraint.width / 2,
@@ -255,13 +278,40 @@ private struct HalfLayout: Layout {
             LayoutAttributes(size: $1.measure(in: halfConstraint))
         }
     }
+
+    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+        let halfConstraint = SizeConstraint(
+            width: proposal.width / 2,
+            height: proposal.height / 2
+        )
+        let measurements = subviews.map { $0.sizeThatFits(halfConstraint) }
+        return CGSize(
+            width: measurements.map(\.width).reduce(0, +),
+            height: measurements.map(\.height).reduce(0, +)
+        )
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
+        let halfConstraint = SizeConstraint(CGSize(width: bounds.size.width / 2, height: bounds.size.height / 2))
+        for subview in subviews {
+            subview.place(
+                at: bounds.origin,
+                size: subview.sizeThatFits(halfConstraint)
+            )
+        }
+    }
+
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        fatalError()
+    }
 }
 
 private class TestCounter {
     var measures: Int = 0
 }
 
-private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout: Layout {
+private struct MeasureCountingLayout<WrappedLayout>: Layout, StrictLayout where WrappedLayout: Layout & StrictLayout {
+
     static var defaultTraits: Traits { WrappedLayout.defaultTraits }
 
     typealias Traits = WrappedLayout.Traits
@@ -276,6 +326,28 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
 
     func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         layout.layout(size: size, items: items)
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout WrappedLayout.Cache) -> CGSize {
+        counts.measures += 1
+        return layout.sizeThatFits(proposal: proposal, subviews: subviews, cache: &cache)
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: BlueprintUI.SizeConstraint,
+        subviews: Subviews,
+        cache: inout WrappedLayout.Cache
+    ) {
+        layout.placeSubviews(in: bounds, proposal: proposal, subviews: subviews, cache: &cache)
+    }
+
+    func makeCache(subviews: LayoutSubviews) -> WrappedLayout.Cache {
+        layout.makeCache(subviews: subviews)
+    }
+
+    func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+        layout.layout(in: context, children: children)
     }
 }
 
@@ -293,7 +365,8 @@ private struct MeasureCountingSpacer: Element {
         nil
     }
 
-    struct FixedLayout: Layout {
+    struct FixedLayout: Layout, StrictLayout {
+
         var size: CGSize
 
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
@@ -302,6 +375,18 @@ private struct MeasureCountingSpacer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             []
+        }
+
+        func sizeThatFits(proposal: BlueprintUI.SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+            size
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: BlueprintUI.SizeConstraint, subviews: Subviews, cache: inout ()) {
+            // No-op
+        }
+
+        func layout(in context: BlueprintUI.StrictLayoutContext, children: [StrictLayoutChild]) -> BlueprintUI.StrictLayoutAttributes {
+            fatalError()
         }
     }
 }

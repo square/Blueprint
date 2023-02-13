@@ -257,7 +257,8 @@ private struct TestElement: Element {
         )
     }
 
-    struct TestLayout: Layout {
+    struct TestLayout: Layout, StrictLayout {
+
         var value: TestValue
 
         func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
@@ -266,6 +267,23 @@ private struct TestElement: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             [value.layoutAttributes]
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subviews: Subviews, cache: inout ()) -> CGSize {
+            value.size
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: SizeConstraint, subviews: Subviews, cache: inout ()) {
+            for subview in subviews {
+                subview.place(
+                    at: bounds.origin + value.layoutAttributes.frame.origin,
+                    size: value.layoutAttributes.frame.size
+                )
+            }
+        }
+
+        func layout(in context: StrictLayoutContext, children: [StrictLayoutChild]) -> StrictLayoutAttributes {
+            fatalError()
         }
     }
 

@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import QuartzCore
 
 
 public typealias LayoutSubviews = [LayoutSubview]

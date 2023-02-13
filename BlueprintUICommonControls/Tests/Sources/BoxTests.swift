@@ -125,12 +125,25 @@ private struct InsettingElement: Element {
     }
 
     private struct Layout: SingleChildLayout {
+
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             .zero
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subview: LayoutSubview, cache: inout ()) -> CGSize {
+            .zero
+        }
+
+        func placeSubview(in bounds: CGRect, proposal: SizeConstraint, subview: LayoutSubview, cache: inout ()) {
+            subview.place(at: bounds.insetBy(dx: 20, dy: 20))
+        }
+
+        func layout(in context: StrictLayoutContext, child: StrictLayoutable) -> StrictLayoutAttributes {
+            fatalError()
         }
     }
 
