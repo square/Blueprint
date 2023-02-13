@@ -418,7 +418,7 @@ extension StackLayout {
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
         let axisSegments = _axisSegments(for: axisItems, in: vectorConstraint)
-        
+
         let axisConstraints = axisSegments.map { $0.magnitude }
 
         // Then measure cross axis for each item based on the space it was allocated.
@@ -926,28 +926,26 @@ extension StackLayout {
             subview.place(
                 at: bounds.origin + frame.origin,
                 anchor: .topLeading,
-                proposal: vectorFrame.constraint,
-                width: frame.width,
-                height: frame.height
+                size: frame.size
             )
         }
     }
-    
+
     private struct StackLayoutItem {
-        
+
         let traits: Traits
         private let measure: (SizeConstraint) -> CGSize
-        
+
         init(_ tuple: (Traits, Measurable)) {
             traits = tuple.0
             measure = tuple.1.measure(in:)
         }
-        
+
         init(_ subview: LayoutSubview) {
             traits = subview.stackLayoutTraits
             measure = subview.sizeThatFits(_:)
         }
-        
+
         init(_ child: StrictLayoutChild, options: StrictLayoutOptions) {
             traits = child.traits
             measure = { constraint in
@@ -957,7 +955,7 @@ extension StackLayout {
                 )
             }
         }
-        
+
         func measure(in constraint: SizeConstraint) -> CGSize {
             measure(constraint)
         }
@@ -991,7 +989,7 @@ extension StackLayout {
                 mode: mode
             )
             return children.map { child in
-                return StackLayoutItem(child, options: options)
+                StackLayoutItem(child, options: options)
             }
         }
 
@@ -1001,7 +999,7 @@ extension StackLayout {
         let crossItems = items(axisPressure: .fill)
 
         let frames = _frames(axisItems: axisItems, crossItems: crossItems, in: vectorConstraint)
-        
+
         // If we're in fill mode, we'll do an additional pass to ensure we fill the assigned space,
         // in case:
         // - cross pressure is natural, so we still need to fill the calculated size
@@ -1017,7 +1015,7 @@ extension StackLayout {
                     )
                 )
             }
-            
+
         default: break
         }
 
@@ -1034,7 +1032,7 @@ extension StackLayout {
             size: size,
             childPositions: frames.map { $0.origin.point(axis: axis) }
         )
-        
+
         return attributes
 
     }
@@ -1257,7 +1255,7 @@ extension StrictLayoutContext {
         } else {
             width = .unconstrained
         }
-        
+
         if let proposedHeight = proposedSize.height.constrainedValue {
             if mode.vertical == .fill {
                 height = .exactly(proposedHeight)
