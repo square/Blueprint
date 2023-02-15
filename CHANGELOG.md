@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `Environment` will now automatically inherit for `BlueprintView` instances nested inside `UIViewElement` during measurement.
+
 ### Added
 
 ### Removed

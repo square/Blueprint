@@ -115,7 +115,7 @@ class UIViewElementTests: XCTestCase {
 
     func test_environment() {
         enum TestKey: EnvironmentKey {
-            static var defaultValue: Void { () }
+            static let defaultValue: Void? = nil
         }
 
         @propertyWrapper
@@ -130,11 +130,16 @@ class UIViewElementTests: XCTestCase {
         struct TestElement: UIViewElement {
             @Box var environment: Environment?
 
+            var validateEnvironment: (BlueprintView) -> Void = { _ in }
+
             func makeUIView() -> TestView {
-                TestView()
+                let view = TestView()
+                view.validateEnvironment = validateEnvironment
+                return view
             }
 
             func updateUIView(_ view: TestView, with context: UIViewElementContext) {
+                view.validateEnvironment = validateEnvironment
                 environment = context.environment
             }
         }
@@ -145,6 +150,7 @@ class UIViewElementTests: XCTestCase {
         do {
             // Environment is passed during measurement.
             let element = TestElement()
+
             _ = element.content.measure(
                 in: .unconstrained,
                 environment: env
@@ -155,6 +161,7 @@ class UIViewElementTests: XCTestCase {
         do {
             // Enviroment is passed during apply.
             let element = TestElement()
+
             let description = element.backingViewDescription(
                 with: .init(
                     bounds: .zero,
@@ -165,6 +172,21 @@ class UIViewElementTests: XCTestCase {
             description?.apply(to: element.makeUIView())
             XCTAssertNotNil(element.environment?[TestKey.self])
         }
+
+        do {
+            let blueprintView = BlueprintView(frame: .init(origin: .zero, size: .init(width: 100, height: 100)))
+
+            var element = TestElement()
+
+            element.validateEnvironment = { view in
+                XCTAssertNotNil(view.inheritedBlueprintEnvironment)
+            }
+
+            /// `.centered()` so we're not the root element, so we are measured as well.
+            blueprintView.element = element.centered()
+
+            blueprintView.layoutIfNeeded()
+        }
     }
 }
 
@@ -172,7 +194,31 @@ fileprivate final class TestView: UIView {
 
     var sizeThatFits: CGSize = .zero
 
+    let blueprintView: BlueprintView
+
+    var validateEnvironment: (BlueprintView) -> Void = { _ in }
+
+    override init(frame: CGRect) {
+        blueprintView = BlueprintView()
+
+        super.init(frame: frame)
+
+        addSubview(blueprintView)
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
     override func sizeThatFits(_ size: CGSize) -> CGSize {
-        sizeThatFits
+        validateEnvironment(blueprintView)
+
+        return sizeThatFits
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        blueprintView.frame = bounds
+
+        validateEnvironment(blueprintView)
     }
 }

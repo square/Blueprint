@@ -154,6 +154,13 @@ private final class UIViewElementMeasurer {
 
         let view = measurementView(for: element)
 
+        /// Ensure that during measurement / sizing, the inherited `Environment` is available
+        /// to any child `BlueprintView`s. We must manually wire this property up, as the
+        /// measurement views are not in the view hierarchy.
+
+        view.nativeViewNodeBlueprintEnvironment = environment
+        defer { view.nativeViewNodeBlueprintEnvironment = nil }
+
         element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
 
         return element.size(bounds.size, thatFits: view)
