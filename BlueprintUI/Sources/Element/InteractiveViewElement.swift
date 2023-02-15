@@ -12,7 +12,7 @@ public protocol InteractiveViewElement: Element {
 
     typealias Content = InteractiveViewElementContent<State, View>
 
-    associatedtype State: InteractiveViewElementContentState
+    associatedtype State
     associatedtype View: UIView
 
     var viewContent: InteractiveViewElementContent<State, View> { get }
@@ -23,27 +23,25 @@ public protocol InteractiveViewElement: Element {
 public struct InteractiveViewElementContent<State, View: UIView> {
 
     public var element: (State) -> Element
-
-    public var view: (InteractiveElementViewContext, ViewDescriptionContext) -> ViewDescription
+    public var measuring: State
+    public var view: (InteractiveElementViewContext<State>, ViewDescriptionContext) -> ViewDescription
 
     public init(
         element: @escaping (State) -> Element,
-        view: @escaping (InteractiveElementViewContext, ViewDescriptionContext) -> ViewDescription
+        measuring: () -> State,
+        view: @escaping (InteractiveElementViewContext<State>, ViewDescriptionContext) -> ViewDescription
     ) {
         self.element = element
+        self.measuring = measuring()
         self.view = view
     }
 }
 
 
-public protocol InteractiveViewElementContentState {
+public struct InteractiveElementViewContext<State> {
 
-    static var defaultValue: Self { get }
-
+    public let binding: InteractiveViewBinding<State>
 }
-
-
-public struct InteractiveElementViewContext {}
 
 
 extension InteractiveViewElement {
@@ -53,24 +51,82 @@ extension InteractiveViewElement {
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        fatalError("TODO")
+        let binding = context.environment[AnyInteractiveViewBinding.Key.self] as! InteractiveViewBinding<State>
+
+        return viewContent.view(InteractiveElementViewContext<State>(binding: binding), context)
     }
 
     var measurementContent: Element {
-        viewContent.element(State.defaultValue)
+        viewContent.element(viewContent.measuring)
     }
 }
 
 
-// final class InteractiveViewBinding<State:InteractiveViewElementContentState> {
-//
-//    var value : State
-// }
+public final class InteractiveViewBinding<State>: AnyInteractiveViewBinding {
 
-public protocol InteractiveElementView: UIView {
+    var onValueDidChange: ((State) -> Void)? = nil
 
-    func setContent(_ content: InteractiveElementViewContent)
+    public var value: State {
+        didSet {}
+    }
+
+    public init(_ value: State) {
+        self.value = value
+    }
+
+    public func modify(_ modify: (inout State) -> Void) {
+        var copy = value
+        modify(&copy)
+        value = copy
+    }
+}
+
+
+public class AnyInteractiveViewBinding {
+
+
+    enum Key: EnvironmentKey {
+
+        static var defaultValue: AnyInteractiveViewBinding? {
+            nil
+        }
+
+        static func isEquivalent(_ lhs: AnyInteractiveViewBinding?, _ rhs: AnyInteractiveViewBinding?) -> Bool {
+            lhs === rhs
+        }
+    }
 }
 
 
 public struct InteractiveElementViewContent {}
+
+
+public protocol InteractiveElementView<State>: UIView {
+
+    associatedtype State
+
+    var binding: InteractiveViewBinding<State>? { get }
+
+    func bind(to: InteractiveViewBinding<State>)
+}
+
+
+extension BlueprintView {
+
+    public static func makeInteractive<State>(
+    ) -> some InteractiveElementView<State> {
+        BindableBlueprintView<State>()
+    }
+}
+
+fileprivate final class BindableBlueprintView<State>: BlueprintView, InteractiveElementView {
+
+    // MARK: InteractiveElementView
+
+    public var binding: InteractiveViewBinding<State>?
+
+    public func bind(to: InteractiveViewBinding<State>) {
+        fatalError("TODO")
+    }
+
+}

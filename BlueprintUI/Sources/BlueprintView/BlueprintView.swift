@@ -25,7 +25,7 @@ import UIKit
 ///
 /// }
 /// ```
-public final class BlueprintView: UIView {
+public class BlueprintView: UIView {
 
     private(set) var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
