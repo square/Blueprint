@@ -344,7 +344,7 @@ public final class BlueprintView: UIView {
             .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
             .resolve() ?? []
 
-        let measurementEndTime = CACurrentMediaTime()
+        let layoutEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
 
         // The root controller is fixed, and its layout attributes are never applied.
@@ -385,8 +385,8 @@ public final class BlueprintView: UIView {
             self,
             completedRenderWith: .init(
                 totalDuration: viewUpdateEndTime - startTime,
-                layoutDuration: measurementEndTime - startTime,
-                viewUpdateDuration: viewUpdateEndTime - measurementEndTime
+                layoutDuration: layoutEndTime - startTime,
+                viewUpdateDuration: viewUpdateEndTime - layoutEndTime
             )
         )
     }

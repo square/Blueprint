@@ -709,7 +709,13 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertTrue(metric.totalDuration > 0)
         XCTAssertTrue(metric.layoutDuration > 0)
         XCTAssertTrue(metric.viewUpdateDuration > 0)
-        XCTAssertEqual(metric.totalDuration, metric.layoutDuration + metric.viewUpdateDuration, accuracy: .ulpOfOne)
+
+        // Sanity check that total duration is the sum of the two components.
+        // `accuracy` is generous to account for any accumated error during arithmetic.
+        XCTAssertEqual(
+            metric.totalDuration, metric.layoutDuration + metric.viewUpdateDuration,
+            accuracy: metric.totalDuration.ulp * 2
+        )
     }
 }
 
