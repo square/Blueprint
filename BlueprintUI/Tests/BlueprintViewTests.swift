@@ -691,6 +691,32 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(view.sizeThatFits(CGSize(width: 150, height: 200)), size)
         XCTAssertEqual(measureCount, 3)
     }
+
+    func test_metrics_delegate_completedRenderWith() {
+        let testMetricsDelegate = TestMetricsDelegate()
+
+        let view = BlueprintView()
+        view.metricsDelegate = testMetricsDelegate
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        guard let metric = testMetricsDelegate.metrics.first else {
+            XCTFail("No metric generated")
+            return
+        }
+
+        XCTAssertTrue(metric.totalDuration > 0)
+        XCTAssertTrue(metric.layoutDuration > 0)
+        XCTAssertTrue(metric.viewUpdateDuration > 0)
+
+        // Sanity check that total duration is the sum of the two components.
+        // `accuracy` is generous to account for any accumated error during arithmetic.
+        XCTAssertEqual(
+            metric.totalDuration, metric.layoutDuration + metric.viewUpdateDuration,
+            accuracy: metric.totalDuration.ulp * 2
+        )
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -830,3 +856,14 @@ private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
     }
 }
 
+private class TestMetricsDelegate: BlueprintViewMetricsDelegate {
+
+    var metrics: [BlueprintUI.BlueprintViewRenderMetrics] = []
+
+    func blueprintView(
+        _ view: BlueprintUI.BlueprintView,
+        completedRenderWith metrics: BlueprintUI.BlueprintViewRenderMetrics
+    ) {
+        self.metrics.append(metrics)
+    }
+}
