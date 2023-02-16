@@ -143,11 +143,11 @@ extension Box {
             public static let bottomLeft = Corners(rawValue: 1 << 2)
             public static let bottomRight = Corners(rawValue: 1 << 3)
 
-            public static var all: Corners = [.topLeft, .topRight, .bottomLeft, .bottomRight]
-            public static var top: Corners = [.topRight, .topLeft]
-            public static var left: Corners = [.topLeft, .bottomLeft]
-            public static var bottom: Corners = [.bottomLeft, .bottomRight]
-            public static var right: Corners = [.topRight, .bottomRight]
+            public static let all: Corners = [.topLeft, .topRight, .bottomLeft, .bottomRight]
+            public static let top: Corners = [.topRight, .topLeft]
+            public static let left: Corners = [.topLeft, .bottomLeft]
+            public static let bottom: Corners = [.bottomLeft, .bottomRight]
+            public static let right: Corners = [.topRight, .bottomRight]
 
             var toCACornerMask: CACornerMask {
                 var mask: CACornerMask = []
