@@ -24,7 +24,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        super.invokeTest()
+        // super.invokeTest()
     }
 
     func test_repeated_layouts() {
