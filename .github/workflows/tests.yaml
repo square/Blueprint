@@ -35,7 +35,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
     - name: Install iOS ${{ matrix.sdk }}
-      run: xcversion simulators --install="iOS ${{ matrix.sdk }}"
+      run: xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Build & Test
       run: |
