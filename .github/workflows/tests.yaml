@@ -87,4 +87,4 @@ jobs:
 
     - name: Build & Test
       run: |
-        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=15.0,name=iPhone 8"
+        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=16.2,name=iPhone 8"
