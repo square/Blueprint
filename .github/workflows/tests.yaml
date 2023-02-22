@@ -47,7 +47,7 @@ jobs:
     - name: Package snapshot changes
       if: ${{ failure() }}
       run: |
-        git ls-files -mo BlueprintUICommonControls/Tests/Sources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
+        git ls-files -mo BlueprintUICommonControls/Tests/Sources/Resources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
       uses: actions/upload-artifact@v2
