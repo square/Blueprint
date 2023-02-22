@@ -57,7 +57,7 @@ struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
     }
 
     var debugDescription: String {
-        if let key = self.key {
+        if let key = key {
             return "\(elementType).\(String(describing: key)).\(count)"
         } else {
             return "\(elementType).\(count)"

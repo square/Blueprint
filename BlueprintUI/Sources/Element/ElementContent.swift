@@ -265,7 +265,7 @@ extension ElementContent {
                 return []
             }
 
-            let layoutItems = self.layoutItems(in: environment, cache: cache)
+            let layoutItems = layoutItems(in: environment, cache: cache)
             let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
             var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
@@ -543,7 +543,7 @@ extension Array {
     /// to 25% for large collections, so prefer it when needing an indexed `map` in areas where performance is critical.
     @inlinable func indexedMap<Mapped>(_ map: (Int, Element) -> Mapped) -> [Mapped] {
 
-        let count = self.count
+        let count = count
 
         var mapped = [Mapped]()
         mapped.reserveCapacity(count)

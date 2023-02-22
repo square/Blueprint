@@ -414,7 +414,7 @@ public final class BlueprintView: UIView {
             }
         }()
 
-        var environment = inherited.merged(prioritizing: self.environment)
+        var environment = inherited.merged(prioritizing: environment)
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale

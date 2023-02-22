@@ -127,8 +127,8 @@ extension UIImage {
 
     var pixelData: [UInt8] {
         let size = CGSize(
-            width: self.size.width * scale,
-            height: self.size.height * scale
+            width: size.width * scale,
+            height: size.height * scale
         )
         let dataSize = size.width * size.height * 4
         var pixelData = [UInt8](repeating: 0, count: Int(dataSize))
@@ -142,7 +142,7 @@ extension UIImage {
             space: colorSpace,
             bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
         )
-        guard let cgImage = self.cgImage else { return [] }
+        guard let cgImage = cgImage else { return [] }
         context?.draw(cgImage, in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
 
         return pixelData
