@@ -38,7 +38,7 @@ jobs:
       run: brew install robotsandpencils/made/xcodes
 
     - name: Install iOS ${{ matrix.sdk }}
-      run: xcodes runtimes install "iOS ${{ matrix.sdk }}"
+      run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Build & Test
       run: |
