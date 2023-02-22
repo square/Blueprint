@@ -17,7 +17,7 @@ jobs:
       matrix:
         include:
           - sdk: "14.5"
-            destination: platform=iOS Simulator,OS=14.5,name=iPhone 8
+            destination: platform=iOS Simulator,OS=14.5,name=iPhone 12
 
           - sdk: "15.0"
             destination: platform=iOS Simulator,OS=15.0,name=iPhone 8
