@@ -1,5 +1,3 @@
-# https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md
-
 name: Tests
 
 on:
@@ -12,7 +10,7 @@ jobs:
   spm:
     name: "iOS ${{ matrix.sdk }}"
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     strategy:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
@@ -59,7 +57,7 @@ jobs:
   cocoapods:
     name: "CocoaPods"
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     steps:
     - uses: actions/checkout@v1

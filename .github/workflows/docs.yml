@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Generate docs with jazzy and publish to Github pages
-    runs-on: macos-11
+    runs-on: macos-12
 
     steps:
       - name: Checkout
