@@ -12,6 +12,15 @@ Pods/
 *.xcworkspace
 
 # SPM
+
+# Disabled so that we can commit the generated schemes that live in
+# .swiftpm/xcode/xcshareddata/xcschemes/*.xcscheme, to work around an Xcode 14 bug.
+#
+# See https://stackoverflow.com/q/72741060
+#
+# That's the only thing in .swiftpm now. Make this pattern more complicated if you want to exclude
+# other things.
+#
 # .swiftpm/
 
 .build/
