@@ -1,5 +1,3 @@
-# https://github.com/actions/virtual-environments/blob/main/images/macos/macos-11-Readme.md
-
 name: Tests
 
 on:
@@ -12,17 +10,20 @@ jobs:
   spm:
     name: "iOS ${{ matrix.sdk }}"
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     strategy:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
       matrix:
         include:
           - sdk: "14.5"
-            destination: platform=iOS Simulator,OS=14.5,name=iPhone 8
+            destination: platform=iOS Simulator,OS=14.5,name=iPad (8th generation)
 
           - sdk: "15.0"
             destination: platform=iOS Simulator,OS=15.0,name=iPhone 8
+
+          - sdk: "16.2"
+            destination: platform=iOS Simulator,OS=16.2,name=iPhone 8
 
     steps:
     - uses: actions/checkout@v1
@@ -33,8 +34,11 @@ jobs:
     - name: Switch to Xcode ${{ env.xcode_version }}
       run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
+    - name: Install xcodes
+      run: brew install aria2 robotsandpencils/made/xcodes
+
     - name: Install iOS ${{ matrix.sdk }}
-      run: xcversion simulators --install="iOS ${{ matrix.sdk }}"
+      run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Build & Test
       run: |
@@ -43,7 +47,7 @@ jobs:
     - name: Package snapshot changes
       if: ${{ failure() }}
       run: |
-        git ls-files -mo BlueprintUICommonControls/Tests/Sources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
+        git ls-files -mo BlueprintUICommonControls/Tests/Sources/Resources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
       uses: actions/upload-artifact@v2
@@ -56,7 +60,7 @@ jobs:
   cocoapods:
     name: "CocoaPods"
 
-    runs-on: macos-11
+    runs-on: macos-12
 
     steps:
     - uses: actions/checkout@v1
@@ -83,4 +87,4 @@ jobs:
 
     - name: Build & Test
       run: |
-        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=15.0,name=iPhone 8"
+        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=16.2,name=iPhone 8"
