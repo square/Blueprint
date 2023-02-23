@@ -35,7 +35,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
     - name: Install xcodes
-      run: brew install robotsandpencils/made/xcodes
+      run: brew install aria2 robotsandpencils/made/xcodes
 
     - name: Install iOS ${{ matrix.sdk }}
       run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
