@@ -12,7 +12,8 @@ Pods/
 *.xcworkspace
 
 # SPM
-.swiftpm/
+# .swiftpm/
+
 .build/
 BlueprintUI.xcodeproj/
 
