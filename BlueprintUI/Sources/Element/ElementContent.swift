@@ -108,8 +108,10 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    public init(child: Element) {
-        self = ElementContent(child: child, layout: PassthroughLayout())
+    public init(
+        child: Element
+    ) {
+        storage = SingleChildStorage(child: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -179,6 +181,49 @@ extension ElementContent {
 
         self.init(child: child) { environment in
             environment[key] = value
+        }
+    }
+}
+
+
+extension ElementContent {
+
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    public init(byMeasuring element: Element) {
+        storage = MeasureNestedElementStorage(child: element)
+    }
+
+    private struct MeasureNestedElementStorage: ContentStorage {
+
+        let child: Element
+
+        let childCount: Int = 0
+
+        func measure(
+            in constraint: SizeConstraint,
+            environment: Environment,
+            cache: CacheTree
+        ) -> CGSize {
+
+            cache.get(constraint) { constraint -> CGSize in
+                child.content.measure(
+                    in: constraint,
+                    environment: environment,
+                    cache: cache.subcache(element: child)
+                )
+            }
+        }
+
+        func performLayout(
+            attributes: LayoutAttributes,
+            environment: Environment,
+            cache: CacheTree
+        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+            []
         }
     }
 }
@@ -345,6 +390,54 @@ extension ElementContent {
 }
 
 
+private struct SingleChildStorage: ContentStorage {
+
+    let childCount: Int = 1
+
+    var child: Element
+
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree
+    ) -> CGSize {
+
+        cache.get(constraint) { constraint -> CGSize in
+            child.content.measure(
+                in: constraint,
+                environment: environment,
+                cache: cache.subcache(element: child)
+            )
+        }
+    }
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment,
+        cache: CacheTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+
+        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performLayout(
+                attributes: childAttributes,
+                environment: environment,
+                cache: cache.subcache(element: child)
+            )
+        )
+
+        return [(identifier, node)]
+    }
+}
+
+
+
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
 
@@ -493,20 +586,6 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
-}
-
-
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-
 }
 
 
