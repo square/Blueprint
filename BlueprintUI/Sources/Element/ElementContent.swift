@@ -208,7 +208,6 @@ extension ElementContent {
             environment: Environment,
             cache: CacheTree
         ) -> CGSize {
-
             cache.get(constraint) { constraint -> CGSize in
                 child.content.measure(
                     in: constraint,
