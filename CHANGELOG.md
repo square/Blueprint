@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Misc
 
+### Internal
+- Added an Internal section to the changelog. This section is intended to capture any notable non-public changes to the project.
+
 # Past Releases
 
 ## [0.49.1]
