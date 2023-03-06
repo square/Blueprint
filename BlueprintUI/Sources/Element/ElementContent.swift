@@ -111,7 +111,7 @@ extension ElementContent {
     public init(
         child: Element
     ) {
-        storage = SingleChildStorage(child: child)
+        storage = PassthroughStorage(child: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -193,11 +193,11 @@ extension ElementContent {
     ///
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
-    public init(byMeasuring element: Element) {
-        storage = MeasureNestedElementStorage(child: element)
+    public init(measuring element: Element) {
+        storage = MeasureElementStorage(child: element)
     }
 
-    private struct MeasureNestedElementStorage: ContentStorage {
+    private struct MeasureElementStorage: ContentStorage {
 
         let child: Element
 
@@ -209,7 +209,16 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             cache.get(constraint) { constraint -> CGSize in
-                child.content.measure(
+
+                Logger.logMeasureStart(
+                    object: cache.signpostRef,
+                    description: cache.name,
+                    constraint: constraint
+                )
+
+                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+                return child.content.measure(
                     in: constraint,
                     environment: environment,
                     cache: cache.subcache(element: child)
@@ -288,11 +297,13 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             cache.get(constraint) { constraint -> CGSize in
+
                 Logger.logMeasureStart(
                     object: cache.signpostRef,
                     description: cache.name,
                     constraint: constraint
                 )
+
                 defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
                 let layoutItems = self.layoutItems(in: environment, cache: cache)
@@ -389,7 +400,9 @@ extension ElementContent {
 }
 
 
-private struct SingleChildStorage: ContentStorage {
+/// A storage type that simply delegates its measurement and layout to
+/// another child, without any modification.
+private struct PassthroughStorage: ContentStorage {
 
     let childCount: Int = 1
 
@@ -402,7 +415,16 @@ private struct SingleChildStorage: ContentStorage {
     ) -> CGSize {
 
         cache.get(constraint) { constraint -> CGSize in
-            child.content.measure(
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+            return child.content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -474,7 +496,17 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
             let environment = adapted(environment: environment)
+
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -523,7 +555,17 @@ private struct LazyStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
+
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -558,7 +600,16 @@ private struct MeasurableStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint in
-            measurer(constraint, environment)
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+            return measurer(constraint, environment)
         }
     }
 }

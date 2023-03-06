@@ -187,9 +187,9 @@ class ElementContentTests: XCTestCase {
         XCTAssertEqual(callCount, 2)
     }
 
-    func test_byMeasuring() {
+    func test_measuring() {
 
-        struct TestElement: Element {
+        struct InnerTestElement: Element {
 
             var measure: (SizeConstraint) -> CGSize
 
@@ -202,26 +202,44 @@ class ElementContentTests: XCTestCase {
             }
         }
 
-        var calls: [SizeConstraint] = []
+        struct OuterTestElement: Element {
 
-        let element = Column {
-            TestElement { constraint in
-                calls.append(constraint)
-                return CGSize(width: 10, height: 10)
+            var element: InnerTestElement
+
+            var content: ElementContent {
+                ElementContent(measuring: element)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
             }
         }
 
+        var calls: [SizeConstraint] = []
+
+        let element = OuterTestElement(
+            element: InnerTestElement { constraint in
+                calls.append(constraint)
+                return CGSize(width: 100, height: 10)
+            }
+        )
+
         let cache = RenderPassCache(name: "Test", signpostRef: NSObject())
 
-        /// Invoke measurement with the same cache twice to ensure repeated calls with the same constraints are cached.
+        /// Should output the size of the inner element.
 
-        _ = element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
-        _ = element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+        XCTAssertEqual(
+            CGSize(width: 100, height: 10),
+            element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+        )
 
-        XCTAssertEqual(calls, [
-            SizeConstraint(CGSize(width: 100, height: 100)),
-            SizeConstraint(CGSize(width: 100, height: 10)),
-        ])
+        let layout = element.content.performLayout(
+            attributes: .init(size: CGSize(width: 100, height: 100)),
+            environment: .empty,
+            cache: cache
+        )
+
+        XCTAssertTrue(layout.isEmpty)
     }
 }
 
