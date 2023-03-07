@@ -170,23 +170,3 @@ public protocol CaffeinatedSingleChildLayout {
 extension CaffeinatedSingleChildLayout where Cache == () {
     public func makeCache(subelement: Subelement) { () }
 }
-
-// TODO: temporary conformance
-
-extension CaffeinatedSingleChildLayout {
-    public func sizeThatFits(
-        proposal: SizeConstraint,
-        subelement: Subelement,
-        cache: inout Cache
-    ) -> CGSize {
-        fatalError("not implemented")
-    }
-
-    public func placeSubelement(
-        in size: CGSize,
-        subelement: Subelement,
-        cache: inout Cache
-    ) {
-        fatalError("not implemented")
-    }
-}

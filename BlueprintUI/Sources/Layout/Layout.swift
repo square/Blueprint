@@ -278,23 +278,3 @@ public protocol CaffeinatedLayout {
 extension CaffeinatedLayout where Cache == () {
     public func makeCache(subelements: Subelements) { () }
 }
-
-// TODO: Temporary conformance fulfillment
-
-extension CaffeinatedLayout {
-    public func sizeThatFits(
-        proposal: SizeConstraint,
-        subelements: Subelements,
-        cache: inout Cache
-    ) -> CGSize {
-        fatalError("not implemented")
-    }
-
-    public func placeSubelements(
-        in size: CGSize,
-        subelements: Subelements,
-        cache: inout Cache
-    ) {
-        fatalError("not implemented")
-    }
-}

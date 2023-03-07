@@ -57,6 +57,12 @@ extension SizeConstraint {
         )
     }
 
+    public func inset(by insets: UIEdgeInsets) -> SizeConstraint {
+        inset(
+            width: insets.left + insets.right,
+            height: insets.top + insets.bottom
+        )
+    }
 }
 
 extension SizeConstraint {
@@ -107,6 +113,16 @@ extension SizeConstraint {
                 return value
             case .unconstrained:
                 return nil
+            }
+        }
+
+        func map(transform: (CGFloat) -> (CGFloat)) -> Self {
+            switch self {
+            case .atMost(let value):
+                return .atMost(transform(value))
+
+            case .unconstrained:
+                return .unconstrained
             }
         }
 

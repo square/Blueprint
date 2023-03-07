@@ -120,6 +120,52 @@ extension GridRow {
             return attributes
         }
 
+        private func items(subelements: Subelements) -> [(traits: Traits, content: Measurable)] {
+            subelements.map { subelement in
+                let traits = subelement.gridRowLayoutTraits
+                let measurable = Measurer { constraint in
+                    subelement.sizeThatFits(constraint)
+                }
+                return (traits, measurable)
+            }
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout Cache) -> CGSize {
+            guard subelements.count > 0 else {
+                return .zero
+            }
+
+            let items = items(subelements: subelements)
+
+            let frames = _frames(in: proposal, items: items)
+
+            // Measure the the row to be as wide as the sum of its children and as tall as its tallest child.
+            let size = frames.reduce(.zero) { size, frame in
+                CGSize(width: frame.maxX, height: max(size.height, frame.height))
+            }
+
+            return size
+        }
+
+        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+            guard subelements.count > 0 else {
+                return
+            }
+
+            let items = items(subelements: subelements)
+            let frames = _frames(
+                in: SizeConstraint(size),
+                isExactConstraint: true,
+                items: items
+            )
+
+            for (frame, subelement) in zip(frames, subelements) {
+                subelement.place(at: frame.origin, size: frame.size)
+            }
+        }
+
+        private typealias GridRowLayoutItem = (traits: Width, content: Measurable)
+
         /// Compute child frames in a given layout space.
         ///
         /// First, we measure the size of absolutely-sized children. Next, we measure the size of
@@ -284,6 +330,13 @@ extension GridRow {
         }
     }
 }
+
+extension LayoutSubelement {
+    var gridRowLayoutTraits: GridRow.GridRowLayout.Traits {
+        traits(forLayoutType: GridRow.GridRowLayout.self)
+    }
+}
+
 
 // MARK: - child modeling -
 extension GridRow {

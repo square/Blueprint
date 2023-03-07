@@ -82,6 +82,26 @@ extension ConstrainedSize {
                 return absoluteValue
             }
         }
+
+        func applied(to constraint: SizeConstraint.Axis) -> SizeConstraint.Axis {
+            switch constraint {
+            case .atMost(let maxValue):
+                return .atMost(applied(to: maxValue))
+            case .unconstrained:
+                switch self {
+                case .unconstrained:
+                    return .unconstrained
+                case let .atMost(max):
+                    return .atMost(max)
+                case .atLeast:
+                    return .unconstrained
+                case let .within(range):
+                    return .atMost(range.upperBound)
+                case let .absolute(absoluteValue):
+                    return .atMost(absoluteValue)
+                }
+            }
+        }
     }
 }
 
@@ -186,6 +206,27 @@ extension ConstrainedSize {
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+            if case let .absolute(width) = width, case let .absolute(height) = height {
+                return CGSize(width: width, height: height)
+            }
+
+            let constrainedProposal = SizeConstraint(
+                width: width.applied(to: proposal.width),
+                height: height.applied(to: proposal.height)
+            )
+            let measurement = subelement.sizeThatFits(constrainedProposal)
+
+            return CGSize(
+                width: width.applied(to: measurement.width),
+                height: height.applied(to: measurement.height)
+            )
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            subelement.place(filling: size)
         }
     }
 
