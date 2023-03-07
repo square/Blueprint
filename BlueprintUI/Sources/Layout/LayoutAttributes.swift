@@ -58,6 +58,14 @@ public struct LayoutAttributes {
         validateAlpha()
     }
 
+    init(frame: CGRect, attributes: LayoutSubelement.Attributes) {
+        self.init(frame: frame)
+        transform = attributes.transform
+        alpha = attributes.alpha
+        isUserInteractionEnabled = attributes.isUserInteractionEnabled
+        isHidden = attributes.isHidden
+    }
+
     public var frame: CGRect {
         get {
             var f = CGRect.zero

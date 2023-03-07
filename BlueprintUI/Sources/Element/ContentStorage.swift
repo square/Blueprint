@@ -30,21 +30,3 @@ protocol CaffeinatedContentStorage {
         context: LayoutContext
     ) -> [ElementContent.IdentifiedNode]
 }
-
-// TODO: temporary conformance
-
-extension CaffeinatedContentStorage {
-    public func sizeThatFits(
-        proposal: SizeConstraint,
-        context: MeasureContext
-    ) -> CGSize {
-        fatalError("not implemented")
-    }
-
-    public func performCaffeinatedLayout(
-        frame: CGRect,
-        context: LayoutContext
-    ) -> [ElementContent.IdentifiedNode] {
-        fatalError("not implemented")
-    }
-}

@@ -19,11 +19,16 @@ extension Element {
                 environment: environment
             )
 
-        case .caffeinated:
+        case .caffeinated(let options):
             return caffeinatedLayout(
                 frame: frame,
                 context: LayoutContext(
-                    environment: environment
+                    environment: environment,
+                    node: LayoutTreeNode(
+                        path: "\(type(of: self))",
+                        signpostRef: SignpostToken(),
+                        options: options
+                    )
                 )
             )
         }

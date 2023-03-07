@@ -3,6 +3,8 @@ import Foundation
 /// Content storage that supports layout and multiple children.
 struct LayoutStorage<LayoutType: Layout>: ContentStorage {
 
+    typealias IdentifiedNode = ElementContent.IdentifiedNode
+
     var layout: LayoutType
     var children: [Child]
 
@@ -39,7 +41,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [IdentifiedNode] {
         guard children.isEmpty == false else {
             return []
         }
@@ -47,7 +49,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         let layoutItems = layoutItems(in: environment, cache: cache)
         let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
-        var result: [(identifier: ElementIdentifier, node: LayoutResultNode)] = []
+        var result: [IdentifiedNode] = []
         result.reserveCapacity(children.count)
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
@@ -81,6 +83,101 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         }
 
         return result
+    }
+
+    private func subelements(from node: LayoutTreeNode, environment: Environment) -> LayoutSubelements {
+        node.layoutSubelements {
+            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+            return children.map { child in
+                let identifier = identifierFactory.nextIdentifier(
+                    for: type(of: child.element),
+                    key: child.key
+                )
+                return LayoutSubelement(
+                    identifier: identifier,
+                    content: child.content,
+                    measureContext: MeasureContext(
+                        environment: environment,
+                        node: node.subnode(key: identifier)
+                    ),
+                    traits: child.traits
+                )
+            }
+        }
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+
+        let subelements = subelements(from: context.node, environment: context.environment)
+
+        var associatedCache = context.node.associatedCache {
+            layout.makeCache(subelements: subelements)
+        }
+
+        let size = layout.sizeThatFits(
+            proposal: proposal,
+            subelements: subelements,
+            cache: &associatedCache
+        )
+
+        context.node.update(associatedCache: associatedCache)
+
+        return size
+    }
+
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        context: LayoutContext
+    ) -> [IdentifiedNode] {
+        guard children.isEmpty == false else { return [] }
+
+        let subelements = subelements(from: context.node, environment: context.environment)
+
+        var associatedCache = context.node.associatedCache {
+            layout.makeCache(subelements: subelements)
+        }
+
+        layout.placeSubelements(
+            in: frame.size,
+            subelements: subelements,
+            cache: &associatedCache
+        )
+
+        context.node.update(associatedCache: associatedCache)
+
+        let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
+            let subelement = subelements[index]
+
+            let placement = subelement.placement ?? .filling(frame: frame)
+
+            let size = placement.size
+            let origin = placement.origin(for: size)
+            let frame = CGRect(origin: origin, size: size)
+
+            let childAttributes = LayoutAttributes(
+                frame: frame,
+                attributes: subelement.attributes
+            )
+
+            let identifier = subelement.identifier
+
+            let childContext = LayoutContext(
+                environment: context.environment,
+                node: context.node.subnode(key: identifier)
+            )
+
+            let node = LayoutResultNode(
+                element: child.element,
+                layoutAttributes: childAttributes,
+                environment: context.environment,
+                children: child.content.performCaffeinatedLayout(
+                    frame: frame,
+                    context: childContext
+                )
+            )
+            return (identifier: identifier, node: node)
+        }
+        return identifiedNodes
     }
 
     private func layoutItems(

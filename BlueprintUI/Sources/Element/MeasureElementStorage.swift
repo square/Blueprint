@@ -4,9 +4,17 @@ struct MeasureElementStorage: ContentStorage {
 
     typealias IdentifiedNode = ElementContent.IdentifiedNode
 
-    let child: Element
+    let childCount = 0
 
-    let childCount: Int = 0
+    var child: Element
+    var content: ElementContent
+    var identifier: ElementIdentifier
+
+    init(child: Element) {
+        self.child = child
+        content = child.content
+        identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+    }
 
     func measure(
         in constraint: SizeConstraint,
@@ -23,7 +31,7 @@ struct MeasureElementStorage: ContentStorage {
 
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-            return child.content.measure(
+            return content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -36,6 +44,20 @@ struct MeasureElementStorage: ContentStorage {
         environment: Environment,
         cache: CacheTree
     ) -> [IdentifiedNode] {
+        []
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+        content.sizeThatFits(
+            proposal: proposal,
+            context: MeasureContext(
+                environment: context.environment,
+                node: context.node.subnode(key: identifier)
+            )
+        )
+    }
+
+    func performCaffeinatedLayout(frame: CGRect, context: LayoutContext) -> [IdentifiedNode] {
         []
     }
 }

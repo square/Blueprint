@@ -34,10 +34,15 @@ public struct ElementContent {
                 environment: environment,
                 cache: CacheFactory.makeCache(name: cacheName)
             )
-        case .caffeinated:
+        case .caffeinated(let options):
+            let node = LayoutTreeNode(
+                path: cacheName,
+                signpostRef: SignpostToken(),
+                options: options
+            )
             return sizeThatFits(
                 proposal: constraint,
-                context: MeasureContext(environment: environment)
+                context: MeasureContext(environment: environment, node: node)
             )
         }
     }

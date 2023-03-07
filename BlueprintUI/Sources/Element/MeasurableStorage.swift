@@ -3,6 +3,8 @@ import CoreGraphics
 /// Content storage for leaf nodes.
 struct MeasurableStorage: ContentStorage {
 
+    typealias IdentifiedNode = ElementContent.IdentifiedNode
+
     let childCount = 0
 
     let measurer: (SizeConstraint, Environment) -> CGSize
@@ -11,7 +13,7 @@ struct MeasurableStorage: ContentStorage {
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [IdentifiedNode] {
         []
     }
 
@@ -27,5 +29,16 @@ struct MeasurableStorage: ContentStorage {
 
             return measurer(constraint, environment)
         }
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+        measurer(proposal, context.environment)
+    }
+
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        context: LayoutContext
+    ) -> [IdentifiedNode] {
+        []
     }
 }
