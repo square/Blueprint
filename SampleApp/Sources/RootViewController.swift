@@ -46,6 +46,10 @@ final class RootViewController: UIViewController {
                     print("Performed!")
                 }
             },
+
+            DemoItem(title: "KeyboardReader Keyboard Observation", onTap: { [weak self] in
+                self?.push(KeyboardReaderViewController())
+            }),
         ]
     }
 
