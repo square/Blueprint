@@ -36,6 +36,8 @@ public final class BlueprintView: UIView {
 
     private let rootController: NativeViewController
 
+    private var layoutResult: LayoutResultNode?
+
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
     /// A base environment used when laying out and rendering the element tree.
@@ -97,6 +99,16 @@ public final class BlueprintView: UIView {
             guard oldValue.size != bounds.size else { return }
 
             invalidateIntrinsicContentSize()
+        }
+    }
+
+    /// An optional explicit layout mode for this view. If `nil`, this view will inherit the layout
+    /// mode of its nearest ancestor, or use ``LayoutMode/default``.
+    public var layoutMode: LayoutMode? {
+        didSet {
+            if layoutMode != oldValue {
+                setNeedsViewHierarchyUpdate()
+            }
         }
     }
 
@@ -211,11 +223,18 @@ public final class BlueprintView: UIView {
         )
         defer { Logger.logSizeThatFitsEnd(view: self) }
 
-        let measurement = element.content.measure(
-            in: constraint,
-            environment: makeEnvironment(),
-            cache: CacheFactory.makeCache(name: cacheName)
-        )
+        let environment = makeEnvironment()
+        let layoutMode = environment.layoutMode
+        let renderContext = RenderContext(layoutMode: layoutMode)
+
+        let measurement = renderContext.perform {
+            element.content.measure(
+                in: constraint,
+                environment: environment,
+                cache: CacheFactory.makeCache(name: cacheName),
+                layoutMode: layoutMode
+            )
+        }
 
         sizesThatFit[constraint] = measurement
 
@@ -339,10 +358,21 @@ public final class BlueprintView: UIView {
             size: bounds.size + rootCorrection.size
         )
 
-        /// Grab view descriptions
-        let viewNodes = element?
-            .layout(layoutAttributes: LayoutAttributes(frame: rootFrame), environment: environment)
-            .resolve() ?? []
+        let layoutMode = environment.layoutMode
+        let renderContext = RenderContext(layoutMode: layoutMode)
+
+        // Perform layout
+        let layoutResult = renderContext.perform {
+            element?.layout(
+                frame: rootFrame,
+                environment: environment,
+                layoutMode: layoutMode
+            )
+        }
+        self.layoutResult = layoutResult
+
+        // Flatten into tree of view descriptions
+        let viewNodes = layoutResult?.resolve() ?? []
 
         let layoutEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
@@ -401,6 +431,27 @@ public final class BlueprintView: UIView {
         return rootController.children
     }
 
+    /// Forces a synchronous layout, for testing purposes.
+    @_spi(BlueprintDebugging)
+    public func forceSynchronousLayout() {
+        setNeedsViewHierarchyUpdate()
+        updateViewHierarchyIfNeeded()
+    }
+
+    /// Dumps the result of the most recent layout, by recursing through the layout tree and calling
+    /// the provided visitor on each node. By default, this prints to `stdout`.
+    @_spi(BlueprintDebugging)
+    public func dumpLayoutResult(
+        visit: ((_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void) = { depth, identifier, frame in
+            let origin = "x \(frame.origin.x), y \(frame.origin.y)"
+            let size = "\(frame.size.width) × \(frame.size.height)"
+            let indent = String(repeating: "  ", count: depth)
+            print("\(indent)\(identifier) \(origin), \(size)")
+        }
+    ) {
+        layoutResult?.dump(visit: visit)
+    }
+
     private func makeEnvironment() -> Environment {
 
         let inherited: Environment = {
@@ -427,6 +478,10 @@ public final class BlueprintView: UIView {
 
         if let window = window {
             environment.windowSize = window.bounds.size
+        }
+
+        if let layoutMode = layoutMode ?? RenderContext.current?.layoutMode {
+            environment.layoutMode = layoutMode
         }
 
         return environment

@@ -106,7 +106,8 @@ class ElementContentTests: XCTestCase {
             _ = container.measure(
                 in: SizeConstraint(containerSize),
                 environment: .empty,
-                cache: cache
+                cache: cache,
+                layoutMode: .legacy
             )
 
             return (cache, counts)
