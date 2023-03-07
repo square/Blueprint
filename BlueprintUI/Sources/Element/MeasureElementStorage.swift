@@ -2,6 +2,8 @@ import Foundation
 
 struct MeasureElementStorage: ContentStorage {
 
+    typealias IdentifiedNode = ElementContent.IdentifiedNode
+
     let child: Element
 
     let childCount: Int = 0
@@ -29,11 +31,11 @@ struct MeasureElementStorage: ContentStorage {
         }
     }
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [IdentifiedNode] {
         []
     }
 }

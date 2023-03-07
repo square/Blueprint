@@ -6,7 +6,7 @@ struct LazyStorage: ContentStorage {
 
     var builder: (ElementContent.LayoutPhase, SizeConstraint, Environment) -> Element
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
@@ -21,7 +21,7 @@ struct LazyStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performLayout(
+            children: child.content.performLegacyLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)

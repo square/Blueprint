@@ -5,21 +5,58 @@ extension Element {
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///
-    /// - Parameter layoutAttributes: The layout attributes to assign to the
-    ///   root element.
     ///
     /// - Returns: A layout result
-    func layout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        LayoutResultNode(
-            root: self,
+    /// - Parameters:
+    ///   - frame: the root element's frame
+    ///   - environment: the root environment
+    ///   - layoutMode: the mode to use for layout
+    func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
+        switch layoutMode {
+        case .legacy:
+            return legacyLayout(
+                layoutAttributes: LayoutAttributes(frame: frame),
+                environment: environment
+            )
+
+        case .caffeinated:
+            return caffeinatedLayout(
+                frame: frame,
+                context: LayoutContext(
+                    environment: environment
+                )
+            )
+        }
+    }
+
+    private func legacyLayout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
+        let cache = CacheFactory.makeCache(name: "\(type(of: self))")
+        let children = content.performLegacyLayout(
+            attributes: layoutAttributes,
+            environment: environment,
+            cache: cache
+        )
+
+        return LayoutResultNode(
+            element: self,
             layoutAttributes: layoutAttributes,
-            environment: environment
+            environment: environment,
+            children: children
         )
     }
 
-    func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
-        // TODO: switch on layoutMode
-        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+    private func caffeinatedLayout(frame: CGRect, context: LayoutContext) -> LayoutResultNode {
+        let children = content.performCaffeinatedLayout(
+            frame: frame,
+            context: context
+        )
+
+        return LayoutResultNode(
+            element: self,
+            layoutAttributes: LayoutAttributes(frame: frame),
+            environment: context.environment,
+            children: children
+        )
     }
 }
 
@@ -48,21 +85,6 @@ struct LayoutResultNode {
         self.environment = environment
         self.children = children
     }
-
-    init(root: Element, layoutAttributes: LayoutAttributes, environment: Environment) {
-        let cache = CacheFactory.makeCache(name: "\(type(of: root))")
-        self.init(
-            element: root,
-            layoutAttributes: layoutAttributes,
-            environment: environment,
-            children: root.content.performLayout(
-                attributes: layoutAttributes,
-                environment: environment,
-                cache: cache
-            )
-        )
-    }
-
 }
 
 

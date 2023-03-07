@@ -35,7 +35,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         }
     }
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
@@ -65,7 +65,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
                 environment: environment,
-                children: currentChild.content.performLayout(
+                children: currentChild.content.performLegacyLayout(
                     attributes: currentChildLayoutAttributes,
                     environment: environment,
                     cache: currentChildCache

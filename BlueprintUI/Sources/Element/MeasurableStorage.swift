@@ -7,7 +7,7 @@ struct MeasurableStorage: ContentStorage {
 
     let measurer: (SizeConstraint, Environment) -> CGSize
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
