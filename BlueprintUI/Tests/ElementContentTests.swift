@@ -186,6 +186,61 @@ class ElementContentTests: XCTestCase {
 
         XCTAssertEqual(callCount, 2)
     }
+
+    func test_measuring() {
+
+        struct InnerTestElement: Element {
+
+            var measure: (SizeConstraint) -> CGSize
+
+            var content: ElementContent {
+                ElementContent(measureFunction: measure)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        struct OuterTestElement: Element {
+
+            var element: InnerTestElement
+
+            var content: ElementContent {
+                ElementContent(measuring: element)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        var calls: [SizeConstraint] = []
+
+        let element = OuterTestElement(
+            element: InnerTestElement { constraint in
+                calls.append(constraint)
+                return CGSize(width: 100, height: 10)
+            }
+        )
+
+        let cache = RenderPassCache(name: "Test", signpostRef: NSObject())
+
+        /// Should output the size of the inner element.
+
+        XCTAssertEqual(
+            CGSize(width: 100, height: 10),
+            element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+        )
+
+        let layout = element.content.performLayout(
+            attributes: .init(size: CGSize(width: 100, height: 100)),
+            environment: .empty,
+            cache: cache
+        )
+
+        XCTAssertTrue(layout.isEmpty)
+    }
 }
 
 fileprivate struct MeasurableElement: Element {

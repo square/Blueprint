@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Introduced `ElementContent.init(byMeasuring:)`, for use when your `Element` contains a nested `BlueprintView`, commonly used to implement stateful elements. This avoids detached measurements and improves performance. 
+
 ### Removed
 
 ### Changed
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed `BlueprintViewRenderMetrics.measureDuration` to `layoutDuration`.
 - Renamed `BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)` to `blueprintView(_:completedRenderWith:)`.
 - `BlueprintViewRenderMetrics` values are now calculated using `CACurrentMediaTime` instead of `Date`.
+- `ElementContent.init(child:)` now utilizes a unique `ContentStorage` type, which improves layout performance.
 
 ### Deprecated
 

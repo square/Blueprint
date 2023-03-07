@@ -108,8 +108,10 @@ extension ElementContent {
     /// The given element will be used for measuring, and it will always fill the extent of the parent element.
     ///
     /// - parameter element: The single child element.
-    public init(child: Element) {
-        self = ElementContent(child: child, layout: PassthroughLayout())
+    public init(
+        child: Element
+    ) {
+        storage = PassthroughStorage(child: child)
     }
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided `Measurable`.
@@ -184,6 +186,57 @@ extension ElementContent {
 }
 
 
+extension ElementContent {
+
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    public init(measuring element: Element) {
+        storage = MeasureElementStorage(child: element)
+    }
+
+    private struct MeasureElementStorage: ContentStorage {
+
+        let child: Element
+
+        let childCount: Int = 0
+
+        func measure(
+            in constraint: SizeConstraint,
+            environment: Environment,
+            cache: CacheTree
+        ) -> CGSize {
+            cache.get(constraint) { constraint -> CGSize in
+
+                Logger.logMeasureStart(
+                    object: cache.signpostRef,
+                    description: cache.name,
+                    constraint: constraint
+                )
+
+                defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+                return child.content.measure(
+                    in: constraint,
+                    environment: environment,
+                    cache: cache.subcache(element: child)
+                )
+            }
+        }
+
+        func performLayout(
+            attributes: LayoutAttributes,
+            environment: Environment,
+            cache: CacheTree
+        ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+            []
+        }
+    }
+}
+
+
 fileprivate protocol ContentStorage {
     var childCount: Int { get }
 
@@ -244,11 +297,13 @@ extension ElementContent {
             cache: CacheTree
         ) -> CGSize {
             cache.get(constraint) { constraint -> CGSize in
+
                 Logger.logMeasureStart(
                     object: cache.signpostRef,
                     description: cache.name,
                     constraint: constraint
                 )
+
                 defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
                 let layoutItems = self.layoutItems(in: environment, cache: cache)
@@ -345,6 +400,65 @@ extension ElementContent {
 }
 
 
+/// A storage type that simply delegates its measurement and layout to
+/// another child, without any modification.
+private struct PassthroughStorage: ContentStorage {
+
+    let childCount: Int = 1
+
+    var child: Element
+
+    func measure(
+        in constraint: SizeConstraint,
+        environment: Environment,
+        cache: CacheTree
+    ) -> CGSize {
+
+        cache.get(constraint) { constraint -> CGSize in
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+            return child.content.measure(
+                in: constraint,
+                environment: environment,
+                cache: cache.subcache(element: child)
+            )
+        }
+    }
+
+    func performLayout(
+        attributes: LayoutAttributes,
+        environment: Environment,
+        cache: CacheTree
+    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+
+        let childAttributes = LayoutAttributes(size: attributes.bounds.size)
+
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performLayout(
+                attributes: childAttributes,
+                environment: environment,
+                cache: cache.subcache(element: child)
+            )
+        )
+
+        return [(identifier, node)]
+    }
+}
+
+
+
 private struct EnvironmentAdaptingStorage: ContentStorage {
     let childCount = 1
 
@@ -382,7 +496,17 @@ private struct EnvironmentAdaptingStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
             let environment = adapted(environment: environment)
+
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -431,7 +555,17 @@ private struct LazyStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
+
             return child.content.measure(
                 in: constraint,
                 environment: environment,
@@ -466,7 +600,16 @@ private struct MeasurableStorage: ContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint in
-            measurer(constraint, environment)
+
+            Logger.logMeasureStart(
+                object: cache.signpostRef,
+                description: cache.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+
+            return measurer(constraint, environment)
         }
     }
 }
@@ -493,20 +636,6 @@ fileprivate struct SingleChildLayoutHost: Layout {
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
     }
-}
-
-
-// Used for elements with a single child that requires no custom layout
-fileprivate struct PassthroughLayout: SingleChildLayout {
-
-    func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-        child.measure(in: constraint)
-    }
-
-    func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-        LayoutAttributes(size: size)
-    }
-
 }
 
 
