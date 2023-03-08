@@ -9,21 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The `Environment` will now automatically inherit for `BlueprintView` instances nested inside `UIViewElement` during measurement.
-
 ### Added
-
-- Introduced `ElementContent.init(byMeasuring:)`, for use when your `Element` contains a nested `BlueprintView`, commonly used to implement stateful elements. This avoids detached measurements and improves performance. 
 
 ### Removed
 
 ### Changed
-
-- Renamed `BlueprintViewUpdateMetrics` to `BlueprintViewRenderMetrics`.
-- Renamed `BlueprintViewRenderMetrics.measureDuration` to `layoutDuration`.
-- Renamed `BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)` to `blueprintView(_:completedRenderWith:)`.
-- `BlueprintViewRenderMetrics` values are now calculated using `CACurrentMediaTime` instead of `Date`.
-- `ElementContent.init(child:)` now utilizes a unique `ContentStorage` type, which improves layout performance.
 
 ### Deprecated
 
@@ -34,9 +24,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
-- Added an Internal section to the changelog. This section is intended to capture any notable non-public changes to the project.
+
 
 # Past Releases
+
+## [0.50.0] - 2023-03-07
+
+### Fixed
+
+- The `Environment` will now automatically inherit for `BlueprintView` instances nested inside `UIViewElement` during measurement.
+
+### Added
+
+- Introduced `ElementContent.init(byMeasuring:)`, for use when your `Element` contains a nested `BlueprintView`, commonly used to implement stateful elements. This avoids detached measurements and improves performance. 
+
+### Changed
+
+- Renamed `BlueprintViewUpdateMetrics` to `BlueprintViewRenderMetrics`.
+- Renamed `BlueprintViewRenderMetrics.measureDuration` to `layoutDuration`.
+- Renamed `BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)` to `blueprintView(_:completedRenderWith:)`.
+- `BlueprintViewRenderMetrics` values are now calculated using `CACurrentMediaTime` instead of `Date`.
+
+### Internal
+- Added an Internal section to the changelog. This section is intended to capture any notable non-public changes to the project.
+- `ElementContent.init(child:)` now utilizes a unique `ContentStorage` type, which improves layout performance.
 
 ## [0.49.1]
 
@@ -952,7 +963,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.49.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/0.50.0...HEAD
+[0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
 [0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
 [0.49.0]: https://github.com/square/Blueprint/compare/0.48.1...0.49.0
 [0.48.1]: https://github.com/square/Blueprint/compare/0.48.0...0.48.1
