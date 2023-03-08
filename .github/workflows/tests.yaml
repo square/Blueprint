@@ -77,10 +77,6 @@ jobs:
         ruby-version: ${{ env.ruby_version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
-    - name: Bundle Install
-      run: |
-        bundle check || bundle install --path .bundle
-
     - name: Pod Install
       run: |
         bundle exec pod install --project-directory=SampleApp/
