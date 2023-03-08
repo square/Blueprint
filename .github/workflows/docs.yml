@@ -2,7 +2,7 @@ name: Generate and publish docs
 
 on:
   push:
-    branches: [ main ]
+    branches: [ robmaceachern/docs-fix-pt2 ]
 
 jobs:
   build:
@@ -30,10 +30,10 @@ jobs:
           bundle
           bundle exec ./generate_docs.sh
 
-      - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v2
-        with:
-          target_branch: gh-pages
-          build_dir: .docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Deploy to GitHub Pages
+      #   uses: crazy-max/ghaction-github-pages@v2
+      #   with:
+      #     target_branch: gh-pages
+      #     build_dir: .docs
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
