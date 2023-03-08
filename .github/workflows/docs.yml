@@ -19,6 +19,12 @@ jobs:
       - name: Switch to Xcode ${{ env.xcode_version }}
         run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.ruby_version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
       - name: Generate Docs
         run: |
           bundle

@@ -74,12 +74,8 @@ jobs:
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6
+        ruby-version: ${{ env.ruby_version }}
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-
-    - name: Bundle Install
-      run: |
-        bundle check || bundle install --path .bundle
 
     - name: Pod Install
       run: |
