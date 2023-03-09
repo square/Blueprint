@@ -31,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated cocoapods (1.12.0).
 - Updated Ruby version (2.7).
 
-
 # Past Releases
 
 ## [0.50.0] - 2023-03-07
