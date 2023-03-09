@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Restored documentation generation by executing the generate_docs.sh script with `bundle exec` to ensure gems are referenced properly.
+
 ### Added
 
 ### Removed
@@ -25,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Updated jazzy gem (0.14.3).
+- Updated cocoapods (1.12.0).
+- Updated Ruby version (2.7).
 
 # Past Releases
 

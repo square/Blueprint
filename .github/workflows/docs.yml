@@ -28,7 +28,8 @@ jobs:
       - name: Generate Docs
         run: |
           bundle
-          ./generate_docs.sh
+          bundle exec ./generate_docs.sh
+
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2
         with:
