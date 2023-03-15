@@ -156,6 +156,15 @@ public final class BlueprintView: UIView {
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        NotificationCenter
+            .default
+            .addObserver(
+                self,
+                selector: #selector(defaultLayoutModeChanged(notification:)),
+                name: .defaultLayoutModeChanged,
+                object: nil
+            )
     }
 
     public convenience override init(frame: CGRect) {
@@ -498,6 +507,15 @@ public final class BlueprintView: UIView {
         rootController.traverse { node in
             node.onDisappear?()
         }
+    }
+
+    @objc
+    private func defaultLayoutModeChanged(notification: Notification) {
+        // if this view has an explicit mode set we can ignore this
+        guard layoutMode == nil else { return }
+
+        // otherwise we should re-render
+        setNeedsViewHierarchyUpdate()
     }
 }
 
