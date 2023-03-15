@@ -157,16 +157,10 @@ extension LayoutResultNode {
 
     }
 
-    /// Recursively dump layout tree, for debugging. By default, prints to stdout.
-    @_spi(BlueprintDebugging)
-    public func dump(
+    /// Recursively dump layout tree, for debugging.
+    func dump(
         depth: Int = 0,
-        visit: ((_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void) = { depth, identifier, frame in
-            let origin = "x \(frame.origin.x), y \(frame.origin.y)"
-            let size = "\(frame.size.width) × \(frame.size.height)"
-            let indent = String(repeating: "  ", count: depth)
-            print("\(indent)\(identifier) \(origin), \(size)")
-        }
+        visit: (_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void
     ) {
         for child in children {
             let attributes = child.node.layoutAttributes
