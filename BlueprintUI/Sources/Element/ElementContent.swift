@@ -16,7 +16,7 @@ public struct ElementContent {
         measure(
             in: constraint,
             environment: environment,
-            cache: CacheFactory.makeCache(name: "ElementContent"),
+            cacheName: "ElementContent",
             layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
         )
     }
@@ -24,30 +24,57 @@ public struct ElementContent {
     func measure(
         in constraint: SizeConstraint,
         environment: Environment,
-        cache: CacheTree,
+        cacheName: String,
         layoutMode: LayoutMode
     ) -> CGSize {
-        // TODO: switch on layoutMode
-        storage.measure(in: constraint, environment: environment, cache: cache)
+        switch layoutMode {
+        case .legacy:
+            return measure(
+                in: constraint,
+                environment: environment,
+                cache: CacheFactory.makeCache(name: cacheName)
+            )
+        case .caffeinated:
+            return sizeThatFits(
+                proposal: constraint,
+                context: MeasureContext(environment: environment)
+            )
+        }
     }
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         storage.measure(in: constraint, environment: environment, cache: cache)
     }
 
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+        storage.sizeThatFits(proposal: proposal, context: context)
+    }
+
     public var childCount: Int {
         storage.childCount
     }
 
-    func performLayout(
+    typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
+
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        storage.performLayout(
+    ) -> [IdentifiedNode] {
+        storage.performLegacyLayout(
             attributes: attributes,
             environment: environment,
             cache: cache
+        )
+    }
+
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        context: LayoutContext
+    ) -> [IdentifiedNode] {
+        storage.performCaffeinatedLayout(
+            frame: frame,
+            context: context
         )
     }
 }
@@ -107,7 +134,7 @@ extension ElementContent {
     public init(
         child: Element,
         key: AnyHashable? = nil,
-        layout: SingleChildLayout
+        layout: some SingleChildLayout
     ) {
         self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
             $0.add(key: key, element: child)
@@ -247,11 +274,13 @@ extension ElementContent {
 
 // All layout is ultimately performed by the `Layout` protocol – this implementations delegates to a wrapped
 // `SingleChildLayout` implementation for use in elements with a single child.
-fileprivate struct SingleChildLayoutHost: Layout {
+fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layout {
 
-    private var wrapped: SingleChildLayout
+    typealias Cache = WrappedLayout.Cache
 
-    init(wrapping layout: SingleChildLayout) {
+    private var wrapped: WrappedLayout
+
+    init(wrapping layout: WrappedLayout) {
         wrapped = layout
     }
 
@@ -265,6 +294,37 @@ fileprivate struct SingleChildLayoutHost: Layout {
         return [
             wrapped.layout(size: size, child: items.map { $0.content }.first!),
         ]
+    }
+
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        cache: inout Cache
+    ) -> CGSize {
+        precondition(subelements.count == 1)
+        return wrapped.sizeThatFits(
+            proposal: proposal,
+            subelement: subelements[0],
+            cache: &cache
+        )
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        cache: inout Cache
+    ) {
+        precondition(subelements.count == 1)
+        wrapped.placeSubelement(
+            in: size,
+            subelement: subelements[0],
+            cache: &cache
+        )
+    }
+
+    func makeCache(subelements: Subelements) -> Cache {
+        precondition(subelements.count == 1)
+        return wrapped.makeCache(subelement: subelements[0])
     }
 }
 

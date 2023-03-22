@@ -231,7 +231,7 @@ public final class BlueprintView: UIView {
             element.content.measure(
                 in: constraint,
                 environment: environment,
-                cache: CacheFactory.makeCache(name: cacheName),
+                cacheName: cacheName,
                 layoutMode: layoutMode
             )
         }

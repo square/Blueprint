@@ -4,6 +4,8 @@ import Foundation
 /// another child, without any modification.
 struct PassthroughStorage: ContentStorage {
 
+    typealias IdentifiedNode = ElementContent.IdentifiedNode
+
     let childCount: Int = 1
 
     var child: Element
@@ -32,11 +34,11 @@ struct PassthroughStorage: ContentStorage {
         }
     }
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
-    ) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
+    ) -> [IdentifiedNode] {
 
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
@@ -46,7 +48,7 @@ struct PassthroughStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performLayout(
+            children: child.content.performLegacyLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)

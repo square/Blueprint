@@ -11,7 +11,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
 
     var child: Element
 
-    func performLayout(
+    func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
         cache: CacheTree
@@ -26,7 +26,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performLayout(
+            children: child.content.performLegacyLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)

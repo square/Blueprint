@@ -96,7 +96,7 @@ class ElementContentTests: XCTestCase {
             let cache = TestCache(name: "test")
 
             _ = container
-                .performLayout(
+                .performLegacyLayout(
                     attributes: LayoutAttributes(size: containerSize),
                     environment: .empty,
                     cache: cache
@@ -106,8 +106,7 @@ class ElementContentTests: XCTestCase {
             _ = container.measure(
                 in: SizeConstraint(containerSize),
                 environment: .empty,
-                cache: cache,
-                layoutMode: .legacy
+                cache: cache
             )
 
             return (cache, counts)
@@ -179,7 +178,7 @@ class ElementContentTests: XCTestCase {
 
         let size = measure.measure(in: .unconstrained)
 
-        _ = layout.performLayout(
+        _ = layout.performLegacyLayout(
             attributes: .init(size: size),
             environment: .empty,
             cache: TestCache(name: "test")
@@ -234,13 +233,9 @@ class ElementContentTests: XCTestCase {
             element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
         )
 
-        let layout = element.content.performLayout(
-            attributes: .init(size: CGSize(width: 100, height: 100)),
-            environment: .empty,
-            cache: cache
-        )
+        let layoutResult = element.layout(frame: CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
 
-        XCTAssertTrue(layout.isEmpty)
+        XCTAssertTrue(layoutResult.children.isEmpty)
     }
 }
 
