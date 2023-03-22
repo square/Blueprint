@@ -5,12 +5,11 @@ extension Element {
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///
-    ///
-    /// - Returns: A layout result
     /// - Parameters:
     ///   - frame: the root element's frame
     ///   - environment: the root environment
     ///   - layoutMode: the mode to use for layout
+    /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
         switch layoutMode {
         case .legacy:

@@ -3,7 +3,7 @@ import CoreGraphics
 /// A type that defines the geometry of a collection of elements.
 ///
 /// You traditionally arrange views in your app's user interface using built-in layout containers
-/// like ``Row`` and ``Column``. If  you need more complex layout behavior, you can define a custom
+/// like ``Row`` and ``Column``. If you need more complex layout behavior, you can define a custom
 /// layout container by creating a type that conforms to the ``Layout`` protocol and implementing
 /// its required methods:
 ///
@@ -93,10 +93,14 @@ import CoreGraphics
 /// your layout, it defaults to the void type, `()`.
 ///
 /// Containers can choose to condition their behavior according to the traits of their subelements.
-/// For example, the ``Row`` and ``Column`` types allocate space to their subelements based in part
+/// For example, the ``Row`` and ``Column`` types allocate space for their subelements based in part
 /// on the grow and shrink priorities that you set on each child. Your layout container accesses the
 /// traits for a subelement by calling ``LayoutSubelement/traits(forLayoutType:)`` on the
 /// ``LayoutSubelement`` proxy.
+///
+/// - Note: The ``Layout`` API, and its documentation, are modeled after SwiftUI's
+///   [Layout](https://developer.apple.com/documentation/swiftui/layout), with major differences
+///   noted.
 ///
 public protocol Layout: LegacyLayout, CaffeinatedLayout {}
 
@@ -173,7 +177,13 @@ public protocol CaffeinatedLayout {
     ///    when given a smaller constraint, but it should never shrink when given a larger
     ///    constraint. When growing on one axis, it is OK to shrink along the other axis, such as a
     ///    block of text that re-flows as the width changes.
-    /// 2. If your element has no intrinsic size along an axis, you can represent that in a couple
+    /// 2. For a constraint axis value _a_, if an element has a length  _b_ that is less than _a_ on
+    ///    that axis, then the element must return _b_ for **all constraint values between _a_ and
+    ///    _b_**. In other words, growth must follow a stair-step pattern; elements that grow
+    ///    continuously by calculating a fixed inset of the constraint or a percentage value of the
+    ///    constraint are forbidden. For example, if an element returns `10` for a constraint of
+    ///    `20`, then the element must return `10` for all values in the range `[10, 20]`.
+    /// 3. If your element has no intrinsic size along an axis, you can represent that in a couple
     ///     ways:
     ///     - You can return a fixed value representing the minimum size for your element. In this
     ///       approach, a containing element is usually responsible for stretching your element to
@@ -182,6 +192,9 @@ public protocol CaffeinatedLayout {
     ///       you **must** return `.infinity` when the constraint is
     ///       ``SizeConstraint/Axis/unconstrained``. Otherwise, your behavior would be in violation
     ///       of rule #1.
+    ///
+    /// If an element does not adhere to these rules, it may lay out in unexpected and unpredictable
+    /// ways.
     ///
     /// - Parameters:
     ///   - proposal: A size constraint for the container. The container's parent element that calls

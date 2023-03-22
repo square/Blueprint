@@ -17,6 +17,10 @@ public typealias LayoutSubelements = [LayoutSubelement]
 /// implementation of the layout’s ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)``
 /// method.
 ///
+/// - Note: The ``LayoutSubelement`` API, and its documentation, are modeled after SwiftUI's
+///   [LayoutSubview](https://developer.apple.com/documentation/swiftui/layoutsubview), with major
+///   differences noted.
+///
 public struct LayoutSubelement {
 
     typealias SizeCache = HintingSizeCache

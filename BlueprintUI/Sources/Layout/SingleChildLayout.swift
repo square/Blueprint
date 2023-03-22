@@ -54,27 +54,7 @@ public protocol CaffeinatedSingleChildLayout {
     /// In Blueprint, parents ultimately choose the size of their children, so the actual size that
     /// this container is laid out in may not be a size that was returned from this method.
     ///
-    /// ## Sizing Rules
-    ///
-    /// For performance reasons, the layout engine may deduce the measurement of your container for
-    /// some constraint values without explicitly calling
-    /// ``sizeThatFits(proposal:subelement:cache:)``. To ensure that the deduced value is correct,
-    /// your layout must follow some ground rules:
-    ///
-    /// 1. **Given one fixed constraint axis, the element's growth along the other axis should be
-    ///    _monotonic_.** That is, an element can grow when given a larger constraint, or shrink
-    ///    when given a smaller constraint, but it should never shrink when given a larger
-    ///    constraint. When growing on one axis, it is OK to shrink along the other axis, such as a
-    ///    block of text that re-flows as the width changes.
-    /// 2. If your element has no intrinsic size along an axis, you can represent that in a couple
-    ///     ways:
-    ///     - You can return a fixed value representing the minimum size for your element. In this
-    ///       approach, a containing element is usually responsible for stretching your element to
-    ///       fill desired space.
-    ///     - You can return a size that entirely fills the constraint proposed. In this approach,
-    ///       you **must** return `.infinity` when the constraint is
-    ///       ``SizeConstraint/Axis/unconstrained``. Otherwise, your behavior would be in violation
-    ///       of rule #1.
+    /// For more information, see ``CaffeinatedLayout/sizeThatFits(proposal:subelements:cache:)``.
     ///
     /// - Parameters:
     ///   - proposal: A size constraint for the container. The container's parent element that calls
@@ -142,22 +122,7 @@ public protocol CaffeinatedSingleChildLayout {
     ///
     /// Only implement a cache if profiling shows that it improves performance.
     ///
-    /// ## Initializing a cache
-    ///
-    /// Implement the `makeCache(subelement:)` method to create a cache. You can add computed values
-    /// to the cache right away, using information from the subelement input parameter, or you can
-    /// do that later. The methods of the ``SingleChildLayout`` protocol that can access the cache
-    /// take the cache as an in-out parameter, which enables you to modify the cache anywhere that
-    /// you can read it.
-    ///
-    /// You can use any storage type that makes sense for your layout algorithm, but be sure that
-    /// you only store data that you derive from the layout and its subelement (lazily, if
-    /// possible). For this to work correctly, Blueprint needs to be able to call this method to
-    /// recreate the cache without changing the layout result.
-    ///
-    /// When you return a cache from this method, you implicitly define a type for your cache. Be
-    /// sure to either make the type of the cache parameters on your other ``SingleChildLayout``
-    /// protocol methods match, or use a type alias to define the ``Cache`` associated type.
+    /// For more information, see ``CaffeinatedLayout/makeCache(subelements:)-d3w``.
     ///
     /// - Parameter subelement: A proxy that represent the subelement that the container arranges.
     ///   You can use the proxy to get information about the subelement as you calculate values to
