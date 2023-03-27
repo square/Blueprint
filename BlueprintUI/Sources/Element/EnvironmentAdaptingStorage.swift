@@ -14,11 +14,13 @@ struct EnvironmentAdaptingStorage: ContentStorage {
 
     var child: Element
     var content: ElementContent
+    var identifier: ElementIdentifier
 
     init(adapter: @escaping (inout Environment) -> Void, child: Element) {
         self.adapter = adapter
         self.child = child
         content = child.content
+        identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
 
     private func adapted(environment: Environment) -> Environment {
@@ -80,12 +82,11 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         let environment = adapted(environment: context.environment)
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let context = MeasureContext(
             environment: environment,
             node: context.node.subnode(key: identifier)
         )
-        return child.content.sizeThatFits(proposal: proposal, context: context)
+        return content.sizeThatFits(proposal: proposal, context: context)
     }
 
     func performCaffeinatedLayout(
@@ -93,10 +94,7 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
         context: LayoutContext
     ) -> [IdentifiedNode] {
         let environment = adapted(environment: context.environment)
-
         let childAttributes = LayoutAttributes(size: frame.size)
-
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let context = LayoutContext(
             environment: environment,
