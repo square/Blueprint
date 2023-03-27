@@ -6,9 +6,17 @@ struct PassthroughStorage: ContentStorage {
 
     typealias IdentifiedNode = ElementContent.IdentifiedNode
 
-    let childCount: Int = 1
+    let childCount = 1
 
     var child: Element
+    var content: ElementContent
+    var identifier: ElementIdentifier
+
+    init(child: Element) {
+        self.child = child
+        content = child.content
+        identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+    }
 
     func measure(
         in constraint: SizeConstraint,
@@ -26,7 +34,7 @@ struct PassthroughStorage: ContentStorage {
 
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-            return child.content.measure(
+            return content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -42,8 +50,6 @@ struct PassthroughStorage: ContentStorage {
 
         let childAttributes = LayoutAttributes(size: attributes.bounds.size)
 
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
@@ -57,4 +63,35 @@ struct PassthroughStorage: ContentStorage {
 
         return [(identifier, node)]
     }
+
+    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+        content.sizeThatFits(
+            proposal: proposal,
+            context: MeasureContext(
+                environment: context.environment,
+                node: context.node.subnode(key: identifier)
+            )
+        )
+    }
+
+    func performCaffeinatedLayout(frame: CGRect, context: LayoutContext) -> [IdentifiedNode] {
+        let childAttributes = LayoutAttributes(size: frame.size)
+        let context = LayoutContext(
+            environment: context.environment,
+            node: context.node.subnode(key: identifier)
+        )
+
+        let node = LayoutResultNode(
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: context.environment,
+            children: content.performCaffeinatedLayout(
+                frame: frame,
+                context: context
+            )
+        )
+
+        return [(identifier, node)]
+    }
+
 }

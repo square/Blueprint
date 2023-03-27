@@ -15,6 +15,10 @@ public enum LayoutMode: Equatable {
     case legacy
 
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
-    /// certain contract for behavior.
-    case caffeinated
+    /// to a certain contract for behavior.
+    case caffeinated(options: LayoutOptions = .default)
+
+    /// A newer layout system with some optimizations made possible by ensuring elements adhere
+    /// to a certain contract for behavior.
+    public static let caffeinated = Self.caffeinated()
 }

@@ -38,10 +38,13 @@ extension ElementContent {
                 environment: .empty,
                 cache: CacheFactory.makeCache(name: "test")
             )
-        case .caffeinated:
+        case .caffeinated(let options):
             return performCaffeinatedLayout(
                 frame: attributes.frame,
-                context: LayoutContext(environment: .empty)
+                context: LayoutContext(
+                    environment: .empty,
+                    node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)
+                )
             )
         }
     }
