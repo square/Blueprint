@@ -169,7 +169,7 @@ extension LayoutStorage: CaffeinatedContentStorage {
         frame: CGRect,
         context: LayoutContext
     ) -> [IdentifiedNode] {
-        guard children.isEmpty == false else { return [] }
+        guard !children.isEmpty else { return [] }
 
         let subelements = subelements(from: context.node, environment: context.environment)
 
