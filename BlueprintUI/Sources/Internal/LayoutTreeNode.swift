@@ -9,8 +9,8 @@ import Foundation
 /// In the layout tree, each edge is keyed by an `ElementIdentifier`, and each node corresponds to
 /// an `ElementContent`. An `ElementPath` can uniquely identify a node from the root. Elements that
 /// lazily generate subelements, such as `GeometryReader`, may create subelements with distinct
-/// identifiers across visits during a single render, which will result in spurious nodes being
-/// created that do not correspond to `LayoutResultNode` in the final layout. However, the
+/// identifiers across visits during a single render, which will result in extra nodes being created
+/// that do not correspond to `LayoutResultNode` in the final layout. However, the
 /// `LayoutResultNode` tree will be an isomorphic subgraph of this tree (every `LayoutResultNode`
 /// corresponds to a `LayoutTreeNode`, but not every `LayoutTreeNode` produces a
 /// `LayoutResultNode`).
@@ -25,7 +25,7 @@ final class LayoutTreeNode {
     let path: String
     let sizeCache: HintingSizeCache
 
-    // These commonly used properties are strongly typed. If we need to hang more generalized
+    // These commonly used properties have dedicated storage. If we need to hang more generalized
     // things off this type we may want to store them in a heterogeneous dictionary.
     private var _layoutSubelements: [LayoutSubelement]?
     private var _associatedCache: Any?
