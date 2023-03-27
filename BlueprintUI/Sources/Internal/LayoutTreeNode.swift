@@ -58,6 +58,10 @@ final class LayoutTreeNode {
     }
 
     func associatedCache<AssociatedCache>(create: () -> AssociatedCache) -> AssociatedCache {
+        assert(
+            _associatedCache is AssociatedCache?,
+            "Expected associated cache of type \(AssociatedCache.self), not \(type(of: _associatedCache))"
+        )
         if let associatedCache = _associatedCache as? AssociatedCache {
             return associatedCache
         }
