@@ -15,6 +15,9 @@ struct MeasureElementStorage: ContentStorage {
         content = child.content
         identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
+}
+
+extension MeasureElementStorage: LegacyContentStorage {
 
     func measure(
         in constraint: SizeConstraint,
@@ -46,6 +49,9 @@ struct MeasureElementStorage: ContentStorage {
     ) -> [IdentifiedNode] {
         []
     }
+}
+
+extension MeasureElementStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         content.sizeThatFits(

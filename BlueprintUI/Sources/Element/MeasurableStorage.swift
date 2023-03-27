@@ -8,6 +8,9 @@ struct MeasurableStorage: ContentStorage {
     let childCount = 0
 
     let measurer: (SizeConstraint, Environment) -> CGSize
+}
+
+extension MeasurableStorage: LegacyContentStorage {
 
     func performLegacyLayout(
         attributes: LayoutAttributes,
@@ -30,6 +33,9 @@ struct MeasurableStorage: ContentStorage {
             return measurer(constraint, environment)
         }
     }
+}
+
+extension MeasurableStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         measurer(proposal, context.environment)

@@ -13,7 +13,15 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         self.children = children
     }
 
-    // MARK: ContentStorage
+    struct Child {
+        var traits: LayoutType.Traits
+        var key: AnyHashable?
+        var content: ElementContent
+        var element: Element
+    }
+}
+
+extension LayoutStorage: LegacyContentStorage {
 
     var childCount: Int {
         children.count
@@ -84,6 +92,38 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
 
         return result
     }
+
+    private func layoutItems(
+        in environment: Environment,
+        cache: CacheTree
+    ) -> [(LayoutType.Traits, Measurable)] {
+
+        /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
+        /// here; because the enumerated version is about 25% slower. Because this
+        /// is an extremely hot codepath; this additional performance matters, so we will
+        /// keep track of the index ourselves.
+
+        children.indexedMap { index, child in
+            let childContent = child.content
+            let childCache = cache.subcache(
+                index: index,
+                of: children.count,
+                element: child.element
+            )
+            let measurable = Measurer { constraint -> CGSize in
+                childContent.measure(
+                    in: constraint,
+                    environment: environment,
+                    cache: childCache
+                )
+            }
+
+            return (child.traits, measurable)
+        }
+    }
+}
+
+extension LayoutStorage: CaffeinatedContentStorage {
 
     private func subelements(from node: LayoutTreeNode, environment: Environment) -> LayoutSubelements {
         node.layoutSubelements {
@@ -178,43 +218,5 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
             return (identifier: identifier, node: node)
         }
         return identifiedNodes
-    }
-
-    private func layoutItems(
-        in environment: Environment,
-        cache: CacheTree
-    ) -> [(LayoutType.Traits, Measurable)] {
-
-        /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
-        /// here; because the enumerated version is about 25% slower. Because this
-        /// is an extremely hot codepath; this additional performance matters, so we will
-        /// keep track of the index ourselves.
-
-        children.indexedMap { index, child in
-            let childContent = child.content
-            let childCache = cache.subcache(
-                index: index,
-                of: children.count,
-                element: child.element
-            )
-            let measurable = Measurer { constraint -> CGSize in
-                childContent.measure(
-                    in: constraint,
-                    environment: environment,
-                    cache: childCache
-                )
-            }
-
-            return (child.traits, measurable)
-        }
-    }
-
-    struct Child {
-
-        var traits: LayoutType.Traits
-        var key: AnyHashable?
-        var content: ElementContent
-        var element: Element
-
     }
 }

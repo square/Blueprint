@@ -21,6 +21,15 @@ struct EnvironmentAdaptingStorage: ContentStorage {
         content = child.content
     }
 
+    private func adapted(environment: Environment) -> Environment {
+        var environment = environment
+        adapter(&environment)
+        return environment
+    }
+}
+
+extension EnvironmentAdaptingStorage: LegacyContentStorage {
+
     func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
@@ -65,6 +74,9 @@ struct EnvironmentAdaptingStorage: ContentStorage {
             )
         }
     }
+}
+
+extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         let environment = adapted(environment: context.environment)
@@ -102,11 +114,5 @@ struct EnvironmentAdaptingStorage: ContentStorage {
         )
 
         return [(identifier, node)]
-    }
-
-    private func adapted(environment: Environment) -> Environment {
-        var environment = environment
-        adapter(&environment)
-        return environment
     }
 }

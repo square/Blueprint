@@ -17,6 +17,9 @@ struct PassthroughStorage: ContentStorage {
         content = child.content
         identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
+}
+
+extension PassthroughStorage: LegacyContentStorage {
 
     func measure(
         in constraint: SizeConstraint,
@@ -65,6 +68,9 @@ struct PassthroughStorage: ContentStorage {
 
         return [(identifier, node)]
     }
+}
+
+extension PassthroughStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         content.sizeThatFits(
