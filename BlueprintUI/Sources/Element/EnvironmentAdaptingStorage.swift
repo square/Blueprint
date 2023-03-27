@@ -36,7 +36,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: content.performLegacyLayout(
+            children: child.content.performLegacyLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)

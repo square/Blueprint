@@ -31,7 +31,7 @@ struct MeasureElementStorage: ContentStorage {
 
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-            return content.measure(
+            return child.content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
