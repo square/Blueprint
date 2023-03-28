@@ -188,7 +188,7 @@ extension LayoutStorage: CaffeinatedContentStorage {
         let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
             let subelement = subelements[index]
 
-            let placement = subelement.placement ?? .filling(frame: frame)
+            let placement = subelement.placement ?? .filling(size: frame.size)
 
             let size = placement.size
             let origin = placement.origin(for: size)
