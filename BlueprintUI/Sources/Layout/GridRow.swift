@@ -101,7 +101,7 @@ extension GridRow {
 
             let frames = _frames(in: constraint, items: items)
 
-            // Measure the the row to be as wide as the sum of its children and as tall as its tallest child.
+            // Measure the row to be as wide as the sum of its children and as tall as its tallest child.
             let size = frames.reduce(.zero) { size, frame in
                 CGSize(width: frame.maxX, height: max(size.height, frame.height))
             }
@@ -139,7 +139,7 @@ extension GridRow {
 
             let frames = _frames(in: proposal, items: items)
 
-            // Measure the the row to be as wide as the sum of its children and as tall as its tallest child.
+            // Measure the row to be as wide as the sum of its children and as tall as its tallest child.
             let size = frames.reduce(.zero) { size, frame in
                 CGSize(width: frame.maxX, height: max(size.height, frame.height))
             }
