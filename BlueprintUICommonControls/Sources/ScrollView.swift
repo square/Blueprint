@@ -164,6 +164,72 @@ extension ScrollView {
             return contentAttributes
         }
 
+        func fittedSize(in proposal: SizeConstraint, subelement: LayoutSubelement) -> CGSize {
+            switch contentSize {
+            case .custom(let size):
+                return size
+
+            case .fittingContent:
+                return subelement.sizeThatFits(.unconstrained)
+
+            case .fittingHeight:
+                return subelement.sizeThatFits(
+                    SizeConstraint(
+                        width: proposal.width,
+                        height: .unconstrained
+                    )
+                )
+
+            case .fittingWidth:
+                return subelement.sizeThatFits(
+                    SizeConstraint(
+                        width: .unconstrained,
+                        height: proposal.height
+                    )
+                )
+            }
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+            let adjustedProposal = proposal.inset(by: contentInset)
+
+            var result = fittedSize(in: adjustedProposal, subelement: subelement)
+
+            result.width += contentInset.left + contentInset.right
+            result.height += contentInset.top + contentInset.bottom
+
+            result.width = min(result.width, proposal.width.maximum)
+            result.height = min(result.height, proposal.height.maximum)
+
+            return result
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            var insetSize = size
+            insetSize.width -= contentInset.left + contentInset.right
+            insetSize.height -= contentInset.top + contentInset.bottom
+
+            var itemSize = fittedSize(in: .init(insetSize), subelement: subelement)
+            if contentSize == .fittingHeight {
+                itemSize.width = insetSize.width
+            } else if contentSize == .fittingWidth {
+                itemSize.height = insetSize.height
+            }
+
+            var origin: CGPoint = .zero
+
+            if centersUnderflow {
+                if itemSize.width < size.width {
+                    origin.x += (size.width - itemSize.width) / 2
+                }
+
+                if itemSize.height < size.height {
+                    origin.y += (size.height - itemSize.height) / 2
+                }
+            }
+
+            subelement.place(at: origin, size: itemSize)
+        }
     }
 
 }

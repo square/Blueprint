@@ -158,5 +158,34 @@ extension Inset {
             frame.size.height -= top + bottom
             return LayoutAttributes(frame: frame)
         }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout ()) -> CGSize {
+            let insetProposal = proposal.inset(by: edgeInsets)
+            let childSize = subelement.sizeThatFits(insetProposal)
+            return childSize + CGSize(width: left + right, height: top + bottom)
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            let insetSize = size.inset(by: edgeInsets)
+
+            subelement.place(
+                at: CGPoint(x: edgeInsets.left, y: edgeInsets.top),
+                anchor: .topLeading,
+                size: insetSize
+            )
+        }
+
+        private var edgeInsets: UIEdgeInsets {
+            .init(top: top, left: left, bottom: bottom, right: right)
+        }
+    }
+}
+
+extension CGSize {
+    func inset(by insets: UIEdgeInsets) -> Self {
+        CGSize(
+            width: width - insets.left - insets.right,
+            height: height - insets.top - insets.bottom
+        )
     }
 }

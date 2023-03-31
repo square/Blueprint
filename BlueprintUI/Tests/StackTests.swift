@@ -1185,6 +1185,21 @@ class StackTests: XCTestCase {
 
     func test_measurementCounts() {
 
+        // For this test to be meaningful, cache hinting must be disabled.
+
+        let layoutMode: LayoutMode
+        switch LayoutMode.default {
+        case .legacy:
+            layoutMode = .legacy
+        case .caffeinated:
+            layoutMode = .caffeinated(options: .optimizationsDisabled)
+        }
+
+        RenderContext(layoutMode: layoutMode).perform(block: assertMeasurementCounts)
+    }
+
+    private func assertMeasurementCounts() {
+
         struct MeasurementCounter: Element {
 
             var size: Size
@@ -1414,4 +1429,11 @@ extension VerticalAlignment {
     }
 
     static let test25 = VerticalAlignment(Test25.self)
+}
+
+extension LayoutOptions {
+    static let optimizationsDisabled: Self = .init(
+        hintRangeBoundaries: false,
+        searchUnconstrainedKeys: false
+    )
 }

@@ -113,8 +113,70 @@ public struct Aligned: Element {
 
             return attributes
         }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+            subelement.sizeThatFits(proposal)
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            let x: CGFloat
+            let y: CGFloat
+
+            let subelementSize = subelement.sizeThatFits(SizeConstraint(size))
+            let clampedSize = subelementSize.upperBounded(maxWidth: size.width, maxHeight: size.height)
+
+            let width: CGFloat
+            let height: CGFloat
+
+            switch horizontalAlignment {
+            case .leading:
+                x = 0
+                width = clampedSize.width
+            case .center:
+                x = 0.5
+                width = clampedSize.width
+            case .trailing:
+                x = 1
+                width = clampedSize.width
+            case .fill:
+                x = 0
+                width = size.width
+            }
+
+            switch verticalAlignment {
+            case .top:
+                y = 0
+                height = clampedSize.height
+            case .center:
+                y = 0.5
+                height = clampedSize.height
+            case .bottom:
+                y = 1
+                height = clampedSize.height
+            case .fill:
+                y = 0
+                height = size.height
+            }
+
+            let position = CGPoint(x: x * size.width, y: y * size.height)
+
+            subelement.place(
+                at: position,
+                anchor: UnitPoint(x: x, y: y),
+                size: CGSize(width: width, height: height)
+            )
+        }
+    }
+
+
+}
+
+extension CGSize {
+    func upperBounded(maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
+        CGSize(width: min(width, maxWidth), height: min(height, maxHeight))
     }
 }
+
 
 extension Element {
     /// Wraps the element in an `Aligned` element with the provided parameters.

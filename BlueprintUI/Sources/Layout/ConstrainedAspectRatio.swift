@@ -158,6 +158,19 @@ public struct ConstrainedAspectRatio: Element {
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
         }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+            let contentSize = subelement.sizeThatFits(proposal)
+            return contentMode.constrain(
+                contentSize: contentSize,
+                in: proposal,
+                to: aspectRatio
+            )
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            subelement.place(filling: size)
+        }
     }
 }
 

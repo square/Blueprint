@@ -280,6 +280,24 @@ fileprivate struct FrameLayout: Layout {
         items.map { LayoutAttributes(frame: $0.traits) }
     }
 
+    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+        subelements.reduce(into: CGSize.zero) { result, subview in
+            let traits = subview.traits(forLayoutType: FrameLayout.self)
+            result.width = max(result.width, traits.maxX)
+            result.height = max(result.height, traits.maxY)
+        }
+    }
+
+    func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        for subelement in subelements {
+            let frame = subelement.traits(forLayoutType: FrameLayout.self)
+            subelement.place(
+                at: frame.origin,
+                size: frame.size
+            )
+        }
+    }
+
     static var defaultTraits: CGRect {
         CGRect.zero
     }
@@ -305,6 +323,28 @@ private struct HalfLayout: Layout {
             LayoutAttributes(size: $1.measure(in: halfConstraint))
         }
     }
+
+    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+        let halfConstraint = SizeConstraint(
+            width: proposal.width / 2,
+            height: proposal.height / 2
+        )
+        let measurements = subelements.map { $0.sizeThatFits(halfConstraint) }
+        return CGSize(
+            width: measurements.map(\.width).reduce(0, +),
+            height: measurements.map(\.height).reduce(0, +)
+        )
+    }
+
+    func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
+        for subelement in subelements {
+            subelement.place(
+                at: .zero,
+                size: subelement.sizeThatFits(halfConstraint)
+            )
+        }
+    }
 }
 
 private class TestCounter {
@@ -326,6 +366,23 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
 
     func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         layout.layout(size: size, items: items)
+    }
+
+    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout WrappedLayout.Cache) -> CGSize {
+        counts.measures += 1
+        return layout.sizeThatFits(proposal: proposal, subelements: subelements, cache: &cache)
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        cache: inout WrappedLayout.Cache
+    ) {
+        layout.placeSubelements(in: size, subelements: subelements, cache: &cache)
+    }
+
+    func makeCache(subelements: LayoutSubelements) -> WrappedLayout.Cache {
+        layout.makeCache(subelements: subelements)
     }
 }
 
@@ -352,6 +409,14 @@ private struct MeasureCountingSpacer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             []
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+            size
+        }
+
+        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+            // No-op
         }
     }
 }

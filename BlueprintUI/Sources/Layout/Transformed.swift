@@ -56,6 +56,14 @@ public struct Transformed: Element {
             attributes.transform = transform
             return attributes
         }
+
+        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+            subelement.sizeThatFits(proposal)
+        }
+
+        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+            subelement.attributes.transform = transform
+        }
     }
 }
 
