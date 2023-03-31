@@ -179,13 +179,13 @@ extension EqualStack {
             switch direction {
             case .horizontal:
                 totalSize = CGSize(
-                    width: maximumItemWidth * CGFloat(subelements.count) + spacing * CGFloat(subelements.count - 1),
+                    width: maximumItemWidth * CGFloat(subelements.count) + totalSpacing,
                     height: maximumItemHeight
                 )
             case .vertical:
                 totalSize = CGSize(
                     width: maximumItemWidth,
-                    height: maximumItemHeight * CGFloat(subelements.count) + spacing * CGFloat(subelements.count - 1)
+                    height: maximumItemHeight * CGFloat(subelements.count) + totalSpacing
                 )
             }
 
