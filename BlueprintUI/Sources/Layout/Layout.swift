@@ -177,7 +177,7 @@ public protocol CaffeinatedLayout {
     ///    when given a smaller constraint, but it should never shrink when given a larger
     ///    constraint. When growing on one axis, it is OK to shrink along the other axis, such as a
     ///    block of text that re-flows as the width changes.
-    /// 2. For a constraint axis value _a_, if an element has a length  _b_ that is less than _a_ on
+    /// 2. For a constraint axis value _a_, if an element has a length _b_ that is less than _a_ on
     ///    that axis, then the element must return _b_ for **all constraint values between _a_ and
     ///    _b_**. In other words, growth must follow a stair-step pattern; elements that grow
     ///    continuously by calculating a fixed inset of the constraint or a percentage value of the
