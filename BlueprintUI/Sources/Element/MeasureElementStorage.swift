@@ -15,6 +15,9 @@ struct MeasureElementStorage: ContentStorage {
         content = child.content
         identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
+}
+
+extension MeasureElementStorage: LegacyContentStorage {
 
     func measure(
         in constraint: SizeConstraint,
@@ -31,7 +34,7 @@ struct MeasureElementStorage: ContentStorage {
 
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-            return content.measure(
+            return child.content.measure(
                 in: constraint,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -46,6 +49,9 @@ struct MeasureElementStorage: ContentStorage {
     ) -> [IdentifiedNode] {
         []
     }
+}
+
+extension MeasureElementStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         content.sizeThatFits(

@@ -9,6 +9,17 @@ struct LazyStorage: ContentStorage {
 
     var builder: (ElementContent.LayoutPhase, SizeConstraint, Environment) -> Element
 
+    private func buildChild(
+        for phase: ElementContent.LayoutPhase,
+        in constraint: SizeConstraint,
+        environment: Environment
+    ) -> Element {
+        builder(phase, constraint, environment)
+    }
+}
+
+extension LazyStorage: LegacyContentStorage {
+
     func performLegacyLayout(
         attributes: LayoutAttributes,
         environment: Environment,
@@ -53,6 +64,9 @@ struct LazyStorage: ContentStorage {
             )
         }
     }
+}
+
+extension LazyStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         let child = buildChild(
@@ -98,14 +112,5 @@ struct LazyStorage: ContentStorage {
         )
 
         return [(identifier, node)]
-    }
-
-
-    private func buildChild(
-        for phase: ElementContent.LayoutPhase,
-        in constraint: SizeConstraint,
-        environment: Environment
-    ) -> Element {
-        builder(phase, constraint, environment)
     }
 }

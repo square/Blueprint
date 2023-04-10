@@ -17,6 +17,10 @@ public typealias LayoutSubelements = [LayoutSubelement]
 /// implementation of the layout’s ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)``
 /// method.
 ///
+/// - Note: The ``LayoutSubelement`` API, and its documentation, are modeled after SwiftUI's
+///   [LayoutSubview](https://developer.apple.com/documentation/swiftui/layoutsubview), with major
+///   differences noted.
+///
 public struct LayoutSubelement {
 
     typealias SizeCache = HintingSizeCache
@@ -24,6 +28,7 @@ public struct LayoutSubelement {
     var identifier: ElementIdentifier
     private var content: ElementContent
     var measureContext: MeasureContext
+    private var traits: Any
 
     var environment: Environment { measureContext.environment }
     private var cache: HintingSizeCache { measureContext.node.sizeCache }
@@ -34,10 +39,6 @@ public struct LayoutSubelement {
     /// Optional attributes to apply to this subelement, such as opacity and transforms.
     @Storage
     public var attributes = Attributes()
-
-    // Once we are able to fully deprecate the old layout API we can remove the `LayoutType.Traits`
-    // and the `traits` parameter, and instead rely on setting `LayoutValueKey`s where needed.
-    private var traits: Any
 
     init(
         identifier: ElementIdentifier,
@@ -113,7 +114,7 @@ public struct LayoutSubelement {
     /// Asks the subelement for its size.
     ///
     /// In Blueprint, elements are ultimately sized by their parents, but you can use this method to
-    /// determine the size that a subelement would prefer to choose.
+    /// determine the size that a subelement would prefer.
     ///
     /// - Parameter proposal: A proposed size constraint for the subelement.
     /// - Returns: The size that the subelement would choose for itself, given the proposal.
@@ -153,11 +154,11 @@ extension LayoutSubelement {
             )
         }
 
-        static func filling(frame: CGRect) -> Self {
+        static func filling(size: CGSize) -> Self {
             .init(
-                position: frame.center,
-                anchor: .center,
-                size: frame.size
+                position: .zero,
+                anchor: .topLeading,
+                size: size
             )
         }
     }

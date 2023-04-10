@@ -122,8 +122,9 @@ public struct Aligned: Element {
             let x: CGFloat
             let y: CGFloat
 
-            let subelementSize = subelement.sizeThatFits(SizeConstraint(size))
-            let clampedSize = subelementSize.upperBounded(maxWidth: size.width, maxHeight: size.height)
+            let subelementSize = subelement
+                .sizeThatFits(SizeConstraint(size))
+                .upperBounded(by: size)
 
             let width: CGFloat
             let height: CGFloat
@@ -131,13 +132,13 @@ public struct Aligned: Element {
             switch horizontalAlignment {
             case .leading:
                 x = 0
-                width = clampedSize.width
+                width = subelementSize.width
             case .center:
                 x = 0.5
-                width = clampedSize.width
+                width = subelementSize.width
             case .trailing:
                 x = 1
-                width = clampedSize.width
+                width = subelementSize.width
             case .fill:
                 x = 0
                 width = size.width
@@ -146,13 +147,13 @@ public struct Aligned: Element {
             switch verticalAlignment {
             case .top:
                 y = 0
-                height = clampedSize.height
+                height = subelementSize.height
             case .center:
                 y = 0.5
-                height = clampedSize.height
+                height = subelementSize.height
             case .bottom:
                 y = 1
-                height = clampedSize.height
+                height = subelementSize.height
             case .fill:
                 y = 0
                 height = size.height
@@ -167,16 +168,7 @@ public struct Aligned: Element {
             )
         }
     }
-
-
 }
-
-extension CGSize {
-    func upperBounded(maxWidth: CGFloat, maxHeight: CGFloat) -> CGSize {
-        CGSize(width: min(width, maxWidth), height: min(height, maxHeight))
-    }
-}
-
 
 extension Element {
     /// Wraps the element in an `Aligned` element with the provided parameters.

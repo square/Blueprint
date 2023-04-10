@@ -1,7 +1,7 @@
 import Foundation
 
 enum LayoutModeKey: EnvironmentKey {
-    static let defaultValue: LayoutMode = .default
+    static var defaultValue: LayoutMode { .default }
 }
 
 extension Environment {

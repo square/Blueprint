@@ -103,7 +103,7 @@ public final class BlueprintView: UIView {
     }
 
     /// An optional explicit layout mode for this view. If `nil`, this view will inherit the layout
-    /// mode of its nearest ancestor, or use ``LayoutMode/default``.
+    /// mode of its nearest ancestor or use ``LayoutMode/default`` if it has no ancestor.
     public var layoutMode: LayoutMode? {
         didSet {
             if layoutMode != oldValue {
@@ -156,6 +156,15 @@ public final class BlueprintView: UIView {
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        NotificationCenter
+            .default
+            .addObserver(
+                self,
+                selector: #selector(defaultLayoutModeChanged(notification:)),
+                name: .defaultLayoutModeChanged,
+                object: nil
+            )
     }
 
     public convenience override init(frame: CGRect) {
@@ -227,6 +236,7 @@ public final class BlueprintView: UIView {
         let layoutMode = environment.layoutMode
         let renderContext = RenderContext(layoutMode: layoutMode)
 
+        // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
         let measurement = renderContext.perform {
             element.content.measure(
                 in: constraint,
@@ -361,15 +371,15 @@ public final class BlueprintView: UIView {
         let layoutMode = environment.layoutMode
         let renderContext = RenderContext(layoutMode: layoutMode)
 
-        // Perform layout
-        let layoutResult = renderContext.perform {
+        // Perform layout.
+        // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
+        layoutResult = renderContext.perform {
             element?.layout(
                 frame: rootFrame,
                 environment: environment,
                 layoutMode: layoutMode
             )
         }
-        self.layoutResult = layoutResult
 
         // Flatten into tree of view descriptions
         let viewNodes = layoutResult?.resolve() ?? []
@@ -497,6 +507,15 @@ public final class BlueprintView: UIView {
         rootController.traverse { node in
             node.onDisappear?()
         }
+    }
+
+    @objc
+    private func defaultLayoutModeChanged(notification: Notification) {
+        // if this view has an explicit mode set we can ignore this
+        guard layoutMode == nil else { return }
+
+        // otherwise we should re-render
+        setNeedsViewHierarchyUpdate()
     }
 }
 

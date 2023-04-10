@@ -41,11 +41,6 @@ public struct UnitPoint: Hashable {
     /// The normalized distance from the origin to the point in the vertical direction.
     public var y: CGFloat
 
-    /// Creates a unit point at the origin.
-    public init() {
-        self.init(x: 0, y: 0)
-    }
-
     /// Creates a unit point with the specified horizontal and vertical offsets.
     public init(x: CGFloat, y: CGFloat) {
         self.x = x

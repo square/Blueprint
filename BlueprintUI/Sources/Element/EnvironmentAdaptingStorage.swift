@@ -14,12 +14,23 @@ struct EnvironmentAdaptingStorage: ContentStorage {
 
     var child: Element
     var content: ElementContent
+    var identifier: ElementIdentifier
 
     init(adapter: @escaping (inout Environment) -> Void, child: Element) {
         self.adapter = adapter
         self.child = child
         content = child.content
+        identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
+
+    private func adapted(environment: Environment) -> Environment {
+        var environment = environment
+        adapter(&environment)
+        return environment
+    }
+}
+
+extension EnvironmentAdaptingStorage: LegacyContentStorage {
 
     func performLegacyLayout(
         attributes: LayoutAttributes,
@@ -36,7 +47,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: content.performLegacyLayout(
+            children: child.content.performLegacyLayout(
                 attributes: childAttributes,
                 environment: environment,
                 cache: cache.subcache(element: child)
@@ -65,15 +76,17 @@ struct EnvironmentAdaptingStorage: ContentStorage {
             )
         }
     }
+}
+
+extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
 
     func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
         let environment = adapted(environment: context.environment)
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
         let context = MeasureContext(
             environment: environment,
             node: context.node.subnode(key: identifier)
         )
-        return child.content.sizeThatFits(proposal: proposal, context: context)
+        return content.sizeThatFits(proposal: proposal, context: context)
     }
 
     func performCaffeinatedLayout(
@@ -81,10 +94,7 @@ struct EnvironmentAdaptingStorage: ContentStorage {
         context: LayoutContext
     ) -> [IdentifiedNode] {
         let environment = adapted(environment: context.environment)
-
         let childAttributes = LayoutAttributes(size: frame.size)
-
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let context = LayoutContext(
             environment: environment,
@@ -102,11 +112,5 @@ struct EnvironmentAdaptingStorage: ContentStorage {
         )
 
         return [(identifier, node)]
-    }
-
-    private func adapted(environment: Environment) -> Environment {
-        var environment = environment
-        adapter(&environment)
-        return environment
     }
 }

@@ -8,8 +8,18 @@ import Foundation
 /// You can change the layout system used by setting the ``BlueprintView/layoutMode`` property, but
 /// generally you should use the ``default`` option.
 ///
+/// Changing the default will cause all instances of ``BlueprintView`` to be invalidated, and re-
+/// render their contents.
+///
 public enum LayoutMode: Equatable {
-    public static let `default`: Self = .legacy
+    public static var `default`: Self = .legacy {
+        didSet {
+            guard oldValue != .default else { return }
+            NotificationCenter
+                .default
+                .post(name: .defaultLayoutModeChanged, object: nil)
+        }
+    }
 
     /// The "standard" layout system.
     case legacy
@@ -21,4 +31,10 @@ public enum LayoutMode: Equatable {
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
     public static let caffeinated = Self.caffeinated()
+}
+
+extension Notification.Name {
+    static let defaultLayoutModeChanged: Self = .init(
+        "com.squareup.blueprint.defaultLayoutModeChanged"
+    )
 }

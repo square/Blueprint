@@ -5,12 +5,11 @@ extension Element {
     /// Build a fully laid out element tree with complete layout attributes
     /// for each element.
     ///
-    ///
-    /// - Returns: A layout result
     /// - Parameters:
     ///   - frame: the root element's frame
     ///   - environment: the root environment
     ///   - layoutMode: the mode to use for layout
+    /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
         switch layoutMode {
         case .legacy:
@@ -157,16 +156,10 @@ extension LayoutResultNode {
 
     }
 
-    /// Recursively dump layout tree, for debugging. By default, prints to stdout.
-    @_spi(BlueprintDebugging)
-    public func dump(
+    /// Recursively dump layout tree, for debugging.
+    func dump(
         depth: Int = 0,
-        visit: ((_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void) = { depth, identifier, frame in
-            let origin = "x \(frame.origin.x), y \(frame.origin.y)"
-            let size = "\(frame.size.width) × \(frame.size.height)"
-            let indent = String(repeating: "  ", count: depth)
-            print("\(indent)\(identifier) \(origin), \(size)")
-        }
+        visit: (_ depth: Int, _ identifier: String, _ frame: CGRect) -> Void
     ) {
         for child in children {
             let attributes = child.node.layoutAttributes
