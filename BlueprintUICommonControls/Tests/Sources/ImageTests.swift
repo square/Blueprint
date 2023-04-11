@@ -42,12 +42,14 @@ class ImageTests: XCTestCase {
             size: CGSize,
             constraint: SizeConstraint,
             expectedValue: CGSize,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
             line: UInt = #line
         ) {
             self.validate(
                 contentMode: .aspectFill,
                 imageSize: size,
                 constraint: constraint,
+                layoutModes: layoutModes,
                 expectedValue: expectedValue,
                 line: line
             )
@@ -58,7 +60,15 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 20, height: 10)
+            expectedValue: .init(width: 20, height: 10),
+            layoutModes: [.legacy]
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .infinity,
+            layoutModes: [.caffeinated]
         )
 
         validate(
@@ -108,7 +118,15 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 10, height: 20)
+            expectedValue: .init(width: 10, height: 20),
+            layoutModes: [.legacy]
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .infinity,
+            layoutModes: [.caffeinated]
         )
 
         validate(
@@ -159,12 +177,14 @@ class ImageTests: XCTestCase {
             size: CGSize,
             constraint: SizeConstraint,
             expectedValue: CGSize,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
             line: UInt = #line
         ) {
             self.validate(
                 contentMode: .aspectFit,
                 imageSize: size,
                 constraint: constraint,
+                layoutModes: layoutModes,
                 expectedValue: expectedValue,
                 line: line
             )
@@ -175,7 +195,15 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 20, height: 10)
+            expectedValue: .init(width: 20, height: 10),
+            layoutModes: [.legacy]
+        )
+
+        validate(
+            size: .init(width: 20, height: 10),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .infinity,
+            layoutModes: [.caffeinated]
         )
 
         validate(
@@ -225,7 +253,15 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 10, height: 20)
+            expectedValue: .init(width: 10, height: 20),
+            layoutModes: [.legacy]
+        )
+
+        validate(
+            size: .init(width: 10, height: 20),
+            constraint: .init(width: .unconstrained, height: .unconstrained),
+            expectedValue: .infinity,
+            layoutModes: [.caffeinated]
         )
 
         validate(
@@ -276,12 +312,14 @@ class ImageTests: XCTestCase {
             size: CGSize,
             constraint: SizeConstraint,
             expectedValue: CGSize,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
             line: UInt = #line
         ) {
             self.validate(
                 contentMode: .center,
                 imageSize: size,
                 constraint: constraint,
+                layoutModes: layoutModes,
                 expectedValue: expectedValue,
                 line: line
             )
@@ -393,12 +431,14 @@ class ImageTests: XCTestCase {
             size: CGSize,
             constraint: SizeConstraint,
             expectedValue: CGSize,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
             line: UInt = #line
         ) {
             self.validate(
                 contentMode: .stretch,
                 imageSize: size,
                 constraint: constraint,
+                layoutModes: layoutModes,
                 expectedValue: expectedValue,
                 line: line
             )
@@ -509,6 +549,7 @@ class ImageTests: XCTestCase {
         contentMode: Image.ContentMode,
         imageSize: CGSize,
         constraint: SizeConstraint,
+        layoutModes: [LayoutMode],
         expectedValue: CGSize,
         line: UInt = #line
     ) {
@@ -518,17 +559,24 @@ class ImageTests: XCTestCase {
             contentMode: contentMode
         )
 
-        XCTAssertEqual(
-            element.content.measure(in: constraint),
-            expectedValue,
-            """
-            Image in content mode: \(contentMode),
-            of size (\(Int(imageSize.width))x\(Int(imageSize.height)))
-            expected to be measured as (\(Int(expectedValue.width))x\(Int(expectedValue.height)))
-            in constraint: (\(constraint))
-            """,
-            line: line
-        )
+        for layoutMode in layoutModes {
+            let actualSize = layoutMode.performAsDefault {
+                element.content.measure(in: constraint)
+            }
+
+            XCTAssertEqual(
+                actualSize,
+                expectedValue,
+                """
+                Image in content mode: \(contentMode),
+                of size \(imageSize)
+                expected to be measured as \(expectedValue)
+                in constraint: (\(constraint))
+                and layout mode: \(layoutMode)
+                """,
+                line: line
+            )
+        }
     }
 }
 

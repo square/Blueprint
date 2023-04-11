@@ -7,7 +7,7 @@ enum LayoutModeKey: EnvironmentKey {
 extension Environment {
     /// This mode will be inherited by descendant BlueprintViews that do not have an explicit
     /// mode set.
-    var layoutMode: LayoutMode {
+    public internal(set) var layoutMode: LayoutMode {
         get { self[LayoutModeKey.self] }
         set { self[LayoutModeKey.self] = newValue }
     }

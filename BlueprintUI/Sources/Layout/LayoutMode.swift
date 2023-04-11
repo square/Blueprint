@@ -33,6 +33,26 @@ public enum LayoutMode: Equatable {
     public static let caffeinated = Self.caffeinated()
 }
 
+extension LayoutMode: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .legacy:
+            return "Legacy"
+        case .caffeinated(let options):
+            switch (options.hintRangeBoundaries, options.searchUnconstrainedKeys) {
+            case (true, true):
+                return "Caffeinated (hint+search)"
+            case (true, false):
+                return "Caffeinated (hint)"
+            case (false, true):
+                return "Caffeinated (search)"
+            case (false, false):
+                return "Caffeinated"
+            }
+        }
+    }
+}
+
 extension Notification.Name {
     static let defaultLayoutModeChanged: Self = .init(
         "com.squareup.blueprint.defaultLayoutModeChanged"

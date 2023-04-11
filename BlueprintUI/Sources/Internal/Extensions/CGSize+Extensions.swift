@@ -1,4 +1,4 @@
-import CoreGraphics
+import UIKit
 
 extension CGSize {
     static func + (lhs: CGSize, rhs: CGSize) -> CGSize {
