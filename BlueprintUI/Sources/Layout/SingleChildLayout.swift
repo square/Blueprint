@@ -40,7 +40,7 @@ public protocol CaffeinatedSingleChildLayout {
     /// as your data storage type. Alternatively, you can refer to the data storage type directly in
     /// all the places where you work with the cache.
     ///
-    /// See ``makeCache(subelement:)-33y4l`` for more information.
+    /// See ``makeCache(subelement:environment:)-8vyl9`` for more information.
     associatedtype Cache = Void
 
     /// Returns the size of the element, given a proposed size constraint and the container's
@@ -54,7 +54,8 @@ public protocol CaffeinatedSingleChildLayout {
     /// In Blueprint, parents ultimately choose the size of their children, so the actual size that
     /// this container is laid out in may not be a size that was returned from this method.
     ///
-    /// For more information, see ``CaffeinatedLayout/sizeThatFits(proposal:subelements:cache:)``.
+    /// For more information, see
+    /// ``CaffeinatedLayout/sizeThatFits(proposal:subelements:environment:cache:)``.
     ///
     /// - Parameters:
     ///   - proposal: A size constraint for the container. The container's parent element that calls
@@ -63,13 +64,17 @@ public protocol CaffeinatedSingleChildLayout {
     ///   - subelement: A proxy that represents the element that the container arranges. You can use
     ///     the proxy to get information about the subelement as you determine how much space the
     ///     container needs to display it.
+    ///   - environment: The environment of the container. You can use properties from the
+    ///     environment when calculating the size of this container, as long as you adhere to the
+    ///     sizing rules.
     ///   - cache: Optional storage for calculated data that you can share among the methods of your
-    ///     custom layout container. See ``makeCache(subelement:)-33y4l`` for details.
+    ///     custom layout container. See ``makeCache(subelement:environment:)-8vyl9`` for details.
     /// - Returns: A size that indicates how much space the container needs to arrange its
     ///   subelement.
     func sizeThatFits(
         proposal: SizeConstraint,
         subelement: Subelement,
+        environment: Environment,
         cache: inout Cache
     ) -> CGSize
 
@@ -85,20 +90,24 @@ public protocol CaffeinatedSingleChildLayout {
     /// Be sure that you use computations during placement that are consistent with those in your
     /// implementation of other protocol methods for a given set of inputs. For example, if you add
     /// spacing during placement, make sure your implementation of
-    /// ``sizeThatFits(proposal:subelement:cache:)`` accounts for the extra space.
+    /// ``sizeThatFits(proposal:subelement:environment:cache:)`` accounts for the extra space.
     ///
     /// - Parameters:
     ///   - size: The region that the container's parent allocates to the container. Place the
     ///     container's subelement within the region. The size of this region may not match any size
-    ///     that was returned from a call to ``sizeThatFits(proposal:subelement:cache:)``.
+    ///     that was returned from a call to
+    ///     ``sizeThatFits(proposal:subelement:environment:cache:)``.
     ///   - subelement: A proxy that represents the element that the container arranges. Use the
     ///     proxy to get information about the subelement and to tell the subelement where to
     ///     appear.
+    ///   - environment: The environment of this container. You can use properties from the
+    ///     environment to vary the placement of the subelement.
     ///   - cache: Optional storage for calculated data that you can share among the methods of your
-    ///     custom layout container. See ``makeCache(subelement:)-33y4l`` for details.
+    ///     custom layout container. See ``makeCache(subelement:environment:)-8vyl9`` for details.
     func placeSubelement(
         in size: CGSize,
         subelement: Subelement,
+        environment: Environment,
         cache: inout Cache
     )
 
@@ -111,27 +120,29 @@ public protocol CaffeinatedSingleChildLayout {
     /// method if you don’t need a cache.
     ///
     /// However you might find a cache useful when the layout container repeats complex intermediate
-    /// calculations across calls to ``sizeThatFits(proposal:subelement:cache:)`` and
-    /// ``placeSubelement(in:subelement:cache:)``. You might be able to improve performance by
-    /// calculating values once and storing them in a cache.
+    /// calculations across calls to ``sizeThatFits(proposal:subelement:environment:cache:)`` and
+    /// ``placeSubelement(in:subelement:environment:cache:)``. You might be able to improve
+    /// performance by calculating values once and storing them in a cache.
     ///
     /// - Note: A cache's lifetime is limited to a single render pass, so you cannot use it to store
-    ///   values across multiple calls to ``placeSubelement(in:subelement:cache:)``. A render pass
-    ///   includes zero, one, or many calls to ``sizeThatFits(proposal:subelement:cache:)``,
-    ///   followed by a single call to ``placeSubelement(in:subelement:cache:)``.
+    ///   values across multiple calls to ``placeSubelement(in:subelement:environment:cache:)``. A
+    ///   render pass includes zero, one, or many calls to
+    ///   ``sizeThatFits(proposal:subelement:environment:cache:)``, followed by a single call to
+    ///   ``placeSubelement(in:subelement:environment:cache:)``.
     ///
     /// Only implement a cache if profiling shows that it improves performance.
     ///
-    /// For more information, see ``CaffeinatedLayout/makeCache(subelements:)-d3w``.
+    /// For more information, see ``CaffeinatedLayout/makeCache(subelements:environment:)-8ciko``.
     ///
     /// - Parameter subelement: A proxy that represent the subelement that the container arranges.
     ///   You can use the proxy to get information about the subelement as you calculate values to
     ///   store in the cache.
+    /// - Parameter environment: The environment of this container.
     /// - Returns: Storage for calculated data that you share among the methods of your custom
     ///   layout container.
-    func makeCache(subelement: Subelement) -> Cache
+    func makeCache(subelement: Subelement, environment: Environment) -> Cache
 }
 
 extension CaffeinatedSingleChildLayout where Cache == () {
-    public func makeCache(subelement: Subelement) { () }
+    public func makeCache(subelement: Subelement, environment: Environment) { () }
 }

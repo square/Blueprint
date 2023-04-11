@@ -14,8 +14,8 @@ public typealias LayoutSubelements = [LayoutSubelement]
 /// Use this proxy to get information about the associated element, like its size and traits. You
 /// should also use the proxy to tell its corresponding element where to appear by calling the
 /// proxy’s ``place(at:anchor:size:)`` method. Do this once for each subview from your
-/// implementation of the layout’s ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)``
-/// method.
+/// implementation of the layout’s
+/// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method.
 ///
 /// - Note: The ``LayoutSubelement`` API, and its documentation, are modeled after SwiftUI's
 ///   [LayoutSubview](https://developer.apple.com/documentation/swiftui/layoutsubview), with major
@@ -55,10 +55,10 @@ public struct LayoutSubelement {
     /// Assigns a position and size to a subelement.
     ///
     /// Call this method from your implementation of the `Layout` protocol’s
-    /// ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)`` method for each subelement
-    /// arranged by the layout. Provide a position within the container’s bounds where the
-    /// subelement should appear, an anchor that indicates which part of the subelement appears at
-    /// that point, and a size.
+    /// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method for each
+    /// subelement arranged by the layout. Provide a position within the container’s bounds where
+    /// the subelement should appear, an anchor that indicates which part of the subelement appears
+    /// at that point, and a size.
     ///
     /// To learn the subelement's preferred size for a given proposal before calling this method,
     /// you can call ``sizeThatFits(_:)`` method on the subelement.

@@ -159,7 +159,12 @@ public struct ConstrainedAspectRatio: Element {
             LayoutAttributes(size: size)
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
             let contentSize = subelement.sizeThatFits(proposal)
             return contentMode.constrain(
                 contentSize: contentSize,
@@ -168,7 +173,12 @@ public struct ConstrainedAspectRatio: Element {
             )
         }
 
-        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
             subelement.place(filling: size)
         }
     }

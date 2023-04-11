@@ -304,12 +304,14 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     ) -> CGSize {
         precondition(subelements.count == 1)
         return wrapped.sizeThatFits(
             proposal: proposal,
             subelement: subelements[0],
+            environment: environment,
             cache: &cache
         )
     }
@@ -317,19 +319,21 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     ) {
         precondition(subelements.count == 1)
         wrapped.placeSubelement(
             in: size,
             subelement: subelements[0],
+            environment: environment,
             cache: &cache
         )
     }
 
-    func makeCache(subelements: Subelements) -> Cache {
+    func makeCache(subelements: Subelements, environment: Environment) -> Cache {
         precondition(subelements.count == 1)
-        return wrapped.makeCache(subelement: subelements[0])
+        return wrapped.makeCache(subelement: subelements[0], environment: environment)
     }
 }
 

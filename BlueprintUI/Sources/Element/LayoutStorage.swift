@@ -151,12 +151,13 @@ extension LayoutStorage: CaffeinatedContentStorage {
         let subelements = subelements(from: context.node, environment: context.environment)
 
         var associatedCache = context.node.associatedCache {
-            layout.makeCache(subelements: subelements)
+            layout.makeCache(subelements: subelements, environment: environment)
         }
 
         let size = layout.sizeThatFits(
             proposal: proposal,
             subelements: subelements,
+            environment: context.environment,
             cache: &associatedCache
         )
 
@@ -174,12 +175,13 @@ extension LayoutStorage: CaffeinatedContentStorage {
         let subelements = subelements(from: context.node, environment: context.environment)
 
         var associatedCache = context.node.associatedCache {
-            layout.makeCache(subelements: subelements)
+            layout.makeCache(subelements: subelements, environment: environment)
         }
 
         layout.placeSubelements(
             in: frame.size,
             subelements: subelements,
+            environment: context.environment,
             cache: &associatedCache
         )
 

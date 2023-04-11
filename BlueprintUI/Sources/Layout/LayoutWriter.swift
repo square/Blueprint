@@ -273,11 +273,21 @@ extension LayoutWriter {
                 }
             }
 
-            func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout Cache) -> CGSize {
+            func sizeThatFits(
+                proposal: SizeConstraint,
+                subelements: Subelements,
+                environment: Environment,
+                cache: inout Cache
+            ) -> CGSize {
                 builder.sizing.measure(with: builder)
             }
 
-            func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+            func placeSubelements(
+                in size: CGSize,
+                subelements: Subelements,
+                environment: Environment,
+                cache: inout ()
+            ) {
                 for (child, subelement) in zip(builder.children, subelements) {
                     subelement.place(
                         at: child.frame.origin,

@@ -153,7 +153,12 @@ extension EqualStack {
             return result
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout Cache) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
             guard subelements.count > 0 else { return .zero }
 
             let totalSpacing = (spacing * CGFloat(subelements.count - 1))
@@ -192,7 +197,12 @@ extension EqualStack {
             return totalSize
         }
 
-        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
             guard subelements.count > 0 else { return }
 
             let totalSpacing = (spacing * CGFloat(subelements.count - 1))

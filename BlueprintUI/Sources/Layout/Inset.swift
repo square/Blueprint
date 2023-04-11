@@ -159,13 +159,23 @@ extension Inset {
             return LayoutAttributes(frame: frame)
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout ()) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
             let insetProposal = proposal.inset(by: edgeInsets)
             let childSize = subelement.sizeThatFits(insetProposal)
             return childSize + CGSize(width: left + right, height: top + bottom)
         }
 
-        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
             let insetSize = size.inset(by: edgeInsets)
 
             subelement.place(

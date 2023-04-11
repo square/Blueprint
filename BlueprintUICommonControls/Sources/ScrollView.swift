@@ -164,7 +164,7 @@ extension ScrollView {
             return contentAttributes
         }
 
-        func fittedSize(in proposal: SizeConstraint, subelement: LayoutSubelement) -> CGSize {
+        func fittedSize(in proposal: SizeConstraint, subelement: Subelement) -> CGSize {
             switch contentSize {
             case .custom(let size):
                 return size
@@ -190,7 +190,12 @@ extension ScrollView {
             }
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
             let adjustedProposal = proposal.inset(by: contentInset)
 
             var result = fittedSize(in: adjustedProposal, subelement: subelement)
@@ -208,7 +213,12 @@ extension ScrollView {
             return result
         }
 
-        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right
             insetSize.height -= contentInset.top + contentInset.bottom
