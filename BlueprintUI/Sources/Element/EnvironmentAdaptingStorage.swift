@@ -80,26 +80,24 @@ extension EnvironmentAdaptingStorage: LegacyContentStorage {
 
 extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        let environment = adapted(environment: context.environment)
-        let context = MeasureContext(
-            environment: environment,
-            node: context.node.subnode(key: identifier)
-        )
-        return content.sizeThatFits(proposal: proposal, context: context)
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
+        let environment = adapted(environment: environment)
+        let subnode = node.subnode(key: identifier)
+        return content.sizeThatFits(proposal: proposal, environment: environment, node: subnode)
     }
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
-        let environment = adapted(environment: context.environment)
+        let environment = adapted(environment: environment)
         let childAttributes = LayoutAttributes(size: frame.size)
-
-        let context = LayoutContext(
-            environment: environment,
-            node: context.node.subnode(key: identifier)
-        )
+        let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
             element: child,
@@ -107,7 +105,8 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
             environment: environment,
             children: content.performCaffeinatedLayout(
                 frame: frame,
-                context: context
+                environment: environment,
+                node: subnode
             )
         )
 

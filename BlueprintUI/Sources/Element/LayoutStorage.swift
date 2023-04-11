@@ -136,56 +136,59 @@ extension LayoutStorage: CaffeinatedContentStorage {
                 return LayoutSubelement(
                     identifier: identifier,
                     content: child.content,
-                    measureContext: MeasureContext(
-                        environment: environment,
-                        node: node.subnode(key: identifier)
-                    ),
+                    environment: environment,
+                    node: node.subnode(key: identifier),
                     traits: child.traits
                 )
             }
         }
     }
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
 
-        let subelements = subelements(from: context.node, environment: context.environment)
+        let subelements = subelements(from: node, environment: environment)
 
-        var associatedCache = context.node.associatedCache {
+        var associatedCache = node.associatedCache {
             layout.makeCache(subelements: subelements, environment: environment)
         }
 
         let size = layout.sizeThatFits(
             proposal: proposal,
             subelements: subelements,
-            environment: context.environment,
+            environment: environment,
             cache: &associatedCache
         )
 
-        context.node.update(associatedCache: associatedCache)
+        node.update(associatedCache: associatedCache)
 
         return size
     }
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         guard !children.isEmpty else { return [] }
 
-        let subelements = subelements(from: context.node, environment: context.environment)
+        let subelements = subelements(from: node, environment: environment)
 
-        var associatedCache = context.node.associatedCache {
+        var associatedCache = node.associatedCache {
             layout.makeCache(subelements: subelements, environment: environment)
         }
 
         layout.placeSubelements(
             in: frame.size,
             subelements: subelements,
-            environment: context.environment,
+            environment: environment,
             cache: &associatedCache
         )
 
-        context.node.update(associatedCache: associatedCache)
+        node.update(associatedCache: associatedCache)
 
         let identifiedNodes: [IdentifiedNode] = children.indexedMap { index, child in
             let subelement = subelements[index]
@@ -202,19 +205,16 @@ extension LayoutStorage: CaffeinatedContentStorage {
             )
 
             let identifier = subelement.identifier
-
-            let childContext = LayoutContext(
-                environment: context.environment,
-                node: context.node.subnode(key: identifier)
-            )
+            let subnode = node.subnode(key: identifier)
 
             let node = LayoutResultNode(
                 element: child.element,
                 layoutAttributes: childAttributes,
-                environment: context.environment,
+                environment: environment,
                 children: child.content.performCaffeinatedLayout(
                     frame: frame,
-                    context: childContext
+                    environment: environment,
+                    node: subnode
                 )
             )
             return (identifier: identifier, node: node)

@@ -42,7 +42,8 @@ public struct ElementContent {
             )
             return sizeThatFits(
                 proposal: constraint,
-                context: MeasureContext(environment: environment, node: node)
+                environment: environment,
+                node: node
             )
         }
     }
@@ -51,8 +52,12 @@ public struct ElementContent {
         storage.measure(in: constraint, environment: environment, cache: cache)
     }
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        storage.sizeThatFits(proposal: proposal, context: context)
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
+        storage.sizeThatFits(proposal: proposal, environment: environment, node: node)
     }
 
     public var childCount: Int {
@@ -75,11 +80,13 @@ public struct ElementContent {
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         storage.performCaffeinatedLayout(
             frame: frame,
-            context: context
+            environment: environment,
+            node: node
         )
     }
 }

@@ -53,17 +53,23 @@ extension MeasureElementStorage: LegacyContentStorage {
 
 extension MeasureElementStorage: CaffeinatedContentStorage {
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
         content.sizeThatFits(
             proposal: proposal,
-            context: MeasureContext(
-                environment: context.environment,
-                node: context.node.subnode(key: identifier)
-            )
+            environment: environment,
+            node: node.subnode(key: identifier)
         )
     }
 
-    func performCaffeinatedLayout(frame: CGRect, context: LayoutContext) -> [IdentifiedNode] {
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> [IdentifiedNode] {
         []
     }
 }
