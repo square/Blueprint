@@ -198,8 +198,12 @@ extension ScrollView {
             result.width += contentInset.left + contentInset.right
             result.height += contentInset.top + contentInset.bottom
 
-            result.width = min(result.width, proposal.width.maximum)
-            result.height = min(result.height, proposal.height.maximum)
+            if let maxWidth = proposal.width.constrainedValue {
+                result.width = min(result.width, maxWidth)
+            }
+            if let maxHeight = proposal.height.constrainedValue {
+                result.height = min(result.height, maxHeight)
+            }
 
             return result
         }
@@ -210,6 +214,8 @@ extension ScrollView {
             insetSize.height -= contentInset.top + contentInset.bottom
 
             var itemSize = fittedSize(in: .init(insetSize), subelement: subelement)
+                .replacingInfinity(with: insetSize)
+
             if contentSize == .fittingHeight {
                 itemSize.width = insetSize.width
             } else if contentSize == .fittingWidth {
