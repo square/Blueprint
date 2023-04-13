@@ -31,6 +31,16 @@ public enum LayoutMode: Equatable {
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
     public static let caffeinated = Self.caffeinated()
+
+    /// The name of the layout mode.
+    public var name: String {
+        switch self {
+        case .legacy:
+            return "Legacy"
+        case .caffeinated:
+            return "Caffeinated"
+        }
+    }
 }
 
 extension Notification.Name {

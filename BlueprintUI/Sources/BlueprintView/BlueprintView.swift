@@ -424,6 +424,7 @@ public final class BlueprintView: UIView {
         metricsDelegate?.blueprintView(
             self,
             completedRenderWith: .init(
+                layoutMode: layoutMode,
                 totalDuration: viewUpdateEndTime - startTime,
                 layoutDuration: layoutEndTime - startTime,
                 viewUpdateDuration: viewUpdateEndTime - layoutEndTime
@@ -530,10 +531,15 @@ public protocol BlueprintViewMetricsDelegate: AnyObject {
 
 public struct BlueprintViewRenderMetrics {
 
+    /// The layout mode used to render the view.
+    public var layoutMode: LayoutMode
+
     /// The total time it took to apply a new element.
     public var totalDuration: TimeInterval
+
     /// The time it took to lay out and measure the new element.
     public var layoutDuration: TimeInterval
+
     /// The time it took to update the on-screen views for the element.
     public var viewUpdateDuration: TimeInterval
 }
