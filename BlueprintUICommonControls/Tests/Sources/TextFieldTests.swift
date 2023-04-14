@@ -5,6 +5,23 @@ import XCTest
 
 class TextFieldTests: XCTestCase {
 
+    func test_measuring() {
+        LayoutMode.legacy.performAsDefault {
+            let size = TextField(text: "").content.measure(in: .unconstrained)
+            XCTAssert(size.height > 0)
+            XCTAssert(size.height < .infinity)
+            XCTAssert(size.width > 0)
+            XCTAssert(size.width < .infinity)
+        }
+
+        LayoutMode.caffeinated.performAsDefault {
+            let size = TextField(text: "").content.measure(in: .unconstrained)
+            XCTAssert(size.height > 0)
+            XCTAssert(size.height < .infinity)
+            XCTAssertEqual(size.width, .infinity)
+        }
+    }
+
     func test_snapshots() {
 
         do {
