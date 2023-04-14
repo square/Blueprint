@@ -130,7 +130,12 @@ extension GridRow {
             }
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout Cache) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
             guard subelements.count > 0 else {
                 return .zero
             }
@@ -147,7 +152,12 @@ extension GridRow {
             return size
         }
 
-        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
             guard subelements.count > 0 else {
                 return
             }

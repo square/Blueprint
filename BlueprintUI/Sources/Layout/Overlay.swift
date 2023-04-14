@@ -78,7 +78,12 @@ fileprivate struct OverlayLayout: Layout {
         )
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout Cache) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout Cache
+    ) -> CGSize {
         subelements.reduce(into: CGSize.zero) { result, subelement in
             let measuredSize = subelement.sizeThatFits(proposal)
             result.width = max(result.width, measuredSize.width)
@@ -86,7 +91,12 @@ fileprivate struct OverlayLayout: Layout {
         }
     }
 
-    func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
         for subelement in subelements {
             subelement.place(filling: size)
         }

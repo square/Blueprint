@@ -70,11 +70,21 @@ public struct Keyed: Element {
             LayoutAttributes(size: size)
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelement: LayoutSubelement, cache: inout Cache) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
             subelement.sizeThatFits(proposal)
         }
 
-        func placeSubelement(in size: CGSize, subelement: LayoutSubelement, cache: inout ()) {
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
             subelement.place(at: .zero, size: size)
         }
     }

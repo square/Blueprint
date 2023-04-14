@@ -7,10 +7,10 @@ import CoreGraphics
 /// layout container by creating a type that conforms to the ``Layout`` protocol and implementing
 /// its required methods:
 ///
-/// - ``CaffeinatedLayout/sizeThatFits(proposal:subelements:cache:)`` reports the sizes of the
-///   composite layout.
-/// - ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)`` assigns positions to the
-///   container's subelements.
+/// - ``CaffeinatedLayout/sizeThatFits(proposal:subelements:environment:cache:)`` reports the sizes
+///   of the composite layout.
+/// - ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` assigns positions to
+///   the container's subelements.
 ///
 /// You can define a basic layout type with only these two methods (see note below):
 ///
@@ -81,7 +81,7 @@ import CoreGraphics
 /// This enables you to measure subelements before you commit to placing them. You also assign a
 /// position to each subelement by calling its proxy’s ``LayoutSubelement/place(at:anchor:size:)``
 /// method. Call the method on each subelement from within your implementation of the layout’s
-/// ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)`` method.
+/// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method.
 ///
 /// ## Access layout traits
 ///
@@ -151,7 +151,7 @@ public protocol CaffeinatedLayout {
     /// as your data storage type. Alternatively, you can refer to the data storage type directly in
     /// all the places where you work with the cache.
     ///
-    /// See ``makeCache(subelements:)-4kmy2`` for more information.
+    /// See ``makeCache(subelements:environment:)-8ciko`` for more information.
     associatedtype Cache = Void
 
     /// Returns the size of the composite element, given a proposed size constraint and the
@@ -169,8 +169,8 @@ public protocol CaffeinatedLayout {
     ///
     /// For performance reasons, the layout engine may deduce the measurement of your container for
     /// some constraint values without explicitly calling
-    /// ``sizeThatFits(proposal:subelements:cache:)``. To ensure that the deduced value is correct,
-    /// your layout must follow some ground rules:
+    /// ``sizeThatFits(proposal:subelements:environment:cache:)``. To ensure that the deduced value
+    /// is correct, your layout must follow some ground rules:
     ///
     /// 1. **Given one fixed constraint axis, the element's growth along the other axis should be
     ///    _monotonic_.** That is, an element can grow when given a larger constraint, or shrink
@@ -203,13 +203,17 @@ public protocol CaffeinatedLayout {
     ///   - subelements: A collection of proxies that represent the elements that the container
     ///     arranges. You can use the proxies in the collection to get information about the
     ///     subelements as you determine how much space the container needs to display them.
+    ///   - environment: The environment of the container. You can use properties from the
+    ///     environment when calculating the size of this container, as long as you adhere to the
+    ///     sizing rules.
     ///   - cache: Optional storage for calculated data that you can share among the methods of your
-    ///     custom layout container. See ``makeCache(subelements:)-4kmy2`` for details.
+    ///     custom layout container. See ``makeCache(subelements:environment:)-8ciko`` for details.
     /// - Returns: A size that indicates how much space the container needs to arrange its
     ///   subelements.
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     ) -> CGSize
 
@@ -226,20 +230,24 @@ public protocol CaffeinatedLayout {
     /// Be sure that you use computations during placement that are consistent with those in your
     /// implementation of other protocol methods for a given set of inputs. For example, if you add
     /// spacing during placement, make sure your implementation of
-    /// ``sizeThatFits(proposal:subelements:cache:)`` accounts for the extra space.
+    /// ``sizeThatFits(proposal:subelements:environment:cache:)`` accounts for the extra space.
     ///
     /// - Parameters:
     ///   - size: The region that the container's parent allocates to the container. Place all the
     ///     container's subelements within the region. The size of this region may not match any
-    ///     size that was returned from a call to ``sizeThatFits(proposal:subelements:cache:)``.
+    ///     size that was returned from a call to
+    ///     ``sizeThatFits(proposal:subelements:environment:cache:)``.
     ///   - subelements: A collection of proxies that represent the elements that the container
     ///     arranges. Use the proxies in the collection to get information about the subelements and
     ///     to tell the subelements where to appear.
+    ///   - environment: The environment of this container. You can use properties from the
+    ///     environment to vary the placement of subelements.
     ///   - cache: Optional storage for calculated data that you can share among the methods of your
-    ///     custom layout container. See ``makeCache(subelements:)-4kmy2`` for details.
+    ///     custom layout container. See ``makeCache(subelements:environment:)-8ciko`` for details.
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     )
 
@@ -252,14 +260,15 @@ public protocol CaffeinatedLayout {
     /// method if you don’t need a cache.
     ///
     /// However you might find a cache useful when the layout container repeats complex intermediate
-    /// calculations across calls to ``sizeThatFits(proposal:subelements:cache:)`` and
-    /// ``placeSubelements(in:subelements:cache:)``. You might be able to improve performance by
-    /// calculating values once and storing them in a cache.
+    /// calculations across calls to ``sizeThatFits(proposal:subelements:environment:cache:)`` and
+    /// ``placeSubelements(in:subelements:environment:cache:)``. You might be able to improve
+    /// performance by calculating values once and storing them in a cache.
     ///
     /// - Note: A cache's lifetime is limited to a single render pass, so you cannot use it to store
-    ///   values across multiple calls to ``placeSubelements(in:subelements:cache:)``. A render pass
-    ///   includes zero, one, or many calls to ``sizeThatFits(proposal:subelements:cache:)``,
-    ///   followed by a single call to ``placeSubelements(in:subelements:cache:)``.
+    ///   values across multiple calls to ``placeSubelements(in:subelements:environment:cache:)``. A
+    ///   render pass includes zero, one, or many calls to
+    ///   ``sizeThatFits(proposal:subelements:environment:cache:)``, followed by a single call to
+    ///   ``placeSubelements(in:subelements:environment:cache:)``.
     ///
     /// Only implement a cache if profiling shows that it improves performance.
     ///
@@ -283,11 +292,12 @@ public protocol CaffeinatedLayout {
     /// - Parameter subelements: A collection of proxy instances that represent the subelements that
     ///   the container arranges. You can use the proxies in the collection to get information about
     ///   the subelements as you calculate values to store in the cache.
+    /// - Parameter environment: The environment of this container.
     /// - Returns: Storage for calculated data that you share among the methods of your custom
     ///   layout container.
-    func makeCache(subelements: Subelements) -> Cache
+    func makeCache(subelements: Subelements, environment: Environment) -> Cache
 }
 
 extension CaffeinatedLayout where Cache == () {
-    public func makeCache(subelements: Subelements) { () }
+    public func makeCache(subelements: Subelements, environment: Environment) { () }
 }

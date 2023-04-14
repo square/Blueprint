@@ -22,11 +22,13 @@ protocol LegacyContentStorage {
 protocol CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
-        context: MeasureContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> CGSize
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [ElementContent.IdentifiedNode]
 }

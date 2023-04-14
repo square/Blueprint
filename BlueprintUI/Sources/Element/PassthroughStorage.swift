@@ -72,30 +72,34 @@ extension PassthroughStorage: LegacyContentStorage {
 
 extension PassthroughStorage: CaffeinatedContentStorage {
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
         content.sizeThatFits(
             proposal: proposal,
-            context: MeasureContext(
-                environment: context.environment,
-                node: context.node.subnode(key: identifier)
-            )
+            environment: environment,
+            node: node.subnode(key: identifier)
         )
     }
 
-    func performCaffeinatedLayout(frame: CGRect, context: LayoutContext) -> [IdentifiedNode] {
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> [IdentifiedNode] {
         let childAttributes = LayoutAttributes(size: frame.size)
-        let context = LayoutContext(
-            environment: context.environment,
-            node: context.node.subnode(key: identifier)
-        )
+        let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
-            environment: context.environment,
+            environment: environment,
             children: content.performCaffeinatedLayout(
                 frame: frame,
-                context: context
+                environment: environment,
+                node: subnode
             )
         )
 

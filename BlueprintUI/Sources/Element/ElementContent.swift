@@ -42,7 +42,8 @@ public struct ElementContent {
             )
             return sizeThatFits(
                 proposal: constraint,
-                context: MeasureContext(environment: environment, node: node)
+                environment: environment,
+                node: node
             )
         }
     }
@@ -51,8 +52,12 @@ public struct ElementContent {
         storage.measure(in: constraint, environment: environment, cache: cache)
     }
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        storage.sizeThatFits(proposal: proposal, context: context)
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
+        storage.sizeThatFits(proposal: proposal, environment: environment, node: node)
     }
 
     public var childCount: Int {
@@ -75,11 +80,13 @@ public struct ElementContent {
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         storage.performCaffeinatedLayout(
             frame: frame,
-            context: context
+            environment: environment,
+            node: node
         )
     }
 }
@@ -304,12 +311,14 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     ) -> CGSize {
         precondition(subelements.count == 1)
         return wrapped.sizeThatFits(
             proposal: proposal,
             subelement: subelements[0],
+            environment: environment,
             cache: &cache
         )
     }
@@ -317,19 +326,21 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
+        environment: Environment,
         cache: inout Cache
     ) {
         precondition(subelements.count == 1)
         wrapped.placeSubelement(
             in: size,
             subelement: subelements[0],
+            environment: environment,
             cache: &cache
         )
     }
 
-    func makeCache(subelements: Subelements) -> Cache {
+    func makeCache(subelements: Subelements, environment: Environment) -> Cache {
         precondition(subelements.count == 1)
-        return wrapped.makeCache(subelement: subelements[0])
+        return wrapped.makeCache(subelement: subelements[0], environment: environment)
     }
 }
 

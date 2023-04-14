@@ -37,13 +37,18 @@ extension MeasurableStorage: LegacyContentStorage {
 
 extension MeasurableStorage: CaffeinatedContentStorage {
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
-        measurer(proposal, context.environment)
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
+        measurer(proposal, environment)
     }
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         []
     }
