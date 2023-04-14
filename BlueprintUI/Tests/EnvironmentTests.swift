@@ -268,11 +268,21 @@ private struct TestElement: Element {
             [value.layoutAttributes]
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
             value.size
         }
 
-        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
             for subelement in subelements {
                 subelement.place(
                     at: value.layoutAttributes.frame.origin,

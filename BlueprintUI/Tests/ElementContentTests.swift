@@ -280,7 +280,12 @@ fileprivate struct FrameLayout: Layout {
         items.map { LayoutAttributes(frame: $0.traits) }
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) -> CGSize {
         subelements.reduce(into: CGSize.zero) { result, subview in
             let traits = subview.traits(forLayoutType: FrameLayout.self)
             result.width = max(result.width, traits.maxX)
@@ -288,7 +293,12 @@ fileprivate struct FrameLayout: Layout {
         }
     }
 
-    func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
         for subelement in subelements {
             let frame = subelement.traits(forLayoutType: FrameLayout.self)
             subelement.place(
@@ -324,26 +334,22 @@ private struct HalfLayout: Layout {
         }
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
-        let halfConstraint = SizeConstraint(
-            width: proposal.width / 2,
-            height: proposal.height / 2
-        )
-        let measurements = subelements.map { $0.sizeThatFits(halfConstraint) }
-        return CGSize(
-            width: measurements.map(\.width).reduce(0, +),
-            height: measurements.map(\.height).reduce(0, +)
-        )
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) -> CGSize {
+        fatalError("Not supported in Caffeinated Layout")
     }
 
-    func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
-        let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
-        for subelement in subelements {
-            subelement.place(
-                at: .zero,
-                size: subelement.sizeThatFits(halfConstraint)
-            )
-        }
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
+        fatalError("Not supported in Caffeinated Layout")
     }
 }
 
@@ -368,21 +374,37 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
         layout.layout(size: size, items: items)
     }
 
-    func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout WrappedLayout.Cache) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout WrappedLayout.Cache
+    ) -> CGSize {
         counts.measures += 1
-        return layout.sizeThatFits(proposal: proposal, subelements: subelements, cache: &cache)
+        return layout.sizeThatFits(
+            proposal: proposal,
+            subelements: subelements,
+            environment: environment,
+            cache: &cache
+        )
     }
 
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
+        environment: Environment,
         cache: inout WrappedLayout.Cache
     ) {
-        layout.placeSubelements(in: size, subelements: subelements, cache: &cache)
+        layout.placeSubelements(
+            in: size,
+            subelements: subelements,
+            environment: environment,
+            cache: &cache
+        )
     }
 
-    func makeCache(subelements: LayoutSubelements) -> WrappedLayout.Cache {
-        layout.makeCache(subelements: subelements)
+    func makeCache(subelements: Subelements, environment: Environment) -> WrappedLayout.Cache {
+        layout.makeCache(subelements: subelements, environment: environment)
     }
 }
 
@@ -411,11 +433,21 @@ private struct MeasureCountingSpacer: Element {
             []
         }
 
-        func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
             size
         }
 
-        func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
             // No-op
         }
     }

@@ -14,8 +14,8 @@ public typealias LayoutSubelements = [LayoutSubelement]
 /// Use this proxy to get information about the associated element, like its size and traits. You
 /// should also use the proxy to tell its corresponding element where to appear by calling the
 /// proxy’s ``place(at:anchor:size:)`` method. Do this once for each subview from your
-/// implementation of the layout’s ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)``
-/// method.
+/// implementation of the layout’s
+/// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method.
 ///
 /// - Note: The ``LayoutSubelement`` API, and its documentation, are modeled after SwiftUI's
 ///   [LayoutSubview](https://developer.apple.com/documentation/swiftui/layoutsubview), with major
@@ -27,11 +27,11 @@ public struct LayoutSubelement {
 
     var identifier: ElementIdentifier
     private var content: ElementContent
-    var measureContext: MeasureContext
+    var environment: Environment
+    var node: LayoutTreeNode
     private var traits: Any
 
-    var environment: Environment { measureContext.environment }
-    private var cache: HintingSizeCache { measureContext.node.sizeCache }
+    private var cache: HintingSizeCache { node.sizeCache }
 
     @Storage
     private(set) var placement: Placement?
@@ -43,22 +43,24 @@ public struct LayoutSubelement {
     init(
         identifier: ElementIdentifier,
         content: ElementContent,
-        measureContext: MeasureContext,
+        environment: Environment,
+        node: LayoutTreeNode,
         traits: Any
     ) {
         self.identifier = identifier
         self.content = content
-        self.measureContext = measureContext
+        self.environment = environment
+        self.node = node
         self.traits = traits
     }
 
     /// Assigns a position and size to a subelement.
     ///
     /// Call this method from your implementation of the `Layout` protocol’s
-    /// ``CaffeinatedLayout/placeSubelements(in:subelements:cache:)`` method for each subelement
-    /// arranged by the layout. Provide a position within the container’s bounds where the
-    /// subelement should appear, an anchor that indicates which part of the subelement appears at
-    /// that point, and a size.
+    /// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method for each
+    /// subelement arranged by the layout. Provide a position within the container’s bounds where
+    /// the subelement should appear, an anchor that indicates which part of the subelement appears
+    /// at that point, and a size.
     ///
     /// To learn the subelement's preferred size for a given proposal before calling this method,
     /// you can call ``sizeThatFits(_:)`` method on the subelement.
@@ -120,7 +122,7 @@ public struct LayoutSubelement {
     /// - Returns: The size that the subelement would choose for itself, given the proposal.
     public func sizeThatFits(_ proposal: SizeConstraint) -> CGSize {
         cache.get(key: proposal) { proposal in
-            content.sizeThatFits(proposal: proposal, context: measureContext)
+            content.sizeThatFits(proposal: proposal, environment: environment, node: node)
         }
     }
 

@@ -68,46 +68,49 @@ extension LazyStorage: LegacyContentStorage {
 
 extension LazyStorage: CaffeinatedContentStorage {
 
-    func sizeThatFits(proposal: SizeConstraint, context: MeasureContext) -> CGSize {
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize {
         let child = buildChild(
             for: .measurement,
             in: proposal,
-            environment: context.environment
+            environment: environment
         )
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let context = MeasureContext(
-            environment: context.environment,
-            node: context.node.subnode(key: identifier)
+        let subnode = node.subnode(key: identifier)
+
+        return child.content.sizeThatFits(
+            proposal: proposal,
+            environment: environment,
+            node: subnode
         )
-        return child.content.sizeThatFits(proposal: proposal, context: context)
     }
 
     func performCaffeinatedLayout(
         frame: CGRect,
-        context: LayoutContext
+        environment: Environment,
+        node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         let child = buildChild(
             for: .layout,
             in: SizeConstraint(frame.size),
-            environment: context.environment
+            environment: environment
         )
 
         let childAttributes = LayoutAttributes(size: frame.size)
-
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-
-        let context = LayoutContext(
-            environment: context.environment,
-            node: context.node.subnode(key: identifier)
-        )
+        let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
             element: child,
             layoutAttributes: childAttributes,
-            environment: context.environment,
+            environment: environment,
             children: child.content.performCaffeinatedLayout(
                 frame: frame,
-                context: context
+                environment: environment,
+                node: subnode
             )
         )
 

@@ -41,10 +41,8 @@ extension ElementContent {
         case .caffeinated(let options):
             return performCaffeinatedLayout(
                 frame: attributes.frame,
-                context: LayoutContext(
-                    environment: .empty,
-                    node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)
-                )
+                environment: .empty,
+                node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)
             )
         }
     }

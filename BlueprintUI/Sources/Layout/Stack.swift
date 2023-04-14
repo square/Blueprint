@@ -873,7 +873,12 @@ extension LayoutSubelement {
 }
 
 extension StackLayout {
-    public func sizeThatFits(proposal: SizeConstraint, subelements: Subelements, cache: inout ()) -> CGSize {
+    public func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) -> CGSize {
         guard subelements.isEmpty == false else { return .zero }
 
         let constraint = proposal.vectorConstraint(on: axis)
@@ -890,8 +895,12 @@ extension StackLayout {
         return vector.size(axis: axis)
     }
 
-    public func placeSubelements(in size: CGSize, subelements: Subelements, cache: inout ()) {
-
+    public func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
         let constraint = size.vectorConstraint(axis: axis)
 
         let frames = _frames(for: subelements.map(StackLayoutItem.init), in: constraint)

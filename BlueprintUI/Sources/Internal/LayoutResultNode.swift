@@ -21,13 +21,11 @@ extension Element {
         case .caffeinated(let options):
             return caffeinatedLayout(
                 frame: frame,
-                context: LayoutContext(
-                    environment: environment,
-                    node: LayoutTreeNode(
-                        path: "\(type(of: self))",
-                        signpostRef: SignpostToken(),
-                        options: options
-                    )
+                environment: environment,
+                node: LayoutTreeNode(
+                    path: "\(type(of: self))",
+                    signpostRef: SignpostToken(),
+                    options: options
                 )
             )
         }
@@ -49,16 +47,21 @@ extension Element {
         )
     }
 
-    private func caffeinatedLayout(frame: CGRect, context: LayoutContext) -> LayoutResultNode {
+    private func caffeinatedLayout(
+        frame: CGRect,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> LayoutResultNode {
         let children = content.performCaffeinatedLayout(
             frame: frame,
-            context: context
+            environment: environment,
+            node: node
         )
 
         return LayoutResultNode(
             element: self,
             layoutAttributes: LayoutAttributes(frame: frame),
-            environment: context.environment,
+            environment: environment,
             children: children
         )
     }
