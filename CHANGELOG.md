@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `layoutMode` to `BlueprintViewRenderMetrics` to expose which layout mode was used to render a Blueprint view.
+
 ### Removed
 
 ### Changed
