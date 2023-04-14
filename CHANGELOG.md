@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Caffeinated Layout is enabled by default. You can disable it on a `BlueprintView` with the `layoutMode` property, or disable it globally by setting `LayoutMode.default`.
+
 ### Deprecated
 
 - `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.

@@ -12,7 +12,7 @@ import Foundation
 /// render their contents.
 ///
 public enum LayoutMode: Equatable {
-    public static var `default`: Self = .legacy {
+    public static var `default`: Self = .caffeinated {
         didSet {
             guard oldValue != .default else { return }
             NotificationCenter
