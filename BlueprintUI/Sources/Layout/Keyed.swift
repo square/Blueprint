@@ -69,6 +69,24 @@ public struct Keyed: Element {
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(size: size)
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
+            subelement.sizeThatFits(proposal)
+        }
+
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            subelement.place(at: .zero, size: size)
+        }
     }
 }
 

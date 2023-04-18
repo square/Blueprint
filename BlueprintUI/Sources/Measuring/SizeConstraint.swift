@@ -4,7 +4,7 @@ import UIKit
 ///
 /// Currently this constraint type can only handles layout where
 /// the primary (breaking) axis is horizontal (row in CSS-speak).
-public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
+public struct SizeConstraint: Hashable, CustomStringConvertible {
 
     /// The width constraint.
     @UnconstrainedInfiniteAxis public var width: Axis
@@ -19,8 +19,8 @@ public struct SizeConstraint: Hashable, CustomDebugStringConvertible {
 
     // MARK: CustomDebugStringConvertible
 
-    public var debugDescription: String {
-        "<SizeConstraint: \(width.debugDescription) x \(height.debugDescription)>"
+    public var description: String {
+        "\(width) × \(height)"
     }
 }
 
@@ -57,12 +57,18 @@ extension SizeConstraint {
         )
     }
 
+    public func inset(by insets: UIEdgeInsets) -> SizeConstraint {
+        inset(
+            width: insets.left + insets.right,
+            height: insets.top + insets.bottom
+        )
+    }
 }
 
 extension SizeConstraint {
 
     /// Represents a size constraint for a single axis.
-    public enum Axis: Hashable, CustomDebugStringConvertible {
+    public enum Axis: Hashable, CustomStringConvertible {
 
         /// The measurement should treat the associated value as the largest
         /// possible size in the given dimension.
@@ -107,6 +113,16 @@ extension SizeConstraint {
                 return value
             case .unconstrained:
                 return nil
+            }
+        }
+
+        func map(transform: (CGFloat) -> (CGFloat)) -> Self {
+            switch self {
+            case .atMost(let value):
+                return .atMost(transform(value))
+
+            case .unconstrained:
+                return .unconstrained
             }
         }
 
@@ -192,7 +208,7 @@ extension SizeConstraint {
 
         // MARK: CustomDebugStringConvertible
 
-        public var debugDescription: String {
+        public var description: String {
             switch self {
             case .atMost(let max):
                 return "atMost(\(max))"

@@ -41,4 +41,8 @@ extension CGRect {
     func offset(by point: CGPoint) -> CGRect {
         offsetBy(dx: point.x, dy: point.y)
     }
+
+    var center: CGPoint {
+        CGPoint(x: midX, y: midY)
+    }
 }

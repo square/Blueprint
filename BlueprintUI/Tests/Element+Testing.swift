@@ -9,7 +9,11 @@ extension Element {
     ///
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment = .empty) -> LayoutResultNode {
-        layout(layoutAttributes: LayoutAttributes(frame: frame), environment: environment)
+        layout(
+            frame: frame,
+            environment: environment,
+            layoutMode: RenderContext.current?.layoutMode ?? .default
+        )
     }
 }
 
@@ -26,10 +30,20 @@ extension ElementContent {
     /// A convenience wrapper to perform layout during testing, using a default `Environment` and
     /// a new cache.
     func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
-        performLayout(
-            attributes: attributes,
-            environment: .empty,
-            cache: CacheFactory.makeCache(name: "test")
-        )
+        let layoutMode = RenderContext.current?.layoutMode ?? .default
+        switch layoutMode {
+        case .legacy:
+            return performLegacyLayout(
+                attributes: attributes,
+                environment: .empty,
+                cache: CacheFactory.makeCache(name: "test")
+            )
+        case .caffeinated(let options):
+            return performCaffeinatedLayout(
+                frame: attributes.frame,
+                environment: .empty,
+                node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)
+            )
+        }
     }
 }

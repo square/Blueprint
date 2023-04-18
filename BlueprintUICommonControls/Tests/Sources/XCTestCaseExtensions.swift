@@ -101,22 +101,33 @@ extension XCTestCase {
         size: CGSize? = nil,
         identifier: String? = nil,
         scale: CGFloat = 1,
+        layoutModes: [LayoutMode] = LayoutMode.testModes,
         file: StaticString = #file,
         testName: String = #function,
         line: UInt = #line
     ) {
-        let view = BlueprintView(element: element)
-        view.name = "Snapshot Host"
+        for layoutMode in layoutModes {
+            let view = BlueprintView(element: element)
+            view.name = "Snapshot Host"
+            view.layoutMode = layoutMode
 
-        if let size = size {
-            view.frame = CGRect(origin: .zero, size: size)
-        } else {
-            view.sizeToFit()
-            view.frame.size.width.round(.up, by: scale)
-            view.frame.size.height.round(.up, by: scale)
+            if let size = size {
+                view.frame = CGRect(origin: .zero, size: size)
+            } else {
+                view.sizeToFit()
+                view.frame.size.width.round(.up, by: scale)
+                view.frame.size.height.round(.up, by: scale)
+            }
+
+            compareSnapshot(
+                of: view,
+                identifier: identifier,
+                scale: scale,
+                file: file,
+                testName: testName,
+                line: line
+            )
         }
-
-        compareSnapshot(of: view, identifier: identifier, scale: scale, file: file, testName: testName, line: line)
     }
 
 }

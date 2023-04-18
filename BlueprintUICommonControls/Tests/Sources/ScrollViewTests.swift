@@ -15,6 +15,50 @@ import BlueprintUI
 
 class ScrollViewTests: XCTestCase {
 
+    // When a scrollview places a subelement that has an infinite size, it defaults to replacing
+    // those dimensions with the size of the scrollview itself.
+    func test_infiniteContent() throws {
+
+        struct InfiniteBox: Element {
+            var content: ElementContent {
+                ElementContent(intrinsicSize: .infinity)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                UIView.describe { view in
+                    view[\.backgroundColor] = .red
+                }
+            }
+        }
+
+        compareSnapshot(
+            of: InfiniteBox()
+                .scrollable(.fittingContent)
+                .inset(uniform: 10),
+            size: CGSize(width: 100, height: 100),
+            identifier: "fittingContent",
+            layoutModes: [.caffeinated]
+        )
+
+        compareSnapshot(
+            of: InfiniteBox()
+                .scrollable(.fittingWidth)
+                .inset(uniform: 10),
+            size: CGSize(width: 100, height: 100),
+            identifier: "fittingWidth",
+            layoutModes: [.caffeinated]
+        )
+
+        compareSnapshot(
+            of: InfiniteBox()
+                .scrollable(.fittingHeight)
+                .inset(uniform: 10),
+            size: CGSize(width: 100, height: 100),
+            identifier: "fittingHeight",
+            layoutModes: [.caffeinated]
+        )
+    }
+
     func test_calculateContentInset() {
         // No inset
 

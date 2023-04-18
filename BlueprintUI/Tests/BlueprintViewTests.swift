@@ -801,6 +801,26 @@ private struct TestContainer: Element {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             Array(repeating: LayoutAttributes(size: .zero), count: items.count)
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            .zero
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            for subelement in subelements {
+                subelement.place(in: .zero)
+            }
+        }
     }
 }
 
