@@ -13,11 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Introduced a new layout engine, Caffeinated Layout. Caffeinated Layout features a new API for custom layouts that is modeled after SwiftUI, and greatly improves performance.
+
+  To enable Caffeinated Layout globally, set `LayoutMode.default` to `.caffeinated`. To enable it for a single view, set the `layoutMode` property of a `BlueprintView`.
+
+  Caffeinated Layout is not enabled by default yet, but will be in a future release.
+
 - Added `layoutMode` to `BlueprintViewRenderMetrics` to expose which layout mode was used to render a Blueprint view.
 
 ### Removed
 
 ### Changed
+
+- The `Layout` and `SingleChildLayout` protocols have new methods to support Caffeinated Layout.
+
+  To improve performance, Caffeinated Layout requires elements to adhere to a new contract for sizing behavior. Many elements can be easily adapted to the new API, but certain behaviors are no longer possible, particularly with regard to behavior when the size constraint is `unconstrained`.
+
+  For more information about implementing these protocols and the sizing contract, see [the `Layout` documentation](https://square.github.io/Blueprint/Protocols/Layout.html).
 
 ### Deprecated
 
