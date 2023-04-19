@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+### Internal
+
+# Past Releases
+
+## [1.0.0] - 2023-04-18
+
+### Fixed
+
 - Restored documentation generation by executing the generate_docs.sh script with `bundle exec` to ensure gems are referenced properly.
 
 ### Added
@@ -21,8 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `layoutMode` to `BlueprintViewRenderMetrics` to expose which layout mode was used to render a Blueprint view.
 
-### Removed
-
 ### Changed
 
 - The `Layout` and `SingleChildLayout` protocols have new methods to support Caffeinated Layout.
@@ -31,21 +51,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   For more information about implementing these protocols and the sizing contract, see [the `Layout` documentation](https://square.github.io/Blueprint/Protocols/Layout.html).
 
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
 ### Internal
 
 - Updated jazzy gem (0.14.3).
 - Updated cocoapods (1.12.0).
 - Updated Ruby version (2.7).
-
-# Past Releases
 
 ## [0.50.0] - 2023-03-07
 
@@ -982,7 +992,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.50.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
 [0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
 [0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
 [0.49.0]: https://github.com/square/Blueprint/compare/0.48.1...0.49.0
