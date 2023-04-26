@@ -66,13 +66,14 @@ public struct ConstrainedAspectRatio: Element {
                     } else if constrainedHeight > availableHeight {
                         return aspectRatio.size(forHeight: constrainedHeight)
                     }
+                    return contentSize
                 } else if constraint.width.constrainedValue == nil {
                     return aspectRatio.size(forWidth: constrainedWidth)
                 } else if constraint.height.constrainedValue == nil {
                     return aspectRatio.size(forHeight: constrainedHeight)
                 } else if constrainedWidth < availableWidth {
                     return aspectRatio.size(forHeight: constrainedHeight)
-                } else if constrainedHeight < availableHeight {
+                } else {
                     return aspectRatio.size(forWidth: constrainedWidth)
                 }
 
@@ -85,13 +86,14 @@ public struct ConstrainedAspectRatio: Element {
                     } else if constrainedHeight > availableHeight {
                         return aspectRatio.size(forHeight: constrainedHeight)
                     }
+                    return contentSize
                 } else if constraint.width.constrainedValue == nil {
                     return aspectRatio.size(forWidth: constrainedWidth)
                 } else if constraint.height.constrainedValue == nil {
                     return aspectRatio.size(forHeight: constrainedHeight)
                 } else if constrainedWidth > availableWidth {
                     return aspectRatio.size(forHeight: constrainedHeight)
-                } else if constrainedHeight > availableHeight {
+                } else {
                     return aspectRatio.size(forWidth: constrainedWidth)
                 }
 
@@ -101,6 +103,7 @@ public struct ConstrainedAspectRatio: Element {
                 } else if constrainedHeight > availableHeight {
                     return aspectRatio.size(forHeight: constrainedHeight)
                 }
+                return contentSize
 
             case .shrinkContent:
                 if constrainedWidth < availableWidth {
@@ -108,9 +111,8 @@ public struct ConstrainedAspectRatio: Element {
                 } else if constrainedHeight < availableHeight {
                     return aspectRatio.size(forHeight: constrainedHeight)
                 }
+                return contentSize
             }
-
-            return contentSize
         }
     }
 
