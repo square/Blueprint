@@ -4,20 +4,32 @@ import UIKit
 public struct ConstrainedAspectRatio: Element {
     /// Represents how the content should size itself relative to its parent.
     public enum ContentMode: Equatable {
-        /// The content will be sized to fill its parent while maintaining the specified aspect
-        /// ratio.
+        /// The content will be sized to fill its parent while
+        /// maintaining the specified aspect ratio.
         ///
-        /// If the parent is unconstrained in all dimensions, the content size will be used for
-        /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
-        /// dimension, the element will fill the constrained dimension.
+        /// In ``LayoutMode/legacy`` layout mode, if the parent is unconstrained in all dimensions,
+        /// the content size will be used for measurement and will behave like `fitContent`. If the
+        /// parent is unconstrained in one dimension, the element will fill the constrained
+        /// dimension.
+        ///
+        /// In ``LayoutMode/caffeinated``, if the parent is unconstrained in any dimension, this
+        /// element will report a size of `infinity`.
+        ///
+        @available(*, deprecated, message: "Limited utility in Caffeinated Layout")
         case fillParent
 
         /// The content will be sized to fit within its parent while maintaining the specified
         /// aspect ratio.
         ///
-        /// If the parent is unconstrained in all dimensions, the content size will be used for
-        /// measurement and will behave like `fitContent`. If the parent is unconstrained in one
-        /// dimension, the element will fit the constrained dimension.
+        /// If the parent is unconstrained in one dimension, the element will fit the constrained
+        /// dimension.
+        ///
+        /// In ``LayoutMode/legacy`` layout mode, if the parent is unconstrained in all dimensions,
+        /// the content size will be used for measurement and will behave like `fitContent`.
+        ///
+        /// In ``LayoutMode/caffeinated`` layout mode, if the parent is unconstrained in both
+        /// dimensions, this element will report a size of `infinity`.
+        ///
         case fitParent
 
         /// The content will grow in whichever dimension is needed to maintain the aspect ratio,
@@ -114,6 +126,81 @@ public struct ConstrainedAspectRatio: Element {
                 return contentSize
             }
         }
+
+        func constrain(
+            subelement: LayoutSubelement,
+            to aspectRatio: AspectRatio,
+            in proposal: SizeConstraint
+        ) -> CGSize {
+
+            switch self {
+            case .fillParent:
+                switch (proposal.width, proposal.height) {
+
+                case (.atMost(let maxWidth), .atMost(let maxHeight)):
+                    let constrainedWidth = aspectRatio.width(forHeight: maxHeight)
+
+                    if constrainedWidth > maxWidth {
+                        // grow width to match height
+                        return aspectRatio.size(forHeight: maxHeight)
+                    } else {
+                        // grow height to match width
+                        return aspectRatio.size(forWidth: maxWidth)
+                    }
+
+                default:
+                    return .infinity
+                }
+
+            case .fitParent:
+                switch (proposal.width, proposal.height) {
+                case (.unconstrained, .unconstrained):
+                    return .infinity
+
+                case (.atMost(let maxWidth), .unconstrained):
+                    return aspectRatio.size(forWidth: maxWidth)
+
+                case (.unconstrained, .atMost(let maxHeight)):
+                    return aspectRatio.size(forHeight: maxHeight)
+
+                case (.atMost(let maxWidth), .atMost(let maxHeight)):
+                    let constrainedWidth = aspectRatio.width(forHeight: maxHeight)
+
+                    if constrainedWidth > maxWidth {
+                        // too wide, match width and shrink height
+                        return aspectRatio.size(forWidth: maxWidth)
+                    } else {
+                        // match height and shrink width
+                        return aspectRatio.size(forHeight: maxHeight)
+                    }
+                }
+
+            case .fitContent:
+                let contentSize = subelement.sizeThatFits(proposal)
+                let constrainedWidth = aspectRatio.width(forHeight: contentSize.height)
+
+                if constrainedWidth > contentSize.width {
+                    // grow width to match height
+                    return aspectRatio.size(forHeight: contentSize.height)
+                } else {
+                    // grow height to match width
+                    return aspectRatio.size(forWidth: contentSize.width)
+                }
+
+            case .shrinkContent:
+                let contentSize = subelement.sizeThatFits(proposal)
+                let constrainedWidth = aspectRatio.width(forHeight: contentSize.height)
+
+                if constrainedWidth < contentSize.width {
+                    // shrink width to match height
+                    return aspectRatio.size(forHeight: contentSize.height)
+                } else {
+                    // shrink height to match width
+                    return aspectRatio.size(forWidth: contentSize.width)
+                }
+            }
+
+        }
     }
 
     /// The element being constrained.
@@ -167,12 +254,7 @@ public struct ConstrainedAspectRatio: Element {
             environment: Environment,
             cache: inout Cache
         ) -> CGSize {
-            let contentSize = subelement.sizeThatFits(proposal)
-            return contentMode.constrain(
-                contentSize: contentSize,
-                in: proposal,
-                to: aspectRatio
-            )
+            contentMode.constrain(subelement: subelement, to: aspectRatio, in: proposal)
         }
 
         func placeSubelement(
