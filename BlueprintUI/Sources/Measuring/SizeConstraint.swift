@@ -1,9 +1,6 @@
 import UIKit
 
 /// Defines the maximum size for a measurement.
-///
-/// Currently this constraint type can only handles layout where
-/// the primary (breaking) axis is horizontal (row in CSS-speak).
 public struct SizeConstraint: Hashable, CustomStringConvertible {
 
     /// The width constraint.
@@ -48,6 +45,12 @@ extension SizeConstraint {
 
     public var maximum: CGSize {
         CGSize(width: width.maximum, height: height.maximum)
+    }
+
+    /// A size representing this constraint. Unconstrained dimensions are represented with
+    /// `CGFloat.infinity`.
+    public var unconstrainedSize: CGSize {
+        CGSize(width: width.unconstrainedValue, height: height.unconstrainedValue)
     }
 
     public func inset(width: CGFloat, height: CGFloat) -> SizeConstraint {
@@ -113,6 +116,16 @@ extension SizeConstraint {
                 return value
             case .unconstrained:
                 return nil
+            }
+        }
+
+        /// The constraint value, or `infinity` if this dimension is unconstrained.
+        public var unconstrainedValue: CGFloat {
+            switch self {
+            case .atMost(let value):
+                return value
+            case .unconstrained:
+                return .infinity
             }
         }
 
