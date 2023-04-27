@@ -24,15 +24,15 @@ struct TestElement: ProxyElement {
 
 #if DEBUG && canImport(SwiftUI) && !arch(i386)
 
-    import SwiftUI
+import SwiftUI
 
-    @available(iOS 13.0, *)
-    struct TestingView_Preview: PreviewProvider {
-        static var previews: some View {
-            ElementPreview(with: .thatFits(padding: 5)) {
-                TestElement()
-            }
+@available(iOS 13.0, *)
+struct TestingView_Preview: PreviewProvider {
+    static var previews: some View {
+        ElementPreview(with: .thatFits(padding: 5)) {
+            TestElement()
         }
     }
+}
 
 #endif

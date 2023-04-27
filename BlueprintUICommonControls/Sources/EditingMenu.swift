@@ -240,14 +240,14 @@ extension EditingMenuItem {
             case decreaseSize
 
             #if swift(>=5.5)
-                @available(iOS 15.0, *)
-                case printContent
-                @available(iOS 15.0, *)
-                case pasteAndGo
-                @available(iOS 15.0, *)
-                case pasteAndMatchStyle
-                @available(iOS 15.0, *)
-                case pasteAndSearch
+            @available(iOS 15.0, *)
+            case printContent
+            @available(iOS 15.0, *)
+            case pasteAndGo
+            @available(iOS 15.0, *)
+            case pasteAndMatchStyle
+            @available(iOS 15.0, *)
+            case pasteAndSearch
             #endif
         }
     }
@@ -373,18 +373,18 @@ extension EditingMenuItem.Kind.System {
             return #selector(actions.decreaseSize)
 
         #if swift(>=5.5)
-            case .printContent:
-                guard #available(iOS 15.0, *) else { fatalError() }
-                return #selector(actions.printContent)
-            case .pasteAndGo:
-                guard #available(iOS 15.0, *) else { fatalError() }
-                return #selector(actions.pasteAndGo)
-            case .pasteAndMatchStyle:
-                guard #available(iOS 15.0, *) else { fatalError() }
-                return #selector(actions.pasteAndMatchStyle)
-            case .pasteAndSearch:
-                guard #available(iOS 15.0, *) else { fatalError() }
-                return #selector(actions.pasteAndSearch)
+        case .printContent:
+            guard #available(iOS 15.0, *) else { fatalError() }
+            return #selector(actions.printContent)
+        case .pasteAndGo:
+            guard #available(iOS 15.0, *) else { fatalError() }
+            return #selector(actions.pasteAndGo)
+        case .pasteAndMatchStyle:
+            guard #available(iOS 15.0, *) else { fatalError() }
+            return #selector(actions.pasteAndMatchStyle)
+        case .pasteAndSearch:
+            guard #available(iOS 15.0, *) else { fatalError() }
+            return #selector(actions.pasteAndSearch)
         #endif
         }
     }
@@ -526,25 +526,25 @@ extension EditingMenu {
 
         #if swift(>=5.5)
 
-            @available(iOS 15.0, *)
-            @objc override func printContent(_ any: Any?) {
-                perform(kind: .printContent)
-            }
+        @available(iOS 15.0, *)
+        @objc override func printContent(_ any: Any?) {
+            perform(kind: .printContent)
+        }
 
-            @available(iOS 15.0, *)
-            @objc override func pasteAndGo(_ any: Any?) {
-                perform(kind: .pasteAndGo)
-            }
+        @available(iOS 15.0, *)
+        @objc override func pasteAndGo(_ any: Any?) {
+            perform(kind: .pasteAndGo)
+        }
 
-            @available(iOS 15.0, *)
-            @objc override func pasteAndMatchStyle(_ any: Any?) {
-                perform(kind: .pasteAndMatchStyle)
-            }
+        @available(iOS 15.0, *)
+        @objc override func pasteAndMatchStyle(_ any: Any?) {
+            perform(kind: .pasteAndMatchStyle)
+        }
 
-            @available(iOS 15.0, *)
-            @objc override func pasteAndSearch(_ any: Any?) {
-                perform(kind: .pasteAndSearch)
-            }
+        @available(iOS 15.0, *)
+        @objc override func pasteAndSearch(_ any: Any?) {
+            perform(kind: .pasteAndSearch)
+        }
 
         #endif
 
