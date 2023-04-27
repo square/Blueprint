@@ -137,8 +137,8 @@ private final class UIViewElementMeasurer {
     static let shared = UIViewElementMeasurer()
 
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement: UIViewElement>(
-        element: ViewElement,
+    func measure(
+        element: some UIViewElement,
         constraint: SizeConstraint,
         environment: Environment
     ) -> CGSize {
