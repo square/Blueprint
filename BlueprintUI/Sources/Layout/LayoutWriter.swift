@@ -1,10 +1,3 @@
-//
-//  LayoutWriter.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 10/7/20.
-//
-
 import UIKit
 
 

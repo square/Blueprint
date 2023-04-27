@@ -14,6 +14,7 @@
 --shortoptionals always
 --voidtype void
 --wraparguments before-first
+--header strip
 
 --rules anyObjectProtocol
 --rules blankLinesBetweenScopes
@@ -24,6 +25,7 @@
 --rules emptyBraces
 --rules extensionAccessControl
 --rules indent
+--rules fileHeader
 --rules leadingDelimiters
 --rules linebreakAtEndOfFile
 --rules modifierOrder

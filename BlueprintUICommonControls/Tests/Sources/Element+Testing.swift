@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Kyle Van Essen on 1/12/22.
-//
-
 import BlueprintUI
 import UIKit
 import XCTest

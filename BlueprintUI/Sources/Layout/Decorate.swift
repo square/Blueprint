@@ -1,10 +1,3 @@
-//
-//  Decorate.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 11/4/20.
-//
-
 import UIKit
 
 

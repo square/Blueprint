@@ -1,10 +1,3 @@
-//
-//  EditingMenu.swift
-//  BlueprintUICommonControls
-//
-//  Created by Kyle Van Essen on 1/5/22.
-//
-
 import BlueprintUI
 import Foundation
 import UIKit

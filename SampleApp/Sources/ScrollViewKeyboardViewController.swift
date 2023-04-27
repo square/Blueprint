@@ -1,11 +1,3 @@
-//
-//  ScrollViewKeyboardViewController.swift
-//  SampleApp
-//
-//  Created by Kyle Van Essen on 3/22/20.
-//  Copyright © 2020 Square. All rights reserved.
-//
-
 import BlueprintUI
 import BlueprintUICommonControls
 import UIKit

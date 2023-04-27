@@ -1,10 +1,3 @@
-//
-//  Keyed.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 4/2/21.
-//
-
 import UIKit
 
 
