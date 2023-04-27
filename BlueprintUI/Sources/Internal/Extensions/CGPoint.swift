@@ -21,16 +21,4 @@ extension CGPoint {
     func applying(_ transform: CATransform3D) -> CGPoint {
         CGPoint(double4Value * transform.double4x4Value)
     }
-
-    static func + (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
-        CGPoint(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
-    }
-
-    static func - (lhs: CGPoint, rhs: CGPoint) -> CGPoint {
-        CGPoint(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
-    }
-
-    static prefix func - (point: CGPoint) -> CGPoint {
-        CGPoint(x: -point.x, y: -point.y)
-    }
 }

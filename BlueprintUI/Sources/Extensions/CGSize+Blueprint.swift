@@ -1,4 +1,4 @@
-import CoreGraphics
+import UIKit
 
 extension CGSize {
     /// A size with `infinity` in both dimensions.
@@ -12,5 +12,27 @@ extension CGSize {
             width: width.replacingInfinity(with: replacement.width),
             height: height.replacingInfinity(with: replacement.height)
         )
+    }
+
+    public static func + (lhs: CGSize, rhs: CGSize) -> CGSize {
+        CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
+
+    public static func - (lhs: CGSize, rhs: CGSize) -> CGSize {
+        CGSize(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
+    }
+
+    /// Returns a size inset from this size by the given inset values.
+    public func inset(by insets: UIEdgeInsets) -> Self {
+        CGSize(
+            width: width - insets.left - insets.right,
+            height: height - insets.top - insets.bottom
+        )
+    }
+
+    /// Returns a size whose width and height are upper bounded by the width and height of the given
+    /// maximum size.
+    public func upperBounded(by maxSize: CGSize) -> CGSize {
+        CGSize(width: min(width, maxSize.width), height: min(height, maxSize.height))
     }
 }
