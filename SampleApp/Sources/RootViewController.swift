@@ -1,11 +1,3 @@
-//
-//  RootViewController.swift
-//  SampleApp
-//
-//  Created by Kyle Van Essen on 6/26/20.
-//  Copyright © 2020 Square. All rights reserved.
-//
-
 import Foundation
 
 

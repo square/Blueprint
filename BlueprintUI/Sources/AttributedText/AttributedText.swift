@@ -65,7 +65,7 @@ import UIKit
         self.mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
     }
 
-    public func range<StringType: StringProtocol>(of aString: StringType) -> Range<String.Index>? {
+    public func range(of aString: some StringProtocol) -> Range<String.Index>? {
         string.range(of: aString)
     }
 

@@ -1,10 +1,3 @@
-//
-//  ScrollViewTests.swift
-//  BlueprintUICommonControls-Unit-Tests
-//
-//  Created by Kyle Van Essen on 2/26/20.
-//
-
 import Foundation
 import XCTest
 

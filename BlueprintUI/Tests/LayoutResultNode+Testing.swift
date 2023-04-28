@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Kyle Bashour on 9/24/21.
-//
-
 import XCTest
 @testable import BlueprintUI
 

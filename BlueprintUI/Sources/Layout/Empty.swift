@@ -1,10 +1,3 @@
-//
-//  Empty.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 6/4/20.
-//
-
 import UIKit
 
 

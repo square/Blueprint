@@ -56,7 +56,7 @@ public struct ViewDescription {
 
     /// Generates a view description for the given view class.
     /// - parameter viewType: The class of the described view.
-    public init<View>(_ viewType: View.Type) where View: UIView {
+    public init(_ viewType: (some UIView).Type) {
         self.init(viewType, configuring: { _ in })
     }
 

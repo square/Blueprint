@@ -1,10 +1,3 @@
-//
-//  BlueprintViewAdditions.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 2/21/20.
-//
-
 import UIKit
 
 @testable import BlueprintUI
