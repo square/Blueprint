@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `ConstrainedAspectRatio`  measures correctly in `fitParent` and `fillParent` modes when the proposed constraint has the same aspect ratio as the element's constraint.
+- `ConstrainedAspectRatio` adheres to the Caffeinated Layout contract when unconstrained in `fitParent` or `fillParent`, by reporting `infinity` instead of falling back to the constrained element's size.
+
 ### Added
 
 ### Removed
@@ -16,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Deprecated
+
+- `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.
 
 ### Security
 
