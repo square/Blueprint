@@ -9,20 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `ConstrainedAspectRatio`  measures correctly in `fitParent` and `fillParent` modes when the proposed constraint has the same aspect ratio as the element's constraint.
-- `ConstrainedAspectRatio` adheres to the Caffeinated Layout contract when unconstrained in `fitParent` or `fillParent`, by reporting `infinity` instead of falling back to the constrained element's size.
-
 ### Added
 
 ### Removed
 
 ### Changed
 
-- Caffeinated Layout is enabled by default. You can disable it on a `BlueprintView` with the `layoutMode` property, or disable it globally by setting `LayoutMode.default`.
-
 ### Deprecated
-
-- `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.
 
 ### Security
 
@@ -33,6 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [2.0.0] - 2023-05-02
+
+### Fixed
+
+- `ConstrainedAspectRatio`  measures correctly in `fitParent` and `fillParent` modes when the proposed constraint has the same aspect ratio as the element's constraint.
+- `ConstrainedAspectRatio` adheres to the Caffeinated Layout contract when unconstrained in `fitParent` or `fillParent`, by reporting `infinity` instead of falling back to the constrained element's size.
+
+### Changed
+
+- Caffeinated Layout is enabled by default. You can disable it on a `BlueprintView` with the `layoutMode` property, or disable it globally by setting `LayoutMode.default`.
+
+### Deprecated
+
+- `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.
 
 ## [1.0.0] - 2023-04-18
 
@@ -999,7 +1007,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/1.0.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
 [0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
 [0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
