@@ -10,8 +10,9 @@ public struct ScrollView: Element {
 
     /// Determines the sizing behavior of the content within the scroll view.
     public var contentSize: ContentSize
-    public var alwaysBounceVertical = false
-    public var alwaysBounceHorizontal = false
+
+    public var alwaysBounceVertical: Bool
+    public var alwaysBounceHorizontal: Bool
 
     /**
      How much the content of the `ScrollView` should be inset.
@@ -19,9 +20,9 @@ public struct ScrollView: Element {
      Note: When `keyboardAdjustmentMode` is used, it will also adjust
      the on-screen `UIScrollView`s `contentInset.bottom` to make space for the keyboard.
      */
-    public var contentInset: UIEdgeInsets = .zero
+    public var contentInset: UIEdgeInsets
 
-    public var underflow: Underflow = .top
+    public var underflow: Underflow
 
     @available(*, deprecated, message: "Please use `underflow = .center`.")
     public var centersUnderflow: Bool {
@@ -29,15 +30,15 @@ public struct ScrollView: Element {
         set { underflow = newValue ? .center : .top }
     }
 
-    public var showsHorizontalScrollIndicator: Bool = true
-    public var showsVerticalScrollIndicator: Bool = true
-    public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
+    public var showsHorizontalScrollIndicator: Bool
+    public var showsVerticalScrollIndicator: Bool
+    public var pullToRefreshBehavior: PullToRefreshBehavior
 
-    public var keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none
-    public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior = .automatic
-    public var keyboardAdjustmentMode: KeyboardAdjustmentMode = .adjustsWhenVisible
+    public var keyboardDismissMode: UIScrollView.KeyboardDismissMode
+    public var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior
+    public var keyboardAdjustmentMode: KeyboardAdjustmentMode
 
-    public var delaysContentTouches: Bool = true
+    public var delaysContentTouches: Bool
 
     public var contentOffsetTrigger: ScrollTrigger?
 
@@ -78,8 +79,9 @@ public struct ScrollView: Element {
         wrapping element: Element,
         configure: (inout ScrollView) -> Void = { _ in }
     ) {
-        self.contentSize = contentSize
-        wrappedElement = element
+        self.init(contentSize: contentSize) {
+            element
+        }
 
         configure(&self)
     }
