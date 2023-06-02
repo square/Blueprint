@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `ScrollView.Underflow`, to allow more granular control of how to lay out content when a scroll view's content underflows the available space.
+
 ### Removed
 
 ### Changed
 
 ### Deprecated
+
+- `ScrollView.centersUnderflow` has been deprecated; use `ScrollView.Underflow.center` instead.
 
 ### Security
 

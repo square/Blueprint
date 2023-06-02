@@ -21,6 +21,9 @@ final class RootViewController: UIViewController {
             DemoItem(title: "GeometryReader Responsive Layout", onTap: { [weak self] in
                 self?.push(ResponsiveViewController())
             }),
+            DemoItem(title: "ScrollView Underflow", onTap: { [weak self] in
+                self?.push(ScrollViewUnderflowViewController())
+            }),
 
             EditingMenu { menu in
                 DemoItem(title: "Show A Menu Controller") {

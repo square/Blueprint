@@ -21,7 +21,14 @@ public struct ScrollView: Element {
      */
     public var contentInset: UIEdgeInsets = .zero
 
-    public var centersUnderflow: Bool = false
+    public var underflow: Underflow = .top
+
+    @available(*, deprecated, message: "Please use `underflow = .center`.")
+    public var centersUnderflow: Bool {
+        get { underflow == .center }
+        set { underflow = newValue ? .center : .top }
+    }
+
     public var showsHorizontalScrollIndicator: Bool = true
     public var showsVerticalScrollIndicator: Bool = true
     public var pullToRefreshBehavior: PullToRefreshBehavior = .disabled
@@ -33,6 +40,38 @@ public struct ScrollView: Element {
     public var delaysContentTouches: Bool = true
 
     public var contentOffsetTrigger: ScrollTrigger?
+
+    public init(
+        contentSize: ScrollView.ContentSize = .fittingHeight,
+        alwaysBounceVertical: Bool = false,
+        alwaysBounceHorizontal: Bool = false,
+        contentInset: UIEdgeInsets = .zero,
+        underflow: ScrollView.Underflow = .top,
+        showsHorizontalScrollIndicator: Bool = true,
+        showsVerticalScrollIndicator: Bool = true,
+        pullToRefreshBehavior: ScrollView.PullToRefreshBehavior = .disabled,
+        keyboardDismissMode: UIScrollView.KeyboardDismissMode = .none,
+        contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior = .automatic,
+        keyboardAdjustmentMode: ScrollView.KeyboardAdjustmentMode = .adjustsWhenVisible,
+        delaysContentTouches: Bool = true,
+        contentOffsetTrigger: ScrollView.ScrollTrigger? = nil,
+        element: () -> Element
+    ) {
+        wrappedElement = element()
+        self.contentSize = contentSize
+        self.alwaysBounceVertical = alwaysBounceVertical
+        self.alwaysBounceHorizontal = alwaysBounceHorizontal
+        self.contentInset = contentInset
+        self.underflow = underflow
+        self.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator
+        self.showsVerticalScrollIndicator = showsVerticalScrollIndicator
+        self.pullToRefreshBehavior = pullToRefreshBehavior
+        self.keyboardDismissMode = keyboardDismissMode
+        self.contentInsetAdjustmentBehavior = contentInsetAdjustmentBehavior
+        self.keyboardAdjustmentMode = keyboardAdjustmentMode
+        self.delaysContentTouches = delaysContentTouches
+        self.contentOffsetTrigger = contentOffsetTrigger
+    }
 
     public init(
         _ contentSize: ContentSize = .fittingHeight,
@@ -67,7 +106,8 @@ public struct ScrollView: Element {
         Layout(
             contentInset: contentInset,
             contentSize: contentSize,
-            centersUnderflow: centersUnderflow
+            underflow: underflow,
+            contentInsetAdjustmentBehavior: contentInsetAdjustmentBehavior
         )
     }
 }
@@ -94,7 +134,8 @@ extension ScrollView {
 
         var contentInset: UIEdgeInsets
         var contentSize: ContentSize
-        var centersUnderflow: Bool
+        var underflow: Underflow
+        var contentInsetAdjustmentBehavior: UIScrollView.ContentInsetAdjustmentBehavior
 
         func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             switch contentSize {
@@ -152,7 +193,7 @@ extension ScrollView {
 
             var contentAttributes = LayoutAttributes(frame: CGRect(origin: .zero, size: itemSize))
 
-            if centersUnderflow {
+            if underflow == .center {
                 if contentAttributes.bounds.width < size.width {
                     contentAttributes.center.x = size.width / 2.0
                 }
@@ -160,7 +201,10 @@ extension ScrollView {
                 if contentAttributes.bounds.height < size.height {
                     contentAttributes.center.y = size.height / 2.0
                 }
+            } else if underflow != .top {
+                fatalError("Underflow value `\(underflow)` is not supported in legacy layout.")
             }
+
             return contentAttributes
         }
 
@@ -234,13 +278,38 @@ extension ScrollView {
 
             var origin: CGPoint = .zero
 
-            if centersUnderflow {
+            switch underflow {
+            case .top: break
+            case .center:
                 if itemSize.width < size.width {
                     origin.x += (size.width - itemSize.width) / 2
                 }
 
                 if itemSize.height < size.height {
                     origin.y += (size.height - itemSize.height) / 2
+                }
+
+            case .bottom:
+                if itemSize.width < size.width {
+                    origin.x = (size.width - itemSize.width)
+                }
+
+                if itemSize.height < size.height {
+                    origin.y = (size.height - itemSize.height)
+                }
+
+            case .fill:
+                let verticalSafeArea = environment.safeAreaInsets.top + environment.safeAreaInsets.bottom
+                let horizontalSafeArea = environment.safeAreaInsets.left + environment.safeAreaInsets.right
+
+                if itemSize.width < size.width {
+                    origin.x = 0
+                    itemSize.width = size.width - horizontalSafeArea
+                }
+
+                if itemSize.height < size.height {
+                    origin.y = 0
+                    itemSize.height = size.height - verticalSafeArea
                 }
             }
 
@@ -251,6 +320,13 @@ extension ScrollView {
 }
 
 extension ScrollView {
+
+    public enum Underflow: Equatable {
+        case top
+        case center
+        case bottom
+        case fill
+    }
 
     public enum KeyboardAdjustmentMode: Equatable {
         case none
