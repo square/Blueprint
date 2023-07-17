@@ -205,7 +205,7 @@ class BlueprintViewTests: XCTestCase {
                         // make sure UIKit knows we want a chance for layout
                         view.setNeedsLayout()
                     }
-                    config[\.onLayoutSubviews] = self.onLayoutSubviews
+                    config[\.onLayoutSubviews] = onLayoutSubviews
                 }
             }
 
@@ -694,7 +694,7 @@ class BlueprintViewTests: XCTestCase {
 
     func test_lifecycleCallbacks_dont_cause_crash() {
 
-        let expectation = self.expectation(description: "Re-rendered")
+        let expectation = expectation(description: "Re-rendered")
 
         withHostedView { view in
 
@@ -755,7 +755,7 @@ fileprivate struct MeasurableElement: Element {
 
     var content: ElementContent {
         ElementContent { constraint -> CGSize in
-            self.validate(constraint)
+            validate(constraint)
         }
     }
 
