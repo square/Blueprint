@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 - Update CI script to reference the `xcodesorg/made/xcodes` package for installing simulator runtimes.
+- Corrected a typo in `AttributedLabel`, which now exits paragraph style enumeration after encountering the first paragraph style. This is an optimization and not a functional change. The method continues to accept only a paragraph style which spans the length of the attributed string.
 
 # Past Releases
 

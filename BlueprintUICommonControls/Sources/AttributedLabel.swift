@@ -347,6 +347,7 @@ extension AttributedLabel {
 
         private func links(at location: CGPoint) -> [Link] {
             guard let textStorage = makeTextStorage(),
+                  textStorage.string.isEmpty == false,
                   let layoutManager = textStorage.layoutManagers.first,
                   let textContainer = layoutManager.textContainers.first
             else {
@@ -354,18 +355,18 @@ extension AttributedLabel {
             }
 
             func alignmentMultiplier() -> CGFloat {
-                var alignment: NSTextAlignment = .natural
+                // If a paragraph style spans the range of the text, use its alignment.
+                // Otherwise, fall back to `.natural`.
+                let alignment: NSTextAlignment = {
+                    var range: NSRange = NSRange(location: -1, length: 0)
+                    let style = textStorage.attribute(.paragraphStyle, at: 0, effectiveRange: &range)
 
-                textStorage.enumerateAttribute(
-                    .paragraphStyle,
-                    in: textStorage.entireRange,
-                    options: []
-                ) { style, range, continuePointer in
-                    if let style = style as? NSParagraphStyle, range == textStorage.entireRange {
-                        alignment = style.alignment
-                        continuePointer.pointee = false
+                    guard let style = style as? NSParagraphStyle, range == textStorage.entireRange else {
+                        return .natural
                     }
-                }
+
+                    return style.alignment
+                }()
 
                 switch (alignment, layoutDirection) {
                 case (.left, _),
