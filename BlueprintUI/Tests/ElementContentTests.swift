@@ -96,7 +96,7 @@ class ElementContentTests: XCTestCase {
             let cache = TestCache(name: "test")
 
             _ = container
-                .performLayout(
+                .performLegacyLayout(
                     attributes: LayoutAttributes(size: containerSize),
                     environment: .empty,
                     cache: cache
@@ -178,13 +178,64 @@ class ElementContentTests: XCTestCase {
 
         let size = measure.measure(in: .unconstrained)
 
-        _ = layout.performLayout(
+        _ = layout.performLegacyLayout(
             attributes: .init(size: size),
             environment: .empty,
             cache: TestCache(name: "test")
         )
 
         XCTAssertEqual(callCount, 2)
+    }
+
+    func test_measuring() {
+
+        struct InnerTestElement: Element {
+
+            var measure: (SizeConstraint) -> CGSize
+
+            var content: ElementContent {
+                ElementContent(measureFunction: measure)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        struct OuterTestElement: Element {
+
+            var element: InnerTestElement
+
+            var content: ElementContent {
+                ElementContent(measuring: element)
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                nil
+            }
+        }
+
+        var calls: [SizeConstraint] = []
+
+        let element = OuterTestElement(
+            element: InnerTestElement { constraint in
+                calls.append(constraint)
+                return CGSize(width: 100, height: 10)
+            }
+        )
+
+        let cache = RenderPassCache(name: "Test", signpostRef: NSObject())
+
+        /// Should output the size of the inner element.
+
+        XCTAssertEqual(
+            CGSize(width: 100, height: 10),
+            element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+        )
+
+        let layoutResult = element.layout(frame: CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
+
+        XCTAssertTrue(layoutResult.children.isEmpty)
     }
 }
 
@@ -229,6 +280,34 @@ fileprivate struct FrameLayout: Layout {
         items.map { LayoutAttributes(frame: $0.traits) }
     }
 
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) -> CGSize {
+        subelements.reduce(into: CGSize.zero) { result, subview in
+            let traits = subview.traits(forLayoutType: FrameLayout.self)
+            result.width = max(result.width, traits.maxX)
+            result.height = max(result.height, traits.maxY)
+        }
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
+        for subelement in subelements {
+            let frame = subelement.traits(forLayoutType: FrameLayout.self)
+            subelement.place(
+                at: frame.origin,
+                size: frame.size
+            )
+        }
+    }
+
     static var defaultTraits: CGRect {
         CGRect.zero
     }
@@ -254,6 +333,24 @@ private struct HalfLayout: Layout {
             LayoutAttributes(size: $1.measure(in: halfConstraint))
         }
     }
+
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) -> CGSize {
+        fatalError("Not supported in Caffeinated Layout")
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
+        fatalError("Not supported in Caffeinated Layout")
+    }
 }
 
 private class TestCounter {
@@ -275,6 +372,39 @@ private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout:
 
     func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
         layout.layout(size: size, items: items)
+    }
+
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout WrappedLayout.Cache
+    ) -> CGSize {
+        counts.measures += 1
+        return layout.sizeThatFits(
+            proposal: proposal,
+            subelements: subelements,
+            environment: environment,
+            cache: &cache
+        )
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout WrappedLayout.Cache
+    ) {
+        layout.placeSubelements(
+            in: size,
+            subelements: subelements,
+            environment: environment,
+            cache: &cache
+        )
+    }
+
+    func makeCache(subelements: Subelements, environment: Environment) -> WrappedLayout.Cache {
+        layout.makeCache(subelements: subelements, environment: environment)
     }
 }
 
@@ -301,6 +431,24 @@ private struct MeasureCountingSpacer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             []
+        }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            size
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            // No-op
         }
     }
 }

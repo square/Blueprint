@@ -1,10 +1,3 @@
-//
-//  UIViewElement.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 6/4/20.
-//
-
 import UIKit
 
 
@@ -144,8 +137,8 @@ private final class UIViewElementMeasurer {
     static let shared = UIViewElementMeasurer()
 
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement: UIViewElement>(
-        element: ViewElement,
+    func measure(
+        element: some UIViewElement,
         constraint: SizeConstraint,
         environment: Environment
     ) -> CGSize {
@@ -153,6 +146,13 @@ private final class UIViewElementMeasurer {
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
 
         let view = measurementView(for: element)
+
+        /// Ensure that during measurement / sizing, the inherited `Environment` is available
+        /// to any child `BlueprintView`s. We must manually wire this property up, as the
+        /// measurement views are not in the view hierarchy.
+
+        view.nativeViewNodeBlueprintEnvironment = environment
+        defer { view.nativeViewNodeBlueprintEnvironment = nil }
 
         element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
 

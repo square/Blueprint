@@ -376,7 +376,7 @@ class BlueprintViewTests: XCTestCase {
             var child: Element?
 
             var content: ElementContent {
-                if let child = self.child {
+                if let child = child {
                     return .init(child: child)
                 } else {
                     return .init(intrinsicSize: .zero)
@@ -384,7 +384,7 @@ class BlueprintViewTests: XCTestCase {
             }
 
             func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-                guard let view = self.view else {
+                guard let view = view else {
                     return nil
                 }
 
@@ -721,6 +721,32 @@ class BlueprintViewTests: XCTestCase {
 
         waitForExpectations(timeout: 1)
     }
+
+    func test_metrics_delegate_completedRenderWith() {
+        let testMetricsDelegate = TestMetricsDelegate()
+
+        let view = BlueprintView()
+        view.metricsDelegate = testMetricsDelegate
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        guard let metric = testMetricsDelegate.metrics.first else {
+            XCTFail("No metric generated")
+            return
+        }
+
+        XCTAssertTrue(metric.totalDuration > 0)
+        XCTAssertTrue(metric.layoutDuration > 0)
+        XCTAssertTrue(metric.viewUpdateDuration > 0)
+
+        // Sanity check that total duration is the sum of the two components.
+        // `accuracy` is generous to account for any accumated error during arithmetic.
+        XCTAssertEqual(
+            metric.totalDuration, metric.layoutDuration + metric.viewUpdateDuration,
+            accuracy: metric.totalDuration.ulp * 2
+        )
+    }
 }
 
 fileprivate struct MeasurableElement: Element {
@@ -805,6 +831,26 @@ private struct TestContainer: Element {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             Array(repeating: LayoutAttributes(size: .zero), count: items.count)
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            .zero
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            for subelement in subelements {
+                subelement.place(in: .zero)
+            }
+        }
     }
 }
 
@@ -860,3 +906,14 @@ private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
     }
 }
 
+private class TestMetricsDelegate: BlueprintViewMetricsDelegate {
+
+    var metrics: [BlueprintUI.BlueprintViewRenderMetrics] = []
+
+    func blueprintView(
+        _ view: BlueprintUI.BlueprintView,
+        completedRenderWith metrics: BlueprintUI.BlueprintViewRenderMetrics
+    ) {
+        self.metrics.append(metrics)
+    }
+}

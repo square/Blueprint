@@ -25,7 +25,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Misc
 
+### Internal
+
 # Past Releases
+
+## [2.0.0] - 2023-05-02
+
+### Fixed
+
+- `ConstrainedAspectRatio`  measures correctly in `fitParent` and `fillParent` modes when the proposed constraint has the same aspect ratio as the element's constraint.
+- `ConstrainedAspectRatio` adheres to the Caffeinated Layout contract when unconstrained in `fitParent` or `fillParent`, by reporting `infinity` instead of falling back to the constrained element's size.
+
+### Changed
+
+- Caffeinated Layout is enabled by default. You can disable it on a `BlueprintView` with the `layoutMode` property, or disable it globally by setting `LayoutMode.default`.
+
+### Deprecated
+
+- `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.
+
+## [1.0.0] - 2023-04-18
+
+### Fixed
+
+- Restored documentation generation by executing the generate_docs.sh script with `bundle exec` to ensure gems are referenced properly.
+
+### Added
+
+- Introduced a new layout engine, Caffeinated Layout. Caffeinated Layout features a new API for custom layouts that is modeled after SwiftUI, and greatly improves performance.
+
+  To enable Caffeinated Layout globally, set `LayoutMode.default` to `.caffeinated`. To enable it for a single view, set the `layoutMode` property of a `BlueprintView`.
+
+  Caffeinated Layout is not enabled by default yet, but will be in a future release.
+
+- Added `layoutMode` to `BlueprintViewRenderMetrics` to expose which layout mode was used to render a Blueprint view.
+
+### Changed
+
+- The `Layout` and `SingleChildLayout` protocols have new methods to support Caffeinated Layout.
+
+  To improve performance, Caffeinated Layout requires elements to adhere to a new contract for sizing behavior. Many elements can be easily adapted to the new API, but certain behaviors are no longer possible, particularly with regard to behavior when the size constraint is `unconstrained`.
+
+  For more information about implementing these protocols and the sizing contract, see [the `Layout` documentation](https://square.github.io/Blueprint/Protocols/Layout.html).
+
+### Internal
+
+- Updated jazzy gem (0.14.3).
+- Updated cocoapods (1.12.0).
+- Updated Ruby version (2.7).
+
+## [0.50.0] - 2023-03-07
+
+### Fixed
+
+- The `Environment` will now automatically inherit for `BlueprintView` instances nested inside `UIViewElement` during measurement.
+
+### Added
+
+- Introduced `ElementContent.init(byMeasuring:)`, for use when your `Element` contains a nested `BlueprintView`, commonly used to implement stateful elements. This avoids detached measurements and improves performance. 
+
+### Changed
+
+- Renamed `BlueprintViewUpdateMetrics` to `BlueprintViewRenderMetrics`.
+- Renamed `BlueprintViewRenderMetrics.measureDuration` to `layoutDuration`.
+- Renamed `BlueprintViewMetricsDelegate.blueprintView(_:completedUpdateWith:)` to `blueprintView(_:completedRenderWith:)`.
+- `BlueprintViewRenderMetrics` values are now calculated using `CACurrentMediaTime` instead of `Date`.
+
+### Internal
+- Added an Internal section to the changelog. This section is intended to capture any notable non-public changes to the project.
+- `ElementContent.init(child:)` now utilizes a unique `ContentStorage` type, which improves layout performance.
+
+## [0.49.1]
+
+### Fixed
+
+- `Image`'s `aspectFill` `contentMode` now measures the same as `aspectFit` to avoid aggressively taking up space when not necessary.
+
+## [0.49.0]
+
+### Fixed
+
+- Fixed unexpected measurement results that could occur from `Image`s using the `aspectFit` `contentMode`.
 
 ## [0.48.1]
 
@@ -929,7 +1009,12 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.48.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
+[1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
+[0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
+[0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
+[0.49.0]: https://github.com/square/Blueprint/compare/0.48.1...0.49.0
 [0.48.1]: https://github.com/square/Blueprint/compare/0.48.0...0.48.1
 [0.48.0]: https://github.com/square/Blueprint/compare/0.47.0...0.48.0
 [0.47.0]: https://github.com/square/Blueprint/compare/0.46.0...0.47.0

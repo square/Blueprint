@@ -1,10 +1,3 @@
-//
-//  PerformancePlayground.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 6/23/20.
-//
-
 import XCTest
 @testable import BlueprintUI
 @testable import BlueprintUICommonControls
@@ -24,7 +17,7 @@ class PerformancePlayground: XCTestCase {
 
     override func invokeTest() {
         // Uncomment this line to run performance metrics, eg in Instruments.app.
-        super.invokeTest()
+        // super.invokeTest()
     }
 
     func test_repeated_layouts() {

@@ -84,7 +84,7 @@ extension UIView {
     var inheritedBlueprintEnvironment: Environment? {
         if let environment = nativeViewNodeBlueprintEnvironment {
             return environment
-        } else if let superview = self.superview {
+        } else if let superview = superview {
             return superview.inheritedBlueprintEnvironment
         } else {
             return nil

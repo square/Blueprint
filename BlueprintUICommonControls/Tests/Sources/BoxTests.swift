@@ -132,6 +132,24 @@ private struct InsettingElement: Element {
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
             LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            .zero
+        }
+
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            subelement.place(in: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
+        }
     }
 
 }

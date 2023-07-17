@@ -267,6 +267,29 @@ private struct TestElement: Element {
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             [value.layoutAttributes]
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            value.size
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            for subelement in subelements {
+                subelement.place(
+                    at: value.layoutAttributes.frame.origin,
+                    size: value.layoutAttributes.frame.size
+                )
+            }
+        }
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

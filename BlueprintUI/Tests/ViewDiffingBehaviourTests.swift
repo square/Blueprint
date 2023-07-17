@@ -1,10 +1,3 @@
-//
-//  ViewDiffingBehaviourTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 2/20/20.
-//
-
 import Foundation
 import XCTest
 

@@ -153,6 +153,85 @@ extension EqualStack {
             return result
         }
 
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
+            guard subelements.count > 0 else { return .zero }
+
+            let totalSpacing = (spacing * CGFloat(subelements.count - 1))
+            let itemProposal: SizeConstraint
+            switch direction {
+            case .horizontal:
+                itemProposal = .init(
+                    width: proposal.width.map { ($0 - totalSpacing) / CGFloat(subelements.count) },
+                    height: proposal.height
+                )
+            case .vertical:
+                itemProposal = .init(
+                    width: proposal.width,
+                    height: proposal.height.map { ($0 - totalSpacing) / CGFloat(subelements.count) }
+                )
+            }
+            let itemSizes = subelements.map { $0.sizeThatFits(itemProposal) }
+
+            let maximumItemWidth = itemSizes.map { $0.width }.max() ?? 0
+            let maximumItemHeight = itemSizes.map { $0.height }.max() ?? 0
+
+            let totalSize: CGSize
+            switch direction {
+            case .horizontal:
+                totalSize = CGSize(
+                    width: maximumItemWidth * CGFloat(subelements.count) + totalSpacing,
+                    height: maximumItemHeight
+                )
+            case .vertical:
+                totalSize = CGSize(
+                    width: maximumItemWidth,
+                    height: maximumItemHeight * CGFloat(subelements.count) + totalSpacing
+                )
+            }
+
+            return totalSize
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            guard subelements.count > 0 else { return }
+
+            let totalSpacing = (spacing * CGFloat(subelements.count - 1))
+            let itemSize: CGSize
+            switch direction {
+            case .horizontal:
+                itemSize = CGSize(
+                    width: (size.width - totalSpacing) / CGFloat(subelements.count),
+                    height: size.height
+                )
+            case .vertical:
+                itemSize = CGSize(
+                    width: size.width,
+                    height: (size.height - totalSpacing) / CGFloat(subelements.count)
+                )
+            }
+
+            for (subelement, index) in zip(subelements, 0...) {
+                var origin = CGPoint.zero
+                switch direction {
+                case .horizontal:
+                    origin.x += (itemSize.width + spacing) * CGFloat(index)
+                case .vertical:
+                    origin.y += (itemSize.height + spacing) * CGFloat(index)
+                }
+
+                subelement.place(at: origin, size: itemSize)
+            }
+        }
     }
 
 }

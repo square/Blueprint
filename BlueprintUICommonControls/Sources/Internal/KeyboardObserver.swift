@@ -1,10 +1,3 @@
-//
-//  KeyboardObserver.swift
-//  BlueprintUICommonControls
-//
-//  Created by Kyle Van Essen on 2/16/20.
-//
-
 import UIKit
 
 

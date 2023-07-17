@@ -78,6 +78,29 @@ fileprivate struct OverlayLayout: Layout {
         )
     }
 
+    func sizeThatFits(
+        proposal: SizeConstraint,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout Cache
+    ) -> CGSize {
+        subelements.reduce(into: CGSize.zero) { result, subelement in
+            let measuredSize = subelement.sizeThatFits(proposal)
+            result.width = max(result.width, measuredSize.width)
+            result.height = max(result.height, measuredSize.height)
+        }
+    }
+
+    func placeSubelements(
+        in size: CGSize,
+        subelements: Subelements,
+        environment: Environment,
+        cache: inout ()
+    ) {
+        for subelement in subelements {
+            subelement.place(filling: size)
+        }
+    }
 }
 
 extension Overlay {

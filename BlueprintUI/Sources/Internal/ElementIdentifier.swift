@@ -41,24 +41,24 @@
 
  You will note that the identifiers remain stable, which ultimately ensures that views are reused.
  */
-struct ElementIdentifier: Hashable, CustomDebugStringConvertible {
+struct ElementIdentifier: Hashable, CustomStringConvertible {
 
-    let elementType: ObjectIdentifier
+    let elementType: Metatype
     let key: AnyHashable?
 
     let count: Int
 
     init(elementType: Element.Type, key: AnyHashable?, count: Int) {
 
-        self.elementType = ObjectIdentifier(elementType)
+        self.elementType = Metatype(elementType)
         self.key = key
 
         self.count = count
     }
 
-    var debugDescription: String {
-        if let key = self.key {
-            return "\(elementType).\(String(describing: key)).\(count)"
+    var description: String {
+        if let key = key {
+            return "\(elementType).\(key).\(count)"
         } else {
             return "\(elementType).\(count)"
         }

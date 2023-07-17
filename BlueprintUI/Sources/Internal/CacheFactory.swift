@@ -10,4 +10,4 @@ enum CacheFactory {
 }
 
 /// A token reference type that can be used to group associated signpost logs using `OSSignpostID`.
-private final class SignpostToken {}
+final class SignpostToken {}

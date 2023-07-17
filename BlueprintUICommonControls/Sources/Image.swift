@@ -34,7 +34,9 @@ public struct Image: Element {
 
     public var content: ElementContent {
         let measurer = Measurer(contentMode: contentMode, imageSize: image?.size)
-        return ElementContent(measurable: measurer)
+        return ElementContent { constraint, environment in
+            measurer.measure(in: constraint, layoutMode: environment.layoutMode)
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -106,18 +108,19 @@ extension CGSize {
 
 extension Image {
 
-    fileprivate struct Measurer: Measurable {
+    fileprivate struct Measurer {
 
         var contentMode: ContentMode
         var imageSize: CGSize?
 
-        func measure(in constraint: SizeConstraint) -> CGSize {
+        func measure(in constraint: SizeConstraint, layoutMode: LayoutMode) -> CGSize {
             guard let imageSize = imageSize else { return .zero }
 
             enum Mode {
                 case fitWidth(CGFloat)
                 case fitHeight(CGFloat)
                 case useImageSize
+                case infinite
             }
 
             let mode: Mode
@@ -127,7 +130,7 @@ extension Image {
                 mode = .useImageSize
             case .aspectFit, .aspectFill:
                 if case .atMost(let width) = constraint.width, case .atMost(let height) = constraint.height {
-                    if CGSize(width: width, height: height).aspectRatio > imageSize.aspectRatio {
+                    if CGSize(width: width, height: height).aspectRatio < imageSize.aspectRatio {
                         mode = .fitWidth(width)
                     } else {
                         mode = .fitHeight(height)
@@ -137,7 +140,12 @@ extension Image {
                 } else if case .atMost(let height) = constraint.height {
                     mode = .fitHeight(height)
                 } else {
-                    mode = .useImageSize
+                    switch layoutMode {
+                    case .legacy:
+                        mode = .useImageSize
+                    case .caffeinated:
+                        mode = .infinite
+                    }
                 }
             }
 
@@ -154,6 +162,8 @@ extension Image {
                 )
             case .useImageSize:
                 return imageSize
+            case .infinite:
+                return .infinity
             }
 
 

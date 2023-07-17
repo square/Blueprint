@@ -1,10 +1,3 @@
-//
-//  KeyedTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 4/5/21.
-//
-
 import BlueprintUI
 import XCTest
 
