@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Update CI script to reference the `xcodesorg/made/xcodes` package for installing simulator runtimes.
+
 # Past Releases
 
 ## [2.0.0] - 2023-05-02
