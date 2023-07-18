@@ -27,5 +27,8 @@ Pod::Spec.new do |s|
     test_spec.library = 'swiftsimd'
     test_spec.source_files = 'BlueprintUI/Tests/**/*.swift'
     test_spec.framework = 'XCTest'
+    test_spec.pod_target_xcconfig = {
+      'APPLICATION_EXTENSION_API_ONLY' => 'NO',
+    }
   end
 end
