@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Lifecycle callbacks like `onAppear` and `onDisappear` now occur outside of the layout pass; allowing, eg, `onAppear` to safely trigger a re-render.
+
 ### Deprecated
 
 ### Security
