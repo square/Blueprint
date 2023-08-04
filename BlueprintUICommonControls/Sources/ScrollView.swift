@@ -304,7 +304,7 @@ extension ScrollView {
 fileprivate final class ScrollerWrapperView: UIView {
 
     let scrollView = UIScrollView()
-    let keyboardObserver = KeyboardObserver(center: .default)
+    let keyboardObserver = KeyboardObserver.shared
 
     /// The current `ScrollView` state we represent.
     private var representedElement: ScrollView
