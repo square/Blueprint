@@ -136,7 +136,7 @@ final class KeyboardObserver {
     /// or the observer has not yet learned about the keyboard's position, this method returns nil.
     func currentFrame(in view: UIView) -> KeyboardFrame? {
 
-        guard view.window != nil else {
+        guard let window = view.window else {
             return nil
         }
 
@@ -144,19 +144,12 @@ final class KeyboardObserver {
             return nil
         }
 
-        let frame: CGRect
+        let screen = notification.screen ?? window.screen
 
-        if #available(iOS 16.1, *) {
-            frame = notification.screen.coordinateSpace.convert(
-                notification.endingFrame,
-                to: view
-            )
-        } else {
-            frame = view.convert(
-                notification.endingFrame,
-                from: nil
-            )
-        }
+        let frame = screen.coordinateSpace.convert(
+            notification.endingFrame,
+            to: view
+        )
 
         if frame.intersects(view.bounds) {
             return .overlapping(frame: frame)
@@ -213,23 +206,19 @@ extension KeyboardObserver {
         var animationDuration: Double = 0.0
         var animationCurve: UIView.AnimationCurve = .easeInOut
 
-        @available(iOS 16.1, *)
-        var screen: UIScreen {
-            get {
-                guard let screen = _screen else {
-                    fatalError("UIScreen value was not initialized from notification object.")
-                }
-                return screen
-            }
-            set {
-                _screen = newValue
-            }
-        }
-
-        // Note: Using this to work around: "Stored properties cannot be marked
-        // potentially unavailable with '@available'"
-        // Can be removed when deployment target is >= 16.1. @available(iOS 16.1, *)
-        private var _screen: UIScreen?
+        /// The `UIScreen` that the keyboard appears on.
+        ///
+        /// This may influence the `KeyboardFrame` calculation when the app is not in full screen,
+        /// such as in Split View, Slide Over, and Stage Manager.
+        ///
+        /// - note: In iOS 16.1 and later, every `keyboardWillChangeFrameNotification` and
+        /// `keyboardDidChangeFrameNotification` is _supposed_ to include a `UIScreen`
+        /// in a the notification, however we've had reports that this isn't always the case (at least when
+        /// using the iOS 16.1 simulator runtime). If a screen is _not_ included in an iOS 16.1+ notification,
+        /// we do not throw a `ParseError` as it would cause the entire notification to be discarded.
+        ///
+        /// [Apple Documentation](https://developer.apple.com/documentation/uikit/uiresponder/1621623-keyboardwillchangeframenotificat)
+        var screen: UIScreen?
 
         init(with notification: Notification) throws {
 
@@ -257,14 +246,7 @@ extension KeyboardObserver {
 
             self.animationCurve = animationCurve
 
-            if #available(iOS 16.1, *) {
-                guard let screen = notification.object as? UIScreen else {
-                    throw ParseError.missingScreen
-                }
-
-                self.screen = screen
-            }
-
+            screen = notification.object as? UIScreen
         }
 
         enum ParseError: Error, Equatable {
@@ -273,7 +255,6 @@ extension KeyboardObserver {
             case missingEndingFrame
             case missingAnimationDuration
             case missingAnimationCurve
-            case missingScreen
         }
     }
 }
