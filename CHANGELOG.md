@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Resolved a Swift 5.9 compilation warning: Forming 'UnsafeRawPointer' to a variable of type 'NSObject'; this is likely incorrect because 'NSObject' may contain an object reference.
+
 ### Added
 
 ### Removed
