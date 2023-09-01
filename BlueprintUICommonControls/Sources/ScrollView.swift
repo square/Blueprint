@@ -304,7 +304,7 @@ extension ScrollView {
 fileprivate final class ScrollerWrapperView: UIView {
 
     let scrollView = UIScrollView()
-    let keyboardObserver = KeyboardObserver()
+    let keyboardObserver = KeyboardObserver.shared
 
     /// The current `ScrollView` state we represent.
     private var representedElement: ScrollView
@@ -341,7 +341,7 @@ fileprivate final class ScrollerWrapperView: UIView {
 
         super.init(frame: frame)
 
-        keyboardObserver.delegate = self
+        keyboardObserver.add(delegate: self)
 
         addSubview(scrollView)
     }
@@ -564,11 +564,12 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
     func keyboardFrameWillChange(
         for observer: KeyboardObserver,
         animationDuration: Double,
-        options: UIView.AnimationOptions
+        animationCurve: UIView.AnimationCurve
     ) {
-        UIView.animate(withDuration: animationDuration, delay: 0.0, options: options, animations: {
+        UIViewPropertyAnimator(duration: animationDuration, curve: animationCurve) {
             self.updateBottomContentInsetWithKeyboardFrame()
-        })
+        }
+        .startAnimation()
     }
 }
 
