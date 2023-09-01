@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Resolved a Swift 5.9 compilation warning: Forming 'UnsafeRawPointer' to a variable of type 'NSObject'; this is likely incorrect because 'NSObject' may contain an object reference.
+- `KeyboardObserver` has been updated to handle iOS 16.1+ changes that use the screen's coordinate space to report keyboard position. This can impact reported values when the app isn't full screen in Split View, Slide Over, and Stage Manager.
 
 ### Added
 

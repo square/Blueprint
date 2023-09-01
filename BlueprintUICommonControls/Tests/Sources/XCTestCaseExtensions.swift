@@ -172,3 +172,31 @@ extension XCTestCase {
         window.windowScene = nil
     }
 }
+
+extension XCTestCase {
+
+    /// Allows waiting for asynchronous work to complete within a test method by
+    /// spinning the main runloop until the `predicate` returns true.
+    public func waitFor(
+        timeout: TimeInterval = 10.0,
+        predicate: () throws -> Bool,
+        error: (() -> String)? = nil
+    ) rethrows {
+        let runloop = RunLoop.main
+        let timeout = Date(timeIntervalSinceNow: timeout)
+
+        while Date() < timeout {
+            if try predicate() {
+                return
+            }
+
+            runloop.run(mode: .default, before: Date(timeIntervalSinceNow: 0.001))
+        }
+
+        if let error = error {
+            XCTFail("waitUntil timed out waiting for a check to pass. Error: \(error())")
+        } else {
+            XCTFail("waitUntil timed out waiting for a check to pass.")
+        }
+    }
+}
