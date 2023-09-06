@@ -9,16 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Resolved a Swift 5.9 compilation warning: Forming 'UnsafeRawPointer' to a variable of type 'NSObject'; this is likely incorrect because 'NSObject' may contain an object reference.
-- `KeyboardObserver` has been updated to handle iOS 16.1+ changes that use the screen's coordinate space to report keyboard position. This can impact reported values when the app isn't full screen in Split View, Slide Over, and Stage Manager.
-
 ### Added
 
 ### Removed
 
 ### Changed
-
-- Lifecycle callbacks like `onAppear` and `onDisappear` now occur outside of the layout pass; allowing, eg, `onAppear` to safely trigger a re-render.
 
 ### Deprecated
 
@@ -30,10 +25,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+# Past Releases
+
+## [2.1.0] - 2023-09-06
+
+### Fixed
+
+- Resolved a Swift 5.9 compilation warning: Forming 'UnsafeRawPointer' to a variable of type 'NSObject'; this is likely incorrect because 'NSObject' may contain an object reference.
+- `KeyboardObserver` has been updated to handle iOS 16.1+ changes that use the screen's coordinate space to report keyboard position. This can impact reported values when the app isn't full screen in Split View, Slide Over, and Stage Manager.
+
+### Changed
+
+- Lifecycle callbacks like `onAppear` and `onDisappear` now occur outside of the layout pass; allowing, eg, `onAppear` to safely trigger a re-render.
+
+### Internal
+
 - Update CI script to reference the `xcodesorg/made/xcodes` package for installing simulator runtimes.
 - Corrected a typo in `AttributedLabel`, which now exits paragraph style enumeration after encountering the first paragraph style. This is an optimization and not a functional change. The method continues to accept only a paragraph style which spans the length of the attributed string.
-
-# Past Releases
 
 ## [2.0.0] - 2023-05-02
 
@@ -1015,7 +1023,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/2.0.0...HEAD
+[main]: https://github.com/square/Blueprint/square/2.1.0...HEAD
+[2.1.0]: https://github.com/square/Blueprint/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
 [0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
