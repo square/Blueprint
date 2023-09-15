@@ -11,6 +11,7 @@ class ImageTests: XCTestCase {
         let element = Image(image: image)
         XCTAssertEqual(element.contentMode, .aspectFill)
         XCTAssertNil(element.tintColor)
+        XCTAssertNil(element.tintAdjustmentMode)
     }
 
     func test_aspectFill() {
