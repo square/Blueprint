@@ -56,6 +56,13 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertNotEqual(attributes, other)
         }
 
+        do {
+            /// tintAdjustmentMode
+            var other = attributes
+            other.tintAdjustmentMode = .normal
+            XCTAssertNotEqual(attributes, other)
+        }
+
     }
 
     func testConcatAlpha() {
@@ -179,6 +186,47 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertTrue(combined.isHidden)
         }
     }
+
+    func test_concat_tintAdjustmentMode() {
+        do {
+            /// parent adopts child attribute if parent not set
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = nil
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .normal
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// parent overrides child
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .normal
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .dimmed
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// child inherits from parent
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .normal
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = nil
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+    }
 }
 
 final class LayoutAttributesTests_CGRect: XCTestCase {
@@ -242,5 +290,14 @@ final class LayoutAttributesTests_Apply: XCTestCase {
         let view = UIView()
         attributes.apply(to: view)
         XCTAssertTrue(view.isHidden)
+    }
+
+    func test_apply_tintAdjustmentMode() {
+        var attributes = LayoutAttributes()
+        attributes.tintAdjustmentMode = .normal
+
+        let view = UIView()
+        attributes.apply(to: view)
+        XCTAssertEqual(view.tintAdjustmentMode, .normal)
     }
 }

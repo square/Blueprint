@@ -1,6 +1,7 @@
 import CoreGraphics
 import Foundation
 import QuartzCore
+import UIKit
 
 /// A collection of proxy values that represent the child elements of a layout.
 public typealias LayoutSubelements = [LayoutSubelement]
@@ -179,6 +180,9 @@ extension LayoutSubelement {
 
         /// Corresponds to `UIView.isHidden`.
         public var isHidden: Bool = false
+
+        /// Corresponds to `UIView.tintAdjustmentMode`.
+        public var tintAdjustmentMode: UIView.TintAdjustmentMode?
     }
 
     @propertyWrapper

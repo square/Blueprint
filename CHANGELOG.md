@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `tintAdjustmentMode` to `Image` for finer control of tint color during modal presentations.
+- Added a `TintAdjustmentMode` element and `.tintAdjustmentMode(:)` modifier for finer control of tint color during modal presentations.
 
 ### Removed
 

@@ -29,6 +29,9 @@ public struct LayoutAttributes {
     /// Corresponds to `UIView.isHidden`.
     public var isHidden: Bool
 
+    /// Corresponds to `UIView.tintAdjustmentMode`.
+    public var tintAdjustmentMode: UIView.TintAdjustmentMode?
+
     public init() {
         self.init(center: .zero, bounds: .zero)
     }
@@ -51,6 +54,7 @@ public struct LayoutAttributes {
         alpha = 1.0
         isUserInteractionEnabled = true
         isHidden = false
+        tintAdjustmentMode = nil
 
         validateBounds()
         validateCenter()
@@ -64,6 +68,7 @@ public struct LayoutAttributes {
         alpha = attributes.alpha
         isUserInteractionEnabled = attributes.isUserInteractionEnabled
         isHidden = attributes.isHidden
+        tintAdjustmentMode = attributes.tintAdjustmentMode
     }
 
     public var frame: CGRect {
@@ -88,6 +93,9 @@ public struct LayoutAttributes {
         view.alpha = alpha
         view.isUserInteractionEnabled = isUserInteractionEnabled
         view.isHidden = isHidden
+        if let tintAdjustmentMode {
+            view.tintAdjustmentMode = tintAdjustmentMode
+        }
     }
 
 
@@ -155,6 +163,7 @@ public struct LayoutAttributes {
         result.alpha = alpha * layoutAttributes.alpha
         result.isUserInteractionEnabled = layoutAttributes.isUserInteractionEnabled && isUserInteractionEnabled
         result.isHidden = layoutAttributes.isHidden || isHidden
+        result.tintAdjustmentMode = layoutAttributes.tintAdjustmentMode ?? tintAdjustmentMode
 
         return result
     }
@@ -267,6 +276,7 @@ extension LayoutAttributes: Equatable {
             && lhs.alpha == rhs.alpha
             && lhs.isUserInteractionEnabled == rhs.isUserInteractionEnabled
             && lhs.isHidden == rhs.isHidden
+            && lhs.tintAdjustmentMode == rhs.tintAdjustmentMode
     }
 
 }

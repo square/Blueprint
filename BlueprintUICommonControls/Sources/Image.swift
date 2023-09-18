@@ -11,12 +11,6 @@ public struct Image: Element {
     /// The tint color.
     public var tintColor: UIColor?
 
-    /// The tint adjustment mode. When this value is `.dimmed`, the view's `tintColor`
-    /// property returns a desaturated, dimmed version of the view's original tint color. When
-    /// this value is `.normal`, the view's `tintColor` property returns the completely
-    /// unmodified tint color.
-    public var tintAdjustmentMode: UIView.TintAdjustmentMode?
-
     /// The content mode determines the layout of the image when its size does
     /// not precisely match the size that the element is assigned.
     public var contentMode: ContentMode
@@ -30,13 +24,11 @@ public struct Image: Element {
         image: UIImage?,
         contentMode: ContentMode = .aspectFill,
         tintColor: UIColor? = nil,
-        tintAdjustmentMode: UIView.TintAdjustmentMode? = nil,
         blockAccessibilityDescription: Bool = false
     ) {
         self.image = image
         self.contentMode = contentMode
         self.tintColor = tintColor
-        self.tintAdjustmentMode = tintAdjustmentMode
         self.blockAccessibilityDescription = blockAccessibilityDescription
     }
 
@@ -53,9 +45,6 @@ public struct Image: Element {
             config[\.contentMode] = contentMode.uiViewContentMode
             config[\.layer.minificationFilter] = .trilinear
             config[\.tintColor] = tintColor
-            if let tintAdjustmentMode {
-                config[\.tintAdjustmentMode] = tintAdjustmentMode
-            }
             if blockAccessibilityDescription {
                 // Seting `isAccessibilityElement = false` isn't enough here, VoiceOver is very aggressive in finding images to discribe. We need to explicitly remove the `.image` trait.
                 config[\.accessibilityTraits] = UIAccessibilityTraits.none
