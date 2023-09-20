@@ -27,7 +27,6 @@ final class LayoutTreeNode {
 
     // These commonly used properties have dedicated storage. If we need to hang more generalized
     // things off this type we may want to store them in a heterogeneous dictionary.
-    private var _layoutSubelements: [LayoutSubelement]?
     private var _associatedCache: Any?
 
     init(path: String, signpostRef: AnyObject, options: LayoutOptions) {
@@ -46,15 +45,6 @@ final class LayoutTreeNode {
         )
         subnodes[key] = subnode
         return subnode
-    }
-
-    func layoutSubelements(create: () -> [LayoutSubelement]) -> [LayoutSubelement] {
-        if let layoutSubelements = _layoutSubelements {
-            return layoutSubelements
-        }
-        let layoutSubelements = create()
-        _layoutSubelements = layoutSubelements
-        return layoutSubelements
     }
 
     func associatedCache<AssociatedCache>(create: () -> AssociatedCache) -> AssociatedCache {

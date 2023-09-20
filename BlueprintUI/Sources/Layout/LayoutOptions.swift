@@ -9,8 +9,7 @@ public struct LayoutOptions: Equatable {
     /// The default configuration.
     public static let `default` = LayoutOptions(
         hintRangeBoundaries: true,
-        searchUnconstrainedKeys: true,
-        assumeStableSubelements: true
+        searchUnconstrainedKeys: true
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
@@ -23,15 +22,8 @@ public struct LayoutOptions: Equatable {
     /// Layout contract for correct behavior.
     public var searchUnconstrainedKeys: Bool
 
-    public var assumeStableSubelements: Bool
-
-    public init(
-        hintRangeBoundaries: Bool,
-        searchUnconstrainedKeys: Bool,
-        assumeStableSubelements: Bool = true
-    ) {
+    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool) {
         self.hintRangeBoundaries = hintRangeBoundaries
         self.searchUnconstrainedKeys = searchUnconstrainedKeys
-        self.assumeStableSubelements = assumeStableSubelements
     }
 }

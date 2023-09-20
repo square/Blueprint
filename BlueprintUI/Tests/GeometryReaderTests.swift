@@ -100,7 +100,7 @@ final class GeometryReaderTests: XCTestCase {
             outerRow.addFlexible(
                 child: GeometryReader { geometry in
 
-                    return Row { innerRow in
+                    Row { innerRow in
                         innerRow.horizontalUnderflow = .growUniformly
                         innerRow.horizontalOverflow = .condenseUniformly
                         innerRow.verticalAlignment = .fill
@@ -127,30 +127,20 @@ final class GeometryReaderTests: XCTestCase {
         // 4. GR body evaluates as a row with 2 children
         // 5. Subelement count has changed, as well as content of child 1
 
-        LayoutMode.caffeinated(options: .notAssumingSubelementsStable).performAsDefault {
-            let frames = element
-                .layout(frame: CGRect(origin: .zero, size: size))
-                .queryLayout(for: Spacer.self)
-                .map { $0.layoutAttributes.frame }
+        let frames = element
+            .layout(frame: CGRect(origin: .zero, size: size))
+            .queryLayout(for: Spacer.self)
+            .map { $0.layoutAttributes.frame }
 
-            XCTAssertEqual(
-                frames,
-                [
-                    CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 1, height: 120)),
-                    CGRect(origin: CGPoint(x: 1, y: 0), size: CGSize(width: 1, height: 120)),
-                    CGRect(origin: CGPoint(x: 85, y: 0), size: CGSize(width: 35, height: 120)),
-                ]
-            )
-        }
+        XCTAssertEqual(
+            frames,
+            [
+                CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 1, height: 120)),
+                CGRect(origin: CGPoint(x: 1, y: 0), size: CGSize(width: 1, height: 120)),
+                CGRect(origin: CGPoint(x: 85, y: 0), size: CGSize(width: 35, height: 120)),
+            ]
+        )
     }
-}
-
-extension LayoutOptions {
-    static let notAssumingSubelementsStable = LayoutOptions(
-        hintRangeBoundaries: true,
-        searchUnconstrainedKeys: true,
-        assumeStableSubelements: false
-    )
 }
 
 extension SizeConstraint.Axis {
