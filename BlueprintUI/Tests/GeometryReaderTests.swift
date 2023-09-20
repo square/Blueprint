@@ -87,6 +87,70 @@ final class GeometryReaderTests: XCTestCase {
 
         wait(for: [layoutExpectation], timeout: 5)
     }
+
+    func test_dynamicSubelements() {
+        let threshold: CGFloat = 100
+        let size = CGSize(width: 120, height: 120)
+
+        let element: Element = Row { outerRow in
+            outerRow.horizontalUnderflow = .growUniformly
+            outerRow.horizontalOverflow = .condenseUniformly
+            outerRow.verticalAlignment = .fill
+
+            outerRow.addFlexible(
+                child: GeometryReader { geometry in
+
+                    return Row { innerRow in
+                        innerRow.horizontalUnderflow = .growUniformly
+                        innerRow.horizontalOverflow = .condenseUniformly
+                        innerRow.verticalAlignment = .fill
+
+                        if let width = geometry.constraint.width.constrainedValue, width < threshold {
+                            // If constrained < 100, 2 children
+                            innerRow.addFixed(child: Spacer(1))
+                            innerRow.addFixed(child: Spacer(1))
+                        } else {
+                            // else 1 child
+                            innerRow.addFixed(child: Spacer(threshold))
+                        }
+                    }
+                }
+            )
+
+            outerRow.addFlexible(child: Spacer(threshold / 2))
+        }
+
+        // during layout:
+        // 1. Outer row measures GR with full width
+        // 2. GR body evaluates as a row with 1 child
+        // 3. Outer row measures again with reduced width
+        // 4. GR body evaluates as a row with 2 children
+        // 5. Subelement count has changed, as well as content of child 1
+
+        LayoutMode.caffeinated(options: .notAssumingSubelementsStable).performAsDefault {
+            let frames = element
+                .layout(frame: CGRect(origin: .zero, size: size))
+                .queryLayout(for: Spacer.self)
+                .map { $0.layoutAttributes.frame }
+
+            XCTAssertEqual(
+                frames,
+                [
+                    CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 1, height: 120)),
+                    CGRect(origin: CGPoint(x: 1, y: 0), size: CGSize(width: 1, height: 120)),
+                    CGRect(origin: CGPoint(x: 85, y: 0), size: CGSize(width: 35, height: 120)),
+                ]
+            )
+        }
+    }
+}
+
+extension LayoutOptions {
+    static let notAssumingSubelementsStable = LayoutOptions(
+        hintRangeBoundaries: true,
+        searchUnconstrainedKeys: true,
+        assumeStableSubelements: false
+    )
 }
 
 extension SizeConstraint.Axis {
