@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed a bug that could cause a crash or incorrect layout when an element with lazily resolved content (such as `GeometryReader`) generated a subtree that varied within a layout pass. ([#468])
+
 ### Added
 
 ### Removed
@@ -1095,6 +1097,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#468]: https://github.com/square/Blueprint/pull/468
 [#264]: https://github.com/square/Blueprint/pull/264
 [#260]: https://github.com/square/Blueprint/pull/260
 [#259]: https://github.com/square/Blueprint/pull/259

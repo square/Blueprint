@@ -126,21 +126,19 @@ extension LayoutStorage: LegacyContentStorage {
 extension LayoutStorage: CaffeinatedContentStorage {
 
     private func subelements(from node: LayoutTreeNode, environment: Environment) -> LayoutSubelements {
-        node.layoutSubelements {
-            var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
-            return children.map { child in
-                let identifier = identifierFactory.nextIdentifier(
-                    for: type(of: child.element),
-                    key: child.key
-                )
-                return LayoutSubelement(
-                    identifier: identifier,
-                    content: child.content,
-                    environment: environment,
-                    node: node.subnode(key: identifier),
-                    traits: child.traits
-                )
-            }
+        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
+        return children.map { child in
+            let identifier = identifierFactory.nextIdentifier(
+                for: type(of: child.element),
+                key: child.key
+            )
+            return LayoutSubelement(
+                identifier: identifier,
+                content: child.content,
+                environment: environment,
+                node: node.subnode(key: identifier),
+                traits: child.traits
+            )
         }
     }
 
