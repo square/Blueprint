@@ -182,7 +182,7 @@ extension LayoutSubelement {
         public var isHidden: Bool = false
 
         /// Corresponds to `UIView.tintAdjustmentMode`.
-        public var tintAdjustmentMode: UIView.TintAdjustmentMode?
+        public var tintAdjustmentMode: UIView.TintAdjustmentMode = .automatic
     }
 
     @propertyWrapper

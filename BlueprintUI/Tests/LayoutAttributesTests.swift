@@ -189,9 +189,9 @@ final class LayoutAttributesTests: XCTestCase {
 
     func test_concat_tintAdjustmentMode() {
         do {
-            /// parent adopts child attribute if parent not set
+            /// combined adopts child attribute if child is non-`.automatic`
             var a = LayoutAttributes()
-            a.tintAdjustmentMode = nil
+            a.tintAdjustmentMode = .automatic
 
             var b = LayoutAttributes()
             b.tintAdjustmentMode = .normal
@@ -202,12 +202,12 @@ final class LayoutAttributesTests: XCTestCase {
         }
 
         do {
-            /// parent overrides child
+            /// combined adopts child attribute if both child and parent are non-`.automatic`
             var a = LayoutAttributes()
-            a.tintAdjustmentMode = .normal
+            a.tintAdjustmentMode = .dimmed
 
             var b = LayoutAttributes()
-            b.tintAdjustmentMode = .dimmed
+            b.tintAdjustmentMode = .normal
 
             let combined = b.within(a)
 
@@ -215,16 +215,29 @@ final class LayoutAttributesTests: XCTestCase {
         }
 
         do {
-            /// child inherits from parent
+            /// combined inherits from parent if child is `.automatic`
             var a = LayoutAttributes()
             a.tintAdjustmentMode = .normal
 
             var b = LayoutAttributes()
-            b.tintAdjustmentMode = nil
+            b.tintAdjustmentMode = .automatic
 
             let combined = b.within(a)
 
             XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// combined is `.automatic` if both parent and child attributes are `.automatic`
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .automatic
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .automatic
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .automatic)
         }
     }
 }

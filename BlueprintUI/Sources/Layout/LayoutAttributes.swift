@@ -30,7 +30,7 @@ public struct LayoutAttributes {
     public var isHidden: Bool
 
     /// Corresponds to `UIView.tintAdjustmentMode`.
-    public var tintAdjustmentMode: UIView.TintAdjustmentMode?
+    public var tintAdjustmentMode: UIView.TintAdjustmentMode
 
     public init() {
         self.init(center: .zero, bounds: .zero)
@@ -54,7 +54,7 @@ public struct LayoutAttributes {
         alpha = 1.0
         isUserInteractionEnabled = true
         isHidden = false
-        tintAdjustmentMode = nil
+        tintAdjustmentMode = .automatic
 
         validateBounds()
         validateCenter()
@@ -93,9 +93,7 @@ public struct LayoutAttributes {
         view.alpha = alpha
         view.isUserInteractionEnabled = isUserInteractionEnabled
         view.isHidden = isHidden
-        if let tintAdjustmentMode {
-            view.tintAdjustmentMode = tintAdjustmentMode
-        }
+        view.tintAdjustmentMode = tintAdjustmentMode
     }
 
 
@@ -163,7 +161,15 @@ public struct LayoutAttributes {
         result.alpha = alpha * layoutAttributes.alpha
         result.isUserInteractionEnabled = layoutAttributes.isUserInteractionEnabled && isUserInteractionEnabled
         result.isHidden = layoutAttributes.isHidden || isHidden
-        result.tintAdjustmentMode = layoutAttributes.tintAdjustmentMode ?? tintAdjustmentMode
+
+        switch tintAdjustmentMode {
+        case .dimmed, .normal:
+            result.tintAdjustmentMode = tintAdjustmentMode
+        case .automatic:
+            result.tintAdjustmentMode = layoutAttributes.tintAdjustmentMode
+        @unknown default:
+            result.tintAdjustmentMode = layoutAttributes.tintAdjustmentMode
+        }
 
         return result
     }
