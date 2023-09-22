@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed a bug that could cause a crash or incorrect layout when an element with lazily resolved content (such as `GeometryReader`) generated a subtree that varied within a layout pass. ([#468])
-
 ### Added
-
-- Added a `TintAdjustmentMode` element and `.tintAdjustmentMode(:)` modifier for finer control of tint color during modal presentations.
 
 ### Removed
 
@@ -30,6 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [2.2.0] - 2023-09-22
+
+### Fixed
+
+- Fixed a bug that could cause a crash or incorrect layout when an element with lazily resolved content (such as `GeometryReader`) generated a subtree that varied within a layout pass. ([#468])
+
+### Added
+
+- Added a `TintAdjustmentMode` element and `.tintAdjustmentMode(:)` modifier for finer control of tint color during modal presentations.
 
 ## [2.1.0] - 2023-09-06
 
@@ -1027,7 +1033,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/square/2.1.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/square/Blueprint/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/square/Blueprint/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
