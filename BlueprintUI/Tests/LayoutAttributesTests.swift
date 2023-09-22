@@ -56,6 +56,13 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertNotEqual(attributes, other)
         }
 
+        do {
+            /// tintAdjustmentMode
+            var other = attributes
+            other.tintAdjustmentMode = .normal
+            XCTAssertNotEqual(attributes, other)
+        }
+
     }
 
     func testConcatAlpha() {
@@ -179,6 +186,60 @@ final class LayoutAttributesTests: XCTestCase {
             XCTAssertTrue(combined.isHidden)
         }
     }
+
+    func test_concat_tintAdjustmentMode() {
+        do {
+            /// combined adopts child attribute if child is non-`.automatic`
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .automatic
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .normal
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// combined adopts child attribute if both child and parent are non-`.automatic`
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .dimmed
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .normal
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// combined inherits from parent if child is `.automatic`
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .normal
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .automatic
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .normal)
+        }
+
+        do {
+            /// combined is `.automatic` if both parent and child attributes are `.automatic`
+            var a = LayoutAttributes()
+            a.tintAdjustmentMode = .automatic
+
+            var b = LayoutAttributes()
+            b.tintAdjustmentMode = .automatic
+
+            let combined = b.within(a)
+
+            XCTAssertEqual(combined.tintAdjustmentMode, .automatic)
+        }
+    }
 }
 
 final class LayoutAttributesTests_CGRect: XCTestCase {
@@ -242,5 +303,14 @@ final class LayoutAttributesTests_Apply: XCTestCase {
         let view = UIView()
         attributes.apply(to: view)
         XCTAssertTrue(view.isHidden)
+    }
+
+    func test_apply_tintAdjustmentMode() {
+        var attributes = LayoutAttributes()
+        attributes.tintAdjustmentMode = .normal
+
+        let view = UIView()
+        attributes.apply(to: view)
+        XCTAssertEqual(view.tintAdjustmentMode, .normal)
     }
 }
