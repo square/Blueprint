@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `AccessibilityElement` now supports providing arbitrary strings to assistive devices using the `AXCustomContent` protocol. 
+
 ### Removed
 
 ### Changed

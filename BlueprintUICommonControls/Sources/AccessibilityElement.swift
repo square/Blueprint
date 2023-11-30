@@ -24,7 +24,7 @@ public struct AccessibilityElement: Element {
     public var customActions: [CustomAction] = []
 
     /// An array containing one or more `CustomContent`s, defining additional content associated with the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
-    public var customContent: [CustomContent]! = []
+    public var customContent: [CustomContent] = []
 
 
     public init(
