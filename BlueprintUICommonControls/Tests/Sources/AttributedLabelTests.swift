@@ -254,6 +254,7 @@ class AttributedLabelTests: XCTestCase {
         let string = NSAttributedString(string: "Phone: (555) 555-5555 Address: 1455 Market St URL: https://block.xyz Date: 12/1/12")
         let element = AttributedLabel(attributedText: string) {
             $0.linkDetectionTypes = [.link, .address, .phoneNumber, .date]
+            $0.linkAttributes = [.foregroundColor: UIColor.systemBlueColor]
         }
 
         compareSnapshot(of: element)
