@@ -263,7 +263,16 @@ extension AttributedLabel {
 
             if !isMeasuring {
                 if previousAttributedText != attributedText {
-                    links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
+                    let attributedLinks = attributedLinks(in: model.attributedText)
+                    let detectedLinks = detectedDataLinks(in: model.attributedText)
+                    if let newText = attributedText {
+                        let mutableText = NSMutableAttributedString(attributedString: newText)
+                        detectedLinks.forEach { link in
+                            mutableText.addAttribute(.link, value: link.url.absoluteString, range: link.range)
+                        }
+                        attributedText = NSAttributedString(attributedString: mutableText)
+                    }
+                    links = attributedLinks + detectedLinks
                     accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
                 }
 
@@ -591,6 +600,7 @@ extension AttributedLabel {
             self.link = link
             super.init(accessibilityContainer: container)
             accessibilityLabel = label
+            accessibilityTraits = [.link]
         }
 
         override var accessibilityFrameInContainerSpace: CGRect {

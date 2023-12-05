@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `AttributedLabel` now applies a `link` attribute key for detected links. 
+
 ### Added
 
 ### Removed
