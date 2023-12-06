@@ -369,7 +369,15 @@ extension AccessibilityElement {
 
 extension AccessibilityElement {
     public struct CustomContent {
-        public enum Importance: Equatable { case regular, high }
+        /// The importance of the content.
+        public enum Importance: Equatable {
+            /// By default custom content is available through the rotor.
+            case regular
+            /// In addtion to being available through the rotor, high importance content will announced in the main VoiceOver utterance.
+            /// High Importance content is announced follllowing the `accessibilityValue` but preceding any `accessibilityHint`.
+            case high
+        }
+
         public var label: String
         public var value: String?
         public var importance: Importance
