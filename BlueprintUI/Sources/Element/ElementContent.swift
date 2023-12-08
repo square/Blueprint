@@ -279,8 +279,23 @@ extension ElementContent {
     ///
     /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
     /// to create a stateful element) and just need this element to be correctly sized.
-    public init(measuring element: Element) {
-        storage = MeasureElementStorage(child: element)
+    ///
+    /// You can optionally pass which axes should be included in the final measurement. Defaults to both axes.
+    public init(
+        measuring element: Element,
+        on axes: MeasuringAxes = .both
+    ) {
+        storage = MeasureElementStorage(child: element, axes: axes)
+    }
+
+    /// The axes to include when measuring an element with `ElementContent(measuring:)`
+    public enum MeasuringAxes {
+        /// Only the width of the measurement will be included.
+        case horizontal
+        /// Only the height of the measurement will be included.
+        case vertical
+        /// Both the width and height of the measurement will be included.
+        case both
     }
 }
 

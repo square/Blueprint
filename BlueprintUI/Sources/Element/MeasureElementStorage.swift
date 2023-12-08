@@ -10,8 +10,12 @@ struct MeasureElementStorage: ContentStorage {
     var content: ElementContent
     var identifier: ElementIdentifier
 
-    init(child: Element) {
+    let axes: ElementContent.MeasuringAxes
+
+    init(child: Element, axes: ElementContent.MeasuringAxes) {
         self.child = child
+        self.axes = axes
+
         content = child.content
         identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
     }
@@ -34,10 +38,12 @@ extension MeasureElementStorage: LegacyContentStorage {
 
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
-            return child.content.measure(
-                in: constraint,
-                environment: environment,
-                cache: cache.subcache(element: child)
+            return size(
+                with: child.content.measure(
+                    in: constraint,
+                    environment: environment,
+                    cache: cache.subcache(element: child)
+                )
             )
         }
     }
@@ -49,6 +55,17 @@ extension MeasureElementStorage: LegacyContentStorage {
     ) -> [IdentifiedNode] {
         []
     }
+
+    fileprivate func size(with size: CGSize) -> CGSize {
+        switch axes {
+        case .horizontal:
+            return CGSize(width: size.width, height: 0)
+        case .vertical:
+            return CGSize(width: 0, height: size.height)
+        case .both:
+            return size
+        }
+    }
 }
 
 extension MeasureElementStorage: CaffeinatedContentStorage {
@@ -58,10 +75,12 @@ extension MeasureElementStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        content.sizeThatFits(
-            proposal: proposal,
-            environment: environment,
-            node: node.subnode(key: identifier)
+        size(
+            with: content.sizeThatFits(
+                proposal: proposal,
+                environment: environment,
+                node: node.subnode(key: identifier)
+            )
         )
     }
 

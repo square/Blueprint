@@ -206,8 +206,10 @@ class ElementContentTests: XCTestCase {
 
             var element: InnerTestElement
 
+            var axes: ElementContent.MeasuringAxes = .both
+
             var content: ElementContent {
-                ElementContent(measuring: element)
+                ElementContent(measuring: element, on: axes)
             }
 
             func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -217,20 +219,40 @@ class ElementContentTests: XCTestCase {
 
         var calls: [SizeConstraint] = []
 
-        let element = OuterTestElement(
+        var element = OuterTestElement(
             element: InnerTestElement { constraint in
                 calls.append(constraint)
                 return CGSize(width: 100, height: 10)
             }
         )
 
-        let cache = RenderPassCache(name: "Test", signpostRef: NSObject())
+        let cache = {
+            RenderPassCache(name: "Test", signpostRef: NSObject())
+        }
 
         /// Should output the size of the inner element.
 
+        let sizeConstraint = SizeConstraint(CGSize(width: 100, height: 100))
+
+        element.axes = .both
+
         XCTAssertEqual(
             CGSize(width: 100, height: 10),
-            element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+            element.content.measure(in: sizeConstraint, environment: .empty, cache: cache())
+        )
+
+        element.axes = .horizontal
+
+        XCTAssertEqual(
+            CGSize(width: 100, height: 0),
+            element.content.measure(in: sizeConstraint, environment: .empty, cache: cache())
+        )
+
+        element.axes = .vertical
+
+        XCTAssertEqual(
+            CGSize(width: 0, height: 10),
+            element.content.measure(in: sizeConstraint, environment: .empty, cache: cache())
         )
 
         let layoutResult = element.layout(frame: CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
