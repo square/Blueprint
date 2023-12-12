@@ -1,5 +1,6 @@
 import CoreGraphics
 
+// TODO: Remove
 /// A cache implementation suitable for the lifetime of a single render pass or measurement.
 final class RenderPassCache: CacheTree {
 

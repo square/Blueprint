@@ -2,7 +2,7 @@ import Foundation
 
 /// Controls the layout system that Blueprint uses to lay out elements.
 ///
-/// Blueprint supports multiple layout systems. Each is expected to produce the same result, but
+/// Blueprint can support multiple layout systems. Each is expected to produce the same result, but
 /// some may have different performance profiles or special requirements.
 ///
 /// You can change the layout system used by setting the ``BlueprintView/layoutMode`` property, but
@@ -21,9 +21,6 @@ public enum LayoutMode: Equatable {
         }
     }
 
-    /// The "standard" layout system.
-    case legacy
-
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
     case caffeinated(options: LayoutOptions = .default)
@@ -35,8 +32,6 @@ public enum LayoutMode: Equatable {
     /// The name of the layout mode.
     public var name: String {
         switch self {
-        case .legacy:
-            return "Legacy"
         case .caffeinated:
             return "Caffeinated"
         }
@@ -46,8 +41,6 @@ public enum LayoutMode: Equatable {
 extension LayoutMode: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .legacy:
-            return "Legacy"
         case .caffeinated(let options):
             switch (options.hintRangeBoundaries, options.searchUnconstrainedKeys) {
             case (true, true):

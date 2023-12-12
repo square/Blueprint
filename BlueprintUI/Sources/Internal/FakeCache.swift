@@ -1,5 +1,6 @@
 import CoreGraphics
 
+// TODO: Remove
 /// A fake cache that can be used to disable caching.
 final class FakeCache: CacheTree {
 

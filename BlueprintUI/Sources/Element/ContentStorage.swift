@@ -1,25 +1,9 @@
 import CoreGraphics
 
 /// The implementation of an `ElementContent`.
-protocol ContentStorage: LegacyContentStorage, CaffeinatedContentStorage {
+protocol ContentStorage {
     var childCount: Int { get }
-}
 
-protocol LegacyContentStorage {
-    func measure(
-        in constraint: SizeConstraint,
-        environment: Environment,
-        cache: CacheTree
-    ) -> CGSize
-
-    func performLegacyLayout(
-        attributes: LayoutAttributes,
-        environment: Environment,
-        cache: CacheTree
-    ) -> [ElementContent.IdentifiedNode]
-}
-
-protocol CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,

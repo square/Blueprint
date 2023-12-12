@@ -32,12 +32,6 @@ extension ElementContent {
     func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         let layoutMode = RenderContext.current?.layoutMode ?? .default
         switch layoutMode {
-        case .legacy:
-            return performLegacyLayout(
-                attributes: attributes,
-                environment: .empty,
-                cache: CacheFactory.makeCache(name: "test")
-            )
         case .caffeinated(let options):
             return performCaffeinatedLayout(
                 frame: attributes.frame,

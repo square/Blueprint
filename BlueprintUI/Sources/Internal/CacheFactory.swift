@@ -1,5 +1,6 @@
 import Foundation
 
+// TODO: Remove
 enum CacheFactory {
     static func makeCache(name: String, signpostRef: AnyObject = SignpostToken()) -> CacheTree {
         // to disable caching, use this instead:

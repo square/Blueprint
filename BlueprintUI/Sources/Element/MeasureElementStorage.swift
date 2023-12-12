@@ -17,41 +17,7 @@ struct MeasureElementStorage: ContentStorage {
     }
 }
 
-extension MeasureElementStorage: LegacyContentStorage {
-
-    func measure(
-        in constraint: SizeConstraint,
-        environment: Environment,
-        cache: CacheTree
-    ) -> CGSize {
-        cache.get(constraint) { constraint -> CGSize in
-
-            Logger.logMeasureStart(
-                object: cache.signpostRef,
-                description: cache.name,
-                constraint: constraint
-            )
-
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
-
-            return child.content.measure(
-                in: constraint,
-                environment: environment,
-                cache: cache.subcache(element: child)
-            )
-        }
-    }
-
-    func performLegacyLayout(
-        attributes: LayoutAttributes,
-        environment: Environment,
-        cache: CacheTree
-    ) -> [IdentifiedNode] {
-        []
-    }
-}
-
-extension MeasureElementStorage: CaffeinatedContentStorage {
+extension MeasureElementStorage {
 
     func sizeThatFits(
         proposal: SizeConstraint,
