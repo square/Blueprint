@@ -1189,8 +1189,6 @@ class StackTests: XCTestCase {
 
         let layoutMode: LayoutMode
         switch LayoutMode.default {
-        case .legacy:
-            layoutMode = .legacy
         case .caffeinated:
             layoutMode = .caffeinated(options: .optimizationsDisabled)
         }

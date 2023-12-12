@@ -1,5 +1,6 @@
 import Foundation
 
+// TODO: Remove
 /// Configuration options for ``LayoutMode/caffeinated``.
 ///
 /// Generally these are only useful for experimenting with the performance profile of different

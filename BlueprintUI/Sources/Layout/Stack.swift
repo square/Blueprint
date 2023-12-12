@@ -258,16 +258,6 @@ public struct StackLayout: Layout {
         self.axis = axis
         self.alignment = alignment
     }
-
-    public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        let size = _measureIn(constraint: constraint, items: items)
-        return size
-    }
-
-    public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        _layout(size: size, items: items)
-    }
-
 }
 
 

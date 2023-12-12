@@ -55,13 +55,6 @@ public struct Keyed: Element {
     }
 
     private struct KeyedLayout: SingleChildLayout {
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            LayoutAttributes(size: size)
-        }
 
         func sizeThatFits(
             proposal: SizeConstraint,

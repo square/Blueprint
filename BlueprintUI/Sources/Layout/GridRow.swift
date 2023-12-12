@@ -94,32 +94,6 @@ extension GridRow {
             .absolute(0)
         }
 
-        func measure(in constraint: SizeConstraint, items: [(traits: Width, content: Measurable)]) -> CGSize {
-            guard items.count > 0 else {
-                return .zero
-            }
-
-            let frames = _frames(in: constraint, items: items)
-
-            // Measure the row to be as wide as the sum of its children and as tall as its tallest child.
-            let size = frames.reduce(.zero) { size, frame in
-                CGSize(width: frame.maxX, height: max(size.height, frame.height))
-            }
-
-            return size
-        }
-
-        func layout(size: CGSize, items: [(traits: Width, content: Measurable)]) -> [LayoutAttributes] {
-            guard items.count > 0 else {
-                return []
-            }
-
-            let frames = _frames(in: SizeConstraint(size), isExactConstraint: true, items: items)
-            let attributes = frames.map(LayoutAttributes.init)
-
-            return attributes
-        }
-
         private func items(subelements: Subelements) -> [(traits: Traits, content: Measurable)] {
             subelements.map { subelement in
                 let traits = subelement.gridRowLayoutTraits
