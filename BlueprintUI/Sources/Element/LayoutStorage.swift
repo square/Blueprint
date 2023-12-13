@@ -69,7 +69,7 @@ extension LayoutStorage {
         return size
     }
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
@@ -112,7 +112,7 @@ extension LayoutStorage {
                 element: child.element,
                 layoutAttributes: childAttributes,
                 environment: environment,
-                children: child.content.performCaffeinatedLayout(
+                children: child.content.performLayout(
                     frame: frame,
                     environment: environment,
                     node: subnode

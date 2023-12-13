@@ -1,7 +1,7 @@
 import BlueprintUI
 import XCTest
 
-/// Asserts that an element's layout adheres to the Caffeinated Layout contract, by probing its size
+/// Asserts that an element's layout adheres to the Layout contract, by probing its size
 /// in a variety of constraints.
 ///
 /// - Parameters:
@@ -58,7 +58,7 @@ public func assertLayoutContract(
                     lowerSize.height,
                     upperSize.height,
                     """
-                    Caffeinated layout contract violation:
+                    Layout contract violation:
                       At fixed width \(width),
                       measured height \(upperHeight) => \(upperSize.height)
                       implies a range [\(upperSize.height)...\(upperHeight)] => \(upperSize.height),
@@ -74,7 +74,7 @@ public func assertLayoutContract(
                     lowerSize.height,
                     upperSize.height,
                     """
-                    Caffeinated layout contract violation:
+                    Layout contract violation:
                       At fixed width \(width),
                       measured height \(lowerHeight) => \(lowerSize.height)
                       and height \(upperHeight) => \(upperSize.height)
@@ -97,7 +97,7 @@ public func assertLayoutContract(
                     lowerSize.width,
                     upperSize.width,
                     """
-                    Caffeinated layout contract violation:
+                    Layout contract violation:
                       At fixed height \(height),
                       measured width \(upperWidth) => \(upperSize.width)
                       implies a range [\(upperSize.width)...\(upperWidth)] => \(upperSize.width),
@@ -113,7 +113,7 @@ public func assertLayoutContract(
                     lowerSize.width,
                     upperSize.width,
                     """
-                    Caffeinated layout contract violation:
+                    Layout contract violation:
                       At fixed height \(height),
                       measured width \(lowerWidth) => \(lowerSize.width)
                       and width \(upperWidth) => \(upperSize.width)

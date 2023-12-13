@@ -1,6 +1,5 @@
 import Foundation
 
-// TODO: Remove
 /// Configuration options for ``LayoutMode/caffeinated``.
 ///
 /// Generally these are only useful for experimenting with the performance profile of different
@@ -14,12 +13,12 @@ public struct LayoutOptions: Equatable {
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
-    /// measured sizes. Requires elements to conform to the Caffeinated Layout contract for correct
+    /// measured sizes. Requires elements to conform to the Layout contract for correct
     /// behavior.
     public var hintRangeBoundaries: Bool
 
     /// Allows cache misses on finite constraints to deduce a range-based match by searching for a
-    /// hit on the unconstrained value for each axis. Requires elements to adhere to the Caffeinated
+    /// hit on the unconstrained value for each axis. Requires elements to adhere to the
     /// Layout contract for correct behavior.
     public var searchUnconstrainedKeys: Bool
 

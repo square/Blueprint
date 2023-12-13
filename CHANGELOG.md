@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- The legacy layout system has been removed and is no longer available. Adherences to the legacy `Layout` API methods may now be safely removed.
+
 ### Changed
 
 ### Deprecated

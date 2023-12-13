@@ -21,7 +21,6 @@ public enum LayoutMode: Equatable {
         }
     }
 
-    // TODO: Remove LayoutOptions
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
     case caffeinated(options: LayoutOptions = .default)

@@ -1,7 +1,6 @@
 import CoreGraphics
 
-/// A measurement cache that automatically "hints" values that can be deduced from the Caffeinated
-/// Layout contract.
+/// A measurement cache that automatically "hints" values that can be deduced from the Layout contract.
 ///
 /// See the documentation for more details about the layout contract and hinting optimizations.
 ///

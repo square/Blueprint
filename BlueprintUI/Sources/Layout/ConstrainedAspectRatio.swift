@@ -7,11 +7,6 @@ public struct ConstrainedAspectRatio: Element {
         /// The content will be sized to fill its parent while
         /// maintaining the specified aspect ratio.
         ///
-        /// In ``LayoutMode/legacy`` layout mode, if the parent is unconstrained in all dimensions,
-        /// the content size will be used for measurement and will behave like `fitContent`. If the
-        /// parent is unconstrained in one dimension, the element will fill the constrained
-        /// dimension.
-        ///
         /// In ``LayoutMode/caffeinated``, if the parent is unconstrained in any dimension, this
         /// element will report a size of `infinity`.
         ///
@@ -23,9 +18,6 @@ public struct ConstrainedAspectRatio: Element {
         ///
         /// If the parent is unconstrained in one dimension, the element will fit the constrained
         /// dimension.
-        ///
-        /// In ``LayoutMode/legacy`` layout mode, if the parent is unconstrained in all dimensions,
-        /// the content size will be used for measurement and will behave like `fitContent`.
         ///
         /// In ``LayoutMode/caffeinated`` layout mode, if the parent is unconstrained in both
         /// dimensions, this element will report a size of `infinity`.

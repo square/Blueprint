@@ -7,9 +7,9 @@ import CoreGraphics
 /// layout container by creating a type that conforms to the ``Layout`` protocol and implementing
 /// its required methods:
 ///
-/// - ``CaffeinatedLayout/sizeThatFits(proposal:subelements:environment:cache:)`` reports the sizes
+/// - ``Layout/sizeThatFits(proposal:subelements:environment:cache:)`` reports the sizes
 ///   of the composite layout.
-/// - ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` assigns positions to
+/// - ``Layout/placeSubelements(in:subelements:environment:cache:)`` assigns positions to
 ///   the container's subelements.
 ///
 /// You can define a basic layout type with only these two methods (see note below):
@@ -62,18 +62,12 @@ import CoreGraphics
 /// ``SingleChildLayout`` protocol instead. It has similar methods, but is strongly typed for a
 /// single subelement instead of a collection.
 ///
-/// - Note: During the transition from Blueprint's legacy layout system to Caffeinated Layout, the
-///   ``Layout`` protocol is composed of two sets of layout methods: ``LegacyLayout`` and
-///   ``CaffeinatedLayout``. While this documentation focuses on the newer layout API, you must
-///   currently implement both. Fortunately, the methods are similar, and you may be able to reuse
-///   logic.
-///
 /// ## Interact with subelements through their proxies
 ///
 /// To perform layout, you need information about all of your container's subelements, which are the
 /// child elements that your container arranges. While your layout can’t interact directly with its
 /// subelements, it can access a set of subelement proxies through the
-/// ``CaffeinatedLayout/Subelements`` collection that each protocol method receives as an input
+/// ``Layout/Subelements`` collection that each protocol method receives as an input
 /// parameter. That type is an alias for the ``LayoutSubelements`` collection type, which in turn
 /// contains ``LayoutSubelement`` instances that are the subelement proxies.
 ///
@@ -81,7 +75,7 @@ import CoreGraphics
 /// This enables you to measure subelements before you commit to placing them. You also assign a
 /// position to each subelement by calling its proxy’s ``LayoutSubelement/place(at:anchor:size:)``
 /// method. Call the method on each subelement from within your implementation of the layout’s
-/// ``CaffeinatedLayout/placeSubelements(in:subelements:environment:cache:)`` method.
+/// ``Layout/placeSubelements(in:subelements:environment:cache:)`` method.
 ///
 /// ## Access layout traits
 ///
@@ -102,26 +96,7 @@ import CoreGraphics
 ///   [Layout](https://developer.apple.com/documentation/swiftui/layout), with major differences
 ///   noted.
 ///
-public protocol Layout: LegacyLayout, CaffeinatedLayout {}
-
-public protocol LegacyLayout {
-    /// Per-item metadata that is used during the measuring and layout pass.
-    associatedtype Traits = ()
-
-    /// Returns a default traits object.
-    static var defaultTraits: Self.Traits { get }
-
-}
-
-extension LegacyLayout where Traits == () {
-
-    public static var defaultTraits: () {
-        return ()
-    }
-
-}
-
-public protocol CaffeinatedLayout {
+public protocol Layout: LegacyLayout {
 
     typealias Subelements = LayoutSubelements
 
@@ -278,6 +253,24 @@ public protocol CaffeinatedLayout {
     func makeCache(subelements: Subelements, environment: Environment) -> Cache
 }
 
-extension CaffeinatedLayout where Cache == () {
+
+extension LegacyLayout where Traits == () {
+
+    public static var defaultTraits: () {
+        return ()
+    }
+}
+
+
+public protocol LegacyLayout {
+    /// Per-item metadata that is used during the measuring and layout pass.
+    associatedtype Traits = ()
+
+    /// Returns a default traits object.
+    static var defaultTraits: Self.Traits { get }
+}
+
+
+extension Layout where Cache == () {
     public func makeCache(subelements: Subelements, environment: Environment) { () }
 }

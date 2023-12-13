@@ -40,7 +40,7 @@ extension LazyStorage {
         )
     }
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
@@ -59,7 +59,7 @@ extension LazyStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: child.content.performCaffeinatedLayout(
+            children: child.content.performLayout(
                 frame: frame,
                 environment: environment,
                 node: subnode

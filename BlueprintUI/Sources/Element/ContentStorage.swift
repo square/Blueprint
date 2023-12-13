@@ -10,7 +10,7 @@ protocol ContentStorage {
         node: LayoutTreeNode
     ) -> CGSize
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode

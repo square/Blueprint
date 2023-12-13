@@ -34,7 +34,7 @@ extension PassthroughStorage {
         )
     }
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
@@ -46,7 +46,7 @@ extension PassthroughStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: content.performCaffeinatedLayout(
+            children: content.performLayout(
                 frame: frame,
                 environment: environment,
                 node: subnode

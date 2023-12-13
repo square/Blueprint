@@ -32,7 +32,7 @@ public protocol SingleChildLayout {
     /// this container is laid out in may not be a size that was returned from this method.
     ///
     /// For more information, see
-    /// ``CaffeinatedLayout/sizeThatFits(proposal:subelements:environment:cache:)``.
+    /// ``Layout/sizeThatFits(proposal:subelements:environment:cache:)``.
     ///
     /// - Parameters:
     ///   - proposal: A size constraint for the container. The container's parent element that calls
@@ -109,7 +109,7 @@ public protocol SingleChildLayout {
     ///
     /// Only implement a cache if profiling shows that it improves performance.
     ///
-    /// For more information, see ``CaffeinatedLayout/makeCache(subelements:environment:)-8ciko``.
+    /// For more information, see ``Layout/makeCache(subelements:environment:)-8ciko``.
     ///
     /// - Parameter subelement: A proxy that represent the subelement that the container arranges.
     ///   You can use the proxy to get information about the subelement as you calculate values to

@@ -42,7 +42,7 @@ extension EnvironmentAdaptingStorage {
         return content.sizeThatFits(proposal: proposal, environment: environment, node: subnode)
     }
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
@@ -55,7 +55,7 @@ extension EnvironmentAdaptingStorage {
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
-            children: content.performCaffeinatedLayout(
+            children: content.performLayout(
                 frame: frame,
                 environment: environment,
                 node: subnode

@@ -30,7 +30,7 @@ extension Element {
         environment: Environment,
         node: LayoutTreeNode
     ) -> LayoutResultNode {
-        let children = content.performCaffeinatedLayout(
+        let children = content.performLayout(
             frame: frame,
             environment: environment,
             node: node

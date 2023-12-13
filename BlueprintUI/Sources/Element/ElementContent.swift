@@ -56,12 +56,12 @@ public struct ElementContent {
 
     typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
     ) -> [IdentifiedNode] {
-        storage.performCaffeinatedLayout(
+        storage.performLayout(
             frame: frame,
             environment: environment,
             node: node

@@ -33,7 +33,7 @@ extension ElementContent {
         let layoutMode = RenderContext.current?.layoutMode ?? .default
         switch layoutMode {
         case .caffeinated(let options):
-            return performCaffeinatedLayout(
+            return performLayout(
                 frame: attributes.frame,
                 environment: .empty,
                 node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)

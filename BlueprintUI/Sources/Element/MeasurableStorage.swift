@@ -20,7 +20,7 @@ extension MeasurableStorage {
         measurer(proposal, environment)
     }
 
-    func performCaffeinatedLayout(
+    func performLayout(
         frame: CGRect,
         environment: Environment,
         node: LayoutTreeNode
