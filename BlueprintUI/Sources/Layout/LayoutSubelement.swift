@@ -129,7 +129,7 @@ public struct LayoutSubelement {
 
     /// Gets the layout traits of the subelement.
     ///
-    /// Use this method to access the layout-specific ``LegacyLayout/Traits`` value for this
+    /// Use this method to access the layout-specific ``Layout/Traits`` value for this
     /// subelement.
     ///
     /// - Important: Only call this method with the type of your `Layout`. For compatibility with

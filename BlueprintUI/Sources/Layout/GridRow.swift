@@ -108,7 +108,7 @@ extension GridRow {
             proposal: SizeConstraint,
             subelements: Subelements,
             environment: Environment,
-            cache: inout Cache
+            cache: inout ()
         ) -> CGSize {
             guard subelements.count > 0 else {
                 return .zero

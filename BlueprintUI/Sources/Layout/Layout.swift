@@ -80,7 +80,7 @@ import CoreGraphics
 /// ## Access layout traits
 ///
 /// Subelements may have _traits_ that are specific to their container's layout. The traits are of
-/// the ``Layout`` protocol's associated type ``LegacyLayout/Traits``, and each subelement can have
+/// the ``Layout`` protocol's associated type ``Layout/Traits``, and each subelement can have
 /// a distinct `Traits` value assigned. You can set this in the `configure` block of
 /// ``ElementContent/init(layout:configure:)``, when you call
 /// ``ElementContent/Builder/add(traits:key:element:)``. If you do not specify a `Traits` type for
@@ -96,7 +96,10 @@ import CoreGraphics
 ///   [Layout](https://developer.apple.com/documentation/swiftui/layout), with major differences
 ///   noted.
 ///
-public protocol Layout: LegacyLayout {
+public protocol Layout {
+
+    /// Per-item metadata that is used during the measuring and layout pass.
+    associatedtype Traits = Void
 
     typealias Subelements = LayoutSubelements
 
@@ -108,6 +111,9 @@ public protocol Layout: LegacyLayout {
     ///
     /// See ``makeCache(subelements:environment:)-8ciko`` for more information.
     associatedtype Cache = Void
+
+    /// Returns a default traits object.
+    static var defaultTraits: Self.Traits { get }
 
     /// Returns the size of the composite element, given a proposed size constraint and the
     /// container's subelements.
@@ -254,20 +260,11 @@ public protocol Layout: LegacyLayout {
 }
 
 
-extension LegacyLayout where Traits == () {
+extension Layout where Traits == () {
 
     public static var defaultTraits: () {
         return ()
     }
-}
-
-
-public protocol LegacyLayout {
-    /// Per-item metadata that is used during the measuring and layout pass.
-    associatedtype Traits = ()
-
-    /// Returns a default traits object.
-    static var defaultTraits: Self.Traits { get }
 }
 
 
