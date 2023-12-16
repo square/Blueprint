@@ -362,7 +362,7 @@ extension AttributedLabel {
                     let style = textStorage.attribute(.paragraphStyle, at: 0, effectiveRange: &range)
 
                     guard let style = style as? NSParagraphStyle, range == textStorage.entireRange else {
-                        return .natural
+                        return textAlignment
                     }
 
                     return style.alignment
