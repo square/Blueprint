@@ -355,8 +355,8 @@ extension AttributedLabel {
             }
 
             func alignmentMultiplier() -> CGFloat {
-                // If a paragraph style spans the range of the text, use its alignment.
-                // Otherwise, fall back to `.natural`.
+                /// If a paragraph style spans the range of the text, use its alignment.
+                /// Otherwise, fall back to the text alignment of the label.
                 let alignment: NSTextAlignment = {
                     var range: NSRange = NSRange(location: -1, length: 0)
                     let style = textStorage.attribute(.paragraphStyle, at: 0, effectiveRange: &range)
