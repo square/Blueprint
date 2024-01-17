@@ -354,19 +354,38 @@ extension AttributedLabel {
                 return []
             }
 
-            func alignmentMultiplier() -> CGFloat {
-                /// If a paragraph style spans the range of the text, use its alignment.
-                /// Otherwise, fall back to the text alignment of the label.
-                let alignment: NSTextAlignment = {
-                    var range: NSRange = NSRange(location: -1, length: 0)
-                    let style = textStorage.attribute(.paragraphStyle, at: 0, effectiveRange: &range)
+            /// The below positioning calculation assumes that there is only one
+            /// alignment within the label, so verify that is the case.
+            func alignment() -> NSTextAlignment {
 
-                    guard let style = style as? NSParagraphStyle, range == textStorage.entireRange else {
-                        return textAlignment
+                guard let string = attributedText, string.length > 0 else {
+                    return textAlignment
+                }
+
+                var alignments = [NSTextAlignment]()
+
+                string.enumerateAttribute(.paragraphStyle, in: string.entireRange) { style, _, _ in
+                    guard let style = style as? NSParagraphStyle else {
+                        return
                     }
 
-                    return style.alignment
-                }()
+                    alignments.append(style.alignment)
+                }
+
+                assert(
+                    alignments.count == 1,
+                    """
+                    AttributedLabel links only support a single NSTextAlignment. \
+                    Instead, found: \(alignments).
+                    """
+                )
+
+                return alignments.first ?? textAlignment
+            }
+
+            func alignmentMultiplier() -> CGFloat {
+
+                let alignment = alignment()
 
                 switch (alignment, layoutDirection) {
                 case (.left, _),
