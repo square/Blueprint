@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-ruby File.read(".ruby-version").strip
+# Read the current Ruby version from the .ruby-version file
+ruby Bundler.read_file(Bundler.root.join('.ruby-version')).strip
 
 gem 'cocoapods', '~> 1.11'
 gem 'cocoapods-generate', '~> 1.0'
