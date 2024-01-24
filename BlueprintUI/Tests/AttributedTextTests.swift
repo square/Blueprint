@@ -119,7 +119,10 @@ class AttributedTextTests: XCTestCase {
         var text = AttributedText("some emoji: 😵‍💫👨‍👩‍👧‍👦🏃🏽 and some hiragana:  あいうえお and some katakana: アイウエオカキクケコ")
         text.color = .blue
 
-        let partialEmoji = text.range(of: "😵")!
+        guard let partialEmoji = text.range(of: "😵") else {
+            XCTFail("No range found for: 😵")
+            return
+        }
         text[partialEmoji].color = .brown
 
         let family = text.range(of: "👨‍👩‍👧‍👦")!
