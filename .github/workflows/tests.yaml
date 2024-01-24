@@ -18,12 +18,17 @@ jobs:
         include:
           - sdk: "15.0"
             destination: platform=iOS Simulator,OS=15.0,name=iPhone 13
+            installation_required: true
 
           - sdk: "16.2"
             destination: platform=iOS Simulator,OS=16.2,name=iPhone 14
+            installation_required: true
 
           - sdk: "17.2"
             destination: platform=iOS Simulator,OS=17.2,name=iPhone 15
+            # The iOS 17.2 SDK is pre-installed on the macOS 13 image.
+            # Attempting to install it will fail with an error.
+            installation_required: false
 
     steps:
     - uses: actions/checkout@v1
@@ -38,6 +43,7 @@ jobs:
       run: brew install aria2 xcodesorg/made/xcodes
 
     - name: Install iOS ${{ matrix.sdk }}
+      if: ${{ matrix.installation_required }}
       run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Build & Test
