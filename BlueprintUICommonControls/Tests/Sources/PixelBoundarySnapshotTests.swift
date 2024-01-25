@@ -3,10 +3,7 @@ import BlueprintUICommonControls
 import XCTest
 
 final class PixelBoundarySnapshotTests: XCTestCase {
-    // Disabled 2024-01-24
-    // The snapshot comparison was failing in the transition to Xcode 15
-    // and replacing the reference images did not seem to resolve the issue.
-    func xtest_nestedBoxes() {
+    func test_nestedBoxes() {
         compareSnapshot(
             of: NestedBoxes(addIntermediateViews: false),
             identifier: "flat",
