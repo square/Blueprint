@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Updated CI to use M1 machines, Xcode 15.1, and Ruby 3.2.2.
+- Added iOS 17 snapshot images.
+- Bump Swift version to 5.9.
+- Update Ruby gems.
+
 # Past Releases
 
 ## [2.2.0] - 2023-09-22

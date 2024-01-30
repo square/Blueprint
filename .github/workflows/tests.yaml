@@ -10,20 +10,25 @@ jobs:
   spm:
     name: "iOS ${{ matrix.sdk }}"
 
-    runs-on: macos-12
+    runs-on: macos-13-xlarge
 
     strategy:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
       matrix:
         include:
-          - sdk: "14.5"
-            destination: platform=iOS Simulator,OS=14.5,name=iPad (8th generation)
-
-          - sdk: "15.0"
-            destination: platform=iOS Simulator,OS=15.0,name=iPhone 8
+          - sdk: "15.4"
+            destination: platform=iOS Simulator,OS=15.4,name=iPhone SE (3rd generation)
+            installation_required: true
 
           - sdk: "16.2"
-            destination: platform=iOS Simulator,OS=16.2,name=iPhone 8
+            destination: platform=iOS Simulator,OS=16.2,name=iPhone SE (3rd generation)
+            installation_required: true
+
+          - sdk: "17.2"
+            destination: platform=iOS Simulator,OS=17.2,name=iPhone SE (3rd generation)
+            # The iOS 17.2 SDK is pre-installed on the macOS 13 image.
+            # Attempting to install it will fail with an error.
+            installation_required: false
 
     steps:
     - uses: actions/checkout@v1
@@ -38,6 +43,7 @@ jobs:
       run: brew install aria2 xcodesorg/made/xcodes
 
     - name: Install iOS ${{ matrix.sdk }}
+      if: ${{ matrix.installation_required }}
       run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Build & Test
@@ -60,7 +66,7 @@ jobs:
   cocoapods:
     name: "CocoaPods"
 
-    runs-on: macos-12
+    runs-on: macos-13-xlarge
 
     steps:
     - uses: actions/checkout@v1
@@ -74,7 +80,7 @@ jobs:
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ env.ruby_version }}
+        # Uses version specified in .ruby_version
         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
     - name: Pod Install
@@ -83,4 +89,4 @@ jobs:
 
     - name: Build & Test
       run: |
-        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=16.2,name=iPhone 8"
+        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=17.2,name=iPhone SE (3rd generation)"
