@@ -32,6 +32,9 @@ struct TestingView_Preview: PreviewProvider {
         ElementPreview(with: .thatFits(padding: 5)) {
             TestElement()
         }
+        ElementPreview(named: "with a name", with: .thatFits(padding: 5)) {
+            TestElement()
+        }
     }
 }
 

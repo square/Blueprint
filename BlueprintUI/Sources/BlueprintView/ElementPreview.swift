@@ -191,34 +191,28 @@ extension ElementPreview {
             for element: Element
         ) -> AnyView {
 
-            let formattedName: String = {
-                if name.isEmpty == false {
-                    return " – " + name
-                } else {
-                    return ""
-                }
-            }()
+            let formattedName: String? = name.isEmpty ? nil : name
 
             switch self {
             case .device(let device):
                 return AnyView(
                     constrained(element: element)
                         .previewDevice(.init(rawValue: device.rawValue))
-                        .previewDisplayName(device.rawValue + formattedName)
+                        .previewDisplayName(formattedName)
                 )
 
             case .fixed(let width, let height):
                 return AnyView(
                     constrained(element: element)
                         .previewLayout(.fixed(width: width, height: height))
-                        .previewDisplayName("Fixed Size: (\(width), \(height))" + formattedName)
+                        .previewDisplayName(formattedName)
                 )
 
             case .thatFits(let padding):
                 return AnyView(
                     constrained(element: element)
                         .previewLayout(.sizeThatFits)
-                        .previewDisplayName("Size That Fits" + formattedName)
+                        .previewDisplayName(formattedName)
                         .padding(.all, padding)
                 )
             }

@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The behavior of `name` of `ElementPreview` has been change, affecting the SwiftUI `previewName`. Instead of including device or size information (i.e. `sizeThatFits - \(name)`), it now either defaults to the Xcode default if given an empty string, and shows _only_ the `name` if `name` is non-empty.
+
 ### Deprecated
 
 ### Security
