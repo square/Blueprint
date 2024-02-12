@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "BlueprintUI",
     platforms: [
-        .iOS(.v14),
-        .macCatalyst(.v14),
+        .iOS(.v15),
+        .macCatalyst(.v15),
     ],
     products: [
         .library(
