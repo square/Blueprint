@@ -345,7 +345,7 @@ extension AttributedLabel {
             return textStorage
         }
 
-        private func links(at location: CGPoint) -> [Link] {
+        func links(at location: CGPoint) -> [Link] {
             guard let textStorage = makeTextStorage(),
                   textStorage.string.isEmpty == false,
                   let layoutManager = textStorage.layoutManagers.first,
@@ -362,14 +362,14 @@ extension AttributedLabel {
                     return textAlignment
                 }
 
-                var alignments = [NSTextAlignment]()
+                var alignments = Set<NSTextAlignment>()
 
                 string.enumerateAttribute(.paragraphStyle, in: string.entireRange) { style, _, _ in
                     guard let style = style as? NSParagraphStyle else {
                         return
                     }
 
-                    alignments.append(style.alignment)
+                    alignments.insert(style.alignment)
                 }
 
                 assert(
@@ -380,6 +380,10 @@ extension AttributedLabel {
                     """
                 )
 
+                /// If we for some reason could not find an alignment from a paragraph style,
+                /// lets just fall back to the alignment from the label itself. Note that with
+                /// attributed strings, `UILabel` derives this in a similar way to what we've done
+                /// here, from the string info.
                 return alignments.first ?? textAlignment
             }
 
@@ -407,7 +411,7 @@ extension AttributedLabel {
             let textBoundingBox = layoutManager.usedRect(for: textContainer)
             let textContainerOffset = CGPoint(
                 x: (labelSize.width - textBoundingBox.size.width) * alignmentMultiplier - textBoundingBox.origin.x,
-                y: (labelSize.height - textBoundingBox.size.height) * alignmentMultiplier - textBoundingBox.origin.y
+                y: (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
             )
             let locationInTextContainer = CGPoint(
                 x: location.x - textContainerOffset.x,
