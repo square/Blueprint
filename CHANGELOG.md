@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+### Internal
+
+# Past Releases
+
+## [3.0.0] - 2024-02-21
+
+### Fixed
+
 - Fixed an issue where `AttributedLabel` would not properly handle tapping on links when a label was stretched.
 
 ### Added
@@ -22,22 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The behavior of `name` of `ElementPreview` has been change, affecting the SwiftUI `previewName`. Instead of including device or size information (i.e. `sizeThatFits - \(name)`), it now either defaults to the Xcode default if given an empty string, and shows _only_ the `name` if `name` is non-empty.
 - Updated minimum deployment target from iOS 14 to iOS 15.
 
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
 ### Internal
-
 - Updated CI to use M1 machines, Xcode 15.1, and Ruby 3.2.2.
 - Added iOS 17 snapshot images.
 - Bump Swift version to 5.9.
 - Update Ruby gems.
-
-# Past Releases
 
 ## [2.2.0] - 2023-09-22
 
@@ -1045,7 +1056,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/2.2.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/square/Blueprint/compare/2.2.0...3.0.0
 [2.2.0]: https://github.com/square/Blueprint/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/square/Blueprint/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
