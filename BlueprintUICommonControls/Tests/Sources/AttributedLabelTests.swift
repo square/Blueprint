@@ -259,6 +259,95 @@ class AttributedLabelTests: XCTestCase {
         compareSnapshot(of: element)
     }
 
+    func test_linkTapDetection() {
+
+        func perform(
+            identifier: String,
+            with string: String,
+            size: CGSize,
+            style: (NSMutableParagraphStyle) -> Void,
+            file: StaticString = #file,
+            testName: String = #function,
+            line: UInt = #line
+        ) {
+            compareSnapshot(
+                of: LabelTapDetectionGrid(
+                    wrapping: AttributedLabel(
+                        attributedText: NSAttributedString(
+                            string: string,
+                            attributes: [.paragraphStyle: NSParagraphStyle.style { style($0) }]
+                        )
+                    ) {
+                        $0.linkDetectionTypes = [.link]
+                    }
+                ),
+                size: size,
+                identifier: identifier,
+                file: file,
+                testName: testName,
+                line: line
+            )
+        }
+
+        let short = "Short text https://squareup.com"
+
+        perform(
+            identifier: "short left",
+            with: short,
+            size: CGSize(width: 500, height: 50),
+            style: {
+                $0.alignment = .left
+            }
+        )
+
+        perform(
+            identifier: "short centered",
+            with: short,
+            size: CGSize(width: 500, height: 50),
+            style: {
+                $0.alignment = .center
+            }
+        )
+
+        perform(
+            identifier: "short right",
+            with: short,
+            size: CGSize(width: 500, height: 50),
+            style: {
+                $0.alignment = .right
+            }
+        )
+
+        let long = "Here’s to the crazy ones, the misfits at https://block.xyz, the rebels, the troublemakers, the round pegs in the https://squareup.com holes… the ones who see things differently"
+
+        perform(
+            identifier: "long left",
+            with: long,
+            size: CGSize(width: 300, height: 200),
+            style: {
+                $0.alignment = .left
+            }
+        )
+
+        perform(
+            identifier: "long centered",
+            with: long,
+            size: CGSize(width: 300, height: 200),
+            style: {
+                $0.alignment = .center
+            }
+        )
+
+        perform(
+            identifier: "long right",
+            with: long,
+            size: CGSize(width: 300, height: 200),
+            style: {
+                $0.alignment = .right
+            }
+        )
+    }
+
     func test_linkAttribute() {
         let string = NSAttributedString(string: "Some text", attributes: [.link: URL(string: "https://block.xyz")!])
         let element = AttributedLabel(attributedText: string) {
@@ -436,7 +525,108 @@ class AttributedLabelTests: XCTestCase {
 
 }
 
-struct TextContainerBox: Element {
+fileprivate struct LabelTapDetectionGrid: Element {
+
+    var wrapping: Element
+
+    var content: ElementContent {
+        ElementContent(child: wrapping)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        View.describe { _ in }
+    }
+
+    private final class View: UIView {
+
+        private let overlay: BlueprintView
+
+        override init(frame: CGRect) {
+
+            overlay = BlueprintView()
+            overlay.backgroundColor = .clear
+
+            super.init(frame: frame)
+
+            overlay.frame = bounds
+
+            addSubview(overlay)
+        }
+
+        required init?(coder: NSCoder) { fatalError() }
+
+        override func layoutSubviews() {
+
+            super.layoutSubviews()
+
+            let label = firstSubview(ofType: AttributedLabel.LabelView.self)
+
+            overlay.frame = bounds
+
+            guard let label else { return }
+
+            let bounds = bounds
+
+            let stride = 6
+
+            overlay.element = LayoutWriter { context, builder in
+
+                for x in 0...Int(bounds.width / CGFloat(stride)) {
+                    for y in 0...Int(bounds.height / CGFloat(stride)) {
+
+                        let x = CGFloat(x * stride)
+                        let y = CGFloat(y * stride)
+
+                        let point = CGPoint(x: CGFloat(x), y: CGFloat(y))
+                        let labelPoint = label.convert(point, from: self)
+
+                        let links = label.links(at: labelPoint)
+
+                        if links.isEmpty == false {
+                            builder.add(
+                                with: CGRect(x: x - 2.0, y: y - 2.0, width: 4, height: 4),
+                                child: Box(backgroundColor: .red.withAlphaComponent(0.4), cornerStyle: .capsule)
+                            )
+                        }
+                    }
+                }
+            }
+
+            overlay.layoutIfNeeded()
+        }
+    }
+}
+
+extension UIView {
+
+    fileprivate func firstSubview<ViewType: UIView>(ofType type: ViewType.Type) -> ViewType? {
+
+        for subview in subviews {
+            if subview.isKind(of: type) {
+                return (subview as! ViewType)
+            }
+
+            return subview.firstSubview(ofType: type)
+        }
+
+        return nil
+    }
+
+}
+
+extension NSParagraphStyle {
+
+    static func style(_ configure: (NSMutableParagraphStyle) -> Void) -> NSParagraphStyle {
+
+        let style = NSMutableParagraphStyle()
+
+        configure(style)
+
+        return style.copy() as! NSParagraphStyle
+    }
+}
+
+fileprivate struct TextContainerBox: Element {
     var model: AttributedLabel
 
     var content: ElementContent {
