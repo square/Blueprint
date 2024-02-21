@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-BLUEPRINT_VERSION ||= '2.2.0'
+BLUEPRINT_VERSION ||= '2.3.0'
 
 SWIFT_VERSION ||= File.read(File.join(__dir__, '.swift-version'))
 
