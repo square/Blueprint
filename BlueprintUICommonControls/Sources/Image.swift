@@ -16,7 +16,7 @@ public struct Image: Element {
     public var contentMode: ContentMode
 
     /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always appropriate.
-    /// Set this to `true` to prevent VoiceOver from discribing the displayed image.
+    /// Set this to `true` to prevent VoiceOver from describing the displayed image.
     public var blockAccessibilityDescription: Bool
 
     /// Initializes an image element with the given `UIImage` instance.

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where `AttributedLabel` would not properly handle tapping on links when a label was stretched.
+
 ### Added
 
 - `AccessibilityElement` now supports providing arbitrary strings to assistive devices using the `AXCustomContent` protocol. 
@@ -18,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The behavior of `name` of `ElementPreview` has been change, affecting the SwiftUI `previewName`. Instead of including device or size information (i.e. `sizeThatFits - \(name)`), it now either defaults to the Xcode default if given an empty string, and shows _only_ the `name` if `name` is non-empty.
+- Updated minimum deployment target from iOS 14 to iOS 15.
 
 ### Deprecated
 

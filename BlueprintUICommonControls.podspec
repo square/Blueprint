@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
 
   s.swift_version = SWIFT_VERSION
 
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = BLUEPRINT_IOS_DEPLOYMENT_TARGET
 
   s.source_files = 'BlueprintUICommonControls/Sources/**/*.swift'
 
