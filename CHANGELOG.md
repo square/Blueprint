@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
+- Fixed a bug where `AccessibilityBlocker` would block accessibility when `isBlocking` is `false`
 
 ### Added
 
