@@ -9,6 +9,9 @@ import UIKit
 final class RootViewController: UIViewController {
     fileprivate var demos: [Element] {
         [
+            DemoItem(title: "Accessibility", onTap: { [weak self] in
+                self?.push(AccessibilityViewController())
+            }),
             DemoItem(title: "Text Links", onTap: { [weak self] in
                 self?.push(TextLinkViewController())
             }),
