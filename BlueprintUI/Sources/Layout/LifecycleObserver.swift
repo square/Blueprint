@@ -5,14 +5,17 @@ public struct LifecycleObserver: Element {
     public var wrapped: Element
 
     public var onAppear: LifecycleCallback?
+    public var onUpdate: LifecycleCallback?
     public var onDisappear: LifecycleCallback?
 
     public init(
         onAppear: LifecycleCallback? = nil,
+        onUpdate: LifecycleCallback? = nil,
         onDisappear: LifecycleCallback? = nil,
         wrapping: Element
     ) {
         self.onAppear = onAppear
+        self.onUpdate = onUpdate
         self.onDisappear = onDisappear
         wrapped = wrapping
     }
@@ -24,6 +27,7 @@ public struct LifecycleObserver: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         PassthroughView.describe { config in
             config.onAppear = onAppear
+            config.onUpdate = onUpdate
             config.onDisappear = onDisappear
         }
     }
@@ -37,6 +41,21 @@ extension LifecycleObserver {
     public func onAppear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(
             onAppear: onAppear + callback,
+            onUpdate: onUpdate,
+            onDisappear: onDisappear,
+            wrapping: wrapped
+        )
+    }
+
+    /// Adds a hook that will be called when this element is updated. This can happen as the result
+    /// of a new element being set on a `BlueprintView`, or due to another layout pass, such
+    /// as the frame of the containing view changing.
+    ///
+    /// Callbacks run in depth-first traversal order, with parents before children.
+    public func onUpdate(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
+        LifecycleObserver(
+            onAppear: onAppear,
+            onUpdate: onUpdate + callback,
             onDisappear: onDisappear,
             wrapping: wrapped
         )
@@ -50,6 +69,7 @@ extension LifecycleObserver {
     public func onDisappear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(
             onAppear: onAppear,
+            onUpdate: onUpdate,
             onDisappear: onDisappear + callback,
             wrapping: wrapped
         )
@@ -62,6 +82,13 @@ extension Element {
     /// Callbacks run in depth-first traversal order, with parents before children.
     public func onAppear(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
         LifecycleObserver(onAppear: callback, wrapping: self)
+    }
+
+    /// Adds a hook that will be called when this element is updated.
+    ///
+    /// Callbacks run in depth-first traversal order, with parents before children.
+    public func onUpdate(_ callback: @escaping LifecycleCallback) -> LifecycleObserver {
+        LifecycleObserver(onUpdate: callback, wrapping: self)
     }
 
     /// Adds a hook that will be called when this element disappears.

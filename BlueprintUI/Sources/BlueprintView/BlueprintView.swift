@@ -416,7 +416,7 @@ public final class BlueprintView: UIView {
         /// We intentionally deliver our lifecycle callbacks (eg, `onAppear`,
         /// `onDisappear`, etc, _after_ we've marked our view as updated.
         /// This is in case the `onAppear` callback triggers a re-render,
-        /// we don't hit our recurisve update precondition.
+        /// we don't hit our recursive update precondition.
 
         for callback in updateResult.lifecycleCallbacks {
             callback()
@@ -562,6 +562,10 @@ extension BlueprintView {
             viewDescription.onAppear
         }
 
+        var onUpdate: LifecycleCallback? {
+            viewDescription.onUpdate
+        }
+
         var onDisappear: LifecycleCallback? {
             viewDescription.onDisappear
         }
@@ -652,6 +656,7 @@ extension BlueprintView {
                     } else {
                         layoutTransition = .inherited
                     }
+
                     layoutTransition.perform {
                         child.layoutAttributes.apply(to: controller.view)
 
@@ -662,6 +667,10 @@ extension BlueprintView {
                             contentView.insertSubview(controller.view, at: index)
                         }
 
+                        if let onUpdate = controller.onUpdate {
+                            result.lifecycleCallbacks.append(onUpdate)
+                        }
+
                         let childResult = controller.update(node: child, context: context)
                         result.merge(childResult)
                     }
@@ -669,7 +678,7 @@ extension BlueprintView {
                     var controller: NativeViewController!
 
                     // Building the view and applying the initial layout and update need to be wrapped in
-                    // performWithoutAnimation so they're not caught up inside an occuring transition.
+                    // performWithoutAnimation so they're not caught up inside an occurring transition.
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
                         child.layoutAttributes.apply(to: controller.view)

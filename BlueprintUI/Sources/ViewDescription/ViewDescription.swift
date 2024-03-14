@@ -50,6 +50,7 @@ public struct ViewDescription {
     private let _disappearingTransition: VisibilityTransition?
 
     let onAppear: LifecycleCallback?
+    let onUpdate: LifecycleCallback?
     let onDisappear: LifecycleCallback?
 
     let frameRoundingBehavior: FrameRoundingBehavior
@@ -96,6 +97,7 @@ public struct ViewDescription {
         _disappearingTransition = configuration.disappearingTransition
 
         onAppear = configuration.onAppear
+        onUpdate = configuration.onUpdate
         onDisappear = configuration.onDisappear
 
         frameRoundingBehavior = configuration.frameRoundingBehavior
@@ -173,6 +175,9 @@ extension ViewDescription {
 
         /// A hook to call when the element appears.
         public var onAppear: LifecycleCallback?
+
+        /// A hook to call when the element is updated.
+        public var onUpdate: LifecycleCallback?
 
         /// A hook to call when the element disappears.
         public var onDisappear: LifecycleCallback?

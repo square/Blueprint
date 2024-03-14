@@ -399,21 +399,27 @@ class BlueprintViewTests: XCTestCase {
         var events: [LifecycleTestEvent] = []
         var expectedEvents: [LifecycleTestEvent] = []
 
-        let element = LifecycleTestElement(
+        let element = LifecycleObserver(
             onAppear: {
                 events.append(.appear(1))
+            },
+            onUpdate: {
+                events.append(.update(1))
             },
             onDisappear: {
                 events.append(.disappear(1))
             },
-            wrapped: LifecycleTestElement(
+            wrapping: LifecycleObserver(
                 onAppear: {
                     events.append(.appear(2))
+                },
+                onUpdate: {
+                    events.append(.update(2))
                 },
                 onDisappear: {
                     events.append(.disappear(2))
                 },
-                wrapped: nil
+                wrapping: Empty()
             )
         )
 
@@ -437,6 +443,15 @@ class BlueprintViewTests: XCTestCase {
         expectedEvents.append(.appear(2))
         XCTAssertEqual(events, expectedEvents)
 
+        // Perform another layout
+
+        view.element = element
+        view.ensureLayoutPass()
+
+        expectedEvents.append(.update(1))
+        expectedEvents.append(.update(2))
+        XCTAssertEqual(events, expectedEvents)
+
         // Remove element while visible
 
         view.element = nil
@@ -453,6 +468,15 @@ class BlueprintViewTests: XCTestCase {
 
         expectedEvents.append(.appear(1))
         expectedEvents.append(.appear(2))
+        XCTAssertEqual(events, expectedEvents)
+
+        // Perform another layout
+
+        view.element = element
+        view.ensureLayoutPass()
+
+        expectedEvents.append(.update(1))
+        expectedEvents.append(.update(2))
         XCTAssertEqual(events, expectedEvents)
 
         // Become not visible while element is set
@@ -475,12 +499,13 @@ class BlueprintViewTests: XCTestCase {
         let childViewDescriptionApplied = expectation(description: "child view description applied")
         let parentAppeared = expectation(description: "parent appeared")
 
-        let element = LifecycleTestElement(
+        let element = LifecycleObserver(
             onAppear: {
                 parentAppeared.fulfill()
             },
+            onUpdate: {},
             onDisappear: {},
-            wrapped: CallbackElement(onViewDescriptionApplied: {
+            wrapping: CallbackElement(onViewDescriptionApplied: {
                 childViewDescriptionApplied.fulfill()
             })
         )
@@ -870,36 +895,18 @@ private struct CallbackElement: Element {
     }
 }
 
-private struct LifecycleTestElement: Element {
-    var onAppear: LifecycleCallback
-    var onDisappear: LifecycleCallback
-
-    var wrapped: Element?
-
-    var content: ElementContent {
-        if let wrapped = wrapped {
-            return ElementContent(child: wrapped)
-        } else {
-            return ElementContent(intrinsicSize: .zero)
-        }
-    }
-
-    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        UIView.describe { config in
-            config.onAppear = onAppear
-            config.onDisappear = onDisappear
-        }
-    }
-}
 
 private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
     case appear(Int)
+    case update(Int)
     case disappear(Int)
 
     var description: String {
         switch self {
         case .appear(let i):
             return "appear(\(i))"
+        case .update(let i):
+            return "update(\(i))"
         case .disappear(let i):
             return "disappear(\(i))"
         }

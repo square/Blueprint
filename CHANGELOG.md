@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- An `onUpdate` hook is now available, which is invoked when an already visible element is laid out.
+
 ### Removed
 
 ### Changed
