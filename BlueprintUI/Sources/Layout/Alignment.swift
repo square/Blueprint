@@ -51,7 +51,7 @@ public protocol AlignmentID {
 }
 
 /// An alignment position along the horizontal axis.
-public struct HorizontalAlignment: Equatable {
+public struct HorizontalAlignment: Equatable, CustomStringConvertible {
 
     var id: AlignmentID.Type
 
@@ -65,10 +65,14 @@ public struct HorizontalAlignment: Equatable {
     public static func == (lhs: HorizontalAlignment, rhs: HorizontalAlignment) -> Bool {
         lhs.id == rhs.id
     }
+
+    public var description: String {
+        "\(id)"
+    }
 }
 
 /// An alignment position along the vertical axis.
-public struct VerticalAlignment: Equatable {
+public struct VerticalAlignment: Equatable, CustomStringConvertible {
 
     var id: AlignmentID.Type
 
@@ -81,6 +85,10 @@ public struct VerticalAlignment: Equatable {
 
     public static func == (lhs: VerticalAlignment, rhs: VerticalAlignment) -> Bool {
         lhs.id == rhs.id
+    }
+
+    public var description: String {
+        "\(id)"
     }
 }
 

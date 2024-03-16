@@ -33,7 +33,7 @@ public struct AccessibilityBlocker: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { config in
-            config[\.isAccessibilityElement] = !isBlocking
+            config[\.isAccessibilityElement] = false
             config[\.accessibilityElementsHidden] = isBlocking
         }
     }

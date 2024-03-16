@@ -14,6 +14,9 @@
 --shortoptionals always
 --voidtype void
 --wraparguments before-first
+--ifdef no-indent
+--header strip
+--someAny disabled # opaqueGenericParameters
 
 --rules anyObjectProtocol
 --rules blankLinesBetweenScopes
@@ -24,9 +27,11 @@
 --rules emptyBraces
 --rules extensionAccessControl
 --rules indent
+--rules fileHeader
 --rules leadingDelimiters
 --rules linebreakAtEndOfFile
 --rules modifierOrder
+--rules opaqueGenericParameters 
 --rules redundantGet # https://google.github.io/swift/#properties-1
 --rules redundantInit # https://google.github.io/swift/#initializers-1
 --rules redundantParens # https://google.github.io/swift/#parentheses, https://google.github.io/swift/#enum-cases, https://google.github.io/swift/#trailing-closures

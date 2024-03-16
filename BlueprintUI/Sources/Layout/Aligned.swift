@@ -113,6 +113,70 @@ public struct Aligned: Element {
 
             return attributes
         }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout Cache
+        ) -> CGSize {
+            subelement.sizeThatFits(proposal)
+        }
+
+        func placeSubelement(
+            in size: CGSize,
+            subelement: Subelement,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            let x: CGFloat
+            let y: CGFloat
+
+            let subelementSize = subelement
+                .sizeThatFits(SizeConstraint(size))
+                .upperBounded(by: size)
+
+            let width: CGFloat
+            let height: CGFloat
+
+            switch horizontalAlignment {
+            case .leading:
+                x = 0
+                width = subelementSize.width
+            case .center:
+                x = 0.5
+                width = subelementSize.width
+            case .trailing:
+                x = 1
+                width = subelementSize.width
+            case .fill:
+                x = 0
+                width = size.width
+            }
+
+            switch verticalAlignment {
+            case .top:
+                y = 0
+                height = subelementSize.height
+            case .center:
+                y = 0.5
+                height = subelementSize.height
+            case .bottom:
+                y = 1
+                height = subelementSize.height
+            case .fill:
+                y = 0
+                height = size.height
+            }
+
+            let position = CGPoint(x: x * size.width, y: y * size.height)
+
+            subelement.place(
+                at: position,
+                anchor: UnitPoint(x: x, y: y),
+                size: CGSize(width: width, height: height)
+            )
+        }
     }
 }
 

@@ -353,27 +353,51 @@ extension AttributedLabel {
             return textStorage
         }
 
-        private func links(at location: CGPoint) -> [Link] {
+        func links(at location: CGPoint) -> [Link] {
             guard let textStorage = makeTextStorage(),
+                  textStorage.string.isEmpty == false,
                   let layoutManager = textStorage.layoutManagers.first,
                   let textContainer = layoutManager.textContainers.first
             else {
                 return []
             }
 
-            func alignmentMultiplier() -> CGFloat {
-                var alignment: NSTextAlignment = .natural
+            /// The below positioning calculation assumes that there is only one
+            /// alignment within the label, so verify that is the case.
+            func alignment() -> NSTextAlignment {
 
-                textStorage.enumerateAttribute(
-                    .paragraphStyle,
-                    in: textStorage.entireRange,
-                    options: []
-                ) { style, range, continuePointer in
-                    if let style = style as? NSParagraphStyle, range == textStorage.entireRange {
-                        alignment = style.alignment
-                        continuePointer.pointee = false
-                    }
+                guard let string = attributedText, string.length > 0 else {
+                    return textAlignment
                 }
+
+                var alignments = Set<NSTextAlignment>()
+
+                string.enumerateAttribute(.paragraphStyle, in: string.entireRange) { style, _, _ in
+                    guard let style = style as? NSParagraphStyle else {
+                        return
+                    }
+
+                    alignments.insert(style.alignment)
+                }
+
+                assert(
+                    alignments.count == 1,
+                    """
+                    AttributedLabel links only support a single NSTextAlignment. \
+                    Instead, found: \(alignments).
+                    """
+                )
+
+                /// If we for some reason could not find an alignment from a paragraph style,
+                /// lets just fall back to the alignment from the label itself. Note that with
+                /// attributed strings, `UILabel` derives this in a similar way to what we've done
+                /// here, from the string info.
+                return alignments.first ?? textAlignment
+            }
+
+            func alignmentMultiplier() -> CGFloat {
+
+                let alignment = alignment()
 
                 switch (alignment, layoutDirection) {
                 case (.left, _),
@@ -395,7 +419,7 @@ extension AttributedLabel {
             let textBoundingBox = layoutManager.usedRect(for: textContainer)
             let textContainerOffset = CGPoint(
                 x: (labelSize.width - textBoundingBox.size.width) * alignmentMultiplier - textBoundingBox.origin.x,
-                y: (labelSize.height - textBoundingBox.size.height) * alignmentMultiplier - textBoundingBox.origin.y
+                y: (labelSize.height - textBoundingBox.size.height) * 0.5 - textBoundingBox.origin.y
             )
             let locationInTextContainer = CGPoint(
                 x: location.x - textContainerOffset.x,

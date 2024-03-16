@@ -3,62 +3,8 @@ import UIKit
 
 public struct AccessibilityElement: Element {
 
-    /// Used to provide additional functionality to assistive technologies beyond your accessible UI.
-    public struct CustomAction: Equatable, Hashable {
-        public typealias OnActivation = () -> Bool
 
-        /// A localized name that discribes the action.
-        public var name: String
-        /// An image representing the action to be shown with some assistive technologies such as Switch Control.
-        public var image: UIImage?
-        /// A Callback for when the action is activated. This should return a `bool` indicating success or failure of the action.
-        public var onActivation: OnActivation
 
-        public init(name: String, image: UIImage? = nil, onActivation: @escaping OnActivation) {
-            self.name = name
-            self.image = image
-            self.onActivation = onActivation
-        }
-
-        public static func == (lhs: AccessibilityElement.CustomAction, rhs: AccessibilityElement.CustomAction) -> Bool {
-            // Disregard onActivation for equatablity pruposes.
-            lhs.name == rhs.name && lhs.image == rhs.image
-        }
-
-        public func hash(into hasher: inout Hasher) {
-            // Disregard onActivation for hash pruposes.
-            hasher.combine(name)
-            hasher.combine(image)
-        }
-    }
-
-    public enum Trait {
-        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
-        /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
-        public typealias IncrementAction = () -> Void
-
-        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
-        /// See [Accessibility Decrement Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615169-accessibilitydecrement) for further information.
-        public typealias DecrementAction = () -> Void
-
-        case button
-        case link
-        case header
-        case searchField
-        case image
-        case selected
-        case playsSound
-        case keyboardKey
-        case staticText
-        case summaryElement
-        case notEnabled
-        case updatesFrequently
-        case startsMediaSession
-        case adjustable(IncrementAction, DecrementAction)
-        case allowsDirectInteraction
-        case causesPageTurn
-        case tabBar
-    }
 
 
     public var label: String?
@@ -77,6 +23,10 @@ public struct AccessibilityElement: Element {
     /// An array containing one or more `CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
     public var customActions: [CustomAction] = []
 
+    /// An array containing one or more `CustomContent`s, defining additional content associated with the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
+    public var customContent: [CustomContent] = []
+
+
     public init(
         label: String?,
         value: String?,
@@ -86,6 +36,7 @@ public struct AccessibilityElement: Element {
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: Box.CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
+        customContent: [AccessibilityElement.CustomContent] = [],
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
@@ -97,6 +48,7 @@ public struct AccessibilityElement: Element {
         self.accessibilityFrameSize = accessibilityFrameSize
         self.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
         self.customActions = customActions
+        self.customContent = customContent
         wrappedElement = element
         configure(&self)
     }
@@ -123,6 +75,7 @@ public struct AccessibilityElement: Element {
             config[\.accessibilityCustomActions] = customActions.map { action in
                 UIAccessibilityCustomAction(name: action.name, image: action.image) { _ in action.onActivation() }
             }
+            config[\.accessibilityCustomContent] = customContent.map { $0.axCustomContent }
 
 
             if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
@@ -137,10 +90,10 @@ public struct AccessibilityElement: Element {
         }
     }
 
-    private final class AccessibilityView: UIView {
-
+    private final class AccessibilityView: UIView, AXCustomContentProvider {
         var accessibilityFrameSize: CGSize?
         var accessibilityFrameCornerStyle: Box.CornerStyle = .square
+        var accessibilityCustomContent: [AXCustomContent]! = [] // The exclamation `!` is in the protodol definition and required.
 
         var increment: (() -> Void)?
         var decrement: (() -> Void)?
@@ -206,39 +159,6 @@ public struct AccessibilityElement: Element {
     }
 }
 
-extension AccessibilityElement.Trait: Hashable, Equatable {
-    /// This conformance to `Hashable` is provided to allow traits to be included in a `Set`.
-    /// - Important: ⚠️ This implementation does not take equality of associated values on `.adjustable` into account.  ⚠️
-    private var internalValue: Int {
-        switch self {
-        case .button: return 0
-        case .link: return 1
-        case .header: return 2
-        case .searchField: return 3
-        case .image: return 4
-        case .selected: return 5
-        case .playsSound: return 6
-        case .keyboardKey: return 7
-        case .staticText: return 8
-        case .summaryElement: return 9
-        case .notEnabled: return 10
-        case .updatesFrequently: return 11
-        case .startsMediaSession: return 12
-        case .adjustable: return 13
-        case .allowsDirectInteraction: return 14
-        case .causesPageTurn: return 15
-        case .tabBar: return 16
-        }
-    }
-
-    public static func == (lhs: AccessibilityElement.Trait, rhs: AccessibilityElement.Trait) -> Bool {
-        lhs.internalValue == rhs.internalValue
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(internalValue)
-    }
-}
 
 extension Element {
 
@@ -256,7 +176,8 @@ extension Element {
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: Box.CornerStyle = .square,
-        customActions: [AccessibilityElement.CustomAction] = []
+        customActions: [AccessibilityElement.CustomAction] = [],
+        customContent: [AccessibilityElement.CustomContent] = []
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
@@ -267,6 +188,7 @@ extension Element {
             accessibilityFrameSize: accessibilityFrameSize,
             accessibilityFrameCornerStyle: accessibilityFrameCornerStyle,
             customActions: customActions,
+            customContent: customContent,
             wrapping: self
         )
     }
@@ -301,6 +223,72 @@ extension Element {
     }
 }
 
+
+
+extension AccessibilityElement {
+    public enum Trait {
+        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+        /// See [Accessibility Increment Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615076-accessibilityincrement) for further information.
+        public typealias IncrementAction = () -> Void
+
+        /// Used in conjunction with UIAccessibilityTrait.adjustable, these will be called to allow accessible adjustment of a value, for example in a slider or stepper control.
+        /// See [Accessibility Decrement Documentation](https://developer.apple.com/documentation/objectivec/nsobject/1615169-accessibilitydecrement) for further information.
+        public typealias DecrementAction = () -> Void
+
+        case button
+        case link
+        case header
+        case searchField
+        case image
+        case selected
+        case playsSound
+        case keyboardKey
+        case staticText
+        case summaryElement
+        case notEnabled
+        case updatesFrequently
+        case startsMediaSession
+        case adjustable(IncrementAction, DecrementAction)
+        case allowsDirectInteraction
+        case causesPageTurn
+        case tabBar
+    }
+}
+
+
+extension AccessibilityElement.Trait: Hashable, Equatable {
+    /// This conformance to `Hashable` is provided to allow traits to be included in a `Set`.
+    /// - Important: ⚠️ This implementation does not take equality of associated values on `.adjustable` into account.  ⚠️
+    private var internalValue: Int {
+        switch self {
+        case .button: return 0
+        case .link: return 1
+        case .header: return 2
+        case .searchField: return 3
+        case .image: return 4
+        case .selected: return 5
+        case .playsSound: return 6
+        case .keyboardKey: return 7
+        case .staticText: return 8
+        case .summaryElement: return 9
+        case .notEnabled: return 10
+        case .updatesFrequently: return 11
+        case .startsMediaSession: return 12
+        case .adjustable: return 13
+        case .allowsDirectInteraction: return 14
+        case .causesPageTurn: return 15
+        case .tabBar: return 16
+        }
+    }
+
+    public static func == (lhs: AccessibilityElement.Trait, rhs: AccessibilityElement.Trait) -> Bool {
+        lhs.internalValue == rhs.internalValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(internalValue)
+    }
+}
 
 extension UIAccessibilityTraits {
 
@@ -344,6 +332,80 @@ extension UIAccessibilityTraits {
                 formUnion(.tabBar)
             }
         }
+    }
+}
+
+
+extension AccessibilityElement {
+    /// Used to provide additional functionality to assistive technologies beyond your accessible UI.
+    public struct CustomAction: Equatable, Hashable {
+        public typealias OnActivation = () -> Bool
+
+        /// A localized name that discribes the action.
+        public var name: String
+        /// An image representing the action to be shown with some assistive technologies such as Switch Control.
+        public var image: UIImage?
+        /// A Callback for when the action is activated. This should return a `bool` indicating success or failure of the action.
+        public var onActivation: OnActivation
+
+        public init(name: String, image: UIImage? = nil, onActivation: @escaping OnActivation) {
+            self.name = name
+            self.image = image
+            self.onActivation = onActivation
+        }
+
+        public static func == (lhs: AccessibilityElement.CustomAction, rhs: AccessibilityElement.CustomAction) -> Bool {
+            // Disregard onActivation for equatablity pruposes.
+            lhs.name == rhs.name && lhs.image == rhs.image
+        }
+
+        public func hash(into hasher: inout Hasher) {
+            // Disregard onActivation for hash pruposes.
+            hasher.combine(name)
+            hasher.combine(image)
+        }
+    }
+}
+
+extension AccessibilityElement {
+    public struct CustomContent {
+        /// The importance of the content.
+        public enum Importance: Equatable {
+            /// By default custom content is available through the rotor.
+            case regular
+            /// In addtion to being available through the rotor, high importance content will announced in the main VoiceOver utterance.
+            /// High Importance content is announced follllowing the `accessibilityValue` but preceding any `accessibilityHint`.
+            case high
+        }
+
+        public var label: String
+        public var value: String?
+        public var importance: Importance
+
+        public init(label: String, value: String? = nil, importance: Importance = .regular) {
+            self.label = label
+            self.value = value
+            self.importance = importance
+        }
+
+        internal var axCustomContent: AXCustomContent {
+            let importance: AXCustomContent.Importance
+            switch self.importance {
+            case .high:
+                importance = .high
+            default:
+                importance = .default
+            }
+            return .init(label: label, value: value, importance: importance)
+        }
+    }
+}
+
+
+extension AXCustomContent {
+    internal convenience init(label: String, value: String?, importance: AXCustomContent.Importance = .default) {
+        self.init(label: label, value: value ?? "")
+        self.importance = importance
     }
 }
 

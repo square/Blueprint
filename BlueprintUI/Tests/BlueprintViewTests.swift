@@ -205,7 +205,7 @@ class BlueprintViewTests: XCTestCase {
                         // make sure UIKit knows we want a chance for layout
                         view.setNeedsLayout()
                     }
-                    config[\.onLayoutSubviews] = self.onLayoutSubviews
+                    config[\.onLayoutSubviews] = onLayoutSubviews
                 }
             }
 
@@ -692,6 +692,36 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(measureCount, 3)
     }
 
+    func test_lifecycleCallbacks_dont_cause_crash() {
+
+        let expectation = expectation(description: "Re-rendered")
+
+        withHostedView { view in
+
+            var hasRerendered = false
+
+            func render() {
+                view.element = SimpleViewElement(color: .black).onAppear {
+
+                    /// Simulate an onAppear event triggering a re-render.
+
+                    if hasRerendered == false {
+                        hasRerendered = true
+                        render()
+
+                        expectation.fulfill()
+                    }
+                }
+
+                view.layoutIfNeeded()
+            }
+
+            render()
+        }
+
+        waitForExpectations(timeout: 1)
+    }
+
     func test_metrics_delegate_completedRenderWith() {
         let testMetricsDelegate = TestMetricsDelegate()
 
@@ -725,7 +755,7 @@ fileprivate struct MeasurableElement: Element {
 
     var content: ElementContent {
         ElementContent { constraint -> CGSize in
-            self.validate(constraint)
+            validate(constraint)
         }
     }
 
@@ -800,6 +830,26 @@ private struct TestContainer: Element {
 
         func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
             Array(repeating: LayoutAttributes(size: .zero), count: items.count)
+        }
+
+        func sizeThatFits(
+            proposal: SizeConstraint,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) -> CGSize {
+            .zero
+        }
+
+        func placeSubelements(
+            in size: CGSize,
+            subelements: Subelements,
+            environment: Environment,
+            cache: inout ()
+        ) {
+            for subelement in subelements {
+                subelement.place(in: .zero)
+            }
         }
     }
 }

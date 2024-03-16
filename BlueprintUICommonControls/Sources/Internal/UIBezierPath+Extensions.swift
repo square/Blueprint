@@ -1,10 +1,3 @@
-//
-//  UIBezierPath+Extensions.swift
-//
-//
-//  Created by Kyle Van Essen on 6/6/22.
-//
-
 import UIKit
 
 

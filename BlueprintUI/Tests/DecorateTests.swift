@@ -1,10 +1,3 @@
-//
-//  DecorateTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 12/10/20.
-//
-
 import XCTest
 @testable import BlueprintUI
 

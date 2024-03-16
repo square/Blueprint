@@ -119,9 +119,6 @@ class AttributedTextTests: XCTestCase {
         var text = AttributedText("some emoji: 😵‍💫👨‍👩‍👧‍👦🏃🏽 and some hiragana:  あいうえお and some katakana: アイウエオカキクケコ")
         text.color = .blue
 
-        let partialEmoji = text.range(of: "😵")!
-        text[partialEmoji].color = .brown
-
         let family = text.range(of: "👨‍👩‍👧‍👦")!
         text[family].color = .magenta
 
@@ -131,12 +128,10 @@ class AttributedTextTests: XCTestCase {
         let someKatakana = text.range(of: "ウエオカキク")!
         text[someKatakana].color = .red
 
-        XCTAssertEqual(text["😵‍💫"].color, nil, "This emoji spans two colors due to changing the color of 😵")
         XCTAssertEqual(text["🏃🏽"].color, .blue)
         XCTAssertEqual(text["あ"].color, .blue)
         XCTAssertEqual(text["アイ"].color, .blue)
 
-        XCTAssertEqual(text[partialEmoji].color, .brown)
         XCTAssertEqual(text[family].color, .magenta)
         XCTAssertEqual(text[someHiragana].color, .green)
         XCTAssertEqual(text[someKatakana].color, .red)

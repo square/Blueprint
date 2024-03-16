@@ -1,11 +1,3 @@
-//
-//  Conditionals.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 9/22/20.
-//
-
-
 extension Element {
 
     //

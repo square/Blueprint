@@ -1,10 +1,3 @@
-//
-//  BuilderTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 11/10/21.
-//
-
 import BlueprintUI
 import XCTest
 

@@ -1,10 +1,3 @@
-//
-//  UIViewElement.swift
-//  BlueprintUI
-//
-//  Created by Kyle Van Essen on 6/4/20.
-//
-
 import UIKit
 
 
@@ -144,8 +137,8 @@ private final class UIViewElementMeasurer {
     static let shared = UIViewElementMeasurer()
 
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement: UIViewElement>(
-        element: ViewElement,
+    func measure(
+        element: some UIViewElement,
         constraint: SizeConstraint,
         environment: Environment
     ) -> CGSize {

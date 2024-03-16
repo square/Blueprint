@@ -1,10 +1,3 @@
-//
-//  AdaptedEnvironmentTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 6/28/21.
-//
-
 import XCTest
 @testable import BlueprintUI
 

@@ -1,10 +1,3 @@
-//
-//  AttributedLabel+Environment.swift
-//  BlueprintUICommonControls
-//
-//  Created by Kyle Bashour on 12/16/21.
-//
-
 import BlueprintUI
 import UIKit
 

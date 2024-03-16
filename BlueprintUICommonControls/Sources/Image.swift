@@ -16,7 +16,7 @@ public struct Image: Element {
     public var contentMode: ContentMode
 
     /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always appropriate.
-    /// Set this to `true` to prevent VoiceOver from discribing the displayed image.
+    /// Set this to `true` to prevent VoiceOver from describing the displayed image.
     public var blockAccessibilityDescription: Bool
 
     /// Initializes an image element with the given `UIImage` instance.
@@ -34,7 +34,9 @@ public struct Image: Element {
 
     public var content: ElementContent {
         let measurer = Measurer(contentMode: contentMode, imageSize: image?.size)
-        return ElementContent(measurable: measurer)
+        return ElementContent { constraint, environment in
+            measurer.measure(in: constraint, layoutMode: environment.layoutMode)
+        }
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
@@ -106,18 +108,19 @@ extension CGSize {
 
 extension Image {
 
-    fileprivate struct Measurer: Measurable {
+    fileprivate struct Measurer {
 
         var contentMode: ContentMode
         var imageSize: CGSize?
 
-        func measure(in constraint: SizeConstraint) -> CGSize {
+        func measure(in constraint: SizeConstraint, layoutMode: LayoutMode) -> CGSize {
             guard let imageSize = imageSize else { return .zero }
 
             enum Mode {
                 case fitWidth(CGFloat)
                 case fitHeight(CGFloat)
                 case useImageSize
+                case infinite
             }
 
             let mode: Mode
@@ -137,7 +140,12 @@ extension Image {
                 } else if case .atMost(let height) = constraint.height {
                     mode = .fitHeight(height)
                 } else {
-                    mode = .useImageSize
+                    switch layoutMode {
+                    case .legacy:
+                        mode = .useImageSize
+                    case .caffeinated:
+                        mode = .infinite
+                    }
                 }
             }
 
@@ -154,6 +162,8 @@ extension Image {
                 )
             case .useImageSize:
                 return imageSize
+            case .infinite:
+                return .infinity
             }
 
 

@@ -8,8 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
-
-- Restored documentation generation by executing the generate_docs.sh script with `bundle exec` to ensure gems are referenced properly.
+- Fixed a bug where `AccessibilityBlocker` would block accessibility when `isBlocking` is `false`
 
 ### Added
 
@@ -29,11 +28,101 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+# Past Releases
+
+## [3.0.0] - 2024-02-21
+
+### Fixed
+
+- Fixed an issue where `AttributedLabel` would not properly handle tapping on links when a label was stretched.
+
+### Added
+
+- `AccessibilityElement` now supports providing arbitrary strings to assistive devices using the `AXCustomContent` protocol. 
+
+### Removed
+
+### Changed
+
+- The behavior of `name` of `ElementPreview` has been change, affecting the SwiftUI `previewName`. Instead of including device or size information (i.e. `sizeThatFits - \(name)`), it now either defaults to the Xcode default if given an empty string, and shows _only_ the `name` if `name` is non-empty.
+- Updated minimum deployment target from iOS 14 to iOS 15.
+
+### Internal
+- Updated CI to use M1 machines, Xcode 15.1, and Ruby 3.2.2.
+- Added iOS 17 snapshot images.
+- Bump Swift version to 5.9.
+- Update Ruby gems.
+
+## [2.2.0] - 2023-09-22
+
+### Fixed
+
+- Fixed a bug that could cause a crash or incorrect layout when an element with lazily resolved content (such as `GeometryReader`) generated a subtree that varied within a layout pass. ([#468])
+
+### Added
+
+- Added a `TintAdjustmentMode` element and `.tintAdjustmentMode(:)` modifier for finer control of tint color during modal presentations.
+
+## [2.1.0] - 2023-09-06
+
+### Fixed
+
+- Resolved a Swift 5.9 compilation warning: Forming 'UnsafeRawPointer' to a variable of type 'NSObject'; this is likely incorrect because 'NSObject' may contain an object reference.
+- `KeyboardObserver` has been updated to handle iOS 16.1+ changes that use the screen's coordinate space to report keyboard position. This can impact reported values when the app isn't full screen in Split View, Slide Over, and Stage Manager.
+
+### Changed
+
+- Lifecycle callbacks like `onAppear` and `onDisappear` now occur outside of the layout pass; allowing, eg, `onAppear` to safely trigger a re-render.
+
+### Internal
+
+- Update CI script to reference the `xcodesorg/made/xcodes` package for installing simulator runtimes.
+- Corrected a typo in `AttributedLabel`, which now exits paragraph style enumeration after encountering the first paragraph style. This is an optimization and not a functional change. The method continues to accept only a paragraph style which spans the length of the attributed string.
+
+## [2.0.0] - 2023-05-02
+
+### Fixed
+
+- `ConstrainedAspectRatio`  measures correctly in `fitParent` and `fillParent` modes when the proposed constraint has the same aspect ratio as the element's constraint.
+- `ConstrainedAspectRatio` adheres to the Caffeinated Layout contract when unconstrained in `fitParent` or `fillParent`, by reporting `infinity` instead of falling back to the constrained element's size.
+
+### Changed
+
+- Caffeinated Layout is enabled by default. You can disable it on a `BlueprintView` with the `layoutMode` property, or disable it globally by setting `LayoutMode.default`.
+
+### Deprecated
+
+- `ConstrainedAspectRatio` content mode `fillParent` is deprecated, due to having limited utility in Caffeinated Layout.
+
+## [1.0.0] - 2023-04-18
+
+### Fixed
+
+- Restored documentation generation by executing the generate_docs.sh script with `bundle exec` to ensure gems are referenced properly.
+
+### Added
+
+- Introduced a new layout engine, Caffeinated Layout. Caffeinated Layout features a new API for custom layouts that is modeled after SwiftUI, and greatly improves performance.
+
+  To enable Caffeinated Layout globally, set `LayoutMode.default` to `.caffeinated`. To enable it for a single view, set the `layoutMode` property of a `BlueprintView`.
+
+  Caffeinated Layout is not enabled by default yet, but will be in a future release.
+
+- Added `layoutMode` to `BlueprintViewRenderMetrics` to expose which layout mode was used to render a Blueprint view.
+
+### Changed
+
+- The `Layout` and `SingleChildLayout` protocols have new methods to support Caffeinated Layout.
+
+  To improve performance, Caffeinated Layout requires elements to adhere to a new contract for sizing behavior. Many elements can be easily adapted to the new API, but certain behaviors are no longer possible, particularly with regard to behavior when the size constraint is `unconstrained`.
+
+  For more information about implementing these protocols and the sizing contract, see [the `Layout` documentation](https://square.github.io/Blueprint/Protocols/Layout.html).
+
+### Internal
+
 - Updated jazzy gem (0.14.3).
 - Updated cocoapods (1.12.0).
 - Updated Ruby version (2.7).
-
-# Past Releases
 
 ## [0.50.0] - 2023-03-07
 
@@ -970,7 +1059,12 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/0.50.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/square/Blueprint/compare/2.2.0...3.0.0
+[2.2.0]: https://github.com/square/Blueprint/compare/2.1.0...2.2.0
+[2.1.0]: https://github.com/square/Blueprint/compare/2.0.0...2.1.0
+[2.0.0]: https://github.com/square/Blueprint/compare/1.0.0...2.0.0
+[1.0.0]: https://github.com/square/Blueprint/compare/0.50.0...1.0.0
 [0.50.0]: https://github.com/square/Blueprint/compare/0.49.1...0.50.0
 [0.49.1]: https://github.com/square/Blueprint/compare/0.49.0...0.49.1
 [0.49.0]: https://github.com/square/Blueprint/compare/0.48.1...0.49.0
@@ -1039,6 +1133,7 @@ searchField
 [0.3.1]: https://github.com/square/Blueprint/compare/0.3.0...0.3.1
 [0.3.0]: https://github.com/square/Blueprint/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/square/Blueprint/releases/tag/0.2.2
+[#468]: https://github.com/square/Blueprint/pull/468
 [#264]: https://github.com/square/Blueprint/pull/264
 [#260]: https://github.com/square/Blueprint/pull/260
 [#259]: https://github.com/square/Blueprint/pull/259

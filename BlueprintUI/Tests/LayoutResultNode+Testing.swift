@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Kyle Bashour on 9/24/21.
-//
-
 import XCTest
 @testable import BlueprintUI
 
@@ -20,5 +13,19 @@ extension LayoutResultNode {
             }
         }
         return nil
+    }
+
+    func queryLayout(for elementType: Element.Type) -> [LayoutResultNode] {
+        var results: [LayoutResultNode] = []
+
+        if type(of: element) == elementType {
+            results.append(self)
+        }
+
+        for child in children {
+            results.append(contentsOf: child.node.queryLayout(for: elementType))
+        }
+
+        return results
     }
 }

@@ -103,5 +103,5 @@ extension UIView {
         }
     }
 
-    private static var environmentKey = NSObject()
+    private static var environmentKey: UInt8 = 0
 }

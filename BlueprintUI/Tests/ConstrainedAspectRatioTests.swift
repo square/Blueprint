@@ -2,258 +2,649 @@ import BlueprintUI
 import XCTest
 
 class ConstrainedAspectRatioTests: XCTestCase {
-    func test_expandWide() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitContent,
-            wrapping: TestElement()
-        )
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 200, height: 100))
+    let tallRatio = AspectRatio(width: 1, height: 4)
+    let wideRatio = AspectRatio(width: 4, height: 1)
+
+    func assert(
+        ratio: AspectRatio,
+        mode: ConstrainedAspectRatio.ContentMode,
+        constraint: SizeConstraint,
+        layoutModes: [LayoutMode] = LayoutMode.testModes,
+        expectedSize: CGSize,
+        line: UInt = #line
+    ) {
+        let element = TestElement()
+            .constrainedTo(aspectRatio: ratio, contentMode: mode)
+
+        for layoutMode in layoutModes {
+            layoutMode.performAsDefault {
+                let size = element.content.measure(in: constraint, environment: .empty)
+                XCTAssertEqual(
+                    size,
+                    expectedSize,
+                    """
+                    Element sized \(TestElement.size)
+                    constrained to aspect ratio \(ratio.ratio)
+                    content mode \(mode)
+                    expected to be size: \(expectedSize)
+                    in constraint: \(constraint)
+                    layout mode: \(layoutMode)
+                    """,
+                    line: line
+                )
+            }
+        }
     }
 
-    func test_expandTall() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 1, height: 2),
-            contentMode: .fitContent,
-            wrapping: TestElement()
-        )
+    func test_fillParent_wide() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: wideRatio,
+                mode: .fillParent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 120, height: 240))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 400, height: 100)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 32, height: 8)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 100, height: 25)
+        )
+        assert(
+            constraint: SizeConstraint(width: 100),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 8, height: 2)
+        )
+        assert(
+            constraint: SizeConstraint(width: 8),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 400, height: 100)
+        )
+        assert(
+            constraint: SizeConstraint(height: 100),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 32, height: 8)
+        )
+        assert(
+            constraint: SizeConstraint(height: 8),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 80, height: 20)
+        )
     }
 
-    func test_expandSquare() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: .square,
-            contentMode: .fitContent,
-            wrapping: TestElement()
-        )
+    func test_fillParent_tall() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: tallRatio,
+                mode: .fillParent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 120, height: 120))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 100, height: 400)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 8, height: 32)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 100, height: 400)
+        )
+        assert(
+            constraint: SizeConstraint(width: 100),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 8, height: 32)
+        )
+        assert(
+            constraint: SizeConstraint(width: 8),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 25, height: 100)
+        )
+        assert(
+            constraint: SizeConstraint(height: 100),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 2, height: 8)
+        )
+        assert(
+            constraint: SizeConstraint(height: 8),
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(20), height: .atMost(80)),
+            expectedSize: CGSize(width: 20, height: 80)
+        )
     }
 
-    func test_shrinkWide() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .shrinkContent,
-            wrapping: TestElement()
-        )
+    func test_fitParent_wide() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: wideRatio,
+                mode: .fitParent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 120, height: 60))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 100, height: 25)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 8, height: 2)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 100, height: 25)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 8, height: 2)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 400, height: 100)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 32, height: 8)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 80, height: 20)
+        )
     }
 
-    func test_shrinkTall() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 1, height: 2),
-            contentMode: .shrinkContent,
-            wrapping: TestElement()
-        )
+    func test_fitParent_tall() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: tallRatio,
+                mode: .fitParent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 50, height: 100))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 25, height: 100)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 2, height: 8)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 100, height: 400)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 8, height: 32)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 25, height: 100)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 2, height: 8)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.legacy],
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        assert(
+            constraint: .unconstrained,
+            layoutModes: [.caffeinated],
+            expectedSize: .infinity
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(20), height: .atMost(80)),
+            expectedSize: CGSize(width: 20, height: 80)
+        )
     }
 
-    func test_shrinkSquare() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: .square,
-            contentMode: .shrinkContent,
-            wrapping: TestElement()
-        )
+    func test_fitContent_wide() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: wideRatio,
+                mode: .fitContent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 100, height: 100))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            expectedSize: CGSize(width: 40, height: 10)
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 40, height: 10)
+        )
     }
 
-    func test_expandWideFillParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
-        )
+    func test_fitContent_tall() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: tallRatio,
+                mode: .fitContent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 800, height: 400))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            expectedSize: CGSize(width: 12, height: 48)
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 12, height: 48)
+        )
     }
 
-    func test_expandWideFitParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
-        )
+    func test_shrinkContent_wide() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: wideRatio,
+                mode: .shrinkContent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 300, height: 150))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            expectedSize: CGSize(width: 12, height: 3)
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 12, height: 3)
+        )
     }
 
-    func test_expandTallFillParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 1, height: 2),
-            contentMode: .fillParent,
-            wrapping: TestElement()
-        )
+    func test_shrinkContent_tall() {
+        func assert(
+            constraint: SizeConstraint,
+            layoutModes: [LayoutMode] = LayoutMode.testModes,
+            expectedSize: CGSize,
+            line: UInt = #line
+        ) {
+            self.assert(
+                ratio: tallRatio,
+                mode: .shrinkContent,
+                constraint: constraint,
+                layoutModes: layoutModes,
+                expectedSize: expectedSize,
+                line: line
+            )
+        }
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 300, height: 600))
+        // Fixed large constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(100), height: .atMost(100)),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Fixed small constraint
+        assert(
+            constraint: SizeConstraint(width: .atMost(8), height: .atMost(8)),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Unconstrained height, larger width
+        assert(
+            constraint: SizeConstraint(width: 100),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Unconstrained height, smaller width
+        assert(
+            constraint: SizeConstraint(width: 8),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Unconstrained width, larger height
+        assert(
+            constraint: SizeConstraint(height: 100),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Unconstrained width, smaller height
+        assert(
+            constraint: SizeConstraint(height: 8),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Fully unconstrained
+        assert(
+            constraint: .unconstrained,
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
+        // Exact fit
+        assert(
+            constraint: SizeConstraint(width: .atMost(80), height: .atMost(20)),
+            expectedSize: CGSize(width: 2.5, height: 10)
+        )
     }
 
-    func test_expandTallFitParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 1, height: 2),
-            contentMode: .fitParent,
-            wrapping: TestElement()
+    func test_layoutContract() {
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: wideRatio,
+                contentMode: .fitParent
+            )
         )
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 200, height: 400))
-    }
-
-    func test_expandSquareFillParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: .square,
-            contentMode: .fillParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: tallRatio,
+                contentMode: .fitParent
+            )
         )
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 400, height: 400))
-    }
-
-    func test_expandSquareFitParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: .square,
-            contentMode: .fitParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: wideRatio,
+                contentMode: .fillParent
+            )
         )
 
-        let size = element.content.measure(
-            in: SizeConstraint(CGSize(width: 300, height: 400)))
-        XCTAssertEqual(size, CGSize(width: 300, height: 300))
-    }
-
-    func test_unconstrainedFillParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: tallRatio,
+                contentMode: .fillParent
+            )
         )
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 200, height: 100))
-    }
-
-    func test_unconstrainedFitParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: wideRatio,
+                contentMode: .fitContent
+            )
         )
 
-        let size = element.content.measure(in: .unconstrained)
-        XCTAssertEqual(size, CGSize(width: 200, height: 100))
-    }
-
-    func test_unconstrainedHeightFillLargerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: tallRatio,
+                contentMode: .fitContent
+            )
         )
 
-        let size = element.content.measure(in: SizeConstraint(width: 300))
-        XCTAssertEqual(size, CGSize(width: 300, height: 150))
-    }
-
-    func test_unconstrainedHeightFillSmallerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: wideRatio,
+                contentMode: .shrinkContent
+            )
         )
 
-        let size = element.content.measure(in: SizeConstraint(width: 50))
-        XCTAssertEqual(size, CGSize(width: 50, height: 25))
-    }
-
-    func test_unconstrainedHeightFitLargerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
+        assertLayoutContract(
+            of: TestElement().constrainedTo(
+                aspectRatio: tallRatio,
+                contentMode: .shrinkContent
+            )
         )
-
-        let size = element.content.measure(in: SizeConstraint(width: 300))
-        XCTAssertEqual(size, CGSize(width: 300, height: 150))
-    }
-
-    func test_unconstrainedHeightFitSmallerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
-        )
-
-        let size = element.content.measure(in: SizeConstraint(width: 50))
-        XCTAssertEqual(size, CGSize(width: 50, height: 25))
-    }
-
-    func test_unconstrainedWidthFillLargerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
-        )
-
-        let size = element.content.measure(in: SizeConstraint(height: 300))
-        XCTAssertEqual(size, CGSize(width: 600, height: 300))
-    }
-
-    func test_unconstrainedWidthFillSmallerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fillParent,
-            wrapping: TestElement()
-        )
-
-        let size = element.content.measure(in: SizeConstraint(height: 50))
-        XCTAssertEqual(size, CGSize(width: 100, height: 50))
-    }
-
-    func test_unconstrainedWidthFitLargerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
-        )
-
-        let size = element.content.measure(in: SizeConstraint(height: 300))
-        XCTAssertEqual(size, CGSize(width: 600, height: 300))
-    }
-
-    func test_unconstrainedWidthFitSmallerParent() {
-        let element = ConstrainedAspectRatio(
-            aspectRatio: AspectRatio(width: 2, height: 1),
-            contentMode: .fitParent,
-            wrapping: TestElement()
-        )
-
-        let size = element.content.measure(in: SizeConstraint(height: 50))
-        XCTAssertEqual(size, CGSize(width: 100, height: 50))
     }
 }
 
 private struct TestElement: Element {
+    static let size = CGSize(width: 12, height: 10)
+
     var content: ElementContent {
-        ElementContent(intrinsicSize: CGSize(width: 120, height: 100))
+        ElementContent(intrinsicSize: Self.size)
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

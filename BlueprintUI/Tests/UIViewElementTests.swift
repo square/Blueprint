@@ -1,10 +1,3 @@
-//
-//  UIViewElementTests.swift
-//  BlueprintUI-Unit-Tests
-//
-//  Created by Kyle Van Essen on 6/8/20.
-//
-
 import UIKit
 import XCTest
 @testable import BlueprintUI
