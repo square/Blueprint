@@ -17,6 +17,7 @@
 		4EE23713D657C21C6806E771 /* libPods-SampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADDB22E4D9B4379A15C5AF69 /* libPods-SampleApp.a */; };
 		6B58C7884AE69FA55EA64E57 /* libPods-Tutorial 2 (Completed).a in Frameworks */ = {isa = PBXBuildFile; fileRef = 187E50F5B5395EA0C0BCA8B2 /* libPods-Tutorial 2 (Completed).a */; };
 		7A4B688424DB3BE300E10D7A /* ResponsiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4B688324DB3BE300E10D7A /* ResponsiveViewController.swift */; };
+		83B605572BA0ECC700C867CC /* AccessibilityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B605562BA0ECC700C867CC /* AccessibilityViewController.swift */; };
 		97545519223C12E9003E353F /* PostsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545510223C12E9003E353F /* PostsViewController.swift */; };
 		9754551A223C12E9003E353F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97545511223C12E9003E353F /* AppDelegate.swift */; };
 		9754551B223C12E9003E353F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97545513223C12E9003E353F /* Assets.xcassets */; };
@@ -65,6 +66,7 @@
 		7A4B688324DB3BE300E10D7A /* ResponsiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResponsiveViewController.swift; sourceTree = "<group>"; };
 		7A5624391C38E617246C4356 /* Pods-Tutorial 2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2.debug.xcconfig"; path = "Target Support Files/Pods-Tutorial 2/Pods-Tutorial 2.debug.xcconfig"; sourceTree = "<group>"; };
 		7EA5EE31421ECA2CA9457450 /* Pods-Tutorial 2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 2.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 2/Pods-Tutorial 2.release.xcconfig"; sourceTree = "<group>"; };
+		83B605562BA0ECC700C867CC /* AccessibilityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityViewController.swift; sourceTree = "<group>"; };
 		8501C9E99E00354D89175E65 /* Pods-Tutorial 1.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tutorial 1.release.xcconfig"; path = "Target Support Files/Pods-Tutorial 1/Pods-Tutorial 1.release.xcconfig"; sourceTree = "<group>"; };
 		975454FA223C1289003E353F /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97545510223C12E9003E353F /* PostsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostsViewController.swift; sourceTree = "<group>"; };
@@ -182,6 +184,7 @@
 			children = (
 				0A50E8DA24A685DA0049705B /* RootViewController.swift */,
 				97545510223C12E9003E353F /* PostsViewController.swift */,
+				83B605562BA0ECC700C867CC /* AccessibilityViewController.swift */,
 				C223C14127693D65002AF5C4 /* TextLinkViewController.swift */,
 				7A4B688324DB3BE300E10D7A /* ResponsiveViewController.swift */,
 				0AEA09B22428360500F9ED0C /* ScrollViewKeyboardViewController.swift */,
@@ -585,6 +588,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0A50E8DB24A685DA0049705B /* RootViewController.swift in Sources */,
+				83B605572BA0ECC700C867CC /* AccessibilityViewController.swift in Sources */,
 				9754551A223C12E9003E353F /* AppDelegate.swift in Sources */,
 				97545519223C12E9003E353F /* PostsViewController.swift in Sources */,
 				0AEA09B32428360500F9ED0C /* ScrollViewKeyboardViewController.swift in Sources */,
@@ -773,6 +777,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -791,6 +796,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -809,6 +815,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -827,6 +834,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -845,6 +853,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -863,6 +872,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -881,6 +891,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -899,6 +910,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -917,6 +929,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -935,6 +948,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Resources/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

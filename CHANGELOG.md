@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug where `AccessibilityBlocker` would block accessibility when `isBlocking` is `false`
 
 ### Added
+- Added support for accessibility focus triggers to force VoiceOver to focus on any given element.
 
 ### Removed
 
