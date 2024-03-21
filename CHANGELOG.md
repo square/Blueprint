@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added support for accessibility focus triggers to force VoiceOver to focus on any given element.
+- Added `startTimestamp` to `BlueprintViewRenderMetrics`. This represents the mach time in seconds at which the render started, from `CACurrentMediaTime()`.
 
 ### Removed
 

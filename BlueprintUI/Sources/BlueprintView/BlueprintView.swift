@@ -429,6 +429,7 @@ public final class BlueprintView: UIView {
             self,
             completedRenderWith: .init(
                 layoutMode: layoutMode,
+                startTimestamp: startTime,
                 totalDuration: viewUpdateEndTime - startTime,
                 layoutDuration: layoutEndTime - startTime,
                 viewUpdateDuration: viewUpdateEndTime - layoutEndTime
@@ -537,6 +538,9 @@ public struct BlueprintViewRenderMetrics {
 
     /// The layout mode used to render the view.
     public var layoutMode: LayoutMode
+
+    /// The mach time in seconds at which the view render started (from `CACurrentMediaTime()`).
+    public var startTimestamp: TimeInterval
 
     /// The total time it took to apply a new element.
     public var totalDuration: TimeInterval
