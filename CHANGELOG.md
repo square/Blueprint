@@ -8,11 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
-- Fixed a bug where `AccessibilityBlocker` would block accessibility when `isBlocking` is `false`
 
 ### Added
-- Added support for accessibility focus triggers to force VoiceOver to focus on any given element.
-- Added `startTimestamp` to `BlueprintViewRenderMetrics`. This represents the mach time in seconds at which the render started, from `CACurrentMediaTime()`.
 
 ### Removed
 
@@ -29,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [3.1.0] - 2024-03-26
+
+### Fixed
+- Fixed a bug where `AccessibilityBlocker` would block accessibility when `isBlocking` is `false`.
+
+### Added
+- Added support for accessibility focus triggers to force VoiceOver to focus on any given element.
+- Added `startTimestamp` to `BlueprintViewRenderMetrics`. This represents the mach time in seconds at which the render started, from `CACurrentMediaTime()`.
 
 ## [3.0.0] - 2024-02-21
 
@@ -1059,7 +1065,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/3.0.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/square/Blueprint/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/square/Blueprint/compare/2.2.0...3.0.0
 [2.2.0]: https://github.com/square/Blueprint/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/square/Blueprint/compare/2.0.0...2.1.0
