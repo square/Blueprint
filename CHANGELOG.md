@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Added
+- `AccessibilityElement.CustomContent` now exposes previously internal methods for creating `AXCustomContent` objects. 
 
 ### Removed
 
 ### Changed
+- `AccessibilityElement.CustomContent.Importance.Regular` renamed to `Default`.
 
 ### Deprecated
 

@@ -372,7 +372,7 @@ extension AccessibilityElement {
         /// The importance of the content.
         public enum Importance: Equatable {
             /// By default custom content is available through the rotor.
-            case regular
+            case `default`
             /// In addtion to being available through the rotor, high importance content will announced in the main VoiceOver utterance.
             /// High Importance content is announced follllowing the `accessibilityValue` but preceding any `accessibilityHint`.
             case high
@@ -382,18 +382,18 @@ extension AccessibilityElement {
         public var value: String?
         public var importance: Importance
 
-        public init(label: String, value: String? = nil, importance: Importance = .regular) {
+        public init(label: String, value: String? = nil, importance: Importance = .default) {
             self.label = label
             self.value = value
             self.importance = importance
         }
 
-        internal var axCustomContent: AXCustomContent {
+        public var axCustomContent: AXCustomContent {
             let importance: AXCustomContent.Importance
             switch self.importance {
             case .high:
                 importance = .high
-            default:
+            case .default:
                 importance = .default
             }
             return .init(label: label, value: value, importance: importance)
@@ -403,7 +403,11 @@ extension AccessibilityElement {
 
 
 extension AXCustomContent {
-    internal convenience init(label: String, value: String?, importance: AXCustomContent.Importance = .default) {
+    public convenience init(_ content: AccessibilityElement.CustomContent) {
+        self.init(label: content.label, value: content.value, importance: content.importance == .high ? .high : .default)
+    }
+
+    public convenience init(label: String, value: String?, importance: AXCustomContent.Importance = .default) {
         self.init(label: label, value: value ?? "")
         self.importance = importance
     }
