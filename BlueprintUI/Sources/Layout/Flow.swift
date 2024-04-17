@@ -281,7 +281,7 @@ extension Flow {
 extension Flow.Layout {
 
     /// Helper for computing the frames for a row of items.
-    struct RowLayout {
+    fileprivate struct RowLayout {
 
         let origin: CGPoint
         let maxWidth: CGFloat
