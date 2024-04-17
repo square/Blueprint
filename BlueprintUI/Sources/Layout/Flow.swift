@@ -7,6 +7,17 @@ import UIKit
 /// which controls the horizontal alignment of content within a row when it is smaller than its container,
 /// and via `RowAlignment`, which controls the vertical alignment of shorter elements within a row.
 ///
+/// ```swift
+/// Flow(horizontalSpacing: 10, rowSpacing: 10) {
+///     OnboardingPill("Food / drink")
+///     OnboardingPill("Retail goods")
+///     OnboardingPill("Grocery / gourmet / alcohol")
+///     OnboardingPill("Beauty / wellness bookings")
+///     OnboardingPill("Healthcare services")
+///     OnboardingPill("Something else")
+/// }
+/// ```
+///
 /// Below is a diagram showing a simple example of a `Flow` layout.
 ///
 /// ```
