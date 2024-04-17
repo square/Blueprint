@@ -177,6 +177,7 @@ extension Flow {
             for elements: [ElementSize],
             in constraint: SizeConstraint
         ) -> [CGRect] {
+
             var totalHeight: CGFloat = 0
             var frames: [CGRect] = []
             var row = rowLayout(
@@ -189,7 +190,9 @@ extension Flow {
 
                 if !row.canFitItem(of: elementSize) {
                     frames += row.itemFrames()
+
                     totalHeight += row.height + rowSpacing
+
                     row = rowLayout(
                         origin: .init(x: 0, y: totalHeight),
                         maxWidth: constraint.maximum.width
@@ -198,6 +201,7 @@ extension Flow {
 
                 row.addItem(of: elementSize)
             }
+
             return frames + row.itemFrames()
         }
 
@@ -326,16 +330,11 @@ extension Flow.Layout {
             let extraWidth = maxWidth - totalItemWidth - totalSpacing
             let firstItemX: CGFloat = {
                 switch horizontalAlignment {
-                case .center:
-                    return extraWidth / 2
-                case .trailing:
-                    return extraWidth
-                case .leading:
-                    return 0
+                case .center: extraWidth / 2.0
+                case .trailing: extraWidth
+                case .leading: 0.0
                 }
             }()
-
-            lazy var maxHeight = items.map(\.size.height).sorted(by: >).first!
 
             return items.map { item in
                 .init(
