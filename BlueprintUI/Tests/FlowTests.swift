@@ -40,7 +40,7 @@ class FlowTests: XCTestCase {
 
         let multiple = Flow {
             ConstrainedSize(width: 50, height: 5)
-            ConstrainedSize(width: 100, height: 5)
+            ConstrainedSize(width: 100, height: 5).flowChild(key: "aKey")
             ConstrainedSize(width: 50, height: 5)
         }
 

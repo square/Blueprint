@@ -10,7 +10,7 @@ import UIKit
 /// ```swift
 /// Flow(horizontalSpacing: 10, rowSpacing: 10) {
 ///     OnboardingPill("Food / drink")
-///     OnboardingPill("Retail goods")
+///     OnboardingPill("Retail goods").flowChild(key: "aKey")
 ///     OnboardingPill("Grocery / gourmet / alcohol")
 ///     OnboardingPill("Beauty / wellness bookings")
 ///     OnboardingPill("Healthcare services")
@@ -134,9 +134,26 @@ extension Flow {
             self.element = element
         }
 
+        /// Creates a new child item with the given element.
+        public init(_ element: Element, key: AnyHashable? = nil) {
+            self.key = key
+            traits = .init()
+            self.element = element
+        }
+
         public struct Traits {}
     }
 }
+
+
+extension Element {
+
+    /// Wraps the element in a `Flow.Child` to allow customizing the item in the flow layout.
+    public func flowChild(key: AnyHashable? = nil) -> Flow.Child {
+        .init(self, key: key)
+    }
+}
+
 
 extension Flow {
 
