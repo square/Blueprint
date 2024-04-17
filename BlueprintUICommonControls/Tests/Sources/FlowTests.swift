@@ -5,6 +5,7 @@ import XCTest
 
 /// Note; While `Flow` lives in `BlueprintUI`, we're putting some snapshot tests in
 /// `BlueprintUICommonControls` for easier verification of the layout.
+
 class FlowTests: XCTestCase {
 
     private static let elements = [
