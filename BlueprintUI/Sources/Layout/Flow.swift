@@ -35,7 +35,7 @@ public struct Flow: Element {
     /// How to horizontally align items in the row when there is extra space.
     public var horizontalAlignment: HorizontalAlignment
 
-    /// How to vertically align items which there is extra space.
+    /// How to vertically align items when there is extra space.
     public var rowAlignment: RowAlignment
 
     /// Space between items within a row.
