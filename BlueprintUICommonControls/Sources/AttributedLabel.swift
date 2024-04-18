@@ -553,6 +553,20 @@ extension AttributedLabel {
             attributedText = mutableString
         }
 
+        override func accessibilityActivate() -> Bool {
+            /// No links: Not interactive, no effect.
+            guard links.isEmpty == false else {
+                return false
+            }
+            /// Exactly one link: Activate the link.
+            if links.count == 1, let url = links.first?.url {
+                urlHandler?.onTap(url: url)
+                return true
+            }
+            /// More than one link: Ambiguous selection, no effect, Select links using the rotor..
+            return false
+        }
+
         override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             guard links.isEmpty == false, let first = touches.first else {
                 return super.touchesBegan(touches, with: event)
@@ -614,6 +628,7 @@ extension AttributedLabel {
             self.link = link
             super.init(accessibilityContainer: container)
             accessibilityLabel = label
+            accessibilityTraits = [.link]
         }
 
         override var accessibilityFrameInContainerSpace: CGRect {

@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Changed
+- `AttributedLabel` now activates a single contained link when activated by accessible technologies. 
 - `AccessibilityElement.CustomContent.Importance.Regular` renamed to `Default`.
 
 ### Deprecated
