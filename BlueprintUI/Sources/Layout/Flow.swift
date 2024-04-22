@@ -216,7 +216,8 @@ extension Flow {
             for element in elements {
                 let elementSize = element(constraint)
 
-                if !row.canFitItem(of: elementSize) {
+                // Note: We always want at least one item per row.
+                if !row.canFitItem(of: elementSize) && row.items.isEmpty == false {
                     frames += row.itemFrames()
 
                     totalHeight += row.height + rowSpacing
@@ -321,7 +322,7 @@ extension Flow.Layout {
         }
 
         private(set) var height: CGFloat = 0
-        private var items: [Item] = []
+        private(set) var items: [Item] = []
         private var totalItemWidth: CGFloat = 0
 
         private var itemCount: CGFloat {

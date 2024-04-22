@@ -8,19 +8,6 @@ import XCTest
 
 class FlowTests: XCTestCase {
 
-    private static let elements = [
-        ConstrainedSize(width: 50, height: 40, color: .green),
-        ConstrainedSize(width: 20, height: 20, color: .red),
-        ConstrainedSize(width: 30, height: 30, color: .blue),
-        ConstrainedSize(width: 40, height: 40, color: .green),
-        ConstrainedSize(width: 50, height: 20, color: .red),
-        ConstrainedSize(width: 60, height: 30, color: .blue),
-        ConstrainedSize(width: 70, height: 40, color: .green),
-        ConstrainedSize(width: 80, height: 20, color: .red),
-        ConstrainedSize(width: 90, height: 30, color: .blue),
-        ConstrainedSize(width: 100, height: 40, color: .green),
-    ]
-
     func test_aligned() {
 
         func flow(
@@ -33,7 +20,16 @@ class FlowTests: XCTestCase {
                 rowAlignment: rowAlignment,
                 rowSpacing: 5
             ) {
-                Self.elements
+                ConstrainedSize(width: 50, height: 40, color: .green)
+                ConstrainedSize(width: 20, height: 20, color: .red)
+                ConstrainedSize(width: 30, height: 30, color: .blue)
+                ConstrainedSize(width: 40, height: 40, color: .green)
+                ConstrainedSize(width: 50, height: 20, color: .red)
+                ConstrainedSize(width: 60, height: 30, color: .blue)
+                ConstrainedSize(width: 70, height: 40, color: .green)
+                ConstrainedSize(width: 80, height: 20, color: .red)
+                ConstrainedSize(width: 90, height: 30, color: .blue)
+                ConstrainedSize(width: 100, height: 40, color: .green)
             }
             .constrainedTo(width: .absolute(200))
         }
@@ -46,6 +42,18 @@ class FlowTests: XCTestCase {
                 )
             }
         }
+    }
+
+    func test_tooWide() {
+
+        let flow = Flow(rowSpacing: 5) {
+            ConstrainedSize(width: 110, height: 40, color: .green)
+            ConstrainedSize(width: 120, height: 20, color: .red)
+            ConstrainedSize(width: 130, height: 30, color: .blue)
+        }
+        .constrainedTo(width: .absolute(100))
+
+        compareSnapshot(of: flow)
     }
 }
 
