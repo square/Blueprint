@@ -121,4 +121,50 @@ class AccessibilityContainerTests: XCTestCase {
 
         XCTAssertNil(accessibleSubviews.first)
     }
+
+    func test_overrideAccessibility() {
+        let label1 = Label(text: "One")
+        let label2 = Label(text: "Two")
+        let label3 = Label(text: "Three")
+        let element = Column {
+            label1
+            label2
+            label3
+        }
+
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+
+        element
+            .accessibilityContainer()
+            .accessBackingView(in: view) { view in
+                let textVals: [String] = view.accessibilityElements!.map {
+                    ($0 as! UILabel).text!
+                }
+
+                XCTAssertEqual(view.accessibilityElements?.count, 3)
+                XCTAssertEqual(textVals, ["One", "Two", "Three"])
+            }
+
+        element
+            .accessibilityContainer(accessibilityElements: [label1, label3])
+            .accessBackingView(in: view) { view in
+                let textVals: [String] = view.accessibilityElements!.map {
+                    ($0 as! BlueprintUICommonControls.Label).text
+                }
+
+                XCTAssertEqual(view.accessibilityElements?.count, 2)
+                XCTAssertEqual(textVals, ["One", "Three"])
+            }
+
+        element
+            .accessibilityContainer(accessibilityElements: [label3, label2, label1])
+            .accessBackingView(in: view) { view in
+                let textVals: [String] = view.accessibilityElements!.map {
+                    ($0 as! BlueprintUICommonControls.Label).text
+                }
+
+                XCTAssertEqual(view.accessibilityElements?.count, 3)
+                XCTAssertEqual(textVals, ["Three", "Two", "One"])
+            }
+    }
 }
