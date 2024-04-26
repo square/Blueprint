@@ -18,10 +18,12 @@ public struct AccessibilityContainer: Element {
     /// An optional `accessibilityIdentifier` to give the container. Defaults to `nil`.
     public var identifier: String?
     public var wrapped: Element
+    public var accessibilityElements: [Any]?
 
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
-    public init(identifier: String? = nil, wrapping element: Element) {
+    public init(identifier: String? = nil, accessibilityElements: [Any]? = nil, wrapping element: Element) {
         self.identifier = identifier
+        self.accessibilityElements = accessibilityElements
         wrapped = element
     }
 
@@ -36,6 +38,7 @@ public struct AccessibilityContainer: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityContainerView.describe { config in
             config[\.accessibilityIdentifier] = identifier
+            config[\.explicitAccessibilityElements] = self.accessibilityElements
         }
     }
 }
@@ -44,15 +47,17 @@ extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    public func accessibilityContainer(identifier: String? = nil) -> Element {
-        AccessibilityContainer(identifier: identifier, wrapping: self)
+    public func accessibilityContainer(identifier: String? = nil, accessibilityElements: [Any]? = nil) -> Element {
+        AccessibilityContainer(identifier: identifier, accessibilityElements: accessibilityElements, wrapping: self)
     }
 }
 
 extension AccessibilityContainer {
     private final class AccessibilityContainerView: UIView {
+        var explicitAccessibilityElements: [Any]?
+
         override var accessibilityElements: [Any]? {
-            get { recursiveAccessibleSubviews() }
+            get { explicitAccessibilityElements ?? recursiveAccessibleSubviews() }
             set { fatalError("This property is not settable") }
         }
     }
