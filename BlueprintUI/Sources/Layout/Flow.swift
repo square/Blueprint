@@ -215,7 +215,15 @@ extension Flow {
             )
 
             for element in elements {
-                let elementSize = element(constraint)
+
+                let elementSize: CGSize = {
+                    let size = element(constraint)
+
+                    return CGSize(
+                        width: min(size.width, constraint.width.maximum),
+                        height: min(size.height, constraint.height.maximum)
+                    )
+                }()
 
                 // Note: We always want at least one item per row.
                 if !row.canFitItem(of: elementSize) && row.items.isEmpty == false {

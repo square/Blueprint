@@ -31,7 +31,7 @@ class FlowTests: XCTestCase {
 
         XCTAssertEqual(
             one.content.measure(in: .init(CGSize(width: 40, height: 4))),
-            CGSize(width: 50, height: 5)
+            CGSize(width: 40, height: 4)
         )
 
         ///
@@ -62,7 +62,7 @@ class FlowTests: XCTestCase {
 
         XCTAssertEqual(
             multipleTooWide.content.measure(in: .init(width: 100)),
-            CGSize(width: 130, height: 25)
+            CGSize(width: 100, height: 25)
         )
     }
 }

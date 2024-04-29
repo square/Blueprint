@@ -52,6 +52,8 @@ class FlowTests: XCTestCase {
             ConstrainedSize(width: 130, height: 30, color: .blue)
         }
         .constrainedTo(width: .absolute(100))
+        .box(borders: .solid(color: .black, width: 1))
+        .inset(horizontal: 50)
 
         compareSnapshot(of: flow)
     }
