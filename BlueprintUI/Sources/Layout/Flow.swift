@@ -334,10 +334,6 @@ extension Flow.Layout {
         private(set) var items: [Item] = []
         private var totalItemWidth: CGFloat = 0
 
-        private var itemCount: CGFloat {
-            CGFloat(items.count)
-        }
-
         struct Item {
             let size: CGSize
             let xOffset: CGFloat
@@ -347,7 +343,7 @@ extension Flow.Layout {
         func canFitItem(
             of size: CGSize
         ) -> Bool {
-            itemCount * itemSpacing + totalItemWidth + size.width <= maxWidth
+            CGFloat(items.count) * itemSpacing + totalItemWidth + size.width <= maxWidth
         }
 
         /// Adds item of given size to the row layout.
@@ -355,7 +351,7 @@ extension Flow.Layout {
             items.append(
                 .init(
                     size: size,
-                    xOffset: totalItemWidth + itemSpacing * itemCount
+                    xOffset: totalItemWidth + itemSpacing * CGFloat(items.count)
                 )
             )
             totalItemWidth += size.width
@@ -364,7 +360,7 @@ extension Flow.Layout {
 
         /// Compute frames for the items in the row layout.
         func itemFrames() -> [CGRect] {
-            let totalSpacing = (itemCount - 1) * itemSpacing
+            let totalSpacing = (CGFloat(items.count) - 1) * itemSpacing
             let extraWidth = maxWidth - totalItemWidth - totalSpacing
             let firstItemX: CGFloat = {
                 switch lineAlignment {
