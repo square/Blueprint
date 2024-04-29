@@ -232,7 +232,7 @@ extension Flow {
                     totalHeight += row.height + lineSpacing
 
                     row = rowLayout(
-                        origin: .init(x: 0, y: totalHeight),
+                        origin: totalHeight,
                         maxWidth: constraint.maximum.width
                     )
                 }
@@ -289,7 +289,7 @@ extension Flow {
         // MARK: Private Methods
 
         private func rowLayout(
-            origin: CGPoint,
+            origin: CGFloat,
             maxWidth: CGFloat
         ) -> RowLayout {
             .init(
@@ -310,14 +310,14 @@ extension Flow.Layout {
     /// Helper for computing the frames for a row of items.
     fileprivate struct RowLayout {
 
-        let origin: CGPoint
+        let origin: CGFloat
         let maxWidth: CGFloat
         let itemSpacing: CGFloat
         let lineAlignment: Flow.LineAlignment
         let itemAlignment: Flow.ItemAlignment
 
         init(
-            origin: CGPoint,
+            origin: CGFloat,
             maxWidth: CGFloat,
             itemSpacing: CGFloat,
             lineAlignment: Flow.LineAlignment,
@@ -375,10 +375,10 @@ extension Flow.Layout {
                     x: firstItemX + item.xOffset,
                     y: {
                         switch itemAlignment {
-                        case .fill: origin.y
-                        case .top: origin.y
-                        case .center: origin.y + (height - item.size.height) / 2
-                        case .bottom: origin.y + (height - item.size.height)
+                        case .fill: origin
+                        case .top: origin
+                        case .center: origin + (height - item.size.height) / 2
+                        case .bottom: origin + (height - item.size.height)
                         }
                     }(),
                     width: item.size.width,
