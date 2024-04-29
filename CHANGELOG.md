@@ -10,14 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Added
-- `AccessibilityElement.CustomContent` now exposes previously internal methods for creating `AXCustomContent` objects. 
-- Introduced a new `Flow` layout type, for creating flow layout based elements.
 
 ### Removed
 
 ### Changed
-- `AttributedLabel` now activates a single contained link when activated by accessible technologies. 
-- `AccessibilityElement.CustomContent.Importance.Regular` renamed to `Default`.
 
 ### Deprecated
 
@@ -30,6 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [4.0.0] - 2024-04-29
+
+### Added
+- `AccessibilityElement.CustomContent` now exposes previously internal methods for creating `AXCustomContent` objects. 
+- Introduced a new `Flow` layout type, for creating flow layout based elements.
+
+### Changed
+- `AttributedLabel` now activates a single contained link when activated by accessible technologies. 
+- `AccessibilityElement.CustomContent.Importance.Regular` renamed to `Default`.
 
 ## [3.1.0] - 2024-03-26
 
@@ -1069,7 +1075,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/3.1.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/square/Blueprint/compare/3.1.0...4.0.0
 [3.1.0]: https://github.com/square/Blueprint/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/square/Blueprint/compare/2.2.0...3.0.0
 [2.2.0]: https://github.com/square/Blueprint/compare/2.1.0...2.2.0
