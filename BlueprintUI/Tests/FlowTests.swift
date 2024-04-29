@@ -54,7 +54,7 @@ class FlowTests: XCTestCase {
         /// Ensure that they don't end up creating extra rows.
         ///
 
-        let multipleTooWide = Flow(rowSpacing: 5) {
+        let multipleTooWide = Flow(lineSpacing: 5) {
             ConstrainedSize(width: 110, height: 5)
             ConstrainedSize(width: 120, height: 5).flowChild(key: "aKey")
             ConstrainedSize(width: 130, height: 5)

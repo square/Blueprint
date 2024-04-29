@@ -11,14 +11,14 @@ class FlowTests: XCTestCase {
     func test_aligned() {
 
         func flow(
-            horizontalAlignment: Flow.HorizontalAlignment,
-            rowAlignment: Flow.RowAlignment
+            lineAlignment: Flow.LineAlignment,
+            itemAlignment: Flow.ItemAlignment
         ) -> Element {
             Flow(
-                horizontalAlignment: horizontalAlignment,
-                horizontalSpacing: 10,
-                rowAlignment: rowAlignment,
-                rowSpacing: 5
+                lineAlignment: lineAlignment,
+                lineSpacing: 10,
+                itemAlignment: itemAlignment,
+                itemSpacing: 2
             ) {
                 ConstrainedSize(width: 50, height: 40, color: .green)
                 ConstrainedSize(width: 20, height: 20, color: .red)
@@ -34,11 +34,11 @@ class FlowTests: XCTestCase {
             .constrainedTo(width: .absolute(200))
         }
 
-        for horizontalAlignment in Flow.HorizontalAlignment.allCases {
-            for rowAlignment in Flow.RowAlignment.allCases {
+        for lineAlignment in Flow.LineAlignment.allCases {
+            for itemAlignment in Flow.ItemAlignment.allCases {
                 compareSnapshot(
-                    of: flow(horizontalAlignment: horizontalAlignment, rowAlignment: rowAlignment),
-                    identifier: "\(horizontalAlignment)_\(rowAlignment)"
+                    of: flow(lineAlignment: lineAlignment, itemAlignment: itemAlignment),
+                    identifier: "\(lineAlignment)_\(itemAlignment)"
                 )
             }
         }
@@ -46,7 +46,7 @@ class FlowTests: XCTestCase {
 
     func test_tooWide() {
 
-        let flow = Flow(rowSpacing: 5) {
+        let flow = Flow(lineSpacing: 5) {
             ConstrainedSize(width: 110, height: 40, color: .green)
             ConstrainedSize(width: 120, height: 20, color: .red)
             ConstrainedSize(width: 130, height: 30, color: .blue)

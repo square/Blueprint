@@ -3,12 +3,12 @@ import UIKit
 
 /// Element which lays out children horizontally, wrapping to another row when there is not enough space.
 ///
-/// You may control the layout of each row within the flow layout, by providing a `HorizontalAlignment`,
+/// You may control the layout of each row within the flow layout, by providing a `LineAlignment`,
 /// which controls the horizontal alignment of content within a row when it is smaller than its container,
-/// and via `RowAlignment`, which controls the vertical alignment of shorter elements within a row.
+/// and via `ItemAlignment`, which controls the vertical alignment of shorter elements within a row.
 ///
 /// ```swift
-/// Flow(horizontalSpacing: 10, rowSpacing: 10) {
+/// Flow(itemSpacing: 10, lineSpacing: 10) {
 ///     OnboardingPill("Food / drink")
 ///     OnboardingPill("Retail goods").flowChild(key: "aKey")
 ///     OnboardingPill("Grocery / gourmet / alcohol")
@@ -32,33 +32,34 @@ import UIKit
 /// ```
 public struct Flow: Element {
 
-    /// How to horizontally align items in the row when there is extra space.
-    public var horizontalAlignment: HorizontalAlignment
+    /// How to align each row when there is extra horizontal space.
+    public var lineAlignment: LineAlignment
 
-    /// How to vertically align items when there is extra space.
-    public var rowAlignment: RowAlignment
+    /// Space between lines in the layout.
+    public var lineSpacing: CGFloat
 
-    /// Space between items within a row.
-    public var horizontalSpacing: CGFloat
+    /// How to align items in a line when there is extra vertical space.
+    public var itemAlignment: ItemAlignment
 
-    /// Space between rows.
-    public var rowSpacing: CGFloat
+    /// Space between items within a line.
+    public var itemSpacing: CGFloat
 
     /// The child elements of the flow layout to be laid out.
     public var children: [Child]
 
     /// Creates a new flow layout with the provided parameters.
     public init(
-        horizontalAlignment: HorizontalAlignment = .leading,
-        horizontalSpacing: CGFloat = 0,
-        rowAlignment: RowAlignment = .center,
-        rowSpacing: CGFloat = 0,
+        lineAlignment: LineAlignment = .leading,
+        lineSpacing: CGFloat = 0,
+        itemAlignment: ItemAlignment = .center,
+        itemSpacing: CGFloat = 0,
         @ElementBuilder<Flow.Child> _ children: () -> [Flow.Child]
     ) {
-        self.horizontalAlignment = horizontalAlignment
-        self.horizontalSpacing = horizontalSpacing
-        self.rowAlignment = rowAlignment
-        self.rowSpacing = rowSpacing
+        self.lineAlignment = lineAlignment
+        self.lineSpacing = lineSpacing
+        self.itemAlignment = itemAlignment
+        self.itemSpacing = itemSpacing
+
         self.children = children()
     }
 
@@ -67,10 +68,10 @@ public struct Flow: Element {
     public var content: ElementContent {
         .init(
             layout: Layout(
-                horizontalAlignment: horizontalAlignment,
-                rowAlignment: rowAlignment,
-                horizontalSpacing: horizontalSpacing,
-                rowSpacing: rowSpacing
+                lineAlignment: lineAlignment,
+                lineSpacing: lineSpacing,
+                itemAlignment: itemAlignment,
+                itemSpacing: itemSpacing
             )
         ) {
             for child in children {
@@ -86,8 +87,8 @@ public struct Flow: Element {
 
 extension Flow {
 
-    /// How to horizontally align items in the row when there is extra space.
-    public enum HorizontalAlignment: CaseIterable {
+    /// How to horizontally align the line when there is extra space.
+    public enum LineAlignment: CaseIterable {
 
         /// Items are aligned with the leading edge.
         case leading
@@ -100,7 +101,7 @@ extension Flow {
     }
 
     /// How to vertically align items which there is extra space.
-    public enum RowAlignment: CaseIterable {
+    public enum ItemAlignment: CaseIterable {
 
         /// Shorter items are stretched to fill the height of the tallest item.
         case fill
@@ -111,7 +112,7 @@ extension Flow {
         /// Shorter items are vertically aligned within the row.
         case center
 
-        /// Shoter items are aligned to the bottom of the row.
+        /// Shorter items are aligned to the bottom of the row.
         case bottom
     }
 
@@ -161,10 +162,10 @@ extension Flow {
 
         typealias Traits = Child.Traits
 
-        var horizontalAlignment: HorizontalAlignment
-        var rowAlignment: RowAlignment
-        var horizontalSpacing: CGFloat
-        var rowSpacing: CGFloat
+        var lineAlignment: LineAlignment
+        var lineSpacing: CGFloat
+        var itemAlignment: ItemAlignment
+        var itemSpacing: CGFloat
 
         static var defaultTraits: Traits = .init()
 
@@ -220,7 +221,7 @@ extension Flow {
                 if !row.canFitItem(of: elementSize) && row.items.isEmpty == false {
                     frames += row.itemFrames()
 
-                    totalHeight += row.height + rowSpacing
+                    totalHeight += row.height + lineSpacing
 
                     row = rowLayout(
                         origin: .init(x: 0, y: totalHeight),
@@ -286,9 +287,9 @@ extension Flow {
             .init(
                 origin: origin,
                 maxWidth: maxWidth,
-                itemSpacing: horizontalSpacing,
-                horizontalAlignment: horizontalAlignment,
-                rowAlignment: rowAlignment
+                itemSpacing: itemSpacing,
+                lineAlignment: lineAlignment,
+                itemAlignment: itemAlignment
             )
         }
     }
@@ -304,21 +305,21 @@ extension Flow.Layout {
         let origin: CGPoint
         let maxWidth: CGFloat
         let itemSpacing: CGFloat
-        let horizontalAlignment: Flow.HorizontalAlignment
-        let rowAlignment: Flow.RowAlignment
+        let lineAlignment: Flow.LineAlignment
+        let itemAlignment: Flow.ItemAlignment
 
         init(
             origin: CGPoint,
             maxWidth: CGFloat,
             itemSpacing: CGFloat,
-            horizontalAlignment: Flow.HorizontalAlignment,
-            rowAlignment: Flow.RowAlignment
+            lineAlignment: Flow.LineAlignment,
+            itemAlignment: Flow.ItemAlignment
         ) {
             self.origin = origin
             self.maxWidth = maxWidth
             self.itemSpacing = itemSpacing
-            self.horizontalAlignment = horizontalAlignment
-            self.rowAlignment = rowAlignment
+            self.lineAlignment = lineAlignment
+            self.itemAlignment = itemAlignment
         }
 
         private(set) var height: CGFloat = 0
@@ -358,7 +359,7 @@ extension Flow.Layout {
             let totalSpacing = (itemCount - 1) * itemSpacing
             let extraWidth = maxWidth - totalItemWidth - totalSpacing
             let firstItemX: CGFloat = {
-                switch horizontalAlignment {
+                switch lineAlignment {
                 case .center: extraWidth / 2.0
                 case .trailing: extraWidth
                 case .leading: 0.0
@@ -369,7 +370,7 @@ extension Flow.Layout {
                 .init(
                     x: firstItemX + item.xOffset,
                     y: {
-                        switch rowAlignment {
+                        switch itemAlignment {
                         case .fill: origin.y
                         case .top: origin.y
                         case .center: origin.y + (height - item.size.height) / 2
@@ -378,7 +379,7 @@ extension Flow.Layout {
                     }(),
                     width: item.size.width,
                     height: {
-                        switch rowAlignment {
+                        switch itemAlignment {
                         case .fill: height
                         case .top, .center, .bottom: item.size.height
                         }
