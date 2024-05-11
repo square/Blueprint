@@ -53,3 +53,61 @@ public struct GeometryProxy {
         element.content.measure(in: explicit ?? constraint, environment: environment)
     }
 }
+
+extension GeometryProxy {
+
+    public enum Direction {
+        case horizontal
+        case vertical
+    }
+
+    /// Measures `wideElement` and returns it if its width is less than or equal to
+    /// `constraint.width`. Otherwise, returns `fallback`.
+    ///
+    /// - Parameters:
+    ///   - width: The horizontal size constraint to use when measuring `wideElement`. To measure an
+    ///     element's maximum size, pass `.unconstrained`. To measure an element's minimum size,
+    ///     pass `.atMost(0)`. Defaults to `.unconstrained`.
+    ///   - wideElement: The element to measure.
+    ///   - fallback: The element to return if `wideElement` is too wide.
+    /// - Returns: One of the provided elements.
+    func element(
+        fittingWidth width: SizeConstraint.Axis = .unconstrained,
+        ifFits wideElement: @autoclosure () -> Element,
+        else fallback: @autoclosure () -> Element
+    ) -> Element {
+
+        let wide = wideElement()
+
+        if ifFits(width: width, element: { wide }) {
+            return wide
+        } else {
+            return fallback()
+        }
+    }
+
+    /// Measures `wideElement` and returns it if its width is less than or equal to
+    /// `constraint.width`. Otherwise, returns `nil`.
+    ///
+    /// - Parameters:
+    ///   - width: The horizontal size constraint to use when measuring `wideElement`. To measure an
+    ///     element's maximum size, pass `.unconstrained`. To measure an element's minimum size,
+    ///     pass `.atMost(0)`. Defaults to `.unconstrained`.
+    ///   - wideElement: The element to measure.
+    /// - Returns: One of the provided elements.
+    func ifFits(
+        width: SizeConstraint.Axis = .unconstrained,
+        element: () -> Element
+    ) -> Bool {
+
+        let element = element()
+
+        guard let maxWidth = width.constrainedValue else {
+            return true
+        }
+
+        let constraint = SizeConstraint(width: width, height: constraint.height)
+
+        return measure(element: element, in: constraint).width <= maxWidth
+    }
+}
