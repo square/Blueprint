@@ -559,6 +559,12 @@ extension AttributedLabel {
                   !links.isEmpty else { return string }
             var label = string
             // Wrap the word in [brackets] to indicate that it is a tag distinct from the content string. This is transparent to voiceover but should be helpful when the accessibility label is printed e.g. in the accessibility inspector.
+
+            // The use of square brackets is arbitrary but was chosen because:
+            // • Voiceover doesn't read the [] characters, but does realize the contained word is distinct from the preceding word.
+            // • Square brackets aren't often used in prose, unlike parenthesis. They're unlikely to be confused with the actual content.
+            // • They look like markdown.
+
             let insertionString = "[\(localizedLinkString)] "
             // Insert from the end of the string to keep indices stable.
             let reversed = links.sorted { $0.range.location > $1.range.location }
