@@ -113,6 +113,9 @@ public struct Box: Element {
                     view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
                 }
 
+                if self.cornerStyle.cornerMask != view.contentView.layer.maskedCorners {
+                    view.contentView.layer.maskedCorners = self.cornerStyle.cornerMask
+                }
             }
 
 
