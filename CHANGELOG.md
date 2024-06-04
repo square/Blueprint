@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
-- Fixed a bug where defining a `Box` with a `.rounded` `CornerStyle` with `Corners` set to anything other than `.all` would sometimes still round all of the corners. 
 
 ### Added
 
@@ -27,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [4.0.1] - 2024-06-04
+
+### Fixed
+- Fixed a bug where defining a `Box` with a `.rounded` `CornerStyle` with `Corners` set to anything other than `.all` would sometimes still round all of the corners.
 
 ## [4.0.0] - 2024-04-29
 
@@ -1076,7 +1080,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.0.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.0.1...HEAD
+[4.0.1]: https://github.com/square/Blueprint/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/square/Blueprint/compare/3.1.0...4.0.0
 [3.1.0]: https://github.com/square/Blueprint/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/square/Blueprint/compare/2.2.0...3.0.0
