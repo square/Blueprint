@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
+- Fixed a bug where defining a `Box` with a `.rounded` `CornerStyle` with `Corners` set to anything other than `.all` would sometimes still round all of the corners. 
 
 ### Added
 
