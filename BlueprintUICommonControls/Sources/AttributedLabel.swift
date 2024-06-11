@@ -265,6 +265,11 @@ extension AttributedLabel {
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
                     accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
+                    accessibilityLabel = accessibilityLabel(
+                        with: links,
+                        in: model.attributedText.string,
+                        linkAccessibilityLabel: environment.linkAccessibilityLabel
+                    )
                 }
 
                 if let shadow = model.shadow {
@@ -537,6 +542,45 @@ extension AttributedLabel {
                         link: link
                     )
                 }
+
+
+        }
+
+        private func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
+            // When reading an attributed string that contains the `.link` attribute VoiceOver will announce "link" when it encounters the applied range. This is important because it informs the user about the context and position of the linked text within the greater string. This can be partocularly important when a string contains multiple links with the same linked text but different link destinations.
+
+            // UILabel is extremely insistant about how the `.link` attribute should be styled going so far as to apply its own preferences above any other provided attributes. In order to allow custom link styling we replace any instances of the `.link` attribute with a `labelLink.` attribute (see `NSAttributedString.normalizingForView(with:)`. This allows us to track the location of links while still providing our own custom styling. Unfortunately this means that voiceover doesnt recognize our links as links and consequently they are not announced to the user.
+
+            // Ideally we'd be able to enumerate our links, insert the `.link` attribute back and then set the resulting string as the `accessibilityAttributedString` but unfortunately that doesnt seem to work. Apple's [docs](https://developer.apple.com/documentation/objectivec/nsobject/2865944-accessibilityattributedlabel) indicate that this property is intended "for the inclusion of language attributes in the string to control pronunciation or accents" and doesnt seem to notice any included `.link` attributes.
+
+            // Insert the word "link" after each link in the label. This mirrors the VoiceOver behavior when encountering a `.link` attribute.
+
+            guard let localizedLinkString = linkAccessibilityLabel,
+                  !links.isEmpty else { return string }
+            var label = string
+            // Wrap the word in [brackets] to indicate that it is a tag distinct from the content string. This is transparent to voiceover but should be helpful when the accessibility label is printed e.g. in the accessibility inspector.
+
+            // The use of square brackets is arbitrary but was chosen because:
+            // • Voiceover doesn't read the [] characters, but does realize the contained word is distinct from the preceding word.
+            // • Square brackets aren't often used in prose, unlike parenthesis. They're unlikely to be confused with the actual content.
+            // • They look like markdown.
+
+            let insertionString = "[\(localizedLinkString)] "
+            // Insert from the end of the string to keep indices stable.
+            let reversed = links.sorted { $0.range.location > $1.range.location }
+            for link in reversed {
+                let insertionPoint = label.index(label.startIndex, offsetBy: link.range.location + link.range.length)
+                let insertionEnd = label.index(
+                    insertionPoint,
+                    offsetBy: insertionString.count,
+                    limitedBy: label.endIndex
+                )
+                if insertionEnd != nil && label[insertionPoint...(insertionEnd ?? insertionPoint)] == insertionString {
+                    continue
+                }
+                label.insert(contentsOf: insertionString, at: insertionPoint)
+            }
+            return label
         }
 
         func applyLinkColors(activeLinks: [Link] = []) {
