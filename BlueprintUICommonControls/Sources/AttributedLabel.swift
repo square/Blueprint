@@ -546,7 +546,7 @@ extension AttributedLabel {
 
         }
 
-        private func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
+        internal func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
             // When reading an attributed string that contains the `.link` attribute VoiceOver will announce "link" when it encounters the applied range. This is important because it informs the user about the context and position of the linked text within the greater string. This can be partocularly important when a string contains multiple links with the same linked text but different link destinations.
 
             // UILabel is extremely insistant about how the `.link` attribute should be styled going so far as to apply its own preferences above any other provided attributes. In order to allow custom link styling we replace any instances of the `.link` attribute with a `labelLink.` attribute (see `NSAttributedString.normalizingForView(with:)`. This allows us to track the location of links while still providing our own custom styling. Unfortunately this means that voiceover doesnt recognize our links as links and consequently they are not announced to the user.
@@ -565,17 +565,32 @@ extension AttributedLabel {
             // • Square brackets aren't often used in prose, unlike parenthesis. They're unlikely to be confused with the actual content.
             // • They look like markdown.
 
-            let insertionString = "[\(localizedLinkString)] "
+            let insertionString = "[\(localizedLinkString)]"
             // Insert from the end of the string to keep indices stable.
             let reversed = links.sorted { $0.range.location > $1.range.location }
             for link in reversed {
-                let insertionPoint = label.index(label.startIndex, offsetBy: link.range.location + link.range.length)
+                // Extract substring from NSString to align with NSRange provided by the link.
+                let nsstring = string as NSString
+                guard link.range.location >= 0,
+                      link.range.length >= 0,
+                      link.range.location + link.range.length <= nsstring.length
+                else {
+                    continue
+                }
+                let substring = nsstring.substring(with: link.range)
+
+                // Generate swift range from substring
+                guard let swiftRange = string.range(of: substring) else {
+                    continue
+                }
+                let insertionPoint = swiftRange.upperBound
+
                 let insertionEnd = label.index(
                     insertionPoint,
                     offsetBy: insertionString.count,
                     limitedBy: label.endIndex
                 )
-                if insertionEnd != nil && label[insertionPoint...(insertionEnd ?? insertionPoint)] == insertionString {
+                if insertionEnd != nil && label[insertionPoint..<(insertionEnd ?? insertionPoint)] == insertionString {
                     continue
                 }
                 label.insert(contentsOf: insertionString, at: insertionPoint)

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
+- Fixed a string range bug when a closed range should be half open. 
 
 ### Added
 
