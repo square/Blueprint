@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [4.1.0] - 2024-06-04
+
+### Fixed
+- Fixed a bug where `AttributedLabel`'s accessibility utterance was not properly announcing links.
+
 ## [4.0.1] - 2024-06-04
 
 ### Fixed
@@ -1080,7 +1085,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.0.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.1.0...HEAD
+[4.1.0]: https://github.com/square/Blueprint/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/square/Blueprint/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/square/Blueprint/compare/3.1.0...4.0.0
 [3.1.0]: https://github.com/square/Blueprint/compare/3.0.0...3.1.0
