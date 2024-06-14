@@ -26,8 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+## [4.1.1] - 2024-06-14
+- Fixed a string range bug when a closed range should be half open.
 
-## [4.1.0] - 2024-06-04
+## [4.1.0] - 2024-06-13
 
 ### Fixed
 - Fixed a bug where `AttributedLabel`'s accessibility utterance was not properly announcing links.
@@ -1085,7 +1087,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.1.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.1.1...HEAD
+[4.1.1]: https://github.com/square/Blueprint/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/square/Blueprint/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/square/Blueprint/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/square/Blueprint/compare/3.1.0...4.0.0
