@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix a bug in which newlines were preserved in accessibility labels.
-
 ### Added
 
 ### Removed
@@ -28,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [4.1.2] - 2024-06-17
+- Fix a bug in which newlines were preserved in accessibility labels.
+
 ## [4.1.1] - 2024-06-14
 - Fixed a string range bug when a closed range should be half open.
 
@@ -1089,7 +1091,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.1.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.1.2...HEAD
+[4.1.1]: https://github.com/square/Blueprint/compare/4.1.1...4.1.2
 [4.1.1]: https://github.com/square/Blueprint/compare/4.1.0...4.1.1
 [4.1.0]: https://github.com/square/Blueprint/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/square/Blueprint/compare/4.0.0...4.0.1
