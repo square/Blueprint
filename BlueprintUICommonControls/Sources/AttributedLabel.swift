@@ -559,7 +559,7 @@ extension AttributedLabel {
                   !links.isEmpty
             else {
                 // We need to replace all newlines with " "
-                return string.components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
+                return string.removingNewlines
             }
             var label = string
             // Wrap the word in [brackets] to indicate that it is a tag distinct from the content string. This is transparent to voiceover but should be helpful when the accessibility label is printed e.g. in the accessibility inspector.
@@ -601,7 +601,7 @@ extension AttributedLabel {
             }
 
             // We need to replace all newlines with " "
-            return label.components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
+            return label.removingNewlines
         }
 
         func applyLinkColors(activeLinks: [Link] = []) {
@@ -855,3 +855,8 @@ extension NSTextCheckingResult.CheckingType {
     }
 }
 
+extension String {
+    var removingNewlines: String {
+        components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
+    }
+}
