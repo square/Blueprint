@@ -856,7 +856,7 @@ extension NSTextCheckingResult.CheckingType {
 }
 
 extension String {
-    var removingNewlines: String {
+    fileprivate var removingNewlines: String {
         components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
     }
 }
