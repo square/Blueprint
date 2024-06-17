@@ -595,7 +595,9 @@ extension AttributedLabel {
                 }
                 label.insert(contentsOf: insertionString, at: insertionPoint)
             }
-            return label
+
+            // We need to replace all newlines with \n
+            return label.components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
         }
 
         func applyLinkColors(activeLinks: [Link] = []) {
