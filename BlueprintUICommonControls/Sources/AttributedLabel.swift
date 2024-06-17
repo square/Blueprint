@@ -556,7 +556,11 @@ extension AttributedLabel {
             // Insert the word "link" after each link in the label. This mirrors the VoiceOver behavior when encountering a `.link` attribute.
 
             guard let localizedLinkString = linkAccessibilityLabel,
-                  !links.isEmpty else { return string }
+                  !links.isEmpty
+            else {
+                // We need to replace all newlines with " "
+                return string.components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
+            }
             var label = string
             // Wrap the word in [brackets] to indicate that it is a tag distinct from the content string. This is transparent to voiceover but should be helpful when the accessibility label is printed e.g. in the accessibility inspector.
 
@@ -595,7 +599,9 @@ extension AttributedLabel {
                 }
                 label.insert(contentsOf: insertionString, at: insertionPoint)
             }
-            return label
+
+            // We need to replace all newlines with " "
+            return label.components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
         }
 
         func applyLinkColors(activeLinks: [Link] = []) {

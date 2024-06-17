@@ -357,6 +357,20 @@ class AttributedLabelTests: XCTestCase {
         compareSnapshot(of: element)
     }
 
+    func test_multilineAccessibility() {
+        let labelview = AttributedLabel.LabelView()
+
+        for (text, expected) in [
+            ("Test Test", "Test Test"),
+            ("Test\nTest", "Test Test"),
+            ("Test\n\nTest", "Test Test"),
+            ("\n\n\n\nTest\n\n\nTest\n\n\n", "Test Test"),
+        ] {
+            let result = labelview.accessibilityLabel(with: [], in: text, linkAccessibilityLabel: nil)
+            XCTAssertEqual(expected, result)
+        }
+    }
+
     func test_linkAccessibility() {
         let labelview = AttributedLabel.LabelView()
 

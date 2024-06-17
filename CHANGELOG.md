@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix a bug in which newlines were preserved in accessibility labels.
+
 ### Added
 
 ### Removed
