@@ -255,14 +255,14 @@ extension AttributedLabel {
 
             if !isMeasuring {
                 updateFontFitting(with: model)
-            }
 
-            isAccessibilityElement = model.isAccessibilityElement
-            accessibilityHint = model.accessibilityHint
-            accessibilityValue = model.accessibilityValue
-            updateAccessibilityTraits(with: model)
-            accessibilityCustomActions = model.accessibilityCustomActions.map { action in
-                UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                isAccessibilityElement = model.isAccessibilityElement
+                accessibilityHint = model.accessibilityHint
+                accessibilityValue = model.accessibilityValue
+                updateAccessibilityTraits(with: model)
+                accessibilityCustomActions = model.accessibilityCustomActions.map { action in
+                    UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                }
             }
 
             urlHandler = environment.urlHandler
