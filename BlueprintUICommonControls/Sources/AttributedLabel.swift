@@ -77,6 +77,10 @@ public struct AttributedLabel: Element, Hashable {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// A localized string that is read when the label is selected by the accessibility system. If this value is not provided,
+    /// the plain text version of the `attributedText` is used.
+    public var accessibilityLabel: String?
+
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
     public var accessibilityHint: String?
 
@@ -252,6 +256,7 @@ extension AttributedLabel {
             }
 
             isAccessibilityElement = model.isAccessibilityElement
+            accessibilityLabel = model.accessibilityLabel
             accessibilityHint = model.accessibilityHint
             updateAccessibilityTraits(with: model)
             accessibilityCustomActions = model.accessibilityCustomActions.map { action in
