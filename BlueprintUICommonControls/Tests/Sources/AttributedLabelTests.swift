@@ -371,6 +371,20 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
+    func test_attributedValue() throws {
+        let view = BlueprintView()
+
+        view.element = AttributedLabel(attributedText: NSAttributedString(string: "Some string with stuff")) {
+            $0.accessibilityValue = "A value"
+        }
+
+        view.layoutIfNeeded()
+
+        let labelView = try XCTUnwrap(view.firstSubview(ofType: AttributedLabel.LabelView.self))
+
+        XCTAssertEqual(labelView.accessibilityValue, "A value")
+    }
+
     func test_linkAccessibility() {
         let labelview = AttributedLabel.LabelView()
 

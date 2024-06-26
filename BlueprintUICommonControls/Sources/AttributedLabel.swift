@@ -77,6 +77,12 @@ public struct AttributedLabel: Element, Hashable {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// A localized string that represents the current value of the accessibility element.
+    ///
+    /// The value is a localized string that contains the current value of an element.
+    /// For example, the value of a slider might be 9.5 or 35% and the value of a text field is the text it contains.
+    public var accessibilityValue: String?
+
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
     public var accessibilityHint: String?
 
@@ -249,13 +255,14 @@ extension AttributedLabel {
 
             if !isMeasuring {
                 updateFontFitting(with: model)
-            }
 
-            isAccessibilityElement = model.isAccessibilityElement
-            accessibilityHint = model.accessibilityHint
-            updateAccessibilityTraits(with: model)
-            accessibilityCustomActions = model.accessibilityCustomActions.map { action in
-                UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                isAccessibilityElement = model.isAccessibilityElement
+                accessibilityHint = model.accessibilityHint
+                accessibilityValue = model.accessibilityValue
+                updateAccessibilityTraits(with: model)
+                accessibilityCustomActions = model.accessibilityCustomActions.map { action in
+                    UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                }
             }
 
             urlHandler = environment.urlHandler
