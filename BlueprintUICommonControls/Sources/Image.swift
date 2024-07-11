@@ -43,7 +43,6 @@ public struct Image: Element {
         UIImageView.describe { config in
             config[\.image] = image
             config[\.contentMode] = contentMode.uiViewContentMode
-            config[\.layer.minificationFilter] = .trilinear
             config[\.tintColor] = tintColor
             if blockAccessibilityDescription {
                 // Seting `isAccessibilityElement = false` isn't enough here, VoiceOver is very aggressive in finding images to discribe. We need to explicitly remove the `.image` trait.
