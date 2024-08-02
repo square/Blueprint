@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Made public the `UIBezierPath` convenience init that uses a `Box.CornerStyle`.
-
 ### Removed
 
 ### Changed
@@ -28,6 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [4.2.1] - 2024-08-02
+
+### Added
+
+- Made public the `UIBezierPath` convenience init that uses a `Box.CornerStyle`.
 
 ## [4.2.0] - 2024-06-25
 
