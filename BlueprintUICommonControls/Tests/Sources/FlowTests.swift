@@ -57,6 +57,64 @@ class FlowTests: XCTestCase {
 
         compareSnapshot(of: flow)
     }
+
+    func test_priority() {
+        func flow(
+            lineAlignment: Flow.LineAlignment,
+            itemAlignment: Flow.ItemAlignment,
+            @ElementBuilder<Flow.Child> _ children: () -> [Flow.Child]
+        ) -> Element {
+            Flow(
+                lineAlignment: lineAlignment,
+                lineSpacing: 10,
+                itemAlignment: itemAlignment,
+                itemSpacing: 2
+            ) {
+                children()
+            }
+            .constrainedTo(width: .absolute(200))
+        }
+
+        compareSnapshot(
+            of: flow(lineAlignment: .leading, itemAlignment: .center) {
+                ConstrainedSize(width: 100, height: 40, color: .green)
+                ConstrainedSize(width: 90, height: 40, color: .red)
+                ConstrainedSize(width: 40, height: 40, color: .purple)
+
+                ConstrainedSize(width: 80, height: 40, color: .lightGray)
+                    .flowChild(priority: .grows)
+            },
+            identifier: "one-scaling"
+        )
+
+        compareSnapshot(
+            of: flow(lineAlignment: .leading, itemAlignment: .center) {
+                ConstrainedSize(width: 100, height: 40, color: .green)
+                ConstrainedSize(width: 90, height: 40, color: .red)
+
+                ConstrainedSize(width: 40, height: 40, color: .purple)
+                    .flowChild(priority: .grows)
+
+                ConstrainedSize(width: 40, height: 40, color: .lightGray)
+                    .flowChild(priority: .grows)
+            },
+            identifier: "two-even-scaling"
+        )
+
+        compareSnapshot(
+            of: flow(lineAlignment: .leading, itemAlignment: .center) {
+                ConstrainedSize(width: 100, height: 40, color: .green)
+                ConstrainedSize(width: 90, height: 40, color: .red)
+
+                ConstrainedSize(width: 40, height: 40, color: .purple)
+                    .flowChild(priority: .grows)
+
+                ConstrainedSize(width: 80, height: 40, color: .lightGray)
+                    .flowChild(priority: .grows)
+            },
+            identifier: "two-scaling"
+        )
+    }
 }
 
 extension ConstrainedSize {
