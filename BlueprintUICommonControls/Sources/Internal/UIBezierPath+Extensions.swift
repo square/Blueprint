@@ -3,7 +3,7 @@ import UIKit
 
 extension UIBezierPath {
 
-    convenience init(
+    public convenience init(
         rect: CGRect,
         corners: Box.CornerStyle
     ) {
