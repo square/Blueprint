@@ -128,7 +128,7 @@ public struct Box: Element {
 }
 
 extension Box {
-    
+
     public typealias CornerStyle = BlueprintUICommonControls.CornerStyle
 
     /// Specifies the curve style when showing rounded corners on a `Box`.
