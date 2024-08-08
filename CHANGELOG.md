@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Moved `CornerStyle` out of the `Box` namespace, and is now a root type in `BlueprintUICommonControls`. `Box.CornerStyle` is still available as a typealias.
+
 ### Deprecated
 
 ### Security
