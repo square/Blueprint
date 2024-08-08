@@ -13,7 +13,7 @@ public struct AccessibilityElement: Element {
     public var identifier: String?
     public var traits: Set<Trait>
     public var accessibilityFrameSize: CGSize?
-    public var accessibilityFrameCornerStyle: Box.CornerStyle
+    public var accessibilityFrameCornerStyle: CornerStyle
     public var wrappedElement: Element
 
     /// Used to provide custom behaviour when activated by voiceover. This will override the default behavior of issuing a tap event at the accessibility activation point.
@@ -34,7 +34,7 @@ public struct AccessibilityElement: Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
-        accessibilityFrameCornerStyle: Box.CornerStyle = .square,
+        accessibilityFrameCornerStyle: CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
         customContent: [AccessibilityElement.CustomContent] = [],
         wrapping element: Element,
@@ -92,7 +92,7 @@ public struct AccessibilityElement: Element {
 
     private final class AccessibilityView: UIView, AXCustomContentProvider {
         var accessibilityFrameSize: CGSize?
-        var accessibilityFrameCornerStyle: Box.CornerStyle = .square
+        var accessibilityFrameCornerStyle: CornerStyle = .square
         var accessibilityCustomContent: [AXCustomContent]! = [] // The exclamation `!` is in the protodol definition and required.
 
         var increment: (() -> Void)?
@@ -175,7 +175,7 @@ extension Element {
         hint: String? = nil,
         identifier: String? = nil,
         accessibilityFrameSize: CGSize? = nil,
-        accessibilityFrameCornerStyle: Box.CornerStyle = .square,
+        accessibilityFrameCornerStyle: CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
         customContent: [AccessibilityElement.CustomContent] = []
     ) -> AccessibilityElement {
