@@ -6,7 +6,7 @@ import XCTest
 class AccessibilityContainerTests: XCTestCase {
 
     func test_recursiveAccessibleSubviewsIncludesContainedElements() {
-        XCTFail("Test failure")
+
         let viewA = UIView()
         let viewB = UIView()
 
