@@ -343,7 +343,6 @@ public final class BlueprintView: UIView {
 
         if passThroughTouches {
             return result == self ? nil : result
-
         } else {
             return result
         }
