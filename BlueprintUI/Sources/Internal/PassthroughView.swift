@@ -16,7 +16,6 @@ import UIKit
 
         if passThroughTouches {
             return result == self ? nil : result
-
         } else {
             return result
         }
