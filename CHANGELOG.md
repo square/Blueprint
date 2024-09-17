@@ -11,12 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
+
 ### Removed
 
 ### Changed
 
 - Moved `CornerStyle` out of the `Box` namespace, and is now a root type in `BlueprintUICommonControls`. `Box.CornerStyle` is still available as a typealias.
-- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
 
 ### Deprecated
 
