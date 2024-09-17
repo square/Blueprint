@@ -75,7 +75,7 @@ class AttributedLabelTests: XCTestCase {
             .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)
             .appending(string: "e", font: .systemFont(ofSize: 14.0), color: .blue)
             .appending(string: "llo, ", font: .italicSystemFont(ofSize: 13.0), color: .magenta)
-            .appending(string: "Test!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
+            .appending(string: "World!", font: .monospacedDigitSystemFont(ofSize: 32.0, weight: .black), color: .yellow)
 
         let element = AttributedLabel(attributedText: string)
 
