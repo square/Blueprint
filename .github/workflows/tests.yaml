@@ -31,7 +31,7 @@ jobs:
             installation_required: false
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - name: Read env
       run: cat .github/workflows/env.properties >> $GITHUB_ENV
@@ -56,7 +56,7 @@ jobs:
         git ls-files -mo BlueprintUICommonControls/Tests/Sources/Resources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
         name: snapshot_changes_${{ matrix.sdk }}
@@ -69,7 +69,7 @@ jobs:
     runs-on: macos-13-xlarge
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
 
     - name: Read env
       run: cat .github/workflows/env.properties >> $GITHUB_ENV
