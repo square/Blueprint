@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
+
 ### Removed
 
 ### Changed

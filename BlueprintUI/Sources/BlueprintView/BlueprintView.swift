@@ -118,6 +118,16 @@ public final class BlueprintView: UIView {
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate: BlueprintViewMetricsDelegate? = nil
 
+    /// Defaults to `false`. If enabled, Blueprint will pass through any touches
+    /// not recieved by an element to the view hierarchy behind the `BlueprintView`.
+    public var passThroughTouches: Bool = false {
+        didSet {
+            if oldValue != passThroughTouches {
+                setNeedsViewHierarchyUpdate()
+            }
+        }
+    }
+
     private var isVisible: Bool = false {
         didSet {
             switch (oldValue, isVisible) {
@@ -141,7 +151,7 @@ public final class BlueprintView: UIView {
 
         rootController = NativeViewController(
             node: NativeViewNode(
-                content: UIView.describe { _ in },
+                content: PassthroughView.describe { _ in },
                 // Because no layout update occurs here, passing an empty environment is fine;
                 // the correct environment will be passed during update.
                 environment: .empty,
@@ -327,6 +337,17 @@ public final class BlueprintView: UIView {
         setNeedsViewHierarchyUpdate()
     }
 
+    /// Ignore any touches on this view and (pass through) by returning nil if the default `hitTest` implementation returns this view.
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let result = super.hitTest(point, with: event)
+
+        if passThroughTouches {
+            return result == self ? nil : result
+        } else {
+            return result
+        }
+    }
+
     /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
     /// view, and marks the view as needing a layout.
     private func setNeedsViewHierarchyUpdate() {
@@ -391,7 +412,9 @@ public final class BlueprintView: UIView {
         rootController.view.frame = bounds
 
         var rootNode = NativeViewNode(
-            content: UIView.describe { _ in },
+            content: PassthroughView.describe { [weak self] config in
+                config[\.passThroughTouches] = self?.passThroughTouches ?? false
+            },
             environment: environment,
             layoutAttributes: LayoutAttributes(frame: rootFrame),
             children: viewNodes
