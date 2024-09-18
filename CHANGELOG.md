@@ -11,13 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
-
 ### Removed
 
 ### Changed
-
-- Moved `CornerStyle` out of the `Box` namespace, and is now a root type in `BlueprintUICommonControls`. `Box.CornerStyle` is still available as a typealias.
 
 ### Deprecated
 
@@ -30,6 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Internal
 
 # Past Releases
+
+## [4.3.0] - 2024-09-18
+
+### Added
+
+- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
+
+### Changed
+
+- Moved `CornerStyle` out of the `Box` namespace, and is now a root type in `BlueprintUICommonControls`. `Box.CornerStyle` is still available as a typealias.
 
 ## [4.2.1] - 2024-08-02
 
@@ -1107,7 +1113,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.2.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.3.0...HEAD
+[4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
 [4.2.1]: https://github.com/square/Blueprint/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/square/Blueprint/compare/4.1.2...4.2.0
 [4.1.2]: https://github.com/square/Blueprint/compare/4.1.1...4.1.2
