@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- A redundant `UIView` layer in the `BlueprintView` hierarchy has been removed. If your tests or view hierarchy is explicitly introspecting the view hierarchy, you'll need to fix these callsites.
+
 ### Deprecated
 
 ### Security

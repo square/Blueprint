@@ -34,7 +34,7 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
 
-    private let rootController: NativeViewController
+    private var rootController: NativeViewController! = nil
 
     private var layoutResult: LayoutResultNode?
 
@@ -149,9 +149,13 @@ public final class BlueprintView: UIView {
         self.element = element
         self.environment = environment
 
+        super.init(frame: CGRect.zero)
+
         rootController = NativeViewController(
             node: NativeViewNode(
-                content: PassthroughView.describe { _ in },
+                content: BlueprintView.describe {
+                    $0.builder = { [weak self] in self! }
+                },
                 // Because no layout update occurs here, passing an empty environment is fine;
                 // the correct environment will be passed during update.
                 environment: .empty,
@@ -160,10 +164,7 @@ public final class BlueprintView: UIView {
             )
         )
 
-        super.init(frame: CGRect.zero)
-
         backgroundColor = .white
-        addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
 
@@ -408,12 +409,9 @@ public final class BlueprintView: UIView {
         let layoutEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
 
-        // The root controller is fixed, and its layout attributes are never applied.
-        rootController.view.frame = bounds
-
         var rootNode = NativeViewNode(
-            content: PassthroughView.describe { [weak self] config in
-                config[\.passThroughTouches] = self?.passThroughTouches ?? false
+            content: BlueprintView.describe {
+                $0.builder = { [weak self] in self! }
             },
             environment: environment,
             layoutAttributes: LayoutAttributes(frame: rootFrame),
