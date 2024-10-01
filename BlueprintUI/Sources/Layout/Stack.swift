@@ -370,10 +370,11 @@ extension StackLayout {
 
     private func _frames(
         for items: [StackLayoutItem],
-        in vectorConstraint: VectorConstraint
+        in vectorConstraint: VectorConstraint,
+        scale: CGFloat
     ) -> [VectorFrame] {
         // First allocate available space along the layout axis.
-        let axisSegments = _axisSegments(for: items, in: vectorConstraint)
+        let axisSegments = _axisSegments(for: items, in: vectorConstraint, scale: scale)
 
         let axisConstraints = axisSegments.map { $0.magnitude }
 
@@ -392,7 +393,7 @@ extension StackLayout {
     /// sizes along the layout axis, represented as segments.
     ///
     /// The axis segments of a Row look like this diagram.
-    ///
+    /// ```
     /// Row───────────────────────────────────────────┐
     /// │┌───────────┐                                │
     /// ││           │                   ┌───────────┐│
@@ -406,14 +407,15 @@ extension StackLayout {
     /// ││           │                   └───────────┘│
     /// │└───────────┘                                │
     /// └─────────────────────────────────────────────┘
-    ///
+    /// ```
     /// - Parameters:
     ///   - for: The items to measure.
     ///   - in: The constraint for all measurements.
     /// - Returns: The axis measurements as segments.
     private func _axisSegments(
         for items: [StackLayoutItem],
-        in vectorConstraint: VectorConstraint
+        in vectorConstraint: VectorConstraint,
+        scale: CGFloat
     ) -> [Segment] {
 
         let minimumTotalSpacing = CGFloat(items.count - 1) * minimumSpacing
@@ -451,6 +453,7 @@ extension StackLayout {
 
                 measurement.size = measurement.item
                     .measure(in: constraint)
+                    .rounded(.up, by: scale, axis: axis)
             }
 
             // Determine how much space the fixed items took up
@@ -847,7 +850,7 @@ extension StackLayout {
 
         let constraint = proposal.vectorConstraint(on: axis)
 
-        let frames = _frames(for: subelements.map(StackLayoutItem.init), in: constraint)
+        let frames = _frames(for: subelements.map(StackLayoutItem.init), in: constraint, scale: environment.displayScale)
 
         let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
             Vector(
@@ -867,7 +870,7 @@ extension StackLayout {
     ) {
         let constraint = size.vectorConstraint(axis: axis)
 
-        let frames = _frames(for: subelements.map(StackLayoutItem.init), in: constraint)
+        let frames = _frames(for: subelements.map(StackLayoutItem.init), in: constraint, scale: environment.displayScale)
 
         for i in 0..<subelements.count {
             let vectorFrame = frames[i]
@@ -1215,5 +1218,19 @@ extension ElementBuilder where Child == StackLayout.Child {
 extension StackLayout.Child: ElementBuilderChild {
     public init(_ element: Element) {
         self.init(element: element)
+    }
+}
+
+extension CGSize {
+
+    fileprivate func rounded(_ rule: FloatingPointRoundingRule, by scale: CGFloat, axis: StackLayout.Axis) -> CGSize {
+        switch axis {
+
+        case .horizontal:
+            CGSize(width: width.rounded(rule, by: scale), height: height)
+
+        case .vertical:
+            CGSize(width: width, height: height.rounded(rule, by: scale))
+        }
     }
 }
