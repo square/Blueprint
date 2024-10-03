@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Stack layout will now round up it's measurement of fixed-size child elements.
+
 ### Added
 
 ### Removed
