@@ -116,6 +116,25 @@ extension Flow {
         case bottom
     }
 
+    /// When there is extra space in a run, how the extra space should be used.
+    public enum Priority {
+
+        public static let `default` = Self.fixed
+
+        /// The item will take up only the space it asked for.
+        case fixed
+
+        /// The item will be stretched to fill any extra space in each run.
+        case grows
+
+        var scales: Bool {
+            switch self {
+            case .fixed: false
+            case .grows: true
+            }
+        }
+    }
+
     /// A child placed within the flow layout.
     public struct Child: ElementBuilderChild {
 
@@ -136,13 +155,21 @@ extension Flow {
         }
 
         /// Creates a new child item with the given element.
-        public init(_ element: Element, key: AnyHashable? = nil) {
+        public init(_ element: Element, key: AnyHashable? = nil, priority: Priority = .default) {
             self.key = key
-            traits = .init()
             self.element = element
+
+            traits = .init(priority: priority)
         }
 
-        public struct Traits {}
+        public struct Traits {
+
+            public var priority: Priority
+
+            public init(priority: Flow.Priority = .default) {
+                self.priority = priority
+            }
+        }
     }
 }
 
@@ -150,8 +177,11 @@ extension Flow {
 extension Element {
 
     /// Wraps the element in a `Flow.Child` to allow customizing the item in the flow layout.
-    public func flowChild(key: AnyHashable? = nil) -> Flow.Child {
-        .init(self, key: key)
+    public func flowChild(
+        priority: Flow.Priority = .default,
+        key: AnyHashable? = nil
+    ) -> Flow.Child {
+        .init(self, key: key, priority: priority)
     }
 }
 
@@ -178,7 +208,12 @@ extension Flow {
             cache: inout ()
         ) -> CGSize {
             size(
-                for: subelements.map { $0.sizeThatFits(_:) },
+                for: subelements.map {
+                    .init(
+                        traits: $0.traits(forLayoutType: Self.self),
+                        size: $0.sizeThatFits(_:)
+                    )
+                },
                 in: proposal
             )
         }
@@ -191,7 +226,12 @@ extension Flow {
         ) {
             zip(
                 frames(
-                    for: subelements.map { $0.sizeThatFits(_:) },
+                    for: subelements.map {
+                        .init(
+                            traits: $0.traits(forLayoutType: Self.self),
+                            size: $0.sizeThatFits(_:)
+                        )
+                    },
                     in: .init(size)
                 ),
                 subelements
@@ -200,10 +240,17 @@ extension Flow {
             }
         }
 
-        typealias ElementSize = (SizeConstraint) -> CGSize
+
+        /// Shim type. Once legacy layout is removed, we can remove this shim and just use `Child` directly.
+        private struct FlowChild {
+            typealias ElementSize = (SizeConstraint) -> CGSize
+
+            var traits: Traits
+            var size: ElementSize
+        }
 
         private func frames(
-            for elements: [ElementSize],
+            for elements: [FlowChild],
             in constraint: SizeConstraint
         ) -> [CGRect] {
 
@@ -217,7 +264,7 @@ extension Flow {
             for element in elements {
 
                 let elementSize: CGSize = {
-                    let size = element(constraint)
+                    let size = element.size(constraint)
 
                     return CGSize(
                         width: min(size.width, constraint.width.maximum),
@@ -237,14 +284,19 @@ extension Flow {
                     )
                 }
 
-                row.addItem(of: elementSize)
+                row.add(
+                    .init(
+                        size: elementSize,
+                        traits: element.traits
+                    )
+                )
             }
 
             return frames + row.itemFrames()
         }
 
         private func size(
-            for elements: [ElementSize],
+            for elements: [FlowChild],
             in constraint: SizeConstraint
         ) -> CGSize {
             frames(
@@ -268,7 +320,12 @@ extension Flow {
             )]
         ) -> CGSize {
             size(
-                for: items.map { $0.content.measure(in:) },
+                for: items.map {
+                    .init(
+                        traits: $0.traits,
+                        size: $0.content.measure(in:)
+                    )
+                },
                 in: constraint
             )
         }
@@ -281,7 +338,12 @@ extension Flow {
             )]
         ) -> [LayoutAttributes] {
             frames(
-                for: items.map { $0.content.measure(in:) },
+                for: items.map {
+                    .init(
+                        traits: $0.traits,
+                        size: $0.content.measure(in:)
+                    )
+                },
                 in: .init(size)
             ).map(LayoutAttributes.init(frame:))
         }
@@ -336,7 +398,7 @@ extension Flow.Layout {
 
         struct Item {
             let size: CGSize
-            let xOffset: CGFloat
+            let traits: Flow.Layout.Traits
         }
 
         /// `True` if we can fit an item of the given size in the row.
@@ -347,32 +409,58 @@ extension Flow.Layout {
         }
 
         /// Adds item of given size to the row layout.
-        mutating func addItem(of size: CGSize) {
-            items.append(
-                .init(
-                    size: size,
-                    xOffset: totalItemWidth + itemSpacing * CGFloat(items.count)
-                )
-            )
-            totalItemWidth += size.width
-            height = max(size.height, height)
+        mutating func add(_ item: Item) {
+            items.append(item)
+
+            totalItemWidth += item.size.width
+            height = max(item.size.height, height)
         }
 
-        /// Compute frames for the items in the row layout.
         func itemFrames() -> [CGRect] {
+
             let totalSpacing = (CGFloat(items.count) - 1) * itemSpacing
+
+            let scalingConstant: CGFloat = items
+                .map {
+                    switch $0.traits.priority {
+                    case .fixed: 0.0
+                    case .grows: 1.0
+                    }
+                }
+                .reduce(0, +)
+
+            let scalableWidth = items
+                .filter(\.traits.priority.scales)
+                .map(\.size.width)
+                .reduce(0, +)
+
+            let hasScalingItems = scalingConstant > 0.0
+
             let extraWidth = maxWidth - totalItemWidth - totalSpacing
-            let firstItemX: CGFloat = {
+
+            let firstItemX: CGFloat = if hasScalingItems {
+                0.0
+            } else {
                 switch lineAlignment {
                 case .center: extraWidth / 2.0
                 case .trailing: extraWidth
                 case .leading: 0.0
                 }
-            }()
+            }
+
+            var xOrigin: CGFloat = firstItemX
 
             return items.map { item in
-                .init(
-                    x: firstItemX + item.xOffset,
+                let percentOfScalableWidth = item.size.width / scalableWidth
+
+                let width = if item.traits.priority.scales {
+                    item.size.width + (extraWidth * percentOfScalableWidth)
+                } else {
+                    item.size.width
+                }
+
+                let frame = CGRect(
+                    x: xOrigin,
                     y: {
                         switch itemAlignment {
                         case .fill: origin
@@ -381,7 +469,7 @@ extension Flow.Layout {
                         case .bottom: origin + (height - item.size.height)
                         }
                     }(),
-                    width: item.size.width,
+                    width: width,
                     height: {
                         switch itemAlignment {
                         case .fill: height
@@ -389,6 +477,10 @@ extension Flow.Layout {
                         }
                     }()
                 )
+
+                xOrigin = frame.maxX + itemSpacing
+
+                return frame
             }
         }
     }
