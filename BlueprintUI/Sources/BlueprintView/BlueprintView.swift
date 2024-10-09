@@ -329,7 +329,10 @@ public final class BlueprintView: UIView {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        updateViewHierarchyIfNeeded()
+        
+        if isInsideUpdate == false {
+            updateViewHierarchyIfNeeded()
+        }
     }
 
     public override func didMoveToWindow() {
