@@ -92,7 +92,7 @@ extension UIViewElement {
     public var content: ElementContent {
 
         ElementContent { constraint, environment in
-            UIViewElementMeasurer.shared.measure(
+            environment.elementMeasurer.measure(
                 element: self,
                 constraint: constraint,
                 environment: environment
@@ -131,11 +131,16 @@ public struct UIViewElementContext {
 }
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
-private final class UIViewElementMeasurer {
+public final class UIViewElementMeasurer {
 
-    /// The standard shared cache.
-    static let shared = UIViewElementMeasurer()
-
+    /// Provides access to a view in the provided block.
+    public func accessMeasurementView<View: UIView, Result>(
+        perform : (View) -> Result,
+        create : () -> View
+    ) -> Result {
+        perform(measurementView(create))
+    }
+    
     /// Provides the size for the provided element by using a cached measurement view.
     func measure(
         element: some UIViewElement,
@@ -145,7 +150,9 @@ private final class UIViewElementMeasurer {
 
         let bounds = CGRect(origin: .zero, size: constraint.maximum)
 
-        let view = measurementView(for: element)
+        let view = measurementView {
+            element.makeUIView()
+        }
 
         /// Ensure that during measurement / sizing, the inherited `Environment` is available
         /// to any child `BlueprintView`s. We must manually wire this property up, as the
@@ -159,15 +166,16 @@ private final class UIViewElementMeasurer {
         return element.size(bounds.size, thatFits: view)
     }
 
-    func measurementView<ViewElement: UIViewElement>(for element: ViewElement) -> ViewElement.UIViewType {
+    private func measurementView<View: UIView>(_ create : () -> View) -> View {
+        
         let key = Key(
-            elementType: ObjectIdentifier(ViewElement.self)
+            elementType: ObjectIdentifier(View.self)
         )
 
         if let existing = views[key] {
-            return existing as! ViewElement.UIViewType
+            return existing as! View
         } else {
-            let new = element.makeUIView()
+            let new = create()
             views[key] = new
             return new
         }
@@ -180,3 +188,35 @@ private final class UIViewElementMeasurer {
     }
 }
 
+
+extension Environment {
+    
+    private static let fallback = UIViewElementMeasurer()
+    
+    public internal(set) var elementMeasurer : UIViewElementMeasurer {
+        get {
+            if let inheritedElementMeasurer {
+                return inheritedElementMeasurer
+            } else {
+                assertionFailure(
+                    """
+                    WARNING: Blueprint is falling back to a static `UIViewElementMeasurer`, \
+                    which may result in longer object lifetimes than expected.
+                    """
+                )
+                
+                return Self.fallback
+            }
+        }
+        
+        set { self[ElementMeasurerKey.self] = newValue }
+    }
+    
+    var inheritedElementMeasurer : UIViewElementMeasurer? {
+        get { self[ElementMeasurerKey.self] }
+    }
+    
+    private enum ElementMeasurerKey : EnvironmentKey {
+        static let defaultValue: UIViewElementMeasurer? = nil
+    }
+}

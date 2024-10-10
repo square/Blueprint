@@ -125,17 +125,18 @@ public struct AttributedLabel: Element, Hashable {
     /// You can check if this value should be false via `NSAttributedString.needsNormalizingForView(...)`
     public var needsTextNormalization: Bool = true
 
-    private static let prototypeLabel = LabelView()
-
     public var content: ElementContent {
 
         // We create this outside of the measurement block so it's called fewer times.
         let text = displayableAttributedText
 
         return ElementContent { constraint, environment -> CGSize in
-            let label = Self.prototypeLabel
-            label.update(model: self, text: text, environment: environment, isMeasuring: true)
-            return label.sizeThatFits(constraint.maximum)
+            environment.elementMeasurer.accessMeasurementView { label in
+                label.update(model: self, text: text, environment: environment, isMeasuring: true)
+                return label.sizeThatFits(constraint.maximum)
+            } create: {
+                LabelView()
+            }
         }
     }
 

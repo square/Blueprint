@@ -11,6 +11,9 @@ xcuserdata/
 Pods/
 *.xcworkspace
 
+# Tuist
+Derived/
+
 # SPM
 
 # Disabled so that we can commit the generated schemes that live in
