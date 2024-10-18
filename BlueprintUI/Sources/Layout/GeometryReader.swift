@@ -43,7 +43,7 @@ public struct GeometryReader: Element {
 
 /// Contains information about the current layout being measured by GeometryReader
 public struct GeometryProxy {
-    var environment: Environment
+    public var environment: Environment
 
     /// The size constraint of the element being laid out.
     public var constraint: SizeConstraint
