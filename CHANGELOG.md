@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Changed
+Renamed deprecated function `accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)` to `deprecated_accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)`.
 
 ### Deprecated
 
