@@ -204,7 +204,7 @@ extension Element {
         deprecated,
         renamed: "accessibilityElement(label:value:traits:hint:identifier:accessibilityFrameSize:)"
     )
-    public func accessibility(
+    public func deprecated_accessibility(
         label: String? = nil,
         value: String? = nil,
         hint: String? = nil,
