@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Bump CI Xcode version to 15.4.
+
 # Past Releases
 
 ## [4.3.0] - 2024-09-18
