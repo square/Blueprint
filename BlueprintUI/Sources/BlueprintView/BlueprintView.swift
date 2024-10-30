@@ -350,7 +350,16 @@ public final class BlueprintView: UIView {
 
     /// Clears any sizing caches, invalidates the `intrinsicContentSize` of the
     /// view, and marks the view as needing a layout.
+    @MainActor
     private func setNeedsViewHierarchyUpdate() {
+        MainActor.preconditionIsolated(
+            """
+            setNeedsViewHierarchyUpdate() must only execute on the main actor.
+
+            Examine your stack trace to determine what caused this to be called
+            off of the main actor.
+            """
+        )
 
         invalidateIntrinsicContentSize()
         sizesThatFit.removeAll()
@@ -366,7 +375,14 @@ public final class BlueprintView: UIView {
 
     @MainActor
     private func updateViewHierarchyIfNeeded() {
-        MainActor.preconditionIsolated("updateViewHierarchyIfNeeded must only execute on the main actor.")
+        MainActor.preconditionIsolated(
+            """
+            updateViewHierarchyIfNeeded() must only execute on the main actor.
+
+            Examine your stack trace to determine what caused this to be called
+            off of the main actor.
+            """
+        )
 
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
@@ -617,7 +633,15 @@ extension BlueprintView {
 
         @MainActor
         fileprivate func update(node: NativeViewNode, context: UpdateContext) -> UpdateResult {
-            MainActor.preconditionIsolated("BlueprintView.NativeViewController.update(node:context:) must only execute on the main actor.")
+            MainActor.preconditionIsolated(
+                """
+                BlueprintView.NativeViewController.update(node:context:) must 
+                only execute on the main actor.
+
+                Examine your stack trace to determine what caused this to be 
+                called off of the main actor.
+                """
+            )
 
             assert(node.viewDescription.viewType == type(of: view))
 
