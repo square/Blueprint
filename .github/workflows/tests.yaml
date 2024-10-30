@@ -10,7 +10,7 @@ jobs:
   spm:
     name: "iOS ${{ matrix.sdk }}"
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     strategy:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
@@ -66,7 +66,7 @@ jobs:
   cocoapods:
     name: "CocoaPods"
 
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     steps:
     - uses: actions/checkout@v4

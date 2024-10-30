@@ -26,6 +26,8 @@ Renamed deprecated function `accessibility(label:value:traits:hint:identifier:ac
 
 ### Internal
 
+- Bump CI Xcode version to 15.4.
+
 # Past Releases
 
 ## [4.3.0] - 2024-09-18
