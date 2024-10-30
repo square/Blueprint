@@ -11,12 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `BlueprintView` has added preconditions to some methods to ensure they are only invoked on the main queue.
-
 ### Removed
 
 ### Changed
-Renamed deprecated function `accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)` to `deprecated_accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)`.
 
 ### Deprecated
 
@@ -31,6 +28,16 @@ Renamed deprecated function `accessibility(label:value:traits:hint:identifier:ac
 - Bump CI Xcode version to 15.4.
 
 # Past Releases
+
+## [5.0.0] - 2024-10-30
+
+### Added
+
+- `BlueprintView` has added preconditions to some methods to ensure they are only invoked on the main queue.
+
+### Changed
+
+- Renamed deprecated function `accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)` to `deprecated_accessibility(label:value:traits:hint:identifier:accessibilityFrameSize:)`.
 
 ## [4.3.0] - 2024-09-18
 
@@ -1118,7 +1125,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.3.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.0.0...HEAD
+[5.0.0]: https://github.com/square/Blueprint/compare/4.3.0...5.0.0
 [4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
 [4.2.1]: https://github.com/square/Blueprint/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/square/Blueprint/compare/4.1.2...4.2.0
