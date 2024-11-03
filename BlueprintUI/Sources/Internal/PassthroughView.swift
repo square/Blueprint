@@ -8,10 +8,16 @@ import UIKit
         CATransformLayer.self
     }
 
-    /// Ignore any touches on this view and (pass through) by returning nil if the
-    /// default `hitTest` implementation returns this view.
+    public var passThroughTouches: Bool = true
+
+    /// Ignore any touches on this view and (pass through) by returning nil if the default `hitTest` implementation returns this view.
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let result = super.hitTest(point, with: event)
-        return result == self ? nil : result
+
+        if passThroughTouches {
+            return result == self ? nil : result
+        } else {
+            return result
+        }
     }
 }

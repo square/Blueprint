@@ -29,6 +29,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 # Past Releases
 
+## [4.3.0] - 2024-09-18
+
+### Added
+
+- `BlueprintView` will now pass through touches to views lower in the view hierarchy if `passThroughTouches` is true.
+
+### Changed
+
+- Moved `CornerStyle` out of the `Box` namespace, and is now a root type in `BlueprintUICommonControls`. `Box.CornerStyle` is still available as a typealias.
+
+## [4.2.1] - 2024-08-02
+
+### Added
+
+- Made public the `UIBezierPath` convenience init that uses a `Box.CornerStyle`.
+
+## [4.2.0] - 2024-06-25
+
+### Added
+
+- `Label` and `AttributedLabel` now support `accessibilityValue`.
+
+## [4.1.2] - 2024-06-17
+- Fix a bug in which newlines were preserved in accessibility labels.
+
+## [4.1.1] - 2024-06-14
+- Fixed a string range bug when a closed range should be half open.
+
+## [4.1.0] - 2024-06-13
+
+### Fixed
+- Fixed a bug where `AttributedLabel`'s accessibility utterance was not properly announcing links.
+
 ## [4.0.1] - 2024-06-04
 
 ### Fixed
@@ -1082,7 +1115,13 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/4.0.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/4.3.0...HEAD
+[4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
+[4.2.1]: https://github.com/square/Blueprint/compare/4.2.0...4.2.1
+[4.2.0]: https://github.com/square/Blueprint/compare/4.1.2...4.2.0
+[4.1.2]: https://github.com/square/Blueprint/compare/4.1.1...4.1.2
+[4.1.1]: https://github.com/square/Blueprint/compare/4.1.0...4.1.1
+[4.1.0]: https://github.com/square/Blueprint/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/square/Blueprint/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/square/Blueprint/compare/3.1.0...4.0.0
 [3.1.0]: https://github.com/square/Blueprint/compare/3.0.0...3.1.0

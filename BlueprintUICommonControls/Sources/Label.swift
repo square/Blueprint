@@ -57,6 +57,12 @@ public struct Label: ProxyElement {
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
+    /// A localized string that represents the current value of the accessibility element.
+    ///
+    /// The value is a localized string that contains the current value of an element.
+    /// For example, the value of a slider might be 9.5 or 35% and the value of a text field is the text it contains.
+    public var accessibilityValue: String?
+
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
     public var accessibilityHint: String?
 
@@ -102,6 +108,7 @@ public struct Label: ProxyElement {
             label.numberOfLines = numberOfLines
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
+            label.accessibilityValue = accessibilityValue
             label.accessibilityHint = accessibilityHint
             label.accessibilityTraits = accessibilityTraits
             label.accessibilityCustomActions = accessibilityCustomActions

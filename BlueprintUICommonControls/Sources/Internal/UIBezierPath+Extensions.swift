@@ -3,9 +3,9 @@ import UIKit
 
 extension UIBezierPath {
 
-    convenience init(
+    public convenience init(
         rect: CGRect,
-        corners: Box.CornerStyle
+        corners: CornerStyle
     ) {
         switch corners {
         case .square:

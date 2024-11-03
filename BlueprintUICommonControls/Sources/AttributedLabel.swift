@@ -77,6 +77,12 @@ public struct AttributedLabel: Element, Hashable {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// A localized string that represents the current value of the accessibility element.
+    ///
+    /// The value is a localized string that contains the current value of an element.
+    /// For example, the value of a slider might be 9.5 or 35% and the value of a text field is the text it contains.
+    public var accessibilityValue: String?
+
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
     public var accessibilityHint: String?
 
@@ -249,13 +255,14 @@ extension AttributedLabel {
 
             if !isMeasuring {
                 updateFontFitting(with: model)
-            }
 
-            isAccessibilityElement = model.isAccessibilityElement
-            accessibilityHint = model.accessibilityHint
-            updateAccessibilityTraits(with: model)
-            accessibilityCustomActions = model.accessibilityCustomActions.map { action in
-                UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                isAccessibilityElement = model.isAccessibilityElement
+                accessibilityHint = model.accessibilityHint
+                accessibilityValue = model.accessibilityValue
+                updateAccessibilityTraits(with: model)
+                accessibilityCustomActions = model.accessibilityCustomActions.map { action in
+                    UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
+                }
             }
 
             urlHandler = environment.urlHandler
@@ -265,6 +272,11 @@ extension AttributedLabel {
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
                     accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
+                    accessibilityLabel = accessibilityLabel(
+                        with: links,
+                        in: model.attributedText.string,
+                        linkAccessibilityLabel: environment.linkAccessibilityLabel
+                    )
                 }
 
                 if let shadow = model.shadow {
@@ -537,6 +549,66 @@ extension AttributedLabel {
                         link: link
                     )
                 }
+
+
+        }
+
+        internal func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
+            // When reading an attributed string that contains the `.link` attribute VoiceOver will announce "link" when it encounters the applied range. This is important because it informs the user about the context and position of the linked text within the greater string. This can be partocularly important when a string contains multiple links with the same linked text but different link destinations.
+
+            // UILabel is extremely insistant about how the `.link` attribute should be styled going so far as to apply its own preferences above any other provided attributes. In order to allow custom link styling we replace any instances of the `.link` attribute with a `labelLink.` attribute (see `NSAttributedString.normalizingForView(with:)`. This allows us to track the location of links while still providing our own custom styling. Unfortunately this means that voiceover doesnt recognize our links as links and consequently they are not announced to the user.
+
+            // Ideally we'd be able to enumerate our links, insert the `.link` attribute back and then set the resulting string as the `accessibilityAttributedString` but unfortunately that doesnt seem to work. Apple's [docs](https://developer.apple.com/documentation/objectivec/nsobject/2865944-accessibilityattributedlabel) indicate that this property is intended "for the inclusion of language attributes in the string to control pronunciation or accents" and doesnt seem to notice any included `.link` attributes.
+
+            // Insert the word "link" after each link in the label. This mirrors the VoiceOver behavior when encountering a `.link` attribute.
+
+            guard let localizedLinkString = linkAccessibilityLabel,
+                  !links.isEmpty
+            else {
+                // We need to replace all newlines with " "
+                return string.removingNewlines
+            }
+            var label = string
+            // Wrap the word in [brackets] to indicate that it is a tag distinct from the content string. This is transparent to voiceover but should be helpful when the accessibility label is printed e.g. in the accessibility inspector.
+
+            // The use of square brackets is arbitrary but was chosen because:
+            // • Voiceover doesn't read the [] characters, but does realize the contained word is distinct from the preceding word.
+            // • Square brackets aren't often used in prose, unlike parenthesis. They're unlikely to be confused with the actual content.
+            // • They look like markdown.
+
+            let insertionString = "[\(localizedLinkString)]"
+            // Insert from the end of the string to keep indices stable.
+            let reversed = links.sorted { $0.range.location > $1.range.location }
+            for link in reversed {
+                // Extract substring from NSString to align with NSRange provided by the link.
+                let nsstring = string as NSString
+                guard link.range.location >= 0,
+                      link.range.length >= 0,
+                      link.range.location + link.range.length <= nsstring.length
+                else {
+                    continue
+                }
+                let substring = nsstring.substring(with: link.range)
+
+                // Generate swift range from substring
+                guard let swiftRange = string.range(of: substring) else {
+                    continue
+                }
+                let insertionPoint = swiftRange.upperBound
+
+                let insertionEnd = label.index(
+                    insertionPoint,
+                    offsetBy: insertionString.count,
+                    limitedBy: label.endIndex
+                )
+                if insertionEnd != nil && label[insertionPoint..<(insertionEnd ?? insertionPoint)] == insertionString {
+                    continue
+                }
+                label.insert(contentsOf: insertionString, at: insertionPoint)
+            }
+
+            // We need to replace all newlines with " "
+            return label.removingNewlines
         }
 
         func applyLinkColors(activeLinks: [Link] = []) {
@@ -790,3 +862,8 @@ extension NSTextCheckingResult.CheckingType {
     }
 }
 
+extension String {
+    fileprivate var removingNewlines: String {
+        components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
+    }
+}

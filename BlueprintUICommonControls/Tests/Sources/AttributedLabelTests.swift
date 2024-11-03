@@ -357,6 +357,115 @@ class AttributedLabelTests: XCTestCase {
         compareSnapshot(of: element)
     }
 
+    func test_multilineAccessibility() {
+        let labelview = AttributedLabel.LabelView()
+
+        for (text, expected) in [
+            ("Test Test", "Test Test"),
+            ("Test\nTest", "Test Test"),
+            ("Test\n\nTest", "Test Test"),
+            ("\n\n\n\nTest\n\n\nTest\n\n\n", "Test Test"),
+        ] {
+            let result = labelview.accessibilityLabel(with: [], in: text, linkAccessibilityLabel: nil)
+            XCTAssertEqual(expected, result)
+        }
+    }
+
+    func test_attributedValue() throws {
+        let view = BlueprintView()
+
+        view.element = AttributedLabel(attributedText: NSAttributedString(string: "Some string with stuff")) {
+            $0.accessibilityValue = "A value"
+        }
+
+        view.layoutIfNeeded()
+
+        let labelView = try XCTUnwrap(view.firstSubview(ofType: AttributedLabel.LabelView.self))
+
+        XCTAssertEqual(labelView.accessibilityValue, "A value")
+    }
+
+    func test_linkAccessibility() {
+        let labelview = AttributedLabel.LabelView()
+
+        do {
+            // Test that link insertion happy path works
+            let string = NSString("Foo Bar Baz")
+            let url = URL(string: "https://block.xyz")!
+            for (word, result) in [
+                ("Foo", "Foo[Link] Bar Baz"),
+                ("Bar", "Foo Bar[Link] Baz"),
+                ("Baz", "Foo Bar Baz[Link]"),
+            ] {
+                let range = string.range(of: word)
+                let link = AttributedLabel.Link(url: url, range: range)
+                let accessibilityLabel = labelview.accessibilityLabel(
+                    with: [link],
+                    in: string as String,
+                    linkAccessibilityLabel: "Link"
+                )
+                XCTAssertEqual(accessibilityLabel, result)
+            }
+        }
+
+        do {
+            // Test every position
+            let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            let string = numbers.map { String($0) }.joined() as NSString
+            let url = URL(string: "https://block.xyz")!
+            for number in numbers {
+                let range = NSMakeRange(max(0, number - 2), 1)
+                let link = AttributedLabel.Link(url: url, range: range)
+                let accessibilityLabel = labelview.accessibilityLabel(
+                    with: [link],
+                    in: string as String,
+                    linkAccessibilityLabel: "."
+                ) as NSString
+                XCTAssertNotEqual(accessibilityLabel, string)
+            }
+        }
+
+        do {
+            // Test stupid ranges don't crash
+            let string = "Foo Bar Baz"
+            let url = URL(string: "https://block.xyz")!
+            let badRanges = [
+                NSMakeRange(0, 0),
+                NSMakeRange(-1, 0),
+                NSMakeRange(0, -1),
+                NSMakeRange(0, 100),
+                NSMakeRange(100, 0),
+                NSMakeRange(100, -100),
+            ]
+            for range in badRanges {
+                let link = AttributedLabel.Link(url: url, range: range)
+                let accessibilityLabel = labelview.accessibilityLabel(
+                    with: [link],
+                    in: string as String,
+                    linkAccessibilityLabel: "."
+                )
+                XCTAssertEqual(accessibilityLabel, string)
+            }
+        }
+
+        do {
+            // Test with emoji
+            let string = "🇺🇸🇨🇦🇯🇵🇫🇷"
+            let url = URL(string: "https://block.xyz")!
+            let range = NSRange(string.range(of: "🇨🇦")!, in: string)
+            let link = AttributedLabel.Link(url: url, range: range)
+
+            let accessibilityLabel = labelview.accessibilityLabel(
+                with: [link],
+                in: string as String,
+                linkAccessibilityLabel: "."
+            )
+            XCTAssertEqual(accessibilityLabel, "🇺🇸🇨🇦[.]🇯🇵🇫🇷")
+        }
+    }
+
+
+
     func test_textContainerRects() {
         let lineBreakModes: [NSLineBreakMode?] = [
             nil,
