@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Flow` children now support a layout `priority`, to specify if they should grow to use the extra space in a run.
+
 ### Removed
 
 ### Changed
