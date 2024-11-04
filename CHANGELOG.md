@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `Flow` children now support a layout `priority`, to specify if they should grow to use the extra space in a run.
-
 ### Removed
 
 ### Changed
@@ -27,9 +25,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
-- Bump CI Xcode version to 15.4.
-
 # Past Releases
+
+## [5.0.1] - 2024-11-04
+
+### Added
+
+- `Flow` children now support a layout `priority`, to specify if they should grow to use the extra space in a run.
+
+### Internal
+
+- Bump CI Xcode version to 15.4.
 
 ## [5.0.0] - 2024-10-30
 
@@ -1127,7 +1133,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.0.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.0.1...HEAD
+[5.0.1]: https://github.com/square/Blueprint/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/square/Blueprint/compare/4.3.0...5.0.0
 [4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
 [4.2.1]: https://github.com/square/Blueprint/compare/4.2.0...4.2.1
