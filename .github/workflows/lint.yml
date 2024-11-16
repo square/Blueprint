@@ -12,28 +12,13 @@ jobs:
     runs-on: macos-14-xlarge
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
 
-      - name: Read env
-        run: cat .github/workflows/env.properties >> $GITHUB_ENV
+    - name: Run swiftformat
+      run: swiftformat --lint .
 
-      - name: Switch to Xcode ${{ env.xcode_version }}
-        run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
-
-      - name: Cache SPM build
-        uses: actions/cache@v2
-        with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
-      - name: Run SwiftFormat
-        run: |
-          swift run -c release swiftformat --lint .
-
-      - name: Report error
-        if: ${{ failure() }}
-        run: |
-          echo '::error::SwiftFormat linting failed. Run `Scripts/swiftformat` to format your code.'
+    - name: Report error
+      if: ${{ failure() }}
+      run: |
+        echo '::error::SwiftFormat linting failed. Run `Scripts/swiftformat` to format your code.'

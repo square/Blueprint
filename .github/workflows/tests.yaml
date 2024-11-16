@@ -12,26 +12,31 @@ jobs:
 
     runs-on: macos-14-xlarge
 
+    env:
+      TUIST_TEST_DEVICE: iPhone SE (3rd generation)
+      TUIST_TEST_PLATFORM: iOS
+
     strategy:
       fail-fast: false # Don’t fail-fast so that we get all snapshot test changes
       matrix:
         include:
           - sdk: "15.4"
-            destination: platform=iOS Simulator,OS=15.4,name=iPhone SE (3rd generation)
+            simctl_runtime: "com.apple.CoreSimulator.SimRuntime.iOS-15-4"
             installation_required: true
 
           - sdk: "16.2"
-            destination: platform=iOS Simulator,OS=16.2,name=iPhone SE (3rd generation)
+            simctl_runtime: "com.apple.CoreSimulator.SimRuntime.iOS-16-2"
             installation_required: true
 
           - sdk: "17.2"
-            destination: platform=iOS Simulator,OS=17.2,name=iPhone SE (3rd generation)
+            simctl_runtime: "com.apple.CoreSimulator.SimRuntime.iOS-17-2"
             # The iOS 17.2 SDK is pre-installed on the macOS 13 image.
             # Attempting to install it will fail with an error.
             installation_required: false
 
     steps:
     - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
 
     - name: Read env
       run: cat .github/workflows/env.properties >> $GITHUB_ENV
@@ -46,9 +51,18 @@ jobs:
       if: ${{ matrix.installation_required }}
       run: sudo xcodes runtimes install "iOS ${{ matrix.sdk }}"
 
-    - name: Build & Test
+    - name: Ensure sim exists
       run: |
-        xcodebuild -scheme "BlueprintUI-Package" -destination "${{ matrix.destination }}" build test
+        xcrun simctl create \
+          "${{ env.TUIST_TEST_DEVICE }}" \
+          "${{ env.TUIST_TEST_DEVICE }}" \
+          "${{ matrix.simctl_runtime }}"
+
+    - name: Install dependencies
+      run: tuist install --path SampleApp
+
+    - name: Build & Test
+      run: tuist test --path SampleApp --os ${{ matrix.sdk }} UnitTests
 
     - name: Package snapshot changes
       if: ${{ failure() }}
@@ -61,32 +75,3 @@ jobs:
       with:
         name: snapshot_changes_${{ matrix.sdk }}
         path: snapshot_changes_${{ matrix.sdk }}.tar
-
-
-  cocoapods:
-    name: "CocoaPods"
-
-    runs-on: macos-14-xlarge
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Read env
-      run: cat .github/workflows/env.properties >> $GITHUB_ENV
-
-    - name: Switch to Xcode ${{ env.xcode_version }}
-      run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
-
-    - name: Setup Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        # Uses version specified in .ruby_version
-        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-
-    - name: Pod Install
-      run: |
-        bundle exec pod install --project-directory=SampleApp/
-
-    - name: Build & Test
-      run: |
-        xcodebuild -workspace SampleApp/SampleApp.xcworkspace -scheme "BlueprintUI-Unit-Tests" -destination "platform=iOS Simulator,OS=17.2,name=iPhone SE (3rd generation)"
