@@ -5,7 +5,13 @@ if [[ $(git rev-parse -q --verify MERGE_HEAD) ]]; then
     exit 0
 fi
 
-git diff --diff-filter=d --staged --name-only | grep -e ".swift$" | while read file; do
-    swift run -c release swiftformat "${file}";
-    git add "$file";
-done
+ROOT="$(git rev-parse --show-toplevel)"
+SWIFT_FORMAT="mise x -- swiftformat"
+GIT_FORMAT_STAGED="$ROOT/Scripts/git-format-staged"
+CONFIG="${ROOT}/.swiftformat"
+
+$SWIFT_FORMAT --version 1>/dev/null 2>&1
+if [ $? -eq 0 ]
+then
+    $GIT_FORMAT_STAGED --formatter "$SWIFT_FORMAT stdin --config "$CONFIG" --stdinpath '{}'" "*.swift"
+fi
