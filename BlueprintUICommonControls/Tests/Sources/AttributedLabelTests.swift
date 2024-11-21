@@ -70,6 +70,26 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
+    func test_accessibilityConfiguration() {
+        let string = NSAttributedString(string: "Hello, World!")
+
+        let label = AttributedLabel(attributedText: string) { label in
+            label.isAccessibilityElement = true
+            label.accessibilityHint = "Hint"
+            label.accessibilityValue = "Value"
+            label.accessibilityIdentifier = "Identifier"
+        }
+
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+
+        label.accessBackingView(in: view) { view in
+            XCTAssertTrue(view.isAccessibilityElement)
+            XCTAssertEqual(view.accessibilityHint, "Hint")
+            XCTAssertEqual(view.accessibilityValue, "Value")
+            XCTAssertEqual(view.accessibilityIdentifier, "Identifier")
+        }
+    }
+
     func test_displaysText() {
         let string = NSAttributedString()
             .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)
