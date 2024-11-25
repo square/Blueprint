@@ -11,6 +11,13 @@ usage() {
   exit 1
 }
 
+# Check if gh CLI is installed
+if ! command -v gh &> /dev/null; then
+  echo "Error: GitHub CLI (gh) is not installed. It is required by this script."
+  echo "Please install it from https://cli.github.com/, authenticate, and try again."
+  exit 1
+fi
+
 # Parse options
 while [[ $# -gt 0 ]]; do
   case $1 in
