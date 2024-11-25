@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Added release and changelog managements scripts to streamline releases.
+
 ## [5.0.1] - 2024-11-04
 
 ### Added
