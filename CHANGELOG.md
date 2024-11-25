@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The `accessibilityIdentifier` can now be set on `AttributedLabel`.
-
 ### Removed
 
 ### Changed
@@ -27,7 +25,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
-# Past Releases
+## [5.1.0] - 2024-11-25
+
+### Added
+
+- The `accessibilityIdentifier` can now be set on `AttributedLabel`.
+
+### Internal
+
+- Added release and changelog managements scripts to streamline releases.
 
 ## [5.0.1] - 2024-11-04
 
@@ -115,8 +121,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `AccessibilityElement` now supports providing arbitrary strings to assistive devices using the `AXCustomContent` protocol. 
-
-### Removed
 
 ### Changed
 
@@ -1135,7 +1139,7 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.0.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.1.0...HEAD
 [5.0.1]: https://github.com/square/Blueprint/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/square/Blueprint/compare/4.3.0...5.0.0
 [4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
@@ -1273,3 +1277,4 @@ searchField
 [#19]: https://github.com/square/Blueprint/pull/19
 [#18]: https://github.com/square/Blueprint/pull/18
 [#15]: https://github.com/square/Blueprint/pull/15
+[5.1.0]: https://github.com/square/Blueprint/compare/5.0.1...5.1.0
