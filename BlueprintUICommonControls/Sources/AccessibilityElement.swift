@@ -261,23 +261,23 @@ extension AccessibilityElement.Trait: Hashable, Equatable {
     /// - Important: ⚠️ This implementation does not take equality of associated values on `.adjustable` into account.  ⚠️
     private var internalValue: Int {
         switch self {
-        case .button: return 0
-        case .link: return 1
-        case .header: return 2
-        case .searchField: return 3
-        case .image: return 4
-        case .selected: return 5
-        case .playsSound: return 6
-        case .keyboardKey: return 7
-        case .staticText: return 8
-        case .summaryElement: return 9
-        case .notEnabled: return 10
-        case .updatesFrequently: return 11
-        case .startsMediaSession: return 12
-        case .adjustable: return 13
-        case .allowsDirectInteraction: return 14
-        case .causesPageTurn: return 15
-        case .tabBar: return 16
+        case .button: 0
+        case .link: 1
+        case .header: 2
+        case .searchField: 3
+        case .image: 4
+        case .selected: 5
+        case .playsSound: 6
+        case .keyboardKey: 7
+        case .staticText: 8
+        case .summaryElement: 9
+        case .notEnabled: 10
+        case .updatesFrequently: 11
+        case .startsMediaSession: 12
+        case .adjustable: 13
+        case .allowsDirectInteraction: 14
+        case .causesPageTurn: 15
+        case .tabBar: 16
         }
     }
 

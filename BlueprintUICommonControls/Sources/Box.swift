@@ -47,9 +47,9 @@ public struct Box: Element {
 
     public var content: ElementContent {
         if let wrappedElement = wrappedElement {
-            return ElementContent(child: wrappedElement)
+            ElementContent(child: wrappedElement)
         } else {
-            return ElementContent(intrinsicSize: .zero)
+            ElementContent(intrinsicSize: .zero)
         }
     }
 
@@ -58,63 +58,63 @@ public struct Box: Element {
 
             config.apply { view in
 
-                if self.backgroundColor != view.backgroundColor {
-                    view.backgroundColor = self.backgroundColor
+                if backgroundColor != view.backgroundColor {
+                    view.backgroundColor = backgroundColor
                 }
 
-                if self.cornerStyle.cornerMask != view.layer.maskedCorners {
-                    view.layer.maskedCorners = self.cornerStyle.cornerMask
+                if cornerStyle.cornerMask != view.layer.maskedCorners {
+                    view.layer.maskedCorners = cornerStyle.cornerMask
                 }
 
-                if self.cornerStyle.radius(for: context.bounds) != view.layer.cornerRadius {
-                    view.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
+                if cornerStyle.radius(for: context.bounds) != view.layer.cornerRadius {
+                    view.layer.cornerRadius = cornerStyle.radius(for: context.bounds)
                 }
 
-                if self.cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
-                    view.layer.cornerCurve = self.cornerCurve.toLayerCornerCurve
+                if cornerCurve.toLayerCornerCurve != view.layer.cornerCurve {
+                    view.layer.cornerCurve = cornerCurve.toLayerCornerCurve
                 }
 
-                if self.borderStyle.color?.cgColor != view.layer.borderColor {
-                    view.layer.borderColor = self.borderStyle.color?.cgColor
+                if borderStyle.color?.cgColor != view.layer.borderColor {
+                    view.layer.borderColor = borderStyle.color?.cgColor
                 }
 
-                if self.borderStyle.width != view.layer.borderWidth {
-                    view.layer.borderWidth = self.borderStyle.width
+                if borderStyle.width != view.layer.borderWidth {
+                    view.layer.borderWidth = borderStyle.width
                 }
 
-                if self.cornerStyle.shadowRoundedCorners != view.shadowRoundCorners {
-                    view.shadowRoundCorners = self.cornerStyle.shadowRoundedCorners
+                if cornerStyle.shadowRoundedCorners != view.shadowRoundCorners {
+                    view.shadowRoundCorners = cornerStyle.shadowRoundedCorners
                 }
 
-                if self.shadowStyle.radius != view.layer.shadowRadius {
-                    view.layer.shadowRadius = self.shadowStyle.radius
+                if shadowStyle.radius != view.layer.shadowRadius {
+                    view.layer.shadowRadius = shadowStyle.radius
                 }
 
-                if self.shadowStyle.offset != view.layer.shadowOffset {
-                    view.layer.shadowOffset = self.shadowStyle.offset
+                if shadowStyle.offset != view.layer.shadowOffset {
+                    view.layer.shadowOffset = shadowStyle.offset
                 }
 
-                if self.shadowStyle.color?.cgColor != view.layer.shadowColor {
-                    view.layer.shadowColor = self.shadowStyle.color?.cgColor
+                if shadowStyle.color?.cgColor != view.layer.shadowColor {
+                    view.layer.shadowColor = shadowStyle.color?.cgColor
                 }
 
-                if self.shadowStyle.opacity != CGFloat(view.layer.shadowOpacity) {
-                    view.layer.shadowOpacity = Float(self.shadowStyle.opacity)
+                if shadowStyle.opacity != CGFloat(view.layer.shadowOpacity) {
+                    view.layer.shadowOpacity = Float(shadowStyle.opacity)
                 }
 
                 /// `.contentView` is used for clipping, make sure the corner radius
                 /// matches.
 
-                if self.clipsContent != view.contentView.clipsToBounds {
-                    view.contentView.clipsToBounds = self.clipsContent
+                if clipsContent != view.contentView.clipsToBounds {
+                    view.contentView.clipsToBounds = clipsContent
                 }
 
-                if self.cornerStyle.radius(for: context.bounds) != view.contentView.layer.cornerRadius {
-                    view.contentView.layer.cornerRadius = self.cornerStyle.radius(for: context.bounds)
+                if cornerStyle.radius(for: context.bounds) != view.contentView.layer.cornerRadius {
+                    view.contentView.layer.cornerRadius = cornerStyle.radius(for: context.bounds)
                 }
 
-                if self.cornerStyle.cornerMask != view.contentView.layer.maskedCorners {
-                    view.contentView.layer.maskedCorners = self.cornerStyle.cornerMask
+                if cornerStyle.cornerMask != view.contentView.layer.maskedCorners {
+                    view.contentView.layer.maskedCorners = cornerStyle.cornerMask
                 }
             }
 
@@ -146,8 +146,8 @@ extension Box {
         @available(iOS 13.0, *)
         var toLayerCornerCurve: CALayerCornerCurve {
             switch self {
-            case .circular: return .circular
-            case .continuous: return .continuous
+            case .circular: .circular
+            case .continuous: .continuous
             }
         }
     }
@@ -203,18 +203,18 @@ extension Box.CornerStyle {
     fileprivate var cornerMask: CACornerMask {
         switch self {
         case .square, .capsule:
-            return Corners.all.toCACornerMask
+            Corners.all.toCACornerMask
         case let .rounded(_, corners):
-            return corners.toCACornerMask
+            corners.toCACornerMask
         }
     }
 
     fileprivate var shadowRoundedCorners: UIRectCorner {
         switch self {
         case .square, .capsule:
-            return Corners.all.toUIRectCorner
+            Corners.all.toUIRectCorner
         case let .rounded(_, corners):
-            return corners.toUIRectCorner
+            corners.toUIRectCorner
         }
     }
 }
@@ -224,18 +224,18 @@ extension Box.BorderStyle {
     fileprivate var width: CGFloat {
         switch self {
         case .none:
-            return 0.0
+            0.0
         case let .solid(_, width):
-            return width
+            width
         }
     }
 
     fileprivate var color: UIColor? {
         switch self {
         case .none:
-            return nil
+            nil
         case let .solid(color, _):
-            return color
+            color
         }
     }
 
@@ -246,36 +246,36 @@ extension Box.ShadowStyle {
     fileprivate var radius: CGFloat {
         switch self {
         case .none:
-            return 0.0
+            0.0
         case let .simple(radius, _, _, _):
-            return radius
+            radius
         }
     }
 
     fileprivate var opacity: CGFloat {
         switch self {
         case .none:
-            return 0.0
+            0.0
         case let .simple(_, opacity, _, _):
-            return opacity
+            opacity
         }
     }
 
     fileprivate var offset: CGSize {
         switch self {
         case .none:
-            return .zero
+            .zero
         case let .simple(_, _, offset, _):
-            return offset
+            offset
         }
     }
 
     fileprivate var color: UIColor? {
         switch self {
         case .none:
-            return nil
+            nil
         case let .simple(_, _, _, color):
-            return color
+            color
         }
     }
 

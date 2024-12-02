@@ -193,9 +193,9 @@ class PixelBoundaryTests: XCTestCase {
 
         var content: ElementContent {
             if let wrappedElement = wrappedElement {
-                return ElementContent(child: wrappedElement)
+                ElementContent(child: wrappedElement)
             } else {
-                return ElementContent(intrinsicSize: .zero)
+                ElementContent(intrinsicSize: .zero)
             }
         }
 

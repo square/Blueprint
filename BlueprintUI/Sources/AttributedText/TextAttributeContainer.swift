@@ -18,9 +18,9 @@ public struct TextAttributeContainer {
     public subscript<Key>(key: Key.Type) -> Key.Value? where Key: AttributedTextKey {
         get {
             if let value = storage[key.name] as? Key.Value {
-                return value
+                value
             } else {
-                return nil
+                nil
             }
         }
         set {

@@ -99,20 +99,20 @@ extension ScrollView {
         func fittedSize(in constraint: SizeConstraint, child: Measurable) -> CGSize {
             switch contentSize {
             case .custom(let size):
-                return size
+                size
 
             case .fittingContent:
-                return child.measure(in: .unconstrained)
+                child.measure(in: .unconstrained)
 
             case .fittingHeight:
-                return child.measure(
+                child.measure(
                     in: SizeConstraint(
                         width: constraint.width,
                         height: .unconstrained
                     ))
 
             case .fittingWidth:
-                return child.measure(
+                child.measure(
                     in: SizeConstraint(
                         width: .unconstrained,
                         height: constraint.height
@@ -167,13 +167,13 @@ extension ScrollView {
         func fittedSize(in proposal: SizeConstraint, subelement: Subelement) -> CGSize {
             switch contentSize {
             case .custom(let size):
-                return size
+                size
 
             case .fittingContent:
-                return subelement.sizeThatFits(.unconstrained)
+                subelement.sizeThatFits(.unconstrained)
 
             case .fittingHeight:
-                return subelement.sizeThatFits(
+                subelement.sizeThatFits(
                     SizeConstraint(
                         width: proposal.width,
                         height: .unconstrained
@@ -181,7 +181,7 @@ extension ScrollView {
                 )
 
             case .fittingWidth:
-                return subelement.sizeThatFits(
+                subelement.sizeThatFits(
                     SizeConstraint(
                         width: .unconstrained,
                         height: proposal.height
@@ -282,18 +282,18 @@ extension ScrollView {
         var needsRefreshControl: Bool {
             switch self {
             case .disabled:
-                return false
+                false
             case .enabled, .refreshing:
-                return true
+                true
             }
         }
 
         var isRefreshing: Bool {
             switch self {
             case .refreshing:
-                return true
+                true
             case .disabled, .enabled:
-                return false
+                false
             }
         }
 
@@ -326,11 +326,11 @@ fileprivate final class ScrollerWrapperView: UIView {
                 guard let self = self else { return }
 
                 let context = ScrollView.ContentOffset.ScrollingContext(
-                    contentSize: self.scrollView.contentSize,
-                    scrollViewBounds: self.scrollView.bounds,
-                    contentInsets: self.scrollView.contentInset
+                    contentSize: scrollView.contentSize,
+                    scrollViewBounds: scrollView.bounds,
+                    contentInsets: scrollView.contentInset
                 )
-                self.scrollView.setContentOffset(offset.provider(context), animated: animated)
+                scrollView.setContentOffset(offset.provider(context), animated: animated)
             }
         }
     }

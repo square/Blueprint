@@ -377,9 +377,9 @@ class BlueprintViewTests: XCTestCase {
 
             var content: ElementContent {
                 if let child = child {
-                    return .init(child: child)
+                    .init(child: child)
                 } else {
-                    return .init(intrinsicSize: .zero)
+                    .init(intrinsicSize: .zero)
                 }
             }
 
@@ -878,9 +878,9 @@ private struct LifecycleTestElement: Element {
 
     var content: ElementContent {
         if let wrapped = wrapped {
-            return ElementContent(child: wrapped)
+            ElementContent(child: wrapped)
         } else {
-            return ElementContent(intrinsicSize: .zero)
+            ElementContent(intrinsicSize: .zero)
         }
     }
 
@@ -899,9 +899,9 @@ private enum LifecycleTestEvent: Equatable, CustomStringConvertible {
     var description: String {
         switch self {
         case .appear(let i):
-            return "appear(\(i))"
+            "appear(\(i))"
         case .disappear(let i):
-            return "disappear(\(i))"
+            "disappear(\(i))"
         }
     }
 }

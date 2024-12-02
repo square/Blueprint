@@ -62,7 +62,7 @@ public struct AdaptedEnvironment: Element {
         ElementContent(
             child: wrapped,
             environment: { env in
-                for adapter in self.adapters.reversed() {
+                for adapter in adapters.reversed() {
                     adapter(&env)
                 }
             }

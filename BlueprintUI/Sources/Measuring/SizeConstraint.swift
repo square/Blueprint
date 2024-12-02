@@ -90,9 +90,9 @@ extension SizeConstraint {
         public var maximum: CGFloat {
             switch self {
             case .atMost(let value):
-                return value
+                value
             case .unconstrained:
-                return Axis.maxValue
+                Axis.maxValue
             }
         }
 
@@ -100,9 +100,9 @@ extension SizeConstraint {
         public var minimum: CGFloat {
             switch self {
             case .atMost(_):
-                return 0.0
+                0.0
             case .unconstrained:
-                return 0.0
+                0.0
             }
         }
 
@@ -110,19 +110,19 @@ extension SizeConstraint {
         public var constrainedValue: CGFloat? {
             switch self {
             case .atMost(let value):
-                return value
+                value
             case .unconstrained:
-                return nil
+                nil
             }
         }
 
         func map(transform: (CGFloat) -> (CGFloat)) -> Self {
             switch self {
             case .atMost(let value):
-                return .atMost(transform(value))
+                .atMost(transform(value))
 
             case .unconstrained:
-                return .unconstrained
+                .unconstrained
             }
         }
 
@@ -133,9 +133,9 @@ extension SizeConstraint {
         public static func + (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
-                return .atMost(limit + rhs)
+                .atMost(limit + rhs)
             case .unconstrained:
-                return .unconstrained
+                .unconstrained
             }
         }
 
@@ -144,9 +144,9 @@ extension SizeConstraint {
         public static func - (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
-                return .atMost(limit - rhs)
+                .atMost(limit - rhs)
             case .unconstrained:
-                return .unconstrained
+                .unconstrained
             }
         }
 
@@ -155,9 +155,9 @@ extension SizeConstraint {
         public static func / (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
-                return .atMost(limit / rhs)
+                .atMost(limit / rhs)
             case .unconstrained:
-                return .unconstrained
+                .unconstrained
             }
         }
 
@@ -166,9 +166,9 @@ extension SizeConstraint {
         public static func * (lhs: SizeConstraint.Axis, rhs: CGFloat) -> SizeConstraint.Axis {
             switch lhs {
             case .atMost(let limit):
-                return .atMost(limit * rhs)
+                .atMost(limit * rhs)
             case .unconstrained:
-                return .unconstrained
+                .unconstrained
             }
         }
 
@@ -176,9 +176,9 @@ extension SizeConstraint {
         public var isGreaterThanZero: Bool {
             switch self {
             case .atMost(let limit):
-                return limit > 0
+                limit > 0
             case .unconstrained:
-                return true
+                true
             }
         }
 
@@ -211,9 +211,9 @@ extension SizeConstraint {
         public var description: String {
             switch self {
             case .atMost(let max):
-                return "atMost(\(max))"
+                "atMost(\(max))"
             case .unconstrained:
-                return "unconstrained"
+                "unconstrained"
             }
         }
     }
@@ -238,12 +238,12 @@ extension SizeConstraint {
             switch axis {
             case .atMost(let maxAxis):
                 if maxAxis.isInfinite || maxAxis == .greatestFiniteMagnitude {
-                    return .unconstrained
+                    .unconstrained
                 } else {
-                    return axis
+                    axis
                 }
             case .unconstrained:
-                return axis
+                axis
             }
         }
     }

@@ -83,10 +83,10 @@ extension Image {
 
         fileprivate var uiViewContentMode: UIView.ContentMode {
             switch self {
-            case .center: return .center
-            case .stretch: return .scaleToFill
-            case .aspectFit: return .scaleAspectFit
-            case .aspectFill: return .scaleAspectFill
+            case .center: .center
+            case .stretch: .scaleToFill
+            case .aspectFit: .scaleAspectFit
+            case .aspectFill: .scaleAspectFill
             }
         }
     }
@@ -98,9 +98,9 @@ extension CGSize {
 
     fileprivate var aspectRatio: CGFloat {
         if height > 0.0 {
-            return width / height
+            width / height
         } else {
-            return 0.0
+            0.0
         }
     }
 

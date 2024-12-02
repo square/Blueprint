@@ -131,10 +131,10 @@ public struct ElementPreview: View {
     // MARK: View
 
     public var body: some View {
-        ForEach(self.previewTypes, id: \.identifier) { previewType in
+        ForEach(previewTypes, id: \.identifier) { previewType in
             previewType.previewView(
-                with: self.name,
-                for: self.provider()
+                with: name,
+                for: provider()
             )
         }
     }
@@ -180,9 +180,9 @@ extension ElementPreview {
 
         public var identifier: AnyHashable {
             switch self {
-            case .device(let device): return device.rawValue
-            case .fixed(let width, let height): return "(\(width), \(height))"
-            case .thatFits(let padding): return "thatFits (\(padding)"
+            case .device(let device): device.rawValue
+            case .fixed(let width, let height): "(\(width), \(height))"
+            case .thatFits(let padding): "thatFits (\(padding)"
             }
         }
 

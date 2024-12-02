@@ -303,9 +303,9 @@ public final class BlueprintView: UIView {
 
         func constraint() -> SizeConstraint {
             if bounds.width == 0 {
-                return .unconstrained
+                .unconstrained
             } else {
-                return .init(width: bounds.width)
+                .init(width: bounds.width)
             }
         }
 
@@ -517,9 +517,9 @@ public final class BlueprintView: UIView {
                 self.automaticallyInheritsEnvironmentFromContainingBlueprintViews,
                 let inherited = self.inheritedBlueprintEnvironment
             {
-                return inherited
+                inherited
             } else {
-                return .empty
+                .empty
             }
         }()
 

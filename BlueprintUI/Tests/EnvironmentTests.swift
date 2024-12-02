@@ -294,7 +294,7 @@ private struct TestElement: Element {
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         TestView.describe { config in
-            config[\.testValue] = self.value
+            config[\.testValue] = value
         }
     }
 }
@@ -323,11 +323,11 @@ private enum TestValue {
     var size: CGSize {
         switch self {
         case .defaultValue:
-            return CGSize(width: 2, height: 3)
+            CGSize(width: 2, height: 3)
         case .right:
-            return CGSize(width: 4, height: 5)
+            CGSize(width: 4, height: 5)
         case .wrong:
-            return CGSize(width: 6, height: 7)
+            CGSize(width: 6, height: 7)
         }
     }
 

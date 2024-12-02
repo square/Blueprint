@@ -1054,9 +1054,9 @@ class StackTests: XCTestCase {
             func element(on axis: StackLayout.Axis) -> Element {
                 switch self {
                 case .fixed:
-                    return Spacer(size: CGSize(width: 10, height: 10))
+                    Spacer(size: CGSize(width: 10, height: 10))
                 case .flex:
-                    return WrappingElement(axis: axis)
+                    WrappingElement(axis: axis)
                 }
             }
         }
@@ -1357,21 +1357,21 @@ class StackTests: XCTestCase {
 
         var content: ElementContent {
             ElementContent { constraint -> CGSize in
-                switch self.axis {
+                switch axis {
                 case .horizontal:
-                    let itemsPerLine = max(1, Int(constraint.width.maximum / self.itemSize.width))
-                    let lineCount = (self.itemCount + itemsPerLine - 1) / itemsPerLine
+                    let itemsPerLine = max(1, Int(constraint.width.maximum / itemSize.width))
+                    let lineCount = (itemCount + itemsPerLine - 1) / itemsPerLine
                     return CGSize(
-                        width: CGFloat(itemsPerLine) * self.itemSize.width,
-                        height: CGFloat(lineCount) * self.itemSize.height
+                        width: CGFloat(itemsPerLine) * itemSize.width,
+                        height: CGFloat(lineCount) * itemSize.height
                     )
 
                 case .vertical:
-                    let itemsPerColumn = max(1, Int(constraint.height.maximum / self.itemSize.height))
-                    let columnCount = (self.itemCount + itemsPerColumn - 1) / itemsPerColumn
+                    let itemsPerColumn = max(1, Int(constraint.height.maximum / itemSize.height))
+                    let columnCount = (itemCount + itemsPerColumn - 1) / itemsPerColumn
                     let size = CGSize(
-                        width: CGFloat(columnCount) * self.itemSize.width,
-                        height: CGFloat(itemsPerColumn) * self.itemSize.height
+                        width: CGFloat(columnCount) * itemSize.width,
+                        height: CGFloat(itemsPerColumn) * itemSize.height
                     )
                     return size
                 }

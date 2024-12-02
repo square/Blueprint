@@ -34,9 +34,9 @@ public struct Column: StackElement {
         var stackAlignment: StackLayout.Alignment {
             switch self {
             case .fill:
-                return .fill
+                .fill
             case let .align(to: alignment):
-                return .align(to: alignment.id)
+                .align(to: alignment.id)
             }
         }
     }

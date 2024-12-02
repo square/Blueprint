@@ -39,7 +39,7 @@ struct ResponsiveLabel: ProxyElement {
 
     var elementRepresentation: Element {
         GeometryReader { geometry -> Element in
-            let label = Label(text: self.text) { label in
+            let label = Label(text: text) { label in
                 label.numberOfLines = 1
             }
 

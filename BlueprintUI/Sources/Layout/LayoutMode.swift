@@ -36,9 +36,9 @@ public enum LayoutMode: Equatable {
     public var name: String {
         switch self {
         case .legacy:
-            return "Legacy"
+            "Legacy"
         case .caffeinated:
-            return "Caffeinated"
+            "Caffeinated"
         }
     }
 }
@@ -47,17 +47,17 @@ extension LayoutMode: CustomStringConvertible {
     public var description: String {
         switch self {
         case .legacy:
-            return "Legacy"
+            "Legacy"
         case .caffeinated(let options):
             switch (options.hintRangeBoundaries, options.searchUnconstrainedKeys) {
             case (true, true):
-                return "Caffeinated (hint+search)"
+                "Caffeinated (hint+search)"
             case (true, false):
-                return "Caffeinated (hint)"
+                "Caffeinated (hint)"
             case (false, true):
-                return "Caffeinated (search)"
+                "Caffeinated (search)"
             case (false, false):
-                return "Caffeinated"
+                "Caffeinated"
             }
         }
     }

@@ -17,9 +17,9 @@ extension Element {
         then: (Self) -> Element
     ) -> Element {
         if isTrue {
-            return then(self)
+            then(self)
         } else {
-            return self
+            self
         }
     }
 
@@ -43,9 +43,9 @@ extension Element {
         else: (Self) -> Element
     ) -> Element {
         if isTrue {
-            return then(self)
+            then(self)
         } else {
-            return `else`(self)
+            `else`(self)
         }
     }
 
@@ -66,9 +66,9 @@ extension Element {
         then: (Value, Self) -> Element
     ) -> Element {
         if let value = value {
-            return then(value, self)
+            then(value, self)
         } else {
-            return self
+            self
         }
     }
 
@@ -92,9 +92,9 @@ extension Element {
         else: (Self) -> Element
     ) -> Element {
         if let value = value {
-            return then(value, self)
+            then(value, self)
         } else {
-            return `else`(self)
+            `else`(self)
         }
     }
 
