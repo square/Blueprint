@@ -13,9 +13,14 @@ public protocol StackElement: Element {
 extension StackElement {
 
     public var content: ElementContent {
-        ElementContent(layout: layout) {
+        ElementContent(layout: layout) { builder in
             for child in self.children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                builder.add(
+                    traitsType: LegacyLayoutTraitsKey<StackLayout>.self,
+                    traits: child.traits,
+                    key: child.key,
+                    element: child.element
+                )
             }
         }
     }
