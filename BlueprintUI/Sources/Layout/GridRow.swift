@@ -71,7 +71,12 @@ public struct GridRow: Element {
     public var content: ElementContent {
         ElementContent(layout: GridRowLayout(verticalAlignment: verticalAlignment, spacing: spacing)) { builder in
             children.forEach {
-                builder.add(traits: $0.width, key: $0.key, element: $0.element)
+                builder.add(
+                    traitsType: LegacyLayoutTraitsKey<GridRowLayout>.self,
+                    traits: $0.width,
+                    key: $0.key,
+                    element: $0.element
+                )
             }
         }
     }

@@ -30,7 +30,7 @@ public struct LayoutSubelement {
     private var content: ElementContent
     var environment: Environment
     var node: LayoutTreeNode
-    private var traits: Any
+    private var traits: LayoutTraits
 
     private var cache: HintingSizeCache { node.sizeCache }
 
@@ -46,7 +46,7 @@ public struct LayoutSubelement {
         content: ElementContent,
         environment: Environment,
         node: LayoutTreeNode,
-        traits: Any
+        traits: LayoutTraits
     ) {
         self.identifier = identifier
         self.content = content
@@ -137,10 +137,15 @@ public struct LayoutSubelement {
     ///
     /// - Parameter layoutType: The type of layout, which determines the type of the traits.
     /// - Returns: The subelements's layout traits.
-    public func traits<LayoutType>(
+    public func traits<LayoutType: LegacyLayout>(
         forLayoutType layoutType: LayoutType.Type
-    ) -> LayoutType.Traits where LayoutType: Layout {
-        traits as! LayoutType.Traits
+    ) -> LayoutType.Traits {
+        traits[legacyLayout: layoutType]
+    }
+
+    /// Gets the layout traits of the subelement.
+    public subscript<Key: LayoutTraitsKey>(key: Key.Type) -> Key.Value {
+        traits[key]
     }
 }
 

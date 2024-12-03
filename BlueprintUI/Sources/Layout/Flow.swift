@@ -66,16 +66,21 @@ public struct Flow: Element {
     // MARK: Element
 
     public var content: ElementContent {
-        .init(
+        ElementContent(
             layout: Layout(
                 lineAlignment: lineAlignment,
                 lineSpacing: lineSpacing,
                 itemAlignment: itemAlignment,
                 itemSpacing: itemSpacing
             )
-        ) {
+        ) { builder in
             for child in children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                builder.add(
+                    traitsType: LegacyLayoutTraitsKey<Layout>.self,
+                    traits: child.traits,
+                    key: child.key,
+                    element: child.element
+                )
             }
         }
     }

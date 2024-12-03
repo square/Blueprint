@@ -109,12 +109,28 @@ extension ElementContent {
 
         /// Adds the given child element.
         public mutating func add(
-            traits: LayoutType.Traits = LayoutType.defaultTraits,
             key: AnyHashable? = nil,
             element: Element
         ) {
             let child = Child(
-                traits: traits,
+                traits: .init(),
+                key: key,
+                content: element.content,
+                element: element
+            )
+
+            children.append(child)
+        }
+
+        /// Adds the given child element.
+        public mutating func add<TraitsKey: LayoutTraitsKey>(
+            traitsType: TraitsKey.Type,
+            traits: TraitsKey.Value = TraitsKey.defaultValue,
+            key: AnyHashable? = nil,
+            element: Element
+        ) {
+            let child = Child(
+                traits: .init(key: TraitsKey.self, value: traits),
                 key: key,
                 content: element.content,
                 element: element
@@ -148,10 +164,21 @@ extension ElementContent {
         key: AnyHashable? = nil,
         layout: some SingleChildLayout
     ) {
-        self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
-            $0.add(key: key, element: child)
-        }
+        storage = LayoutStorage(
+            layout: SingleChildLayoutHost(wrapping: layout),
+            children: [
+                .init(
+                    key: key,
+                    content: child.content,
+                    element: child
+                ),
+            ]
+        )
+//        self = ElementContent(layout: SingleChildLayoutHost(wrapping: layout)) {
+//            $0.add(key: key, element: child)
+//        }
     }
+
 }
 
 // MARK: - Passthrough storage
