@@ -44,14 +44,14 @@ public struct LayoutWriter: Element {
 
             func layoutPhase() -> Context.LayoutPhase {
                 switch phase {
-                case .measurement: return .measurement
-                case .layout: return .layout(size.maximum)
+                case .measurement: .measurement
+                case .layout: .layout(size.maximum)
                 }
             }
 
             var builder = Builder()
 
-            self.build(
+            build(
                 Context(
                     size: size,
                     phase: layoutPhase()
@@ -167,7 +167,7 @@ extension LayoutWriter {
         func measure(with builder: Builder) -> CGSize {
             switch self {
             case .unionOfChildren:
-                return CGSize(
+                CGSize(
                     width: builder.children.reduce(0.0) { width, child in
                         max(width, child.frame.maxX)
                     },
@@ -176,7 +176,7 @@ extension LayoutWriter {
                     }
                 )
             case .fixed(let size):
-                return size
+                size
             }
         }
     }
@@ -224,8 +224,8 @@ extension LayoutWriter.Context {
             onLayout: (CGSize) -> Value
         ) -> Value {
             switch self {
-            case .measurement: return onMeasure()
-            case .layout(let size): return onLayout(size)
+            case .measurement: onMeasure()
+            case .layout(let size): onLayout(size)
             }
         }
     }

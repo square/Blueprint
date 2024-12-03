@@ -136,7 +136,7 @@ public protocol LegacyLayout {
 extension LegacyLayout where Traits == () {
 
     public static var defaultTraits: () {
-        return ()
+        ()
     }
 
 }

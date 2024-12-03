@@ -71,34 +71,34 @@ extension ConstrainedSize {
         fileprivate func applied(to value: CGFloat) -> CGFloat {
             switch self {
             case .unconstrained:
-                return value
+                value
             case let .atMost(max):
-                return min(max, value)
+                min(max, value)
             case let .atLeast(min):
-                return max(min, value)
+                max(min, value)
             case let .within(range):
-                return value.clamped(to: range)
+                value.clamped(to: range)
             case let .absolute(absoluteValue):
-                return absoluteValue
+                absoluteValue
             }
         }
 
         func applied(to constraint: SizeConstraint.Axis) -> SizeConstraint.Axis {
             switch constraint {
             case .atMost(let maxValue):
-                return .atMost(applied(to: maxValue))
+                .atMost(applied(to: maxValue))
             case .unconstrained:
                 switch self {
                 case .unconstrained:
-                    return .unconstrained
+                    .unconstrained
                 case let .atMost(max):
-                    return .atMost(max)
+                    .atMost(max)
                 case .atLeast:
-                    return .unconstrained
+                    .unconstrained
                 case let .within(range):
-                    return .atMost(range.upperBound)
+                    .atMost(range.upperBound)
                 case let .absolute(absoluteValue):
-                    return .atMost(absoluteValue)
+                    .atMost(absoluteValue)
                 }
             }
         }
@@ -143,8 +143,8 @@ extension Element {
     public func constrained(to sizeConstraint: SizeConstraint) -> ConstrainedSize {
         func toConstrainedSize(_ axis: SizeConstraint.Axis) -> ConstrainedSize.Constraint {
             switch axis {
-            case .atMost(let value): return .atMost(value)
-            case .unconstrained: return .unconstrained
+            case .atMost(let value): .atMost(value)
+            case .unconstrained: .unconstrained
             }
         }
 

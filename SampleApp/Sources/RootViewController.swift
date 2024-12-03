@@ -98,13 +98,13 @@ fileprivate struct DemoItem: ProxyElement {
             )
         )
         .tappable {
-            self.onTap()
+            onTap()
         }
         .decorate(layering: .below, position: .inset(5)) {
             Box(backgroundColor: .init(white: 0.0, alpha: 0.1), cornerStyle: .rounded(radius: 17))
         }
         .decorate(layering: .above, position: .corner(.topLeft)) {
-            guard let badge = self.badgeText else {
+            guard let badge = badgeText else {
                 return Empty()
             }
 

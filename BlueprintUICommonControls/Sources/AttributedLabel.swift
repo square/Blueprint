@@ -116,9 +116,9 @@ public struct AttributedLabel: Element, Hashable {
     /// The text to pass to the underlying `UILabel`, normalized for display if necessary.
     var displayableAttributedText: NSAttributedString {
         if needsTextNormalization || linkDetectionTypes.isEmpty == false {
-            return attributedText.normalizingForView(with: numberOfLines)
+            attributedText.normalizingForView(with: numberOfLines)
         } else {
-            return attributedText
+            attributedText
         }
     }
 
@@ -176,10 +176,10 @@ extension AttributedLabel {
 
         var checkingType: NSTextCheckingResult.CheckingType {
             switch self {
-            case .date: return .date
-            case .address: return .address
-            case .link: return .link
-            case .phoneNumber: return .phoneNumber
+            case .date: .date
+            case .address: .address
+            case .link: .link
+            case .phoneNumber: .phoneNumber
             }
         }
     }
@@ -228,14 +228,14 @@ extension AttributedLabel {
                                 return nil
                             }
 
-                            self.accessibilityLinkIndex += predicate.searchDirection == .next ? 1 : -1
-                            self.accessibilityLinkIndex = min(
-                                self.accessibilityLinks.count - 1,
-                                self.accessibilityLinkIndex
+                            accessibilityLinkIndex += predicate.searchDirection == .next ? 1 : -1
+                            accessibilityLinkIndex = min(
+                                accessibilityLinks.count - 1,
+                                accessibilityLinkIndex
                             )
-                            self.accessibilityLinkIndex = max(0, self.accessibilityLinkIndex)
+                            accessibilityLinkIndex = max(0, accessibilityLinkIndex)
 
-                            let link = self.accessibilityLinks[self.accessibilityLinkIndex]
+                            let link = accessibilityLinks[accessibilityLinkIndex]
                             return UIAccessibilityCustomRotorItemResult(targetElement: link, targetRange: nil)
                         },
                     ]

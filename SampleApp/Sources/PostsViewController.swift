@@ -88,9 +88,9 @@ final class PostsViewController: UIViewController {
                 guard let self = self else { return }
                 switch field {
                 case .name:
-                    self.state.entry.authorName = text
+                    state.entry.authorName = text
                 case .body:
-                    self.state.entry.body = text
+                    state.entry.body = text
                 }
             },
             onSubmit: { [weak self] in
@@ -142,7 +142,7 @@ fileprivate struct MainView: ProxyElement {
                 $0.contentSize = .fittingHeight
                 $0.alwaysBounceVertical = true
                 $0.keyboardDismissMode = .onDrag
-                $0.pullToRefreshBehavior = self.pullToRefreshBehavior
+                $0.pullToRefreshBehavior = pullToRefreshBehavior
             }
             .inset(by: environment.safeAreaInsets)
             .box(background: UIColor(white: 0.95, alpha: 1.0))
@@ -272,7 +272,7 @@ fileprivate struct FeedItemBody: ProxyElement {
                 row.verticalAlignment = .center
 
                 let name = EnvironmentReader { environment -> Element in
-                    var name = Label(text: self.post.authorName)
+                    var name = Label(text: post.authorName)
                     name.font = UIFont.boldSystemFont(ofSize: 14.0)
                     name.color = environment.feedTheme.authorColor
                     return name

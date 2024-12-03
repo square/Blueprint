@@ -503,9 +503,9 @@ extension StackLayout {
                 let flexibleConstraint: SizeConstraint = {
                     switch axis {
                     case .horizontal:
-                        return .init(width: flexibleMagnitude, height: constraint.height)
+                        .init(width: flexibleMagnitude, height: constraint.height)
                     case .vertical:
-                        return .init(width: constraint.width, height: flexibleMagnitude)
+                        .init(width: constraint.width, height: flexibleMagnitude)
                     }
                 }()
 
@@ -959,18 +959,18 @@ extension StackLayout {
         func size(axis: StackLayout.Axis) -> CGSize {
             switch axis {
             case .horizontal:
-                return CGSize(width: self.axis, height: cross)
+                CGSize(width: self.axis, height: cross)
             case .vertical:
-                return CGSize(width: cross, height: self.axis)
+                CGSize(width: cross, height: self.axis)
             }
         }
 
         func point(axis: StackLayout.Axis) -> CGPoint {
             switch axis {
             case .horizontal:
-                return CGPoint(x: self.axis, y: cross)
+                CGPoint(x: self.axis, y: cross)
             case .vertical:
-                return CGPoint(x: cross, y: self.axis)
+                CGPoint(x: cross, y: self.axis)
             }
         }
     }
@@ -985,9 +985,9 @@ extension StackLayout {
             var sizeConstraint: SizeConstraint.Axis {
                 switch self {
                 case .exactly(let max), .atMost(let max):
-                    return .atMost(max)
+                    .atMost(max)
                 case .unconstrained:
-                    return .unconstrained
+                    .unconstrained
                 }
             }
         }
@@ -998,9 +998,9 @@ extension StackLayout {
         func constraint(axis layoutAxis: StackLayout.Axis) -> SizeConstraint {
             switch layoutAxis {
             case .horizontal:
-                return SizeConstraint(width: axis.sizeConstraint, height: cross.sizeConstraint)
+                SizeConstraint(width: axis.sizeConstraint, height: cross.sizeConstraint)
             case .vertical:
-                return SizeConstraint(width: cross.sizeConstraint, height: axis.sizeConstraint)
+                SizeConstraint(width: cross.sizeConstraint, height: axis.sizeConstraint)
             }
         }
     }
@@ -1044,21 +1044,21 @@ extension CGSize {
     fileprivate func stackVector(axis: StackLayout.Axis) -> StackLayout.Vector {
         switch axis {
         case .horizontal:
-            return StackLayout.Vector(axis: width, cross: height)
+            StackLayout.Vector(axis: width, cross: height)
         case .vertical:
-            return StackLayout.Vector(axis: height, cross: width)
+            StackLayout.Vector(axis: height, cross: width)
         }
     }
 
     fileprivate func vectorConstraint(axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
         switch axis {
         case .horizontal:
-            return StackLayout.VectorConstraint(
+            StackLayout.VectorConstraint(
                 axis: .exactly(width),
                 cross: .exactly(height)
             )
         case .vertical:
-            return StackLayout.VectorConstraint(
+            StackLayout.VectorConstraint(
                 axis: .exactly(height),
                 cross: .exactly(width)
             )
@@ -1068,18 +1068,18 @@ extension CGSize {
     fileprivate func axis(on axis: StackLayout.Axis) -> CGFloat {
         switch axis {
         case .horizontal:
-            return width
+            width
         case .vertical:
-            return height
+            height
         }
     }
 
     fileprivate func cross(on axis: StackLayout.Axis) -> CGFloat {
         switch axis {
         case .horizontal:
-            return height
+            height
         case .vertical:
-            return width
+            width
         }
     }
 }
@@ -1088,27 +1088,27 @@ extension SizeConstraint {
     fileprivate func vectorConstraint(on axis: StackLayout.Axis) -> StackLayout.VectorConstraint {
         switch axis {
         case .horizontal:
-            return StackLayout.VectorConstraint(axis: width.vectorConstraint, cross: height.vectorConstraint)
+            StackLayout.VectorConstraint(axis: width.vectorConstraint, cross: height.vectorConstraint)
         case .vertical:
-            return StackLayout.VectorConstraint(axis: height.vectorConstraint, cross: width.vectorConstraint)
+            StackLayout.VectorConstraint(axis: height.vectorConstraint, cross: width.vectorConstraint)
         }
     }
 
     fileprivate func axis(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
         switch axis {
         case .horizontal:
-            return width
+            width
         case .vertical:
-            return height
+            height
         }
     }
 
     fileprivate func cross(on axis: StackLayout.Axis) -> SizeConstraint.Axis {
         switch axis {
         case .horizontal:
-            return height
+            height
         case .vertical:
-            return width
+            width
         }
     }
 }
@@ -1117,9 +1117,9 @@ extension SizeConstraint.Axis {
     fileprivate var vectorConstraint: StackLayout.VectorConstraint.Axis {
         switch self {
         case .atMost(let max):
-            return .atMost(max)
+            .atMost(max)
         case .unconstrained:
-            return .unconstrained
+            .unconstrained
         }
     }
 }
@@ -1157,19 +1157,19 @@ extension StackLayout {
 
             fileprivate var growPriority: CGFloat {
                 switch self {
-                case .fixed: return 0
-                case .flexible: return 1
-                case .grows: return 1
-                case .shrinks: return 0
+                case .fixed: 0
+                case .flexible: 1
+                case .grows: 1
+                case .shrinks: 0
                 }
             }
 
             fileprivate var shrinkPriority: CGFloat {
                 switch self {
-                case .fixed: return 0
-                case .flexible: return 1
-                case .grows: return 0
-                case .shrinks: return 1
+                case .fixed: 0
+                case .flexible: 1
+                case .grows: 0
+                case .shrinks: 1
                 }
             }
         }

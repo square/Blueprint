@@ -25,11 +25,11 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
     public static let defaultValue: URLHandler = {
         // This is our best guess for "is this executable an extension?"
         if let _ = Bundle.main.infoDictionary?["NSExtension"] {
-            return NullURLHandler()
+            NullURLHandler()
         } else if Bundle.main.bundlePath.hasSuffix(".appex") {
-            return NullURLHandler()
+            NullURLHandler()
         } else {
-            return DefaultURLHandler()
+            DefaultURLHandler()
         }
     }()
 }

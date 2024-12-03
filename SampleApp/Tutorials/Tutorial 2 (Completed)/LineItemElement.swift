@@ -1,5 +1,6 @@
 import BlueprintUI
 import BlueprintUICommonControls
+import UIKit
 
 struct LineItemElement: ProxyElement {
 
@@ -37,29 +38,29 @@ extension LineItemElement {
 
         fileprivate var titleFont: UIFont {
             switch self {
-            case .regular: return .systemFont(ofSize: 18.0)
-            case .bold: return .boldSystemFont(ofSize: 18.0)
+            case .regular: .systemFont(ofSize: 18.0)
+            case .bold: .boldSystemFont(ofSize: 18.0)
             }
         }
 
         fileprivate var titleColor: UIColor {
             switch self {
-            case .regular: return .gray
-            case .bold: return .black
+            case .regular: .gray
+            case .bold: .black
             }
         }
 
         fileprivate var priceFont: UIFont {
             switch self {
-            case .regular: return .systemFont(ofSize: 18.0)
-            case .bold: return .boldSystemFont(ofSize: 18.0)
+            case .regular: .systemFont(ofSize: 18.0)
+            case .bold: .boldSystemFont(ofSize: 18.0)
             }
         }
 
         fileprivate var priceColor: UIColor {
             switch self {
-            case .regular: return .black
-            case .bold: return .black
+            case .regular: .black
+            case .bold: .black
             }
         }
 

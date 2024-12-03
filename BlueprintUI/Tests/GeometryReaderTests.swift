@@ -147,9 +147,9 @@ extension SizeConstraint.Axis {
     fileprivate var isConstrained: Bool {
         switch self {
         case .atMost:
-            return true
+            true
         case .unconstrained:
-            return false
+            false
         }
     }
 }

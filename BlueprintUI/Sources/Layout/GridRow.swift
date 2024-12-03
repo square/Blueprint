@@ -327,13 +327,13 @@ extension GridRow {
         private func _yVector(rowHeight: CGFloat) -> (CGFloat) -> (origin: CGFloat, height: CGFloat) {
             switch verticalAlignment {
             case .fill:
-                return { _ in (0, rowHeight) }
+                { _ in (0, rowHeight) }
             case .align(let id) where id == .top:
-                return { height in (0, height) }
+                { height in (0, height) }
             case .align(let id) where id == .center:
-                return { height in ((rowHeight - height) / 2.0, height) }
+                { height in ((rowHeight - height) / 2.0, height) }
             case .align(let id) where id == .bottom:
-                return { height in (rowHeight - height, height) }
+                { height in (rowHeight - height, height) }
             case .align:
                 fatalError("GridRow supports fill, top, center, and bottom alignment.")
             }

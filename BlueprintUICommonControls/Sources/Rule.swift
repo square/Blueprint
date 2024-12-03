@@ -23,9 +23,9 @@ public struct Rule: ProxyElement {
         var value: CGFloat {
             switch self {
             case .hairline:
-                return 1.0 / UIScreen.main.scale
+                1.0 / UIScreen.main.scale
             case .points(let points):
-                return points
+                points
             }
         }
     }
@@ -61,18 +61,18 @@ public struct Rule: ProxyElement {
     private var width: ConstrainedSize.Constraint {
         switch orientation {
         case .horizontal:
-            return .unconstrained
+            .unconstrained
         case .vertical:
-            return .absolute(thickness.value)
+            .absolute(thickness.value)
         }
     }
 
     private var height: ConstrainedSize.Constraint {
         switch orientation {
         case .horizontal:
-            return .absolute(thickness.value)
+            .absolute(thickness.value)
         case .vertical:
-            return .unconstrained
+            .unconstrained
         }
     }
 }

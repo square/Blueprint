@@ -58,9 +58,9 @@ struct ElementIdentifier: Hashable, CustomStringConvertible {
 
     var description: String {
         if let key = key {
-            return "\(elementType).\(key).\(count)"
+            "\(elementType).\(key).\(count)"
         } else {
-            return "\(elementType).\(count)"
+            "\(elementType).\(count)"
         }
     }
 
