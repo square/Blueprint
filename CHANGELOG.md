@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- CocoaPods podspecs removed. Blueprint will only be vended via Swift Package Manager.
+
 ### Changed
 
 ### Deprecated
