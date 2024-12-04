@@ -5,33 +5,16 @@ The easiest way to complete the Blueprint tutorials is to use the sample app inc
 1. Clone the Blueprint repo
 
 ```bash
-git clone git@github.com:square/Blueprint.git
+git clone https://github.com/square/Blueprint
 ```
 
 ```bash
 cd Blueprint
 ```
 
-2. CocoaPods
+2. Generate a project
 
-The sample app uses CocoaPods to integrate dependencies. First, we'll make sure CocoaPods and all of its dependencies are installed.
-
-```bash
-bundle install
-```
-
-Next, we'll use CocoaPods to integrate the workspace that we will use for completing the tutorials.
-
-```bash
-cd SampleApp
-bundle exec pod install
-```
-
-Finally...
-
-```bash
-open SampleApp.xcworkspace
-```
+Follow [the main README instructions](../../README.md#local-development) to set up a local development environment with Tuist.
 
 3. Code!
 

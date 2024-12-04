@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 
 # Read the current Ruby version from the .ruby-version file
-ruby Bundler.read_file(Bundler.root.join('.ruby-version')).strip
+ruby Bundler.read_file(File.join(__dir__, '.ruby-version')).strip
 
-gem 'cocoapods', '~> 1.11'
-gem 'cocoapods-generate', '~> 1.0'
 gem 'jazzy', '~> 0.13'

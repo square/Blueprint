@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "TODO: Update this script to use the new release process."
+echo "Use the manual steps in RELEASING.md for now."
+exit 0
+
 set -euo pipefail
 
 branch="main"
