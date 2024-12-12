@@ -86,6 +86,9 @@ public struct AttributedLabel: Element, Hashable {
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
     public var accessibilityHint: String?
 
+    /// A string that identifies the element.
+    public var accessibilityIdentifier: String?
+
     /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
@@ -260,6 +263,7 @@ extension AttributedLabel {
                 isAccessibilityElement = model.isAccessibilityElement
                 accessibilityHint = model.accessibilityHint
                 accessibilityValue = model.accessibilityValue
+                accessibilityIdentifier = model.accessibilityIdentifier
                 updateAccessibilityTraits(with: model)
                 accessibilityCustomActions = model.accessibilityCustomActions.map { action in
                     UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
