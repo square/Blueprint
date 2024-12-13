@@ -131,41 +131,10 @@ public struct UIViewElementContext {
 }
 
 
-extension Environment {
-
-    private static let fallback = MeasurementCache()
-
-    public internal(set) var elementMeasurer: MeasurementCache {
-        get {
-            if let inheritedElementMeasurer {
-                return inheritedElementMeasurer
-            } else {
-                assertionFailure(
-                    """
-                    WARNING: Blueprint is falling back to a static `MeasurementCache`, \
-                    which may result in longer object lifetimes than expected.
-                    """
-                )
-
-                return Self.fallback
-            }
-        }
-
-        set { self[ElementMeasurerKey.self] = newValue }
-    }
-
-    var inheritedElementMeasurer: MeasurementCache? { self[ElementMeasurerKey.self] }
-
-    private enum ElementMeasurerKey: EnvironmentKey {
-        static let defaultValue: MeasurementCache? = nil
-    }
-}
-
-
 extension MeasurementCache {
 
     /// Provides the size for the provided element by using a cached measurement view.
-    func measure<ViewElement: UIViewElement>(
+    fileprivate func measure<ViewElement: UIViewElement>(
         element: ViewElement,
         constraint: SizeConstraint,
         environment: Environment

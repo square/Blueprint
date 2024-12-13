@@ -527,7 +527,8 @@ public final class BlueprintView: UIView {
 
         var environment = inherited.merged(prioritizing: environment)
 
-        /// We're a root `BlueprintView`, so pass in the view measurer for our downstream dependencies.
+        /// We're a root `BlueprintView`, so pass in the view measurer for our downstream
+        /// dependencies if we didn't inherit a measurement cache.
 
         if environment.inheritedElementMeasurer == nil {
             environment.elementMeasurer = viewMeasurer
