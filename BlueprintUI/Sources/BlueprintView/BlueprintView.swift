@@ -40,6 +40,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private lazy var viewCache: TypeKeyedCache = .init()
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -524,6 +526,13 @@ public final class BlueprintView: UIView {
         }()
 
         var environment = inherited.merged(prioritizing: environment)
+
+        /// We're a root `BlueprintView`, so pass in the view measurer for our downstream
+        /// dependencies if we didn't inherit a measurement cache.
+
+        if environment.inheritedViewCache == nil {
+            environment.viewCache = viewCache
+        }
 
         if let displayScale = window?.screen.scale {
             environment.displayScale = displayScale

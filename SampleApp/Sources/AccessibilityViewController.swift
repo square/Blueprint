@@ -34,8 +34,8 @@ final class AccessibilityViewController: UIViewController {
 
             Row {
                 Button(
-                    onTap: {
-                        self.firstTrigger.focus()
+                    onTap: { [weak self] in
+                        self?.firstTrigger.focus()
                     },
                     wrapping: Label(text: "Focus on First", configure: { label in
                         label.color = .systemBlue
@@ -75,9 +75,9 @@ final class AccessibilityViewController: UIViewController {
         .accessibilityContainer()
         .inset(uniform: 20)
         .centered()
-        .onAppear {
+        .onAppear { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.secondTrigger.focus()
+                self?.secondTrigger.focus()
             }
         }
     }

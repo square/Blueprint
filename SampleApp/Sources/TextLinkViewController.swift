@@ -33,8 +33,8 @@ final class TextLinkViewController: UIViewController {
         return Column(alignment: .fill, minimumSpacing: 20) {
             label
             Label(text: "Custom link handling:")
-            label.onLinkTapped {
-                self.presentAlert(message: $0.absoluteString)
+            label.onLinkTapped { [weak self] in
+                self?.presentAlert(message: $0.absoluteString)
             }
 
             AttributedLabel(attributedText: NSAttributedString(string: "https://squareup.com")) {
