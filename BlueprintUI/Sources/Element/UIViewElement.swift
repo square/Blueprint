@@ -90,13 +90,23 @@ extension UIViewElement {
 
     /// Defer to the reused measurement view to provide the size of the element.
     public var content: ElementContent {
-
         ElementContent { constraint, environment in
-            environment.elementMeasurer.measure(
-                element: self,
-                constraint: constraint,
-                environment: environment
-            )
+            let view = environment.viewCache.value {
+                makeUIView()
+            }
+
+            let bounds = CGRect(origin: .zero, size: constraint.maximum)
+
+            /// Ensure that during measurement / sizing, the inherited `Environment` is available
+            /// to any child `BlueprintView`s. We must manually wire this property up, as the
+            /// measurement views are not in the view hierarchy.
+
+            view.nativeViewNodeBlueprintEnvironment = environment
+            defer { view.nativeViewNodeBlueprintEnvironment = nil }
+
+            updateUIView(view, with: UIViewElementContext(isMeasuring: true, environment: environment))
+
+            return size(bounds.size, thatFits: view)
         }
     }
 
@@ -128,32 +138,4 @@ public struct UIViewElementContext {
 
     /// The environment the element is rendered in.
     public var environment: Environment
-}
-
-
-extension MeasurementCache {
-
-    /// Provides the size for the provided element by using a cached measurement view.
-    fileprivate func measure<ViewElement: UIViewElement>(
-        element: ViewElement,
-        constraint: SizeConstraint,
-        environment: Environment
-    ) -> CGSize {
-        access(type: ViewElement.UIViewType.self) { view in
-            let bounds = CGRect(origin: .zero, size: constraint.maximum)
-
-            /// Ensure that during measurement / sizing, the inherited `Environment` is available
-            /// to any child `BlueprintView`s. We must manually wire this property up, as the
-            /// measurement views are not in the view hierarchy.
-
-            view.nativeViewNodeBlueprintEnvironment = environment
-            defer { view.nativeViewNodeBlueprintEnvironment = nil }
-
-            element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
-
-            return element.size(bounds.size, thatFits: view)
-        } create: {
-            element.makeUIView()
-        }
-    }
 }

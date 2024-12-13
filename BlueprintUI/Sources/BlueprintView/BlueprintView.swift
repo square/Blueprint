@@ -40,7 +40,7 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
-    private let viewMeasurer: MeasurementCache = .init()
+    private let viewMeasurer: TypeKeyedCache = .init()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -530,8 +530,8 @@ public final class BlueprintView: UIView {
         /// We're a root `BlueprintView`, so pass in the view measurer for our downstream
         /// dependencies if we didn't inherit a measurement cache.
 
-        if environment.inheritedElementMeasurer == nil {
-            environment.elementMeasurer = viewMeasurer
+        if environment.inheritedViewCache == nil {
+            environment.viewCache = viewMeasurer
         }
 
         if let displayScale = window?.screen.scale {
