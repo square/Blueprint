@@ -40,7 +40,7 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
-    private let viewCache: TypeKeyedCache = .init()
+    private lazy var viewCache: TypeKeyedCache = .init()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
