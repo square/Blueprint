@@ -134,7 +134,7 @@ public struct AttributedLabel: Element, Hashable {
         let text = displayableAttributedText
 
         return ElementContent { constraint, environment -> CGSize in
-            environment.elementMeasurer.accessMeasurementView { label in
+            environment.elementMeasurer.access(type: LabelView.self) { label in
                 label.update(model: self, text: text, environment: environment, isMeasuring: true)
                 return label.sizeThatFits(constraint.maximum)
             } create: {

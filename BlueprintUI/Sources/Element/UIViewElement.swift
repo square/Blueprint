@@ -130,93 +130,61 @@ public struct UIViewElementContext {
     public var environment: Environment
 }
 
-/// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
-public final class UIViewElementMeasurer {
-
-    /// Provides access to a view in the provided block.
-    public func accessMeasurementView<View: UIView, Result>(
-        perform : (View) -> Result,
-        create : () -> View
-    ) -> Result {
-        perform(measurementView(create))
-    }
-    
-    /// Provides the size for the provided element by using a cached measurement view.
-    func measure(
-        element: some UIViewElement,
-        constraint: SizeConstraint,
-        environment: Environment
-    ) -> CGSize {
-
-        let bounds = CGRect(origin: .zero, size: constraint.maximum)
-
-        let view = measurementView {
-            element.makeUIView()
-        }
-
-        /// Ensure that during measurement / sizing, the inherited `Environment` is available
-        /// to any child `BlueprintView`s. We must manually wire this property up, as the
-        /// measurement views are not in the view hierarchy.
-
-        view.nativeViewNodeBlueprintEnvironment = environment
-        defer { view.nativeViewNodeBlueprintEnvironment = nil }
-
-        element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
-
-        return element.size(bounds.size, thatFits: view)
-    }
-
-    private func measurementView<View: UIView>(_ create : () -> View) -> View {
-        
-        let key = Key(
-            elementType: ObjectIdentifier(View.self)
-        )
-
-        if let existing = views[key] {
-            return existing as! View
-        } else {
-            let new = create()
-            views[key] = new
-            return new
-        }
-    }
-
-    private var views: [Key: UIView] = [:]
-
-    private struct Key: Hashable {
-        let elementType: ObjectIdentifier
-    }
-}
-
 
 extension Environment {
-    
-    private static let fallback = UIViewElementMeasurer()
-    
-    public internal(set) var elementMeasurer : UIViewElementMeasurer {
+
+    private static let fallback = MeasurementCache()
+
+    public internal(set) var elementMeasurer: MeasurementCache {
         get {
             if let inheritedElementMeasurer {
                 return inheritedElementMeasurer
             } else {
                 assertionFailure(
                     """
-                    WARNING: Blueprint is falling back to a static `UIViewElementMeasurer`, \
+                    WARNING: Blueprint is falling back to a static `MeasurementCache`, \
                     which may result in longer object lifetimes than expected.
                     """
                 )
-                
+
                 return Self.fallback
             }
         }
-        
+
         set { self[ElementMeasurerKey.self] = newValue }
     }
-    
-    var inheritedElementMeasurer : UIViewElementMeasurer? {
-        get { self[ElementMeasurerKey.self] }
+
+    var inheritedElementMeasurer: MeasurementCache? { self[ElementMeasurerKey.self] }
+
+    private enum ElementMeasurerKey: EnvironmentKey {
+        static let defaultValue: MeasurementCache? = nil
     }
-    
-    private enum ElementMeasurerKey : EnvironmentKey {
-        static let defaultValue: UIViewElementMeasurer? = nil
+}
+
+
+extension MeasurementCache {
+
+    /// Provides the size for the provided element by using a cached measurement view.
+    func measure<ViewElement: UIViewElement>(
+        element: ViewElement,
+        constraint: SizeConstraint,
+        environment: Environment
+    ) -> CGSize {
+        access(type: ViewElement.UIViewType.self) { view in
+            let bounds = CGRect(origin: .zero, size: constraint.maximum)
+
+            /// Ensure that during measurement / sizing, the inherited `Environment` is available
+            /// to any child `BlueprintView`s. We must manually wire this property up, as the
+            /// measurement views are not in the view hierarchy.
+
+            view.nativeViewNodeBlueprintEnvironment = environment
+            defer { view.nativeViewNodeBlueprintEnvironment = nil }
+
+            element.updateUIView(view, with: .init(isMeasuring: true, environment: environment))
+
+            return element.size(bounds.size, thatFits: view)
+        } create: {
+            element.makeUIView()
+        }
     }
 }
