@@ -131,10 +131,14 @@ public struct UIViewElementContext {
 }
 
 /// An private type which caches `UIViewElement` views to be reused for sizing and measurement.
-private final class UIViewElementMeasurer {
+final class UIViewElementMeasurer {
 
     /// The standard shared cache.
     static let shared = UIViewElementMeasurer()
+
+    var cachedViewCount: Int {
+        views.count
+    }
 
     /// Provides the size for the provided element by using a cached measurement view.
     func measure(
@@ -171,6 +175,10 @@ private final class UIViewElementMeasurer {
             views[key] = new
             return new
         }
+    }
+
+    func removeAllObjects() {
+        views = [:]
     }
 
     private var views: [Key: UIView] = [:]
