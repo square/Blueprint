@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `CacheCleaner` which exposes a method to force Blueprint's static caches to be cleared. 
-
 ### Removed
 
 ### Changed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [5.2.0] - 2024-12-18
+
+### Added
+
+- Added `CacheCleaner` which exposes a method to force Blueprint's static caches to be cleared. 
 
 ## [5.1.0] - 2024-11-25
 
@@ -1141,7 +1145,7 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.1.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.2.0...HEAD
 [5.0.1]: https://github.com/square/Blueprint/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/square/Blueprint/compare/4.3.0...5.0.0
 [4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
@@ -1280,3 +1284,4 @@ searchField
 [#18]: https://github.com/square/Blueprint/pull/18
 [#15]: https://github.com/square/Blueprint/pull/15
 [5.1.0]: https://github.com/square/Blueprint/compare/5.0.1...5.1.0
+[5.2.0]: https://github.com/square/Blueprint/compare/5.1.0...5.2.0
