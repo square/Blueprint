@@ -83,11 +83,11 @@ extension UIView {
     /// If no views in the superview hierarchy are managed by Blueprint, this property returns nil.
     var inheritedBlueprintEnvironment: Environment? {
         if let environment = nativeViewNodeBlueprintEnvironment {
-            return environment
+            environment
         } else if let superview = superview {
-            return superview.inheritedBlueprintEnvironment
+            superview.inheritedBlueprintEnvironment
         } else {
-            return nil
+            nil
         }
     }
 

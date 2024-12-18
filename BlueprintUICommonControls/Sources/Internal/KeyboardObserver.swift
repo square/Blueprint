@@ -264,11 +264,11 @@ extension KeyboardObserver {
     private static let isExtensionContext: Bool = {
         // This is our best guess for "is this executable an extension?"
         if let _ = Bundle.main.infoDictionary?["NSExtension"] {
-            return true
+            true
         } else if Bundle.main.bundlePath.hasSuffix(".appex") {
-            return true
+            true
         } else {
-            return false
+            false
         }
     }()
 

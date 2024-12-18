@@ -32,7 +32,7 @@ public struct GeometryReader: Element {
 
     public var content: ElementContent {
         ElementContent { constraint, environment -> Element in
-            self.elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
+            elementRepresentation(GeometryProxy(environment: environment, constraint: constraint))
         }
     }
 

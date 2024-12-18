@@ -259,42 +259,42 @@ extension EditingMenuItem {
         var selector: Selector {
             switch self {
             case .system(let kind, _):
-                return kind.selector
+                kind.selector
             case .custom(_, let selector, _):
-                return selector
+                selector
             }
         }
 
         var onSelect: OnSelect {
             switch self {
             case .system(_, let onSelect):
-                return onSelect
+                onSelect
             case .custom(_, _, let onSelect):
-                return onSelect
+                onSelect
             }
         }
 
         var isCustom: Bool {
             switch self {
-            case .system: return false
-            case .custom: return true
+            case .system: false
+            case .custom: true
             }
         }
 
         var isSystem: Bool {
             switch self {
-            case .system: return true
-            case .custom: return false
+            case .system: true
+            case .custom: false
             }
         }
 
         var asMenuItem: UIMenuItem? {
             switch self {
             case .system:
-                return nil
+                nil
 
             case .custom(let title, let selector, _):
-                return UIMenuItem(title: title, action: selector)
+                UIMenuItem(title: title, action: selector)
             }
         }
     }
@@ -577,8 +577,8 @@ extension EditingMenu {
         private func perform(kind kindToPerform: EditingMenuItem.Kind.System) {
             let action = items.first { item in
                 switch item {
-                case .system(let kind, _): return kind == kindToPerform
-                case .custom: return false
+                case .system(let kind, _): kind == kindToPerform
+                case .custom: false
                 }
             }
 

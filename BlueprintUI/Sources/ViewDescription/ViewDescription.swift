@@ -235,9 +235,9 @@ extension ViewDescription.Configuration {
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value>) -> Value? {
         get {
             if let binding = bindings[keyPath] as? ValueBinding<Value> {
-                return binding.value
+                binding.value
             } else {
-                return nil
+                nil
             }
         }
         set {
@@ -263,9 +263,9 @@ extension ViewDescription.Configuration {
     public subscript<Value>(keyPath: ReferenceWritableKeyPath<View, Value?>) -> Value? {
         get {
             if let binding = bindings[keyPath] as? ValueBinding<Value> {
-                return binding.value
+                binding.value
             } else {
-                return nil
+                nil
             }
         }
         set {

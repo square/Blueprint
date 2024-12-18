@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Local development environment switched from CocoaPods to Tuist.
+
 ## [5.1.0] - 2024-11-25
 
 ### Added

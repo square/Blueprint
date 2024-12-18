@@ -236,7 +236,7 @@ extension FocusState {
                 },
                 onBlur: { [weak self] in
                     if let self = self, self.value == value {
-                        self.value = self.defaultValue
+                        self.value = defaultValue
                     }
                 }
             )

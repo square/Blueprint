@@ -66,9 +66,9 @@ extension SegmentedControl {
         fileprivate var resolvedIndex: Int {
             switch self {
             case .none:
-                return UISegmentedControl.noSegment
+                UISegmentedControl.noSegment
             case let .index(index):
-                return index
+                index
             }
         }
     }
@@ -101,9 +101,9 @@ extension SegmentedControl.Item {
         fileprivate var resolvedWidth: CGFloat {
             switch self {
             case .automatic:
-                return 0.0
+                0.0
             case let .specific(width):
-                return width
+                width
             }
         }
 

@@ -63,7 +63,7 @@ public struct Decorate: ProxyElement {
                 let contentFrame = CGRect(
                     origin: .zero,
                     size: context.phase.onMeasure {
-                        self.wrapped.content.measure(
+                        wrapped.content.measure(
                             in: context.size,
                             environment: environment
                         )
@@ -72,22 +72,22 @@ public struct Decorate: ProxyElement {
                     }
                 )
 
-                let decorationFrame = self.position.frame(
+                let decorationFrame = position.frame(
                     with: contentFrame.size,
-                    decoration: self.decoration,
+                    decoration: decoration,
                     environment: environment
                 )
 
                 layout.sizing = .fixed(contentFrame.size)
 
-                switch self.layering {
+                switch layering {
                 case .above:
-                    layout.add(with: contentFrame, child: self.wrapped)
-                    layout.add(with: decorationFrame, child: self.decoration)
+                    layout.add(with: contentFrame, child: wrapped)
+                    layout.add(with: decorationFrame, child: decoration)
 
                 case .below:
-                    layout.add(with: decorationFrame, child: self.decoration)
-                    layout.add(with: contentFrame, child: self.wrapped)
+                    layout.add(with: decorationFrame, child: decoration)
+                    layout.add(with: contentFrame, child: wrapped)
                 }
             }
         }
@@ -116,10 +116,10 @@ extension Decorate {
 
         var alignment: Alignment {
             switch self {
-            case .topLeft: return .topLeading
-            case .topRight: return .topTrailing
-            case .bottomLeft: return .bottomLeading
-            case .bottomRight: return .bottomTrailing
+            case .topLeft: .topLeading
+            case .topRight: .topTrailing
+            case .bottomLeft: .bottomLeading
+            case .bottomRight: .bottomTrailing
             }
         }
     }
