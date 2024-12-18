@@ -181,6 +181,27 @@ class UIViewElementTests: XCTestCase {
             blueprintView.layoutIfNeeded()
         }
     }
+
+    func test_removeAllObjects() {
+
+        struct TestElement: UIViewElement {
+            func makeUIView() -> UIView {
+                UIView()
+            }
+
+            func updateUIView(_ view: UIView, with context: BlueprintUI.UIViewElementContext) {}
+        }
+
+        let measurer = UIViewElementMeasurer()
+
+        _ = measurer.measure(element: TestElement(), constraint: .unconstrained, environment: .empty)
+
+        XCTAssertEqual(measurer.cachedViewCount, 1)
+
+        measurer.removeAllObjects()
+
+        XCTAssertEqual(measurer.cachedViewCount, 0)
+    }
 }
 
 fileprivate final class TestView: UIView {
