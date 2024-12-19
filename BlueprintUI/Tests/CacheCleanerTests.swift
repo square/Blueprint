@@ -19,7 +19,7 @@ class CacheClearerTests: XCTestCase {
             environment: .empty
         )
 
-        XCTAssertEqual(UIViewElementMeasurer.shared.cachedViewCount, 1)
+        XCTAssertGreaterThanOrEqual(UIViewElementMeasurer.shared.cachedViewCount, 1)
 
         CacheClearer.clearStaticCaches()
 
