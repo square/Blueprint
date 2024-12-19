@@ -10,7 +10,7 @@ public struct CacheClearer {
     /// views reference other objects.
     ///
     /// - WARNING: Clearing these caches can have global performance implications. This method
-    /// should be invoked sparingley and only after other workarounds to manage object lifetimes have failed.
+    /// should be invoked sparingly and only after other workarounds to manage object lifetimes have failed.
     @_spi(CacheManagement)
     public static func clearStaticCaches() {
         UIViewElementMeasurer.shared.removeAllObjects()
