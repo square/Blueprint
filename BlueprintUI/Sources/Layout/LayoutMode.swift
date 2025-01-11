@@ -22,7 +22,7 @@ public enum LayoutMode: Equatable {
     }
 
     /// The "standard" layout system.
-    case legacy
+//    case legacy
 
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
@@ -35,8 +35,8 @@ public enum LayoutMode: Equatable {
     /// The name of the layout mode.
     public var name: String {
         switch self {
-        case .legacy:
-            return "Legacy"
+//        case .legacy:
+//            return "Legacy"
         case .caffeinated:
             return "Caffeinated"
         }
@@ -46,8 +46,8 @@ public enum LayoutMode: Equatable {
 extension LayoutMode: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .legacy:
-            return "Legacy"
+//        case .legacy:
+//            return "Legacy"
         case .caffeinated(let options):
             switch (options.hintRangeBoundaries, options.searchUnconstrainedKeys) {
             case (true, true):

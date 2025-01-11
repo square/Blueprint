@@ -81,11 +81,11 @@ public struct TextField: Element {
     public var content: ElementContent {
         ElementContent { constraint, environment -> CGSize in
             switch environment.layoutMode {
-            case .legacy:
-                return CGSize(
-                    width: max(constraint.maximum.width, 44),
-                    height: 44.0
-                )
+//            case .legacy:
+//                return CGSize(
+//                    width: max(constraint.maximum.width, 44),
+//                    height: 44.0
+//                )
             case .caffeinated:
                 return CGSize(
                     width: constraint.width.constrainedValue.map { max($0, 44) } ?? .infinity,

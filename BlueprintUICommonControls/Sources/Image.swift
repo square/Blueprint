@@ -141,8 +141,8 @@ extension Image {
                     mode = .fitHeight(height)
                 } else {
                     switch layoutMode {
-                    case .legacy:
-                        mode = .useImageSize
+//                    case .legacy:
+//                        mode = .useImageSize
                     case .caffeinated:
                         mode = .infinite
                     }
