@@ -21,7 +21,12 @@ public enum LayoutMode: Equatable {
         }
     }
 
-    /// The "standard" layout system.
+    /// Blueprint's original layout system. This mode is deprecated and will be removed.
+    @available(
+        *,
+        deprecated,
+        message: "Legacy mode is deprecated and will be removed in a future release. Switch to the default layout mode."
+    )
     case legacy
 
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
