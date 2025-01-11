@@ -1,0 +1,60 @@
+import Foundation
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project(
+    name: "Development",
+    settings: .settings(base: ["ENABLE_MODULE_VERIFIER": "YES"]),
+    targets: [
+
+        .app(
+            name: "SampleApp",
+            sources: ["Sources/**"]
+        ),
+
+        .app(
+            name: "Tutorial 1",
+            sources: ["Tutorials/Tutorial 1/**"]
+        ),
+        .app(
+            name: "Tutorial 1 (Completed)",
+            sources: ["Tutorials/Tutorial 1 (Completed)/**"]
+        ),
+        .app(
+            name: "Tutorial 2",
+            sources: ["Tutorials/Tutorial 2/**"]
+        ),
+        .app(
+            name: "Tutorial 2 (Completed)",
+            sources: ["Tutorials/Tutorial 2 (Completed)/**"]
+        ),
+
+        // These tests are duplicates of the test definitions in the root Package.swift, but Tuist
+        // does not currently support creating targets for tests in SwiftPM dependencies. See
+        // https://github.com/tuist/tuist/issues/5912
+
+        .unitTest(for: "BlueprintUI"),
+        .unitTest(
+            for: "BlueprintUICommonControls",
+            resources: [
+                .glob(
+                    pattern: "../BlueprintUICommonControls/Tests/Sources/Resources/*"
+                ),
+            ]
+        ),
+    ],
+    schemes: [
+        .scheme(
+            name: "UnitTests",
+            testAction: .targets(
+                [
+                    "BlueprintUI-Tests",
+                    "BlueprintUICommonControls-Tests",
+                ]
+            )
+        ),
+    ],
+    additionalFiles: [
+        "../CHANGELOG.md",
+    ]
+)

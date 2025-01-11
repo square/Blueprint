@@ -24,10 +24,17 @@ Pods/
 # .swiftpm/
 
 .build/
-BlueprintUI.xcodeproj/
 
 # jazzy
 .docs/
 
 # User settings
 .vscode/
+
+# Tuist
+/Derived
+/*.xcodeproj
+/*.xcworkspace
+/SampleApp/Derived
+/SampleApp/*.xcodeproj
+/SampleApp/*.xcworkspace

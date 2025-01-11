@@ -113,6 +113,28 @@ target MyTarget do
 end
 ```
 
+## Local Development
+
+This project uses [Mise](https://mise.jdx.dev/) and [Tuist](https://tuist.io/) to generate a project for local development. Follow the steps below for the recommended setup for zsh.
+
+```sh
+# install mise
+brew install mise
+# add mise activation line to your zshrc
+echo 'eval "$(mise activate zsh)"' >> ~/.zshrc
+# load mise into your shell
+source ~/.zshrc
+# tell mise to trust Blueprint's config file
+mise trust
+# install dependencies
+mise install
+
+# only necessary for first setup or after changing dependencies
+tuist install --path SampleApp
+# generates and opens the Xcode project
+tuist generate --path SampleApp
+```
+
 ---
 
 [Release instructions](./RELEASING.md)
