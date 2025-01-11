@@ -67,56 +67,26 @@ class ConstrainedAspectRatioTests: XCTestCase {
         // Unconstrained height, larger width
         assert(
             constraint: SizeConstraint(width: 100),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 100, height: 25)
-        )
-        assert(
-            constraint: SizeConstraint(width: 100),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained height, smaller width
         assert(
             constraint: SizeConstraint(width: 8),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 8, height: 2)
-        )
-        assert(
-            constraint: SizeConstraint(width: 8),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained width, larger height
         assert(
             constraint: SizeConstraint(height: 100),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 400, height: 100)
-        )
-        assert(
-            constraint: SizeConstraint(height: 100),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained width, smaller height
         assert(
             constraint: SizeConstraint(height: 8),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 32, height: 8)
-        )
-        assert(
-            constraint: SizeConstraint(height: 8),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Fully unconstrained
         assert(
             constraint: .unconstrained,
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 40, height: 10)
-        )
-        assert(
-            constraint: .unconstrained,
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Exact fit
@@ -156,56 +126,26 @@ class ConstrainedAspectRatioTests: XCTestCase {
         // Unconstrained height, larger width
         assert(
             constraint: SizeConstraint(width: 100),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 100, height: 400)
-        )
-        assert(
-            constraint: SizeConstraint(width: 100),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained height, smaller width
         assert(
             constraint: SizeConstraint(width: 8),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 8, height: 32)
-        )
-        assert(
-            constraint: SizeConstraint(width: 8),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained width, larger height
         assert(
             constraint: SizeConstraint(height: 100),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 25, height: 100)
-        )
-        assert(
-            constraint: SizeConstraint(height: 100),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Unconstrained width, smaller height
         assert(
             constraint: SizeConstraint(height: 8),
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 2, height: 8)
-        )
-        assert(
-            constraint: SizeConstraint(height: 8),
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Fully unconstrained
         assert(
             constraint: .unconstrained,
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 12, height: 48)
-        )
-        assert(
-            constraint: .unconstrained,
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Exact fit
@@ -265,12 +205,6 @@ class ConstrainedAspectRatioTests: XCTestCase {
         // Fully unconstrained
         assert(
             constraint: .unconstrained,
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 40, height: 10)
-        )
-        assert(
-            constraint: .unconstrained,
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Exact fit
@@ -330,12 +264,6 @@ class ConstrainedAspectRatioTests: XCTestCase {
         // Fully unconstrained
         assert(
             constraint: .unconstrained,
-            layoutModes: [.legacy],
-            expectedSize: CGSize(width: 12, height: 48)
-        )
-        assert(
-            constraint: .unconstrained,
-            layoutModes: [.caffeinated],
             expectedSize: .infinity
         )
         // Exact fit

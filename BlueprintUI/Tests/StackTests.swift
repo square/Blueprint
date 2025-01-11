@@ -1186,16 +1186,9 @@ class StackTests: XCTestCase {
     func test_measurementCounts() {
 
         // For this test to be meaningful, cache hinting must be disabled.
-
-        let layoutMode: LayoutMode
-        switch LayoutMode.default {
-        case .legacy:
-            layoutMode = .legacy
-        case .caffeinated:
-            layoutMode = .caffeinated(options: .optimizationsDisabled)
-        }
-
-        RenderContext(layoutMode: layoutMode).perform(block: assertMeasurementCounts)
+        RenderContext(
+            layoutMode: .caffeinated(options: .optimizationsDisabled)
+        ).perform(block: assertMeasurementCounts)
     }
 
     private func assertMeasurementCounts() {

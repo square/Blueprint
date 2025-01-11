@@ -140,12 +140,7 @@ extension Image {
                 } else if case .atMost(let height) = constraint.height {
                     mode = .fitHeight(height)
                 } else {
-                    switch layoutMode {
-                    case .legacy:
-                        mode = .useImageSize
-                    case .caffeinated:
-                        mode = .infinite
-                    }
+                    mode = .infinite
                 }
             }
 
