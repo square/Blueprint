@@ -60,15 +60,7 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 20, height: 10),
-            layoutModes: [.legacy]
-        )
-
-        validate(
-            size: .init(width: 20, height: 10),
-            constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .infinity,
-            layoutModes: [.caffeinated]
+            expectedValue: .infinity
         )
 
         validate(
@@ -118,15 +110,7 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 10, height: 20),
-            layoutModes: [.legacy]
-        )
-
-        validate(
-            size: .init(width: 10, height: 20),
-            constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .infinity,
-            layoutModes: [.caffeinated]
+            expectedValue: .infinity
         )
 
         validate(
@@ -195,15 +179,7 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 20, height: 10),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 20, height: 10),
-            layoutModes: [.legacy]
-        )
-
-        validate(
-            size: .init(width: 20, height: 10),
-            constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .infinity,
-            layoutModes: [.caffeinated]
+            expectedValue: .infinity
         )
 
         validate(
@@ -253,15 +229,7 @@ class ImageTests: XCTestCase {
         validate(
             size: .init(width: 10, height: 20),
             constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .init(width: 10, height: 20),
-            layoutModes: [.legacy]
-        )
-
-        validate(
-            size: .init(width: 10, height: 20),
-            constraint: .init(width: .unconstrained, height: .unconstrained),
-            expectedValue: .infinity,
-            layoutModes: [.caffeinated]
+            expectedValue: .infinity
         )
 
         validate(

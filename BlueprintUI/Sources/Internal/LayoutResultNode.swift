@@ -12,12 +12,6 @@ extension Element {
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
         switch layoutMode {
-        case .legacy:
-            return legacyLayout(
-                layoutAttributes: LayoutAttributes(frame: frame),
-                environment: environment
-            )
-
         case .caffeinated(let options):
             return caffeinatedLayout(
                 frame: frame,

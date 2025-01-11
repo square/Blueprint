@@ -28,12 +28,6 @@ public struct ElementContent {
         layoutMode: LayoutMode
     ) -> CGSize {
         switch layoutMode {
-        case .legacy:
-            return measure(
-                in: constraint,
-                environment: environment,
-                cache: CacheFactory.makeCache(name: cacheName)
-            )
         case .caffeinated(let options):
             let node = LayoutTreeNode(
                 path: cacheName,
