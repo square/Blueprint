@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- `LayoutMode.legacy` is deprecated and will be removed in a future release.
+
 ### Security
 
 ### Documentation
