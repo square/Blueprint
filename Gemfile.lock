@@ -52,7 +52,6 @@ GEM
       typhoeus (~> 1.0)
     cocoapods-deintegrate (1.0.5)
     cocoapods-downloader (2.1)
-    cocoapods-generate (1.4.1)
     cocoapods-plugins (1.0.0)
       nap
     cocoapods-search (1.0.1)
@@ -125,12 +124,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  cocoapods (~> 1.11)
-  cocoapods-generate (~> 1.0)
   jazzy (~> 0.13)
 
 RUBY VERSION
    ruby 3.2.2p53
 
 BUNDLED WITH
-   2.4.10
+   2.5.5
