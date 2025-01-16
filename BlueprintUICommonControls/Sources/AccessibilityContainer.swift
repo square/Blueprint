@@ -17,30 +17,33 @@ public struct AccessibilityContainer: Element {
     public enum ContainerType {
         case none, dataTable, list, landmark, semanticGroup
     }
+
     /// indicates the type of content in a data-based container.
     public var containerType: ContainerType
 
     /// An optional `accessibilityIdentifier` to give the container. Defaults to `nil`.
     public var identifier: String?
-    
+
     /// An optional `accessibilityLabel` to give the container. Defaults to `nil`.
     public var label: String?
-    
+
     /// An optional `accessibilityValue` to give the container. Defaults to `nil`.
     public var value: String?
 
     public var wrapped: Element
-    
+
 
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
-    public init(containerType: AccessibilityContainer.ContainerType = .none,
-                label: String? = nil,
-                value: String? = nil,
-                identifier: String? = nil,
-                wrapping element: Element) {
+    public init(
+        containerType: AccessibilityContainer.ContainerType = .none,
+        label: String? = nil,
+        value: String? = nil,
+        identifier: String? = nil,
+        wrapping element: Element
+    ) {
         self.containerType = containerType
-        self.label = label;
-        self.value = value;
+        self.label = label
+        self.value = value
         self.identifier = identifier
         wrapped = element
     }
@@ -63,19 +66,19 @@ public struct AccessibilityContainer: Element {
     }
 }
 
-fileprivate extension AccessibilityContainer.ContainerType {
-     var UIKitContainerType: UIAccessibilityContainerType {
+extension AccessibilityContainer.ContainerType {
+    fileprivate var UIKitContainerType: UIAccessibilityContainerType {
         switch self {
         case .none:
-                .none
+            .none
         case .dataTable:
-                .dataTable
+            .dataTable
         case .list:
-                .list
+            .list
         case .landmark:
-                .landmark
+            .landmark
         case .semanticGroup:
-                .semanticGroup
+            .semanticGroup
         }
     }
 }
@@ -85,15 +88,19 @@ extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    public func accessibilityContainer(containerType: AccessibilityContainer.ContainerType = .none,
-                                       label: String? = nil,
-                                       value: String? = nil,
-                                       identifier: String? = nil) -> Element {
-        AccessibilityContainer(containerType: containerType,
-                               label: label,
-                               value: value,
-                               identifier: identifier,
-                               wrapping: self)
+    public func accessibilityContainer(
+        containerType: AccessibilityContainer.ContainerType = .none,
+        label: String? = nil,
+        value: String? = nil,
+        identifier: String? = nil
+    ) -> Element {
+        AccessibilityContainer(
+            containerType: containerType,
+            label: label,
+            value: value,
+            identifier: identifier,
+            wrapping: self
+        )
     }
 }
 
