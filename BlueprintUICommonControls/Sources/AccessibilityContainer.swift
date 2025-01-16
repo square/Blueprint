@@ -14,13 +14,33 @@ import UIKit
 /// the elements returned from the container are added to the `accessibilityElements`
 /// and the search down that branch is also terminated.
 public struct AccessibilityContainer: Element {
+    public enum ContainerType {
+        case none, dataTable, list, landmark, semanticGroup
+    }
+    /// indicates the type of content in a data-based container.
+    public var containerType: ContainerType
 
     /// An optional `accessibilityIdentifier` to give the container. Defaults to `nil`.
     public var identifier: String?
+    
+    /// An optional `accessibilityLabel` to give the container. Defaults to `nil`.
+    public var label: String?
+    
+    /// An optional `accessibilityValue` to give the container. Defaults to `nil`.
+    public var value: String?
+
     public var wrapped: Element
+    
 
     /// Creates a new `AccessibilityContainer` wrapping the provided element.
-    public init(identifier: String? = nil, wrapping element: Element) {
+    public init(containerType: AccessibilityContainer.ContainerType = .none,
+                label: String? = nil,
+                value: String? = nil,
+                identifier: String? = nil,
+                wrapping element: Element) {
+        self.containerType = containerType
+        self.label = label;
+        self.value = value;
         self.identifier = identifier
         wrapped = element
     }
@@ -35,17 +55,45 @@ public struct AccessibilityContainer: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityContainerView.describe { config in
+            config[\.accessibilityLabel] = label
+            config[\.accessibilityValue] = value
             config[\.accessibilityIdentifier] = identifier
+            config[\.accessibilityContainerType] = containerType.UIKitContainerType
         }
     }
 }
+
+fileprivate extension AccessibilityContainer.ContainerType {
+     var UIKitContainerType: UIAccessibilityContainerType {
+        switch self {
+        case .none:
+                .none
+        case .dataTable:
+                .dataTable
+        case .list:
+                .list
+        case .landmark:
+                .landmark
+        case .semanticGroup:
+                .semanticGroup
+        }
+    }
+}
+
 
 extension Element {
 
     /// Acts as an accessibility container for any subviews
     /// where `isAccessibilityElement == true`.
-    public func accessibilityContainer(identifier: String? = nil) -> Element {
-        AccessibilityContainer(identifier: identifier, wrapping: self)
+    public func accessibilityContainer(containerType: AccessibilityContainer.ContainerType = .none,
+                                       label: String? = nil,
+                                       value: String? = nil,
+                                       identifier: String? = nil) -> Element {
+        AccessibilityContainer(containerType: containerType,
+                               label: label,
+                               value: value,
+                               identifier: identifier,
+                               wrapping: self)
     }
 }
 
