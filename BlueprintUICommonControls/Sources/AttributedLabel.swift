@@ -210,35 +210,11 @@ extension AttributedLabel {
             }
         }
 
-        /// The view needs to keep track of the current index for the accessibility rotor.
-        private var accessibilityLinkIndex = -1
-
-        /// These elements need to be retained by the view, and cannot be created inside the
-        /// `accessibilityCustomRotors` getter.
-        private var accessibilityLinks: [LinkAccessibilityElement] = []
-
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
             set { fatalError() }
             get {
-                accessibilityLinks.isEmpty
-                    ? []
-                    : [
-                        UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
-                            guard let self = self, !self.accessibilityLinks.isEmpty else {
-                                return nil
-                            }
-
-                            self.accessibilityLinkIndex += predicate.searchDirection == .next ? 1 : -1
-                            self.accessibilityLinkIndex = min(
-                                self.accessibilityLinks.count - 1,
-                                self.accessibilityLinkIndex
-                            )
-                            self.accessibilityLinkIndex = max(0, self.accessibilityLinkIndex)
-
-                            let link = self.accessibilityLinks[self.accessibilityLinkIndex]
-                            return UIAccessibilityCustomRotorItemResult(targetElement: link, targetRange: nil)
-                        },
-                    ]
+                guard let attributedText, !links.isEmpty else { return [] }
+                return [accessibilityRotor(for: links, in: attributedText)]
             }
         }
 
@@ -275,7 +251,6 @@ extension AttributedLabel {
             if !isMeasuring {
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
-                    accessibilityLinks = accessibilityLinks(for: links, in: model.attributedText)
                     accessibilityLabel = accessibilityLabel(
                         with: links,
                         in: model.attributedText.string,
@@ -539,30 +514,28 @@ extension AttributedLabel {
             return links
         }
 
-        private func accessibilityLinks(for links: [Link], in string: NSAttributedString) -> [LinkAccessibilityElement] {
-            links
+        private func accessibilityRotor(for links: [Link], in string: NSAttributedString) -> UIAccessibilityCustomRotor {
+            let elements: [LinkAccessibilityElement] = links
                 .sorted(by: { $0.range.location < $1.range.location })
                 .compactMap { link in
                     guard NSIntersectionRange(string.entireRange, link.range).length > 0 else {
                         return nil
                     }
-
                     return LinkAccessibilityElement(
                         container: self,
                         label: string.attributedSubstring(from: link.range).string,
                         link: link
                     )
                 }
-
-
+            return elements.accessibilityRotor(systemType: .link)
         }
 
         internal func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
-            // When reading an attributed string that contains the `.link` attribute VoiceOver will announce "link" when it encounters the applied range. This is important because it informs the user about the context and position of the linked text within the greater string. This can be partocularly important when a string contains multiple links with the same linked text but different link destinations.
+            // When reading an attributed string that contains the `.link` attribute VoiceOver will announce "link" when it encounters the applied range. This is important because it informs the user about the context and position of the linked text within the greater string. This can be particularly important when a string contains multiple links with the same linked text but different link destinations.
 
-            // UILabel is extremely insistant about how the `.link` attribute should be styled going so far as to apply its own preferences above any other provided attributes. In order to allow custom link styling we replace any instances of the `.link` attribute with a `labelLink.` attribute (see `NSAttributedString.normalizingForView(with:)`. This allows us to track the location of links while still providing our own custom styling. Unfortunately this means that voiceover doesnt recognize our links as links and consequently they are not announced to the user.
+            // UILabel is extremely insistent about how the `.link` attribute should be styled going so far as to apply its own preferences above any other provided attributes. In order to allow custom link styling we replace any instances of the `.link` attribute with a `labelLink.` attribute (see `NSAttributedString.normalizingForView(with:)`. This allows us to track the location of links while still providing our own custom styling. Unfortunately this means that voiceover doesn't recognize our links as links and consequently they are not announced to the user.
 
-            // Ideally we'd be able to enumerate our links, insert the `.link` attribute back and then set the resulting string as the `accessibilityAttributedString` but unfortunately that doesnt seem to work. Apple's [docs](https://developer.apple.com/documentation/objectivec/nsobject/2865944-accessibilityattributedlabel) indicate that this property is intended "for the inclusion of language attributes in the string to control pronunciation or accents" and doesnt seem to notice any included `.link` attributes.
+            // Ideally we'd be able to enumerate our links, insert the `.link` attribute back and then set the resulting string as the `accessibilityAttributedString` but unfortunately that doesn't seem to work. Apple's [docs](https://developer.apple.com/documentation/objectivec/nsobject/2865944-accessibilityattributedlabel) indicate that this property is intended "for the inclusion of language attributes in the string to control pronunciation or accents" and doesnt seem to notice any included `.link` attributes.
 
             // Insert the word "link" after each link in the label. This mirrors the VoiceOver behavior when encountering a `.link` attribute.
 
