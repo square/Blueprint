@@ -364,7 +364,7 @@ extension AttributedLabel {
                 }
 
                 assert(
-                    alignments.count == 1,
+                    alignments.count <= 1,
                     """
                     AttributedLabel links only support a single NSTextAlignment. \
                     Instead, found: \(alignments).
