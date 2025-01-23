@@ -514,7 +514,7 @@ extension AttributedLabel {
             return links
         }
 
-        private func accessibilityRotor(for links: [Link], in string: NSAttributedString) -> UIAccessibilityCustomRotor {
+        internal func accessibilityRotor(for links: [Link], in string: NSAttributedString) -> UIAccessibilityCustomRotor {
             let elements: [LinkAccessibilityElement] = links
                 .sorted(by: { $0.range.location < $1.range.location })
                 .compactMap { link in

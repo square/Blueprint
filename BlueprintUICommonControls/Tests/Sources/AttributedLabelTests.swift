@@ -485,6 +485,38 @@ class AttributedLabelTests: XCTestCase {
     }
 
 
+    func test_linkAccessibility_Rotors() {
+        let labelView = AttributedLabel.LabelView()
+        let text: NSString = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
+
+        let url = URL(string: "https://one.ring")!
+
+        let links = ["Frodo", "Merry", "Sam", "Pippin"].map {
+            AttributedLabel.Link(url: url, range: text.range(of: $0))
+        }
+
+        let rotor = labelView.accessibilityRotor(for: links, in: NSAttributedString(string: text as String))
+        XCTAssertNotNil(rotor)
+
+        var results = [UIAccessibilityCustomRotorItemResult]()
+        let predicate = UIAccessibilityCustomRotorSearchPredicate()
+        predicate.searchDirection = .next
+        let first = rotor.itemSearchBlock(predicate)
+        XCTAssertNotNil(first)
+        results.append(first!)
+        predicate.currentItem = first!
+        while let last = results.last,
+              let next = rotor.itemSearchBlock(predicate),
+              last.targetElement as! NSObject != next.targetElement as! NSObject
+        {
+            results.append(next)
+            predicate.currentItem = next
+        }
+
+        // links should be sorted by their position in the main string.
+        let sortedHobbits = results.map { ($0.targetElement as! NSObject).accessibilityLabel }
+        XCTAssertEqual(sortedHobbits, ["Sam", "Frodo", "Pippin", "Merry"])
+    }
 
     func test_textContainerRects() {
         let lineBreakModes: [NSLineBreakMode?] = [
