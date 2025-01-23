@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed a bug in `AttributedLabel` which could cause a crash if the attributed string lacked a specified `NSTextAlignment`. 
+
 ### Added
+
 - `AccessibilityContainer` now supports configuration of `UIAccessibilityContainerType`, `AccessibilityLabel` and `AccessibilityValue`.
 
 ### Removed
@@ -17,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CocoaPods podspecs removed. Blueprint will only be vended via Swift Package Manager.
 
 ### Changed
+
+`AttributedLabel` accessibility links are now stateless.
 
 ### Deprecated
 
