@@ -485,6 +485,66 @@ class AttributedLabelTests: XCTestCase {
     }
 
 
+    func test_linkAccessibility_Rotors() {
+        let labelView = AttributedLabel.LabelView()
+        let text: NSString = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
+
+        let url = URL(string: "https://one.ring")!
+
+        let links = ["Frodo", "Merry", "Sam", "Pippin"].map {
+            AttributedLabel.Link(url: url, range: text.range(of: $0))
+        }
+
+        let rotor = labelView.accessibilityRotor(for: links, in: NSAttributedString(string: text as String))
+        XCTAssertNotNil(rotor)
+
+        // links should be sorted by their position in the main string.
+        let sortedHobbits = rotor.dumpItems().map { $0.accessibilityLabel }
+        XCTAssertEqual(sortedHobbits, ["Sam", "Frodo", "Pippin", "Merry"])
+    }
+
+
+
+    func test_linkAccessibility_Rotors_update() {
+        let string = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
+        var attributedText = AttributedText(string)
+
+        for hobbit in ["Frodo", "Merry", "Sam", "Pippin"] {
+            let range = attributedText.range(of: hobbit)!
+            attributedText[range].link = URL(string: "https://one.ring")!
+        }
+
+        var label = AttributedLabel(attributedText: attributedText.attributedString)
+        let labelView = AttributedLabel.LabelView()
+        labelView.update(model: label, text: label.attributedText, environment: .empty, isMeasuring: false)
+
+        let rotor = labelView.accessibilityCustomRotors!.first!
+        XCTAssertNotNil(rotor)
+
+        // links should be sorted by their position in the main string.
+        let sortedHobbits = rotor.dumpItems().map { $0.accessibilityLabel }
+        XCTAssertEqual(sortedHobbits, ["Sam", "Frodo", "Pippin", "Merry"])
+
+        let removedLinks = AttributedText(string)
+        label.attributedText = removedLinks.attributedString
+        labelView.update(model: label, text: label.attributedText, environment: .empty, isMeasuring: false)
+        XCTAssertTrue(labelView.accessibilityCustomRotors!.isEmpty)
+
+        var updatedText = AttributedText(string)
+        for name in ["Aragorn", "Gandalf", "Gimli", "Legolas", "Boromir"] {
+            let range = updatedText.range(of: name)!
+            updatedText[range].link = URL(string: "https://one.ring")!
+        }
+        label.attributedText = updatedText.attributedString
+        labelView.update(model: label, text: label.attributedText, environment: .empty, isMeasuring: false)
+
+        let updatedRotor = labelView.accessibilityCustomRotors!.first!
+        XCTAssertNotNil(updatedRotor)
+
+        let notHobbits = updatedRotor.dumpItems().map { $0.accessibilityLabel }
+        XCTAssertEqual(notHobbits, ["Gandalf", "Aragorn", "Gimli", "Boromir", "Legolas"])
+    }
+
 
     func test_textContainerRects() {
         let lineBreakModes: [NSLineBreakMode?] = [
@@ -652,6 +712,44 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
+}
+
+extension UIAccessibilityCustomRotor {
+    fileprivate func dumpItems() -> [NSObject] {
+        var results = [UIAccessibilityCustomRotorItemResult]()
+
+        let predicate = UIAccessibilityCustomRotorSearchPredicate()
+        predicate.searchDirection = .next
+
+        let first = itemSearchBlock(predicate)
+        XCTAssertNotNil(first)
+        results = [first!]
+
+
+        predicate.currentItem = first!
+
+        while let last = results.last,
+              let next = itemSearchBlock(predicate),
+              last.targetElement as? NSObject != next.targetElement as? NSObject
+        {
+            results = results + [next]
+            predicate.currentItem = next
+        }
+
+        predicate.searchDirection = .previous
+        predicate.currentItem = first!
+
+        while let last = results.first,
+              let next = itemSearchBlock(predicate),
+              last.targetElement as? NSObject != next.targetElement as? NSObject
+        {
+            results = [next] + results
+            predicate.currentItem = next
+        }
+
+
+        return results.compactMap { $0.targetElement as? NSObject }
+    }
 }
 
 fileprivate struct LabelTapDetectionGrid: Element {
