@@ -717,19 +717,37 @@ class AttributedLabelTests: XCTestCase {
 extension UIAccessibilityCustomRotor {
     fileprivate func dumpItems() -> [NSObject] {
         var results = [UIAccessibilityCustomRotorItemResult]()
+
         let predicate = UIAccessibilityCustomRotorSearchPredicate()
         predicate.searchDirection = .next
+
         let first = itemSearchBlock(predicate)
         XCTAssertNotNil(first)
-        results.append(first!)
+        results = [first!]
+
+
         predicate.currentItem = first!
+
         while let last = results.last,
               let next = itemSearchBlock(predicate),
-              last.targetElement as! NSObject != next.targetElement as! NSObject
+              last.targetElement as? NSObject != next.targetElement as? NSObject
         {
-            results.append(next)
+            results = results + [next]
             predicate.currentItem = next
         }
+
+        predicate.searchDirection = .previous
+        predicate.currentItem = first!
+
+        while let last = results.first,
+              let next = itemSearchBlock(predicate),
+              last.targetElement as? NSObject != next.targetElement as? NSObject
+        {
+            results = [next] + results
+            predicate.currentItem = next
+        }
+
+
         return results.compactMap { $0.targetElement as? NSObject }
     }
 }
