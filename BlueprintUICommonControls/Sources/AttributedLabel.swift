@@ -211,7 +211,7 @@ extension AttributedLabel {
         }
 
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
-            set { fatalError() }
+            set { fatalError("accessibilityCustomRotors is not settable.") }
             get {
                 guard let attributedText, !links.isEmpty else { return [] }
                 return [accessibilityRotor(for: links, in: attributedText)]
@@ -681,7 +681,7 @@ extension AttributedLabel {
         }
 
         override var accessibilityFrameInContainerSpace: CGRect {
-            set { fatalError() }
+            set { fatalError("accessibilityFrameInContainerSpace") }
             get {
                 guard let container = container,
                       let textStorage = container.makeTextStorage(),
