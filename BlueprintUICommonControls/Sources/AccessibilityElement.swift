@@ -26,6 +26,9 @@ public struct AccessibilityElement: Element {
     /// An array containing one or more `CustomContent`s, defining additional content associated with the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
     public var customContent: [CustomContent] = []
 
+    /// An array of localized labels the user provides to refer to the accessibility element.
+    /// This is primarily used for Voice control, an element that contains descriptive information in its accessibilityLabel can return a more concise label. The primary label is first in the array, optionally followed by alternative labels in descending order of importance.
+    public var userInputLabels: [String] = []
 
     public init(
         label: String?,
@@ -37,6 +40,7 @@ public struct AccessibilityElement: Element {
         accessibilityFrameCornerStyle: CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
         customContent: [AccessibilityElement.CustomContent] = [],
+        userInputLabels: [String] = [],
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
@@ -49,6 +53,7 @@ public struct AccessibilityElement: Element {
         self.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
         self.customActions = customActions
         self.customContent = customContent
+        self.userInputLabels = userInputLabels
         wrappedElement = element
         configure(&self)
     }
@@ -63,29 +68,31 @@ public struct AccessibilityElement: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityView.describe { config in
-            config[\.accessibilityLabel] = label
-            config[\.accessibilityValue] = value
-            config[\.accessibilityHint] = hint
-            config[\.accessibilityIdentifier] = identifier
-            config[\.accessibilityTraits] = accessibilityTraits
-            config[\.isAccessibilityElement] = true
-            config[\.accessibilityFrameSize] = accessibilityFrameSize
-            config[\.accessibilityFrameCornerStyle] = accessibilityFrameCornerStyle
-            config[\.activate] = accessibilityActivate
-            config[\.accessibilityCustomActions] = customActions.map { action in
-                UIAccessibilityCustomAction(name: action.name, image: action.image) { _ in action.onActivation() }
-            }
-            config[\.accessibilityCustomContent] = customContent.map { $0.axCustomContent }
+            config.apply { element in
+                element.accessibilityLabel = label
+                element.accessibilityValue = value
+                element.accessibilityHint = hint
+                element.accessibilityIdentifier = identifier
+                element.accessibilityTraits = accessibilityTraits
+                element.isAccessibilityElement = true
+                element.accessibilityFrameSize = accessibilityFrameSize
+                element.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
+                element.activate = accessibilityActivate
+                element.accessibilityCustomActions = customActions.map { action in
+                    UIAccessibilityCustomAction(name: action.name, image: action.image) { _ in action.onActivation() }
+                }
+                element.accessibilityCustomContent = customContent.map { $0.axCustomContent }
+                element.accessibilityUserInputLabels = userInputLabels
 
-
-            if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
-               case let .adjustable(incrementAction, decrementAction) = adjustable
-            {
-                config[\.increment] = incrementAction
-                config[\.decrement] = decrementAction
-            } else {
-                config[\.increment] = nil
-                config[\.decrement] = nil
+                if let adjustable = traits.first(where: { $0 == .adjustable({}, {}) }),
+                   case let .adjustable(incrementAction, decrementAction) = adjustable
+                {
+                    element.increment = incrementAction
+                    element.decrement = decrementAction
+                } else {
+                    element.increment = nil
+                    element.decrement = nil
+                }
             }
         }
     }
@@ -93,7 +100,7 @@ public struct AccessibilityElement: Element {
     private final class AccessibilityView: UIView, AXCustomContentProvider {
         var accessibilityFrameSize: CGSize?
         var accessibilityFrameCornerStyle: CornerStyle = .square
-        var accessibilityCustomContent: [AXCustomContent]! = [] // The exclamation `!` is in the protodol definition and required.
+        var accessibilityCustomContent: [AXCustomContent]! = [] // The exclamation `!` is in the protocol definition and required.
 
         var increment: (() -> Void)?
         var decrement: (() -> Void)?
@@ -177,7 +184,8 @@ extension Element {
         accessibilityFrameSize: CGSize? = nil,
         accessibilityFrameCornerStyle: CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
-        customContent: [AccessibilityElement.CustomContent] = []
+        customContent: [AccessibilityElement.CustomContent] = [],
+        userInputLabels: [String] = []
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
@@ -189,6 +197,7 @@ extension Element {
             accessibilityFrameCornerStyle: accessibilityFrameCornerStyle,
             customActions: customActions,
             customContent: customContent,
+            userInputLabels: userInputLabels,
             wrapping: self
         )
     }

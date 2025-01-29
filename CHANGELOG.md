@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `AccessibilityContainer` now supports configuration of `UIAccessibilityContainerType`, `AccessibilityLabel` and `AccessibilityValue`.
+- `AccessibilityElement` now supports configuration of `userInputLabels`.
 
 ### Removed
 
