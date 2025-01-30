@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Added
+
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+### Internal
+
+## [5.3.0] - 2025-01-30
+
+### Fixed
+
 - Fixed a bug in `AttributedLabel` which could cause a crash if the attributed string lacked a specified `NSTextAlignment`. 
 
 ### Added
@@ -1158,7 +1178,10 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.2.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.3.0...HEAD
+[5.3.0]: https://github.com/square/Blueprint/compare/5.2.0...5.3.0
+[5.2.0]: https://github.com/square/Blueprint/compare/5.1.0...5.2.0
+[5.1.0]: https://github.com/square/Blueprint/compare/5.0.1...5.1.0
 [5.0.1]: https://github.com/square/Blueprint/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/square/Blueprint/compare/4.3.0...5.0.0
 [4.3.0]: https://github.com/square/Blueprint/compare/4.2.1...4.3.0
