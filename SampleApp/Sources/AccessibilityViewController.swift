@@ -71,6 +71,14 @@ final class AccessibilityViewController: UIViewController {
                 }
             }.accessibilityElement(label: "Title", value: "Detail", traits: [])
 
+            Label(text: "This is an example of a long accessibility label")
+                .accessibilityElement(
+                    label: "This is an example of a long accessibility label",
+                    value: "Detail",
+                    traits: [],
+                    userInputLabels: ["Short Input Label"]
+                )
+
         }
         .accessibilityContainer()
         .inset(uniform: 20)
