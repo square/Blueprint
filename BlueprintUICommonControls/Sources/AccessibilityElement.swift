@@ -377,7 +377,7 @@ extension AccessibilityElement {
 }
 
 extension AccessibilityElement {
-    public struct CustomContent {
+    public struct CustomContent: Equatable {
         /// The importance of the content.
         public enum Importance: Equatable {
             /// By default custom content is available through the rotor.
