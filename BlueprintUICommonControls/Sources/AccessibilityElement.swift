@@ -3,10 +3,6 @@ import UIKit
 
 public struct AccessibilityElement: Element {
 
-
-
-
-
     public var label: String?
     public var value: String?
     public var hint: String?
@@ -261,6 +257,8 @@ extension AccessibilityElement {
         case allowsDirectInteraction
         case causesPageTurn
         case tabBar
+        case backButton
+        case toggleButton
     }
 }
 
@@ -287,6 +285,8 @@ extension AccessibilityElement.Trait: Hashable, Equatable {
         case .allowsDirectInteraction: return 14
         case .causesPageTurn: return 15
         case .tabBar: return 16
+        case .backButton: return 17
+        case .toggleButton: return 18
         }
     }
 
@@ -339,6 +339,10 @@ extension UIAccessibilityTraits {
                 formUnion(.causesPageTurn)
             case .tabBar:
                 formUnion(.tabBar)
+            case .backButton:
+                formUnion(.backButton)
+            case .toggleButton:
+                formUnion(._toggleButton)
             }
         }
     }
