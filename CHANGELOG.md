@@ -11,11 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `AccessibilityElement.Trait` now includes `.backButton` and `.toggleButton`
+- `Accessibility.Trait` now includes `.backButton` and `.toggleButton`
 
 ### Removed
 
 ### Changed
+
+- `AccessibilityElement.Trait`now a typealias to `Accessibility.Trait` 
+- `AccessibilityElement.CustomAction` now a typealias to `Accessibility.CustomAction`
+- `AccessibilityElement.CustomContent` now a typealias to `Accessibility.CustomContent`
 
 ### Deprecated
 
@@ -25,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Misc
 
-- `AccessibilityElement.CustomContent` now conforms to `Equatable`
+- `Accessibility.CustomContent` now conforms to `Equatable`
 
 ### Internal
 
