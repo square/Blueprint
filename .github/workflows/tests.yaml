@@ -62,7 +62,14 @@ jobs:
       run: tuist install --path SampleApp
 
     - name: Build & Test
-      run: tuist test --path SampleApp --os ${{ matrix.sdk }} UnitTests
+      run: tuist test --path SampleApp --os ${{ matrix.sdk }} UnitTests -- -resultBundlePath TestResult
+    
+    - name: Archive TestResult
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
+      with:
+        name: TestResult.xcresult
+        path: TestResult.xcresult
 
     - name: Package snapshot changes
       if: ${{ failure() }}

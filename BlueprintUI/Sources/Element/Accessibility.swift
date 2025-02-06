@@ -145,12 +145,12 @@ extension Accessibility {
         }
 
         public static func == (lhs: Self, rhs: Self) -> Bool {
-            // Disregard onActivation for equatablity pruposes.
+            // Disregard onActivation for equatablity purposes.
             lhs.name == rhs.name && lhs.image == rhs.image
         }
 
         public func hash(into hasher: inout Hasher) {
-            // Disregard onActivation for hash pruposes.
+            // Disregard onActivation for hash purposes.
             hasher.combine(name)
             hasher.combine(image)
         }

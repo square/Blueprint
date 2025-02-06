@@ -33,7 +33,20 @@ let project = Project(
         // does not currently support creating targets for tests in SwiftPM dependencies. See
         // https://github.com/tuist/tuist/issues/5912
 
-        .unitTest(for: "BlueprintUI"),
+        .unitTest(
+            for: "BlueprintUI"
+        ),
+
+        .target(
+            name: "BlueprintUI_UITests",
+            destinations: .iOS,
+            product: .uiTests,
+            bundleId: "$(inherited).UITests",
+            deploymentTargets: .iOS("15.0"),
+            sources: ["../BlueprintUI/Tests/Extensions/**", "../BlueprintUI/UITests/**"],
+            dependencies: [.target(name: "SampleApp")]
+        ),
+
         .unitTest(
             for: "BlueprintUICommonControls",
             resources: [
@@ -50,6 +63,7 @@ let project = Project(
                 [
                     "BlueprintUI-Tests",
                     "BlueprintUICommonControls-Tests",
+                    "BlueprintUI_UITests",
                 ]
             )
         ),
