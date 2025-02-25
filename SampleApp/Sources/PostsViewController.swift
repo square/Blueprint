@@ -3,10 +3,11 @@ import BlueprintUICommonControls
 import UIKit
 
 
-struct Post {
-    var authorName: String = ""
+struct Post: Equatable {
+    var authorName: String = "Me"
     var date: Date = Date()
     var body: String = ""
+    var isFave: Bool = false
 }
 
 
@@ -36,6 +37,13 @@ final class PostsViewController: UIViewController {
         mutating func publishEntry() {
             posts.append(entry)
             entry = Post()
+        }
+
+        mutating func didFave(_ post: Post) {
+            guard let index = posts.firstIndex(of: post) else { return }
+            var new = post
+            new.isFave.toggle()
+            posts[index] = new
         }
     }
 
@@ -96,7 +104,18 @@ final class PostsViewController: UIViewController {
             onSubmit: { [weak self] in
                 self?.state.publishEntry()
             },
+            didFave: { [weak self] post in
+                self?.state.didFave(post)
+            },
+            didRT: { [weak self] post in
+                guard let self else { return }
+                let author = state.entry.authorName
+                state.entry.authorName = author
+                self.state.entry.body = "RT: @\(post.authorName) \(post.body)"
+                self.state.publishEntry()
+            },
             pullToRefreshBehavior: pullToRefreshBehavior
+
         )
         .adaptedEnvironment(keyPath: \.feedTheme, value: theme)
     }
@@ -122,14 +141,19 @@ fileprivate struct MainView: ProxyElement {
     var state: PostsViewController.State
     var onChange: (EntryForm.Field, String) -> Void
     var onSubmit: () -> Void
+
+    var didFave: (Post) -> Void
+    var didRT: (Post) -> Void
+
     var pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
+
 
     var elementRepresentation: Element {
         EnvironmentReader { environment -> Element in
             Column { col in
                 col.horizontalAlignment = .fill
 
-                col.add(child: List(posts: state.posts))
+                col.add(child: List(posts: state.posts, didFave: didFave, didRT: didRT))
                 col.add(
                     child: EntryForm(
                         entry: state.entry,
@@ -154,13 +178,16 @@ fileprivate struct List: ProxyElement {
 
     var posts: [Post]
 
+    var didFave: (Post) -> Void
+    var didRT: (Post) -> Void
+
     var elementRepresentation: Element {
         Column { col in
             col.horizontalAlignment = .fill
             col.minimumVerticalSpacing = 8.0
 
             for post in posts {
-                col.add(child: FeedItem(post: post))
+                col.add(child: FeedItem(post: post, didFave: didFave, didRT: didRT))
             }
         }
     }
@@ -224,29 +251,63 @@ fileprivate struct FeedItem: ProxyElement {
 
     var post: Post
 
-    var elementRepresentation: Element {
-        Row { row in
-            row.verticalAlignment = .top
-            row.minimumHorizontalSpacing = 16.0
-            row.horizontalUnderflow = .growUniformly
+    var didFave: (Post) -> Void
+    var didRT: (Post) -> Void
 
-            let avatar = Box(
-                backgroundColor: .lightGray,
-                cornerStyle: .rounded(radius: 32.0)
-            ).constrainedTo(width: .absolute(64.0), height: .absolute(64.0))
-
-            row.add(
-                growPriority: 0.0,
-                shrinkPriority: 0.0,
-                child: avatar
+    var buttons: Element {
+        Row {
+            Button(onTap: { didFave(post) }, wrapping: Label(text: post.isFave ? "★" : "☆") {
+                $0.font = .boldSystemFont(ofSize: 36.0)
+                $0.color = UIColor.systemYellow
+            })
+            .accessibilityElement(
+                label: post.isFave ? "Unfave @\(post.authorName)'s post" : "Fave @\(post.authorName)'s Post",
+                value: nil,
+                traits: [.button]
             )
 
-            row.add(
-                growPriority: 1.0,
-                shrinkPriority: 1.0,
-                child: FeedItemBody(post: post)
-            )
+            Button(onTap: { didRT(post) }, wrapping: Label(text: "↺") {
+                $0.font = .boldSystemFont(ofSize: 36.0)
+                $0.color = UIColor.systemBlue
+            })
+            .accessibilityElement(label: "RT @\(post.authorName)'s Post", value: nil, traits: [.button])
+
         }
+    }
+
+    var elementRepresentation: Element {
+        Column { col in
+            let content = Row { row in
+                row.verticalAlignment = .top
+                row.minimumHorizontalSpacing = 16.0
+                row.horizontalUnderflow = .growUniformly
+
+                let avatar = Box(
+                    backgroundColor: .lightGray,
+                    cornerStyle: .rounded(radius: 32.0)
+                ).constrainedTo(width: .absolute(64.0), height: .absolute(64.0))
+
+                row.add(
+                    growPriority: 0.0,
+                    shrinkPriority: 0.0,
+                    child: avatar
+                )
+
+                row.add(
+                    growPriority: 1.0,
+                    shrinkPriority: 1.0,
+                    child: FeedItemBody(post: post)
+                )
+            }
+            col.add(child: content)
+
+            col.add(child: buttons)
+        }
+        .accessibilityContainer(
+            containerType: .semanticGroup,
+            label: post.authorName,
+            value: post.isFave ? "Faved" : nil
+        )
         .inset(uniform: 16.0)
         .box(background: .white)
     }
@@ -292,6 +353,7 @@ fileprivate struct FeedItemBody: ProxyElement {
 
             col.add(child: body)
         }
+        .accessibilityElement(label: post.body, value: dateFormatter.string(for: post.date), traits: [.staticText])
 
         return column
     }

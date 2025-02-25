@@ -118,7 +118,7 @@ fileprivate struct DemoItem: ProxyElement {
         .accessibilityElement(
             label: title,
             value: nil,
-            traits: [.staticText],
+            traits: [.staticText, .button],
             accessibilityFrameCornerStyle: .rounded(radius: 15)
         )
     }

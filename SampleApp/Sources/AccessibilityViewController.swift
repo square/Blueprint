@@ -69,13 +69,13 @@ final class AccessibilityViewController: UIViewController {
                 Label(text: "Detail") { label in
                     label.color = .systemGray
                 }
-            }.accessibilityElement(label: "Title", value: "Detail", traits: [])
+            }.accessibilityElement(label: "Title", value: "Detail", traits: [.staticText])
 
             Label(text: "This is an example of a long accessibility label")
                 .accessibilityElement(
                     label: "This is an example of a long accessibility label",
                     value: "Detail",
-                    traits: [],
+                    traits: [.staticText],
                     userInputLabels: ["Short Input Label"]
                 )
 
