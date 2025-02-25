@@ -28,6 +28,11 @@ let project = Project(
             name: "Tutorial 2 (Completed)",
             sources: ["Tutorials/Tutorial 2 (Completed)/**"]
         ),
+        .app(
+            name: "UITestHost",
+            sources: ["../BlueprintUI/UITests/UITestHost/**"]
+
+        ),
 
         // These tests are duplicates of the test definitions in the root Package.swift, but Tuist
         // does not currently support creating targets for tests in SwiftPM dependencies. See
@@ -44,7 +49,7 @@ let project = Project(
             bundleId: "$(inherited).UITests",
             deploymentTargets: .iOS("15.0"),
             sources: ["../BlueprintUI/Tests/Extensions/**", "../BlueprintUI/UITests/**"],
-            dependencies: [.target(name: "SampleApp")]
+            dependencies: [.target(name: "UITestHost")]
         ),
 
         .unitTest(
