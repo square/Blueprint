@@ -31,7 +31,6 @@ let project = Project(
         .app(
             name: "UITestHost",
             sources: ["../BlueprintUI/UITests/UITestHost/**"]
-
         ),
 
         // These tests are duplicates of the test definitions in the root Package.swift, but Tuist
