@@ -1,6 +1,6 @@
-import BlueprintUI
 import UIKit
 import XCTest
+@testable import BlueprintUI
 
 
 class UIAccessibilityTraits_Tests: XCTestCase {
