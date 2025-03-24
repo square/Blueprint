@@ -479,7 +479,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support `CALayerCornerCurve` for `Box` corner styles.
-- Added `AttributedText`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
+- Added `AttributedString`, which supports applying strongly-typed attributes to strings (much like the `AttributedString` type introduced in iOS 15).
 - Added support for links to `AttributedLabel`:
   - Links can be added using the `link` attribute of the attributed string. This attribute supports `URL`s or `String`s.
   - The label also supports detecting certain types of data and links, much like UITextView. Use the `linkDetectionTypes` property to specify which types of data to detect.

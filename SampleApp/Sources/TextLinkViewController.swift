@@ -12,12 +12,13 @@ final class TextLinkViewController: UIViewController {
     }
 
     var element: Element {
-        let text = "This is an attributed string with a phone number, address, link, and date. The phone number is (555) 555-5555. The address is 1455 Market St, San Francisco CA. The link is https://squareup.com. And the date is 12/1/21. There's also a `link` attribute to Block right here!"
-        let linkRange = text.range(of: "right here")!
-        let attributedText = NSMutableAttributedString(string: text)
-        attributedText.addAttribute(.link, value: "https://block.xyz", range: NSRange(linkRange, in: text))
+        var attributedString = AttributedString("This is an attributed string with a phone number, address, link, and date. The phone number is (555) 555-5555. The address is 1455 Market St, San Francisco CA. The link is https://squareup.com. And the date is 12/1/21. There's also a `link` attribute to Block right here!")
+        let linkRange = attributedString.range(of: "right here")!
+        let container = AttributeContainer()
+            .link(URL("https://block.xyz")!)
+        attributedString[linkRange].setAttributes(container)
 
-        let label = AttributedLabel(attributedText: attributedText) {
+        let label = AttributedLabel(attributedString: attributedString) {
             $0.linkDetectionTypes = [.link, .phoneNumber, .address, .date]
         }
 
@@ -37,20 +38,21 @@ final class TextLinkViewController: UIViewController {
                 self.presentAlert(message: $0.absoluteString)
             }
 
-            AttributedLabel(attributedText: NSAttributedString(string: "https://squareup.com")) {
+            AttributedLabel(attributedString: AttributedString("https://squareup.com")) {
                 $0.linkDetectionTypes = [.link]
             }
 
-            AttributedLabel(attributedText: NSAttributedString(
-                string: "https://squareup.com",
-                attributes: [.paragraphStyle: centered]
-            )) {
-                $0.linkDetectionTypes = [.link]
-            }
+            AttributedLabel(attributedString:
+                AttributedString(
+                    "https://squareup.com",
+                    attributes: AttributeContainer().paragraphStyle(centered)
+                )) {
+                    $0.linkDetectionTypes = [.link]
+                }
 
-            AttributedLabel(attributedText: NSAttributedString(
-                string: "https://squareup.com",
-                attributes: [.paragraphStyle: right]
+            AttributedLabel(attributedString: AttributedString(
+                "https://squareup.com",
+                attributes: AttributeContainer().paragraphStyle(right)
             )) {
                 $0.linkDetectionTypes = [.link]
             }
