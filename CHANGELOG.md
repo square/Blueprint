@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Removed
+- `AccessibilityElement.deprecated_accessibility(…)`. This was deprecated in September 2021, and renamed from .accessibility(…) to .deprecated_accessibility(…) in Oct 2024.
 
 ### Changed
 

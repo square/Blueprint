@@ -201,33 +201,4 @@ extension Element {
             wrapping: self
         )
     }
-
-
-    /// Wraps the receiver in an accessibility element with the provided values.
-    ///
-    /// - Important: ⚠️ This overrides the accessibility of the contained element and all of its children ⚠️
-    ///
-    /// - SeeAlso: ``accessibilityElement``
-    @available(
-        *,
-        deprecated,
-        renamed: "accessibilityElement(label:value:traits:hint:identifier:accessibilityFrameSize:)"
-    )
-    public func deprecated_accessibility(
-        label: String? = nil,
-        value: String? = nil,
-        hint: String? = nil,
-        identifier: String? = nil,
-        traits: Set<Accessibility.Trait> = [],
-        accessibilityFrameSize: CGSize? = nil
-    ) -> AccessibilityElement {
-        accessibilityElement(
-            label: label,
-            value: value,
-            traits: traits,
-            hint: hint,
-            identifier: identifier,
-            accessibilityFrameSize: accessibilityFrameSize
-        )
-    }
 }
