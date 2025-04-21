@@ -15,6 +15,9 @@ public struct Image: Element {
     /// not precisely match the size that the element is assigned.
     public var contentMode: ContentMode
 
+    /// Whether to override the user interface style, `nil` is the system style.
+    public var overrideUserInterfaceStyle: UIUserInterfaceStyle?
+
     /// iOS 14 added support for Image Descriptions using VoiceOver. This is not always appropriate.
     /// Set this to `true` to prevent VoiceOver from describing the displayed image.
     public var blockAccessibilityDescription: Bool
@@ -24,12 +27,14 @@ public struct Image: Element {
         image: UIImage?,
         contentMode: ContentMode = .aspectFill,
         tintColor: UIColor? = nil,
-        blockAccessibilityDescription: Bool = false
+        blockAccessibilityDescription: Bool = false,
+        overrideUserInterfaceStyle: UIUserInterfaceStyle? = nil
     ) {
         self.image = image
         self.contentMode = contentMode
         self.tintColor = tintColor
         self.blockAccessibilityDescription = blockAccessibilityDescription
+        self.overrideUserInterfaceStyle = overrideUserInterfaceStyle
     }
 
     public var content: ElementContent {
@@ -45,6 +50,7 @@ public struct Image: Element {
             config[\.contentMode] = contentMode.uiViewContentMode
             config[\.layer.minificationFilter] = .trilinear
             config[\.tintColor] = tintColor
+            config[\.overrideUserInterfaceStyle] = overrideUserInterfaceStyle
             if blockAccessibilityDescription {
                 // Seting `isAccessibilityElement = false` isn't enough here, VoiceOver is very aggressive in finding images to discribe. We need to explicitly remove the `.image` trait.
                 config[\.accessibilityTraits] = UIAccessibilityTraits.none
