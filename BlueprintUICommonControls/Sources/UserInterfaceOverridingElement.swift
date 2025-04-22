@@ -15,7 +15,7 @@ import UIKit
 ///     wrapping: content
 /// )
 /// ```
-public struct UserInterfaceOverridingElement: Element {
+public struct UserInterfaceStyleOverridingElement: Element {
 
     /// The element being wrapped with the overridden interface style.
     public var wrappedElement: Element
@@ -28,13 +28,13 @@ public struct UserInterfaceOverridingElement: Element {
     ///
     /// - Parameters:
     ///   - userInterfaceStyle: The desired interface style to apply (`.light`, `.dark`, or `.unspecified`).
-    ///   - element: The element whose interface style should be overridden.
+    ///   - wrapping: The content whose interface style should be overridden.
     public init(
         userInterfaceStyle: UIUserInterfaceStyle,
-        wrapping element: Element
+        wrapping content: () -> (Element)
     ) {
         self.userInterfaceStyle = userInterfaceStyle
-        wrappedElement = element
+        wrappedElement = content()
     }
 
     public var content: ElementContent {
@@ -49,7 +49,7 @@ public struct UserInterfaceOverridingElement: Element {
 }
 
 extension Element {
-    /// Wraps this element in a `UserInterfaceOverridingElement` to override its interface style.
+    /// Wraps this element in a `UserInterfaceStyleOverridingElement` to override its interface style.
     ///
     /// This method provides a convenient way to override the user interface style (light/dark mode)
     /// for any element.
@@ -64,10 +64,9 @@ extension Element {
     /// - Returns: A new element wrapped with the specified interface style override.
     public func overrideUserInterfaceStyle(
         _ override: UIUserInterfaceStyle = .unspecified
-    ) -> UserInterfaceOverridingElement {
-        UserInterfaceOverridingElement(
-            userInterfaceStyle: override,
-            wrapping: self
-        )
+    ) -> UserInterfaceStyleOverridingElement {
+        UserInterfaceStyleOverridingElement(userInterfaceStyle: override) {
+            self
+        }
     }
 }
