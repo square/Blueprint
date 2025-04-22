@@ -10,7 +10,7 @@ import UIKit
 /// Example:
 /// ```swift
 /// let content = Label(text: "Hello, World!")
-/// let forcedLightMode = UserInterfaceOverridingElement(
+/// let forcedLightMode = UserInterfaceStyleOverridingElement(
 ///     userInterfaceStyle: .light,
 ///     wrapping: content
 /// )
