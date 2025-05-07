@@ -32,6 +32,7 @@ extension LazyStorage: LegacyContentStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let node = LayoutResultNode(
+            identifier: identifier,
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -88,6 +89,52 @@ extension LazyStorage: CaffeinatedContentStorage {
         )
     }
 
+}
+
+extension LazyStorage: CaffeinatedContentStorageCrossRenderCached {
+
+    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+        state.measure(in: constraint, with: environment) { environment in
+
+            let child = buildChild(for: .measurement, in: constraint, environment: environment)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
+            let childState = state.childState(for: child, in: environment, with: identifier)
+
+            return childState.elementContent.cachedMeasure(
+                in: constraint,
+                with: environment,
+                state: childState
+            )
+        }
+    }
+
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        state.layout(in: size, with: environment) { environment in
+            let constraint = SizeConstraint(size)
+            let child = buildChild(for: .layout, in: constraint, environment: environment)
+
+            let childAttributes = LayoutAttributes(size: size)
+
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
+
+            let childState = state.childState(for: child, in: environment, with: identifier)
+
+            let node = LayoutResultNode(
+                identifier: identifier,
+                element: childState.element.latest,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                children: childState.elementContent.performCachedCaffeinatedLayout(
+                    in: size,
+                    with: environment,
+                    state: childState
+                ).caffeinatedBridgedWithIdentity
+            )
+
+            return [node]
+        }
+    }
+
     func performCaffeinatedLayout(
         frame: CGRect,
         environment: Environment,
@@ -104,6 +151,7 @@ extension LazyStorage: CaffeinatedContentStorage {
         let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
+            identifier: identifier,
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -116,4 +164,30 @@ extension LazyStorage: CaffeinatedContentStorage {
 
         return [(identifier, node)]
     }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementContent.ForEachElementContext) -> Void
+    ) {
+        precondition(childNodes.count == 1)
+
+        let element = builder(.layout, SizeConstraint(size), environment)
+
+        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+
+        let childNode = childNodes[0]
+
+        forEach(.init(state: childState, element: element, layoutNode: childNode))
+
+        childState.elementContent.forEachElement(
+            with: childNode,
+            environment: environment,
+            state: childState,
+            forEach: forEach
+        )
+    }
+
 }

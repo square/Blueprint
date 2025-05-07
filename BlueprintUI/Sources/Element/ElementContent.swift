@@ -3,6 +3,17 @@ import UIKit
 /// Represents the content of an element.
 public struct ElementContent {
 
+    /// A private element we can use as the root of the `ElementStateTree`
+    /// when calling `ElementContent.measure`.
+    private struct MeasurementElement: Element {
+
+        let content: ElementContent
+
+        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+            nil
+        }
+    }
+
     private let storage: ContentStorage
 
     // MARK: Measurement & Children
@@ -89,6 +100,120 @@ public struct ElementContent {
             node: node
         )
     }
+
+}
+
+extension ElementContent: CaffeinatedContentStorageCrossRenderCached {
+
+    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+        autoreleasepool {
+            let element = MeasurementElement(content: self)
+            let root = ElementStateTree(name: "ElementContent.measure")
+
+            let (_, size) = root.performUpdate(with: element, in: environment) { state in
+                self.cachedMeasure(
+                    in: constraint,
+                    with: environment,
+                    state: state
+                )
+            }
+
+            return size
+        }
+    }
+
+    /// Lays out the content, returning a tree of `LayoutResultNode` values
+    /// that can be  used to drive a layout process.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        autoreleasepool {
+            storage.performCachedCaffeinatedLayout(
+                in: size,
+                with: environment,
+                state: state
+            )
+        }
+    }
+
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ForEachElementContext) -> Void
+    ) {
+        autoreleasepool {
+            storage.forEachElement(
+                in: size,
+                with: environment,
+                children: childNodes,
+                state: state,
+                forEach: forEach
+            )
+        }
+    }
+
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func forEachElement(
+        with node: LayoutResultNode,
+        environment: Environment,
+        state: ElementState,
+        forEach: (ForEachElementContext) -> Void
+    ) {
+        forEachElement(
+            in: node.layoutAttributes.bounds.size,
+            with: environment,
+            children: node.children.map(\.node),
+            state: state,
+            forEach: forEach
+        )
+    }
+
+
+    //    private func layoutItems(
+    //        state: ElementState,
+    //        environment: Environment
+    //    ) -> [(traits: LayoutType.Traits, content: Measurable)] {
+    //
+    //        /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
+    //        /// here; because the enumerated version is about 25% slower. Because this
+    //        /// is an extremely hot codepath; this additional performance matters, so we will
+    //        /// keep track of the index ourselves.
+    //
+    //        children.indexedMap { index, child in
+    //
+    //            let childState = state.childState(for: child.element, in: environment, with: child.identifier)
+    //
+    //            let measurable = Measurer { constraint in
+    //                childState.elementContent.measure(
+    //                    in: constraint,
+    //                    with: environment,
+    //                    state: childState
+    //                )
+    //            }
+    //
+    //            return (traits: child.traits, measurable)
+    //        }
+    //    }
+
 }
 
 // MARK: - Layout storage
@@ -114,6 +239,8 @@ extension ElementContent {
             element: Element
         ) {
             let child = Child(
+                // TODO: VERIFY
+                identifier: .identifier(for: element, key: key, count: children.count + 1),
                 traits: traits,
                 key: key,
                 content: element.content,

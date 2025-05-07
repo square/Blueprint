@@ -40,6 +40,7 @@ extension Element {
         )
 
         return LayoutResultNode(
+            identifier: .identifierFor(singleChild: self),
             element: self,
             layoutAttributes: layoutAttributes,
             environment: environment,
@@ -59,6 +60,7 @@ extension Element {
         )
 
         return LayoutResultNode(
+            identifier: .identifierFor(singleChild: self),
             element: self,
             layoutAttributes: LayoutAttributes(frame: frame),
             environment: environment,
@@ -70,8 +72,11 @@ extension Element {
 /// Represents a tree of elements with complete layout attributes
 struct LayoutResultNode {
 
+    /// The identifier for the element within its parent.
+    var identifier: ElementIdentifier
+
     /// The element that was laid out
-    var element: Element
+    var element: ElementState.LatestElement
 
     /// The layout attributes for the element
     var layoutAttributes: LayoutAttributes
@@ -82,18 +87,39 @@ struct LayoutResultNode {
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
 
     init(
+        identifier: ElementIdentifier,
         element: Element,
         layoutAttributes: LayoutAttributes,
         environment: Environment,
         children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
     ) {
-        self.element = element
+        self.identifier = identifier
+        self.element = ElementState.LatestElement(element)
         self.layoutAttributes = layoutAttributes
         self.environment = environment
         self.children = children
     }
-}
 
+    init(
+        identifier: ElementIdentifier,
+        layoutAttributes: LayoutAttributes,
+        environment: Environment,
+        state: ElementState
+    ) {
+        self.init(
+            identifier: identifier,
+            element: state.element.latest,
+            layoutAttributes: layoutAttributes,
+            environment: environment,
+            // FIXME: THIS
+            children: /* state.element.latest.content.performCaffeinatedLayout(
+                    in: layoutAttributes.frame.size,
+                    with: environment,
+                    state: state
+                ) */ []
+        )
+    }
+}
 
 extension LayoutResultNode {
 
@@ -125,7 +151,7 @@ extension LayoutResultNode {
 
         // Get the backing view description for the current node (if any),
         // populated with relevant layout data.
-        let viewDescription = element.backingViewDescription(
+        let viewDescription = element.latest.backingViewDescription(
             with: .init(
                 bounds: layoutAttributes.bounds,
                 subtreeExtent: subtreeExtent,
@@ -170,6 +196,16 @@ extension LayoutResultNode {
             visit(depth, "\(child.identifier)", attributes.frame)
 
             child.node.dump(depth: depth + 1, visit: visit)
+        }
+    }
+
+}
+
+extension [LayoutResultNode] {
+
+    var caffeinatedBridgedWithIdentity: [(ElementIdentifier, LayoutResultNode)] {
+        map {
+            (ElementIdentifier.identifier(for: $0.element.latest, key: nil, count: count), $0)
         }
     }
 

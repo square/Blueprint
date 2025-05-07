@@ -44,6 +44,7 @@ extension EnvironmentAdaptingStorage: LegacyContentStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let node = LayoutResultNode(
+            identifier: identifier,
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -100,6 +101,7 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
         let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
+            identifier: .identifierFor(singleChild: child),
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -111,5 +113,73 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
         )
 
         return [(identifier, node)]
+    }
+
+}
+
+extension EnvironmentAdaptingStorage: CaffeinatedContentStorageCrossRenderCached {
+
+    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+        state.measure(in: constraint, with: environment) { environment in
+
+            let environment = self.adapted(environment: environment)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
+            let childState = state.childState(for: child, in: environment, with: identifier)
+
+            return childState.elementContent.cachedMeasure(
+                in: constraint,
+                with: environment,
+                state: childState
+            )
+        }
+    }
+
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        state.layout(in: size, with: environment) { environment in
+            let environment = adapted(environment: environment)
+            let childAttributes = LayoutAttributes(size: size)
+            let identifier = ElementIdentifier.identifierFor(singleChild: child)
+            let childState = state.childState(for: child, in: environment, with: identifier)
+            let node = LayoutResultNode(
+                identifier: identifier,
+                element: childState.element.latest,
+                layoutAttributes: childAttributes,
+                environment: environment,
+                children: childState.elementContent.performCachedCaffeinatedLayout(
+                    in: size,
+                    with: environment,
+                    state: childState
+                ).caffeinatedBridgedWithIdentity
+            )
+
+            return [node]
+        }
+    }
+
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementContent.ForEachElementContext) -> Void
+    ) {
+        precondition(childNodes.count == 1)
+
+        var environment = environment
+        adapter(&environment)
+
+        let childState = state.childState(for: child, in: environment, with: .identifierFor(singleChild: child))
+
+        let childNode = childNodes[0]
+
+        forEach(.init(state: childState, element: child, layoutNode: childNode))
+
+        childState.elementContent.forEachElement(
+            with: childNode,
+            environment: environment,
+            state: childState,
+            forEach: forEach
+        )
     }
 }

@@ -14,6 +14,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
     }
 
     struct Child {
+        var identifier: ElementIdentifier
         var traits: LayoutType.Traits
         var key: AnyHashable?
         var content: ElementContent
@@ -62,7 +63,7 @@ extension LayoutStorage: LegacyContentStorage {
 
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
 
-        for index in 0..<children.count {
+        for index in 0..<childCount {
             let currentChildLayoutAttributes = childAttributes[index]
             let currentChild = children[index]
             let currentChildCache = cache.subcache(
@@ -72,6 +73,7 @@ extension LayoutStorage: LegacyContentStorage {
             )
 
             let resultNode = LayoutResultNode(
+                identifier: .identifier(for: currentChild.element, key: nil, count: childCount),
                 element: currentChild.element,
                 layoutAttributes: currentChildLayoutAttributes,
                 environment: environment,
@@ -83,7 +85,7 @@ extension LayoutStorage: LegacyContentStorage {
             )
 
             let identifier = identifierFactory.nextIdentifier(
-                for: type(of: currentChild.element),
+                for: currentChild.element,
                 key: currentChild.key
             )
 
@@ -129,7 +131,7 @@ extension LayoutStorage: CaffeinatedContentStorage {
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
         return children.map { child in
             let identifier = identifierFactory.nextIdentifier(
-                for: type(of: child.element),
+                for: child.element,
                 key: child.key
             )
             return LayoutSubelement(
@@ -206,6 +208,7 @@ extension LayoutStorage: CaffeinatedContentStorage {
             let subnode = node.subnode(key: identifier)
 
             let node = LayoutResultNode(
+                identifier: identifier,
                 element: child.element,
                 layoutAttributes: childAttributes,
                 environment: environment,
@@ -218,5 +221,86 @@ extension LayoutStorage: CaffeinatedContentStorage {
             return (identifier: identifier, node: node)
         }
         return identifiedNodes
+    }
+
+}
+
+extension LayoutStorage: CaffeinatedContentStorageCrossRenderCached {
+
+    private func layoutItems(
+        state: ElementState,
+        environment: Environment
+    ) -> [(traits: LayoutType.Traits, content: Measurable)] {
+
+        /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
+        /// here; because the enumerated version is about 25% slower. Because this
+        /// is an extremely hot codepath; this additional performance matters, so we will
+        /// keep track of the index ourselves.
+
+        // FIXME: THIS
+        []
+//        children.indexedMap { index, child in
+//
+//            let childState = state.childState(for: child.element, in: environment, with: child.identifier)
+//
+//            let measurable = Measurer { constraint in
+//                childState.elementContent.measure(
+//                    in: constraint,
+//                    with: environment,
+//                    state: childState
+//                )
+//            }
+//
+//            return (traits: child.traits, measurable)
+//        }
+    }
+
+    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+        state.measure(in: constraint, with: environment) { environment in
+
+            Logger.logMeasureStart(
+                object: state.signpostRef,
+                description: state.name,
+                constraint: constraint
+            )
+
+            defer { Logger.logMeasureEnd(object: state.signpostRef) }
+
+            let layoutItems = self.layoutItems(state: state, environment: environment)
+
+            return layout.measure(
+                in: constraint,
+                items: layoutItems
+            )
+        }
+    }
+
+    // FIXME: THIS
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        []
+    }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementContent.ForEachElementContext) -> Void
+    ) {
+        // FIXME: THIS
+//        precondition(childNodes.count == 1)
+//
+//        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
+//
+//        let childNode = childNodes[0]
+//
+//        forEach(.init(state: childState, element: element, layoutNode: childNode))
+//
+//        childState.elementContent.forEachElement(
+//            with: childNode,
+//            environment: environment,
+//            state: childState,
+//            forEach: forEach
+//        )
     }
 }

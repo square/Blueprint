@@ -34,35 +34,92 @@ import UIKit
 ///             }
 ///         }
 ///     }
-public struct Environment {
+public struct Environment: Equatable {
 
     /// A default "empty" environment, with no values overridden.
     /// Each key will return its default value.
     public static let empty = Environment()
-
-    private var values: [ObjectIdentifier: Any] = [:]
-
-    /// Gets or sets an environment value by its key.
-    public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
-        get {
-            let objectId = ObjectIdentifier(key)
-
-            if let value = values[objectId] {
-                return value as! Key.Value
-            }
-
-            return key.defaultValue
-        }
-        set {
-            values[ObjectIdentifier(key)] = newValue
-        }
-    }
 
     /// If the `Environment` contains any values.
     var isEmpty: Bool {
         values.isEmpty
     }
 
+    private var values: [StorageKey: ValueBox] = [:]
+
+    /// Gets or sets an environment value by its key.
+    public subscript<KeyType: EnvironmentKey>(key: KeyType.Type) -> KeyType.Value {
+        get {
+            let storageKey = StorageKey(key)
+
+            for reader in readSubscriptions {
+                reader(storageKey)
+            }
+
+            if let value = values[storageKey] {
+                return value.base as! KeyType.Value
+            }
+            return key.defaultValue
+        }
+        set {
+            values[StorageKey(key)] = ValueBox(newValue)
+        }
+    }
+
+    public static func == (lhs: Environment, rhs: Environment) -> Bool {
+        guard lhs.values.count == rhs.values.count else { return false }
+
+        for (key, value) in lhs.values {
+            if key.valuesEqual(value.base, rhs.values[key]?.base) == false {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    func valuesEqual(to subset: Environment.Subset?) -> Bool {
+
+        guard let subset = subset else { return true }
+
+        for (key, value) in subset.values {
+            if key.valuesEqual(value.base, values[key]?.base) == false {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    func subset(with keys: Set<StorageKey>) -> Environment.Subset? {
+
+        if keys.isEmpty { return nil }
+
+        var subset = Subset()
+        subset.values.reserveCapacity(keys.count)
+
+        for key in keys {
+            if let value = values[key] {
+                subset.values[key] = value
+            }
+        }
+
+        return subset
+    }
+
+    /// Callback for when an `EnvironmentKey` is read from the `Environment`.
+    typealias OnDidRead = (StorageKey) -> Void
+
+    /// When an `EnvironmentKey` is read from the `Environment`,
+    /// the provided callback is invoked, allowing the caller to track what is being
+    /// accessed in the environment. This is used by the measurement and layout
+    /// phases of the render pass in order to determine if cached measurements
+    /// and layouts can be reused.
+    mutating func subscribeToReads(with callback: @escaping OnDidRead) {
+        readSubscriptions.append(callback)
+    }
+
+    private var readSubscriptions: [OnDidRead] = []
     /// Returns a new `Environment` by merging the values from `self` and the
     /// provided environment; keeping values from the provided environment when there
     /// are key overlaps between the two environments.
@@ -73,6 +130,49 @@ public struct Environment {
     }
 }
 
+extension Environment {
+
+    /// A subset of `Environment.value`s that can be used for matching a set of
+    /// key-value pairs with other `Environment`s
+    struct Subset {
+        var values: [StorageKey: ValueBox] = [:]
+    }
+
+    /// Place values in the environment into a reference box, so that their storage is only allocated once
+    /// even when placed into an environment subset for change tracking.
+    final class ValueBox {
+        let base: Any
+
+        init(_ base: Any) {
+            self.base = base
+        }
+    }
+
+    struct StorageKey: Hashable {
+
+        private let identifier: ObjectIdentifier
+
+        private let isEqual: (Any?, Any?) -> Bool
+
+        init<KeyType: EnvironmentKey>(_ key: KeyType.Type) {
+            identifier = ObjectIdentifier(key)
+
+            isEqual = KeyType.areValuesEqual
+        }
+
+        fileprivate func valuesEqual(_ lhs: Any?, _ rhs: Any?) -> Bool {
+            isEqual(lhs, rhs)
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(identifier)
+        }
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.identifier == rhs.identifier
+        }
+    }
+}
 
 extension UIView {
 

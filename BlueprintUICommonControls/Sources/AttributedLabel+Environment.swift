@@ -32,6 +32,12 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
             return DefaultURLHandler()
         }
     }()
+
+    public static func isEquivalent(_ lhs: any URLHandler, _ rhs: any URLHandler) -> Bool {
+        type(of: lhs) == type(of: rhs)
+    }
+
+
 }
 
 extension Environment {

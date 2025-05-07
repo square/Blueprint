@@ -56,6 +56,7 @@ extension PassthroughStorage: LegacyContentStorage {
         let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
 
         let node = LayoutResultNode(
+            identifier: identifier,
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -93,6 +94,7 @@ extension PassthroughStorage: CaffeinatedContentStorage {
         let subnode = node.subnode(key: identifier)
 
         let node = LayoutResultNode(
+            identifier: .identifierFor(singleChild: child),
             element: child,
             layoutAttributes: childAttributes,
             environment: environment,
@@ -104,6 +106,28 @@ extension PassthroughStorage: CaffeinatedContentStorage {
         )
 
         return [(identifier, node)]
+    }
+
+}
+
+extension PassthroughStorage: CaffeinatedContentStorageCrossRenderCached {
+
+    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+        content.cachedMeasure(in: constraint, with: environment, state: state)
+    }
+
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        content.performCachedCaffeinatedLayout(in: size, with: environment, state: state)
+    }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementContent.ForEachElementContext) -> Void
+    ) {
+        content.forEachElement(in: size, with: environment, children: childNodes, state: state, forEach: forEach)
     }
 
 }
