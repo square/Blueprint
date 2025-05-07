@@ -165,10 +165,10 @@ final class ElementState {
     /// while returning a cached layout.
     private(set) var hasUpdatedChildrenDuringLayout: Bool
 
-    /// The cached measurements for the current node.
+    /// The cached sizeThatFits for the current node.
     /// Measurements are cached by a `SizeConstraint` key, meaning that
     /// there can be multiple cached measurements for the same element.
-    private var measurements: [SizeConstraint: CachedMeasurement] = [:]
+    private var measurements: [SizeConstraint: CachedSizeThatFits] = [:]
 
     /// The cached layouts for the current node.
     /// Layouts are cached by a `CGSize` key, meaning that
@@ -388,25 +388,25 @@ final class ElementState {
         }
     }
 
-    /// Represents a cached measurement, which contains
+    /// Represents a cached sizeThatFits, which contains
     /// both the output measurements and the dependencies
     /// from the `Environment`, if any.
-    struct CachedMeasurement {
+    struct CachedSizeThatFits {
         var size: CGSize
         var dependencies: Environment.Subset?
     }
 
     /// Invoked by `ElementContent` to generate a measurement via the `measurer`,
     /// or return a cached measurement if one exists.
-    func measure(
-        in constraint: SizeConstraint,
+    func sizeThatFits(
+        proposal: SizeConstraint,
         with environment: Environment,
         using measurement: (Environment) -> CGSize
     ) -> CGSize {
         /// We already have a cached measurement, reuse that.
-        if let existing = measurements[constraint] {
+        if let existing = measurements[proposal] {
             delegate.ifDebug {
-                $0.treeDidReturnCachedMeasurement(existing, constraint: constraint, for: self)
+                $0.treeDidReturnCachedSizeThatFits(existing, proposal: proposal, for: self)
             }
 
             return existing.size
@@ -420,15 +420,15 @@ final class ElementState {
 
         /// Save the measurement for next time.
 
-        let measurement = CachedMeasurement(
+        let measurement = CachedSizeThatFits(
             size: size,
             dependencies: dependencies
         )
 
-        measurements[constraint] = measurement
+        measurements[proposal] = measurement
 
         delegate.ifDebug {
-            $0.treeDidPerformMeasurement(measurement, constraint: constraint, for: self)
+            $0.treeDidPerformSizeThatFits(measurement, proposal: proposal, for: self)
         }
 
         return size
@@ -788,15 +788,15 @@ protocol ElementStateTreeDelegate: AnyObject {
 
     /// Measuring & Laying Out
 
-    func treeDidReturnCachedMeasurement(
-        _ measurement: ElementState.CachedMeasurement,
-        constraint: SizeConstraint,
+    func treeDidReturnCachedSizeThatFits(
+        _ sizeThatFits: ElementState.CachedSizeThatFits,
+        proposal: SizeConstraint,
         for state: ElementState
     )
 
-    func treeDidPerformMeasurement(
-        _ measurement: ElementState.CachedMeasurement,
-        constraint: SizeConstraint,
+    func treeDidPerformSizeThatFits(
+        _ sizeThatFits: ElementState.CachedSizeThatFits,
+        proposal: SizeConstraint,
         for state: ElementState
     )
 
@@ -883,7 +883,7 @@ extension ElementState {
         var depth: Int
         var identifier: ElementIdentifier
         var element: Element
-        var measurements: [SizeConstraint: CachedMeasurement]
+        var measurements: [SizeConstraint: CachedSizeThatFits]
 
         var debugDescription: String {
             "\(identifier.description): \(measurements.count) Measurements"

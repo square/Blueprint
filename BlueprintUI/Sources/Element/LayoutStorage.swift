@@ -255,23 +255,25 @@ extension LayoutStorage: CaffeinatedContentStorageCrossRenderCached {
 //        }
     }
 
-    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
-        state.measure(in: constraint, with: environment) { environment in
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        state.sizeThatFits(proposal: proposal, with: environment) { environment in
 
             Logger.logMeasureStart(
                 object: state.signpostRef,
                 description: state.name,
-                constraint: constraint
+                constraint: proposal
             )
 
             defer { Logger.logMeasureEnd(object: state.signpostRef) }
 
             let layoutItems = self.layoutItems(state: state, environment: environment)
 
-            return layout.measure(
-                in: constraint,
-                items: layoutItems
-            )
+            // FIXME: THIS
+            return .zero
         }
     }
 
@@ -287,20 +289,23 @@ extension LayoutStorage: CaffeinatedContentStorageCrossRenderCached {
         state: ElementState,
         forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
-        // FIXME: THIS
-//        precondition(childNodes.count == 1)
-//
-//        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
-//
-//        let childNode = childNodes[0]
-//
-//        forEach(.init(state: childState, element: element, layoutNode: childNode))
-//
-//        childState.elementContent.forEachElement(
-//            with: childNode,
-//            environment: environment,
-//            state: childState,
-//            forEach: forEach
-//        )
+        precondition(childNodes.count == children.count)
+
+        // FIXME: indexedMap -> indexedForEach
+        _ = children.indexedMap { index, child in
+
+            let childState = state.childState(for: child.element, in: environment, with: child.identifier)
+
+            let childNode = childNodes[index]
+
+            forEach(.init(state: childState, element: child.element, layoutNode: childNode))
+
+            childState.elementContent.forEachElement(
+                with: childNode,
+                environment: environment,
+                state: childState,
+                forEach: forEach
+            )
+        }
     }
 }

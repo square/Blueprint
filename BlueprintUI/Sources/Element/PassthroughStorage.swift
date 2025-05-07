@@ -112,8 +112,12 @@ extension PassthroughStorage: CaffeinatedContentStorage {
 
 extension PassthroughStorage: CaffeinatedContentStorageCrossRenderCached {
 
-    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
-        content.cachedMeasure(in: constraint, with: environment, state: state)
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        content.sizeThatFitsWithCache(proposal: proposal, with: environment, state: state)
     }
 
     func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {

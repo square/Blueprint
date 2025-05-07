@@ -93,15 +93,19 @@ extension LazyStorage: CaffeinatedContentStorage {
 
 extension LazyStorage: CaffeinatedContentStorageCrossRenderCached {
 
-    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
-        state.measure(in: constraint, with: environment) { environment in
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        state.sizeThatFits(proposal: proposal, with: environment) { environment in
 
-            let child = buildChild(for: .measurement, in: constraint, environment: environment)
+            let child = buildChild(for: .measurement, in: proposal, environment: environment)
             let identifier = ElementIdentifier.identifierFor(singleChild: child)
             let childState = state.childState(for: child, in: environment, with: identifier)
 
-            return childState.elementContent.cachedMeasure(
-                in: constraint,
+            return childState.elementContent.sizeThatFitsWithCache(
+                proposal: proposal,
                 with: environment,
                 state: childState
             )

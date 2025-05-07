@@ -111,12 +111,11 @@ struct LayoutResultNode {
             element: state.element.latest,
             layoutAttributes: layoutAttributes,
             environment: environment,
-            // FIXME: THIS
-            children: /* state.element.latest.content.performCaffeinatedLayout(
-                    in: layoutAttributes.frame.size,
-                    with: environment,
-                    state: state
-                ) */ []
+            children: state.elementContent.performCachedCaffeinatedLayout(
+                in: layoutAttributes.frame.size,
+                with: environment,
+                state: state
+            ).caffeinatedBridgedWithIdentity
         )
     }
 }

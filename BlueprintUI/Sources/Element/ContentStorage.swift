@@ -54,8 +54,8 @@ protocol CaffeinatedContentStorage: CaffeinatedContentStorageCrossRenderCached {
 // FIXME: BETTER NAMES
 protocol CaffeinatedContentStorageCrossRenderCached {
 
-    func cachedMeasure(
-        in constraint: SizeConstraint,
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
         with environment: Environment,
         state: ElementState
     ) -> CGSize

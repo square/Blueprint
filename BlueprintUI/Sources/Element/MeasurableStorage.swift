@@ -53,9 +53,13 @@ extension MeasurableStorage: CaffeinatedContentStorage {
 
 extension MeasurableStorage: CaffeinatedContentStorageCrossRenderCached {
 
-    func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
-        state.measure(in: constraint, with: environment) { environment in
-            measurer(constraint, environment)
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        state.sizeThatFits(proposal: proposal, with: environment) { environment in
+            measurer(proposal, environment)
         }
     }
 
