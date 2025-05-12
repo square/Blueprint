@@ -260,6 +260,13 @@ fileprivate struct FeedItem: ProxyElement {
                 $0.font = .boldSystemFont(ofSize: 36.0)
                 $0.color = UIColor.systemYellow
             })
+            .transition(onLayout: .specific(.spring(
+                mass: 1,
+                stiffness: 200,
+                damping: 7,
+                initialVelocity: .zero
+            )))
+            .rotated(by: .init(value: post.isFave ? 72 : 0.0, unit: .degrees))
             .accessibilityElement(
                 label: post.isFave ? "Unfave @\(post.authorName)'s post" : "Fave @\(post.authorName)'s Post",
                 value: nil,
