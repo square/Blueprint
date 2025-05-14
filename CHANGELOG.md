@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
-
 - Fixed bounding rects for VoiceOver when an attributed label's link spans more than one line.
 - Fixed an issue where resizing a `ScrollView` could result in its scroll position being adjusted incorrectly.
 - Fixed an issue where a dismissed keyboard could impact a `ScrollView`'s bottom safe area inset.
+- Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UITableView` or a `UICollectionView` inside it (such as a `Listable` instance).
 
 ### Added
 
