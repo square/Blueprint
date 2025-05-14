@@ -62,6 +62,7 @@ public struct AccessibilityContainer: Element {
             config[\.accessibilityValue] = value
             config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityContainerType] = containerType.UIKitContainerType
+            config[\.layoutDirection] = context.environment.layoutDirection
         }
     }
 }
@@ -106,25 +107,43 @@ extension Element {
 
 extension AccessibilityContainer {
     private final class AccessibilityContainerView: UIView {
+        var layoutDirection: Environment.LayoutDirection = .leftToRight
+
         override var accessibilityElements: [Any]? {
-            get { recursiveAccessibleSubviews() }
+            get { accessibilityElements(layoutDirection: layoutDirection) }
             set { fatalError("This property is not settable") }
         }
     }
 }
 
 extension UIView {
-    func recursiveAccessibleSubviews() -> [Any] {
-        subviews.flatMap { subview -> [Any] in
+    func accessibilityElements(layoutDirection: Environment.LayoutDirection) -> [NSObject] {
+        recursiveAccessibilityElements().sorted(by: AccessibilityElement.frameSort(direction: layoutDirection))
+    }
+
+    private func recursiveAccessibilityElements() -> [NSObject] {
+        subviews.flatMap { subview -> [NSObject] in
             if subview.accessibilityElementsHidden || subview.isHidden {
                 return []
-            } else if let accessibilityElements = subview.accessibilityElements {
-                return accessibilityElements
-            } else if subview.isAccessibilityElement {
-                return [subview]
-            } else {
-                return subview.recursiveAccessibleSubviews()
             }
+
+            // UICollectionView is a special case because it uses virtualization to only show a subset of its elements.
+            // By doing this, we outsource the logic of specifying the accessibility elements to the collection view itself.
+            // If we did not do this, we would only make the visible cells accessible, and it would prevent the user from
+            // scrolling/swiping to cells outside the visible area.
+            if let collectionView = subview as? UICollectionView {
+                return [collectionView]
+            }
+
+            if let accessibilityElements = subview.accessibilityElements {
+                return accessibilityElements.compactMap { $0 as? NSObject }
+            }
+
+            if subview.isAccessibilityElement {
+                return [subview]
+            }
+
+            return subview.recursiveAccessibilityElements()
         }
     }
 }

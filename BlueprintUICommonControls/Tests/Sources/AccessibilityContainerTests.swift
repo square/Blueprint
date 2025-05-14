@@ -16,7 +16,7 @@ class AccessibilityContainerTests: XCTestCase {
         let outerContainerView = UIView()
         outerContainerView.addSubview(innerContainerView)
 
-        let accessibleSubviews = outerContainerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = outerContainerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertEqual(accessibleSubviews.count, 2)
         XCTAssertTrue(accessibleSubviews.contains(where: { $0 === viewA }))
@@ -34,7 +34,7 @@ class AccessibilityContainerTests: XCTestCase {
         let containerView = UIView()
         containerView.addSubview(wrapperView)
 
-        let accessibleSubviews = containerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = containerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertEqual(accessibleSubviews[0], accessibleView)
     }
@@ -53,7 +53,7 @@ class AccessibilityContainerTests: XCTestCase {
         outerContainerView.addSubview(accessibleView)
         outerContainerView.addSubview(innerContainerView)
 
-        let accessibleSubviews = outerContainerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = outerContainerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertEqual(accessibleSubviews.count, 2)
         XCTAssertTrue(accessibleSubviews.contains(where: { $0 === viewA }))
@@ -81,7 +81,7 @@ class AccessibilityContainerTests: XCTestCase {
         outerContainerView.addSubview(accessibleView)
         outerContainerView.addSubview(innerContainerView)
 
-        let accessibleSubviews = outerContainerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = outerContainerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertEqual(accessibleSubviews.count, 2)
         XCTAssertFalse(accessibleSubviews.contains(where: { $0 === undiscoveredViewA }))
@@ -100,7 +100,7 @@ class AccessibilityContainerTests: XCTestCase {
         let containerView = UIView()
         containerView.addSubview(wrapperView)
 
-        let accessibleSubviews = containerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = containerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertNil(accessibleSubviews.first)
     }
@@ -117,7 +117,7 @@ class AccessibilityContainerTests: XCTestCase {
         let containerView = UIView()
         containerView.addSubview(wrapperView)
 
-        let accessibleSubviews = containerView.recursiveAccessibleSubviews() as! [UIView]
+        let accessibleSubviews = containerView.accessibilityElements(layoutDirection: .leftToRight) as! [UIView]
 
         XCTAssertNil(accessibleSubviews.first)
     }
