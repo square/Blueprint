@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Main]
 
 ### Fixed
-- Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UICollectionView` inside it (such as a `Listable` instance.)
 
 ### Added
 
@@ -25,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [5.6.0] - 2025-05-14
+
+### Fixed
+- Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UICollectionView` inside it (such as a `Listable` instance.)
 
 ## [5.5.0] - 2025-04-22
 
@@ -1211,7 +1215,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.5.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.6.0...HEAD
+[5.6.0]: https://github.com/square/Blueprint/compare/5.5.0...5.6.0
 [5.5.0]: https://github.com/square/Blueprint/compare/5.4.0...5.5.0
 [5.4.0]: https://github.com/square/Blueprint/compare/5.3.0...5.4.0
 [5.3.0]: https://github.com/square/Blueprint/compare/5.2.0...5.3.0
