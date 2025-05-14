@@ -202,3 +202,29 @@ extension Element {
         )
     }
 }
+
+extension AccessibilityElement {
+    public static func frameSort(direction: Environment.LayoutDirection) -> (NSObject, NSObject) -> Bool {
+        {
+            let first = $0.accessibilityFrame
+            let second = $1.accessibilityFrame
+
+            // Derived through experimentation, this mimics the default sorting for UIKit.
+            // If frames differ by more than 8 points the top most element is preferred.
+            let verticalThreshold = 8.0
+            let verticalDelta = abs(first.minY - second.minY)
+            if verticalDelta > verticalThreshold {
+                return first.minY < second.minY
+            }
+
+            // Prefer the leading element.
+            switch direction {
+            case .leftToRight:
+                return first.minX < second.minX
+
+            case .rightToLeft:
+                return first.maxX > second.maxX
+            }
+        }
+    }
+}
