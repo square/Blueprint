@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Changed
+- Reverted the change titled "Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UICollectionView` inside it (such as a `Listable` instance.)" pending further investigation.
 
 ### Deprecated
 
