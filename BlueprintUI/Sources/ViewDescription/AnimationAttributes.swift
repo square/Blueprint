@@ -11,6 +11,7 @@ public struct AnimationAttributes {
     // Animation attributes with the default values from `.init()`.
     public static let `default`: Self = .init()
 
+    // Creates an animation with a duration and a UIView animation curve.
     public init(
         duration: TimeInterval = 0.2,
         curve: UIView.AnimationCurve = .easeInOut,
@@ -27,6 +28,7 @@ public struct AnimationAttributes {
         self.allowUserInteraction = allowUserInteraction
     }
 
+    /// An animation that uses in the built-in UIView animation curves.
     public static func curve(_ curve: UIView.AnimationCurve, duration: TimeInterval, allowUserInteraction: Bool = true) -> Self {
         self.init(animation: .curve(curve, duration: duration), allowUserInteraction: allowUserInteraction)
     }
@@ -95,7 +97,6 @@ extension AnimationAttributes {
 
         case cubicBezier(controlPoint1: CGPoint, controlPoint2: CGPoint, duration: TimeInterval)
 
-        /// A spring animation based on a damping ratio and initial velocity.
         case dampenedSpring(
             dampingRatio: CGFloat = 1,
             initialVelocity: CGVector = .zero,
