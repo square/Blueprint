@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `AnimationAttributes` can now be initialized with more types of animations, including bezier curves, springs, and dampened springs.
+
 ### Removed
+
+- Removed `AnimationAttributes.curve`.
+- Removed `AnimationAttributes.duration`.
 
 ### Changed
 
