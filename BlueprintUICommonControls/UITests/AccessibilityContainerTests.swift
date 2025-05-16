@@ -47,36 +47,21 @@ class AccessibilityContainerTests: XCTestCase {
         }
 
         show(vc: rootVC) { _ in
-            let ltrElements = root.accessibilityElements(layoutDirection: .leftToRight)
-            let ltrLabels = ltrElements.compactMap {
+            let elements = root.recursiveAccessibilityElements()
+            let labels = elements.compactMap {
                 ($0 as? UIView)?.accessibilityLabel
                     ?? ($0 as? UIAccessibilityElement)?.accessibilityLabel
             }
 
-
-            let rtlElements = root.accessibilityElements(layoutDirection: .rightToLeft)
-            let rtlLabels = rtlElements.compactMap {
-                ($0 as? UIView)?.accessibilityLabel
-                    ?? ($0 as? UIAccessibilityElement)?.accessibilityLabel
-            }
-
-            XCTAssertEqual(ltrLabels, ["Top Left", "Top Right", "Middle", "Nested"])
-            XCTAssertFalse(ltrLabels.contains("Hidden"))
-            XCTAssertFalse(ltrLabels.contains("Child")) // from axHiddenContainer
-
-            // The RTL ordering is not the reverse of LTR because the "Middle" view is within the 8px vertical tolerance threshold that
-            // VoiceOver seems to use.
-            XCTAssertEqual(rtlLabels, ["Top Right", "Middle", "Top Left", "Nested"])
-            XCTAssertFalse(rtlLabels.contains("Hidden"))
-            XCTAssertFalse(rtlLabels.contains("Child")) // from axHiddenContainer
+            XCTAssertEqual(labels, ["Top Left", "Top Right", "Middle", "Nested"])
+            XCTAssertFalse(labels.contains("Hidden"))
+            XCTAssertFalse(labels.contains("Child")) // from axHiddenContainer
 
             // Should include the UICollectionView itself, not its cells
-            XCTAssertTrue(ltrElements.contains { $0 as? UICollectionView === collectionView })
-            XCTAssertTrue(rtlElements.contains { $0 as? UICollectionView === collectionView })
+            XCTAssertTrue(elements.contains { $0 as? UICollectionView === collectionView })
 
             // Expected count: 4 accessible views + 1 collection view
-            XCTAssertEqual(ltrElements.count, 5)
-            XCTAssertEqual(rtlElements.count, 5)
+            XCTAssertEqual(elements.count, 5)
         }
     }
 }

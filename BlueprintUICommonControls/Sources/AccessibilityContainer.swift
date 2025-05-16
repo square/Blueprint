@@ -62,7 +62,6 @@ public struct AccessibilityContainer: Element {
             config[\.accessibilityValue] = value
             config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityContainerType] = containerType.UIKitContainerType
-            config[\.layoutDirection] = context.environment.layoutDirection
         }
     }
 }
@@ -107,21 +106,16 @@ extension Element {
 
 extension AccessibilityContainer {
     private final class AccessibilityContainerView: UIView {
-        var layoutDirection: Environment.LayoutDirection = .leftToRight
 
         override var accessibilityElements: [Any]? {
-            get { accessibilityElements(layoutDirection: layoutDirection) }
+            get { recursiveAccessibilityElements() }
             set { fatalError("This property is not settable") }
         }
     }
 }
 
 extension UIView {
-    func accessibilityElements(layoutDirection: Environment.LayoutDirection) -> [NSObject] {
-        recursiveAccessibilityElements().sorted(by: AccessibilityElement.frameSort(direction: layoutDirection))
-    }
-
-    private func recursiveAccessibilityElements() -> [NSObject] {
+    public func recursiveAccessibilityElements() -> [NSObject] {
         subviews.flatMap { subview -> [NSObject] in
             if subview.accessibilityElementsHidden || subview.isHidden {
                 return []
