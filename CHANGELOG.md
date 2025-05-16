@@ -11,15 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `AnimationAttributes` can now be initialized with more types of animations, including bezier curves, springs, and dampened springs.
-
 ### Removed
 
-- Removed `AnimationAttributes.curve`.
-- Removed `AnimationAttributes.duration`.
-
 ### Changed
-- Reverted the change titled "Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UICollectionView` inside it (such as a `Listable` instance.)" pending further investigation.
 
 ### Deprecated
 
@@ -30,6 +24,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [5.7.0] - 2025-05-16
+
+### Added
+
+- `AnimationAttributes` can now be initialized with more types of animations, including bezier curves, springs, and dampened springs.
+
+### Removed
+
+- Removed `AnimationAttributes.curve`.
+- Removed `AnimationAttributes.duration`.
+
+### Changed
+
+- Reverted the change titled "Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UICollectionView` inside it (such as a `Listable` instance.)" pending further investigation.
 
 ## [5.6.0] - 2025-05-14
 
@@ -1221,7 +1230,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.6.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/5.7.0...HEAD
+[5.6.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
 [5.6.0]: https://github.com/square/Blueprint/compare/5.5.0...5.6.0
 [5.5.0]: https://github.com/square/Blueprint/compare/5.4.0...5.5.0
 [5.4.0]: https://github.com/square/Blueprint/compare/5.3.0...5.4.0
