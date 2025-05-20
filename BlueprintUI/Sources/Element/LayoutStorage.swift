@@ -14,10 +14,22 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
     }
 
     struct Child {
-        var traits: LayoutType.Traits
+        var traits: LayoutTraits
         var key: AnyHashable?
         var content: ElementContent
         var element: Element
+
+        init(
+            traits: LayoutTraits = .empty,
+            key: AnyHashable? = nil,
+            content: ElementContent,
+            element: Element
+        ) {
+            self.traits = traits
+            self.key = key
+            self.content = content
+            self.element = element
+        }
     }
 }
 
@@ -41,7 +53,7 @@ extension LayoutStorage: LegacyContentStorage {
             defer { Logger.logMeasureEnd(object: cache.signpostRef) }
 
             let layoutItems = self.layoutItems(in: environment, cache: cache)
-            return layout.measure(in: constraint, items: layoutItems)
+            return layout.measure(in: constraint, items: layoutItems.legacyItems(for: LayoutType.self))
         }
     }
 
@@ -54,7 +66,7 @@ extension LayoutStorage: LegacyContentStorage {
             return []
         }
 
-        let layoutItems = layoutItems(in: environment, cache: cache)
+        let layoutItems = layoutItems(in: environment, cache: cache).legacyItems(for: LayoutType.self)
         let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
 
         var result: [IdentifiedNode] = []
@@ -96,7 +108,7 @@ extension LayoutStorage: LegacyContentStorage {
     private func layoutItems(
         in environment: Environment,
         cache: CacheTree
-    ) -> [(LayoutType.Traits, Measurable)] {
+    ) -> [(LayoutTraits, Measurable)] {
 
         /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
         /// here; because the enumerated version is about 25% slower. Because this
@@ -119,6 +131,14 @@ extension LayoutStorage: LegacyContentStorage {
             }
 
             return (child.traits, measurable)
+        }
+    }
+}
+
+extension Array where Element == (LayoutTraits, Measurable) {
+    func legacyItems<LayoutType: LegacyLayout>(for layoutType: LayoutType.Type) -> [(LayoutType.Traits, Measurable)] {
+        map { traits, content in
+            (traits[layout: LayoutType.self], content)
         }
     }
 }
