@@ -709,7 +709,7 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
-                        controller.viewDescription.beforeApplyAttributes(with: controller.view)
+                        child.viewDescription.beforeApplyAttributes(with: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {

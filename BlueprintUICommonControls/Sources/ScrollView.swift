@@ -314,7 +314,26 @@ extension ScrollView {
 
 fileprivate final class ScrollerWrapperView: UIView {
 
-    let scrollView = UIScrollView()
+    final class OurScrollView : UIScrollView {
+        
+        override var contentSize: CGSize {
+            didSet {
+                guard oldValue != contentSize else { return }
+                
+                print("New contentSize: \(contentSize)")
+            }
+        }
+        
+        override var frame: CGRect {
+            didSet {
+                guard oldValue != frame else { return }
+                
+                print("New frame: \(frame)")
+            }
+        }
+    }
+    
+    let scrollView = OurScrollView()
     let keyboardObserver = KeyboardObserver.shared
 
     /// The current `ScrollView` state we represent.
