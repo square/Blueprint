@@ -42,6 +42,7 @@ public struct ViewDescription {
 
     private let _viewType: UIView.Type
     private let _build: () -> UIView
+    private let _beforeApplyAttributes: (UIView) -> Void
     private let _apply: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
 
@@ -76,6 +77,14 @@ public struct ViewDescription {
 
         _build = configuration.builder
 
+        _beforeApplyAttributes = { view in
+            let typedView = configuration.typeChecked(view: view)
+            
+            for update in configuration.beforeApplyAttributes {
+                update(typedView)
+            }
+        }
+        
         _apply = { view in
             let typedView = configuration.typeChecked(view: view)
             for update in configuration.updates {
@@ -111,6 +120,10 @@ public struct ViewDescription {
 
     public func apply(to view: UIView) {
         _apply(view)
+    }
+    
+    public func beforeApplyAttributes(with view: UIView) {
+        _beforeApplyAttributes(view)
     }
 
     public func contentView(in view: UIView) -> UIView {
@@ -154,6 +167,9 @@ extension ViewDescription {
         /// The default value instantiates the view using `init(frame:)`.
         public var builder: () -> View
 
+        /// An array of update closures.
+        public var beforeApplyAttributes: [Update]
+        
         /// An array of update closures.
         public var updates: [Update]
 
@@ -200,6 +216,7 @@ extension ViewDescription {
         /// Initializes a default configuration object.
         public init() {
             builder = { View(frame: .zero) }
+            beforeApplyAttributes = []
             updates = []
             contentView = { $0 }
         }
@@ -216,6 +233,11 @@ extension ViewDescription {
 }
 
 extension ViewDescription.Configuration {
+
+    /// Adds the given update closure to the `updates` array.
+    public mutating func beforeApplyAttributes(_ update: @escaping Update) {
+        beforeApplyAttributes.append(update)
+    }
 
     /// Adds the given update closure to the `updates` array.
     public mutating func apply(_ update: @escaping Update) {

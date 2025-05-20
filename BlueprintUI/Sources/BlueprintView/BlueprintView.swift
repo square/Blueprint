@@ -709,6 +709,7 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
+                        controller.viewDescription.beforeApplyAttributes(with: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {
@@ -728,6 +729,7 @@ extension BlueprintView {
                     // performWithoutAnimation so they're not caught up inside an occuring transition.
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
+                        controller.viewDescription.beforeApplyAttributes(with: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         contentView.insertSubview(controller.view, at: index)

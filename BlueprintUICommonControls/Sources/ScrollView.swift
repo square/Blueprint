@@ -56,9 +56,20 @@ public struct ScrollView: Element {
             }
 
             config.contentView = { $0.scrollView }
+            
+            let contentFrame = context.subtreeExtent ?? .zero
+            
+            config.beforeApplyAttributes { view in
+                switch contentSize {
+                case .fittingWidth, .fittingHeight, .fittingContent:
+                    view.scrollView.contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
+                case .custom(let customSize):
+                    view.scrollView.contentSize = customSize
+                }
+            }
 
             config.apply {
-                $0.apply(scrollView: self, contentFrame: context.subtreeExtent ?? .zero)
+                $0.apply(scrollView: self, contentFrame: contentFrame)
             }
         }
     }
