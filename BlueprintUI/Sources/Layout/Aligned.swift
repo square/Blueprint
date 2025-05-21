@@ -1,37 +1,25 @@
 import UIKit
 
 /// Aligns a content element within itself. The vertical and horizontal alignment may be set independently.
-///
-/// When using alignment mode `.fill`, the content is scaled to the width or height of the `Aligned` element.
-///
-/// For other modes, the size of the content element is determined by calling `measure(in:)`
-/// on the content element – even if that size is larger than the wrapping element.
-///
 public struct Aligned: Element {
-    /// The possible vertical alignment values.
+    /// Describes how the content will be vertically aligned.
     public enum VerticalAlignment {
-        /// Aligns the content to the top edge of the containing element.
+        /// Aligns the content to the top edge.
         case top
         /// Centers the content vertically.
         case center
-        /// Aligns the content to the bottom edge of the containing element.
+        /// Aligns the content to the bottom edge.
         case bottom
-        /// The content fills the full vertical height of the containing element.
-        case fill
     }
 
-    /// The possible horizontal alignment values.
+    /// Describes how the content will be horizontally aligned.
     public enum HorizontalAlignment {
-        /// Aligns the content to the leading edge of the containing element.
-        /// In left-to-right languages, this is the left edge.
+        /// Aligns the content to the leading edge.
         case leading
         /// Centers the content horizontally.
         case center
-        /// Aligns the content to the trailing edge of the containing element.
-        /// In left-to-right languages, this is the right edge.
+        /// Aligns the content to the trailing edge.
         case trailing
-        /// The content fills the full horizontal width of the containing element.
-        case fill
     }
 
     /// The content element to be aligned.
@@ -75,7 +63,6 @@ public struct Aligned: Element {
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-
             let measurement = child.measure(in: SizeConstraint(size))
 
             let constrainedMeasurement = CGSize(
@@ -94,9 +81,6 @@ public struct Aligned: Element {
                 attributes.frame.origin.y = (size.height - constrainedMeasurement.height) / 2.0
             case .bottom:
                 attributes.frame.origin.y = size.height - constrainedMeasurement.height
-            case .fill:
-                attributes.frame.origin.y = 0
-                attributes.frame.size.height = size.height
             }
 
             switch horizontalAlignment {
@@ -106,9 +90,6 @@ public struct Aligned: Element {
                 attributes.frame.origin.x = (size.width - constrainedMeasurement.width) / 2.0
             case .trailing:
                 attributes.frame.origin.x = size.width - constrainedMeasurement.width
-            case .fill:
-                attributes.frame.origin.x = 0
-                attributes.frame.size.width = size.width
             }
 
             return attributes
@@ -134,37 +115,22 @@ public struct Aligned: Element {
                 .sizeThatFits(SizeConstraint(size))
                 .upperBounded(by: size)
 
-            let width: CGFloat
-            let height: CGFloat
-
             switch horizontalAlignment {
             case .leading:
                 x = 0
-                width = subelementSize.width
             case .center:
                 x = 0.5
-                width = subelementSize.width
             case .trailing:
                 x = 1
-                width = subelementSize.width
-            case .fill:
-                x = 0
-                width = size.width
             }
 
             switch verticalAlignment {
             case .top:
                 y = 0
-                height = subelementSize.height
             case .center:
                 y = 0.5
-                height = subelementSize.height
             case .bottom:
                 y = 1
-                height = subelementSize.height
-            case .fill:
-                y = 0
-                height = size.height
             }
 
             let position = CGPoint(x: x * size.width, y: y * size.height)
@@ -172,7 +138,7 @@ public struct Aligned: Element {
             subelement.place(
                 at: position,
                 anchor: UnitPoint(x: x, y: y),
-                size: CGSize(width: width, height: height)
+                size: subelementSize
             )
         }
     }
@@ -194,5 +160,22 @@ extension Element {
             horizontally: horizontally,
             wrapping: self
         )
+    }
+}
+
+extension Aligned: ComparableElement {
+    public func isEquivalent(to other: Aligned) -> Bool {
+        guard verticalAlignment == other.verticalAlignment,
+              horizontalAlignment == other.horizontalAlignment
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }

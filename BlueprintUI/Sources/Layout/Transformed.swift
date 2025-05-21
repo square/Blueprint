@@ -148,3 +148,32 @@ extension Element {
         )
     }
 }
+
+extension Transformed: ComparableElement {
+    public func isEquivalent(to other: Transformed) -> Bool {
+        // Compare transforms by their components since CATransform3D doesn't conform to Equatable
+        let m1 = transform.m11 == other.transform.m11 &&
+            transform.m12 == other.transform.m12 &&
+            transform.m13 == other.transform.m13 &&
+            transform.m14 == other.transform.m14 &&
+            transform.m21 == other.transform.m21 &&
+            transform.m22 == other.transform.m22 &&
+            transform.m23 == other.transform.m23 &&
+            transform.m24 == other.transform.m24 &&
+            transform.m31 == other.transform.m31 &&
+            transform.m32 == other.transform.m32 &&
+            transform.m33 == other.transform.m33 &&
+            transform.m34 == other.transform.m34 &&
+            transform.m41 == other.transform.m41 &&
+            transform.m42 == other.transform.m42 &&
+            transform.m43 == other.transform.m43 &&
+            transform.m44 == other.transform.m44
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return m1 && selfComparable.anyIsEquivalent(to: otherComparable)
+    }
+}

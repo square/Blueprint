@@ -74,3 +74,18 @@ extension Element {
         )
     }
 }
+
+extension Opacity: ComparableElement {
+    public func isEquivalent(to other: Opacity) -> Bool {
+        guard opacity == other.opacity else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
+    }
+}

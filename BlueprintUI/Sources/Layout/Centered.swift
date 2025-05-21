@@ -4,7 +4,7 @@
 /// the content element – even if that size is larger than the wrapping `Centered`
 /// element.
 ///
-public struct Centered: ProxyElement {
+public struct Centered: ProxyElement, ComparableElement {
 
     /// The content element to be centered.
     public var wrapped: Element
@@ -20,6 +20,15 @@ public struct Centered: ProxyElement {
             horizontally: .center,
             wrapping: wrapped
         )
+    }
+
+    public func isEquivalent(to other: Centered) -> Bool {
+        guard let selfComparable = wrapped as? AnyComparableElement,
+              let otherComparable = other.wrapped as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }
 

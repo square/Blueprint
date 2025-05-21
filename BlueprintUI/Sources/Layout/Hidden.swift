@@ -1,6 +1,6 @@
-import CoreGraphics
+import UIKit
 
-/// `Hidden` conditionally hides its wrapped element.
+/// Conditionally hides its wrapped element.
 ///
 /// - Note: When an element is hidden, any elements within the wrapped element will be hidden.
 public struct Hidden: Element {
@@ -59,5 +59,20 @@ extension Element {
     /// - Note: When an element is hidden, any elements within the wrapped element will be hidden.
     public func hidden(_ hidden: Bool = true) -> Hidden {
         Hidden(hidden, wrapping: self)
+    }
+}
+
+extension Hidden: ComparableElement {
+    public func isEquivalent(to other: Hidden) -> Bool {
+        guard isHidden == other.isHidden else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }

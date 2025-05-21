@@ -15,11 +15,11 @@ public struct Label: ProxyElement {
     public var lineBreakMode: NSLineBreakMode = .byTruncatingTail
     public var lineHeight: LineHeight = .font
 
-    /// A Boolean value that determines whether the label reduces the text’s font
-    /// size to fit the title string into the label’s bounding rectangle.
+    /// A Boolean value that determines whether the label reduces the text's font
+    /// size to fit the title string into the label's bounding rectangle.
     ///
     /// Normally, the label draws the text with the font you specify in the font property.
-    /// If this property is true, and the text in the text property exceeds the label’s bounding rectangle,
+    /// If this property is true, and the text in the text property exceeds the label's bounding rectangle,
     /// the label reduces the font size until the text fits or it has scaled the font down to the minimum
     /// font size. The default value for this property is false.
     ///
@@ -29,11 +29,11 @@ public struct Label: ProxyElement {
     /// This autoshrinking behavior is only intended for use with a single-line label.
     public var adjustsFontSizeToFitWidth: Bool = false
 
-    /// The minimum scale factor for the label’s text.
+    /// The minimum scale factor for the label's text.
     ///
     /// If the adjustsFontSizeToFitWidth is true, use this property to specify the
     /// smallest multiplier for the current font size that yields an acceptable
-    /// font size for the label’s text.
+    /// font size for the label's text.
     ///
     /// If you specify a value of 0 for this property, the label doesn't scale the text down.
     /// The default value of this property is 0.
@@ -160,5 +160,27 @@ extension Label {
 
         /// Use a custom line height and alignment.
         case custom(lineHeight: CGFloat, alignment: Alignment = .bottom)
+    }
+}
+
+extension Label: ComparableElement {
+    public func isEquivalent(to other: Label) -> Bool {
+        // Compare all properties that affect the visual appearance
+        text == other.text &&
+            font == other.font &&
+            color == other.color &&
+            alignment == other.alignment &&
+            numberOfLines == other.numberOfLines &&
+            lineBreakMode == other.lineBreakMode &&
+            lineHeight == other.lineHeight &&
+            adjustsFontSizeToFitWidth == other.adjustsFontSizeToFitWidth &&
+            minimumScaleFactor == other.minimumScaleFactor &&
+            allowsDefaultTighteningForTruncation == other.allowsDefaultTighteningForTruncation &&
+            shadow == other.shadow &&
+            isAccessibilityElement == other.isAccessibilityElement &&
+            accessibilityValue == other.accessibilityValue &&
+            accessibilityHint == other.accessibilityHint &&
+            accessibilityTraits == other.accessibilityTraits &&
+            accessibilityCustomActions == other.accessibilityCustomActions
     }
 }

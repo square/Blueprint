@@ -82,7 +82,6 @@ public struct Inset: Element {
     }
 }
 
-
 extension Element {
 
     /// Insets the element by the given amount on each side.
@@ -126,11 +125,8 @@ extension Element {
     }
 }
 
-
 extension Inset {
-
     fileprivate struct Layout: SingleChildLayout {
-
         var top: CGFloat
         var bottom: CGFloat
         var left: CGFloat
@@ -190,12 +186,20 @@ extension Inset {
 }
 
 extension Inset: ComparableElement {
-
     public func isEquivalent(to other: Inset) -> Bool {
-        if let selfWrapped = wrappedElement as? AnyComparableElement, let otherWrapped = other.wrappedElement as? AnyComparableElement {
-            return selfWrapped.anyIsEquivalent(to: otherWrapped)
+        guard top == other.top,
+              bottom == other.bottom,
+              left == other.left,
+              right == other.right
+        else {
+            return false
         }
-        return false
-    }
 
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
+    }
 }
