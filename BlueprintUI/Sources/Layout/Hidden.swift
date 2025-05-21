@@ -36,8 +36,7 @@ public struct Hidden: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             subelement.sizeThatFits(proposal)
         }
@@ -45,8 +44,7 @@ public struct Hidden: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             subelement.attributes.isHidden = isHidden
         }

@@ -62,7 +62,7 @@ final class ElementStateTree {
             return new
         }
 
-        if let root = root {
+        if let root {
 
             if type(of: root.element.latest) == type(of: element) {
 
@@ -498,8 +498,7 @@ final class ElementState {
 
                         /// Because we're returning a cached layout, we need to build our
                         /// ordered children based on the layout nodes.
-                        // FIXME: THIS
-//                        context.state.buildOrderedChildrenIfNeeded(from: context.layoutNode.children)
+                        context.state.buildOrderedChildrenIfNeeded(from: context.layoutNode.children.map(\.node))
                     }
                 )
 

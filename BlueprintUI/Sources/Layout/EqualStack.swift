@@ -156,8 +156,7 @@ extension EqualStack {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelements: Subelements,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             guard subelements.count > 0 else { return .zero }
 
@@ -200,8 +199,7 @@ extension EqualStack {
         func placeSubelements(
             in size: CGSize,
             subelements: Subelements,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             guard subelements.count > 0 else { return }
 

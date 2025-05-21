@@ -204,8 +204,7 @@ extension Flow {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelements: Subelements,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) -> CGSize {
             size(
                 for: subelements.map {
@@ -221,8 +220,7 @@ extension Flow {
         func placeSubelements(
             in size: CGSize,
             subelements: Subelements,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             zip(
                 frames(

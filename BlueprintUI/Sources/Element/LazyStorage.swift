@@ -89,6 +89,36 @@ extension LazyStorage: CaffeinatedContentStorage {
         )
     }
 
+    func performCaffeinatedLayout(
+        frame: CGRect,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> [IdentifiedNode] {
+        let child = buildChild(
+            for: .layout,
+            in: SizeConstraint(frame.size),
+            environment: environment
+        )
+
+        let childAttributes = LayoutAttributes(size: frame.size)
+        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
+        let subnode = node.subnode(key: identifier)
+
+        let node = LayoutResultNode(
+            identifier: identifier,
+            element: child,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: child.content.performCaffeinatedLayout(
+                frame: frame,
+                environment: environment,
+                node: subnode
+            )
+        )
+
+        return [(identifier, node)]
+    }
+
 }
 
 extension LazyStorage: CaffeinatedContentStorageCrossRenderCached {
@@ -137,36 +167,6 @@ extension LazyStorage: CaffeinatedContentStorageCrossRenderCached {
 
             return [node]
         }
-    }
-
-    func performCaffeinatedLayout(
-        frame: CGRect,
-        environment: Environment,
-        node: LayoutTreeNode
-    ) -> [IdentifiedNode] {
-        let child = buildChild(
-            for: .layout,
-            in: SizeConstraint(frame.size),
-            environment: environment
-        )
-
-        let childAttributes = LayoutAttributes(size: frame.size)
-        let identifier = ElementIdentifier(elementType: type(of: child), key: nil, count: 1)
-        let subnode = node.subnode(key: identifier)
-
-        let node = LayoutResultNode(
-            identifier: identifier,
-            element: child,
-            layoutAttributes: childAttributes,
-            environment: environment,
-            children: child.content.performCaffeinatedLayout(
-                frame: frame,
-                environment: environment,
-                node: subnode
-            )
-        )
-
-        return [(identifier, node)]
     }
 
     func forEachElement(

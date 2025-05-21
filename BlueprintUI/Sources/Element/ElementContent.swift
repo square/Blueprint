@@ -3,17 +3,6 @@ import UIKit
 /// Represents the content of an element.
 public struct ElementContent {
 
-    /// A private element we can use as the root of the `ElementStateTree`
-    /// when calling `ElementContent.measure`.
-    private struct MeasurementElement: Element {
-
-        let content: ElementContent
-
-        func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-            nil
-        }
-    }
-
     private let storage: ContentStorage
 
     // MARK: Measurement & Children
@@ -182,65 +171,81 @@ extension ElementContent: CaffeinatedContentStorageCrossRenderCached {
 
 }
 
-// FIXME: THIS
-// extension ElementContent {
-//
-//    /// Creates a new `ElementContent` which uses the provided element to measure its
-//    /// size, but does not place the element as a child in the final, laid out hierarchy.
-//    ///
-//    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
-//    /// to create a stateful element) and just need this element to be correctly sized.
-//    @_spi(BlueprintElementContent)
-//    public init(byMeasuring element: Element) {
-//        storage = MeasureNestedElementStorage(element: element)
-//    }
-//
-//    private struct MeasureNestedElementStorage: CaffeinatedContentStorageCrossRenderCached {
-//
-//        let element: Element
-//
-//        let childCount: Int = 0
-//
-//        func cachedMeasure(in constraint: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
-//
-//            let childState = state.childState(
-//                for: element,
-//                in: environment,
-//                with: .identifier(for: element, key: nil, count: 1),
-//                kind: .measurementOnly
-//            )
-//
-//            precondition(type(of: element) == type(of: childState.element.latest))
-//
-//            return childState.measure(in: constraint, with: environment) { environment in
-//                childState.elementContent.measure(in: constraint, with: environment, state: childState)
-//            }
-//        }
-//
-//        func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
-//            []
-//        }
-//
-//        func forEachElement(
-//            in size: CGSize,
-//            with environment: Environment,
-//            children childNodes: [LayoutResultNode],
-//            state: ElementState,
-//            forEach: (ElementContent.ForEachElementContext) -> Void
-//        ) {
-//            precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
-//
-//            /// No-op; we have no children so we won't enumerate them.
-//            ///
-//            /// Important: This means we also won't update measurement-only children
-//            /// with their latest instance versions, but that's OK, since we're also not applying
-//            /// them to real views anyway – that happens in the nested blueprint view.
-//            ///
-//            /// Once we're able to share this measurement and layout across blueprint views,
-//            /// we will be able to finish the bridge here.
-//        }
-//    }
-// }
+extension ElementContent {
+
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    @_spi(BlueprintElementContent)
+    public init(byMeasuring element: Element) {
+        storage = MeasureNestedElementStorage(element: element)
+    }
+
+    private struct MeasureNestedElementStorage: ContentStorage {
+
+        let element: Element
+
+        let childCount: Int = 0
+
+        func measure(in constraint: SizeConstraint, environment: Environment, cache: any CacheTree) -> CGSize {
+            fatalError()
+        }
+
+        func performLegacyLayout(attributes: LayoutAttributes, environment: Environment, cache: any CacheTree) -> [ElementContent.IdentifiedNode] {
+            fatalError()
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, environment: Environment, node: LayoutTreeNode) -> CGSize {
+            // FIXME: SUPPORT ON PRE-CROSSCACHED?
+            fatalError()
+        }
+
+        func performCaffeinatedLayout(frame: CGRect, environment: Environment, node: LayoutTreeNode) -> [ElementContent.IdentifiedNode] {
+            // FIXME: SUPPORT ON PRE-CROSSCACHED?
+            fatalError()
+        }
+
+        func sizeThatFitsWithCache(proposal: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+            let childState = state.childState(
+                for: element,
+                in: environment,
+                with: .identifierFor(singleChild: element),
+                kind: .measurementOnly
+            )
+
+            precondition(type(of: element) == type(of: childState.element.latest))
+
+            return childState.sizeThatFits(proposal: proposal, with: environment) { environment in
+                childState.elementContent.sizeThatFitsWithCache(proposal: proposal, with: environment, state: childState)
+            }
+        }
+
+        func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+            []
+        }
+
+        func forEachElement(
+            in size: CGSize,
+            with environment: Environment,
+            children childNodes: [LayoutResultNode],
+            state: ElementState,
+            forEach: (ElementContent.ForEachElementContext) -> Void
+        ) {
+            precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
+
+            /// No-op; we have no children so we won't enumerate them.
+            ///
+            /// Important: This means we also won't update measurement-only children
+            /// with their latest instance versions, but that's OK, since we're also not applying
+            /// them to real views anyway – that happens in the nested blueprint view.
+            ///
+            /// Once we're able to share this measurement and layout across blueprint views,
+            /// we will be able to finish the bridge here.
+        }
+    }
+}
 
 // MARK: - Layout storage
 
@@ -441,8 +446,6 @@ extension ElementContent {
 // `SingleChildLayout` implementation for use in elements with a single child.
 fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layout {
 
-    typealias Cache = WrappedLayout.Cache
-
     private var wrapped: WrappedLayout
 
     init(wrapping layout: WrappedLayout) {
@@ -464,37 +467,29 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     ) -> CGSize {
         precondition(subelements.count == 1)
         return wrapped.sizeThatFits(
             proposal: proposal,
             subelement: subelements[0],
-            environment: environment,
-            cache: &cache
+            environment: environment
         )
     }
 
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     ) {
         precondition(subelements.count == 1)
         wrapped.placeSubelement(
             in: size,
             subelement: subelements[0],
-            environment: environment,
-            cache: &cache
+            environment: environment
         )
     }
 
-    func makeCache(subelements: Subelements, environment: Environment) -> Cache {
-        precondition(subelements.count == 1)
-        return wrapped.makeCache(subelement: subelements[0], environment: environment)
-    }
 }
 
 extension Array {

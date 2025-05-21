@@ -251,8 +251,7 @@ public struct ConstrainedAspectRatio: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             contentMode.constrain(subelement: subelement, to: aspectRatio, in: proposal)
         }
@@ -260,8 +259,7 @@ public struct ConstrainedAspectRatio: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             subelement.place(filling: size)
         }

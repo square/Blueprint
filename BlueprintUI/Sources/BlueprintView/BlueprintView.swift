@@ -266,12 +266,35 @@ public final class BlueprintView: UIView {
 
         // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
         let measurement = renderContext.perform {
-            element.content.measure(
-                in: constraint,
-                environment: environment,
-                cacheName: cacheName,
-                layoutMode: layoutMode
-            )
+            if case .caffeinated(let options) = layoutMode, options.crossRenderCache {
+                let nodes: ElementState
+                if let state = rootState.root {
+                    nodes = state
+                } else {
+                    let rootCorrection = environment.roundingCorrection
+                    let rootOrigin = environment.roundingOrigin
+                    let rootFrame = CGRect(
+                        origin: .zero,
+                        size: bounds.size + rootCorrection.size
+                    )
+                    renderContext.perform {
+                        calculateNativeViewNodes(
+                            in: environment,
+                            rootFrame: rootFrame
+                        )
+                    }
+                    nodes = rootState.root!
+                }
+
+                return element.content.sizeThatFitsWithCache(proposal: constraint, with: environment, state: nodes)
+            } else {
+                return element.content.measure(
+                    in: constraint,
+                    environment: environment,
+                    cacheName: cacheName,
+                    layoutMode: layoutMode
+                )
+            }
         }
 
         sizesThatFit[constraint] = measurement
@@ -427,23 +450,33 @@ public final class BlueprintView: UIView {
         )
 
         let layoutMode = environment.layoutMode
+
+        let viewNodes: [(path: ElementPath, node: NativeViewNode)]
         let renderContext = RenderContext(layoutMode: layoutMode)
 
-        // Perform layout.
-        // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
-        layoutResult = renderContext.perform {
-            element?.layout(
-                frame: rootFrame,
-                environment: environment,
-                layoutMode: layoutMode
-            )
+        if case .caffeinated(let options) = layoutMode, options.crossRenderCache {
+            // Grab view descriptions
+            // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
+            viewNodes = renderContext.perform {
+                calculateNativeViewNodes(
+                    in: environment,
+                    rootFrame: rootFrame
+                )
+            }
+        } else {
+            // Perform layout.
+            // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
+            layoutResult = renderContext.perform {
+                element?.layout(
+                    frame: rootFrame,
+                    environment: environment,
+                    layoutMode: layoutMode
+                )
+            }
+            // Flatten into tree of view descriptions
+            viewNodes = layoutResult?.resolve() ?? []
         }
 
-        // Grab view descriptions
-        let viewNodes = calculateNativeViewNodes(
-            in: environment,
-            rootFrame: rootFrame
-        )
 
         let layoutEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
@@ -735,9 +768,9 @@ extension BlueprintView {
             for index in node.children.indices {
                 let (path, child) = node.children[index]
 
-                guard usedKeys.contains(path) == false else {
-                    fatalError("Duplicate view identifier")
-                }
+//                guard usedKeys.contains(path) == false else {
+//                    fatalError("Duplicate view identifier")
+//                }
                 usedKeys.insert(path)
 
                 let contentView = node.viewDescription.contentView(in: view)

@@ -876,8 +876,7 @@ extension StackLayout {
     public func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout ()
+        environment: Environment
     ) -> CGSize {
         guard subelements.isEmpty == false else { return .zero }
 
@@ -898,8 +897,7 @@ extension StackLayout {
     public func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout ()
+        environment: Environment
     ) {
         let constraint = size.vectorConstraint(axis: axis)
 
