@@ -59,7 +59,7 @@ public struct ScrollView: Element {
             
             let contentFrame = context.subtreeExtent ?? .zero
             
-            config.beforeApplyAttributes { view in
+            config.apply(.beforeLayoutAttributes) { view in
                 switch contentSize {
                 case .fittingWidth, .fittingHeight, .fittingContent:
                     view.scrollView.contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
@@ -68,7 +68,7 @@ public struct ScrollView: Element {
                 }
             }
 
-            config.apply {
+            config.apply(.afterLayoutAttributes) {
                 $0.apply(scrollView: self, contentFrame: contentFrame)
             }
         }
@@ -420,25 +420,12 @@ fileprivate final class ScrollerWrapperView: UIView {
             }
         }
 
-        let contentSize: CGSize
-
-        switch scrollView.contentSize {
-        case .fittingWidth, .fittingHeight, .fittingContent:
-            contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
-        case .custom(let customSize):
-            contentSize = customSize
-        }
-
         if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
             self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
         }
 
         if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
             self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
-        }
-
-        if self.scrollView.contentSize != contentSize {
-            self.scrollView.contentSize = contentSize
         }
 
         if self.scrollView.showsVerticalScrollIndicator != scrollView.showsVerticalScrollIndicator {

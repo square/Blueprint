@@ -650,7 +650,7 @@ extension BlueprintView {
 
             view.nativeViewNodeBlueprintEnvironment = node.environment
 
-            viewDescription.apply(to: view)
+            viewDescription.apply(for: .afterLayoutAttributes, to: view)
 
             // After this view's children are updated, allow it to run a layout pass.
             // This ensures backing view layout changes are contained in animation blocks.
@@ -709,7 +709,7 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
-                        child.viewDescription.beforeApplyAttributes(with: controller.view)
+                        child.viewDescription.apply(for: .beforeLayoutAttributes, to: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {
@@ -729,7 +729,7 @@ extension BlueprintView {
                     // performWithoutAnimation so they're not caught up inside an occuring transition.
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
-                        controller.viewDescription.beforeApplyAttributes(with: controller.view)
+                        controller.viewDescription.apply(for: .beforeLayoutAttributes, to: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         contentView.insertSubview(controller.view, at: index)

@@ -42,8 +42,7 @@ public struct ViewDescription {
 
     private let _viewType: UIView.Type
     private let _build: () -> UIView
-    private let _beforeApplyAttributes: (UIView) -> Void
-    private let _apply: (UIView) -> Void
+    private let _apply: UpdatePhaseVarying<(UIView) -> Void>
     private let _contentView: (UIView) -> UIView
 
     private let _layoutTransition: LayoutTransition
@@ -76,24 +75,27 @@ public struct ViewDescription {
         _viewType = View.self
 
         _build = configuration.builder
-
-        _beforeApplyAttributes = { view in
-            let typedView = configuration.typeChecked(view: view)
-            
-            for update in configuration.beforeApplyAttributes {
-                update(typedView)
-            }
-        }
         
-        _apply = { view in
-            let typedView = configuration.typeChecked(view: view)
-            for update in configuration.updates {
-                update(typedView)
+        _apply = .init(
+            beforeLayoutAttributes: { view in
+                let typedView = configuration.typeChecked(view: view)
+                
+                for update in configuration.updates.beforeLayoutAttributes {
+                    update(typedView)
+                }
+            },
+            afterLayoutAttributes: { view in
+                let typedView = configuration.typeChecked(view: view)
+                
+                for update in configuration.updates.afterLayoutAttributes {
+                    update(typedView)
+                }
+                
+                for binding in configuration.bindings {
+                    binding.value.apply(to: typedView)
+                }
             }
-            for binding in configuration.bindings {
-                binding.value.apply(to: typedView)
-            }
-        }
+        )
 
         _contentView = { view in
             let typedView = configuration.typeChecked(view: view)
@@ -118,12 +120,8 @@ public struct ViewDescription {
         _build()
     }
 
-    public func apply(to view: UIView) {
-        _apply(view)
-    }
-    
-    public func beforeApplyAttributes(with view: UIView) {
-        _beforeApplyAttributes(view)
+    public func apply(for phase : UpdatePhase, to view: UIView) {
+        _apply.value(for: phase)(view)
     }
 
     public func contentView(in view: UIView) -> UIView {
@@ -167,11 +165,9 @@ extension ViewDescription {
         /// The default value instantiates the view using `init(frame:)`.
         public var builder: () -> View
 
-        /// An array of update closures.
-        public var beforeApplyAttributes: [Update]
         
         /// An array of update closures.
-        public var updates: [Update]
+        public var updates: UpdatePhaseVarying<[Update]>
 
         /// A closure that takes a native view instance as the single argument, and
         /// returns a subview of that view into which child views should be added
@@ -216,8 +212,7 @@ extension ViewDescription {
         /// Initializes a default configuration object.
         public init() {
             builder = { View(frame: .zero) }
-            beforeApplyAttributes = []
-            updates = []
+            updates = .init(beforeLayoutAttributes: [], afterLayoutAttributes: [])
             contentView = { $0 }
         }
 
@@ -232,16 +227,48 @@ extension ViewDescription {
 
 }
 
+extension ViewDescription {
+    
+    public enum UpdatePhase {
+        case beforeLayoutAttributes
+        case afterLayoutAttributes
+    }
+    
+    public struct UpdatePhaseVarying<Value> {
+        
+        var beforeLayoutAttributes : Value
+        var afterLayoutAttributes : Value
+        
+        func value(for phase : UpdatePhase) -> Value {
+            switch phase {
+            case .beforeLayoutAttributes:
+                beforeLayoutAttributes
+            case .afterLayoutAttributes:
+                afterLayoutAttributes
+            }
+        }
+        
+        mutating func mutate(_ phase : UpdatePhase, _ change : (inout Value) -> ()) {
+            switch phase {
+            case .beforeLayoutAttributes:
+                change(&beforeLayoutAttributes)
+            case .afterLayoutAttributes:
+                change(&afterLayoutAttributes)
+            }
+        }
+    }
+}
+
 extension ViewDescription.Configuration {
 
     /// Adds the given update closure to the `updates` array.
-    public mutating func beforeApplyAttributes(_ update: @escaping Update) {
-        beforeApplyAttributes.append(update)
-    }
-
-    /// Adds the given update closure to the `updates` array.
-    public mutating func apply(_ update: @escaping Update) {
-        updates.append(update)
+    public mutating func apply(
+        _ phase : ViewDescription.UpdatePhase = .afterLayoutAttributes,
+        _ update: @escaping Update
+    ) {
+        updates.mutate(phase) {
+            $0.append(update)
+        }
     }
 
     /// Subscript for values that are not optional. We must represent these values as optional so that we can
