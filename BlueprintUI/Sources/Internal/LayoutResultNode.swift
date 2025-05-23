@@ -25,22 +25,6 @@ extension Element {
         }
     }
 
-    private func legacyLayout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        let cache = CacheFactory.makeCache(name: "\(type(of: self))")
-        let children = content.performLegacyLayout(
-            attributes: layoutAttributes,
-            environment: environment,
-            cache: cache
-        )
-
-        return LayoutResultNode(
-            element: self,
-            layoutAttributes: layoutAttributes,
-            environment: environment,
-            children: children
-        )
-    }
-
     private func caffeinatedLayout(
         frame: CGRect,
         environment: Environment,
