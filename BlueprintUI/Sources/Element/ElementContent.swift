@@ -42,10 +42,6 @@ public struct ElementContent {
         }
     }
 
-    func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
-        storage.measure(in: constraint, environment: environment, cache: cache)
-    }
-
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
@@ -59,18 +55,6 @@ public struct ElementContent {
     }
 
     typealias IdentifiedNode = (identifier: ElementIdentifier, node: LayoutResultNode)
-
-    func performLegacyLayout(
-        attributes: LayoutAttributes,
-        environment: Environment,
-        cache: CacheTree
-    ) -> [IdentifiedNode] {
-        storage.performLegacyLayout(
-            attributes: attributes,
-            environment: environment,
-            cache: cache
-        )
-    }
 
     func performCaffeinatedLayout(
         frame: CGRect,
@@ -334,18 +318,6 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
 
     init(wrapping layout: WrappedLayout) {
         wrapped = layout
-    }
-
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        precondition(items.count == 1)
-        return wrapped.measure(in: constraint, child: items.map { $0.content }.first!)
-    }
-
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        precondition(items.count == 1)
-        return [
-            wrapped.layout(size: size, child: items.map { $0.content }.first!),
-        ]
     }
 
     func sizeThatFits(
