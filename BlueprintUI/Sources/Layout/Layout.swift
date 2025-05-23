@@ -62,12 +62,6 @@ import CoreGraphics
 /// ``SingleChildLayout`` protocol instead. It has similar methods, but is strongly typed for a
 /// single subelement instead of a collection.
 ///
-/// - Note: During the transition from Blueprint's legacy layout system to Caffeinated Layout, the
-///   ``Layout`` protocol is composed of two sets of layout methods: ``LegacyLayout`` and
-///   ``CaffeinatedLayout``. While this documentation focuses on the newer layout API, you must
-///   currently implement both. Fortunately, the methods are similar, and you may be able to reuse
-///   logic.
-///
 /// ## Interact with subelements through their proxies
 ///
 /// To perform layout, you need information about all of your container's subelements, which are the
