@@ -35,7 +35,7 @@ public struct Image: Element {
     public var content: ElementContent {
         let measurer = Measurer(contentMode: contentMode, imageSize: image?.size)
         return ElementContent { constraint, environment in
-            measurer.measure(in: constraint, layoutMode: environment.layoutMode)
+            measurer.measure(in: constraint)
         }
     }
 
@@ -113,7 +113,7 @@ extension Image {
         var contentMode: ContentMode
         var imageSize: CGSize?
 
-        func measure(in constraint: SizeConstraint, layoutMode: LayoutMode) -> CGSize {
+        func measure(in constraint: SizeConstraint) -> CGSize {
             guard let imageSize = imageSize else { return .zero }
 
             enum Mode {

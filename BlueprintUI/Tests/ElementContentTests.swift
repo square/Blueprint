@@ -183,17 +183,6 @@ fileprivate struct FrameLayout: Layout, SingleTraitLayout {
 
     typealias Traits = CGRect
 
-    func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
-        items.reduce(into: CGSize.zero) { result, item in
-            result.width = max(result.width, item.traits.maxX)
-            result.height = max(result.height, item.traits.maxY)
-        }
-    }
-
-    func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {
-        items.map { LayoutAttributes(frame: $0.traits) }
-    }
-
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
@@ -287,14 +276,6 @@ private struct MeasureCountingSpacer: Element {
 
     struct FixedLayout: Layout {
         var size: CGSize
-
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            size
-        }
-
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            []
-        }
 
         func sizeThatFits(
             proposal: SizeConstraint,
