@@ -56,9 +56,20 @@ public struct ScrollView: Element {
             }
 
             config.contentView = { $0.scrollView }
+            
+            let contentFrame = context.subtreeExtent ?? .zero
+            
+            config.apply(.beforeLayoutAttributes) { view in
+                switch contentSize {
+                case .fittingWidth, .fittingHeight, .fittingContent:
+                    view.scrollView.contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
+                case .custom(let customSize):
+                    view.scrollView.contentSize = customSize
+                }
+            }
 
-            config.apply {
-                $0.apply(scrollView: self, contentFrame: context.subtreeExtent ?? .zero)
+            config.apply(.afterLayoutAttributes) {
+                $0.apply(scrollView: self, contentFrame: contentFrame)
             }
         }
     }
@@ -303,7 +314,26 @@ extension ScrollView {
 
 fileprivate final class ScrollerWrapperView: UIView {
 
-    let scrollView = UIScrollView()
+    final class OurScrollView : UIScrollView {
+        
+        override var contentSize: CGSize {
+            didSet {
+                guard oldValue != contentSize else { return }
+                
+                print("New contentSize: \(contentSize)")
+            }
+        }
+        
+        override var frame: CGRect {
+            didSet {
+                guard oldValue != frame else { return }
+                
+                print("New frame: \(frame)")
+            }
+        }
+    }
+    
+    let scrollView = OurScrollView()
     let keyboardObserver = KeyboardObserver.shared
 
     /// The current `ScrollView` state we represent.
@@ -390,25 +420,12 @@ fileprivate final class ScrollerWrapperView: UIView {
             }
         }
 
-        let contentSize: CGSize
-
-        switch scrollView.contentSize {
-        case .fittingWidth, .fittingHeight, .fittingContent:
-            contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
-        case .custom(let customSize):
-            contentSize = customSize
-        }
-
         if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
             self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
         }
 
         if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
             self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
-        }
-
-        if self.scrollView.contentSize != contentSize {
-            self.scrollView.contentSize = contentSize
         }
 
         if self.scrollView.showsVerticalScrollIndicator != scrollView.showsVerticalScrollIndicator {
