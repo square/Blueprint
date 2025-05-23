@@ -235,19 +235,6 @@ public struct ConstrainedAspectRatio: Element {
         var aspectRatio: AspectRatio
         var contentMode: ContentMode
 
-        func measure(in sizeConstraint: SizeConstraint, child: Measurable) -> CGSize {
-            let contentSize = child.measure(in: sizeConstraint)
-            return contentMode.constrain(
-                contentSize: contentSize,
-                in: sizeConstraint,
-                to: aspectRatio
-            )
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            LayoutAttributes(size: size)
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,

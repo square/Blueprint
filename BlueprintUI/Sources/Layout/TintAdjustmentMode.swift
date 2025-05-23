@@ -25,16 +25,6 @@ public struct TintAdjustmentMode: Element {
     private struct Layout: SingleChildLayout {
         var tintAdjustmentMode: UIView.TintAdjustmentMode
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            var attributes = LayoutAttributes(size: size)
-            attributes.tintAdjustmentMode = tintAdjustmentMode
-            return attributes
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
