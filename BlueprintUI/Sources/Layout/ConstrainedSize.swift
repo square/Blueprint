@@ -211,8 +211,7 @@ extension ConstrainedSize {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             if case let .absolute(width) = width, case let .absolute(height) = height {
                 return CGSize(width: width, height: height)
@@ -233,8 +232,7 @@ extension ConstrainedSize {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             subelement.place(filling: size)
         }

@@ -162,8 +162,7 @@ extension Inset {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) -> CGSize {
             let insetProposal = proposal.inset(by: edgeInsets)
             let childSize = subelement.sizeThatFits(insetProposal)
@@ -173,8 +172,7 @@ extension Inset {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             let insetSize = size.inset(by: edgeInsets)
 
@@ -189,4 +187,15 @@ extension Inset {
             .init(top: top, left: left, bottom: bottom, right: right)
         }
     }
+}
+
+extension Inset: ComparableElement {
+
+    public func isEquivalent(to other: Inset) -> Bool {
+        if let selfWrapped = wrappedElement as? AnyComparableElement, let otherWrapped = other.wrappedElement as? AnyComparableElement {
+            return selfWrapped.anyIsEquivalent(to: otherWrapped)
+        }
+        return false
+    }
+
 }

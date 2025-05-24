@@ -9,7 +9,8 @@ public struct LayoutOptions: Equatable {
     /// The default configuration.
     public static let `default` = LayoutOptions(
         hintRangeBoundaries: true,
-        searchUnconstrainedKeys: true
+        searchUnconstrainedKeys: true,
+        crossRenderCache: true
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
@@ -22,8 +23,12 @@ public struct LayoutOptions: Equatable {
     /// Layout contract for correct behavior.
     public var searchUnconstrainedKeys: Bool
 
-    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool) {
+    /// Allows for caching of layout values across renders.
+    public var crossRenderCache: Bool
+
+    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool, crossRenderCache: Bool) {
         self.hintRangeBoundaries = hintRangeBoundaries
         self.searchUnconstrainedKeys = searchUnconstrainedKeys
+        self.crossRenderCache = crossRenderCache
     }
 }

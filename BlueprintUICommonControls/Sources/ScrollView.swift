@@ -193,8 +193,7 @@ extension ScrollView {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             let adjustedProposal = proposal.inset(by: contentInset)
 
@@ -216,8 +215,7 @@ extension ScrollView {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             var insetSize = size
             insetSize.width -= contentInset.left + contentInset.right

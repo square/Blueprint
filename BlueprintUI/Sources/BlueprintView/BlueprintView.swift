@@ -40,6 +40,9 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    /// The live, tracked state for each element in the element tree.
+    internal let rootState: ElementStateTree
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -50,9 +53,7 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
-            // Shortcut: If both environments were empty, nothing changed.
-            if oldValue.isEmpty && environment.isEmpty { return }
-
+            guard oldValue != environment else { return }
             setNeedsViewHierarchyUpdate()
         }
     }
@@ -112,8 +113,23 @@ public final class BlueprintView: UIView {
         }
     }
 
-    /// An optional name to help identify this view
-    public var name: String?
+    /// An optional name to help identify this view. Will be
+    /// present in signpost logs, for example.
+    public var name: String? {
+        didSet {
+            guard oldValue != name else { return }
+
+            didUpdateName()
+        }
+    }
+
+    private func didUpdateName() {
+        if let name = name, name.isEmpty == false {
+            rootState.name = "BlueprintView: \(name)"
+        } else {
+            rootState.name = "BlueprintView"
+        }
+    }
 
     /// Provides performance metrics about the duration of layouts, updates, etc.
     public weak var metricsDelegate: BlueprintViewMetricsDelegate? = nil
@@ -152,13 +168,13 @@ public final class BlueprintView: UIView {
         rootController = NativeViewController(
             node: NativeViewNode(
                 content: PassthroughView.describe { _ in },
-                // Because no layout update occurs here, passing an empty environment is fine;
-                // the correct environment will be passed during update.
-                environment: .empty,
+                environment: environment,
                 layoutAttributes: LayoutAttributes(),
                 children: []
             )
         )
+
+        rootState = .init(name: "")
 
         super.init(frame: CGRect.zero)
 
@@ -166,6 +182,8 @@ public final class BlueprintView: UIView {
         addSubview(rootController.view)
         setContentHuggingPriority(.defaultHigh, for: .horizontal)
         setContentHuggingPriority(.defaultHigh, for: .vertical)
+
+        didUpdateName()
 
         NotificationCenter
             .default
@@ -248,12 +266,35 @@ public final class BlueprintView: UIView {
 
         // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
         let measurement = renderContext.perform {
-            element.content.measure(
-                in: constraint,
-                environment: environment,
-                cacheName: cacheName,
-                layoutMode: layoutMode
-            )
+            if case .caffeinated(let options) = layoutMode, options.crossRenderCache {
+                let nodes: ElementState
+                if let state = rootState.root {
+                    nodes = state
+                } else {
+                    let rootCorrection = environment.roundingCorrection
+                    let rootOrigin = environment.roundingOrigin
+                    let rootFrame = CGRect(
+                        origin: .zero,
+                        size: bounds.size + rootCorrection.size
+                    )
+                    renderContext.perform {
+                        calculateNativeViewNodes(
+                            in: environment,
+                            rootFrame: rootFrame
+                        )
+                    }
+                    nodes = rootState.root!
+                }
+
+                return element.content.sizeThatFitsWithCache(proposal: constraint, with: environment, state: nodes)
+            } else {
+                return element.content.measure(
+                    in: constraint,
+                    environment: environment,
+                    cacheName: cacheName,
+                    layoutMode: layoutMode
+                )
+            }
         }
 
         sizesThatFit[constraint] = measurement
@@ -409,20 +450,33 @@ public final class BlueprintView: UIView {
         )
 
         let layoutMode = environment.layoutMode
+
+        let viewNodes: [(path: ElementPath, node: NativeViewNode)]
         let renderContext = RenderContext(layoutMode: layoutMode)
 
-        // Perform layout.
-        // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
-        layoutResult = renderContext.perform {
-            element?.layout(
-                frame: rootFrame,
-                environment: environment,
-                layoutMode: layoutMode
-            )
+        if case .caffeinated(let options) = layoutMode, options.crossRenderCache {
+            // Grab view descriptions
+            // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
+            viewNodes = renderContext.perform {
+                calculateNativeViewNodes(
+                    in: environment,
+                    rootFrame: rootFrame
+                )
+            }
+        } else {
+            // Perform layout.
+            // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
+            layoutResult = renderContext.perform {
+                element?.layout(
+                    frame: rootFrame,
+                    environment: environment,
+                    layoutMode: layoutMode
+                )
+            }
+            // Flatten into tree of view descriptions
+            viewNodes = layoutResult?.resolve() ?? []
         }
 
-        // Flatten into tree of view descriptions
-        let viewNodes = layoutResult?.resolve() ?? []
 
         let layoutEndTime = CACurrentMediaTime()
         Logger.logLayoutEnd(view: self)
@@ -477,6 +531,31 @@ public final class BlueprintView: UIView {
                 viewUpdateDuration: viewUpdateEndTime - layoutEndTime
             )
         )
+    }
+
+    /// Performs a full measurement and layout pass of all contained elements, and then collapses the nodes down
+    /// into `NativeViewNode`s, which represent only the view-backed elements. These view nodes
+    /// are then pushed into a `NativeViewController` to update the on-screen view hierarchy.
+    private func calculateNativeViewNodes(
+        in environment: Environment,
+        rootFrame: CGRect
+    ) -> [(path: ElementPath, node: NativeViewNode)] {
+
+        if let element = element {
+            let (_, node) = rootState.performUpdate(with: element, in: environment) { state in
+                LayoutResultNode(
+                    identifier: .identifierFor(singleChild: element),
+                    layoutAttributes: .init(frame: rootFrame),
+                    environment: environment,
+                    state: state
+                )
+            }
+
+            return node.resolve()
+        } else {
+            _ = rootState.teardownRootElement()
+            return []
+        }
     }
 
     var currentNativeViewControllers: [(path: ElementPath, node: NativeViewController)] {
@@ -689,9 +768,9 @@ extension BlueprintView {
             for index in node.children.indices {
                 let (path, child) = node.children[index]
 
-                guard usedKeys.contains(path) == false else {
-                    fatalError("Duplicate view identifier")
-                }
+//                guard usedKeys.contains(path) == false else {
+//                    fatalError("Duplicate view identifier")
+//                }
                 usedKeys.insert(path)
 
                 let contentView = node.viewDescription.contentView(in: view)

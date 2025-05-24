@@ -117,8 +117,7 @@ public struct Aligned: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             subelement.sizeThatFits(proposal)
         }
@@ -126,8 +125,7 @@ public struct Aligned: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             let x: CGFloat
             let y: CGFloat

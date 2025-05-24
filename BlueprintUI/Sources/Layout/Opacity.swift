@@ -46,8 +46,7 @@ public struct Opacity: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) -> CGSize {
             subelement.sizeThatFits(proposal)
         }
@@ -55,8 +54,7 @@ public struct Opacity: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             subelement.attributes.alpha = opacity
         }
