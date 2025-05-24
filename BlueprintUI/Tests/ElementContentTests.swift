@@ -296,30 +296,3 @@ private struct MeasureCountingSpacer: Element {
         }
     }
 }
-
-private class TestCache: CacheTree {
-    var name: String
-    var signpostRef: AnyObject { self }
-
-    var measurements: [SizeConstraint: CGSize] = [:]
-    var subcaches: [SubcacheKey: TestCache] = [:]
-
-    init(name: String) {
-        self.name = name
-    }
-
-    subscript(constraint: SizeConstraint) -> CGSize? {
-        get { measurements[constraint] }
-        set { measurements[constraint] = newValue }
-    }
-
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        if let subcache = subcaches[key] {
-            return subcache
-        }
-        let subcache = TestCache(name: "\(self.name).\(name())")
-        subcaches[key] = subcache
-        return subcache
-    }
-
-}
