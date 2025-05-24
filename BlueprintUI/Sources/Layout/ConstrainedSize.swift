@@ -172,42 +172,6 @@ extension ConstrainedSize {
         var width: Constraint
         var height: Constraint
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-
-            // If both height & width are absolute, we can avoid measuring entirely.
-            if case let .absolute(width) = width, case let .absolute(height) = height {
-                return CGSize(width: width, height: height)
-            }
-
-            /// 1) Measure how big the element should be by constraining the passed in
-            /// `SizeConstraint` to not be larger than our maximum size. This ensures
-            /// the real maximum possible width is passed to the child, not an unconstrained width.
-            ///
-            /// This is important because some elements heights are affected by their width (eg, a text label),
-            /// or any other elements type which reflows its content.
-
-            let maximumConstraint = SizeConstraint(
-                width: .init(width.applied(to: constraint.width.maximum)),
-                height: .init(height.applied(to: constraint.height.maximum))
-            )
-
-            let measurement = child.measure(in: maximumConstraint)
-
-            /// 2) If our returned size needs to be larger than the measured size,
-            /// eg: the element did not take up all the space during measurement,
-            /// and we have a minimum size in either axis. In that case, adjust the
-            /// measured size to that minimum size before returning.
-
-            return CGSize(
-                width: width.applied(to: measurement.width),
-                height: height.applied(to: measurement.height)
-            )
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            LayoutAttributes(size: size)
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,

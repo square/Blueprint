@@ -824,14 +824,6 @@ private struct TestContainer: Element {
     }
 
     private class TestLayout: Layout {
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            .zero
-        }
-
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            Array(repeating: LayoutAttributes(size: .zero), count: items.count)
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelements: Subelements,

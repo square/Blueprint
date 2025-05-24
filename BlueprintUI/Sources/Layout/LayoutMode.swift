@@ -21,14 +21,6 @@ public enum LayoutMode: Equatable {
         }
     }
 
-    /// Blueprint's original layout system. This mode is deprecated and will be removed.
-    @available(
-        *,
-        deprecated,
-        message: "Legacy mode is deprecated and will be removed in a future release. Switch to the default layout mode."
-    )
-    case legacy
-
     /// A newer layout system with some optimizations made possible by ensuring elements adhere
     /// to a certain contract for behavior.
     case caffeinated(options: LayoutOptions = .default)
@@ -39,20 +31,13 @@ public enum LayoutMode: Equatable {
 
     /// The name of the layout mode.
     public var name: String {
-        switch self {
-        case .legacy:
-            return "Legacy"
-        case .caffeinated:
-            return "Caffeinated"
-        }
+        "Caffeinated"
     }
 }
 
 extension LayoutMode: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .legacy:
-            return "Legacy"
         case .caffeinated(let options):
             switch (options.hintRangeBoundaries, options.searchUnconstrainedKeys) {
             case (true, true):

@@ -77,114 +77,30 @@ class ElementContentTests: XCTestCase {
         XCTAssertEqual(size, CGSize(width: 10, height: 20))
     }
 
-    func test_cacheTree() {
-        let size1 = CGSize(width: 10, height: 15)
-        let size2 = CGSize(width: 20, height: 25)
-
-        let containerSize = CGSize(width: 600, height: 800)
-        let halfSize = CGSize(width: 300, height: 400)
-
-        func layout(sizes: [CGSize]) -> (TestCache, TestCounter) {
-            let counts = TestCounter()
-            let layout = MeasureCountingLayout(counts: counts, layout: HalfLayout())
-
-            let container = ElementContent(layout: layout) { builder in
-                for size in sizes {
-                    builder.add(element: MeasureCountingSpacer(size: size, counts: counts))
-                }
-            }
-            let cache = TestCache(name: "test")
-
-            _ = container
-                .performLegacyLayout(
-                    attributes: LayoutAttributes(size: containerSize),
-                    environment: .empty,
-                    cache: cache
-                )
-                .map { $0.node }
-
-            _ = container.measure(
-                in: SizeConstraint(containerSize),
-                environment: .empty,
-                cache: cache
-            )
-
-            return (cache, counts)
-        }
-
-        // Multiple children
-        do {
-            let (cache, counts) = layout(sizes: [size1, size2])
-
-            XCTAssertEqual(
-                cache.measurements,
-                [SizeConstraint(containerSize): CGSize(width: 30, height: 40)]
-            )
-
-            XCTAssertEqual(cache.subcaches.count, 2)
-            XCTAssertEqual(
-                cache.subcaches[0]!.measurements,
-                [SizeConstraint(halfSize): size1]
-            )
-            XCTAssertEqual(
-                cache.subcaches[1]!.measurements,
-                [SizeConstraint(halfSize): size2]
-            )
-
-            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
-            XCTAssertTrue(cache.subcaches[1]!.subcaches.isEmpty)
-
-            XCTAssertEqual(counts.measures, 3)
-        }
-
-        // Single child
-        do {
-            let (cache, counts) = layout(sizes: [size1])
-
-            XCTAssertEqual(
-                cache.measurements,
-                [SizeConstraint(containerSize): size1]
-            )
-
-            XCTAssertEqual(cache.subcaches.count, 1)
-            XCTAssertEqual(
-                cache.subcaches[0]!.measurements,
-                [SizeConstraint(halfSize): size1]
-            )
-
-            XCTAssertTrue(cache.subcaches[0]!.subcaches.isEmpty)
-
-            XCTAssertEqual(counts.measures, 2)
-        }
-    }
-
     func test_layout_phase() {
 
-        var callCount: Int = 0
+        let measureExpectation = XCTestExpectation(description: "called for measurement")
+        let layoutExpectation = XCTestExpectation(description: "called for layout")
 
         let measure = ElementContent { phase, size, env in
             XCTAssertEqual(phase, .measurement)
-            callCount += 1
+            measureExpectation.fulfill()
 
             return Empty()
         }
 
         let layout = ElementContent { phase, size, env in
             XCTAssertEqual(phase, .layout)
-            callCount += 1
+            layoutExpectation.fulfill()
 
             return Empty()
         }
 
         let size = measure.measure(in: .unconstrained)
 
-        _ = layout.performLegacyLayout(
-            attributes: .init(size: size),
-            environment: .empty,
-            cache: TestCache(name: "test")
-        )
+        _ = layout.testLayout(attributes: LayoutAttributes(size: size))
 
-        XCTAssertEqual(callCount, 2)
+        wait(for: [measureExpectation, layoutExpectation], timeout: 0)
     }
 
     func test_measuring() {
@@ -224,13 +140,11 @@ class ElementContentTests: XCTestCase {
             }
         )
 
-        let cache = RenderPassCache(name: "Test", signpostRef: NSObject())
-
         /// Should output the size of the inner element.
 
         XCTAssertEqual(
             CGSize(width: 100, height: 10),
-            element.content.measure(in: .init(CGSize(width: 100, height: 100)), environment: .empty, cache: cache)
+            element.content.measure(in: .init(CGSize(width: 100, height: 100)))
         )
 
         let layoutResult = element.layout(frame: CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
@@ -265,20 +179,9 @@ fileprivate struct SimpleElement: Element {
 }
 
 
-fileprivate struct FrameLayout: Layout {
+fileprivate struct FrameLayout: Layout, SingleTraitLayout {
 
     typealias Traits = CGRect
-
-    func measure(in constraint: SizeConstraint, items: [(traits: CGRect, content: Measurable)]) -> CGSize {
-        items.reduce(into: CGSize.zero) { result, item in
-            result.width = max(result.width, item.traits.maxX)
-            result.height = max(result.height, item.traits.maxY)
-        }
-    }
-
-    func layout(size: CGSize, items: [(traits: CGRect, content: Measurable)]) -> [LayoutAttributes] {
-        items.map { LayoutAttributes(frame: $0.traits) }
-    }
 
     func sizeThatFits(
         proposal: SizeConstraint,
@@ -314,65 +217,14 @@ fileprivate struct FrameLayout: Layout {
 
 }
 
-private struct HalfLayout: Layout {
-    func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-        let halfConstraint = SizeConstraint(
-            width: constraint.width / 2,
-            height: constraint.height / 2
-        )
-        let measurements = items.map { $1.measure(in: halfConstraint) }
-        return CGSize(
-            width: measurements.map(\.width).reduce(0, +),
-            height: measurements.map(\.height).reduce(0, +)
-        )
-    }
-
-    func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-        let halfConstraint = SizeConstraint(CGSize(width: size.width / 2, height: size.height / 2))
-        return items.map {
-            LayoutAttributes(size: $1.measure(in: halfConstraint))
-        }
-    }
-
-    func sizeThatFits(
-        proposal: SizeConstraint,
-        subelements: Subelements,
-        environment: Environment,
-        cache: inout ()
-    ) -> CGSize {
-        fatalError("Not supported in Caffeinated Layout")
-    }
-
-    func placeSubelements(
-        in size: CGSize,
-        subelements: Subelements,
-        environment: Environment,
-        cache: inout ()
-    ) {
-        fatalError("Not supported in Caffeinated Layout")
-    }
-}
-
 private class TestCounter {
     var measures: Int = 0
 }
 
 private struct MeasureCountingLayout<WrappedLayout>: Layout where WrappedLayout: Layout {
-    static var defaultTraits: Traits { WrappedLayout.defaultTraits }
-
-    typealias Traits = WrappedLayout.Traits
 
     var counts: TestCounter
     var layout: WrappedLayout
-
-    func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        counts.measures += 1
-        return layout.measure(in: constraint, items: items)
-    }
-
-    func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        layout.layout(size: size, items: items)
-    }
 
     func sizeThatFits(
         proposal: SizeConstraint,
@@ -425,14 +277,6 @@ private struct MeasureCountingSpacer: Element {
     struct FixedLayout: Layout {
         var size: CGSize
 
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            size
-        }
-
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            []
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelements: Subelements,
@@ -451,31 +295,4 @@ private struct MeasureCountingSpacer: Element {
             // No-op
         }
     }
-}
-
-private class TestCache: CacheTree {
-    var name: String
-    var signpostRef: AnyObject { self }
-
-    var measurements: [SizeConstraint: CGSize] = [:]
-    var subcaches: [SubcacheKey: TestCache] = [:]
-
-    init(name: String) {
-        self.name = name
-    }
-
-    subscript(constraint: SizeConstraint) -> CGSize? {
-        get { measurements[constraint] }
-        set { measurements[constraint] = newValue }
-    }
-
-    func subcache(key: SubcacheKey, name: @autoclosure () -> String) -> CacheTree {
-        if let subcache = subcaches[key] {
-            return subcache
-        }
-        let subcache = TestCache(name: "\(self.name).\(name())")
-        subcaches[key] = subcache
-        return subcache
-    }
-
 }

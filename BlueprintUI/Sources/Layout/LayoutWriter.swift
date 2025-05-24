@@ -256,16 +256,6 @@ extension LayoutWriter {
         private struct Layout: BlueprintUI.Layout {
             var builder: Builder
 
-            func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-                builder.sizing.measure(with: builder)
-            }
-
-            func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-                builder.children.map { child in
-                    .init(frame: child.frame)
-                }
-            }
-
             func sizeThatFits(
                 proposal: SizeConstraint,
                 subelements: Subelements,

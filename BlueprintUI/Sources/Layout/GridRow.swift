@@ -91,47 +91,11 @@ extension GridRow {
         let verticalAlignment: Row.RowAlignment
         let spacing: CGFloat
 
-        typealias IndexedProportionalItem = (index: Int, proportion: CGFloat, content: Measurable)
+        typealias IndexedProportionalItem = (index: Int, proportion: CGFloat, subelement: LayoutSubelement)
         typealias IndexedSize = (index: Int, size: CGSize)
 
         static var defaultTraits: GridRow.Width {
             .absolute(0)
-        }
-
-        func measure(in constraint: SizeConstraint, items: [(traits: Width, content: Measurable)]) -> CGSize {
-            guard items.count > 0 else {
-                return .zero
-            }
-
-            let frames = _frames(in: constraint, items: items)
-
-            // Measure the row to be as wide as the sum of its children and as tall as its tallest child.
-            let size = frames.reduce(.zero) { size, frame in
-                CGSize(width: frame.maxX, height: max(size.height, frame.height))
-            }
-
-            return size
-        }
-
-        func layout(size: CGSize, items: [(traits: Width, content: Measurable)]) -> [LayoutAttributes] {
-            guard items.count > 0 else {
-                return []
-            }
-
-            let frames = _frames(in: SizeConstraint(size), isExactConstraint: true, items: items)
-            let attributes = frames.map(LayoutAttributes.init)
-
-            return attributes
-        }
-
-        private func items(subelements: Subelements) -> [(traits: Traits, content: Measurable)] {
-            subelements.map { subelement in
-                let traits = subelement.gridRowLayoutTraits
-                let measurable = Measurer { constraint in
-                    subelement.sizeThatFits(constraint)
-                }
-                return (traits, measurable)
-            }
         }
 
         func sizeThatFits(
@@ -144,9 +108,7 @@ extension GridRow {
                 return .zero
             }
 
-            let items = items(subelements: subelements)
-
-            let frames = _frames(in: proposal, items: items)
+            let frames = _frames(in: proposal, subelements: subelements)
 
             // Measure the row to be as wide as the sum of its children and as tall as its tallest child.
             let size = frames.reduce(.zero) { size, frame in
@@ -166,11 +128,10 @@ extension GridRow {
                 return
             }
 
-            let items = items(subelements: subelements)
             let frames = _frames(
                 in: SizeConstraint(size),
                 isExactConstraint: true,
-                items: items
+                subelements: subelements
             )
 
             for (frame, subelement) in zip(frames, subelements) {
@@ -197,33 +158,33 @@ extension GridRow {
         private func _frames(
             in constraint: SizeConstraint,
             isExactConstraint: Bool = false,
-            items: [(traits: Width, content: Measurable)]
+            subelements: LayoutSubelements
         ) -> [CGRect] {
-            var sizes: [CGSize] = Array(repeating: .zero, count: items.count)
+            var sizes: [CGSize] = Array(repeating: .zero, count: subelements.count)
 
             // Group children by their sizing. Maintain child order by also storing index.
-            var absolutelySized: [(index: Int, width: CGFloat, content: Measurable)] = []
-            var proportionallySized: [(index: Int, proportion: CGFloat, content: Measurable)] = []
-            items.enumerated().forEach { index, item in
-                switch item.traits {
+            var absolutelySized: [(index: Int, width: CGFloat, subelement: LayoutSubelement)] = []
+            var proportionallySized: [(index: Int, proportion: CGFloat, subelement: LayoutSubelement)] = []
+            subelements.enumerated().forEach { index, subelement in
+                switch subelement.gridRowLayoutTraits {
                 case .absolute(let width):
-                    absolutelySized.append((index, width, item.content))
+                    absolutelySized.append((index, width, subelement))
                 case .proportional(let proportion):
-                    proportionallySized.append((index, proportion, item.content))
+                    proportionallySized.append((index, proportion, subelement))
                 }
             }
 
             // Measure absolutely-sized children.
-            absolutelySized.forEach { index, width, content in
+            absolutelySized.forEach { index, width, subelement in
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
-                sizes[index] = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
+                sizes[index] = CGSize(width: width, height: subelement.sizeThatFits(fixedWidthConstraint).height)
             }
 
             // Measure proportionally-sized children.
             switch constraint.width {
             case .atMost(let width):
                 let absoluteItemWidth = sizes.map { $0.width }.reduce(0, +)
-                let availableWidth = width - absoluteItemWidth - spacing * CGFloat(items.count - 1)
+                let availableWidth = width - absoluteItemWidth - spacing * CGFloat(subelements.count - 1)
                 constrainedProportionalItemSizes(
                     in: constraint,
                     availableWidth: availableWidth,
@@ -287,10 +248,10 @@ extension GridRow {
             )
             let scale = availableWidth / portionSum
 
-            return items.map { index, proportion, content in
+            return items.map { index, proportion, subelement in
                 let width = scale * proportion
                 let fixedWidthConstraint = SizeConstraint(width: .atMost(width), height: constraint.height)
-                let size = CGSize(width: width, height: content.measure(in: fixedWidthConstraint).height)
+                let size = CGSize(width: width, height: subelement.sizeThatFits(fixedWidthConstraint).height)
                 return (index, size)
             }
         }
@@ -314,8 +275,8 @@ extension GridRow {
             var scale: CGFloat = 0
             var measuredSizes: [CGSize] = []
 
-            items.forEach { _, proportion, content in
-                let size = content.measure(in: constraint)
+            items.forEach { _, proportion, subelement in
+                let size = subelement.sizeThatFits(constraint)
                 measuredSizes.append(size)
                 scale = max(scale, size.width / proportion)
             }
