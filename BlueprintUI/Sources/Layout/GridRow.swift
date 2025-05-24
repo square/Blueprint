@@ -70,8 +70,12 @@ public struct GridRow: Element {
     // MARK: - GridRow+Element -
     public var content: ElementContent {
         ElementContent(layout: GridRowLayout(verticalAlignment: verticalAlignment, spacing: spacing)) { builder in
-            children.forEach {
-                builder.add(traits: $0.width, key: $0.key, element: $0.element)
+            for child in children {
+                builder.add(
+                    traits: child.width,
+                    key: child.key,
+                    element: child.element
+                )
             }
         }
     }
@@ -83,7 +87,7 @@ public struct GridRow: Element {
 
 // MARK: - layout -
 extension GridRow {
-    struct GridRowLayout: Layout {
+    struct GridRowLayout: Layout, SingleTraitLayout {
         let verticalAlignment: Row.RowAlignment
         let spacing: CGFloat
 

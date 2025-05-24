@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Layouts can define custom traits by creating types that conform to `LayoutTraitsKey`.
+- The `SingleTraitLayout` protocol preserves the existing API for legacy layouts that define a single trait type.
+
 ### Removed
 
 ### Changed

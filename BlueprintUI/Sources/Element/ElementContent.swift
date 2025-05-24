@@ -107,9 +107,55 @@ extension ElementContent {
         /// Child elements.
         var children: [Child] = []
 
-        /// Adds the given child element.
+        /// Adds the given child element with this ``SingleTraitLayout``'s trait type.
+        ///
+        /// - Parameters:
+        ///   - traits: The traits to associate with this child.
+        ///   - key: An optional disambiguation key. By default, `nil`.
+        ///   - element: The child element.
         public mutating func add(
-            traits: LayoutType.Traits = LayoutType.defaultTraits,
+            traits: LayoutType.Traits,
+            key: AnyHashable? = nil,
+            element: Element
+        ) where LayoutType: SingleTraitLayout {
+            add(
+                traits: LayoutTraits(
+                    key: SingleTraitLayoutTraitsKey<LayoutType>.self,
+                    value: traits
+                ),
+                key: key,
+                element: element
+            )
+        }
+
+        /// Adds the given child element with a trait-value pair.
+        ///
+        /// - Parameters:
+        ///   - traitsType: The type of traits to associate with this child.
+        ///   - traits: The value of the traits.
+        ///   - key: An optional disambiguation key. By default, `nil`.
+        ///   - element: The child element.
+        public mutating func add<TraitsKey: LayoutTraitsKey>(
+            traitsType: TraitsKey.Type,
+            traits: TraitsKey.Value,
+            key: AnyHashable? = nil,
+            element: Element
+        ) {
+            add(
+                traits: LayoutTraits(key: TraitsKey.self, value: traits),
+                key: key,
+                element: element
+            )
+        }
+
+        /// Adds the given child element.
+        ///
+        /// - Parameters:
+        ///   - traits: Layout traits to associate with this child. By default, no traits.
+        ///   - key: An optional disambiguation key. By default, `nil`.
+        ///   - element: The child element.
+        public mutating func add(
+            traits: LayoutTraits = .empty,
             key: AnyHashable? = nil,
             element: Element
         ) {

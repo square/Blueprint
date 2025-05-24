@@ -30,7 +30,7 @@ public struct LayoutSubelement {
     private var content: ElementContent
     var environment: Environment
     var node: LayoutTreeNode
-    private var traits: Any
+    private var traits: LayoutTraits
 
     private var cache: HintingSizeCache { node.sizeCache }
 
@@ -46,7 +46,7 @@ public struct LayoutSubelement {
         content: ElementContent,
         environment: Environment,
         node: LayoutTreeNode,
-        traits: Any
+        traits: LayoutTraits
     ) {
         self.identifier = identifier
         self.content = content
@@ -127,20 +127,22 @@ public struct LayoutSubelement {
         }
     }
 
-    /// Gets the layout traits of the subelement.
+    /// Gets the subelement's layout traits associated with the given ``SingleTraitLayout``.
     ///
-    /// Use this method to access the layout-specific ``LegacyLayout/Traits`` value for this
-    /// subelement.
-    ///
-    /// - Important: Only call this method with the type of your `Layout`. For compatibility with
-    ///   legacy layout, this is the only type of traits supported.
+    /// If this is not a subelement of the given layout type, it will return the default value. When
+    /// implementing a ``SingleTraitLayout`` be careful to call this with the type of your layout.
     ///
     /// - Parameter layoutType: The type of layout, which determines the type of the traits.
     /// - Returns: The subelements's layout traits.
-    public func traits<LayoutType>(
+    public func traits<LayoutType: SingleTraitLayout>(
         forLayoutType layoutType: LayoutType.Type
-    ) -> LayoutType.Traits where LayoutType: Layout {
-        traits as! LayoutType.Traits
+    ) -> LayoutType.Traits {
+        traits[layout: layoutType]
+    }
+
+    /// Gets the subelement's layout traits associated with the given key.
+    public subscript<Key: LayoutTraitsKey>(key: Key.Type) -> Key.Value {
+        traits[key]
     }
 }
 

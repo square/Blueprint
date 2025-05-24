@@ -13,9 +13,13 @@ public protocol StackElement: Element {
 extension StackElement {
 
     public var content: ElementContent {
-        ElementContent(layout: layout) {
+        ElementContent(layout: layout) { builder in
             for child in self.children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                builder.add(
+                    traits: child.traits,
+                    key: child.key,
+                    element: child.element
+                )
             }
         }
     }
@@ -184,7 +188,7 @@ extension StackElement {
 
 
 /// A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.
-public struct StackLayout: Layout {
+public struct StackLayout: Layout, SingleTraitLayout {
 
     /// The default traits for a child contained within a stack layout
     public static var defaultTraits: Traits {

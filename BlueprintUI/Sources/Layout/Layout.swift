@@ -85,18 +85,20 @@ import CoreGraphics
 ///
 /// ## Access layout traits
 ///
-/// Subelements may have _traits_ that are specific to their container's layout. The traits are of
-/// the ``Layout`` protocol's associated type ``LegacyLayout/Traits``, and each subelement can have
-/// a distinct `Traits` value assigned. You can set this in the `configure` block of
-/// ``ElementContent/init(layout:configure:)``, when you call
-/// ``ElementContent/Builder/add(traits:key:element:)``. If you do not specify a `Traits` type for
-/// your layout, it defaults to the void type, `()`.
+/// Subelements may have _traits_ that are specific to their container's layout. Containers can
+/// choose to condition their behavior according to the traits of their subelements. For example,
+/// the ``Row`` and ``Column`` types allocate space for their subelements based in part on the grow
+/// and shrink priorities that you set on each child.
 ///
-/// Containers can choose to condition their behavior according to the traits of their subelements.
-/// For example, the ``Row`` and ``Column`` types allocate space for their subelements based in part
-/// on the grow and shrink priorities that you set on each child. Your layout container accesses the
-/// traits for a subelement by calling ``LayoutSubelement/traits(forLayoutType:)`` on the
-/// ``LayoutSubelement`` proxy.
+///  Traits are set on each child in the `configure` block of
+/// ``ElementContent/init(layout:configure:)``, when you call
+/// ``ElementContent/Builder/add(traits:key:element:)``. Your layout container accesses the traits
+/// for a subelement by calling ``LayoutSubelement/subscript(key:)`` on the ``LayoutSubelement``
+/// proxy. For more information about custom traits, see ``LayoutTraitsKey``.
+///
+/// Legacy layouts that support a single trait type can conform to ``SingleTraitLayout`` to define
+/// the trait type on the layout itself instead of using a key. These traits can be accessed with
+/// the ``LayoutSubelement/traits(forLayoutType:)`` method.
 ///
 /// - Note: The ``Layout`` API, and its documentation, are modeled after SwiftUI's
 ///   [Layout](https://developer.apple.com/documentation/swiftui/layout), with major differences
@@ -104,7 +106,7 @@ import CoreGraphics
 ///
 public protocol Layout: LegacyLayout, CaffeinatedLayout {}
 
-public protocol LegacyLayout {
+public protocol LegacyLayout: SingleTraitLayout {
     /// Per-item metadata that is used during the measuring and layout pass.
     associatedtype Traits = ()
 
@@ -127,10 +129,6 @@ public protocol LegacyLayout {
     ///
     /// - returns: Layout attributes for the given array of items.
     func layout(size: CGSize, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
-
-    /// Returns a default traits object.
-    static var defaultTraits: Self.Traits { get }
-
 }
 
 extension LegacyLayout where Traits == () {
