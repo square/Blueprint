@@ -44,7 +44,6 @@ public struct ConstrainedSize: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
     }
-
 }
 
 extension ConstrainedSize {
@@ -105,7 +104,6 @@ extension ConstrainedSize {
     }
 }
 
-
 extension Element {
 
     /// Constrains the measured size of the element to the provided width and height.
@@ -156,24 +154,18 @@ extension Element {
     }
 }
 
-
 extension Comparable {
-
     fileprivate func clamped(to limits: ClosedRange<Self>) -> Self {
         min(max(self, limits.lowerBound), limits.upperBound)
     }
 }
 
-
 extension ConstrainedSize {
-
     fileprivate struct Layout: SingleChildLayout {
-
         var width: Constraint
         var height: Constraint
 
         func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-
             // If both height & width are absolute, we can avoid measuring entirely.
             if case let .absolute(width) = width, case let .absolute(height) = height {
                 return CGSize(width: width, height: height)
@@ -237,5 +229,21 @@ extension ConstrainedSize {
             subelement.place(filling: size)
         }
     }
+}
 
+extension ConstrainedSize: ComparableElement {
+    public func isEquivalent(to other: ConstrainedSize) -> Bool {
+        guard width == other.width,
+              height == other.height
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrapped as? AnyComparableElement,
+              let otherComparable = other.wrapped as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
+    }
 }

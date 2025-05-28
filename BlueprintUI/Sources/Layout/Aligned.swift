@@ -4,22 +4,28 @@ import UIKit
 public struct Aligned: Element {
     /// Describes how the content will be vertically aligned.
     public enum VerticalAlignment {
-        /// Aligns the content to the top edge.
+        /// Aligns the content to the top edge of the containing element.
         case top
         /// Centers the content vertically.
         case center
-        /// Aligns the content to the bottom edge.
+        /// Aligns the content to the bottom edge of the containing element.
         case bottom
+        /// The content fills the full vertical height of the containing element.
+        case fill
     }
 
-    /// Describes how the content will be horizontally aligned.
+    /// The possible horizontal alignment values.
     public enum HorizontalAlignment {
-        /// Aligns the content to the leading edge.
+        /// Aligns the content to the leading edge of the containing element.
+        /// In left-to-right languages, this is the left edge.
         case leading
         /// Centers the content horizontally.
         case center
-        /// Aligns the content to the trailing edge.
+        /// Aligns the content to the trailing edge of the containing element.
+        /// In left-to-right languages, this is the right edge.
         case trailing
+        /// The content fills the full horizontal width of the containing element.
+        case fill
     }
 
     /// The content element to be aligned.
@@ -81,6 +87,9 @@ public struct Aligned: Element {
                 attributes.frame.origin.y = (size.height - constrainedMeasurement.height) / 2.0
             case .bottom:
                 attributes.frame.origin.y = size.height - constrainedMeasurement.height
+            case .fill:
+                attributes.frame.origin.y = 0
+                attributes.frame.size.height = size.height
             }
 
             switch horizontalAlignment {
@@ -90,6 +99,9 @@ public struct Aligned: Element {
                 attributes.frame.origin.x = (size.width - constrainedMeasurement.width) / 2.0
             case .trailing:
                 attributes.frame.origin.x = size.width - constrainedMeasurement.width
+            case .fill:
+                attributes.frame.origin.x = 0
+                attributes.frame.size.width = size.width
             }
 
             return attributes
@@ -114,23 +126,38 @@ public struct Aligned: Element {
             let subelementSize = subelement
                 .sizeThatFits(SizeConstraint(size))
                 .upperBounded(by: size)
+            let width: CGFloat
+            let height: CGFloat
+
 
             switch horizontalAlignment {
             case .leading:
                 x = 0
+                width = subelementSize.width
             case .center:
                 x = 0.5
+                width = subelementSize.width
             case .trailing:
                 x = 1
+                width = subelementSize.width
+            case .fill:
+                x = 0
+                width = size.width
             }
 
             switch verticalAlignment {
             case .top:
                 y = 0
+                height = subelementSize.height
             case .center:
                 y = 0.5
+                height = subelementSize.height
             case .bottom:
                 y = 1
+                height = subelementSize.height
+            case .fill:
+                y = 0
+                height = size.height
             }
 
             let position = CGPoint(x: x * size.width, y: y * size.height)
@@ -138,7 +165,7 @@ public struct Aligned: Element {
             subelement.place(
                 at: position,
                 anchor: UnitPoint(x: x, y: y),
-                size: subelementSize
+                size: CGSize(width: width, height: height)
             )
         }
     }

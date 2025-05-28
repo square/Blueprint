@@ -176,13 +176,28 @@ extension LazyStorage: CaffeinatedContentStorageCrossRenderCached {
         state: ElementState,
         forEach: (ElementContent.ForEachElementContext) -> Void
     ) {
-        precondition(childNodes.count == 1)
+        let constraint = SizeConstraint(size)
+        let child = buildChild(for: .layout, in: constraint, environment: environment)
+
+        let childAttributes = LayoutAttributes(size: size)
+
+        let identifier = ElementIdentifier.identifierFor(singleChild: child)
+
+        let childState = state.childState(for: child, in: environment, with: identifier)
+
+        let childNode = LayoutResultNode(
+            identifier: identifier,
+            element: childState.element.latest,
+            layoutAttributes: childAttributes,
+            environment: environment,
+            children: childState.elementContent.performCachedCaffeinatedLayout(
+                in: size,
+                with: environment,
+                state: childState
+            ).caffeinatedBridgedWithIdentity
+        )
 
         let element = builder(.layout, SizeConstraint(size), environment)
-
-        let childState = state.childState(for: element, in: environment, with: .identifierFor(singleChild: element))
-
-        let childNode = childNodes[0]
 
         forEach(.init(state: childState, element: element, layoutNode: childNode))
 

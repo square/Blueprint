@@ -14,7 +14,7 @@ import UIKit
 ///     layout.sizing = .unionOfChildren
 /// }
 /// ```
-public struct LayoutWriter: Element {
+public struct LayoutWriter: Element, ComparableElement {
 
     //
     // MARK: Initialization
@@ -65,6 +65,10 @@ public struct LayoutWriter: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
+    }
+
+    public func isEquivalent(to other: LayoutWriter) -> Bool {
+        true
     }
 }
 

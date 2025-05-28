@@ -92,3 +92,10 @@ extension Element {
         AdaptedEnvironment(by: environmentAdapter, wrapping: self)
     }
 }
+
+extension AdaptedEnvironment: ComparableElement {
+    public func isEquivalent(to other: AdaptedEnvironment) -> Bool {
+        // FIXME: THIS
+        true
+    }
+}
