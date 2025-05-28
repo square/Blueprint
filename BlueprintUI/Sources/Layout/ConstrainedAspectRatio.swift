@@ -251,8 +251,7 @@ public struct ConstrainedAspectRatio: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             contentMode.constrain(subelement: subelement, to: aspectRatio, in: proposal)
         }
@@ -260,14 +259,12 @@ public struct ConstrainedAspectRatio: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             subelement.place(filling: size)
         }
     }
 }
-
 
 extension Element {
     ///
@@ -282,5 +279,22 @@ extension Element {
         contentMode: ConstrainedAspectRatio.ContentMode = .fitContent
     ) -> ConstrainedAspectRatio {
         ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
+    }
+}
+
+extension ConstrainedAspectRatio: ComparableElement {
+    public func isEquivalent(to other: ConstrainedAspectRatio) -> Bool {
+        guard aspectRatio == other.aspectRatio,
+              contentMode == other.contentMode
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }

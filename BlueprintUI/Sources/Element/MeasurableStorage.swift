@@ -45,11 +45,35 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         measurer(proposal, environment)
     }
 
-    func performCaffeinatedLayout(
-        frame: CGRect,
-        environment: Environment,
-        node: LayoutTreeNode
-    ) -> [IdentifiedNode] {
+    func performCaffeinatedLayout(frame: CGRect, environment: Environment, node: LayoutTreeNode) -> [ElementContent.IdentifiedNode] {
         []
+    }
+
+}
+
+extension MeasurableStorage: CaffeinatedContentStorageCrossRenderCached {
+
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        state.sizeThatFits(proposal: proposal, with: environment) { environment in
+            measurer(proposal, environment)
+        }
+    }
+
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        []
+    }
+
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ElementContent.ForEachElementContext) -> Void
+    ) {
+        // No-op; we have no children.
     }
 }

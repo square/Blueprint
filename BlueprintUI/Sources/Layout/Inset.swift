@@ -82,7 +82,6 @@ public struct Inset: Element {
     }
 }
 
-
 extension Element {
 
     /// Insets the element by the given amount on each side.
@@ -126,11 +125,8 @@ extension Element {
     }
 }
 
-
 extension Inset {
-
     fileprivate struct Layout: SingleChildLayout {
-
         var top: CGFloat
         var bottom: CGFloat
         var left: CGFloat
@@ -162,8 +158,7 @@ extension Inset {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) -> CGSize {
             let insetProposal = proposal.inset(by: edgeInsets)
             let childSize = subelement.sizeThatFits(insetProposal)
@@ -173,8 +168,7 @@ extension Inset {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             let insetSize = size.inset(by: edgeInsets)
 
@@ -188,5 +182,24 @@ extension Inset {
         private var edgeInsets: UIEdgeInsets {
             .init(top: top, left: left, bottom: bottom, right: right)
         }
+    }
+}
+
+extension Inset: ComparableElement {
+    public func isEquivalent(to other: Inset) -> Bool {
+        guard top == other.top,
+              bottom == other.bottom,
+              left == other.left,
+              right == other.right
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }

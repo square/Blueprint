@@ -3,7 +3,7 @@ import UIKit
 /// An element that does not display anything (it has neither children or a view).
 ///
 /// `Spacer` simply takes up a specified amount of space within a layout.
-public struct Spacer: Element {
+public struct Spacer: ComparableElement, Equatable {
 
     /// The size that this spacer will take in a layout.
     public var size: CGSize

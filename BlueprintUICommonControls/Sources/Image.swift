@@ -51,14 +51,12 @@ public struct Image: Element {
             }
         }
     }
-
 }
 
 extension Image {
-
     /// The content mode determines the layout of the image when its size does
     /// not precisely match the size that the element is assigned.
-    public enum ContentMode {
+    public enum ContentMode: Equatable {
 
         /// The image is not scaled, and is simply centered within the `Image`
         /// element.
@@ -90,12 +88,9 @@ extension Image {
             }
         }
     }
-
 }
 
-
 extension CGSize {
-
     fileprivate var aspectRatio: CGFloat {
         if height > 0.0 {
             return width / height
@@ -103,13 +98,10 @@ extension CGSize {
             return 0.0
         }
     }
-
 }
 
 extension Image {
-
     fileprivate struct Measurer {
-
         var contentMode: ContentMode
         var imageSize: CGSize?
 
@@ -165,10 +157,19 @@ extension Image {
             case .infinite:
                 return .infinity
             }
-
-
         }
-
     }
+}
 
+extension Image: ComparableElement {
+    public func isEquivalent(to other: Image) -> Bool {
+        // Compare all properties that affect the visual appearance
+        // For images, we can compare their pointer equality since UIImage instances are typically
+        // cached and reused. If they're not the same instance but represent the same image,
+        // that's okay - we'll just re-render which is what we want for image updates anyway.
+        (image === other.image) &&
+            tintColor == other.tintColor &&
+            contentMode == other.contentMode &&
+            blockAccessibilityDescription == other.blockAccessibilityDescription
+    }
 }

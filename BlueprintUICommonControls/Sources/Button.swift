@@ -29,7 +29,6 @@ public struct Button: Element {
             config[\.minimumTappableSize] = minimumTappableSize
         }
     }
-
 }
 
 extension Button {
@@ -116,5 +115,23 @@ extension Button {
         @objc private func handleTap() {
             onTap?()
         }
+    }
+}
+
+extension Button: ComparableElement {
+    public func isEquivalent(to other: Button) -> Bool {
+        guard isEnabled == other.isEnabled,
+              minimumTappableSize == other.minimumTappableSize
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
+        // Note: We don't compare onTap since it's a closure and can't be compared
     }
 }

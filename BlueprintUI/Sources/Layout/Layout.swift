@@ -26,8 +26,7 @@ import CoreGraphics
 ///
 ///     func placeSubelements(
 ///         in size: CGSize,
-///         subelements: Subelements,
-///         cache: inout ()
+///         subelements: Subelements
 ///     ) {
 ///         // Tell each subelement where to appear.
 ///     }
@@ -206,15 +205,12 @@ public protocol CaffeinatedLayout {
     ///   - environment: The environment of the container. You can use properties from the
     ///     environment when calculating the size of this container, as long as you adhere to the
     ///     sizing rules.
-    ///   - cache: Optional storage for calculated data that you can share among the methods of your
-    ///     custom layout container. See ``makeCache(subelements:environment:)-8ciko`` for details.
     /// - Returns: A size that indicates how much space the container needs to arrange its
     ///   subelements.
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     ) -> CGSize
 
     /// Assigns positions to each of the layout’s subelements.
@@ -247,8 +243,7 @@ public protocol CaffeinatedLayout {
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     )
 
     /// Creates and initializes a cache for a layout instance.
