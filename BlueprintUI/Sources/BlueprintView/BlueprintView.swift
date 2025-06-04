@@ -768,9 +768,9 @@ extension BlueprintView {
             for index in node.children.indices {
                 let (path, child) = node.children[index]
 
-//                guard usedKeys.contains(path) == false else {
-//                    fatalError("Duplicate view identifier")
-//                }
+                guard usedKeys.contains(path) == false else {
+                    fatalError("Duplicate view identifier")
+                }
                 usedKeys.insert(path)
 
                 let contentView = node.viewDescription.contentView(in: view)

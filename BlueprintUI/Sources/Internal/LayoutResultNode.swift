@@ -203,8 +203,12 @@ extension LayoutResultNode {
 extension [LayoutResultNode] {
 
     var caffeinatedBridgedWithIdentity: [(ElementIdentifier, LayoutResultNode)] {
-        map {
-            (ElementIdentifier.identifier(for: $0.element.latest, key: nil, count: count), $0)
+        var identifierFactory = ElementIdentifier.Factory(elementCount: count)
+        return map {
+            (identifierFactory.nextIdentifier(
+                for: $0.element.latest,
+                key: nil
+            ), $0)
         }
     }
 
