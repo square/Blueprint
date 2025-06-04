@@ -89,6 +89,162 @@ public struct ElementContent {
             node: node
         )
     }
+
+}
+
+extension ElementContent: CaffeinatedContentStorageCrossRenderCached {
+
+    func sizeThatFitsWithCache(
+        proposal: SizeConstraint,
+        with environment: Environment,
+        state: ElementState
+    ) -> CGSize {
+        autoreleasepool {
+            storage.sizeThatFitsWithCache(proposal: proposal, with: environment, state: state)
+        }
+    }
+
+    /// Lays out the content, returning a tree of `LayoutResultNode` values
+    /// that can be  used to drive a layout process.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+        autoreleasepool {
+            storage.performCachedCaffeinatedLayout(
+                in: size,
+                with: environment,
+                state: state
+            )
+        }
+    }
+
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func forEachElement(
+        in size: CGSize,
+        with environment: Environment,
+        children childNodes: [LayoutResultNode],
+        state: ElementState,
+        forEach: (ForEachElementContext) -> Void
+    ) {
+        autoreleasepool {
+            storage.forEachElement(
+                in: size,
+                with: environment,
+                children: childNodes,
+                state: state,
+                forEach: forEach
+            )
+        }
+    }
+
+    /// Using a tree of `LayoutResultNode` values, enumerates
+    /// all children to return their `ElementState`, `Element`,
+    /// and relevant `LayoutResultNode` values.
+    ///
+    /// ## Note
+    /// This method does _not_ invoke the `forEach` block for the initial reciever.
+    /// If you want to perform work on the reciever, do it before calling this method.
+    ///
+    /// Delegates to `storage` (`ContentStorage`).
+    func forEachElement(
+        with node: LayoutResultNode,
+        environment: Environment,
+        state: ElementState,
+        forEach: (ForEachElementContext) -> Void
+    ) {
+        forEachElement(
+            in: node.layoutAttributes.bounds.size,
+            with: environment,
+            children: node.children.map(\.node),
+            state: state,
+            forEach: forEach
+        )
+    }
+
+}
+
+extension ElementContent {
+
+    /// Creates a new `ElementContent` which uses the provided element to measure its
+    /// size, but does not place the element as a child in the final, laid out hierarchy.
+    ///
+    /// This is useful if you are placing the element in a nested `BlueprintView`, for example (eg
+    /// to create a stateful element) and just need this element to be correctly sized.
+    @_spi(BlueprintElementContent)
+    public init(byMeasuring element: Element) {
+        storage = MeasureNestedElementStorage(element: element)
+    }
+
+    private struct MeasureNestedElementStorage: ContentStorage {
+
+        let element: Element
+
+        let childCount: Int = 0
+
+        func measure(in constraint: SizeConstraint, environment: Environment, cache: any CacheTree) -> CGSize {
+            fatalError()
+        }
+
+        func performLegacyLayout(attributes: LayoutAttributes, environment: Environment, cache: any CacheTree) -> [ElementContent.IdentifiedNode] {
+            fatalError()
+        }
+
+        func sizeThatFits(proposal: SizeConstraint, environment: Environment, node: LayoutTreeNode) -> CGSize {
+            // FIXME: SUPPORT ON PRE-CROSSCACHED?
+            fatalError()
+        }
+
+        func performCaffeinatedLayout(frame: CGRect, environment: Environment, node: LayoutTreeNode) -> [ElementContent.IdentifiedNode] {
+            // FIXME: SUPPORT ON PRE-CROSSCACHED?
+            fatalError()
+        }
+
+        func sizeThatFitsWithCache(proposal: SizeConstraint, with environment: Environment, state: ElementState) -> CGSize {
+            let childState = state.childState(
+                for: element,
+                in: environment,
+                with: .identifierFor(singleChild: element),
+                kind: .measurementOnly
+            )
+
+            precondition(type(of: element) == type(of: childState.element.latest))
+
+            return childState.sizeThatFits(proposal: proposal, with: environment) { environment in
+                childState.elementContent.sizeThatFitsWithCache(proposal: proposal, with: environment, state: childState)
+            }
+        }
+
+        func performCachedCaffeinatedLayout(in size: CGSize, with environment: Environment, state: ElementState) -> [LayoutResultNode] {
+            []
+        }
+
+        func forEachElement(
+            in size: CGSize,
+            with environment: Environment,
+            children childNodes: [LayoutResultNode],
+            state: ElementState,
+            forEach: (ElementContent.ForEachElementContext) -> Void
+        ) {
+            precondition(childNodes.isEmpty, "Expected no child nodes for a layout-only element.")
+
+            /// No-op; we have no children so we won't enumerate them.
+            ///
+            /// Important: This means we also won't update measurement-only children
+            /// with their latest instance versions, but that's OK, since we're also not applying
+            /// them to real views anyway – that happens in the nested blueprint view.
+            ///
+            /// Once we're able to share this measurement and layout across blueprint views,
+            /// we will be able to finish the bridge here.
+        }
+    }
 }
 
 // MARK: - Layout storage
@@ -114,6 +270,8 @@ extension ElementContent {
             element: Element
         ) {
             let child = Child(
+                // TODO: VERIFY
+                identifier: .identifier(for: element, key: key, count: children.count + 1),
                 traits: traits,
                 key: key,
                 content: element.content,
@@ -288,8 +446,6 @@ extension ElementContent {
 // `SingleChildLayout` implementation for use in elements with a single child.
 fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layout {
 
-    typealias Cache = WrappedLayout.Cache
-
     private var wrapped: WrappedLayout
 
     init(wrapping layout: WrappedLayout) {
@@ -311,37 +467,29 @@ fileprivate struct SingleChildLayoutHost<WrappedLayout: SingleChildLayout>: Layo
     func sizeThatFits(
         proposal: SizeConstraint,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     ) -> CGSize {
         precondition(subelements.count == 1)
         return wrapped.sizeThatFits(
             proposal: proposal,
             subelement: subelements[0],
-            environment: environment,
-            cache: &cache
+            environment: environment
         )
     }
 
     func placeSubelements(
         in size: CGSize,
         subelements: Subelements,
-        environment: Environment,
-        cache: inout Cache
+        environment: Environment
     ) {
         precondition(subelements.count == 1)
         wrapped.placeSubelement(
             in: size,
             subelement: subelements[0],
-            environment: environment,
-            cache: &cache
+            environment: environment
         )
     }
 
-    func makeCache(subelements: Subelements, environment: Environment) -> Cache {
-        precondition(subelements.count == 1)
-        return wrapped.makeCache(subelement: subelements[0], environment: environment)
-    }
 }
 
 extension Array {

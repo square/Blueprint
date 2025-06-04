@@ -14,7 +14,7 @@ import UIKit
 ///     layout.sizing = .unionOfChildren
 /// }
 /// ```
-public struct LayoutWriter: Element {
+public struct LayoutWriter: Element, ComparableElement {
 
     //
     // MARK: Initialization
@@ -65,6 +65,10 @@ public struct LayoutWriter: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
+    }
+
+    public func isEquivalent(to other: LayoutWriter) -> Bool {
+        true
     }
 }
 
@@ -269,8 +273,7 @@ extension LayoutWriter {
             func sizeThatFits(
                 proposal: SizeConstraint,
                 subelements: Subelements,
-                environment: Environment,
-                cache: inout Cache
+                environment: Environment
             ) -> CGSize {
                 builder.sizing.measure(with: builder)
             }
@@ -278,8 +281,7 @@ extension LayoutWriter {
             func placeSubelements(
                 in size: CGSize,
                 subelements: Subelements,
-                environment: Environment,
-                cache: inout ()
+                environment: Environment
             ) {
                 for (child, subelement) in zip(builder.children, subelements) {
                     subelement.place(

@@ -131,3 +131,46 @@ public struct Column: StackElement {
         set { layout.minimumSpacing = newValue }
     }
 }
+
+extension Column: ComparableElement {
+    public func isEquivalent(to other: Column) -> Bool {
+        guard children.count == other.children.count else { return false }
+
+        // Compare layout properties
+        guard layout.axis == other.layout.axis &&
+            layout.underflow == other.layout.underflow &&
+            layout.overflow == other.layout.overflow &&
+//              layout.alignment == other.layout.alignment &&
+            layout.minimumSpacing == other.layout.minimumSpacing
+        else {
+            return false
+        }
+
+        // Compare children
+        for i in 0..<children.count {
+            let selfChild = children[i]
+            let otherChild = other.children[i]
+
+            // Compare keys
+            guard selfChild.key == otherChild.key else { return false }
+
+            // Compare traits
+            guard selfChild.traits.growPriority == otherChild.traits.growPriority &&
+                selfChild.traits.shrinkPriority == otherChild.traits.shrinkPriority
+            else {
+                return false
+            }
+
+            guard let selfComparable = selfChild.element as? AnyComparableElement,
+                  let otherComparable = otherChild.element as? AnyComparableElement
+            else {
+                return false
+            }
+            guard selfComparable.anyIsEquivalent(to: otherComparable) else {
+                return false
+            }
+        }
+
+        return true
+    }
+}

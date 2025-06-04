@@ -1,14 +1,8 @@
 import UIKit
 
 /// Aligns a content element within itself. The vertical and horizontal alignment may be set independently.
-///
-/// When using alignment mode `.fill`, the content is scaled to the width or height of the `Aligned` element.
-///
-/// For other modes, the size of the content element is determined by calling `measure(in:)`
-/// on the content element – even if that size is larger than the wrapping element.
-///
 public struct Aligned: Element {
-    /// The possible vertical alignment values.
+    /// Describes how the content will be vertically aligned.
     public enum VerticalAlignment {
         /// Aligns the content to the top edge of the containing element.
         case top
@@ -75,7 +69,6 @@ public struct Aligned: Element {
         }
 
         func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-
             let measurement = child.measure(in: SizeConstraint(size))
 
             let constrainedMeasurement = CGSize(
@@ -117,8 +110,7 @@ public struct Aligned: Element {
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout Cache
+            environment: Environment
         ) -> CGSize {
             subelement.sizeThatFits(proposal)
         }
@@ -126,8 +118,7 @@ public struct Aligned: Element {
         func placeSubelement(
             in size: CGSize,
             subelement: Subelement,
-            environment: Environment,
-            cache: inout ()
+            environment: Environment
         ) {
             let x: CGFloat
             let y: CGFloat
@@ -135,9 +126,9 @@ public struct Aligned: Element {
             let subelementSize = subelement
                 .sizeThatFits(SizeConstraint(size))
                 .upperBounded(by: size)
-
             let width: CGFloat
             let height: CGFloat
+
 
             switch horizontalAlignment {
             case .leading:
@@ -196,5 +187,22 @@ extension Element {
             horizontally: horizontally,
             wrapping: self
         )
+    }
+}
+
+extension Aligned: ComparableElement {
+    public func isEquivalent(to other: Aligned) -> Bool {
+        guard verticalAlignment == other.verticalAlignment,
+              horizontalAlignment == other.horizontalAlignment
+        else {
+            return false
+        }
+
+        guard let selfComparable = wrappedElement as? AnyComparableElement,
+              let otherComparable = other.wrappedElement as? AnyComparableElement
+        else {
+            return false
+        }
+        return selfComparable.anyIsEquivalent(to: otherComparable)
     }
 }
