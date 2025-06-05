@@ -66,16 +66,20 @@ public struct Flow: Element {
     // MARK: Element
 
     public var content: ElementContent {
-        .init(
-            layout: Layout(
+        ElementContent(
+            layout: FlowLayout(
                 lineAlignment: lineAlignment,
                 lineSpacing: lineSpacing,
                 itemAlignment: itemAlignment,
                 itemSpacing: itemSpacing
             )
-        ) {
+        ) { builder in
             for child in children {
-                $0.add(traits: child.traits, key: child.key, element: child.element)
+                builder.add(
+                    traits: child.traits,
+                    key: child.key,
+                    element: child.element
+                )
             }
         }
     }
@@ -188,7 +192,7 @@ extension Element {
 
 extension Flow {
 
-    fileprivate struct Layout: BlueprintUI.Layout {
+    fileprivate struct FlowLayout: Layout, SingleTraitLayout {
 
         typealias Traits = Child.Traits
 
@@ -367,7 +371,7 @@ extension Flow {
 
 // MARK: - RowLayout
 
-extension Flow.Layout {
+extension Flow.FlowLayout {
 
     /// Helper for computing the frames for a row of items.
     fileprivate struct RowLayout {
@@ -398,7 +402,7 @@ extension Flow.Layout {
 
         struct Item {
             let size: CGSize
-            let traits: Flow.Layout.Traits
+            let traits: Flow.FlowLayout.Traits
         }
 
         /// `True` if we can fit an item of the given size in the row.
