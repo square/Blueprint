@@ -16,7 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+- `LayoutMode.legacy` has been removed.
+- The `LegacyLayout` protocol has been removed, and its methods no longer required to implement `Layout`. Layouts can remove their implementations of the `measure` and `layout` methods.
+- `ConstrainedAspectRatio.ContentMode.fillParent` has been removed.
+
 ### Changed
+
+- With the removal of legacy layout, `Layout` no longer conforms to `SingleTraitLayout` by default. Existing layouts that define traits must conform to `SingleTraitLayout` explicitly.
 
 ### Deprecated
 
