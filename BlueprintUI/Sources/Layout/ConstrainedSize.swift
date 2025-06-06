@@ -231,19 +231,3 @@ extension ConstrainedSize {
     }
 }
 
-extension ConstrainedSize: ComparableElement {
-    public func isEquivalent(to other: ConstrainedSize) -> Bool {
-        guard width == other.width,
-              height == other.height
-        else {
-            return false
-        }
-
-        guard let selfComparable = wrapped as? AnyComparableElement,
-              let otherComparable = other.wrapped as? AnyComparableElement
-        else {
-            return false
-        }
-        return selfComparable.anyIsEquivalent(to: otherComparable)
-    }
-}

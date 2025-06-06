@@ -96,6 +96,6 @@ extension Element {
 extension AdaptedEnvironment: ComparableElement {
     public func isEquivalent(to other: AdaptedEnvironment) -> Bool {
         // FIXME: THIS
-        true
+        false
     }
 }

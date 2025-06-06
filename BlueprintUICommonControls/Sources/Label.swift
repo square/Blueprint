@@ -162,25 +162,3 @@ extension Label {
         case custom(lineHeight: CGFloat, alignment: Alignment = .bottom)
     }
 }
-
-extension Label: ComparableElement {
-    public func isEquivalent(to other: Label) -> Bool {
-        // Compare all properties that affect the visual appearance
-        text == other.text &&
-            font == other.font &&
-            color == other.color &&
-            alignment == other.alignment &&
-            numberOfLines == other.numberOfLines &&
-            lineBreakMode == other.lineBreakMode &&
-            lineHeight == other.lineHeight &&
-            adjustsFontSizeToFitWidth == other.adjustsFontSizeToFitWidth &&
-            minimumScaleFactor == other.minimumScaleFactor &&
-            allowsDefaultTighteningForTruncation == other.allowsDefaultTighteningForTruncation &&
-            shadow == other.shadow &&
-            isAccessibilityElement == other.isAccessibilityElement &&
-            accessibilityValue == other.accessibilityValue &&
-            accessibilityHint == other.accessibilityHint &&
-            accessibilityTraits == other.accessibilityTraits &&
-            accessibilityCustomActions == other.accessibilityCustomActions
-    }
-}

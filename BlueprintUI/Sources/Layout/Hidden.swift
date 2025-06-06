@@ -61,18 +61,3 @@ extension Element {
         Hidden(hidden, wrapping: self)
     }
 }
-
-extension Hidden: ComparableElement {
-    public func isEquivalent(to other: Hidden) -> Bool {
-        guard isHidden == other.isHidden else {
-            return false
-        }
-
-        guard let selfComparable = wrappedElement as? AnyComparableElement,
-              let otherComparable = other.wrappedElement as? AnyComparableElement
-        else {
-            return false
-        }
-        return selfComparable.anyIsEquivalent(to: otherComparable)
-    }
-}

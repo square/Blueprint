@@ -281,20 +281,3 @@ extension Element {
         ConstrainedAspectRatio(aspectRatio: aspectRatio, contentMode: contentMode, wrapping: self)
     }
 }
-
-extension ConstrainedAspectRatio: ComparableElement {
-    public func isEquivalent(to other: ConstrainedAspectRatio) -> Bool {
-        guard aspectRatio == other.aspectRatio,
-              contentMode == other.contentMode
-        else {
-            return false
-        }
-
-        guard let selfComparable = wrappedElement as? AnyComparableElement,
-              let otherComparable = other.wrappedElement as? AnyComparableElement
-        else {
-            return false
-        }
-        return selfComparable.anyIsEquivalent(to: otherComparable)
-    }
-}

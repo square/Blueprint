@@ -160,16 +160,3 @@ extension Image {
         }
     }
 }
-
-extension Image: ComparableElement {
-    public func isEquivalent(to other: Image) -> Bool {
-        // Compare all properties that affect the visual appearance
-        // For images, we can compare their pointer equality since UIImage instances are typically
-        // cached and reused. If they're not the same instance but represent the same image,
-        // that's okay - we'll just re-render which is what we want for image updates anyway.
-        (image === other.image) &&
-            tintColor == other.tintColor &&
-            contentMode == other.contentMode &&
-            blockAccessibilityDescription == other.blockAccessibilityDescription
-    }
-}

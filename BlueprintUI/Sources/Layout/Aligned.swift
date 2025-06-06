@@ -189,20 +189,3 @@ extension Element {
         )
     }
 }
-
-extension Aligned: ComparableElement {
-    public func isEquivalent(to other: Aligned) -> Bool {
-        guard verticalAlignment == other.verticalAlignment,
-              horizontalAlignment == other.horizontalAlignment
-        else {
-            return false
-        }
-
-        guard let selfComparable = wrappedElement as? AnyComparableElement,
-              let otherComparable = other.wrappedElement as? AnyComparableElement
-        else {
-            return false
-        }
-        return selfComparable.anyIsEquivalent(to: otherComparable)
-    }
-}

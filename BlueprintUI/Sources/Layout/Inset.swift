@@ -184,22 +184,3 @@ extension Inset {
         }
     }
 }
-
-extension Inset: ComparableElement {
-    public func isEquivalent(to other: Inset) -> Bool {
-        guard top == other.top,
-              bottom == other.bottom,
-              left == other.left,
-              right == other.right
-        else {
-            return false
-        }
-
-        guard let selfComparable = wrappedElement as? AnyComparableElement,
-              let otherComparable = other.wrappedElement as? AnyComparableElement
-        else {
-            return false
-        }
-        return selfComparable.anyIsEquivalent(to: otherComparable)
-    }
-}
