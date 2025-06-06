@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed an issue where resizing a `ScrollView` could result in its scroll position being adjusted incorrectly.
+
 ### Added
 
 - Layouts can define custom traits by creating types that conform to `LayoutTraitsKey`.
 - The `SingleTraitLayout` protocol preserves the existing API for legacy layouts that define a single trait type.
+- Introduced `applyBeforeLayout` to `ViewDescription.Config`, to apply updates to a backing view before its `LayoutAttributes` are applied.
 
 ### Removed
 

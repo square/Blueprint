@@ -31,6 +31,24 @@ class ViewDescriptionTests: XCTestCase {
         XCTAssertEqual(view.mutableProperty, "123")
     }
 
+    func test_applyBeforeLayout() {
+        let description = TestView.describe { config in
+            config.applyBeforeLayout {
+                $0.mutableProperty = "testing"
+            }
+        }
+
+        let view = description.build() as! TestView
+        description.applyBeforeLayout(to: view)
+        XCTAssertEqual(view.mutableProperty, "testing")
+
+        let secondDescription = TestView.describe { config in
+            config.applyBeforeLayout { $0.mutableProperty = "123" }
+        }
+        secondDescription.applyBeforeLayout(to: view)
+        XCTAssertEqual(view.mutableProperty, "123")
+    }
+
     func test_bind() {
         let description = TestView.describe { config in
             config[\.mutableProperty] = "testing"
