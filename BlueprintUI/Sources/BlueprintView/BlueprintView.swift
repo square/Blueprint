@@ -709,6 +709,7 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
+                        child.viewDescription.applyBeforeLayout(to: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {
@@ -729,6 +730,8 @@ extension BlueprintView {
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
                         child.layoutAttributes.apply(to: controller.view)
+                        // So the view has a reasonable size during creation/allocation, do this afterwards.
+                        child.viewDescription.applyBeforeLayout(to: controller.view)
 
                         contentView.insertSubview(controller.view, at: index)
 
