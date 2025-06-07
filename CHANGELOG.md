@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - With the removal of legacy layout, `Layout` no longer conforms to `SingleTraitLayout` by default. Existing layouts that define traits must conform to `SingleTraitLayout` explicitly.
+- `LayoutMode` converted from an enum to a struct with `LayoutOptions` available as a property.
 
 ### Deprecated
 

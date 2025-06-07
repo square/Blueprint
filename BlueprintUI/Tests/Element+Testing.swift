@@ -31,13 +31,10 @@ extension ElementContent {
     /// a new cache.
     func testLayout(attributes: LayoutAttributes) -> [(identifier: ElementIdentifier, node: LayoutResultNode)] {
         let layoutMode = RenderContext.current?.layoutMode ?? .default
-        switch layoutMode {
-        case .caffeinated(let options):
-            return performCaffeinatedLayout(
-                frame: attributes.frame,
-                environment: .empty,
-                node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: options)
-            )
-        }
+        return performCaffeinatedLayout(
+            frame: attributes.frame,
+            environment: .empty,
+            node: LayoutTreeNode(path: "test", signpostRef: SignpostToken(), options: layoutMode.options)
+        )
     }
 }

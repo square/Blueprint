@@ -11,18 +11,15 @@ extension Element {
     ///   - layoutMode: the mode to use for layout
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
-        switch layoutMode {
-        case .caffeinated(let options):
-            return caffeinatedLayout(
-                frame: frame,
-                environment: environment,
-                node: LayoutTreeNode(
-                    path: "\(type(of: self))",
-                    signpostRef: SignpostToken(),
-                    options: options
-                )
+        caffeinatedLayout(
+            frame: frame,
+            environment: environment,
+            node: LayoutTreeNode(
+                path: "\(type(of: self))",
+                signpostRef: SignpostToken(),
+                options: layoutMode.options
             )
-        }
+        )
     }
 
     private func caffeinatedLayout(

@@ -27,19 +27,16 @@ public struct ElementContent {
         cacheName: String,
         layoutMode: LayoutMode
     ) -> CGSize {
-        switch layoutMode {
-        case .caffeinated(let options):
-            let node = LayoutTreeNode(
-                path: cacheName,
-                signpostRef: SignpostToken(),
-                options: options
-            )
-            return sizeThatFits(
-                proposal: constraint,
-                environment: environment,
-                node: node
-            )
-        }
+        let node = LayoutTreeNode(
+            path: cacheName,
+            signpostRef: SignpostToken(),
+            options: layoutMode.options
+        )
+        return sizeThatFits(
+            proposal: constraint,
+            environment: environment,
+            node: node
+        )
     }
 
     func sizeThatFits(
