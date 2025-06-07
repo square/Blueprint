@@ -13,6 +13,10 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
         self.children = children
     }
 
+    var childCount: Int {
+        children.count
+    }
+
     struct Child {
         var traits: LayoutTraits
         var key: AnyHashable?
@@ -29,116 +33,6 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
             self.key = key
             self.content = content
             self.element = element
-        }
-    }
-}
-
-extension LayoutStorage: LegacyContentStorage {
-
-    var childCount: Int {
-        children.count
-    }
-
-    func measure(
-        in constraint: SizeConstraint,
-        environment: Environment,
-        cache: CacheTree
-    ) -> CGSize {
-        cache.get(constraint) { constraint -> CGSize in
-            Logger.logMeasureStart(
-                object: cache.signpostRef,
-                description: cache.name,
-                constraint: constraint
-            )
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
-
-            let layoutItems = self.layoutItems(in: environment, cache: cache)
-            return layout.measure(in: constraint, items: layoutItems.legacyItems(for: LayoutType.self))
-        }
-    }
-
-    func performLegacyLayout(
-        attributes: LayoutAttributes,
-        environment: Environment,
-        cache: CacheTree
-    ) -> [IdentifiedNode] {
-        guard children.isEmpty == false else {
-            return []
-        }
-
-        let layoutItems = layoutItems(in: environment, cache: cache).legacyItems(for: LayoutType.self)
-        let childAttributes = layout.layout(size: attributes.bounds.size, items: layoutItems)
-
-        var result: [IdentifiedNode] = []
-        result.reserveCapacity(children.count)
-
-        var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
-
-        for index in 0..<children.count {
-            let currentChildLayoutAttributes = childAttributes[index]
-            let currentChild = children[index]
-            let currentChildCache = cache.subcache(
-                index: index,
-                of: children.count,
-                element: currentChild.element
-            )
-
-            let resultNode = LayoutResultNode(
-                element: currentChild.element,
-                layoutAttributes: currentChildLayoutAttributes,
-                environment: environment,
-                children: currentChild.content.performLegacyLayout(
-                    attributes: currentChildLayoutAttributes,
-                    environment: environment,
-                    cache: currentChildCache
-                )
-            )
-
-            let identifier = identifierFactory.nextIdentifier(
-                for: type(of: currentChild.element),
-                key: currentChild.key
-            )
-
-            result.append((identifier: identifier, node: resultNode))
-        }
-
-        return result
-    }
-
-    private func layoutItems(
-        in environment: Environment,
-        cache: CacheTree
-    ) -> [(LayoutTraits, Measurable)] {
-
-        /// **Note**: We are intentionally using our `indexedMap(...)` and not `enumerated().map(...)`
-        /// here; because the enumerated version is about 25% slower. Because this
-        /// is an extremely hot codepath; this additional performance matters, so we will
-        /// keep track of the index ourselves.
-
-        children.indexedMap { index, child in
-            let childContent = child.content
-            let childCache = cache.subcache(
-                index: index,
-                of: children.count,
-                element: child.element
-            )
-            let measurable = Measurer { constraint -> CGSize in
-                childContent.measure(
-                    in: constraint,
-                    environment: environment,
-                    cache: childCache
-                )
-            }
-
-            return (child.traits, measurable)
-        }
-    }
-}
-
-extension Array where Element == (LayoutTraits, Measurable) {
-    func legacyItems<LayoutType: LegacyLayout>(for layoutType: LayoutType.Type) -> [(LayoutType.Traits, Measurable)] {
-        map { traits, content in
-            (traits[layout: LayoutType.self], content)
         }
     }
 }

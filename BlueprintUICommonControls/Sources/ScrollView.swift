@@ -120,50 +120,6 @@ extension ScrollView {
             }
         }
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            let adjustedConstraint = constraint.inset(
-                width: contentInset.left + contentInset.right,
-                height: contentInset.top + contentInset.bottom
-            )
-
-            var result = fittedSize(in: adjustedConstraint, child: child)
-
-            result.width += contentInset.left + contentInset.right
-            result.height += contentInset.top + contentInset.bottom
-
-            result.width = min(result.width, constraint.width.maximum)
-            result.height = min(result.height, constraint.height.maximum)
-
-            return result
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-
-            var insetSize = size
-            insetSize.width -= contentInset.left + contentInset.right
-            insetSize.height -= contentInset.top + contentInset.bottom
-
-            var itemSize = fittedSize(in: SizeConstraint(insetSize), child: child)
-            if contentSize == .fittingHeight {
-                itemSize.width = insetSize.width
-            } else if contentSize == .fittingWidth {
-                itemSize.height = insetSize.height
-            }
-
-            var contentAttributes = LayoutAttributes(frame: CGRect(origin: .zero, size: itemSize))
-
-            if centersUnderflow {
-                if contentAttributes.bounds.width < size.width {
-                    contentAttributes.center.x = size.width / 2.0
-                }
-
-                if contentAttributes.bounds.height < size.height {
-                    contentAttributes.center.y = size.height / 2.0
-                }
-            }
-            return contentAttributes
-        }
-
         func fittedSize(in proposal: SizeConstraint, subelement: Subelement) -> CGSize {
             switch contentSize {
             case .custom(let size):

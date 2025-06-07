@@ -11,39 +11,14 @@ extension Element {
     ///   - layoutMode: the mode to use for layout
     /// - Returns: A layout result
     func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
-        switch layoutMode {
-        case .legacy:
-            return legacyLayout(
-                layoutAttributes: LayoutAttributes(frame: frame),
-                environment: environment
-            )
-
-        case .caffeinated(let options):
-            return caffeinatedLayout(
-                frame: frame,
-                environment: environment,
-                node: LayoutTreeNode(
-                    path: "\(type(of: self))",
-                    signpostRef: SignpostToken(),
-                    options: options
-                )
-            )
-        }
-    }
-
-    private func legacyLayout(layoutAttributes: LayoutAttributes, environment: Environment) -> LayoutResultNode {
-        let cache = CacheFactory.makeCache(name: "\(type(of: self))")
-        let children = content.performLegacyLayout(
-            attributes: layoutAttributes,
+        caffeinatedLayout(
+            frame: frame,
             environment: environment,
-            cache: cache
-        )
-
-        return LayoutResultNode(
-            element: self,
-            layoutAttributes: layoutAttributes,
-            environment: environment,
-            children: children
+            node: LayoutTreeNode(
+                path: "\(type(of: self))",
+                signpostRef: SignpostToken(),
+                options: layoutMode.options
+            )
         )
     }
 

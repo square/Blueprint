@@ -260,14 +260,6 @@ private struct TestElement: Element {
     struct TestLayout: Layout {
         var value: TestValue
 
-        func measure(in constraint: SizeConstraint, items: [(traits: (), content: Measurable)]) -> CGSize {
-            value.size
-        }
-
-        func layout(size: CGSize, items: [(traits: (), content: Measurable)]) -> [LayoutAttributes] {
-            [value.layoutAttributes]
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelements: Subelements,

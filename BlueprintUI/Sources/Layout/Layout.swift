@@ -62,12 +62,6 @@ import CoreGraphics
 /// ``SingleChildLayout`` protocol instead. It has similar methods, but is strongly typed for a
 /// single subelement instead of a collection.
 ///
-/// - Note: During the transition from Blueprint's legacy layout system to Caffeinated Layout, the
-///   ``Layout`` protocol is composed of two sets of layout methods: ``LegacyLayout`` and
-///   ``CaffeinatedLayout``. While this documentation focuses on the newer layout API, you must
-///   currently implement both. Fortunately, the methods are similar, and you may be able to reuse
-///   logic.
-///
 /// ## Interact with subelements through their proxies
 ///
 /// To perform layout, you need information about all of your container's subelements, which are the
@@ -104,40 +98,7 @@ import CoreGraphics
 ///   [Layout](https://developer.apple.com/documentation/swiftui/layout), with major differences
 ///   noted.
 ///
-public protocol Layout: LegacyLayout, CaffeinatedLayout {}
-
-public protocol LegacyLayout: SingleTraitLayout {
-    /// Per-item metadata that is used during the measuring and layout pass.
-    associatedtype Traits = ()
-
-    /// Computes the size that this layout requires in a layout, given an array of children and
-    /// accompanying layout traits.
-    ///
-    /// - parameter constraint: The size constraint in which measuring should occur.
-    /// - parameter items: An array of 'items', pairs consisting of a traits object and a
-    ///   `Measurable` value.
-    ///
-    /// - returns: The measured size for the given array of items.
-    func measure(in constraint: SizeConstraint, items: [(traits: Self.Traits, content: Measurable)]) -> CGSize
-
-    /// Generates layout attributes for the given items.
-    ///
-    /// - parameter size: The size that layout attributes should be generated within.
-    ///
-    /// - parameter items: An array of 'items', pairs consisting of a traits object and a
-    ///   `Measurable` value.
-    ///
-    /// - returns: Layout attributes for the given array of items.
-    func layout(size: CGSize, items: [(traits: Self.Traits, content: Measurable)]) -> [LayoutAttributes]
-}
-
-extension LegacyLayout where Traits == () {
-
-    public static var defaultTraits: () {
-        return ()
-    }
-
-}
+public protocol Layout: CaffeinatedLayout {}
 
 public protocol CaffeinatedLayout {
 
