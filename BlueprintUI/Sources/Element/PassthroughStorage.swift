@@ -29,13 +29,13 @@ extension PassthroughStorage: LegacyContentStorage {
 
         cache.get(constraint) { constraint -> CGSize in
 
-            Logger.logMeasureStart(
+            let measureStartToken = Logger.logMeasureStart(
                 object: cache.signpostRef,
                 description: cache.name,
                 constraint: constraint
             )
 
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+            defer { Logger.logMeasureEnd(measureStartToken) }
 
             return child.content.measure(
                 in: constraint,

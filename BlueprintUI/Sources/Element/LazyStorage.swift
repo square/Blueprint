@@ -47,13 +47,13 @@ extension LazyStorage: LegacyContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            Logger.logMeasureStart(
+            let measureStartToken = Logger.logMeasureStart(
                 object: cache.signpostRef,
                 description: cache.name,
                 constraint: constraint
             )
 
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+            defer { Logger.logMeasureEnd(measureStartToken) }
 
             let child = buildChild(for: .measurement, in: constraint, environment: environment)
 

@@ -236,11 +236,11 @@ public final class BlueprintView: UIView {
 
         let cacheName = "sizeThatFits:\(type(of: element))"
 
-        Logger.logSizeThatFitsStart(
+        let sizeThatFitsStart = Logger.logSizeThatFitsStart(
             view: self,
             description: cacheName
         )
-        defer { Logger.logSizeThatFitsEnd(view: self) }
+        defer { Logger.logSizeThatFitsEnd(sizeThatFitsStart) }
 
         let environment = makeEnvironment()
         let layoutMode = environment.layoutMode
@@ -397,7 +397,7 @@ public final class BlueprintView: UIView {
         lastViewHierarchyUpdateBounds = bounds
 
         let startTime = CACurrentMediaTime()
-        Logger.logLayoutStart(view: self)
+        let layoutStartToken = Logger.logLayoutStart(view: self)
 
         let environment = makeEnvironment()
 
@@ -425,7 +425,7 @@ public final class BlueprintView: UIView {
         let viewNodes = layoutResult?.resolve() ?? []
 
         let layoutEndTime = CACurrentMediaTime()
-        Logger.logLayoutEnd(view: self)
+        Logger.logLayoutEnd(layoutStartToken)
 
         // The root controller is fixed, and its layout attributes are never applied.
         rootController.view.frame = bounds
@@ -442,7 +442,7 @@ public final class BlueprintView: UIView {
         let scale = window?.screen.scale ?? UIScreen.main.scale
         rootNode.round(from: rootOrigin, correction: rootCorrection, scale: scale)
 
-        Logger.logViewUpdateStart(view: self)
+        let viewUpdateToken = Logger.logViewUpdateStart(view: self)
 
         let updateResult = rootController.update(
             node: rootNode,
@@ -464,7 +464,7 @@ public final class BlueprintView: UIView {
             callback()
         }
 
-        Logger.logViewUpdateEnd(view: self)
+        Logger.logViewUpdateEnd(viewUpdateToken)
         let viewUpdateEndTime = CACurrentMediaTime()
 
         metricsDelegate?.blueprintView(

@@ -22,13 +22,13 @@ extension MeasurableStorage: LegacyContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint in
-            Logger.logMeasureStart(
+            let measureStartToken = Logger.logMeasureStart(
                 object: cache.signpostRef,
                 description: cache.name,
                 constraint: constraint
             )
 
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+            defer { Logger.logMeasureEnd(measureStartToken) }
 
             return measurer(constraint, environment)
         }
