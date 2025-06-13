@@ -7,7 +7,7 @@ enum Logger {
     private static let _signposter = OSSignposter()
     fileprivate static var signposter: OSSignposter? {
         guard BlueprintLogging.isEnabled else { return nil }
-        return signposter
+        return _signposter
     }
 
 
@@ -55,7 +55,7 @@ extension Logger {
     }
 
     static func logElementAssigned(view: BlueprintView) {
-        start(name: "Element assigned", view: view)
+        event(name: "Element assigned", object: view, description: "Element assigned to \(view.name ?? "BlueprintView")")
     }
 
     static func logSizeThatFitsStart(
