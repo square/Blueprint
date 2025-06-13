@@ -16,19 +16,17 @@ enum Logger {
 extension Logger {
 
     static func start(name: StaticString, view: BlueprintView) -> OSSignpostIntervalState? {
-        guard let signposter else { return nil }
-        return signposter.beginInterval(
+        signposter?.beginInterval(
             name,
-            id: signposter.makeSignpostID(from: view),
+            id: OSSignpostID(log: .active, object: view),
             "\(view.name ?? "BlueprintView", privacy: .public)"
         )
     }
 
     static func event(name: StaticString, object: AnyObject, description: String) {
-        guard let signposter else { return }
-        signposter.emitEvent(
+        signposter?.emitEvent(
             name,
-            id: signposter.makeSignpostID(from: object),
+            id: OSSignpostID(log: .active, object: object),
             "\(description)"
         )
     }
@@ -64,11 +62,10 @@ extension Logger {
         view: BlueprintView,
         description: @autoclosure () -> String
     ) -> OSSignpostIntervalState? {
-        guard let signposter else { return nil }
         let description = description()
-        return signposter.beginInterval(
+        return signposter?.beginInterval(
             "View Sizing",
-            id: signposter.makeSignpostID(from: view),
+            id: OSSignpostID(log: .active, object: view),
             "\(description, privacy: .public)"
         )
     }
@@ -88,7 +85,7 @@ extension Logger {
         return signposter?.beginInterval(
             "Measuring",
             id: OSSignpostID(log: .active, object: object),
-            "\(description, privacy: .public) in \(constraint.width.constrainedValue ?? .infinity, privacy: .public)x\(constraint.height.constrainedValue ?? .infinity, privacy: .public)"
+            "\(description, privacy: .public) in \(constraint.width.logDescription, privacy: .public)x\(constraint.height.logDescription, privacy: .public)"
         )
     }
 
@@ -106,7 +103,7 @@ extension Logger {
         event(
             name: "Cache hit",
             object: object,
-            description: "\(description) in \(constraint.width.constrainedValue ?? .infinity)x\(constraint.height.constrainedValue ?? .infinity)"
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription)"
         )
     }
 
@@ -114,11 +111,10 @@ extension Logger {
         guard shouldRecordMeasurePass() else { return }
         let description = description()
         // FIXME: CHECK REDACT
-        // FIXME: PRECISIION
         event(
             name: "Cache miss",
             object: object,
-            description: "\(description) in \(constraint.width.constrainedValue ?? .infinity)x\(constraint.height.constrainedValue ?? .infinity)"
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription)"
         )
     }
 
@@ -134,11 +130,10 @@ extension Logger {
 
         let description = description()
         // FIXME: CHECK REDACT
-        // FIXME: PRECISIION
         event(
             name: "Cache unconstrained search match",
             object: object,
-            description: "\(description) in \(constraint.width.constrainedValue ?? .infinity)x\(constraint.height.constrainedValue ?? .infinity) matched \(match.width.constrainedValue ?? .infinity)x\(match.height.constrainedValue ?? .infinity)"
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription) matched \(match.width.logDescription)x\(match.height.logDescription)"
         )
     }
 
@@ -148,4 +143,17 @@ extension Logger {
         BlueprintLogging.isEnabled &&
             BlueprintLogging.config.recordElementMeasures
     }
+}
+
+extension SizeConstraint.Axis {
+
+    var logDescription: String {
+        if let constrainedValue {
+            constrainedValue.formatted()
+//            constrainedValue.formatted(.number.precision(.fractionLength(0..<1)))
+        } else {
+            CGFloat.infinity.formatted()
+        }
+    }
+
 }
