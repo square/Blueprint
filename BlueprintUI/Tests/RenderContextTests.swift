@@ -8,9 +8,7 @@ final class RenderContextTests: XCTestCase {
         XCTAssertNil(view.layoutMode)
 
         let defaultMode: LayoutMode = .default
-        let overrideMode: LayoutMode = defaultMode == .legacy
-            ? .caffeinated
-            : .legacy
+        let overrideMode: LayoutMode = .caffeinated(options: .optimizationsDisabled)
 
         var contextualMode: LayoutMode?
 

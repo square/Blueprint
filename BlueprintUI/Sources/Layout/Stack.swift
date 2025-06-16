@@ -263,15 +263,6 @@ public struct StackLayout: Layout, SingleTraitLayout {
         self.alignment = alignment
     }
 
-    public func measure(in constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        let size = _measureIn(constraint: constraint, items: items)
-        return size
-    }
-
-    public func layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        _layout(size: size, items: items)
-    }
-
 }
 
 
@@ -376,37 +367,6 @@ extension StackLayout {
 //      └─────────────────────────┘
 //
 extension StackLayout {
-
-    private func _layout(size: CGSize, items: [(traits: Traits, content: Measurable)]) -> [LayoutAttributes] {
-        guard items.count > 0 else { return [] }
-
-        // During layout the constraints are always `.exactly` to fit the provided size
-        let vectorConstraint = size.vectorConstraint(axis: axis)
-
-        let frames = _frames(for: items.map(StackLayoutItem.init), in: vectorConstraint)
-
-        return frames.map { frame in
-            LayoutAttributes(frame: frame.rect(axis: axis))
-        }
-    }
-
-    private func _measureIn(constraint: SizeConstraint, items: [(traits: Traits, content: Measurable)]) -> CGSize {
-        guard items.count > 0 else { return .zero }
-
-        // During measurement the constraints may be `.atMost` or `.unconstrained` to fit the measurement constraint
-        let vectorConstraint = constraint.vectorConstraint(on: axis)
-
-        let frames = _frames(for: items.map(StackLayoutItem.init), in: vectorConstraint)
-
-        let vector = frames.reduce(Vector.zero) { vector, frame -> Vector in
-            Vector(
-                axis: max(vector.axis, frame.maxAxis),
-                cross: max(vector.cross, frame.maxCross)
-            )
-        }
-
-        return vector.size(axis: axis)
-    }
 
     private func _frames(
         for items: [StackLayoutItem],
