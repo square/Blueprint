@@ -9,11 +9,11 @@ struct TestElement: ProxyElement {
 
             for index in 1...12 {
                 $0.add(child: Label(text: "Hello, World!") {
-                    $0.font = .boldSystemFont(ofSize: 10.0 + CGFloat(index * 4))
+                    $0.font = .boldSystemFont(ofSize: 10.0 + Double(index * 4))
                     $0.color = .init(
-                        red: CGFloat.random(in: 0...1),
-                        green: CGFloat.random(in: 0...1),
-                        blue: CGFloat.random(in: 0...1),
+                        red: Double.random(in: 0...1),
+                        green: Double.random(in: 0...1),
+                        blue: Double.random(in: 0...1),
                         alpha: 1.0
                     )
                 })

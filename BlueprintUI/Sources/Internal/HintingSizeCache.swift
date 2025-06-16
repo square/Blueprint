@@ -89,9 +89,9 @@ final class HintingSizeCache {
         // cases, such as deeply nested stacks. Enable it manually if you want this statistic.
         // Logger.logCacheMiss(object: signpostRef, description: path, constraint: key)
 
-        Logger.logMeasureStart(object: signpostRef, description: path, constraint: key)
+        let measureStartToken = Logger.logMeasureStart(object: signpostRef, description: path, constraint: key)
         let size = create(key)
-        Logger.logMeasureEnd(object: signpostRef)
+        Logger.logMeasureEnd(measureStartToken)
 
         values[key] = size
 

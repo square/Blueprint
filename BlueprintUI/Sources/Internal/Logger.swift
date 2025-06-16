@@ -2,162 +2,116 @@ import Foundation
 import os.log
 
 /// Namespace for logging helpers
-enum Logger {}
+enum Logger {
+
+    private static let _signposter = OSSignposter(subsystem: "com.block.blueprint", category: "Blueprint")
+    fileprivate static var signposter: OSSignposter? {
+        guard BlueprintLogging.isEnabled else { return nil }
+        return _signposter
+    }
+
+
+}
+
+extension Logger {
+
+    static func start(name: StaticString, view: BlueprintView) -> OSSignpostIntervalState? {
+        signposter?.beginInterval(
+            name,
+            id: OSSignpostID(log: .active, object: view),
+            "\(view.name ?? "BlueprintView", privacy: .public)"
+        )
+    }
+
+    static func event(name: StaticString, object: AnyObject, description: String) {
+        signposter?.emitEvent(
+            name,
+            id: OSSignpostID(log: .active, object: object),
+            "\(description)"
+        )
+    }
+
+}
 
 /// BlueprintView signposts
 extension Logger {
-    static func logLayoutStart(view: BlueprintView) {
 
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .begin,
-            log: .active,
-            name: "Layout",
-            signpostID: OSSignpostID(log: .active, object: view),
-            "%{public}s",
-            view.name ?? "BlueprintView"
-        )
+    static func logLayoutStart(view: BlueprintView) -> OSSignpostIntervalState? {
+        start(name: "Layout", view: view)
     }
 
-    static func logLayoutEnd(view: BlueprintView) {
-
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .end,
-            log: .active,
-            name: "Layout",
-            signpostID: OSSignpostID(log: .active, object: view)
-        )
+    static func logLayoutEnd(_ state: OSSignpostIntervalState?) {
+        guard let state else { return }
+        signposter?.endInterval("Layout", state)
     }
 
-    static func logViewUpdateStart(view: BlueprintView) {
-
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .begin,
-            log: .active,
-            name: "View Update",
-            signpostID: OSSignpostID(log: .active, object: view),
-            "%{public}s",
-            view.name ?? "BlueprintView"
-        )
+    static func logViewUpdateStart(view: BlueprintView) -> OSSignpostIntervalState? {
+        start(name: "View Update", view: view)
     }
 
-    static func logViewUpdateEnd(view: BlueprintView) {
-
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .end,
-            log: .active,
-            name: "View Update",
-            signpostID: OSSignpostID(log: .active, object: view)
-        )
+    static func logViewUpdateEnd(_ state: OSSignpostIntervalState?) {
+        guard let state else { return }
+        signposter?.endInterval("View Update", state)
     }
 
     static func logElementAssigned(view: BlueprintView) {
-
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .event,
-            log: .active,
-            name: "Element assigned",
-            signpostID: OSSignpostID(log: .active, object: view),
-            "Element assigned to %{public}s",
-            view.name ?? "BlueprintView"
-        )
+        event(name: "Element assigned", object: view, description: "Element assigned to \(view.name ?? "BlueprintView")")
     }
 
     static func logSizeThatFitsStart(
         view: BlueprintView,
         description: @autoclosure () -> String
-    ) {
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .begin,
-            log: .active,
-            name: "View Sizing",
-            signpostID: OSSignpostID(log: .active, object: view),
-            "%{public}s",
-            description()
+    ) -> OSSignpostIntervalState? {
+        let description = description()
+        return signposter?.beginInterval(
+            "View Sizing",
+            id: OSSignpostID(log: .active, object: view),
+            "\(description, privacy: .public)"
         )
     }
 
-    static func logSizeThatFitsEnd(view: BlueprintView) {
-        guard BlueprintLogging.isEnabled else { return }
-
-        os_signpost(
-            .end,
-            log: .active,
-            name: "View Sizing",
-            signpostID: OSSignpostID(log: .active, object: view)
-        )
+    static func logSizeThatFitsEnd(_ state: OSSignpostIntervalState?) {
+        guard let state else { return }
+        signposter?.endInterval("View Update", state)
     }
+
 }
 
 /// Measuring signposts
 extension Logger {
-    static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
 
-        guard shouldRecordMeasurePass() else { return }
-
-        os_signpost(
-            .begin,
-            log: .active,
-            name: "Measuring",
-            signpostID: OSSignpostID(log: .active, object: object),
-            // nb: os_signpost seems to ignore precision specifiers
-            "%{public}s in %.1f×%.1f",
-            description,
-            constraint.width.constrainedValue ?? .infinity,
-            constraint.height.constrainedValue ?? .infinity
+    static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) -> OSSignpostIntervalState? {
+        guard BlueprintLogging.config.recordElementMeasures else { return nil }
+        return signposter?.beginInterval(
+            "Measuring",
+            id: OSSignpostID(log: .active, object: object),
+            "\(description, privacy: .public) in \(constraint.width.logDescription, privacy: .public)x\(constraint.height.logDescription, privacy: .public)"
         )
     }
 
-    static func logMeasureEnd(object: AnyObject) {
-
-        guard shouldRecordMeasurePass() else { return }
-
-        os_signpost(
-            .end,
-            log: .active,
-            name: "Measuring",
-            signpostID: OSSignpostID(log: .active, object: object)
-        )
+    static func logMeasureEnd(_ state: OSSignpostIntervalState?) {
+        guard BlueprintLogging.config.recordElementMeasures else { return }
+        guard let state else { return }
+        signposter?.endInterval("Measuring", state)
     }
 
     static func logCacheHit(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
-        guard shouldRecordMeasurePass() else { return }
-
-        os_signpost(
-            .event,
-            log: .active,
+        guard BlueprintLogging.config.recordElementMeasures else { return }
+        let description = description()
+        event(
             name: "Cache hit",
-            signpostID: OSSignpostID(log: .active, object: object),
-            "%{public}s in %{public}s×%{public}s",
-            description(),
-            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
-            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+            object: object,
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription)"
         )
     }
 
     static func logCacheMiss(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
-        guard shouldRecordMeasurePass() else { return }
-
-        os_signpost(
-            .event,
-            log: .active,
+        guard BlueprintLogging.config.recordElementMeasures else { return }
+        let description = description()
+        event(
             name: "Cache miss",
-            signpostID: OSSignpostID(log: .active, object: object),
-            "%{public}s in %{public}s×%{public}s",
-            description(),
-            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
-            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity)
+            object: object,
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription)"
         )
     }
 
@@ -167,28 +121,28 @@ extension Logger {
         constraint: SizeConstraint,
         match: @autoclosure () -> SizeConstraint
     ) {
-        guard shouldRecordMeasurePass() else { return }
+        guard BlueprintLogging.config.recordElementMeasures else { return }
 
         let match = match()
 
-        os_signpost(
-            .event,
-            log: .active,
+        let description = description()
+        event(
             name: "Cache unconstrained search match",
-            signpostID: OSSignpostID(log: .active, object: object),
-            "%{public}s in %{public}s×%{public}s matched %{public}s×%{public}s",
-            description(),
-            String(format: "%.1f", constraint.width.constrainedValue ?? .infinity),
-            String(format: "%.1f", constraint.height.constrainedValue ?? .infinity),
-            String(format: "%.1f", match.width.constrainedValue ?? .infinity),
-            String(format: "%.1f", match.height.constrainedValue ?? .infinity)
+            object: object,
+            description: "\(description) in \(constraint.width.logDescription)x\(constraint.height.logDescription) matched \(match.width.logDescription)x\(match.height.logDescription)"
         )
     }
 
-    // MARK: Utilities
+}
 
-    private static func shouldRecordMeasurePass() -> Bool {
-        BlueprintLogging.isEnabled &&
-            BlueprintLogging.config.recordElementMeasures
+extension SizeConstraint.Axis {
+
+    var logDescription: String {
+        if let constrainedValue {
+            Double(constrainedValue).formatted(.number.precision(.fractionLength(0..<1)))
+        } else {
+            CGFloat.infinity.formatted()
+        }
     }
+
 }

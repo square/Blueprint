@@ -59,13 +59,13 @@ extension EnvironmentAdaptingStorage: LegacyContentStorage {
 
     func measure(in constraint: SizeConstraint, environment: Environment, cache: CacheTree) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            Logger.logMeasureStart(
+            let measureStartToken = Logger.logMeasureStart(
                 object: cache.signpostRef,
                 description: cache.name,
                 constraint: constraint
             )
 
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+            defer { Logger.logMeasureEnd(measureStartToken) }
 
             let environment = adapted(environment: environment)
 

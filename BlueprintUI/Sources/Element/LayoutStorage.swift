@@ -45,12 +45,12 @@ extension LayoutStorage: LegacyContentStorage {
         cache: CacheTree
     ) -> CGSize {
         cache.get(constraint) { constraint -> CGSize in
-            Logger.logMeasureStart(
+            let measureStartToken = Logger.logMeasureStart(
                 object: cache.signpostRef,
                 description: cache.name,
                 constraint: constraint
             )
-            defer { Logger.logMeasureEnd(object: cache.signpostRef) }
+            defer { Logger.logMeasureEnd(measureStartToken) }
 
             let layoutItems = self.layoutItems(in: environment, cache: cache)
             return layout.measure(in: constraint, items: layoutItems.legacyItems(for: LayoutType.self))
