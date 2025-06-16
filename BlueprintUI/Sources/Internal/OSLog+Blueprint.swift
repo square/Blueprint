@@ -6,7 +6,7 @@ extension OSLog {
     static let blueprint = OSLog(subsystem: "com.squareup.Blueprint", category: "Blueprint")
 
     /// The log to be used for `os_log` and `os_signpost` logging.
-    fileprivate(set) static var active: OSLog = OSLog.blueprint
+    fileprivate(set) static var active: OSLog = OSLog.disabled
 }
 
 /// Namespace for logging config.

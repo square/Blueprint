@@ -36,7 +36,7 @@ extension Logger {
 /// BlueprintView signposts
 extension Logger {
 
-    @discardableResult static func logLayoutStart(view: BlueprintView) -> OSSignpostIntervalState? {
+    static func logLayoutStart(view: BlueprintView) -> OSSignpostIntervalState? {
         start(name: "Layout", view: view)
     }
 
@@ -81,7 +81,7 @@ extension Logger {
 extension Logger {
 
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) -> OSSignpostIntervalState? {
-        guard shouldRecordMeasurePass() else { return nil }
+        guard BlueprintLogging.config.recordElementMeasures else { return nil }
         return signposter?.beginInterval(
             "Measuring",
             id: OSSignpostID(log: .active, object: object),
@@ -90,16 +90,14 @@ extension Logger {
     }
 
     static func logMeasureEnd(_ state: OSSignpostIntervalState?) {
-        guard shouldRecordMeasurePass() else { return }
+        guard BlueprintLogging.config.recordElementMeasures else { return }
         guard let state else { return }
         signposter?.endInterval("Measuring", state)
     }
 
     static func logCacheHit(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
-        guard shouldRecordMeasurePass() else { return }
+        guard BlueprintLogging.config.recordElementMeasures else { return }
         let description = description()
-        // FIXME: CHECK REDACT
-        // FIXME: PRECISIION
         event(
             name: "Cache hit",
             object: object,
@@ -108,9 +106,8 @@ extension Logger {
     }
 
     static func logCacheMiss(object: AnyObject, description: @autoclosure () -> String, constraint: SizeConstraint) {
-        guard shouldRecordMeasurePass() else { return }
+        guard BlueprintLogging.config.recordElementMeasures else { return }
         let description = description()
-        // FIXME: CHECK REDACT
         event(
             name: "Cache miss",
             object: object,
@@ -124,12 +121,11 @@ extension Logger {
         constraint: SizeConstraint,
         match: @autoclosure () -> SizeConstraint
     ) {
-        guard shouldRecordMeasurePass() else { return }
+        guard BlueprintLogging.config.recordElementMeasures else { return }
 
         let match = match()
 
         let description = description()
-        // FIXME: CHECK REDACT
         event(
             name: "Cache unconstrained search match",
             object: object,
@@ -137,20 +133,13 @@ extension Logger {
         )
     }
 
-    // MARK: Utilities
-
-    private static func shouldRecordMeasurePass() -> Bool {
-        BlueprintLogging.isEnabled &&
-            BlueprintLogging.config.recordElementMeasures
-    }
 }
 
 extension SizeConstraint.Axis {
 
     var logDescription: String {
         if let constrainedValue {
-            constrainedValue.formatted()
-//            constrainedValue.formatted(.number.precision(.fractionLength(0..<1)))
+            Double(constrainedValue).formatted(.number.precision(.fractionLength(0..<1)))
         } else {
             CGFloat.infinity.formatted()
         }
