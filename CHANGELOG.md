@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Removed
+
+### Changed
+
+### Deprecated
+
+### Security
+
+### Documentation
+
+### Misc
+
+### Internal
+
+## [6.0.0] - 2025-06-16
+
+### Added
+
 - Layouts can define custom traits by creating types that conform to `LayoutTraitsKey`.
 - The `SingleTraitLayout` protocol preserves the existing API for legacy layouts that define a single trait type.
 
@@ -24,16 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - With the removal of legacy layout, `Layout` no longer conforms to `SingleTraitLayout` by default. Existing layouts that define traits must conform to `SingleTraitLayout` explicitly.
 - `LayoutMode` converted from an enum to a struct with `LayoutOptions` available as a property.
-
-### Deprecated
-
-### Security
-
-### Documentation
-
-### Misc
-
-### Internal
 
 ## [5.7.0] - 2025-05-16
 
@@ -1240,8 +1248,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.7.0...HEAD
-[5.6.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
+[main]: https://github.com/square/Blueprint/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
+[5.7.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
 [5.6.0]: https://github.com/square/Blueprint/compare/5.5.0...5.6.0
 [5.5.0]: https://github.com/square/Blueprint/compare/5.4.0...5.5.0
 [5.4.0]: https://github.com/square/Blueprint/compare/5.3.0...5.4.0
