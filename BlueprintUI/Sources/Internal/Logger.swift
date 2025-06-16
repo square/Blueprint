@@ -4,7 +4,7 @@ import os.log
 /// Namespace for logging helpers
 enum Logger {
 
-    private static let _signposter = OSSignposter()
+    private static let _signposter = OSSignposter(subsystem: "com.block.blueprint", category: "Blueprint")
     fileprivate static var signposter: OSSignposter? {
         guard BlueprintLogging.isEnabled else { return nil }
         return _signposter
