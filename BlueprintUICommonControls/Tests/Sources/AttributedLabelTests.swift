@@ -484,27 +484,6 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
-
-    func test_linkAccessibility_Rotors() {
-        let labelView = AttributedLabel.LabelView()
-        let text: NSString = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
-
-        let url = URL(string: "https://one.ring")!
-
-        let links = ["Frodo", "Merry", "Sam", "Pippin"].map {
-            AttributedLabel.Link(url: url, range: text.range(of: $0))
-        }
-
-        let rotor = labelView.accessibilityRotor(for: links, in: NSAttributedString(string: text as String))
-        XCTAssertNotNil(rotor)
-
-        // links should be sorted by their position in the main string.
-        let sortedHobbits = rotor.dumpItems().map { $0.accessibilityLabel }
-        XCTAssertEqual(sortedHobbits, ["Sam", "Frodo", "Pippin", "Merry"])
-    }
-
-
-
     func test_linkAccessibility_Rotors_update() {
         let string = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
         var attributedText = AttributedText(string)
@@ -712,6 +691,63 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
+    func test_focusItems() {
+        let string = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
+        var attributedText = AttributedText(string)
+
+        for hobbit in ["Frodo", "Merry", "Sam", "Pippin"] {
+            let range = attributedText.range(of: hobbit)!
+            attributedText[range].link = URL(string: "https://one.ring")!
+        }
+
+        let label = AttributedLabel(attributedText: attributedText.attributedString)
+
+        let view = BlueprintView()
+        view.element = label
+        view.layoutIfNeeded()
+
+        guard let labelView = view.firstSubview(ofType: AttributedLabel.LabelView.self) else {
+            XCTFail("Could not find AttributedLabel.LabelView")
+            return
+        }
+
+        XCTAssertFalse(labelView.canBecomeFocused, "Label view should not be focusable")
+
+        let focusItems = labelView.focusItems(in: labelView.bounds)
+        XCTAssertEqual(focusItems.count, 4)
+
+        for item in focusItems {
+            XCTAssertTrue(item.canBecomeFocused, "Focus item should be focusable")
+            XCTAssertNotNil(item.parentFocusEnvironment, "Focus item should have a parent focus environment")
+        }
+
+        let linkElements: [AttributedLabel.LinkElement] = focusItems.compactMap { $0 as? AttributedLabel.LinkElement }
+        XCTAssertEqual(linkElements.count, focusItems.count, "All focus items should be LinkElement instances")
+
+        // Using accessibilityLabel here since label is private.
+        XCTAssertEqual(
+            linkElements.map { $0.accessibilityLabel! },
+            ["Sam", "Frodo", "Pippin", "Merry"],
+            "Focus items ordering should match the ordering of the links in the attributed string"
+        )
+    }
+
+    func test_focusItems_emptyWhenNoLinks() {
+        let string = NSAttributedString(string: "This is plain text with no links")
+        let label = AttributedLabel(attributedText: string)
+
+        let view = BlueprintView()
+        view.element = label
+        view.layoutIfNeeded()
+
+        guard let labelView = view.firstSubview(ofType: AttributedLabel.LabelView.self) else {
+            XCTFail("Could not find AttributedLabel.LabelView")
+            return
+        }
+
+        let focusItems = labelView.focusItems(in: labelView.bounds)
+        XCTAssertTrue(focusItems.isEmpty, "Focus items should be empty when no links are present")
+    }
 }
 
 extension UIAccessibilityCustomRotor {

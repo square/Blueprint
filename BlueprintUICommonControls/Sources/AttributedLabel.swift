@@ -201,6 +201,7 @@ extension AttributedLabel {
         private var linkAttributes: [NSAttributedString.Key: Any] = [:]
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
         private var links: [Link] = []
+        private var linkElements: [LinkElement] = []
 
         private var textRectOffset: UIOffset = .zero {
             didSet {
@@ -211,12 +212,13 @@ extension AttributedLabel {
         }
 
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
-            set { fatalError("accessibilityCustomRotors is not settable.") }
-            get {
-                guard let attributedText, !links.isEmpty else { return [] }
-                return [accessibilityRotor(for: links, in: attributedText)]
-            }
+            set { assertionFailure("accessibilityCustomRotors is not settable.") }
+            get { !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : [] }
         }
+
+        override var canBecomeFocused: Bool { false }
+
+        override func focusItems(in rect: CGRect) -> [any UIFocusItem] { linkElements }
 
         var urlHandler: URLHandler?
 
@@ -256,6 +258,9 @@ extension AttributedLabel {
                         in: model.attributedText.string,
                         linkAccessibilityLabel: environment.linkAccessibilityLabel
                     )
+                    linkElements = links
+                        .sorted(by: { $0.range.location < $1.range.location })
+                        .compactMap { .init(sourceLabel: attributedText, link: $0) }
                 }
 
                 if let shadow = model.shadow {
@@ -431,9 +436,9 @@ extension AttributedLabel {
                 options: []
             ) { link, range, _ in
                 if let link = link as? URL {
-                    links.append(.init(url: link, range: range))
+                    links.append(.init(url: link, range: range, container: self))
                 } else if let link = link as? String, let url = URL(string: link) {
-                    links.append(.init(url: url, range: range))
+                    links.append(.init(url: url, range: range, container: self))
                 }
             }
 
@@ -468,13 +473,13 @@ extension AttributedLabel {
                         let charactersToRemove = CharacterSet.decimalDigits.inverted
                         let trimmedPhoneNumber = phoneNumber.components(separatedBy: charactersToRemove).joined()
                         if let url = URL(string: "tel:\(trimmedPhoneNumber)") {
-                            links.append(.init(url: url, range: result.range))
+                            links.append(.init(url: url, range: result.range, container: self))
                         }
                     }
 
                 case .link:
                     if let url = result.url {
-                        links.append(.init(url: url, range: result.range))
+                        links.append(.init(url: url, range: result.range, container: self))
                     }
 
                 case .address:
@@ -495,7 +500,7 @@ extension AttributedLabel {
                         if let urlQuery = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                            let url = URL(string: "https://maps.apple.com/?address=\(urlQuery)")
                         {
-                            links.append(.init(url: url, range: result.range))
+                            links.append(.init(url: url, range: result.range, container: self))
                         }
                     }
 
@@ -503,7 +508,7 @@ extension AttributedLabel {
                     if let date = result.date,
                        let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")
                     {
-                        links.append(.init(url: url, range: result.range))
+                        links.append(.init(url: url, range: result.range, container: self))
                     }
 
                 default:
@@ -512,22 +517,6 @@ extension AttributedLabel {
             }
 
             return links
-        }
-
-        internal func accessibilityRotor(for links: [Link], in string: NSAttributedString) -> UIAccessibilityCustomRotor {
-            let elements: [LinkAccessibilityElement] = links
-                .sorted(by: { $0.range.location < $1.range.location })
-                .compactMap { link in
-                    guard NSIntersectionRange(string.entireRange, link.range).length > 0 else {
-                        return nil
-                    }
-                    return LinkAccessibilityElement(
-                        container: self,
-                        label: string.attributedSubstring(from: link.range).string,
-                        link: link
-                    )
-                }
-            return elements.accessibilityRotor(systemType: .link)
         }
 
         internal func accessibilityLabel(with links: [Link], in string: String, linkAccessibilityLabel: String?) -> String {
@@ -663,41 +652,108 @@ extension AttributedLabel {
     struct Link: Equatable, Hashable {
         var url: URL
         var range: NSRange
+        weak var container: LabelView?
+
+        var boundingRect: CGRect {
+            guard let container = container,
+                  let textStorage = container.makeTextStorage(),
+                  let layoutManager = textStorage.layoutManagers.first,
+                  let textContainer = layoutManager.textContainers.first
+            else {
+                return .zero
+            }
+
+            let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+
+            // In cases where a link overflows from one line to the next,
+            // we will get back more than one rect. If we had used the boundingRect
+            // function instead, it will only return us a bounding rect that can
+            // fully encompass all the sub-rects - this is undesired behavior as
+            // it will suppress focusable items within the label that have an
+            // overlap with the larger bounding box.
+            // Since we only select the first rectangle, if there is indeed an overflow,
+            // only the portion of the link in the preceding line would be highlighted by
+            // VoiceOver or Full Keyboard Access. While this is not ideal behavior, it is still
+            // preferred over the former. The correct fix for this would be to return bezier paths
+            // that encompass exactly the linked portion.
+            let rects = { () -> [CGRect] in
+                var glyphRects: [CGRect] = []
+                layoutManager.enumerateEnclosingRects(
+                    forGlyphRange: glyphRange,
+                    withinSelectedGlyphRange: NSMakeRange(NSNotFound, 0),
+                    in: textContainer
+                ) { rect, _ in
+                    glyphRects.append(rect)
+                }
+                return glyphRects
+            }()
+
+            return rects.first ?? .zero
+        }
     }
 
-    private final class LinkAccessibilityElement: UIAccessibilityElement {
-        private let link: AttributedLabel.Link
-        private var container: LabelView? { accessibilityContainer as? LabelView }
+    class LinkElement: UIAccessibilityElement, UIFocusItem {
 
-        init(
-            container: LabelView,
-            label: String,
-            link: AttributedLabel.Link
-        ) {
-            self.link = link
-            super.init(accessibilityContainer: container)
-            accessibilityLabel = label
-            accessibilityTraits = [.link]
+        var preferredFocusEnvironments: [any UIFocusEnvironment] = []
+
+        var focusItemContainer: (any UIFocusItemContainer)?
+
+        func setNeedsFocusUpdate() {}
+
+        func updateFocusIfNeeded() {}
+
+        func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {}
+
+        private var sourceLabel: NSAttributedString
+        private var label: String {
+            sourceLabel.attributedSubstring(from: link.range).string
         }
 
-        override var accessibilityFrameInContainerSpace: CGRect {
-            set { fatalError("accessibilityFrameInContainerSpace") }
-            get {
-                guard let container = container,
-                      let textStorage = container.makeTextStorage(),
-                      let layoutManager = textStorage.layoutManagers.first,
-                      let textContainer = layoutManager.textContainers.first
-                else {
-                    return .zero
-                }
+        private var link: AttributedLabel.Link
 
-                let glyphRange = layoutManager.glyphRange(forCharacterRange: link.range, actualCharacterRange: nil)
-                return layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
-            }
+        init?(
+            sourceLabel: NSAttributedString?,
+            link: AttributedLabel.Link
+        ) {
+            guard let sourceLabel, NSIntersectionRange(sourceLabel.entireRange, link.range).length > 0 else { return nil }
+
+            self.sourceLabel = sourceLabel
+            self.link = link
+            super.init(accessibilityContainer: link.container)
+        }
+
+        var frame: CGRect {
+            set { assertionFailure("cannot set frame") }
+            get { link.boundingRect }
+        }
+
+        weak var parentFocusEnvironment: (any UIFocusEnvironment)? {
+            link.container
+        }
+
+        func shouldUpdateFocus(in context: UIFocusUpdateContext) -> Bool {
+            true
+        }
+
+        var canBecomeFocused: Bool { true }
+
+        override var accessibilityFrameInContainerSpace: CGRect {
+            set { assertionFailure("cannot set accessibilityFrameInContainerSpace") }
+            get { link.boundingRect }
+        }
+
+        override var accessibilityLabel: String? {
+            set { assertionFailure("cannot set accessibilityLabel") }
+            get { label }
+        }
+
+        override var accessibilityTraits: UIAccessibilityTraits {
+            set { assertionFailure("cannot set accessibilityTraits") }
+            get { [.link] }
         }
 
         override func accessibilityActivate() -> Bool {
-            container?.urlHandler?.onTap(url: link.url)
+            link.container?.urlHandler?.onTap(url: link.url)
             return true
         }
     }
@@ -844,3 +900,4 @@ extension String {
         components(separatedBy: .newlines).filter { !$0.isEmpty }.joined(separator: " ")
     }
 }
+
