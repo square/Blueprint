@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed bounding rects for VoiceOver when an attributed label's link spans more than one line.
+
 ### Added
 
 - Added support for tabbing through links in `AttributedLabel`
