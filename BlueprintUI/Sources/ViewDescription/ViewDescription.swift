@@ -172,8 +172,7 @@ extension ViewDescription {
         /// An array of update closures that are applied **after** the `LayoutAttributes` is applied to the view.
         public var updates: [Update]
 
-        /// An array of update closures that are applied **before** the `LayoutAttributes` is applied to the view after
-        /// the first layout – during the first layout it is applied afterwards, so the view has a reasonable size.
+        /// An array of update closures that are applied **before** the `LayoutAttributes` is applied to the view.
         public var updatesBeforeLayout: [Update]
 
         /// A closure that takes a native view instance as the single argument, and
