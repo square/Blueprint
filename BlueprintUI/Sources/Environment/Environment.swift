@@ -41,6 +41,7 @@ public struct Environment {
     public static let empty = Environment()
 
     private var values: [ObjectIdentifier: Any] = [:]
+    private var equivalentEligibleKeys: Set<ObjectIdentifier> = []
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
@@ -71,6 +72,28 @@ public struct Environment {
         merged.values.merge(other.values) { $1 }
         return merged
     }
+}
+
+extension Environment: ContextuallyEquivalent {
+
+    public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
+        guard let other else { return false }
+        // There are situations where the addition or removal of an environment value will not affect equivalency.
+        // This is expressed by `someValue.isEquivalent(to: nil, context: .someContext)` – we'll keep track of
+        // checked values to make sure that if we do this check, nil is always in the param, and not the callee.
+        var checkedKeys: Set<ObjectIdentifier> = []
+        for (key, value) in values {
+            checkedKeys.insert(key)
+            check(key: key, against: other)
+        }
+        for (key, value) in other.values {
+            guard !checkedKeys.contains(key) else { continue }
+        }
+        return true
+    }
+
+    private func check(key: ObjectIdentifier, against other: Environment) -> Bool {}
+
 }
 
 

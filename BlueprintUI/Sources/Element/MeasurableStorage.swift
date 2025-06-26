@@ -17,7 +17,10 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        measurer(proposal, environment)
+        if let cached = cachedValue(proposal: proposal, environment: environment, node: node) {
+            return cached
+        }
+        return measurer(proposal, environment)
     }
 
     func performCaffeinatedLayout(
@@ -27,4 +30,24 @@ extension MeasurableStorage: CaffeinatedContentStorage {
     ) -> [IdentifiedNode] {
         []
     }
+}
+
+extension MeasurableStorage {
+
+    private static var cache: [ElementIdentifier: CGSize] = [:]
+
+//    struct CacheKey: Hashable {
+//        let elementIdentifier: ElementIdentifier
+//        let environment: Environment
+//        let node: LayoutTreeNode
+//    }
+
+    func cachedValue(
+        proposal: SizeConstraint,
+        environment: Environment,
+        node: LayoutTreeNode
+    ) -> CGSize? {
+        nil
+    }
+
 }

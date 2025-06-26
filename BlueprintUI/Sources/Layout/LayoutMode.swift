@@ -11,7 +11,7 @@ import Foundation
 /// Changing the default will cause all instances of ``BlueprintView`` to be invalidated, and re-
 /// render their contents.
 ///
-public struct LayoutMode: Equatable {
+public struct LayoutMode: Hashable {
     public static var `default`: Self = .caffeinated {
         didSet {
             guard oldValue != .default else { return }

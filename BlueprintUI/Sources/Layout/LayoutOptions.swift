@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Generally these are only useful for experimenting with the performance profile of different
 /// element compositions, and you should stick with ``default``.
-public struct LayoutOptions: Equatable {
+public struct LayoutOptions: Hashable {
 
     /// The default configuration.
     public static let `default` = LayoutOptions(

@@ -39,6 +39,7 @@ public final class BlueprintView: UIView {
     private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
+    private var layoutCache = CrossLayoutSizeCache()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -252,6 +253,7 @@ public final class BlueprintView: UIView {
                 in: constraint,
                 environment: environment,
                 cacheName: cacheName,
+                layoutCache: layoutCache.elementCache(for: element),
                 layoutMode: layoutMode
             )
         }
