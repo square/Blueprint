@@ -43,6 +43,7 @@ public struct ViewDescription {
     private let _viewType: UIView.Type
     private let _build: () -> UIView
     private let _apply: (UIView) -> Void
+    private let _applyBeforeLayout: (UIView) -> Void
     private let _contentView: (UIView) -> UIView
 
     private let _layoutTransition: LayoutTransition
@@ -86,6 +87,16 @@ public struct ViewDescription {
             }
         }
 
+        _applyBeforeLayout = { view in
+            let typedView = configuration.typeChecked(view: view)
+            for update in configuration.updatesBeforeLayout {
+                update(typedView)
+            }
+            for binding in configuration.bindings {
+                binding.value.apply(to: typedView)
+            }
+        }
+
         _contentView = { view in
             let typedView = configuration.typeChecked(view: view)
             return configuration.contentView(typedView)
@@ -107,6 +118,10 @@ public struct ViewDescription {
 
     public func build() -> UIView {
         _build()
+    }
+
+    public func applyBeforeLayout(to view: UIView) {
+        _applyBeforeLayout(view)
     }
 
     public func apply(to view: UIView) {
@@ -154,8 +169,11 @@ extension ViewDescription {
         /// The default value instantiates the view using `init(frame:)`.
         public var builder: () -> View
 
-        /// An array of update closures.
+        /// An array of update closures that are applied **after** the `LayoutAttributes` is applied to the view.
         public var updates: [Update]
+
+        /// An array of update closures that are applied **before** the `LayoutAttributes` is applied to the view.
+        public var updatesBeforeLayout: [Update]
 
         /// A closure that takes a native view instance as the single argument, and
         /// returns a subview of that view into which child views should be added
@@ -201,6 +219,7 @@ extension ViewDescription {
         public init() {
             builder = { View(frame: .zero) }
             updates = []
+            updatesBeforeLayout = []
             contentView = { $0 }
         }
 
@@ -217,9 +236,22 @@ extension ViewDescription {
 
 extension ViewDescription.Configuration {
 
-    /// Adds the given update closure to the `updates` array.
+    /// Adds the given update closure to the `updates` array,
+    /// and applies them  **after** the `LayoutAttributes` is applied to the view.
     public mutating func apply(_ update: @escaping Update) {
         updates.append(update)
+    }
+
+    /// Adds the given update closure to the `updates` array,
+    /// and applies them  **before** the `LayoutAttributes` is applied to the view.
+    ///
+    /// > During view allocation and creation, this closure is applied after initial `LayoutAttributes`
+    /// are applied, so the view has reasonable default values.
+    ///
+    /// > You should rarely need to use this method, unless you need to apply an update to the view
+    /// before one of the properties on set by `LayoutAttributes` is set.
+    public mutating func applyBeforeLayout(_ update: @escaping Update) {
+        updatesBeforeLayout.append(update)
     }
 
     /// Subscript for values that are not optional. We must represent these values as optional so that we can
