@@ -125,14 +125,6 @@ private struct InsettingElement: Element {
     }
 
     private struct Layout: SingleChildLayout {
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            .zero
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            LayoutAttributes(frame: CGRect(origin: .zero, size: size).insetBy(dx: 20, dy: 20))
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,

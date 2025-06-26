@@ -1,7 +1,7 @@
 import BlueprintUI
 
 extension LayoutMode {
-    static let testModes: [LayoutMode] = [.legacy, .caffeinated]
+    static let testModes: [LayoutMode] = [.caffeinated]
 
     /// Run the given block with `self` as the default layout mode, restoring the previous default
     /// afterwards, and returning the result of the block.

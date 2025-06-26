@@ -29,8 +29,7 @@ class ScrollViewTests: XCTestCase {
                 .scrollable(.fittingContent)
                 .inset(uniform: 10),
             size: CGSize(width: 100, height: 100),
-            identifier: "fittingContent",
-            layoutModes: [.caffeinated]
+            identifier: "fittingContent"
         )
 
         compareSnapshot(
@@ -38,8 +37,7 @@ class ScrollViewTests: XCTestCase {
                 .scrollable(.fittingWidth)
                 .inset(uniform: 10),
             size: CGSize(width: 100, height: 100),
-            identifier: "fittingWidth",
-            layoutModes: [.caffeinated]
+            identifier: "fittingWidth"
         )
 
         compareSnapshot(
@@ -47,8 +45,7 @@ class ScrollViewTests: XCTestCase {
                 .scrollable(.fittingHeight)
                 .inset(uniform: 10),
             size: CGSize(width: 100, height: 100),
-            identifier: "fittingHeight",
-            layoutModes: [.caffeinated]
+            identifier: "fittingHeight"
         )
     }
 

@@ -9,13 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed bounding rects for VoiceOver when an attributed label's link spans more than one line.
 - Fixed an issue where resizing a `ScrollView` could result in its scroll position being adjusted incorrectly.
 
 ### Added
 
-- Layouts can define custom traits by creating types that conform to `LayoutTraitsKey`.
-- The `SingleTraitLayout` protocol preserves the existing API for legacy layouts that define a single trait type.
-- Introduced `applyBeforeLayout` to `ViewDescription.Config`, to apply updates to a backing view before its `LayoutAttributes` are applied.
+- Added support for tabbing through links in `AttributedLabel`
 
 ### Removed
 
@@ -30,6 +29,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.0.0] - 2025-06-16
+
+### Added
+
+- Layouts can define custom traits by creating types that conform to `LayoutTraitsKey`.
+- The `SingleTraitLayout` protocol preserves the existing API for legacy layouts that define a single trait type.
+
+### Removed
+
+- `LayoutMode.legacy` has been removed.
+- The `LegacyLayout` protocol has been removed, and its methods no longer required to implement `Layout`. Layouts can remove their implementations of the `measure` and `layout` methods.
+- `ConstrainedAspectRatio.ContentMode.fillParent` has been removed.
+
+### Changed
+
+- With the removal of legacy layout, `Layout` no longer conforms to `SingleTraitLayout` by default. Existing layouts that define traits must conform to `SingleTraitLayout` explicitly.
+- `LayoutMode` converted from an enum to a struct with `LayoutOptions` available as a property.
 
 ## [5.7.0] - 2025-05-16
 
@@ -1236,8 +1253,9 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/5.7.0...HEAD
-[5.6.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
+[main]: https://github.com/square/Blueprint/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
+[5.7.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
 [5.6.0]: https://github.com/square/Blueprint/compare/5.5.0...5.6.0
 [5.5.0]: https://github.com/square/Blueprint/compare/5.4.0...5.5.0
 [5.4.0]: https://github.com/square/Blueprint/compare/5.3.0...5.4.0

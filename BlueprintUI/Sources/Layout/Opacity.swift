@@ -33,16 +33,6 @@ public struct Opacity: Element {
     private struct Layout: SingleChildLayout {
         var opacity: CGFloat
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            var attributes = LayoutAttributes(size: size)
-            attributes.alpha = opacity
-            return attributes
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,

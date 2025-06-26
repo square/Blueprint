@@ -211,15 +211,12 @@ extension Flow {
             environment: Environment,
             cache: inout ()
         ) -> CGSize {
-            size(
-                for: subelements.map {
-                    .init(
-                        traits: $0.traits(forLayoutType: Self.self),
-                        size: $0.sizeThatFits(_:)
-                    )
-                },
-                in: proposal
-            )
+            frames(for: subelements, in: proposal).reduce(.zero) { reduced, current in
+                CGSize(
+                    width: max(current.maxX, reduced.width),
+                    height: max(reduced.height, current.maxY)
+                )
+            }
         }
 
         func placeSubelements(
@@ -229,32 +226,15 @@ extension Flow {
             cache: inout ()
         ) {
             zip(
-                frames(
-                    for: subelements.map {
-                        .init(
-                            traits: $0.traits(forLayoutType: Self.self),
-                            size: $0.sizeThatFits(_:)
-                        )
-                    },
-                    in: .init(size)
-                ),
+                frames(for: subelements, in: SizeConstraint(size)),
                 subelements
-            ).forEach { frame, element in
-                element.place(at: frame.origin, size: frame.size)
+            ).forEach { frame, subelement in
+                subelement.place(at: frame.origin, size: frame.size)
             }
         }
 
-
-        /// Shim type. Once legacy layout is removed, we can remove this shim and just use `Child` directly.
-        private struct FlowChild {
-            typealias ElementSize = (SizeConstraint) -> CGSize
-
-            var traits: Traits
-            var size: ElementSize
-        }
-
         private func frames(
-            for elements: [FlowChild],
+            for elements: Subelements,
             in constraint: SizeConstraint
         ) -> [CGRect] {
 
@@ -268,7 +248,7 @@ extension Flow {
             for element in elements {
 
                 let elementSize: CGSize = {
-                    let size = element.size(constraint)
+                    let size = element.sizeThatFits(constraint)
 
                     return CGSize(
                         width: min(size.width, constraint.width.maximum),
@@ -291,65 +271,12 @@ extension Flow {
                 row.add(
                     .init(
                         size: elementSize,
-                        traits: element.traits
+                        traits: element.traits(forLayoutType: FlowLayout.self)
                     )
                 )
             }
 
             return frames + row.itemFrames()
-        }
-
-        private func size(
-            for elements: [FlowChild],
-            in constraint: SizeConstraint
-        ) -> CGSize {
-            frames(
-                for: elements,
-                in: constraint
-            ).reduce(.zero) { reduced, current in
-                CGSize(
-                    width: max(current.maxX, reduced.width),
-                    height: max(reduced.height, current.maxY)
-                )
-            }
-        }
-
-        // MARK: Legacy Layout
-
-        func measure(
-            in constraint: SizeConstraint,
-            items: [(
-                traits: Traits,
-                content: Measurable
-            )]
-        ) -> CGSize {
-            size(
-                for: items.map {
-                    .init(
-                        traits: $0.traits,
-                        size: $0.content.measure(in:)
-                    )
-                },
-                in: constraint
-            )
-        }
-
-        func layout(
-            size: CGSize,
-            items: [(
-                traits: Traits,
-                content: Measurable
-            )]
-        ) -> [LayoutAttributes] {
-            frames(
-                for: items.map {
-                    .init(
-                        traits: $0.traits,
-                        size: $0.content.measure(in:)
-                    )
-                },
-                in: .init(size)
-            ).map(LayoutAttributes.init(frame:))
         }
 
         // MARK: Private Methods

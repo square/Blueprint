@@ -47,16 +47,6 @@ public struct Transformed: Element {
     private struct Layout: SingleChildLayout {
         var transform: CATransform3D
 
-        func measure(in constraint: SizeConstraint, child: Measurable) -> CGSize {
-            child.measure(in: constraint)
-        }
-
-        func layout(size: CGSize, child: Measurable) -> LayoutAttributes {
-            var attributes = LayoutAttributes(size: size)
-            attributes.transform = transform
-            return attributes
-        }
-
         func sizeThatFits(
             proposal: SizeConstraint,
             subelement: Subelement,
