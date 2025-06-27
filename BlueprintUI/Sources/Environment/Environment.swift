@@ -41,7 +41,7 @@ public struct Environment {
     public static let empty = Environment()
 
     private var values: [ObjectIdentifier: Any] = [:]
-    private var equivalentEligibleKeys: Set<ObjectIdentifier> = []
+    private var keys: [any EnvironmentKey] = []
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
@@ -84,15 +84,28 @@ extension Environment: ContextuallyEquivalent {
         var checkedKeys: Set<ObjectIdentifier> = []
         for (key, value) in values {
             checkedKeys.insert(key)
-            check(key: key, against: other)
+            guard check(key: key, against: other, in: context) else { return false }
         }
         for (key, value) in other.values {
             guard !checkedKeys.contains(key) else { continue }
+            guard other.check(key: key, against: self, in: context) else { return false }
         }
         return true
     }
 
-    private func check(key: ObjectIdentifier, against other: Environment) -> Bool {}
+    private func check(key: ObjectIdentifier, against other: Environment, in context: EquivalencyContext) -> Bool {
+        guard let asAny = values[key] as? any ContextuallyEquivalent else { return false }
+        let otherAsAny = other.values[key] as? any ContextuallyEquivalent
+        return asAny.isEquivalent(to: otherAsAny, in: context)
+    }
+
+}
+
+extension ContextuallyEquivalent {
+
+    fileprivate func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
+        isEquivalent(to: other as? Self, in: context)
+    }
 
 }
 
