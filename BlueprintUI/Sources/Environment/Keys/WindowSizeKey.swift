@@ -1,6 +1,7 @@
 import UIKit
 
 extension Environment {
+
     private enum WindowSizeKey: EnvironmentKey {
         static var defaultValue: CGSize? {
             nil
@@ -13,4 +14,6 @@ extension Environment {
         get { self[WindowSizeKey.self] }
         set { self[WindowSizeKey.self] = newValue }
     }
+
+
 }

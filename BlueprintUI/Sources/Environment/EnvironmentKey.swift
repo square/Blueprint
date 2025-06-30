@@ -26,4 +26,16 @@ public protocol EnvironmentKey {
     /// The default value that will be vended by an `Environment` for this key if no other value
     /// has been set.
     static var defaultValue: Self.Value { get }
+
+    // FIXME: DOCS
+    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool
+
+}
+
+extension EnvironmentKey where Value: Equatable {
+
+    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+        lhs == rhs
+    }
+
 }
