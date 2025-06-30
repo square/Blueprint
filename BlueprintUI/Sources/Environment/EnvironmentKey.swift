@@ -34,8 +34,19 @@ public protocol EnvironmentKey {
 
 extension EnvironmentKey where Value: Equatable {
 
-    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+    public static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
         lhs == rhs
+    }
+
+}
+
+extension EnvironmentKey {
+
+    public static func equivalentInSizingCases(in context: EquivalencyContext) -> Bool {
+        switch context {
+        case .all: false
+        case .layout: true
+        }
     }
 
 }
