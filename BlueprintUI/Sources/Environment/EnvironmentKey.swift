@@ -38,14 +38,51 @@ extension EnvironmentKey where Value: Equatable {
         lhs == rhs
     }
 
+    public static func equivalentInLayout(
+        lhs: Value,
+        rhs: Value,
+        in context: EquivalencyContext
+    ) -> Bool {
+        switch context {
+        case .all: lhs == rhs
+        case .overallLayout, .internalElementLayout: true
+        }
+    }
+
+    public static func equivalentInInternalElementLayout(
+        lhs: Value,
+        rhs: Value,
+        in context: EquivalencyContext
+    ) -> Bool {
+        switch context {
+        case .all, .overallLayout: lhs == rhs
+        case .internalElementLayout: true
+        }
+    }
+
 }
 
 extension EnvironmentKey {
 
-    public static func equivalentInSizingCases(in context: EquivalencyContext) -> Bool {
+    public static func equivalentInLayout(
+        lhs: Value,
+        rhs: Value,
+        in context: EquivalencyContext
+    ) -> Bool {
         switch context {
         case .all: false
-        case .layout: true
+        case .overallLayout, .internalElementLayout: true
+        }
+    }
+
+    public static func equivalentInInternalElementLayout(
+        lhs: Value,
+        rhs: Value,
+        in context: EquivalencyContext
+    ) -> Bool {
+        switch context {
+        case .all, .overallLayout: false
+        case .internalElementLayout: true
         }
     }
 

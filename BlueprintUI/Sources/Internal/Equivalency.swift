@@ -2,7 +2,8 @@ import Foundation
 
 public enum EquivalencyContext: Hashable, Sendable {
     case all
-    case layout
+    case overallLayout
+    case internalElementLayout
 }
 
 public protocol ContextuallyEquivalent {

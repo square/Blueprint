@@ -7,10 +7,7 @@ extension Environment {
         }
 
         static func isEquivalent(lhs: String?, rhs: String?, in context: EquivalencyContext) -> Bool {
-            switch context {
-            case .all: false
-            case .layout: true
-            }
+            equivalentInLayout(lhs: lhs, rhs: rhs, in: context)
         }
     }
 

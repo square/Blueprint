@@ -34,10 +34,7 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
     }()
 
     public static func isEquivalent(lhs: any URLHandler, rhs: any URLHandler, in context: EquivalencyContext) -> Bool {
-        switch context {
-        case .all: false
-        case .layout: true
-        }
+        equivalentInLayout(lhs: lhs, rhs: rhs, in: context)
     }
 }
 
