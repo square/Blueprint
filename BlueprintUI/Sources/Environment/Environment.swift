@@ -84,19 +84,12 @@ extension Environment: ContextuallyEquivalent {
         for (key, value) in values {
             checkedKeys.insert(key)
             guard key.isEquivalent(value, other.values[key], context) else {
-                if other.values[key] != nil {
-                    print("Hello \(value) \(other.values[key])")
-                    print(key.isEquivalent(value, other.values[key], context))
-                }
                 return false
             }
         }
         for (key, otherValue) in other.values {
             guard !checkedKeys.contains(key) else { continue }
             guard key.isEquivalent(values[key], otherValue, context) else {
-                if values[key] != nil {
-                    print("Hello2 \(values[key]) \(otherValue)")
-                }
                 return false
             }
         }

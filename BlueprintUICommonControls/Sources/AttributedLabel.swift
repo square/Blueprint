@@ -130,15 +130,57 @@ public struct AttributedLabel: Element, Hashable {
 
     private static let prototypeLabel = LabelView()
 
+    private struct Box: Hashable {
+        let hash: Int
+
+        init(model: AttributedLabel, text: NSAttributedString, maximum: CGSize) {
+            var hasher = Hasher()
+            model.hash(into: &hasher)
+            text.hash(into: &hasher)
+            maximum.hash(into: &hasher)
+            hash = hasher.finalize()
+        }
+
+    }
+
+    private static var lastEnv: BlueprintUI.Environment? = nil
+    private static var cache: [Box: CGSize] = [:]
+
+    private static func cachedValue(for value: Box, in env: BlueprintUI.Environment) -> CGSize? {
+        // FIXME: INJECT
+        let enabled = false
+        guard enabled else {
+            return nil
+        }
+        let prev = lastEnv
+        lastEnv = env
+        // Look this up eagerly, since simple dict lookup is gonna be way faster
+        // than equiv checks and we can short circuit if there's no cached value
+        guard let cached = cache[value] else { return nil }
+        if env.isEquivalent(to: prev, in: .internalElementLayout) {
+            return cached
+        } else {
+            cache.removeAll()
+            return nil
+        }
+    }
+
     public var content: ElementContent {
 
         // We create this outside of the measurement block so it's called fewer times.
         let text = displayableAttributedText
 
         return ElementContent { constraint, environment -> CGSize in
+            let box = Box(model: self, text: text, maximum: constraint.maximum)
+            if let cached = Self.cachedValue(for: box, in: environment) {
+                return cached
+            }
+
             let label = Self.prototypeLabel
             label.update(model: self, text: text, environment: environment, isMeasuring: true)
-            return label.sizeThatFits(constraint.maximum)
+            let value = label.sizeThatFits(constraint.maximum)
+            Self.cache[box] = value
+            return value
         }
     }
 
