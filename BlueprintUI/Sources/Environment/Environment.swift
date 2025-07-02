@@ -77,19 +77,10 @@ extension Environment: ContextuallyEquivalent {
 
     public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
-        // There are situations where the addition or removal of an environment value will not affect equivalency.
-        // This is expressed by `someValue.isEquivalent(to: nil, context: .someContext)` – we'll keep track of
-        // checked values to make sure that if we do this check, nil is always in the param, and not the callee.
-        var checkedKeys: Set<Keybox> = []
-        for (key, value) in values {
-            checkedKeys.insert(key)
-            guard key.isEquivalent(value, other.values[key], context) else {
-                return false
-            }
-        }
-        for (key, otherValue) in other.values {
-            guard !checkedKeys.contains(key) else { continue }
-            guard key.isEquivalent(values[key], otherValue, context) else {
+        let keys = Set(values.keys).union(other.values.keys)
+        for key in keys {
+            guard key.isEquivalent(self[key.type], other[key.type], context) else {
+                print(key, self[key.type], other[key.type])
                 return false
             }
         }
@@ -100,7 +91,7 @@ extension Environment: ContextuallyEquivalent {
 
 extension Environment {
 
-    fileprivate struct Keybox: Hashable {
+    fileprivate struct Keybox: Hashable, CustomStringConvertible {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type
@@ -121,6 +112,10 @@ extension Environment {
 
         static func == (lhs: Keybox, rhs: Keybox) -> Bool {
             lhs.objectIdentifier == rhs.objectIdentifier
+        }
+
+        var description: String {
+            String(describing: type)
         }
 
     }
