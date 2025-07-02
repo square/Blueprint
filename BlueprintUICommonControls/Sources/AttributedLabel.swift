@@ -148,7 +148,7 @@ public struct AttributedLabel: Element, Hashable {
 
     private static func cachedValue(for value: Box, in env: BlueprintUI.Environment) -> CGSize? {
         // FIXME: INJECT
-        let enabled = false
+        let enabled = true
         guard enabled else {
             return nil
         }

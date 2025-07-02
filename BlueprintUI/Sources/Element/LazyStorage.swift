@@ -23,7 +23,8 @@ extension LazyStorage: CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
-        node: LayoutTreeNode
+        node: LayoutTreeNode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
         let child = buildChild(
             for: .measurement,
@@ -36,7 +37,8 @@ extension LazyStorage: CaffeinatedContentStorage {
         return child.content.sizeThatFits(
             proposal: proposal,
             environment: environment,
-            node: subnode
+            node: subnode,
+            cache: cache
         )
     }
 

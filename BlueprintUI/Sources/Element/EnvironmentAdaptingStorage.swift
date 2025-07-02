@@ -35,11 +35,17 @@ extension EnvironmentAdaptingStorage: CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
-        node: LayoutTreeNode
+        node: LayoutTreeNode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
         let environment = adapted(environment: environment)
         let subnode = node.subnode(key: identifier)
-        return content.sizeThatFits(proposal: proposal, environment: environment, node: subnode)
+        return content.sizeThatFits(
+            proposal: proposal,
+            environment: environment,
+            node: subnode,
+            cache: cache
+        )
     }
 
     func performCaffeinatedLayout(

@@ -39,7 +39,7 @@ public final class BlueprintView: UIView {
     private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
-    private var layoutCache = CrossLayoutSizeCache()
+    private let crossLayoutCache = CrossLayoutSizeCache()
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -53,6 +53,10 @@ public final class BlueprintView: UIView {
         didSet {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
+            // Shortcut: If there are no changes to the environment, then, well, nothing changed.
+            if oldValue.isEquivalent(to: environment, in: .all) {
+                return
+            }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -253,8 +257,8 @@ public final class BlueprintView: UIView {
                 in: constraint,
                 environment: environment,
                 cacheName: cacheName,
-                layoutCache: layoutCache.elementCache(for: element),
-                layoutMode: layoutMode
+                layoutMode: layoutMode,
+                cache: crossLayoutCache
             )
         }
 

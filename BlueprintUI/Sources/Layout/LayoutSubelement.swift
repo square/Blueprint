@@ -32,7 +32,8 @@ public struct LayoutSubelement {
     var node: LayoutTreeNode
     private var traits: LayoutTraits
 
-    private var cache: HintingSizeCache { node.sizeCache }
+    private var hintingCache: HintingSizeCache { node.sizeCache }
+    private var crossLayoutCache: CrossLayoutSizeCache?
 
     @Storage
     private(set) var placement: Placement?
@@ -46,13 +47,15 @@ public struct LayoutSubelement {
         content: ElementContent,
         environment: Environment,
         node: LayoutTreeNode,
-        traits: LayoutTraits
+        traits: LayoutTraits,
+        cache: CrossLayoutSizeCache?
     ) {
         self.identifier = identifier
         self.content = content
         self.environment = environment
         self.node = node
         self.traits = traits
+        crossLayoutCache = cache
     }
 
     /// Assigns a position and size to a subelement.
@@ -122,9 +125,16 @@ public struct LayoutSubelement {
     /// - Parameter proposal: A proposed size constraint for the subelement.
     /// - Returns: The size that the subelement would choose for itself, given the proposal.
     public func sizeThatFits(_ proposal: SizeConstraint) -> CGSize {
-        cache.get(key: proposal) { proposal in
-            content.sizeThatFits(proposal: proposal, environment: environment, node: node)
+        if let unhintedCache = crossLayoutCache?[node.path] {
+            if environment.isEquivalent(to: unhintedCache.0, in: .internalElementLayout) {
+                return unhintedCache.1
+            }
         }
+        let fresh = hintingCache.get(key: proposal) { proposal in
+            content.sizeThatFits(proposal: proposal, environment: environment, node: node, cache: nil)
+        }
+        crossLayoutCache?[node.path] = (environment, fresh)
+        return fresh
     }
 
     /// Gets the subelement's layout traits associated with the given ``SingleTraitLayout``.

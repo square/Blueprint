@@ -7,7 +7,7 @@ extension Environment {
         }
 
         static func isEquivalent(lhs: String?, rhs: String?, in context: EquivalencyContext) -> Bool {
-            equivalentInLayout(lhs: lhs, rhs: rhs, in: context)
+            alwaysEquivalentIn([.overallLayout, .internalElementLayout], lhs: lhs, rhs: rhs, in: context)
         }
     }
 

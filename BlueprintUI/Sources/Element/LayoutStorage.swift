@@ -39,7 +39,7 @@ struct LayoutStorage<LayoutType: Layout>: ContentStorage {
 
 extension LayoutStorage: CaffeinatedContentStorage {
 
-    private func subelements(from node: LayoutTreeNode, environment: Environment) -> LayoutSubelements {
+    private func subelements(from node: LayoutTreeNode, environment: Environment, cache: CrossLayoutSizeCache?) -> LayoutSubelements {
         var identifierFactory = ElementIdentifier.Factory(elementCount: children.count)
         return children.map { child in
             let identifier = identifierFactory.nextIdentifier(
@@ -51,7 +51,8 @@ extension LayoutStorage: CaffeinatedContentStorage {
                 content: child.content,
                 environment: environment,
                 node: node.subnode(key: identifier),
-                traits: child.traits
+                traits: child.traits,
+                cache: cache
             )
         }
     }
@@ -59,10 +60,11 @@ extension LayoutStorage: CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
-        node: LayoutTreeNode
+        node: LayoutTreeNode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
 
-        let subelements = subelements(from: node, environment: environment)
+        let subelements = subelements(from: node, environment: environment, cache: cache)
 
         var associatedCache = node.associatedCache {
             layout.makeCache(subelements: subelements, environment: environment)
@@ -87,7 +89,7 @@ extension LayoutStorage: CaffeinatedContentStorage {
     ) -> [IdentifiedNode] {
         guard !children.isEmpty else { return [] }
 
-        let subelements = subelements(from: node, environment: environment)
+        let subelements = subelements(from: node, environment: environment, cache: nil)
 
         var associatedCache = node.associatedCache {
             layout.makeCache(subelements: subelements, environment: environment)

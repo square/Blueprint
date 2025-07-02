@@ -4,7 +4,6 @@ import UIKit
 public struct ElementContent {
 
     private let storage: ContentStorage
-    private let elementCache: CrossLayoutSizeCache.ElementCache?
 
     // MARK: Measurement & Children
 
@@ -18,8 +17,8 @@ public struct ElementContent {
             in: constraint,
             environment: environment,
             cacheName: "ElementContent",
-            layoutCache: nil,
-            layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
+            layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode,
+            cache: nil
         )
     }
 
@@ -27,8 +26,8 @@ public struct ElementContent {
         in constraint: SizeConstraint,
         environment: Environment,
         cacheName: String,
-        layoutCache: CrossLayoutSizeCache.ElementCache?,
-        layoutMode: LayoutMode
+        layoutMode: LayoutMode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
         let node = LayoutTreeNode(
             path: cacheName,
@@ -39,16 +38,18 @@ public struct ElementContent {
         return sizeThatFits(
             proposal: constraint,
             environment: environment,
-            node: node
+            node: node,
+            cache: cache
         )
     }
 
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
-        node: LayoutTreeNode
+        node: LayoutTreeNode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
-        storage.sizeThatFits(proposal: proposal, environment: environment, node: node)
+        storage.sizeThatFits(proposal: proposal, environment: environment, node: node, cache: cache)
     }
 
     public var childCount: Int {
@@ -161,7 +162,6 @@ extension ElementContent {
         configure(&builder)
 
         storage = LayoutStorage(layout: layout, children: builder.children)
-        elementCache = nil
     }
 
     /// Initializes a new `ElementContent` with the given element and layout.
@@ -191,7 +191,6 @@ extension ElementContent {
     /// - parameter element: The single child element.
     public init(child: Element) {
         storage = PassthroughStorage(child: child)
-        elementCache = nil
     }
 }
 
@@ -210,14 +209,12 @@ extension ElementContent {
         storage = LazyStorage { _, size, env in
             builder(size, env)
         }
-        elementCache = nil
     }
 
     init(
         build builder: @escaping (LayoutPhase, SizeConstraint, Environment) -> Element
     ) {
         storage = LazyStorage(builder: builder)
-        elementCache = nil
     }
 
     enum LayoutPhase {
@@ -255,7 +252,6 @@ extension ElementContent {
         measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
         storage = MeasurableStorage(measurer: measureFunction)
-        elementCache = nil
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
@@ -281,7 +277,6 @@ extension ElementContent {
             adapter: environmentAdapter,
             child: child
         )
-        elementCache = nil
     }
 
     /// Initializes a new `ElementContent` with the given child element, measurement caching key, and environment key + value.
@@ -312,7 +307,6 @@ extension ElementContent {
     /// to create a stateful element) and just need this element to be correctly sized.
     public init(measuring element: Element) {
         storage = MeasureElementStorage(child: element)
-        elementCache = nil
     }
 }
 

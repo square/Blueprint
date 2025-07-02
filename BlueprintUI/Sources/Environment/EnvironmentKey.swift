@@ -38,25 +38,16 @@ extension EnvironmentKey where Value: Equatable {
         lhs == rhs
     }
 
-    public static func equivalentInLayout(
+    public static func alwaysEquivalentIn(
+        _ contexts: Set<EquivalencyContext>,
         lhs: Value,
         rhs: Value,
         in context: EquivalencyContext
     ) -> Bool {
-        switch context {
-        case .all: lhs == rhs
-        case .overallLayout, .internalElementLayout: true
-        }
-    }
-
-    public static func equivalentInInternalElementLayout(
-        lhs: Value,
-        rhs: Value,
-        in context: EquivalencyContext
-    ) -> Bool {
-        switch context {
-        case .all, .overallLayout: lhs == rhs
-        case .internalElementLayout: true
+        if contexts.contains(context) {
+            true
+        } else {
+            lhs == rhs
         }
     }
 
@@ -64,26 +55,11 @@ extension EnvironmentKey where Value: Equatable {
 
 extension EnvironmentKey {
 
-    public static func equivalentInLayout(
-        lhs: Value,
-        rhs: Value,
+    public static func alwaysEquivalentIn(
+        _ contexts: Set<EquivalencyContext>,
         in context: EquivalencyContext
     ) -> Bool {
-        switch context {
-        case .all: false
-        case .overallLayout, .internalElementLayout: true
-        }
-    }
-
-    public static func equivalentInInternalElementLayout(
-        lhs: Value,
-        rhs: Value,
-        in context: EquivalencyContext
-    ) -> Bool {
-        switch context {
-        case .all, .overallLayout: false
-        case .internalElementLayout: true
-        }
+        contexts.contains(context)
     }
 
 }

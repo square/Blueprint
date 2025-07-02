@@ -22,12 +22,14 @@ extension MeasureElementStorage: CaffeinatedContentStorage {
     func sizeThatFits(
         proposal: SizeConstraint,
         environment: Environment,
-        node: LayoutTreeNode
+        node: LayoutTreeNode,
+        cache: CrossLayoutSizeCache?
     ) -> CGSize {
         content.sizeThatFits(
             proposal: proposal,
             environment: environment,
-            node: node.subnode(key: identifier)
+            node: node.subnode(key: identifier),
+            cache: cache
         )
     }
 
