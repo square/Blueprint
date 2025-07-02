@@ -5,6 +5,10 @@ extension Environment {
         static var defaultValue: String? {
             UIImage(systemName: "link")?.accessibilityLabel
         }
+
+        static func isEquivalent(lhs: String?, rhs: String?, in context: EquivalencyContext) -> Bool {
+            alwaysEquivalentIn([.overallLayout, .internalElementLayout], lhs: lhs, rhs: rhs, context: context)
+        }
     }
 
     /// The localised accessibility label elements should use when handling links.
