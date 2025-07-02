@@ -39,7 +39,6 @@ public final class BlueprintView: UIView {
     private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
-    private var crossLayoutCache: CrossLayoutSizeCache?
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -260,8 +259,7 @@ public final class BlueprintView: UIView {
                 in: constraint,
                 environment: environment,
                 cacheName: cacheName,
-                layoutMode: layoutMode,
-                cache: crossLayoutCache
+                layoutMode: layoutMode
             )
         }
 
@@ -718,6 +716,7 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
+                        child.viewDescription.applyBeforeLayout(to: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {
@@ -738,6 +737,8 @@ extension BlueprintView {
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
                         child.layoutAttributes.apply(to: controller.view)
+                        // So the view has a reasonable size during creation/allocation, do this afterwards.
+                        child.viewDescription.applyBeforeLayout(to: controller.view)
 
                         contentView.insertSubview(controller.view, at: index)
 
