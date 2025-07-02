@@ -39,6 +39,7 @@ public final class BlueprintView: UIView {
     private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
+    private var crossLayoutCache: CrossLayoutSizeCache?
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -52,6 +53,13 @@ public final class BlueprintView: UIView {
         didSet {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
+            // Shortcut: If there are no changes to the environment, then, well, nothing changed.
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isEquivalent(
+                to: environment,
+                in: .all
+            ) {
+                return
+            }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -252,7 +260,8 @@ public final class BlueprintView: UIView {
                 in: constraint,
                 environment: environment,
                 cacheName: cacheName,
-                layoutMode: layoutMode
+                layoutMode: layoutMode,
+                cache: crossLayoutCache
             )
         }
 
@@ -709,7 +718,6 @@ extension BlueprintView {
                         layoutTransition = .inherited
                     }
                     layoutTransition.perform {
-                        child.viewDescription.applyBeforeLayout(to: controller.view)
                         child.layoutAttributes.apply(to: controller.view)
 
                         if pathsChanged {
@@ -730,8 +738,6 @@ extension BlueprintView {
                     UIView.performWithoutAnimation {
                         controller = NativeViewController(node: child)
                         child.layoutAttributes.apply(to: controller.view)
-                        // So the view has a reasonable size during creation/allocation, do this afterwards.
-                        child.viewDescription.applyBeforeLayout(to: controller.view)
 
                         contentView.insertSubview(controller.view, at: index)
 
