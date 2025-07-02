@@ -57,8 +57,34 @@ public struct ScrollView: Element {
 
             config.contentView = { $0.scrollView }
 
-            config.apply {
-                $0.apply(scrollView: self, contentFrame: context.subtreeExtent ?? .zero)
+            let contentFrame = context.subtreeExtent ?? .zero
+
+            config.applyBeforeLayout { view in
+
+                /// We apply the `contentSize` before the `LayoutAttributes` because order of operations matters
+                /// when adjusting the size of the scroll view's frame and the content size. If we set the frame before
+                /// setting the content size – in particular making the frame taller before adjusting the content size,
+                /// the scroll view will internally adjust the `contentOffset`, resulting in the on-screen content
+                /// jumping around.
+                ///
+                /// This is most visible and annoying when you have a scroll view in a resizable modal, which is scrolled away
+                /// from the top of its content. If the size of the scroll view grows before the `contentSize` is adjusted,
+                /// the visible content will shift.
+
+                let contentSize = switch contentSize {
+                case .fittingWidth, .fittingHeight, .fittingContent:
+                    CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
+                case .custom(let custom):
+                    custom
+                }
+
+                if view.scrollView.contentSize != contentSize {
+                    view.scrollView.contentSize = contentSize
+                }
+            }
+
+            config.apply { view in
+                view.apply(scrollView: self, contentFrame: contentFrame)
             }
         }
     }
@@ -346,25 +372,12 @@ fileprivate final class ScrollerWrapperView: UIView {
             }
         }
 
-        let contentSize: CGSize
-
-        switch scrollView.contentSize {
-        case .fittingWidth, .fittingHeight, .fittingContent:
-            contentSize = CGSize(width: contentFrame.maxX, height: contentFrame.maxY)
-        case .custom(let customSize):
-            contentSize = customSize
-        }
-
         if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
             self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
         }
 
         if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
             self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
-        }
-
-        if self.scrollView.contentSize != contentSize {
-            self.scrollView.contentSize = contentSize
         }
 
         if self.scrollView.showsVerticalScrollIndicator != scrollView.showsVerticalScrollIndicator {

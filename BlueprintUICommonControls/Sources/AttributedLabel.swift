@@ -130,57 +130,15 @@ public struct AttributedLabel: Element, Hashable {
 
     private static let prototypeLabel = LabelView()
 
-    private struct Box: Hashable {
-        let hash: Int
-
-        init(model: AttributedLabel, text: NSAttributedString, maximum: CGSize) {
-            var hasher = Hasher()
-            model.hash(into: &hasher)
-            text.hash(into: &hasher)
-            maximum.hash(into: &hasher)
-            hash = hasher.finalize()
-        }
-
-    }
-
-    private static var lastEnv: BlueprintUI.Environment? = nil
-    private static var cache: [Box: CGSize] = [:]
-
-    private static func cachedValue(for value: Box, in env: BlueprintUI.Environment) -> CGSize? {
-        // FIXME: INJECT
-        let enabled = true
-        guard enabled else {
-            return nil
-        }
-        let prev = lastEnv
-        lastEnv = env
-        // Look this up eagerly, since simple dict lookup is gonna be way faster
-        // than equiv checks and we can short circuit if there's no cached value
-        guard let cached = cache[value] else { return nil }
-        if env.isEquivalent(to: prev, in: .internalElementLayout) {
-            return cached
-        } else {
-            cache.removeAll()
-            return nil
-        }
-    }
-
     public var content: ElementContent {
 
         // We create this outside of the measurement block so it's called fewer times.
         let text = displayableAttributedText
 
         return ElementContent { constraint, environment -> CGSize in
-            let box = Box(model: self, text: text, maximum: constraint.maximum)
-            if let cached = Self.cachedValue(for: box, in: environment) {
-                return cached
-            }
-
             let label = Self.prototypeLabel
             label.update(model: self, text: text, environment: environment, isMeasuring: true)
-            let value = label.sizeThatFits(constraint.maximum)
-            Self.cache[box] = value
-            return value
+            return label.sizeThatFits(constraint.maximum)
         }
     }
 
@@ -696,28 +654,35 @@ extension AttributedLabel {
         var range: NSRange
         weak var container: LabelView?
 
-        var boundingRect: CGRect {
+        struct BoundingShape: Equatable, Hashable {
+            // In case of a link that does not span across multiple lines, the `firstRect` property
+            // is simply the bounding rect for that link. `path` is `nil` in those cases.
+            // Otherwise for links that go longer than one line, `firstRect` encompasses the
+            // first portion of the link up to the end its line.
+            // Using that rectangle as the frame ensures that the item is correctly ordered
+            // by the focus system along with the other links.
+            var firstRect: CGRect
+            var path: UIBezierPath?
+
+            func hash(into hasher: inout Hasher) {
+                hasher.combine(path)
+                hasher.combine(firstRect.origin.x)
+                hasher.combine(firstRect.origin.y)
+                hasher.combine(firstRect.size.width)
+                hasher.combine(firstRect.size.height)
+            }
+        }
+
+        var boundingShape: BoundingShape {
             guard let container = container,
                   let textStorage = container.makeTextStorage(),
                   let layoutManager = textStorage.layoutManagers.first,
                   let textContainer = layoutManager.textContainers.first
             else {
-                return .zero
+                return .init(firstRect: .zero)
             }
 
             let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
-
-            // In cases where a link overflows from one line to the next,
-            // we will get back more than one rect. If we had used the boundingRect
-            // function instead, it will only return us a bounding rect that can
-            // fully encompass all the sub-rects - this is undesired behavior as
-            // it will suppress focusable items within the label that have an
-            // overlap with the larger bounding box.
-            // Since we only select the first rectangle, if there is indeed an overflow,
-            // only the portion of the link in the preceding line would be highlighted by
-            // VoiceOver or Full Keyboard Access. While this is not ideal behavior, it is still
-            // preferred over the former. The correct fix for this would be to return bezier paths
-            // that encompass exactly the linked portion.
             let rects = { () -> [CGRect] in
                 var glyphRects: [CGRect] = []
                 layoutManager.enumerateEnclosingRects(
@@ -730,8 +695,32 @@ extension AttributedLabel {
                 return glyphRects
             }()
 
-            return rects.first ?? .zero
+            guard let firstRect = rects.first else { return .init(firstRect: .zero) }
+
+            let path: UIBezierPath? = {
+                // In cases where a link overflows from one line to the next,
+                // we will get back more than one rect. If we had used the boundingRect
+                // function instead, it will only return us a bounding rect that can
+                // fully encompass all the sub-rects - this is undesired behavior as
+                // it will suppress focusable items within the label that have an
+                // overlap with the larger bounding box.
+                guard rects.count > 1 else { return nil }
+
+                let cornerRadius: CGFloat = 4.0
+                let cgPath = rects.reduce(into: CGMutablePath()) { path, rect in
+                    path.addRoundedRect(
+                        in: rect,
+                        cornerWidth: cornerRadius,
+                        cornerHeight: cornerRadius
+                    )
+                }
+
+                return .init(cgPath: cgPath)
+            }()
+
+            return .init(firstRect: firstRect, path: path)
         }
+
     }
 
     class LinkElement: UIAccessibilityElement, UIFocusItem {
@@ -766,7 +755,7 @@ extension AttributedLabel {
 
         var frame: CGRect {
             set { assertionFailure("cannot set frame") }
-            get { link.boundingRect }
+            get { link.boundingShape.firstRect }
         }
 
         weak var parentFocusEnvironment: (any UIFocusEnvironment)? {
@@ -781,7 +770,18 @@ extension AttributedLabel {
 
         override var accessibilityFrameInContainerSpace: CGRect {
             set { assertionFailure("cannot set accessibilityFrameInContainerSpace") }
-            get { link.boundingRect }
+            get { link.boundingShape.firstRect }
+        }
+
+        override var accessibilityPath: UIBezierPath? {
+            set { assertionFailure("cannot set accessibilityPath") }
+            get {
+                if let path = link.boundingShape.path, let container = link.container {
+                    return UIAccessibility.convertToScreenCoordinates(path, in: container)
+                }
+
+                return nil
+            }
         }
 
         override var accessibilityLabel: String? {
