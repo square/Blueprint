@@ -26,4 +26,83 @@ public protocol EnvironmentKey {
     /// The default value that will be vended by an `Environment` for this key if no other value
     /// has been set.
     static var defaultValue: Self.Value { get }
+
+
+    /// Compares two environment values without direct conformance of the values.
+    /// - Parameters:
+    ///   - lhs: The left hand side value being compared.
+    ///   - rhs: The right hand side value being compared.
+    ///   - context: The context to evaluate the equivalency.
+    /// - Returns: Whether or not the two values are equivalent in the specified context.
+    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool
+
+}
+
+extension EnvironmentKey where Value: Equatable {
+
+    public static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+        lhs == rhs
+    }
+
+    /// Convenience implementation returning that the values are always equivalent in the specified contexts, and otherwise evaluates using Equality.
+    /// - Parameters:
+    ///   - contexts: Contexts in which to always return true for equivalency.
+    ///   - lhs: The left hand side value being compared.
+    ///   - rhs: The right hand side value being compared.
+    ///   - context: The context in which the values are currently being compared.
+    /// - Returns: Whether or not the two values are equivalent in the specified context.
+    /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
+    public static func alwaysEquivalentIn(
+        _ contexts: Set<EquivalencyContext>,
+        lhs: Value,
+        rhs: Value,
+        context context: EquivalencyContext
+    ) -> Bool {
+        if contexts.contains(context) {
+            true
+        } else {
+            lhs == rhs
+        }
+    }
+
+}
+
+extension EnvironmentKey where Value: ContextuallyEquivalent {
+
+    public static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+        lhs.isEquivalent(to: rhs, in: context)
+    }
+
+    /// Convenience implementation returning that the values are always equivalent in the specified contexts, and otherwise evaluates using ContextuallyEquivalent.
+    /// - Parameters:
+    ///   - contexts: Contexts in which to always return true for equivalency.
+    ///   - lhs: The left hand side value being compared.
+    ///   - rhs: The right hand side value being compared.
+    ///   - context: The context in which the values are currently being compared.
+    /// - Returns: Whether or not the two values are equivalent in the specified context.
+    /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
+    public static func alwaysEquivalentIn(
+        _ contexts: Set<EquivalencyContext>,
+        lhs: Value,
+        rhs: Value,
+        context context: EquivalencyContext
+    ) -> Bool {
+        if contexts.contains(context) {
+            true
+        } else {
+            lhs.isEquivalent(to: rhs, in: context)
+        }
+    }
+
+}
+
+extension EnvironmentKey {
+
+    public static func alwaysEquivalentIn(
+        _ contexts: Set<EquivalencyContext>,
+        in context: EquivalencyContext
+    ) -> Bool {
+        contexts.contains(context)
+    }
+
 }

@@ -40,21 +40,21 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [ObjectIdentifier: Any] = [:]
+    private var values: [Keybox: Any] = [:]
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
-            let objectId = ObjectIdentifier(key)
+            let keybox = Keybox(key)
 
-            if let value = values[objectId] {
+            if let value = values[keybox] {
                 return value as! Key.Value
             }
 
             return key.defaultValue
         }
         set {
-            values[ObjectIdentifier(key)] = newValue
+            values[Keybox(key)] = newValue
         }
     }
 
@@ -71,6 +71,68 @@ public struct Environment {
         merged.values.merge(other.values) { $1 }
         return merged
     }
+}
+
+extension Environment: ContextuallyEquivalent {
+
+    public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
+        guard let other else { return false }
+        // There are situations where the addition or removal of an environment value will not affect equivalency.
+        // This is expressed by `someValue.isEquivalent(to: nil, context: .someContext)` – we'll keep track of
+        // checked values to make sure that if we do this check, nil is always in the param, and not the callee.
+        var checkedKeys: Set<Keybox> = []
+        for (key, value) in values {
+            checkedKeys.insert(key)
+            guard key.isEquivalent(value, other.values[key], context) else {
+                return false
+            }
+        }
+        for (key, otherValue) in other.values {
+            guard !checkedKeys.contains(key) else { continue }
+            guard key.isEquivalent(values[key], otherValue, context) else {
+                return false
+            }
+        }
+        return true
+    }
+
+}
+
+extension Environment {
+
+    fileprivate struct Keybox: Hashable {
+
+        let objectIdentifier: ObjectIdentifier
+        let type: any EnvironmentKey.Type
+        let isEquivalent: (Any?, Any?, EquivalencyContext) -> Bool
+
+        init<EnvironmentKeyType: EnvironmentKey>(_ type: EnvironmentKeyType.Type) {
+            objectIdentifier = ObjectIdentifier(type)
+            self.type = type
+            isEquivalent = {
+                guard let lhs = $0 as? EnvironmentKeyType.Value, let rhs = $1 as? EnvironmentKeyType.Value else { return false }
+                return type.isEquivalent(lhs: lhs, rhs: rhs, in: $2)
+            }
+        }
+
+        func hash(into hasher: inout Hasher) {
+            objectIdentifier.hash(into: &hasher)
+        }
+
+        static func == (lhs: Keybox, rhs: Keybox) -> Bool {
+            lhs.objectIdentifier == rhs.objectIdentifier
+        }
+
+    }
+
+}
+
+extension ContextuallyEquivalent {
+
+    fileprivate func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
+        isEquivalent(to: other as? Self, in: context)
+    }
+
 }
 
 

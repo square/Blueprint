@@ -32,6 +32,10 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
             return DefaultURLHandler()
         }
     }()
+
+    public static func isEquivalent(lhs: any URLHandler, rhs: any URLHandler, in context: EquivalencyContext) -> Bool {
+        alwaysEquivalentIn([.overallLayout, .internalElementLayout], in: context)
+    }
 }
 
 extension Environment {
