@@ -1,5 +1,6 @@
 import BlueprintUI
 import BlueprintUICommonControls
+import Foundation
 
 
 struct TestElement: ProxyElement {

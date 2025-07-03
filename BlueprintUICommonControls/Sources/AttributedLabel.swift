@@ -211,6 +211,9 @@ extension AttributedLabel {
             }
         }
 
+        // Store bounding shapes in this cache to avoid costly recalculations
+        private var boundingShapeCache: [Link: Link.BoundingShape] = [:]
+
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
             set { assertionFailure("accessibilityCustomRotors is not settable.") }
             get { !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : [] }
@@ -251,6 +254,8 @@ extension AttributedLabel {
             layoutDirection = environment.layoutDirection
 
             if !isMeasuring {
+                invalidateLinkBoundingShapeCaches()
+
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
                     accessibilityLabel = accessibilityLabel(
@@ -644,8 +649,38 @@ extension AttributedLabel {
             trackingLinks = nil
             applyLinkColors()
         }
-    }
 
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            invalidateLinkBoundingShapeCaches()
+        }
+
+        func boundingShape(for link: Link) -> Link.BoundingShape {
+            if let cachedShape = boundingShapeCache[link] {
+                return cachedShape
+            }
+
+            let calculatedShape = link.calculateBoundingShape()
+            boundingShapeCache[link] = calculatedShape
+            return calculatedShape
+        }
+
+        private func invalidateLinkBoundingShapeCaches() {
+            boundingShapeCache.removeAll()
+        }
+    }
+}
+
+extension AttributedLabel.LabelView {
+    // Without this, we were seeing console messages like the following:
+    // "LabelView implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen."
+    // It's unclear as to why they are appearing despite using the API in the intended manner.
+    // To suppress the messages, we implemented this function much like Apple did with `UITableView`,
+    // `UICollectionView`, etc.
+    @objc private class func _supportsInvalidatingFocusCache() -> Bool {
+        true
+    }
 }
 
 extension AttributedLabel {
@@ -674,6 +709,10 @@ extension AttributedLabel {
         }
 
         var boundingShape: BoundingShape {
+            container?.boundingShape(for: self) ?? calculateBoundingShape()
+        }
+
+        fileprivate func calculateBoundingShape() -> BoundingShape {
             guard let container = container,
                   let textStorage = container.makeTextStorage(),
                   let layoutManager = textStorage.layoutManagers.first,
@@ -715,7 +754,7 @@ extension AttributedLabel {
                     )
                 }
 
-                return .init(cgPath: cgPath)
+                return UIAccessibility.convertToScreenCoordinates(.init(cgPath: cgPath), in: container)
             }()
 
             return .init(firstRect: firstRect, path: path)
@@ -775,13 +814,7 @@ extension AttributedLabel {
 
         override var accessibilityPath: UIBezierPath? {
             set { assertionFailure("cannot set accessibilityPath") }
-            get {
-                if let path = link.boundingShape.path, let container = link.container {
-                    return UIAccessibility.convertToScreenCoordinates(path, in: container)
-                }
-
-                return nil
-            }
+            get { link.boundingShape.path }
         }
 
         override var accessibilityLabel: String? {
