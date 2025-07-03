@@ -48,6 +48,9 @@ extension LayoutMode: CustomStringConvertible {
         if options.searchUnconstrainedKeys {
             optionsDescription.append("search")
         }
+        if options.skipUnneededSetNeedsViewHierarchyUpdates {
+            optionsDescription.append("skip")
+        }
         if optionsDescription.isEmpty {
             return "Caffeinated"
         } else {

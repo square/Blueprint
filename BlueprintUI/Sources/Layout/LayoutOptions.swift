@@ -9,7 +9,8 @@ public struct LayoutOptions: Hashable {
     /// The default configuration.
     public static let `default` = LayoutOptions(
         hintRangeBoundaries: true,
-        searchUnconstrainedKeys: true
+        searchUnconstrainedKeys: true,
+        skipUnneededSetNeedsViewHierarchyUpdates: false
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
@@ -22,8 +23,17 @@ public struct LayoutOptions: Hashable {
     /// Layout contract for correct behavior.
     public var searchUnconstrainedKeys: Bool
 
-    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool) {
+    /// Allows skipping calls to setNeedsViewHierarchyUpdates when updating Environment, if the environment is
+    /// equilvalent to the prior value.
+    public var skipUnneededSetNeedsViewHierarchyUpdates: Bool
+
+    public init(
+        hintRangeBoundaries: Bool,
+        searchUnconstrainedKeys: Bool,
+        skipUnneededSetNeedsViewHierarchyUpdates: Bool
+    ) {
         self.hintRangeBoundaries = hintRangeBoundaries
         self.searchUnconstrainedKeys = searchUnconstrainedKeys
+        self.skipUnneededSetNeedsViewHierarchyUpdates = skipUnneededSetNeedsViewHierarchyUpdates
     }
 }
