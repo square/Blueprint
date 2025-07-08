@@ -242,11 +242,13 @@ extension ElementContent {
 
     /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
     ///
+    /// - parameter cacheKey: If present, a key with which the measureFunction result will be cached.
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
     public init(
+        cacheKey: AnyHashable? = nil,
         measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
-        storage = MeasurableStorage(measurer: measureFunction)
+        storage = MeasurableStorage(cacheKey: cacheKey, measurer: measureFunction)
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.

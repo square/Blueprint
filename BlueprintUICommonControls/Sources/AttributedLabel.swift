@@ -135,10 +135,11 @@ public struct AttributedLabel: Element, Hashable {
         // We create this outside of the measurement block so it's called fewer times.
         let text = displayableAttributedText
 
-        return ElementContent { constraint, environment -> CGSize in
+        return ElementContent(cacheKey: self) { constraint, environment -> CGSize in
             let label = Self.prototypeLabel
             label.update(model: self, text: text, environment: environment, isMeasuring: true)
-            return label.sizeThatFits(constraint.maximum)
+            let size = label.sizeThatFits(constraint.maximum)
+            return size
         }
     }
 
@@ -885,7 +886,17 @@ extension NSAttributedString {
         NSRange(location: 0, length: length)
     }
 
+    private struct AKey: Hashable {
+        let label: NSAttributedString
+        let lines: Int
+    }
+
+    private static var normCache: [AKey: NSAttributedString] = [:]
     fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {
+        let key = AKey(label: self, lines: numberOfLines)
+        if let cached = Self.normCache[key] {
+            return cached
+        }
         var attributedText = AttributedText(self)
 
         for run in attributedText.runs {
@@ -921,7 +932,9 @@ extension NSAttributedString {
             attributedText.paragraphStyle = paragraphStyle
         }
 
-        return attributedText.attributedString
+        let resolved = attributedText.attributedString
+        Self.normCache[key] = resolved
+        return resolved
     }
 }
 

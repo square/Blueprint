@@ -40,21 +40,36 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [Keybox: Any] = [:]
+    private var values: [Keybox: Any] = [:] {
+        didSet {
+            identity = UUID()
+        }
+    }
+
+    private var internalValues: [ObjectIdentifier: Any] = [:]
+
+    fileprivate var identity: UUID = UUID()
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
-            let keybox = Keybox(key)
-
-            if let value = values[keybox] {
-                return value as! Key.Value
-            }
-
-            return key.defaultValue
+            self[Keybox(key)] as! Key.Value
         }
         set {
             values[Keybox(key)] = newValue
+        }
+    }
+
+    private subscript(keybox: Keybox) -> Any {
+        values[keybox, default: keybox.type.defaultValue]
+    }
+
+    public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+        get {
+            internalValues[ObjectIdentifier(key)] as! Key.Value
+        }
+        set {
+            internalValues[ObjectIdentifier(key)] = newValue
         }
     }
 
@@ -77,13 +92,24 @@ extension Environment: ContextuallyEquivalent {
 
     public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
+        if identity == other.identity { return true }
+        if let evaluated = cacheStorage.environmentComparisonCacheKey[other.identity], let result = evaluated[context] {
+            #if DEBUG
+            print("Cached comparison result")
+            #endif
+            return result
+        }
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
-            guard key.isEquivalent(self[key.type], other[key.type], context) else {
-                print(key, self[key.type], other[key.type])
+            guard key.isEquivalent(self[key], other[key], context) else {
+                #if DEBUG
+                print(key, self[key], other[key])
+                #endif
+                cacheStorage.environmentComparisonCacheKey[other.identity, default: [:]][context] = false
                 return false
             }
         }
+        cacheStorage.environmentComparisonCacheKey[other.identity, default: [:]][context] = true
         return true
     }
 
@@ -122,6 +148,73 @@ extension Environment {
 
 }
 
+protocol InternalEnvironmentKey: EnvironmentKey {}
+
+extension InternalEnvironmentKey {
+    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+        true
+    }
+}
+
+
+// FIXME: MOVE
+
+final class CacheStorage: Sendable {
+
+    private var storage: [ObjectIdentifier: Any] = [:]
+
+    subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: Key {
+        get {
+            storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
+        }
+        set {
+            storage[ObjectIdentifier(key)] = newValue
+        }
+    }
+
+    func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: Key {
+        storage.removeValue(forKey: ObjectIdentifier(key)) as? KeyType.Value
+    }
+
+    public protocol Key {
+        associatedtype Value
+        static var emptyValue: Self.Value { get }
+    }
+
+    private struct ElementContentCacheKey: Key {
+        static var emptyValue: [AnyHashable: Any] = [:]
+    }
+
+    var elementContentCache: [AnyHashable: Any] {
+        get { self[ElementContentCacheKey.self] }
+        set { self[ElementContentCacheKey.self] = newValue }
+    }
+
+    private struct EnvironmentComparisonCacheKey: Key {
+        static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
+    }
+
+    fileprivate var environmentComparisonCacheKey: [UUID: [EquivalencyContext: Bool]] {
+        get { self[EnvironmentComparisonCacheKey.self] }
+        set { self[EnvironmentComparisonCacheKey.self] = newValue }
+    }
+
+
+}
+
+extension Environment {
+
+    struct CacheStorageEnvironmentKey: InternalEnvironmentKey {
+        static var defaultValue = CacheStorage()
+    }
+
+    var cacheStorage: CacheStorage {
+        get { self[internal: CacheStorageEnvironmentKey.self] }
+        set { self[internal: CacheStorageEnvironmentKey.self] = newValue }
+    }
+
+}
+
 extension ContextuallyEquivalent {
 
     fileprivate func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
@@ -129,6 +222,7 @@ extension ContextuallyEquivalent {
     }
 
 }
+
 
 
 extension UIView {

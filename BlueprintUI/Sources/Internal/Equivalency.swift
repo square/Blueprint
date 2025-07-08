@@ -1,13 +1,14 @@
 import Foundation
 
 // A context in which to evaluate whether or not two values are equivalent.
-public enum EquivalencyContext: Hashable, Sendable {
+public enum EquivalencyContext: Hashable, Sendable, CaseIterable {
     // The two values are identicial in every respect.
     case all
     // The two values are equivalent in all aspects that would affect layout.
     case overallLayout
     // The two values are equivalent in all aspects that would affect layout internally.
     case internalElementLayout
+    case __test
 }
 
 public protocol ContextuallyEquivalent {

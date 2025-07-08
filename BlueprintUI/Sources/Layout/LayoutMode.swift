@@ -49,7 +49,13 @@ extension LayoutMode: CustomStringConvertible {
             optionsDescription.append("search")
         }
         if options.skipUnneededSetNeedsViewHierarchyUpdates {
-            optionsDescription.append("skip")
+            optionsDescription.append("needsViewHierarchyUpdates")
+        }
+        if options.skipLabelApplication {
+            optionsDescription.append("labelApplication")
+        }
+        if options.measureableStorageCache {
+            optionsDescription.append("measureableStorageCache")
         }
         if optionsDescription.isEmpty {
             return "Caffeinated"
