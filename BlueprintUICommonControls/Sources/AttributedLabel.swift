@@ -225,6 +225,46 @@ extension AttributedLabel {
 
         var urlHandler: URLHandler?
 
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+
+            if #available(iOS 17.0, *) {
+                registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (
+                    view: LabelView,
+                    previousTraitCollection: UITraitCollection
+                ) in
+                    view.invalidateLinkBoundingShapeCaches()
+                }
+            } else {
+                NotificationCenter
+                    .default
+                    .addObserver(
+                        self,
+                        selector: #selector(sizeCategoryChanged(notification:)),
+                        name: UIContentSizeCategory.didChangeNotification,
+                        object: nil
+                    )
+            }
+        }
+
+        deinit {
+            if #available(iOS 17.0, *) {
+                // Do nothing
+            } else {
+                NotificationCenter
+                    .default
+                    .removeObserver(self)
+            }
+        }
+
+        @objc private func sizeCategoryChanged(notification: Notification) {
+            invalidateLinkBoundingShapeCaches()
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
         func update(model: AttributedLabel, text: NSAttributedString, environment: Environment, isMeasuring: Bool) {
             let previousAttributedText = isMeasuring ? nil : attributedText
 
@@ -754,7 +794,7 @@ extension AttributedLabel {
                     )
                 }
 
-                return UIAccessibility.convertToScreenCoordinates(.init(cgPath: cgPath), in: container)
+                return .init(cgPath: cgPath)
             }()
 
             return .init(firstRect: firstRect, path: path)
@@ -814,7 +854,13 @@ extension AttributedLabel {
 
         override var accessibilityPath: UIBezierPath? {
             set { assertionFailure("cannot set accessibilityPath") }
-            get { link.boundingShape.path }
+            get {
+                if let path = link.boundingShape.path?.copy() as? UIBezierPath, let container = link.container {
+                    return UIAccessibility.convertToScreenCoordinates(path, in: container)
+                }
+
+                return nil
+            }
         }
 
         override var accessibilityLabel: String? {
