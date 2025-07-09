@@ -157,6 +157,7 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
+        self.environment.cacheStorage = cacheStorage
 
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -617,6 +618,8 @@ extension BlueprintView {
 
         private(set) var children: [(ElementPath, NativeViewController)]
 
+        private var cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
+
         var onAppear: LifecycleCallback? {
             viewDescription.onAppear
         }
@@ -633,7 +636,10 @@ extension BlueprintView {
             children = []
 
             view = node.viewDescription.build()
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            var environment = node.environment
+            cacheStorage.name = "NVC \(#function)"
+            environment.cacheStorage = cacheStorage
+            view.nativeViewNodeBlueprintEnvironment = environment
         }
 
         deinit {
@@ -661,7 +667,10 @@ extension BlueprintView {
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
 
-            view.nativeViewNodeBlueprintEnvironment = node.environment
+            var environment = node.environment
+            cacheStorage.name = "NVC \(#function)"
+            environment.cacheStorage = cacheStorage
+            view.nativeViewNodeBlueprintEnvironment = environment
 
             viewDescription.apply(to: view)
 

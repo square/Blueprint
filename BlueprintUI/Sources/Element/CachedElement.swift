@@ -1,52 +1,45 @@
 import UIKit
 
-private final class CacheBox {
-
-    fileprivate struct CacheStorage {
-        let environment: Environment
-        let value: Any
-    }
-
-    var caches: [AnyHashable: CacheStorage] = [:]
-}
-
-private var _cacheBox = CacheBox()
-
-public struct CachedElement<CacheType>: ProxyElement {
+public struct CachedElement<CacheType: CacheKey>: ProxyElement {
 
     /// Return the contents of this element in the given environment.
-    let _elementRepresentation: (inout CacheType) -> Element
-    let createCache: (CacheType?) -> CacheType
-    let cacheID: AnyHashable
+    let _elementRepresentation: (inout CacheType.Value) -> Element
     let environmentInvalidationContext: EquivalencyContext
 
     public init(
-        cacheID: AnyHashable = ObjectIdentifier(CacheType.self),
         environmentInvalidationContext: EquivalencyContext = .all,
-        elementRepresentation: @escaping (_ cache: inout CacheType) -> Element,
-        createCache: @escaping (CacheType?) -> CacheType
+        elementRepresentation: @escaping (_ cache: inout CacheType.Value) -> Element,
     ) {
-        self.cacheID = cacheID
         self.environmentInvalidationContext = environmentInvalidationContext
-        self.createCache = createCache
         _elementRepresentation = elementRepresentation
     }
 
     public var elementRepresentation: any Element {
         EnvironmentReader { environment in
-            let existing = _cacheBox.caches[cacheID]
-            var cache: CacheType
-            if let existing, environment.isEquivalent(to: existing.environment, in: environmentInvalidationContext) {
-                cache = existing.value as! CacheType
+            let existing = environment.cacheStorage[CacheType.self]
+            var cache: CacheType.Value
+            // FIXME: NOOP RN, FIX TO PREV ENV
+            if environment.isEquivalent(to: /* existing. */environment, in: environmentInvalidationContext) {
+                cache = existing as! CacheType.Value
             } else {
-                let fresh = createCache(existing?.value as? CacheType)
-                _cacheBox.caches[cacheID] = CacheBox.CacheStorage(environment: environment, value: fresh)
-                cache = fresh
+//                _cacheBox.caches[cacheID] = CacheBox.CacheStorage(environment: environment, value: fresh)
+                cache = CacheType.emptyValue
+                environment.cacheStorage[CacheType.self] = cache
             }
             let rep = _elementRepresentation(&cache)
-            _cacheBox.caches[cacheID] = CacheBox.CacheStorage(environment: environment, value: cache)
+            environment.cacheStorage[CacheType.self] = cache
+//            _cacheBox.caches[cacheID] = CacheBox.CacheStorage(environment: environment, value: cache)
             return rep
         }
     }
 
 }
+
+// private struct ElementContentCacheKey: CacheKey {
+//    static var emptyValue: [AnyHashable: Any] = [:]
+// }
+//
+// var elementContentCache: [AnyHashable: Any] {
+//    get { self[ElementContentCacheKey.self] }
+//    set { self[ElementContentCacheKey.self] = newValue }
+// }

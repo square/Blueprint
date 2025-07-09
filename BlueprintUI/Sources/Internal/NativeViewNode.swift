@@ -23,8 +23,6 @@ struct NativeViewNode {
     /// The view description returned by this node
     var viewDescription: ViewDescription
 
-    var wantsCache: Bool
-
     /// The environment at this node in the tree.
     var environment: Environment
 
@@ -37,14 +35,12 @@ struct NativeViewNode {
 
     init(
         content: ViewDescription,
-        wantsCache: Bool = false,
         environment: Environment,
         layoutAttributes: LayoutAttributes,
         children: [(path: ElementPath, node: NativeViewNode)]
     ) {
 
         viewDescription = content
-        self.wantsCache = wantsCache
         self.environment = environment
         self.layoutAttributes = layoutAttributes
         self.children = children

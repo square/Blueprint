@@ -115,6 +115,20 @@ extension Environment: ContextuallyEquivalent {
 
 }
 
+
+extension CacheStorage {
+
+    private struct EnvironmentComparisonCacheKey: CacheKey {
+        static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
+    }
+
+    fileprivate var environmentComparisonCacheKey: [UUID: [EquivalencyContext: Bool]] {
+        get { self[EnvironmentComparisonCacheKey.self] }
+        set { self[EnvironmentComparisonCacheKey.self] = newValue }
+    }
+
+}
+
 extension Environment {
 
     fileprivate struct Keybox: Hashable, CustomStringConvertible {
@@ -151,6 +165,8 @@ extension Environment {
 protocol InternalEnvironmentKey: EnvironmentKey {}
 
 extension InternalEnvironmentKey {
+
+    // Internal keys don't participate in equivalency, they always return as being equivalent.
     static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
         true
     }
@@ -159,11 +175,12 @@ extension InternalEnvironmentKey {
 
 // FIXME: MOVE
 
-final class CacheStorage: Sendable {
+final class CacheStorage: Sendable, CustomDebugStringConvertible {
 
+    var name: String? = nil
     private var storage: [ObjectIdentifier: Any] = [:]
 
-    subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: Key {
+    subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
         get {
             storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
         }
@@ -172,34 +189,23 @@ final class CacheStorage: Sendable {
         }
     }
 
-    func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: Key {
+    func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: CacheKey {
         storage.removeValue(forKey: ObjectIdentifier(key)) as? KeyType.Value
     }
 
-    public protocol Key {
-        associatedtype Value
-        static var emptyValue: Self.Value { get }
+    var debugDescription: String {
+        if let name {
+            "CacheStorage (\(name))"
+        } else {
+            "CacheStorage"
+        }
     }
 
-    private struct ElementContentCacheKey: Key {
-        static var emptyValue: [AnyHashable: Any] = [:]
-    }
+}
 
-    var elementContentCache: [AnyHashable: Any] {
-        get { self[ElementContentCacheKey.self] }
-        set { self[ElementContentCacheKey.self] = newValue }
-    }
-
-    private struct EnvironmentComparisonCacheKey: Key {
-        static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
-    }
-
-    fileprivate var environmentComparisonCacheKey: [UUID: [EquivalencyContext: Bool]] {
-        get { self[EnvironmentComparisonCacheKey.self] }
-        set { self[EnvironmentComparisonCacheKey.self] = newValue }
-    }
-
-
+public protocol CacheKey {
+    associatedtype Value
+    static var emptyValue: Self.Value { get }
 }
 
 extension Environment {

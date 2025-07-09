@@ -48,7 +48,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
 
 extension CacheStorage {
 
-    private struct MeasurableStorageCacheKey: Key {
+    private struct MeasurableStorageCacheKey: CacheKey {
         static var emptyValue: [SizeKey: (CGSize, Environment)] = [:]
     }
 
