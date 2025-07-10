@@ -211,6 +211,9 @@ extension AttributedLabel {
             }
         }
 
+        // Store bounding shapes in this cache to avoid costly recalculations
+        private var boundingShapeCache: [Link: Link.BoundingShape] = [:]
+
         override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
             set { assertionFailure("accessibilityCustomRotors is not settable.") }
             get { !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : [] }
@@ -221,6 +224,46 @@ extension AttributedLabel {
         override func focusItems(in rect: CGRect) -> [any UIFocusItem] { linkElements }
 
         var urlHandler: URLHandler?
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+
+            if #available(iOS 17.0, *) {
+                registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (
+                    view: LabelView,
+                    previousTraitCollection: UITraitCollection
+                ) in
+                    view.invalidateLinkBoundingShapeCaches()
+                }
+            } else {
+                NotificationCenter
+                    .default
+                    .addObserver(
+                        self,
+                        selector: #selector(sizeCategoryChanged(notification:)),
+                        name: UIContentSizeCategory.didChangeNotification,
+                        object: nil
+                    )
+            }
+        }
+
+        deinit {
+            if #available(iOS 17.0, *) {
+                // Do nothing
+            } else {
+                NotificationCenter
+                    .default
+                    .removeObserver(self)
+            }
+        }
+
+        @objc private func sizeCategoryChanged(notification: Notification) {
+            invalidateLinkBoundingShapeCaches()
+        }
+
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
 
         func update(model: AttributedLabel, text: NSAttributedString, environment: Environment, isMeasuring: Bool) {
             let previousAttributedText = isMeasuring ? nil : attributedText
@@ -251,6 +294,8 @@ extension AttributedLabel {
             layoutDirection = environment.layoutDirection
 
             if !isMeasuring {
+                invalidateLinkBoundingShapeCaches()
+
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
                     accessibilityLabel = accessibilityLabel(
@@ -644,8 +689,38 @@ extension AttributedLabel {
             trackingLinks = nil
             applyLinkColors()
         }
-    }
 
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            invalidateLinkBoundingShapeCaches()
+        }
+
+        func boundingShape(for link: Link) -> Link.BoundingShape {
+            if let cachedShape = boundingShapeCache[link] {
+                return cachedShape
+            }
+
+            let calculatedShape = link.calculateBoundingShape()
+            boundingShapeCache[link] = calculatedShape
+            return calculatedShape
+        }
+
+        private func invalidateLinkBoundingShapeCaches() {
+            boundingShapeCache.removeAll()
+        }
+    }
+}
+
+extension AttributedLabel.LabelView {
+    // Without this, we were seeing console messages like the following:
+    // "LabelView implements focusItemsInRect: - caching for linear focus movement is limited as long as this view is on screen."
+    // It's unclear as to why they are appearing despite using the API in the intended manner.
+    // To suppress the messages, we implemented this function much like Apple did with `UITableView`,
+    // `UICollectionView`, etc.
+    @objc private class func _supportsInvalidatingFocusCache() -> Bool {
+        true
+    }
 }
 
 extension AttributedLabel {
@@ -674,6 +749,10 @@ extension AttributedLabel {
         }
 
         var boundingShape: BoundingShape {
+            container?.boundingShape(for: self) ?? calculateBoundingShape()
+        }
+
+        fileprivate func calculateBoundingShape() -> BoundingShape {
             guard let container = container,
                   let textStorage = container.makeTextStorage(),
                   let layoutManager = textStorage.layoutManagers.first,
@@ -776,7 +855,7 @@ extension AttributedLabel {
         override var accessibilityPath: UIBezierPath? {
             set { assertionFailure("cannot set accessibilityPath") }
             get {
-                if let path = link.boundingShape.path, let container = link.container {
+                if let path = link.boundingShape.path?.copy() as? UIBezierPath, let container = link.container {
                     return UIAccessibility.convertToScreenCoordinates(path, in: container)
                 }
 
