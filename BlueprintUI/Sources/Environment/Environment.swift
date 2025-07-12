@@ -173,64 +173,6 @@ extension InternalEnvironmentKey {
 }
 
 
-// FIXME: MOVE
-
-package final class CacheStorage: Sendable, CustomDebugStringConvertible {
-
-    package var name: String? = nil
-    private var storage: [ObjectIdentifier: Any] = [:]
-
-    package subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
-        get {
-            storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
-        }
-        set {
-            storage[ObjectIdentifier(key)] = newValue
-        }
-    }
-
-    package func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: CacheKey {
-        storage.removeValue(forKey: ObjectIdentifier(key)) as? KeyType.Value
-    }
-
-    package var debugDescription: String {
-        if let name {
-            "CacheStorage (\(name))"
-        } else {
-            "CacheStorage"
-        }
-    }
-
-}
-
-public protocol CacheKey {
-    associatedtype Value
-    static var emptyValue: Self.Value { get }
-}
-
-extension Environment {
-
-    struct CacheStorageEnvironmentKey: InternalEnvironmentKey {
-        static var defaultValue = CacheStorage()
-    }
-
-    package var cacheStorage: CacheStorage {
-        get { self[internal: CacheStorageEnvironmentKey.self] }
-        set { self[internal: CacheStorageEnvironmentKey.self] = newValue }
-    }
-
-}
-
-extension ContextuallyEquivalent {
-
-    fileprivate func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
-        isEquivalent(to: other as? Self, in: context)
-    }
-
-}
-
-
-
 extension UIView {
 
     /// The ``Environment`` for the ``Element`` that this view represents in a Blueprint element tree,

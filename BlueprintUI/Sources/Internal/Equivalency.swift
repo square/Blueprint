@@ -8,7 +8,6 @@ public enum EquivalencyContext: Hashable, Sendable, CaseIterable {
     case overallLayout
     // The two values are equivalent in all aspects that would affect layout internally.
     case internalElementLayout
-    case __test
 }
 
 public protocol ContextuallyEquivalent {
@@ -19,6 +18,17 @@ public protocol ContextuallyEquivalent {
     ///   - context: The context to compare within.
     /// - Returns: Whether or not the other instance is equivalent in the specified context.
     func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool
+
+}
+
+
+extension ContextuallyEquivalent {
+
+    // Allows comparison between types which may or may not be equivalent.
+    @_disfavoredOverload
+    func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
+        isEquivalent(to: other as? Self, in: context)
+    }
 
 }
 
