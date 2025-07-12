@@ -175,12 +175,12 @@ extension InternalEnvironmentKey {
 
 // FIXME: MOVE
 
-final class CacheStorage: Sendable, CustomDebugStringConvertible {
+package final class CacheStorage: Sendable, CustomDebugStringConvertible {
 
-    var name: String? = nil
+    package var name: String? = nil
     private var storage: [ObjectIdentifier: Any] = [:]
 
-    subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
+    package subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
         get {
             storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
         }
@@ -189,11 +189,11 @@ final class CacheStorage: Sendable, CustomDebugStringConvertible {
         }
     }
 
-    func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: CacheKey {
+    package func clear<KeyType>(key: KeyType.Type) -> KeyType.Value? where KeyType: CacheKey {
         storage.removeValue(forKey: ObjectIdentifier(key)) as? KeyType.Value
     }
 
-    var debugDescription: String {
+    package var debugDescription: String {
         if let name {
             "CacheStorage (\(name))"
         } else {
@@ -214,7 +214,7 @@ extension Environment {
         static var defaultValue = CacheStorage()
     }
 
-    var cacheStorage: CacheStorage {
+    package var cacheStorage: CacheStorage {
         get { self[internal: CacheStorageEnvironmentKey.self] }
         set { self[internal: CacheStorageEnvironmentKey.self] = newValue }
     }

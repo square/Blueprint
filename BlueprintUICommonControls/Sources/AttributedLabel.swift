@@ -114,9 +114,9 @@ public struct AttributedLabel: Element, Hashable {
     // MARK: Element
 
     /// The text to pass to the underlying `UILabel`, normalized for display if necessary.
-    var displayableAttributedText: NSAttributedString {
+    func displayableAttributedText(environment: Environment) -> NSAttributedString {
         if needsTextNormalization || linkDetectionTypes.isEmpty == false {
-            return attributedText.normalizingForView(with: numberOfLines)
+            return attributedText.normalizingForView(with: numberOfLines, environment: environment)
         } else {
             return attributedText
         }
@@ -132,10 +132,8 @@ public struct AttributedLabel: Element, Hashable {
 
     public var content: ElementContent {
 
-        // We create this outside of the measurement block so it's called fewer times.
-        let text = displayableAttributedText
-
-        return ElementContent(cacheKey: self) { constraint, environment -> CGSize in
+        ElementContent(cacheKey: self) { constraint, environment -> CGSize in
+            let text = displayableAttributedText(environment: environment)
             let label = Self.prototypeLabel
             label.update(model: self, text: text, environment: environment, isMeasuring: true)
             let size = label.sizeThatFits(constraint.maximum)
@@ -146,7 +144,7 @@ public struct AttributedLabel: Element, Hashable {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
 
         // We create this outside of the application block so it's called fewer times.
-        let text = displayableAttributedText
+        let text = displayableAttributedText(environment: context.environment)
 
         return LabelView.describe { config in
             config.frameRoundingBehavior = .prioritizeSize
@@ -886,15 +884,9 @@ extension NSAttributedString {
         NSRange(location: 0, length: length)
     }
 
-    private struct AKey: Hashable {
-        let label: NSAttributedString
-        let lines: Int
-    }
-
-    private static var normCache: [AKey: NSAttributedString] = [:]
-    fileprivate func normalizingForView(with numberOfLines: Int) -> NSAttributedString {
-        let key = AKey(label: self, lines: numberOfLines)
-        if let cached = Self.normCache[key] {
+    fileprivate func normalizingForView(with numberOfLines: Int, environment: Environment) -> NSAttributedString {
+        let key = AttributedStringNormalizationKey(label: self, lines: numberOfLines)
+        if let cached = environment.cacheStorage.attributedStringNormalizationCache[key] {
             return cached
         }
         var attributedText = AttributedText(self)
@@ -933,7 +925,7 @@ extension NSAttributedString {
         }
 
         let resolved = attributedText.attributedString
-        Self.normCache[key] = resolved
+        environment.cacheStorage.attributedStringNormalizationCache[key] = resolved
         return resolved
     }
 }
@@ -956,3 +948,18 @@ extension String {
     }
 }
 
+fileprivate struct AttributedStringNormalizationKey: Hashable {
+    let label: NSAttributedString
+    let lines: Int
+}
+
+extension CacheStorage {
+    private struct AttributedStringNormalizationCacheKey: CacheKey {
+        static var emptyValue: [AttributedStringNormalizationKey: NSAttributedString] = [:]
+    }
+
+    fileprivate var attributedStringNormalizationCache: [AttributedStringNormalizationKey: NSAttributedString] {
+        get { self[AttributedStringNormalizationCacheKey.self] }
+        set { self[AttributedStringNormalizationCacheKey.self] = newValue }
+    }
+}
