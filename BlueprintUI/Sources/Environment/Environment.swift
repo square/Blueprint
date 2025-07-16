@@ -42,13 +42,14 @@ public struct Environment {
 
     private var values: [Keybox: Any] = [:] {
         didSet {
-            identity = UUID()
+            fingerprint = UUID()
         }
     }
 
     private var internalValues: [ObjectIdentifier: Any] = [:]
 
-    fileprivate var identity: UUID = UUID()
+    // Fingerprint used for referencing previously compared environments.
+    fileprivate var fingerprint: UUID = UUID()
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
@@ -92,8 +93,8 @@ extension Environment: ContextuallyEquivalent {
 
     public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
-        if identity == other.identity { return true }
-        if let evaluated = cacheStorage.environmentComparisonCacheKey[other.identity], let result = evaluated[context] {
+        if fingerprint == other.fingerprint { return true }
+        if let evaluated = cacheStorage.environmentComparisonCacheKey[other.fingerprint], let result = evaluated[context] {
             #if DEBUG
             print("Cached comparison result")
             #endif
@@ -105,11 +106,11 @@ extension Environment: ContextuallyEquivalent {
                 #if DEBUG
                 print(key, self[key], other[key])
                 #endif
-                cacheStorage.environmentComparisonCacheKey[other.identity, default: [:]][context] = false
+                cacheStorage.environmentComparisonCacheKey[other.fingerprint, default: [:]][context] = false
                 return false
             }
         }
-        cacheStorage.environmentComparisonCacheKey[other.identity, default: [:]][context] = true
+        cacheStorage.environmentComparisonCacheKey[other.fingerprint, default: [:]][context] = true
         return true
     }
 
@@ -131,6 +132,7 @@ extension CacheStorage {
 
 extension Environment {
 
+    /// Lightweight key type eraser.
     fileprivate struct Keybox: Hashable, CustomStringConvertible {
 
         let objectIdentifier: ObjectIdentifier
@@ -161,17 +163,6 @@ extension Environment {
     }
 
 }
-
-protocol InternalEnvironmentKey: EnvironmentKey {}
-
-extension InternalEnvironmentKey {
-
-    // Internal keys don't participate in equivalency, they always return as being equivalent.
-    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
-        true
-    }
-}
-
 
 extension UIView {
 

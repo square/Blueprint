@@ -98,11 +98,16 @@ extension EnvironmentKey where Value: ContextuallyEquivalent {
 
 extension EnvironmentKey {
 
+    /// Convenience comparison to express default equality in specific contexts.
+    /// - Parameters:
+    ///   - contexts: The contexts in which the values are always equilvalent.
+    ///   - evaluatingContext: The context being evaulated.
+    /// - Returns: Whether or not the value is equivalent in the context.
     public static func alwaysEquivalentIn(
         _ contexts: Set<EquivalencyContext>,
-        in context: EquivalencyContext
+        in evaluatingContext: EquivalencyContext
     ) -> Bool {
-        contexts.contains(context)
+        contexts.contains(evaluatingContext)
     }
 
 }

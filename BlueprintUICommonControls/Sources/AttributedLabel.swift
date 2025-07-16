@@ -1,6 +1,7 @@
 import BlueprintUI
 import Foundation
 import UIKit
+@_spi(CacheStorage) import BlueprintUI
 
 public struct AttributedLabel: Element, Hashable {
 

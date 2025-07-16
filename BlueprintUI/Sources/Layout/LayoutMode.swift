@@ -51,9 +51,6 @@ extension LayoutMode: CustomStringConvertible {
         if options.skipUnneededSetNeedsViewHierarchyUpdates {
             optionsDescription.append("needsViewHierarchyUpdates")
         }
-        if options.skipLabelApplication {
-            optionsDescription.append("labelApplication")
-        }
         if options.measureableStorageCache {
             optionsDescription.append("measureableStorageCache")
         }

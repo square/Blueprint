@@ -11,8 +11,8 @@ public struct LayoutOptions: Hashable {
         hintRangeBoundaries: true,
         searchUnconstrainedKeys: true,
         skipUnneededSetNeedsViewHierarchyUpdates: false,
-        skipLabelApplication: false,
-        measureableStorageCache: true
+        measureableStorageCache: false,
+        labelAttributedStringCache: false
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
@@ -28,20 +28,20 @@ public struct LayoutOptions: Hashable {
     /// Allows skipping calls to setNeedsViewHierarchyUpdates when updating Environment, if the environment is
     /// equilvalent to the prior value.
     public var skipUnneededSetNeedsViewHierarchyUpdates: Bool
-    public var skipLabelApplication: Bool
     public var measureableStorageCache: Bool
+    public var labelAttributedStringCache: Bool
 
     public init(
         hintRangeBoundaries: Bool,
         searchUnconstrainedKeys: Bool,
         skipUnneededSetNeedsViewHierarchyUpdates: Bool,
-        skipLabelApplication: Bool,
-        measureableStorageCache: Bool
+        measureableStorageCache: Bool,
+        labelAttributedStringCache: Bool
     ) {
         self.hintRangeBoundaries = hintRangeBoundaries
         self.searchUnconstrainedKeys = searchUnconstrainedKeys
         self.skipUnneededSetNeedsViewHierarchyUpdates = skipUnneededSetNeedsViewHierarchyUpdates
-        self.skipLabelApplication = skipLabelApplication
         self.measureableStorageCache = measureableStorageCache
+        self.labelAttributedStringCache = labelAttributedStringCache
     }
 }
