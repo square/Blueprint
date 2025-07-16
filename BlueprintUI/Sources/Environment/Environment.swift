@@ -40,22 +40,27 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [ObjectIdentifier: Any] = [:]
+    private var values: [Keybox: Any] = [:] {
+        didSet {
+            fingerprint = UUID()
+        }
+    }
+
+    // Fingerprint used for referencing previously compared environments.
+    fileprivate var fingerprint: UUID = UUID()
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
-            let objectId = ObjectIdentifier(key)
-
-            if let value = values[objectId] {
-                return value as! Key.Value
-            }
-
-            return key.defaultValue
+            self[Keybox(key)] as! Key.Value
         }
         set {
-            values[ObjectIdentifier(key)] = newValue
+            values[Keybox(key)] = newValue
         }
+    }
+
+    private subscript(keybox: Keybox) -> Any {
+        values[keybox, default: keybox.type.defaultValue]
     }
 
     /// If the `Environment` contains any values.
@@ -73,6 +78,55 @@ public struct Environment {
     }
 }
 
+extension Environment: ContextuallyEquivalent {
+
+    public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
+        guard let other else { return false }
+        if fingerprint == other.fingerprint { return true }
+        let keys = Set(values.keys).union(other.values.keys)
+        for key in keys {
+            guard key.isEquivalent(self[key], other[key], context) else {
+                return false
+            }
+        }
+        return true
+    }
+
+}
+
+extension Environment {
+
+    /// Lightweight key type eraser.
+    fileprivate struct Keybox: Hashable, CustomStringConvertible {
+
+        let objectIdentifier: ObjectIdentifier
+        let type: any EnvironmentKey.Type
+        let isEquivalent: (Any?, Any?, EquivalencyContext) -> Bool
+
+        init<EnvironmentKeyType: EnvironmentKey>(_ type: EnvironmentKeyType.Type) {
+            objectIdentifier = ObjectIdentifier(type)
+            self.type = type
+            isEquivalent = {
+                guard let lhs = $0 as? EnvironmentKeyType.Value, let rhs = $1 as? EnvironmentKeyType.Value else { return false }
+                return type.isEquivalent(lhs: lhs, rhs: rhs, in: $2)
+            }
+        }
+
+        func hash(into hasher: inout Hasher) {
+            objectIdentifier.hash(into: &hasher)
+        }
+
+        static func == (lhs: Keybox, rhs: Keybox) -> Bool {
+            lhs.objectIdentifier == rhs.objectIdentifier
+        }
+
+        var description: String {
+            String(describing: type)
+        }
+
+    }
+
+}
 
 extension UIView {
 
