@@ -54,6 +54,9 @@ extension LayoutMode: CustomStringConvertible {
         if options.measureableStorageCache {
             optionsDescription.append("measureableStorageCache")
         }
+        if options.labelAttributedStringCache {
+            optionsDescription.append("labelAttributedStringCache")
+        }
         if optionsDescription.isEmpty {
             return "Caffeinated"
         } else {
