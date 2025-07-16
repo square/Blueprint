@@ -4,12 +4,13 @@ import Foundation
 ///
 /// Generally these are only useful for experimenting with the performance profile of different
 /// element compositions, and you should stick with ``default``.
-public struct LayoutOptions: Equatable {
+public struct LayoutOptions: Hashable {
 
     /// The default configuration.
     public static let `default` = LayoutOptions(
         hintRangeBoundaries: true,
-        searchUnconstrainedKeys: true
+        searchUnconstrainedKeys: true,
+        skipUnneededSetNeedsViewHierarchyUpdates: true
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
@@ -22,8 +23,17 @@ public struct LayoutOptions: Equatable {
     /// Layout contract for correct behavior.
     public var searchUnconstrainedKeys: Bool
 
-    public init(hintRangeBoundaries: Bool, searchUnconstrainedKeys: Bool) {
+    /// Allows skipping calls to setNeedsViewHierarchyUpdates when updating Environment, if the environment is
+    /// equilvalent to the prior value.
+    public var skipUnneededSetNeedsViewHierarchyUpdates: Bool
+
+    public init(
+        hintRangeBoundaries: Bool,
+        searchUnconstrainedKeys: Bool,
+        skipUnneededSetNeedsViewHierarchyUpdates: Bool
+    ) {
         self.hintRangeBoundaries = hintRangeBoundaries
         self.searchUnconstrainedKeys = searchUnconstrainedKeys
+        self.skipUnneededSetNeedsViewHierarchyUpdates = skipUnneededSetNeedsViewHierarchyUpdates
     }
 }
