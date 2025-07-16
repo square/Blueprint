@@ -46,6 +46,8 @@ public struct Environment {
         }
     }
 
+    private var internalValues: [ObjectIdentifier: Any] = [:]
+
     // Fingerprint used for referencing previously compared environments.
     fileprivate var fingerprint: UUID = UUID()
 
@@ -61,6 +63,15 @@ public struct Environment {
 
     private subscript(keybox: Keybox) -> Any {
         values[keybox, default: keybox.type.defaultValue]
+    }
+
+    public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+        get {
+            internalValues[ObjectIdentifier(key)] as! Key.Value
+        }
+        set {
+            internalValues[ObjectIdentifier(key)] = newValue
+        }
     }
 
     /// If the `Environment` contains any values.
@@ -83,13 +94,33 @@ extension Environment: ContextuallyEquivalent {
     public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
         if fingerprint == other.fingerprint { return true }
+        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint] ?? other.cacheStorage.environmentComparisonCache[fingerprint], let result = evaluated[context] {
+            return result
+        }
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
+                cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = false
                 return false
             }
         }
+        cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = true
         return true
+    }
+
+}
+
+
+extension CacheStorage {
+
+    /// A cache of previously compared environments and their results.
+    private struct EnvironmentComparisonCacheKey: CacheKey {
+        static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
+    }
+
+    fileprivate var environmentComparisonCache: [UUID: [EquivalencyContext: Bool]] {
+        get { self[EnvironmentComparisonCacheKey.self] }
+        set { self[EnvironmentComparisonCacheKey.self] = newValue }
     }
 
 }

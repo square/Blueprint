@@ -40,6 +40,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private var cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -148,6 +150,7 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
+        self.environment.cacheStorage = cacheStorage
 
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -542,8 +545,12 @@ public final class BlueprintView: UIView {
             environment.layoutMode = layoutMode
         }
 
+        environment.cacheStorage = cacheStorage
+
         return environment
     }
+
+
 
     private func handleAppeared() {
         rootController.traverse { node in
