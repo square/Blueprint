@@ -618,8 +618,6 @@ extension BlueprintView {
 
         private(set) var children: [(ElementPath, NativeViewController)]
 
-        private var cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
-
         var onAppear: LifecycleCallback? {
             viewDescription.onAppear
         }
@@ -636,10 +634,7 @@ extension BlueprintView {
             children = []
 
             view = node.viewDescription.build()
-            var environment = node.environment
-            cacheStorage.name = "NVC \(#function)"
-            environment.cacheStorage = cacheStorage
-            view.nativeViewNodeBlueprintEnvironment = environment
+            view.nativeViewNodeBlueprintEnvironment = node.environment
         }
 
         deinit {
@@ -667,10 +662,7 @@ extension BlueprintView {
             viewDescription = node.viewDescription
             layoutAttributes = node.layoutAttributes
 
-            var environment = node.environment
-            cacheStorage.name = "NVC \(#function)"
-            environment.cacheStorage = cacheStorage
-            view.nativeViewNodeBlueprintEnvironment = environment
+            view.nativeViewNodeBlueprintEnvironment = node.environment
 
             viewDescription.apply(to: view)
 

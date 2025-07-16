@@ -94,10 +94,7 @@ extension Environment: ContextuallyEquivalent {
     public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
         if fingerprint == other.fingerprint { return true }
-        if let evaluated = cacheStorage.environmentComparisonCacheKey[other.fingerprint], let result = evaluated[context] {
-            #if DEBUG
-            print("Cached comparison result")
-            #endif
+        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint] ?? other.cacheStorage.environmentComparisonCache[fingerprint], let result = evaluated[context] {
             return result
         }
         let keys = Set(values.keys).union(other.values.keys)
@@ -106,11 +103,11 @@ extension Environment: ContextuallyEquivalent {
                 #if DEBUG
                 print(key, self[key], other[key])
                 #endif
-                cacheStorage.environmentComparisonCacheKey[other.fingerprint, default: [:]][context] = false
+                cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = false
                 return false
             }
         }
-        cacheStorage.environmentComparisonCacheKey[other.fingerprint, default: [:]][context] = true
+        cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = true
         return true
     }
 
@@ -123,7 +120,7 @@ extension CacheStorage {
         static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
     }
 
-    fileprivate var environmentComparisonCacheKey: [UUID: [EquivalencyContext: Bool]] {
+    fileprivate var environmentComparisonCache: [UUID: [EquivalencyContext: Bool]] {
         get { self[EnvironmentComparisonCacheKey.self] }
         set { self[EnvironmentComparisonCacheKey.self] = newValue }
     }
