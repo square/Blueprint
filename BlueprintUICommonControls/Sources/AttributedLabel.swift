@@ -887,7 +887,7 @@ extension NSAttributedString {
 
     fileprivate func normalizingForView(with numberOfLines: Int, environment: Environment) -> NSAttributedString {
         let key = AttributedStringNormalizationKey(label: self, lines: numberOfLines)
-        if environment.layoutMode.options.labelAttributedStringCache, let cached = environment.cacheStorage.attributedStringNormalizationCache[key] {
+        if environment.layoutMode.options.stringNormalizationCache, let cached = environment.cacheStorage.attributedStringNormalizationCache[key] {
             return cached
         }
         var attributedText = AttributedText(self)
@@ -926,7 +926,7 @@ extension NSAttributedString {
         }
 
         let resolved = attributedText.attributedString
-        if environment.layoutMode.options.labelAttributedStringCache {
+        if environment.layoutMode.options.stringNormalizationCache {
             environment.cacheStorage.attributedStringNormalizationCache[key] = resolved
         }
         return resolved
