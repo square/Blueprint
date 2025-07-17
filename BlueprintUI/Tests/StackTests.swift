@@ -1428,6 +1428,8 @@ extension LayoutOptions {
     static let optimizationsDisabled: Self = .init(
         hintRangeBoundaries: false,
         searchUnconstrainedKeys: false,
-        measureableStorageCache: false
+        measureableStorageCache: false,
+        stringNormalizationCache: false,
+        skipUnneededSetNeedsViewHierarchyUpdates: false
     )
 }

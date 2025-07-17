@@ -51,6 +51,12 @@ extension LayoutMode: CustomStringConvertible {
         if options.measureableStorageCache {
             optionsDescription.append("measureableStorageCache")
         }
+        if options.stringNormalizationCache {
+            optionsDescription.append("stringNormalizationCache")
+        }
+        if options.skipUnneededSetNeedsViewHierarchyUpdates {
+            optionsDescription.append("needsViewHierarchyUpdates")
+        }
         if optionsDescription.isEmpty {
             return "Caffeinated"
         } else {
