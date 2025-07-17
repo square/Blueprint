@@ -57,6 +57,9 @@ extension LayoutMode: CustomStringConvertible {
         if options.skipUnneededSetNeedsViewHierarchyUpdates {
             optionsDescription.append("needsViewHierarchyUpdates")
         }
+        if options.labelAttributedStringCache {
+            optionsDescription.append("labelAttributedStringCache")
+        }
         if optionsDescription.isEmpty {
             return "Caffeinated"
         } else {

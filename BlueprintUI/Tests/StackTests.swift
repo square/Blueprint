@@ -1430,6 +1430,7 @@ extension LayoutOptions {
         searchUnconstrainedKeys: false,
         measureableStorageCache: false,
         stringNormalizationCache: false,
-        skipUnneededSetNeedsViewHierarchyUpdates: false
+        skipUnneededSetNeedsViewHierarchyUpdates: false,
+        labelAttributedStringCache: false
     )
 }

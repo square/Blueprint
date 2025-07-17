@@ -22,7 +22,8 @@ final class HintingSizeCacheTests: XCTestCase {
                     searchUnconstrainedKeys: false,
                     measureableStorageCache: false,
                     stringNormalizationCache: false,
-                    skipUnneededSetNeedsViewHierarchyUpdates: false
+                    skipUnneededSetNeedsViewHierarchyUpdates: false,
+                    labelAttributedStringCache: false
                 )
             )
         }
@@ -56,7 +57,8 @@ final class HintingSizeCacheTests: XCTestCase {
                     searchUnconstrainedKeys: false,
                     measureableStorageCache: false,
                     stringNormalizationCache: false,
-                    skipUnneededSetNeedsViewHierarchyUpdates: false
+                    skipUnneededSetNeedsViewHierarchyUpdates: false,
+                    labelAttributedStringCache: false
                 )
             )
         }
@@ -84,7 +86,8 @@ final class HintingSizeCacheTests: XCTestCase {
                 searchUnconstrainedKeys: true,
                 measureableStorageCache: false,
                 stringNormalizationCache: false,
-                skipUnneededSetNeedsViewHierarchyUpdates: false
+                skipUnneededSetNeedsViewHierarchyUpdates: false,
+                labelAttributedStringCache: false
             )
         )
 
@@ -101,7 +104,8 @@ final class HintingSizeCacheTests: XCTestCase {
                 searchUnconstrainedKeys: true,
                 measureableStorageCache: false,
                 stringNormalizationCache: false,
-                skipUnneededSetNeedsViewHierarchyUpdates: false
+                skipUnneededSetNeedsViewHierarchyUpdates: false,
+                labelAttributedStringCache: false
             )
         )
 
@@ -121,7 +125,8 @@ final class HintingSizeCacheTests: XCTestCase {
                 searchUnconstrainedKeys: true,
                 measureableStorageCache: false,
                 stringNormalizationCache: false,
-                skipUnneededSetNeedsViewHierarchyUpdates: false
+                skipUnneededSetNeedsViewHierarchyUpdates: false,
+                labelAttributedStringCache: false
             )
         )
     }
@@ -143,7 +148,8 @@ final class HintingSizeCacheTests: XCTestCase {
                 searchUnconstrainedKeys: true,
                 measureableStorageCache: false,
                 stringNormalizationCache: false,
-                skipUnneededSetNeedsViewHierarchyUpdates: false
+                skipUnneededSetNeedsViewHierarchyUpdates: false,
+                labelAttributedStringCache: false
             )
         )
     }
