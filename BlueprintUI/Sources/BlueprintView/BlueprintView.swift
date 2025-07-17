@@ -54,6 +54,13 @@ public final class BlueprintView: UIView {
         didSet {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
+            // Shortcut: If there are no changes to the environment, then, well, nothing changed.
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isEquivalent(
+                to: environment,
+                in: .all
+            ) {
+                return
+            }
 
             setNeedsViewHierarchyUpdate()
         }
