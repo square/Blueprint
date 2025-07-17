@@ -17,7 +17,11 @@ final class HintingSizeCacheTests: XCTestCase {
                 size: size,
                 // we expect to hit each of the unique keys exactly once
                 misses: boundaries,
-                options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: false)
+                options: .init(
+                    hintRangeBoundaries: false,
+                    searchUnconstrainedKeys: false,
+                    measureableStorageCache: false
+                )
             )
         }
 
@@ -45,7 +49,7 @@ final class HintingSizeCacheTests: XCTestCase {
                 size: size,
                 // we expect to miss the first key, deduce the other boundaries, and miss the off keys
                 misses: [key] + offKeys,
-                options: .init(hintRangeBoundaries: true, searchUnconstrainedKeys: false)
+                options: .init(hintRangeBoundaries: true, searchUnconstrainedKeys: false, measureableStorageCache: false)
             )
         }
 
@@ -67,7 +71,7 @@ final class HintingSizeCacheTests: XCTestCase {
             size: size,
             // we expect to hit only the first key, and range-match the second
             misses: [SizeConstraint(width: .atMost(200), height: .unconstrained)],
-            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true)
+            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true, measureableStorageCache: false)
         )
 
         assertMisses(
@@ -78,7 +82,7 @@ final class HintingSizeCacheTests: XCTestCase {
             size: size,
             // we expect to hit only the first key, and range-match the second
             misses: [SizeConstraint(width: .unconstrained, height: .atMost(200))],
-            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true)
+            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true, measureableStorageCache: false)
         )
 
         let keys = [
@@ -92,7 +96,7 @@ final class HintingSizeCacheTests: XCTestCase {
             size: size,
             // we do not search the double-unconstrained key, so these are all misses
             misses: keys,
-            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true)
+            options: .init(hintRangeBoundaries: false, searchUnconstrainedKeys: true, measureableStorageCache: false)
         )
     }
 
@@ -108,7 +112,7 @@ final class HintingSizeCacheTests: XCTestCase {
             size: size,
             // we will miss the first key, but can then range-match the others off of hinted boundary keys
             misses: [.unconstrained],
-            options: .init(hintRangeBoundaries: true, searchUnconstrainedKeys: true)
+            options: .init(hintRangeBoundaries: true, searchUnconstrainedKeys: true, measureableStorageCache: false)
         )
     }
 
