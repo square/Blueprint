@@ -466,8 +466,13 @@ extension ScrollView {
         var finalContentInset = scrollViewInsets
 
         // Include the keyboard's adjustment at the bottom of the scroll view.
+        //
+        // The value is floored because, on some screens, a dismissed keyboard's
+        // ending frame may intersect the bottom of the view's bounds by a fraction
+        // of a screen point. This has been seen on an iPhone 13 Pro simulator with
+        // iOS 16.2, using a keyboardBottomInset of 0.15466666666668516.
 
-        if keyboardBottomInset > 0.0 {
+        if floor(keyboardBottomInset) > 0.0 {
             finalContentInset.bottom += keyboardBottomInset
 
             // Exclude the safe area insets, so the content hugs the top of the keyboard.
