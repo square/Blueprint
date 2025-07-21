@@ -137,8 +137,16 @@ public struct AttributedLabel: Element, Hashable {
 
         return ElementContent { constraint, environment -> CGSize in
             let label = Self.prototypeLabel
+            let constraint = constraint.maximum
+
             label.update(model: self, text: text, environment: environment, isMeasuring: true)
-            return label.sizeThatFits(constraint.maximum)
+
+            let size = label.sizeThatFits(constraint)
+
+            return CGSize(
+                width: min(constraint.width, size.width),
+                height: min(constraint.height, size.height)
+            )
         }
     }
 
