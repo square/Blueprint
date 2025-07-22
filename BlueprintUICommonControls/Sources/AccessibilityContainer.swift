@@ -30,6 +30,9 @@ public struct AccessibilityContainer: Element {
     /// An optional `accessibilityValue` to give the container. Defaults to `nil`.
     public var value: String?
 
+    /// An optional array of accessibility elements, to override the wrapped children.
+    public var elements: [NSObjectProtocol]?
+
     public var wrapped: Element
 
 
@@ -39,12 +42,14 @@ public struct AccessibilityContainer: Element {
         label: String? = nil,
         value: String? = nil,
         identifier: String? = nil,
+        elements: [NSObjectProtocol]? = nil,
         wrapping element: Element
     ) {
         self.containerType = containerType
         self.label = label
         self.value = value
         self.identifier = identifier
+        self.elements = elements
         wrapped = element
     }
 
@@ -62,6 +67,7 @@ public struct AccessibilityContainer: Element {
             config[\.accessibilityValue] = value
             config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityContainerType] = containerType.UIKitContainerType
+            config[\.elements] = elements
             config[\.layoutDirection] = context.environment.layoutDirection
         }
     }
@@ -106,14 +112,16 @@ extension Element {
 }
 
 extension AccessibilityContainer {
-    private final class AccessibilityContainerView: UIView {
+    internal final class AccessibilityContainerView: UIView {
         var layoutDirection: Environment.LayoutDirection = .leftToRight
+        var elements: [NSObjectProtocol]?
 
         override var accessibilityElements: [Any]? {
             get {
-                accessibilityElements(
-                    layoutDirection: layoutDirection
-                )
+                elements ??
+                    accessibilityElements(
+                        layoutDirection: layoutDirection
+                    )
             }
             set { fatalError("This property is not settable") }
         }
