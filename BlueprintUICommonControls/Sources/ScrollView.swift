@@ -10,8 +10,32 @@ public struct ScrollView: Element {
 
     /// Determines the sizing behavior of the content within the scroll view.
     public var contentSize: ContentSize
+
+    /// When true, the content will bounce even when it is less than or equal to the height
+    /// of the `UIScrollView`.
     public var alwaysBounceVertical = false
+
+    /// When true, the content will bounce even when it is less than or equal to the width
+    /// of the `UIScrollView`.
     public var alwaysBounceHorizontal = false
+
+    /// This controls how the scroll view treats the safe areas when the content size is
+    /// less than the length of the scroll view's scrollable axes, but greater than the
+    /// safe area size.
+    ///
+    /// > This is only used when `contentInsetAdjustmentBehavior` is `scrollableAxes`.
+    public var contentSafeAreaOverlapBehavior: ContentSafeAreaOverlapBehavior = .ignoreSafeArea
+
+    public enum ContentSafeAreaOverlapBehavior {
+        /// Safe areas are respected when the content overlaps them. This is done by
+        /// conditionally setting the `alwaysBounceVertical` and/or `alwaysBounceHorizontal`
+        /// options to `true` on the underlying `UIScrollView`.
+        case includeSafeArea
+
+        /// Safe areas are ignored when the content overlaps them. This is the default
+        /// UIKit behavior when using `ContentInsetAdjustmentBehavior.scrollableAxes`.
+        case ignoreSafeArea
+    }
 
     /**
      How much the content of the `ScrollView` should be inset.
@@ -70,6 +94,22 @@ public struct ScrollView: Element {
                 /// This is most visible and annoying when you have a scroll view in a resizable modal, which is scrolled away
                 /// from the top of its content. If the size of the scroll view grows before the `contentSize` is adjusted,
                 /// the visible content will shift.
+                ///
+                ///
+                /// The `contentFrame` is not inset for the safe area. The `contentFrame` width and height will vary
+                /// depending upon the setting for `self.contentSize`:
+                /// - `fittingWidth` will use a height equal to ScrollView's frame height. This height may overlap the
+                /// vertical safe area, but it will not extend beyond the vertical bounds of the scroll view.
+                /// - `fittingHeight` will use width equal to ScrollView's frame width. This width may overlap the horizontal
+                /// safe area, but it will not extend beyond the horizontal bounds of the scroll view.
+                /// - `fittingContent` will use a `contentFrame` exactly equal to the size of the content. Depending on the
+                /// content measurement, this may extend beyond the safe area.
+                /// - `custom(_:)` will use a `contentFrame` exactly equal to the provided size. Depending on the content
+                /// measurement, this may extend beyond the safe area.
+                ///
+                /// Using `ContentInsetAdjustmentBehavior.always` may eagerly enable scrolling along an an unexpected axis,
+                /// like enabling horizontal scrolling in landscape when using `fittingHeight`, since the content may extend
+                /// into the horizontal safe area. Using `.scrollableAxes` works around this.
 
                 let contentSize = switch contentSize {
                 case .fittingWidth, .fittingHeight, .fittingContent:
@@ -291,6 +331,10 @@ fileprivate final class ScrollerWrapperView: UIView {
     /// The current `ScrollView` state we represent.
     private var representedElement: ScrollView
 
+    /// The current frame of the content within `ScrollView`. This is nil until
+    /// `apply(scrollView:contentFrame:)` is called.
+    private var contentFrame: CGRect?
+
     private var refreshControl: UIRefreshControl? = nil {
 
         didSet {
@@ -342,9 +386,22 @@ fileprivate final class ScrollerWrapperView: UIView {
         refreshAction()
     }
 
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        guard let contentFrame else { return }
+
+        // When the safe area insets change, we need to determine if the content
+        // overlaps the safe area without extending beyond the scroll view frame.
+        processScrollableAxesSafeAreaOverlap(
+            scrollView: representedElement,
+            contentFrame: contentFrame
+        )
+    }
+
     func apply(scrollView: ScrollView, contentFrame: CGRect) {
 
         representedElement = scrollView
+        self.contentFrame = contentFrame
 
         switch scrollView.pullToRefreshBehavior {
         case .disabled, .refreshing:
@@ -372,13 +429,10 @@ fileprivate final class ScrollerWrapperView: UIView {
             }
         }
 
-        if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
-            self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
-        }
-
-        if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
-            self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
-        }
+        processScrollableAxesSafeAreaOverlap(
+            scrollView: scrollView,
+            contentFrame: contentFrame
+        )
 
         if self.scrollView.showsVerticalScrollIndicator != scrollView.showsVerticalScrollIndicator {
             self.scrollView.showsVerticalScrollIndicator = scrollView.showsVerticalScrollIndicator
@@ -403,6 +457,81 @@ fileprivate final class ScrollerWrapperView: UIView {
         contentOffsetTrigger = scrollView.contentOffsetTrigger
 
         applyContentInset(with: scrollView)
+    }
+
+    /// When using both `ContentInsetAdjustmentBehavior.scrollableAxes` and
+    /// `ContentSafeAreaOverlapBehavior.includeSafeArea` together, this function will
+    /// determine if the scrollable content is less than the bounds of the scroll view,
+    /// but larger than the safe area. In those cases, axis bouncing is enabled so that
+    /// the safe area insets are included in the content inset.
+    /// - Parameters:
+    ///   - scrollView: The `ScrollView` that is being drawn.
+    ///   - contentFrame: The frame of the `ScrollView`'s content.
+    func processScrollableAxesSafeAreaOverlap(scrollView: ScrollView, contentFrame: CGRect) {
+
+        guard scrollView.contentInsetAdjustmentBehavior == .scrollableAxes,
+              scrollView.contentSafeAreaOverlapBehavior == .includeSafeArea
+        else {
+            applyStandardVerticalBounceBehavior()
+            applyStandardHorizontalBounceBehavior()
+            return
+        }
+
+        let verticalBoundsRect = CGRect(
+            x: contentFrame.origin.x,
+            y: bounds.origin.y,
+            width: contentFrame.width,
+            height: bounds.height
+        )
+        let verticalSafeAreaRect = CGRect(
+            x: contentFrame.origin.x,
+            y: safeAreaLayoutGuide.layoutFrame.origin.y,
+            width: contentFrame.width,
+            height: safeAreaLayoutGuide.layoutFrame.height - scrollView.contentInset.top - scrollView.contentInset.bottom
+        )
+        // Check if the content is vertically within the scroll view, but outside of the safe area.
+        if verticalBoundsRect.contains(contentFrame) && !verticalSafeAreaRect.contains(contentFrame) {
+            if self.scrollView.alwaysBounceVertical != true {
+                self.scrollView.alwaysBounceVertical = true
+            }
+        } else {
+            applyStandardVerticalBounceBehavior()
+        }
+
+        let horizontalBoundsRect = CGRect(
+            x: bounds.origin.x,
+            y: contentFrame.origin.y,
+            width: bounds.width,
+            height: contentFrame.height
+        )
+        let horizontalSafeAreaRect = CGRect(
+            x: safeAreaLayoutGuide.layoutFrame.origin.x,
+            y: contentFrame.origin.y,
+            width: safeAreaLayoutGuide.layoutFrame.width - scrollView.contentInset.left - scrollView.contentInset.right,
+            height: contentFrame.height
+        )
+        // Check if the content is horizontally within the scroll view, but outside the safe area.
+        if horizontalBoundsRect.contains(contentFrame) && !horizontalSafeAreaRect.contains(contentFrame) {
+            if self.scrollView.alwaysBounceHorizontal != true {
+                self.scrollView.alwaysBounceHorizontal = true
+            }
+        } else {
+            applyStandardHorizontalBounceBehavior()
+        }
+
+        /// This pulls the `alwaysBounceVertical` setting from `scrollView`.
+        func applyStandardVerticalBounceBehavior() {
+            if self.scrollView.alwaysBounceVertical != scrollView.alwaysBounceVertical {
+                self.scrollView.alwaysBounceVertical = scrollView.alwaysBounceVertical
+            }
+        }
+
+        /// This pulls the `alwaysBounceHorizontal` setting from `scrollView`.
+        func applyStandardHorizontalBounceBehavior() {
+            if self.scrollView.alwaysBounceHorizontal != scrollView.alwaysBounceHorizontal {
+                self.scrollView.alwaysBounceHorizontal = scrollView.alwaysBounceHorizontal
+            }
+        }
     }
 
     private func applyContentInset(with scrollView: ScrollView) {
