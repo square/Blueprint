@@ -32,8 +32,12 @@ let project = Project(
             sources: ["Tutorials/Tutorial 2 (Completed)/**"]
         ),
         .app(
-            name: "UITestHost",
+            name: "BlueprintUI_TestHost",
             sources: ["../BlueprintUI/UITests/UITestHost/**"]
+        ),
+        .app(
+            name: "BlueprintUICommonControls_TestHost",
+            sources: ["../BlueprintUICommonControls/UITests/UITestHost/**"]
         ),
 
         // These tests are duplicates of the test definitions in the root Package.swift, but Tuist
@@ -51,7 +55,17 @@ let project = Project(
             bundleId: "$(inherited).UITests",
             deploymentTargets: .iOS("15.0"),
             sources: ["../BlueprintUI/Tests/Extensions/**", "../BlueprintUI/UITests/**"],
-            dependencies: [.target(name: "UITestHost")]
+            dependencies: [.target(name: "BlueprintUI_TestHost")]
+        ),
+
+        .target(
+            name: "BlueprintUICommonControls_UITests",
+            destinations: .iOS,
+            product: .uiTests,
+            bundleId: "$(inherited).UITests",
+            deploymentTargets: .iOS("15.0"),
+            sources: ["../BlueprintUI/Tests/Extensions/**", "../BlueprintUICommonControls/UITests/**"],
+            dependencies: [.target(name: "BlueprintUICommonControls_TestHost")]
         ),
 
         .unitTest(
@@ -71,6 +85,7 @@ let project = Project(
                     "BlueprintUI-Tests",
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
+                    "BlueprintUICommonControls_UITests",
                 ]
             )
         ),
