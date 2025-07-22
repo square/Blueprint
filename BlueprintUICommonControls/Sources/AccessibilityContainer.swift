@@ -31,7 +31,7 @@ public struct AccessibilityContainer: Element {
     public var value: String?
 
     /// An optional array of accessibility elements, to override the wrapped children.
-    public var elements: [NSObjectProtocol]?
+    public var elements: [Any]?
 
     public var wrapped: Element
 
@@ -42,7 +42,7 @@ public struct AccessibilityContainer: Element {
         label: String? = nil,
         value: String? = nil,
         identifier: String? = nil,
-        elements: [NSObjectProtocol]? = nil,
+        elements: [Any]? = nil,
         wrapping element: Element
     ) {
         self.containerType = containerType
@@ -114,7 +114,7 @@ extension Element {
 extension AccessibilityContainer {
     internal final class AccessibilityContainerView: UIView {
         var layoutDirection: Environment.LayoutDirection = .leftToRight
-        var elements: [NSObjectProtocol]?
+        var elements: [Any]?
 
         override var accessibilityElements: [Any]? {
             get {
