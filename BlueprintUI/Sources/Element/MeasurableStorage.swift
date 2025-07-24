@@ -7,8 +7,18 @@ struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
-    let cacheKey: AnyHashable?
+    let validationKey: AnyContextuallyEquivalent?
     let measurer: (SizeConstraint, Environment) -> CGSize
+
+    init(validationKey: some ContextuallyEquivalent, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        self.validationKey = AnyContextuallyEquivalent(validationKey)
+        self.measurer = measurer
+    }
+
+    init(measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        validationKey = nil
+        self.measurer = measurer
+    }
 }
 
 extension MeasurableStorage: CaffeinatedContentStorage {
@@ -18,7 +28,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        guard environment.layoutMode.options.measureableStorageCache, let cacheKey else {
+        guard environment.layoutMode.options.measureableStorageCache, let validationKey else {
             return measurer(proposal, environment)
         }
 
@@ -26,8 +36,8 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         return environment.cacheStorage.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
+            validationValue: validationKey,
             context: .elementSizing,
-            validationValue: cacheKey
         ) {
             measurer(proposal, environment)
         }
@@ -61,13 +71,17 @@ extension MeasurableStorage {
 extension CacheStorage {
 
     private struct MeasurableStorageCacheKey: CacheKey {
-        static var emptyValue = ValidatingCache<MeasurableStorage.MeasurableSizeKey, CGSize, EnvironmentEntangled>()
+        static var emptyValue = XEnvironmentValidatingCache<
+            MeasurableStorage.MeasurableSizeKey,
+            CGSize,
+            AnyContextuallyEquivalent
+        >()
     }
 
-    fileprivate var measurableStorageCache: ValidatingCache<
+    fileprivate var measurableStorageCache: XEnvironmentValidatingCache<
         MeasurableStorage.MeasurableSizeKey,
         CGSize,
-        EnvironmentEntangled
+        AnyContextuallyEquivalent
     > {
         get { self[MeasurableStorageCacheKey.self] }
         set { self[MeasurableStorageCacheKey.self] = newValue }

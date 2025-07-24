@@ -88,7 +88,9 @@ private let assertResults = true
 
 }
 
-extension ValidatingCache where ValidationData == FrozenEnvironment {
+@_spi(CacheStorage) public struct EnvironmentValidatingCache<Key, Value>: Sendable where Key: Hashable {
+
+    var backing = ValidatingCache<Key, Value, FrozenEnvironment>()
 
     mutating func retrieveOrCreate(
         key: Key,
@@ -96,7 +98,7 @@ extension ValidatingCache where ValidationData == FrozenEnvironment {
         context: EquivalencyContext,
         create: () -> Value
     ) -> Value {
-        retrieveOrCreate(key: key) {
+        backing.retrieveOrCreate(key: key) {
             environment.isEquivalent(to: $0, in: context)
         } create: {
             (create(), environment.frozen)
@@ -105,29 +107,77 @@ extension ValidatingCache where ValidationData == FrozenEnvironment {
 
 }
 
-struct EnvironmentEntangled {
-    let environment: FrozenEnvironment
-    let value: AnyHashable
+// FIXME: TMP NAME
+@_spi(CacheStorage) public struct XEnvironmentValidatingCache<Key, Value, Additional>: Sendable where Key: Hashable {
+
+    var backing = ValidatingCache<Key, Value, (FrozenEnvironment, Additional)>()
+
 }
 
-extension ValidatingCache where ValidationData == EnvironmentEntangled {
+
+extension XEnvironmentValidatingCache where Additional: ContextuallyEquivalent {
 
     mutating func retrieveOrCreate(
         key: Key,
         environment: Environment,
+        validationValue: Additional,
         context: EquivalencyContext,
-        validationValue: AnyHashable,
-        create: () -> Value
+        create: () -> (Value)
     ) -> Value {
-        retrieveOrCreate(key: key) {
-            environment.isEquivalent(to: $0.environment, in: context) && validationValue == $0.value
+        backing.retrieveOrCreate(key: key) {
+            environment.isEquivalent(to: $0.0, in: context) && $0.1.isEquivalent(to: validationValue, in: context)
         } create: {
-            (create(), .init(environment: environment.frozen, value: validationValue))
+            (create(), (environment.frozen, validationValue))
         }
     }
 
 }
 
+
+// extension XEnvironmentValidatingCache where Additional: Equatable {
+//
+//    mutating func retrieveOrCreate(
+//        key: Key,
+//        environment: Environment,
+//        validationValue: Additional,
+//        context: EquivalencyContext,
+//        create: () -> (Value)
+//    ) -> Value {
+//        backing.retrieveOrCreate(key: key) {
+//            environment.isEquivalent(to: $0.0, in: context) && validationValue == $0.1
+//        } create: {
+//            (create(), (environment.frozen, validationValue))
+//        }
+//    }
+//
+// }
+
+// @_spi(CacheStorage) public struct ComplexEnvironmentValidatingCache<Key, Value, ValidationData>: Sendable where Key: Hashable, ValidationData: Hashable {
+//
+//    struct EnvironmentEntangled {
+//        let environment: FrozenEnvironment
+//        let value: ValidationData
+//    }
+//
+//    var backing = ValidatingCache<Key, Value, EnvironmentEntangled>()
+//
+//    mutating func retrieveOrCreate(
+//        key: Key,
+//        environment: Environment,
+//        context: EquivalencyContext,
+//        validationValue: ValidationData,
+//        create: () -> Value
+//    ) -> Value {
+//        backing.retrieveOrCreate(key: key) {
+//            environment.isEquivalent(to: $0.environment, in: context) && validationValue.isEquivalent(to: $0.value, in: context)
+//        } create: {
+//            (create(), .init(environment: environment.frozen, value: validationValue))
+//        }
+//    }
+//
+//
+// }
+//
 
 extension Equatable {
 

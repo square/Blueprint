@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 @_spi(CacheStorage) import BlueprintUI
 
-public struct AttributedLabel: Element, Hashable {
+public struct AttributedLabel: Element, Hashable, ContextuallyEquivalent {
 
     /// The attributed text to render in the label.
     ///
@@ -133,7 +133,7 @@ public struct AttributedLabel: Element, Hashable {
 
     public var content: ElementContent {
 
-        ElementContent(cacheKey: self) { constraint, environment -> CGSize in
+        ElementContent(validationKey: self) { constraint, environment -> CGSize in
             let text = displayableAttributedText(environment: environment)
             let label = Self.prototypeLabel
             label.update(model: self, text: text, environment: environment, isMeasuring: true)

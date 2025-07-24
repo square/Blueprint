@@ -30,7 +30,7 @@ extension ContextuallyEquivalent {
     /// Convenience equivalency check passing in .all for context.
     ///   - other: The instance of the type being compared against.
     /// - Returns: Whether or not the other instance is equivalent in all contexts.
-    func isEquivalent(to other: Self?) -> Bool {
+    public func isEquivalent(to other: Self?) -> Bool {
         isEquivalent(to: other, in: .all)
     }
 
@@ -40,7 +40,7 @@ extension ContextuallyEquivalent {
 
     // Allows comparison between types which may or may not be equivalent.
     @_disfavoredOverload
-    func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
+    public func isEquivalent(to other: (any ContextuallyEquivalent)?, in context: EquivalencyContext) -> Bool {
         isEquivalent(to: other as? Self, in: context)
     }
 
@@ -49,8 +49,24 @@ extension ContextuallyEquivalent {
 // Default implementation that always returns strict equivalency.
 extension ContextuallyEquivalent where Self: Equatable {
 
-    func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
+    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
         self == other
     }
 
 }
+
+struct AnyContextuallyEquivalent: ContextuallyEquivalent {
+
+    let base: Any
+
+    init(_ value: some ContextuallyEquivalent) {
+        base = value
+    }
+
+    func isEquivalent(to other: AnyContextuallyEquivalent?, in context: EquivalencyContext) -> Bool {
+        guard let base = (base as? any ContextuallyEquivalent) else { return false }
+        return base.isEquivalent(to: other, in: context)
+    }
+
+}
+
