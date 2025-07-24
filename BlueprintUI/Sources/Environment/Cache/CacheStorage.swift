@@ -7,7 +7,8 @@ import Foundation
 
     // Optional name to distinguish between instances for debugging purposes.
     public var name: String? = nil
-    private var storage: [ObjectIdentifier: Any] = [:]
+    fileprivate var storage: [ObjectIdentifier: Any] = [:]
+    fileprivate var currentEnvironment: FrozenEnvironment? = nil
 
     public subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
         get {
@@ -28,16 +29,66 @@ import Foundation
 
 }
 
+public final class CacheStorageInternal {
+
+    private var storage: [ObjectIdentifier: Any] = [:]
+
+    init(_ cacheStorage: CacheStorage) {
+        storage = cacheStorage.storage
+    }
+
+    init() {
+        storage = [:]
+    }
+
+    func current(with environment: Environment?) -> CacheStorage {
+        var storage = CacheStorage()
+        storage.storage = self.storage
+//        storage.currentEnvironment = environment
+        return storage
+    }
+
+}
 
 extension Environment {
 
     struct CacheStorageEnvironmentKey: InternalEnvironmentKey {
-        static var defaultValue = CacheStorage()
+        static var defaultValue = CacheStorageInternalEnvironmentKey.defaultValue.current(with: nil)
+    }
+
+    private struct CacheStorageInternalEnvironmentKey: InternalEnvironmentKey {
+        static var defaultValue = CacheStorageInternal()
     }
 
     @_spi(CacheStorage) public var cacheStorage: CacheStorage {
         get { self[internal: CacheStorageEnvironmentKey.self] }
         set { self[internal: CacheStorageEnvironmentKey.self] = newValue }
+//        get { self[internal: CacheStorageInternalEnvironmentKey.self].current(with: self) }
+//        set { self[internal: CacheStorageInternalEnvironmentKey.self] = .init(newValue) }
     }
 
 }
+
+/// A frozen environment is immutable copy of the comparable elements of an Environment struct.
+struct FrozenEnvironment {
+
+    // Fingerprint used for referencing previously compared environments.
+    let fingerprint: ComparableFingerprint
+    let values: [Environment.Keybox: Any]
+
+}
+
+struct ComparableFingerprint: Hashable {
+
+    private var fingerprint: UUID
+
+    init() {
+        fingerprint = UUID()
+    }
+
+    mutating func modified() {
+        fingerprint = UUID()
+    }
+
+}
+

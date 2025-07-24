@@ -21,11 +21,13 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         guard environment.layoutMode.options.measureableStorageCache, let cacheKey else {
             return measurer(proposal, environment)
         }
-        let key = MeasurableSizeKey(model: cacheKey, max: proposal.maximum)
+
+        let key = MeasurableSizeKey(path: node.path, max: proposal.maximum)
         return environment.cacheStorage.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
-            context: .internalElementLayout
+            context: .elementSizing,
+            validationValue: cacheKey
         ) {
             measurer(proposal, environment)
         }
@@ -43,13 +45,15 @@ extension MeasurableStorage: CaffeinatedContentStorage {
 extension MeasurableStorage {
 
     fileprivate struct MeasurableSizeKey: Hashable {
-        let hashValue: Int
-        init(model: AnyHashable, max: CGSize) {
-            var hasher = Hasher()
-            model.hash(into: &hasher)
+
+        let path: String
+        let max: CGSize
+
+        func hash(into hasher: inout Hasher) {
+            path.hash(into: &hasher)
             max.hash(into: &hasher)
-            hashValue = hasher.finalize()
         }
+
     }
 
 }
@@ -57,10 +61,14 @@ extension MeasurableStorage {
 extension CacheStorage {
 
     private struct MeasurableStorageCacheKey: CacheKey {
-        static var emptyValue = EnvironmentEntangledCache<MeasurableStorage.MeasurableSizeKey, CGSize>()
+        static var emptyValue = ValidatingCache<MeasurableStorage.MeasurableSizeKey, CGSize, EnvironmentEntangled>()
     }
 
-    fileprivate var measurableStorageCache: EnvironmentEntangledCache<MeasurableStorage.MeasurableSizeKey, CGSize> {
+    fileprivate var measurableStorageCache: ValidatingCache<
+        MeasurableStorage.MeasurableSizeKey,
+        CGSize,
+        EnvironmentEntangled
+    > {
         get { self[MeasurableStorageCacheKey.self] }
         set { self[MeasurableStorageCacheKey.self] = newValue }
     }

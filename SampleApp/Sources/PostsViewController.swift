@@ -125,7 +125,7 @@ extension Environment {
 
     private enum FeedThemeKey: EnvironmentKey {
         static func isEquivalent(lhs: FeedTheme, rhs: FeedTheme, in context: BlueprintUI.EquivalencyContext) -> Bool {
-            alwaysEquivalentIn([.internalElementLayout, .overallLayout], in: context)
+            alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
         }
 
         static let defaultValue = FeedTheme(authorColor: .black)

@@ -1,9 +1,11 @@
 import Foundation
 
+private let assertResults = true
+
 /// Simple dictionary-like key value cache with enforcement around environment consistency.
 @_spi(CacheStorage) public struct EnvironmentEntangledCache<Key: Hashable, Value>: Sendable {
 
-    private var storage: [Key: (Environment, Value)] = [:]
+    private var storage: [Key: (FrozenEnvironment, Value)] = [:]
 
     public subscript(uncheckedKey key: Key) -> Value? {
         storage[key]?.1
@@ -23,15 +25,19 @@ import Foundation
         context: EquivalencyContext,
         create: () -> Value
     ) -> Value {
-        if let existing = storage[key] {
-            if existing.0.isEquivalent(to: environment, in: context) {
-                return existing.1
+        if let (storedEnvironment, storedValue) = storage[key] {
+            if environment.isEquivalent(to: storedEnvironment, in: context) {
+                if assertResults, let stored = storedValue as? (any Equatable) {
+                    let fresh = create() as! Equatable
+                    assert(stored.isEqual(fresh))
+                }
+                return storedValue
             } else {
                 storage.removeValue(forKey: key)
             }
         }
         let fresh = create()
-        storage[key] = (environment, fresh)
+        storage[key] = (environment.frozen, fresh)
         return fresh
     }
 
@@ -41,3 +47,95 @@ import Foundation
 
 }
 
+
+@_spi(CacheStorage) public struct ValidatingCache<Key, Value, ValidationData>: Sendable where Key: Hashable {
+
+    private var storage: [Key: ValueStorage] = [:]
+
+    private struct ValueStorage {
+        let value: Value
+        let validationData: ValidationData
+    }
+
+    public subscript(uncheckedKey key: Key) -> Value? {
+        storage[key]?.value
+    }
+
+    public mutating func retrieveOrCreate(
+        key: Key,
+        validate: (ValidationData) -> Bool,
+        create: () -> (Value, ValidationData)
+    ) -> Value {
+        if let valueStorage = storage[key] {
+            if validate(valueStorage.validationData) {
+                if assertResults, let stored = valueStorage.value as? (any Equatable) {
+                    let fresh = create().0 as! Equatable
+                    assert(stored.isEqual(fresh))
+                }
+                return valueStorage.value
+            } else {
+                storage.removeValue(forKey: key)
+            }
+        }
+        let (fresh, validationData) = create()
+        storage[key] = ValueStorage(value: fresh, validationData: validationData)
+        return fresh
+    }
+
+    public mutating func removeValue(forKey key: Key) -> Value? {
+        storage.removeValue(forKey: key)?.value
+    }
+
+}
+
+extension ValidatingCache where ValidationData == FrozenEnvironment {
+
+    mutating func retrieveOrCreate(
+        key: Key,
+        environment: Environment,
+        context: EquivalencyContext,
+        create: () -> Value
+    ) -> Value {
+        retrieveOrCreate(key: key) {
+            environment.isEquivalent(to: $0, in: context)
+        } create: {
+            (create(), environment.frozen)
+        }
+    }
+
+}
+
+struct EnvironmentEntangled {
+    let environment: FrozenEnvironment
+    let value: AnyHashable
+}
+
+extension ValidatingCache where ValidationData == EnvironmentEntangled {
+
+    mutating func retrieveOrCreate(
+        key: Key,
+        environment: Environment,
+        context: EquivalencyContext,
+        validationValue: AnyHashable,
+        create: () -> Value
+    ) -> Value {
+        retrieveOrCreate(key: key) {
+            environment.isEquivalent(to: $0.environment, in: context) && validationValue == $0.value
+        } create: {
+            (create(), .init(environment: environment.frozen, value: validationValue))
+        }
+    }
+
+}
+
+
+extension Equatable {
+
+    fileprivate func isEqual(_ other: any Equatable) -> Bool {
+        guard let other = other as? Self else {
+            return false
+        }
+        return self == other
+    }
+
+}
