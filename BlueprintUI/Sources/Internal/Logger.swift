@@ -196,6 +196,66 @@ extension Logger {
 
 extension Logger {
 
+    // MARK: Environment Comparison
+
+    static func logEnvironmentKeySetEquivalencyComparisonStart(key: some Hashable) -> OSSignpostIntervalState {
+        signposter.beginInterval(
+            "Environment key set equivalency comparison",
+            id: key.signpost,
+            "Start: \(String(describing: key))"
+        )
+    }
+
+    static func logEnvironmentKeySetEquivalencyComparisonEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
+        signposter.endInterval("Environment key set equivalency comparison", token, "\(String(describing: key))")
+    }
+
+    static func logEnvironmentEquivalencyComparisonStart(environment: Environment) -> OSSignpostIntervalState {
+        signposter.beginInterval(
+            "Environment equivalency comparison",
+            id: environment.fingerprint.value.signpost,
+            "Start: \(String(describing: environment))"
+        )
+    }
+
+    static func logEnvironmentEquivalencyComparisonEnd(_ token: OSSignpostIntervalState, environment: Environment) {
+        signposter.endInterval("Environment equivalency comparison", token, "\(String(describing: environment))")
+    }
+
+    static func logEnvironmentEquivalencyFingerprintEqual(environment: Environment) {
+        signposter.emitEvent("Environments trivially equal from fingerprint", id: environment.fingerprint.value.signpost)
+    }
+
+    static func logEnvironmentEquivalencyFingerprintCacheHit(environment: Environment) {
+        signposter.emitEvent("Environment cached comparison result hit", id: environment.fingerprint.value.signpost)
+    }
+
+    static func logEnvironmentEquivalencyFingerprintCacheMiss(environment: Environment) {
+        signposter.emitEvent("Environment cached comparison result miss", id: environment.fingerprint.value.signpost)
+    }
+
+    static func logEnvironmentEquivalencyCompletedWithNonEquivalence(
+        environment: Environment,
+        key: some Hashable,
+        context: EquivalencyContext
+    ) {
+        signposter.emitEvent(
+            "Environment equivalency completed with non-equivalent result",
+            id: environment.fingerprint.value.signpost,
+            "\(String(describing: context)): \(String(describing: key)) not equivalent"
+        )
+    }
+
+    static func logEnvironmentEquivalencyCompletedWithEquivalence(environment: Environment, context: EquivalencyContext) {
+        signposter.emitEvent(
+            "Environment equivalency completed with equivalent result",
+            id: environment.fingerprint.value.signpost,
+            "\(String(describing: context))"
+        )
+
+    }
+
+
     // MARK: ValidatingCache
 
     static func logValidatingCacheValidationStart(key: some Hashable) -> OSSignpostIntervalState {
@@ -234,7 +294,7 @@ extension Logger {
 
 extension Hashable {
 
-    var signpost: OSSignpostID {
+    fileprivate var signpost: OSSignpostID {
         OSSignpostID(UInt64(abs(hashValue)))
     }
 
