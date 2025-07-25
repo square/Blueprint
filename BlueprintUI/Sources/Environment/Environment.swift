@@ -41,7 +41,7 @@ public struct Environment {
     public static let empty = Environment()
 
     // Fingerprint used for referencing previously compared environments.
-    private var fingerprint = ComparableFingerprint()
+    var fingerprint = ComparableFingerprint()
 
     private var values: [Keybox: Any] = [:]
 
@@ -56,9 +56,11 @@ public struct Environment {
             let keybox = Keybox(key)
             let oldValue = values[keybox]
             values[keybox] = newValue
+            let token = Logger.logEnvironmentKeySetEquivalencyComparisonStart(key: keybox)
             if !keybox.isEquivalent(newValue, oldValue, .all) {
                 fingerprint.modified()
             }
+            Logger.logEnvironmentKeySetEquivalencyComparisonEnd(token, key: keybox)
         }
     }
 
@@ -117,20 +119,34 @@ extension Environment: ContextuallyEquivalent {
 
     public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
-        if fingerprint.isEquivalent(to: other.fingerprint) { return true }
+        if fingerprint.isEquivalent(to: other.fingerprint) {
+            Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
+            return true
+        }
         if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint, context] ?? other.cacheStorage.environmentComparisonCache[
             fingerprint,
             context
         ] {
+            Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
+        Logger.logEnvironmentEquivalencyFingerprintCacheMiss(environment: self)
+        let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
                 cacheStorage.environmentComparisonCache[other.fingerprint, context] = false
+                Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
+                    environment: self,
+                    key: key,
+                    context: context
+                )
+                Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
                 return false
             }
         }
+        Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
+        Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
         cacheStorage.environmentComparisonCache[other.fingerprint, context] = true
         return true
     }
@@ -138,8 +154,11 @@ extension Environment: ContextuallyEquivalent {
     func isEquivalent(to other: FrozenEnvironment?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
         // We don't even need to thaw the environment if the fingerprints match.
-        if frozen.fingerprint.isEquivalent(to: fingerprint) { return true }
-        return isEquivalent(to: thawing(frozen: frozen), in: context)
+        if other.fingerprint.isEquivalent(to: fingerprint) {
+            Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
+            return true
+        }
+        return isEquivalent(to: thawing(frozen: other), in: context)
     }
 
 
