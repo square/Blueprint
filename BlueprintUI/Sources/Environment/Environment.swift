@@ -40,14 +40,9 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [Keybox: Any] = [:] {
-        didSet {
-            fingerprint = UUID()
-        }
-    }
+    private var values: [Keybox: Any] = [:]
 
-    // Fingerprint used for referencing previously compared environments.
-    fileprivate var fingerprint: UUID = UUID()
+    private var internalValues: [ObjectIdentifier: Any] = [:]
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
@@ -55,12 +50,22 @@ public struct Environment {
             self[Keybox(key)] as! Key.Value
         }
         set {
-            values[Keybox(key)] = newValue
+            let keybox = Keybox(key)
+            values[keybox] = newValue
         }
     }
 
     private subscript(keybox: Keybox) -> Any {
         values[keybox, default: keybox.type.defaultValue]
+    }
+
+    public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+        get {
+            internalValues[ObjectIdentifier(key), default: key.defaultValue] as! Key.Value
+        }
+        set {
+            internalValues[ObjectIdentifier(key)] = newValue
+        }
     }
 
     /// If the `Environment` contains any values.
@@ -76,13 +81,14 @@ public struct Environment {
         merged.values.merge(other.values) { $1 }
         return merged
     }
+
+
 }
 
 extension Environment: ContextuallyEquivalent {
 
-    public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
+    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
-        if fingerprint == other.fingerprint { return true }
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
@@ -97,7 +103,7 @@ extension Environment: ContextuallyEquivalent {
 extension Environment {
 
     /// Lightweight key type eraser.
-    fileprivate struct Keybox: Hashable, CustomStringConvertible {
+    struct Keybox: Hashable, CustomStringConvertible {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type

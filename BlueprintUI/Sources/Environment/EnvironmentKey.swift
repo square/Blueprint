@@ -49,16 +49,16 @@ extension EnvironmentKey where Value: Equatable {
     ///   - contexts: Contexts in which to always return true for equivalency.
     ///   - lhs: The left hand side value being compared.
     ///   - rhs: The right hand side value being compared.
-    ///   - context: The context in which the values are currently being compared.
+    ///   - evaluatingContext: The context in which the values are currently being compared.
     /// - Returns: Whether or not the two values are equivalent in the specified context.
     /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
     public static func alwaysEquivalentIn(
         _ contexts: Set<EquivalencyContext>,
         lhs: Value,
         rhs: Value,
-        context context: EquivalencyContext
+        evaluatingContext: EquivalencyContext
     ) -> Bool {
-        if contexts.contains(context) {
+        if contexts.contains(evaluatingContext) {
             true
         } else {
             lhs == rhs
@@ -78,19 +78,19 @@ extension EnvironmentKey where Value: ContextuallyEquivalent {
     ///   - contexts: Contexts in which to always return true for equivalency.
     ///   - lhs: The left hand side value being compared.
     ///   - rhs: The right hand side value being compared.
-    ///   - context: The context in which the values are currently being compared.
+    ///   - evaluatingContext: The context in which the values are currently being compared.
     /// - Returns: Whether or not the two values are equivalent in the specified context.
     /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
     public static func alwaysEquivalentIn(
         _ contexts: Set<EquivalencyContext>,
         lhs: Value,
         rhs: Value,
-        context context: EquivalencyContext
+        evaluatingContext: EquivalencyContext
     ) -> Bool {
-        if contexts.contains(context) {
+        if contexts.contains(evaluatingContext) {
             true
         } else {
-            lhs.isEquivalent(to: rhs, in: context)
+            lhs.isEquivalent(to: rhs, in: evaluatingContext)
         }
     }
 
@@ -105,7 +105,7 @@ extension EnvironmentKey {
     /// - Returns: Whether or not the value is equivalent in the context.
     public static func alwaysEquivalentIn(
         _ contexts: Set<EquivalencyContext>,
-        in evaluatingContext: EquivalencyContext
+        evaluatingContext: EquivalencyContext
     ) -> Bool {
         contexts.contains(evaluatingContext)
     }

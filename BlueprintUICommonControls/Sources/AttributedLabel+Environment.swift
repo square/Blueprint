@@ -34,7 +34,7 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
     }()
 
     public static func isEquivalent(lhs: any URLHandler, rhs: any URLHandler, in context: EquivalencyContext) -> Bool {
-        alwaysEquivalentIn([.overallLayout, .internalElementLayout], in: context)
+        alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
     }
 }
 
