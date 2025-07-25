@@ -7,8 +7,18 @@ struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
-    let cacheKey: AnyHashable?
+    let validationKey: AnyContextuallyEquivalent?
     let measurer: (SizeConstraint, Environment) -> CGSize
+
+    init(validationKey: some ContextuallyEquivalent, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        self.validationKey = AnyContextuallyEquivalent(validationKey)
+        self.measurer = measurer
+    }
+
+    init(measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        validationKey = nil
+        self.measurer = measurer
+    }
 }
 
 extension MeasurableStorage: CaffeinatedContentStorage {
@@ -18,14 +28,16 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        guard environment.layoutMode.options.measureableStorageCache, let cacheKey else {
+        guard environment.layoutMode.options.measureableStorageCache, let validationKey else {
             return measurer(proposal, environment)
         }
-        let key = MeasurableSizeKey(model: cacheKey, max: proposal.maximum)
+
+        let key = MeasurableSizeKey(path: node.path, max: proposal.maximum)
         return environment.cacheStorage.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
-            context: .internalElementLayout
+            validationValue: validationKey,
+            context: .elementSizing,
         ) {
             measurer(proposal, environment)
         }
@@ -43,13 +55,15 @@ extension MeasurableStorage: CaffeinatedContentStorage {
 extension MeasurableStorage {
 
     fileprivate struct MeasurableSizeKey: Hashable {
-        let hashValue: Int
-        init(model: AnyHashable, max: CGSize) {
-            var hasher = Hasher()
-            model.hash(into: &hasher)
+
+        let path: String
+        let max: CGSize
+
+        func hash(into hasher: inout Hasher) {
+            path.hash(into: &hasher)
             max.hash(into: &hasher)
-            hashValue = hasher.finalize()
         }
+
     }
 
 }
@@ -57,10 +71,18 @@ extension MeasurableStorage {
 extension CacheStorage {
 
     private struct MeasurableStorageCacheKey: CacheKey {
-        static var emptyValue = EnvironmentEntangledCache<MeasurableStorage.MeasurableSizeKey, CGSize>()
+        static var emptyValue = EnvironmentAndValueValidatingCache<
+            MeasurableStorage.MeasurableSizeKey,
+            CGSize,
+            AnyContextuallyEquivalent
+        >()
     }
 
-    fileprivate var measurableStorageCache: EnvironmentEntangledCache<MeasurableStorage.MeasurableSizeKey, CGSize> {
+    fileprivate var measurableStorageCache: EnvironmentAndValueValidatingCache<
+        MeasurableStorage.MeasurableSizeKey,
+        CGSize,
+        AnyContextuallyEquivalent
+    > {
         get { self[MeasurableStorageCacheKey.self] }
         set { self[MeasurableStorageCacheKey.self] = newValue }
     }

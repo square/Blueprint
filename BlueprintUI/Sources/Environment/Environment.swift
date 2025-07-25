@@ -40,16 +40,12 @@ public struct Environment {
     /// Each key will return its default value.
     public static let empty = Environment()
 
-    private var values: [Keybox: Any] = [:] {
-        didSet {
-            fingerprint = UUID()
-        }
-    }
+    // Fingerprint used for referencing previously compared environments.
+    private var fingerprint = ComparableFingerprint()
+
+    private var values: [Keybox: Any] = [:]
 
     private var internalValues: [ObjectIdentifier: Any] = [:]
-
-    // Fingerprint used for referencing previously compared environments.
-    fileprivate var fingerprint: UUID = UUID()
 
     /// Gets or sets an environment value by its key.
     public subscript<Key>(key: Key.Type) -> Key.Value where Key: EnvironmentKey {
@@ -57,7 +53,12 @@ public struct Environment {
             self[Keybox(key)] as! Key.Value
         }
         set {
-            values[Keybox(key)] = newValue
+            let keybox = Keybox(key)
+            let oldValue = values[keybox]
+            values[keybox] = newValue
+            if !keybox.isEquivalent(newValue, oldValue, .all) {
+                fingerprint.modified()
+            }
         }
     }
 
@@ -67,7 +68,7 @@ public struct Environment {
 
     public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
         get {
-            internalValues[ObjectIdentifier(key)] as! Key.Value
+            internalValues[ObjectIdentifier(key), default: key.defaultValue] as! Key.Value
         }
         set {
             internalValues[ObjectIdentifier(key)] = newValue
@@ -85,40 +86,101 @@ public struct Environment {
     func merged(prioritizing other: Environment) -> Environment {
         var merged = self
         merged.values.merge(other.values) { $1 }
+        merged.fingerprint.modified()
         return merged
     }
+
+    var frozen: FrozenEnvironment {
+        FrozenEnvironment(fingerprint: fingerprint, values: values)
+    }
+
+    func thawing(frozen: FrozenEnvironment) -> Environment {
+        var merged = self
+        merged.values = frozen.values
+        merged.fingerprint = frozen.fingerprint
+        return merged
+    }
+
+
 }
 
 extension Environment: ContextuallyEquivalent {
 
-    public func isEquivalent(to other: Environment?, in context: EquivalencyContext) -> Bool {
+    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
         guard let other else { return false }
-        if fingerprint == other.fingerprint { return true }
-        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint] ?? other.cacheStorage.environmentComparisonCache[fingerprint], let result = evaluated[context] {
-            return result
+        if fingerprint.isEquivalent(to: other.fingerprint) { return true }
+        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint, context] ?? other.cacheStorage.environmentComparisonCache[
+            fingerprint,
+            context
+        ] {
+            return evaluated
         }
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
-                cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = false
+                cacheStorage.environmentComparisonCache[other.fingerprint, context] = false
                 return false
             }
         }
-        cacheStorage.environmentComparisonCache[other.fingerprint, default: [:]][context] = true
+        cacheStorage.environmentComparisonCache[other.fingerprint, context] = true
         return true
     }
 
-}
+    func isEquivalent(to other: FrozenEnvironment?, in context: EquivalencyContext) -> Bool {
+        guard let other else { return false }
+        // We don't even need to thaw the environment if the fingerprints match.
+        if frozen.fingerprint.isEquivalent(to: fingerprint) { return true }
+        return isEquivalent(to: thawing(frozen: frozen), in: context)
+    }
 
+
+}
 
 extension CacheStorage {
 
-    /// A cache of previously compared environments and their results.
-    private struct EnvironmentComparisonCacheKey: CacheKey {
-        static var emptyValue: [UUID: [EquivalencyContext: Bool]] = [:]
+    fileprivate struct EnvironmentFingerprintCache {
+
+        typealias EquivalencyResult = [EquivalencyContext: Bool]
+        var storage: [ComparableFingerprint.Value: [EquivalencyContext: Bool]] = [:]
+
+        public subscript(fingerprint: ComparableFingerprint, context: EquivalencyContext) -> Bool? {
+            get {
+                if let exact = storage[fingerprint.value]?[context] {
+                    return exact
+                } else if let allComparisons = storage[fingerprint.value] {
+                    switch context {
+                    case .all:
+                        // If we're checking for equivalency in ALL contexts, we can short circuit based on any case where equivalency is false.
+                        if allComparisons.contains(where: { $1 == false }) {
+                            return false
+                        } else {
+                            return nil
+                        }
+                    case .elementSizing:
+                        // If we've already evaluated it to be equivalent in all cases, we can short circuit because we know that means any more specific checks must also be equivalent
+                        if allComparisons[.all] == true {
+                            return true
+                        } else {
+                            return nil
+                        }
+                    }
+                } else {
+                    return nil
+                }
+            }
+            set {
+                storage[fingerprint.value, default: [:]][context] = newValue
+            }
+        }
+
     }
 
-    fileprivate var environmentComparisonCache: [UUID: [EquivalencyContext: Bool]] {
+    /// A cache of previously compared environments and their results.
+    private struct EnvironmentComparisonCacheKey: CacheKey {
+        static var emptyValue = EnvironmentFingerprintCache()
+    }
+
+    fileprivate var environmentComparisonCache: EnvironmentFingerprintCache {
         get { self[EnvironmentComparisonCacheKey.self] }
         set { self[EnvironmentComparisonCacheKey.self] = newValue }
     }
@@ -128,7 +190,7 @@ extension CacheStorage {
 extension Environment {
 
     /// Lightweight key type eraser.
-    fileprivate struct Keybox: Hashable, CustomStringConvertible {
+    struct Keybox: Hashable, CustomStringConvertible {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type
