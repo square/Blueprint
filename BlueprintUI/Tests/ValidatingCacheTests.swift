@@ -99,3 +99,65 @@ struct EnvironmentValidatingCacheTests {
     }
 
 }
+
+
+struct EnvironmentAndValueValidatingCacheTests {
+
+    @Test func basic() {
+        var cache = EnvironmentAndValueValidatingCache<String, String, String>()
+        var environment = Environment()
+        environment[ExampleKey.self] = 1
+        let one = cache.retrieveOrCreate(
+            key: "Hello",
+            environment: environment,
+            validationValue: "Validate",
+            context: .all
+        ) {
+            "One"
+        }
+        #expect(one == "One")
+
+        let two = cache.retrieveOrCreate(
+            key: "Hello",
+            environment: environment,
+            validationValue: "Validate",
+            context: .all
+        ) {
+            "Two"
+        }
+        #expect(two == "One")
+
+        let three = cache.retrieveOrCreate(
+            key: "KeyMiss",
+            environment: environment,
+            validationValue: "Validate",
+            context: .all
+        ) {
+            "Three"
+        }
+        #expect(three == "Three")
+
+        var differentEnvironment = environment
+        differentEnvironment[ExampleKey.self] = 2
+        let four = cache.retrieveOrCreate(
+            key: "Hello",
+            environment: differentEnvironment,
+            validationValue: "Validate",
+            context: .all
+        ) {
+            "Four"
+        }
+        #expect(four == "Four")
+
+        let five = cache.retrieveOrCreate(
+            key: "Hello",
+            environment: differentEnvironment,
+            validationValue: "Invalid",
+            context: .all
+        ) {
+            "Five"
+        }
+        #expect(five == "Five")
+    }
+
+}
