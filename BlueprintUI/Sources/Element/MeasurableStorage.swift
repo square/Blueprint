@@ -71,14 +71,14 @@ extension MeasurableStorage {
 extension CacheStorage {
 
     private struct MeasurableStorageCacheKey: CacheKey {
-        static var emptyValue = XEnvironmentValidatingCache<
+        static var emptyValue = EnvironmentAndValueValidatingCache<
             MeasurableStorage.MeasurableSizeKey,
             CGSize,
             AnyContextuallyEquivalent
         >()
     }
 
-    fileprivate var measurableStorageCache: XEnvironmentValidatingCache<
+    fileprivate var measurableStorageCache: EnvironmentAndValueValidatingCache<
         MeasurableStorage.MeasurableSizeKey,
         CGSize,
         AnyContextuallyEquivalent
