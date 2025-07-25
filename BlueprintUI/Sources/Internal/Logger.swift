@@ -2,9 +2,11 @@ import Foundation
 import os.log
 
 /// Namespace for logging helpers
-enum Logger {}
+enum Logger {
+    fileprivate static let signposter = OSSignposter(logHandle: .active)
+}
 
-/// BlueprintView signposts
+// MARK: - BlueprintView signposts
 extension Logger {
     static func logLayoutStart(view: BlueprintView) {
 
@@ -100,7 +102,8 @@ extension Logger {
     }
 }
 
-/// Measuring signposts
+// MARK: - HintingSizeCache signposts
+
 extension Logger {
     static func logMeasureStart(object: AnyObject, description: String, constraint: SizeConstraint) {
 
@@ -185,10 +188,64 @@ extension Logger {
         )
     }
 
-    // MARK: Utilities
 
+
+}
+
+// MARK: - CacheStorage
+
+extension Logger {
+
+    // MARK: ValidatingCache
+
+    static func logValidatingCacheValidationStart(key: some Hashable) -> OSSignpostIntervalState {
+        signposter.beginInterval("ValidatingCache validation", id: key.signpost, "Start: \(String(describing: key))")
+    }
+
+    static func logValidatingCacheValidationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
+        signposter.endInterval("ValidatingCache validation", token, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheFreshValueCreationStart(key: some Hashable) -> OSSignpostIntervalState {
+        signposter.beginInterval("ValidatingCache fresh value creation", id: key.signpost, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheFreshValueCreationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
+        signposter.endInterval("ValidatingCache fresh value creation", token, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheKeyMiss(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache key miss", id: key.signpost, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheKeyHit(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache key hit", id: key.signpost, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheHitAndValidationSuccess(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache validation success", id: key.signpost, "\(String(describing: key))")
+    }
+
+    static func logValidatingCacheHitAndValidationFailure(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache validation failure", id: key.signpost, "\(String(describing: key))")
+    }
+
+}
+
+extension Hashable {
+
+    var signpost: OSSignpostID {
+        OSSignpostID(UInt64(abs(hashValue)))
+    }
+
+}
+
+// MARK: - Utilities
+
+extension Logger {
     private static func shouldRecordMeasurePass() -> Bool {
         BlueprintLogging.isEnabled &&
             BlueprintLogging.config.recordElementMeasures
     }
+
 }
