@@ -205,3 +205,49 @@ extension AXCustomContent {
     }
 }
 
+extension Accessibility {
+    public static func frameSort(
+        direction: Environment.LayoutDirection,
+        root: UIView,
+        userInterfaceIdiom: UIUserInterfaceIdiom = UIDevice.current.userInterfaceIdiom
+    ) -> (NSObject, NSObject) -> Bool {
+        {
+            let first = root.convert($0.accessibilityFrame, from: nil)
+            let second = root.convert($1.accessibilityFrame, from: nil)
+
+            // Horizontal sorting logic - reusable for both center-aligned and fallback cases
+            let sortHorizontally = {
+                switch direction {
+                case .leftToRight:
+                    return first.minX < second.minX
+                case .rightToLeft:
+                    return first.maxX > second.maxX
+                }
+            }
+
+            // Check if elements are vertically aligned along their central axis first.
+            // While this check deviates from VoiceOver's behavior for UIKit, it covers one frequent
+            // use case of Blueprint Row where it contains a number of elements with their
+            // verticalAlignment set to .center. Since there's no view representation for Row,
+            // checking for midY alignment is a reasonable heuristic in its absence.
+            let centerYTolerance: CGFloat = 1.0
+            let centerYDelta = abs(first.midY - second.midY)
+
+            if centerYDelta <= centerYTolerance {
+                // Elements are center-aligned, sort horizontally.
+                return sortHorizontally()
+            }
+
+            // Derived through experimentation, this mimics the default sorting for UIKit.
+            // If frames differ by more than 8 points the top most element is preferred.
+            let minYTolerance = userInterfaceIdiom == .phone ? 8.0 : 13.0
+            let minYDelta = abs(first.minY - second.minY)
+            if minYDelta <= minYTolerance {
+                // Elements are within vertical tolerance, sort horizontally.
+                return sortHorizontally()
+            }
+
+            return first.minY < second.minY
+        }
+    }
+}
