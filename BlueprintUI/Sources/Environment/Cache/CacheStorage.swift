@@ -58,15 +58,6 @@ extension Environment {
 
 }
 
-/// A frozen environment is immutable copy of the comparable elements of an Environment struct.
-struct FrozenEnvironment {
-
-    // Fingerprint used for referencing previously compared environments.
-    let fingerprint: ComparableFingerprint
-    let values: [Environment.Keybox: Any]
-
-}
-
 /// A UUID that changes based on value changes of the containing type.
 /// Two fingerprinted objects may be quickly compared for equality by comparing their fingerprints.
 /// This is roughly analagous to a hash, although with inverted properties: Two objects with the same fingerprint can be trivially considered equal, but two otherwise equal objects may have different fingerprint.

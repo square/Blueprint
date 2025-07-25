@@ -94,7 +94,7 @@ struct EnvironmentEquivalencyTests {
         var expectedCount = 0
 
         #expect(expectedCount == ForcedResultKey.comparisonCount)
-        #expect(a.isEquivalent(to: b, in: .internalElementLayout))
+        #expect(a.isEquivalent(to: b, in: .elementSizing))
         expectedCount += 1
         #expect(expectedCount == ForcedResultKey.comparisonCount)
 
@@ -113,7 +113,7 @@ struct EnvironmentEquivalencyTests {
         #expect(c.isEquivalent(to: d, in: .all))
         expectedCount += 1
         #expect(expectedCount == ForcedResultKey.comparisonCount)
-        #expect(c.isEquivalent(to: d, in: .overallLayout))
+        #expect(c.isEquivalent(to: d, in: .elementSizing))
         #expect(expectedCount == ForcedResultKey.comparisonCount)
 
         // A specific equivalency being false implies `.all` to be be false, so we should be using a cached result.
@@ -122,7 +122,7 @@ struct EnvironmentEquivalencyTests {
         let f = Environment()
 
         #expect(expectedCount == ForcedResultKey.comparisonCount)
-        #expect(!e.isEquivalent(to: f, in: .internalElementLayout))
+        #expect(!e.isEquivalent(to: f, in: .elementSizing))
         expectedCount += 1
         #expect(expectedCount == ForcedResultKey.comparisonCount)
         #expect(!a.isEquivalent(to: b, in: .all))
@@ -144,7 +144,7 @@ enum NonSizeAffectingKey: EnvironmentKey {
     static let defaultValue = 0
 
     static func isEquivalent(lhs: Int, rhs: Int, in context: EquivalencyContext) -> Bool {
-        alwaysEquivalentIn([.internalElementLayout], evaluatingContext: context)
+        alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
     }
 }
 
