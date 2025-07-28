@@ -466,8 +466,14 @@ extension ScrollView {
         var finalContentInset = scrollViewInsets
 
         // Include the keyboard's adjustment at the bottom of the scroll view.
+        //
+        // We check for values over 1.0 because of how BlueprintView rounds its root node's
+        // frame. This rounding can increase a view's frame so that it extends slightly
+        // offscreen. For example, a view height of 715.51 on a 3x device is rounded to a
+        // height of 715.66. If this view is anchored to the bottom of the screen, it will
+        // technically overlap the dismissed keyboard by 0.15pts. We filter out these cases.
 
-        if keyboardBottomInset > 0.0 {
+        if keyboardBottomInset > 1.0 {
             finalContentInset.bottom += keyboardBottomInset
 
             // Exclude the safe area insets, so the content hugs the top of the keyboard.
