@@ -62,7 +62,7 @@ extension Environment {
 /// Two fingerprinted objects may be quickly compared for equality by comparing their fingerprints.
 /// This is roughly analagous to a hash, although with inverted properties: Two objects with the same fingerprint can be trivially considered equal, but two otherwise equal objects may have different fingerprint.
 /// - Note: This type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable.
-struct ComparableFingerprint: ContextuallyEquivalent {
+struct ComparableFingerprint: ContextuallyEquivalent, CustomStringConvertible {
 
     typealias Value = UUID
 
@@ -79,6 +79,10 @@ struct ComparableFingerprint: ContextuallyEquivalent {
     /// - Note: This is a duplicate message but: this type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable. Use this instead.
     func isEquivalent(to other: ComparableFingerprint?, in context: EquivalencyContext) -> Bool {
         value == other?.value
+    }
+
+    var description: String {
+        value.uuidString
     }
 
 }
