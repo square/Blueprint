@@ -55,79 +55,92 @@ struct EnvironmentEquivalencyTests {
     }
 
     @Test func caching() {
+        var hookedResult: [String] = []
+        Logger.hook = {
+            hookedResult.append($0)
+        }
         var a = Environment()
         let b = a
-        a[CountingKey.self] = 1
-        #expect(CountingKey.comparisonCount == 0)
+        a[ExampleKey.self] = 1
+        hookedResult = []
         #expect(!a.isEquivalent(to: b))
-        // First comparison should call comparison method
-        #expect(CountingKey.comparisonCount == 1)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
+        hookedResult = []
         #expect(!a.isEquivalent(to: b))
         // Subsequent comparison should be cached
-        #expect(CountingKey.comparisonCount == 1)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(a.fingerprint)"))
 
+        hookedResult = []
         #expect(!b.isEquivalent(to: a))
         // Reversed order should still be cached
-        #expect(CountingKey.comparisonCount == 1)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(b.fingerprint)"))
 
-        // Copying without mutation should preserve fingerprint, and be cached.
+        hookedResult = []
         let c = b
-        #expect(CountingKey.comparisonCount == 1)
         #expect(!a.isEquivalent(to: c))
-        #expect(CountingKey.comparisonCount == 1)
+        // Copying without mutation should preserve fingerprint, and be cached.
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(a.fingerprint)"))
 
     }
 
     @Test func cascading() {
-
-        // Note on ForcedResultKey:
-        // Environment's equality checks iterate over the keys in its storage dictionary in a nondetermistic order, so we we just populate the dict with
-        // a variety of keys, some true/false in different contexts. If we simply used CountingKey to observe comparisons, sometimes CountingKey woudln't be
-        // compared, because the iteration would've already hit a false value earlier in the loop and bailed. Instead, we use ForcedResultKey to simulate this.
-
+        var hookedResult: [String] = []
+        Logger.hook = {
+            hookedResult.append($0)
+        }
         var a = Environment()
-        a[ForcedResultKey.self] = true
+        a[ExampleKey.self] = 1
+        a[NonSizeAffectingKey.self] = 1
         var b = Environment()
-        b[ForcedResultKey.self] = true
+        b[ExampleKey.self] = 1
+        b[NonSizeAffectingKey.self] = 2
 
-        var expectedCount = 0
-
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        hookedResult = []
         #expect(a.isEquivalent(to: b, in: .elementSizing))
-        expectedCount += 1
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
-        // A specific equivalency being true doesn't imply `.all` to be true, so we should see another evaluation.
-        a[ForcedResultKey.self] = false
+        hookedResult = []
         #expect(!a.isEquivalent(to: b, in: .all))
-        expectedCount += 1
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        // A specific equivalency being true doesn't imply `.all` to be true, so we should see another evaluation.
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
-        // `.all` equivalency implies that any more fine-grained equivalency should also be true, so we should be using a cached result.
         var c = Environment()
-        c[ForcedResultKey.self] = true
+        c[ExampleKey.self] = 1
         var d = Environment()
-        d[ForcedResultKey.self] = true
+        d[ExampleKey.self] = 1
 
+        hookedResult = []
         #expect(c.isEquivalent(to: d, in: .all))
-        expectedCount += 1
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(c.fingerprint)"))
+
+        hookedResult = []
         #expect(c.isEquivalent(to: d, in: .elementSizing))
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        // `.all` equivalency implies that any more fine-grained equivalency should also be true, so we should be using a cached result.
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(c.fingerprint)"))
 
         // A specific equivalency being false implies `.all` to be be false, so we should be using a cached result.
         var e = Environment()
-        e[ForcedResultKey.self] = false
+        e[ExampleKey.self] = 2
         let f = Environment()
 
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        hookedResult = []
         #expect(!e.isEquivalent(to: f, in: .elementSizing))
-        expectedCount += 1
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
-        #expect(!a.isEquivalent(to: b, in: .all))
-        #expect(expectedCount == ForcedResultKey.comparisonCount)
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(e.fingerprint)"))
 
+        hookedResult = []
+        #expect(!e.isEquivalent(to: f, in: .all))
+        #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(e.fingerprint)"))
+
+    }
+
+    func hello(closure: @autoclosure () -> Bool, message: String) {
+        var hookedResult: [String] = []
+        Logger.hook = {
+            hookedResult.append($0)
+        }
+        #expect(closure())
+        #expect(hookedResult.contains(message))
     }
 
 }
@@ -145,28 +158,5 @@ enum NonSizeAffectingKey: EnvironmentKey {
 
     static func isEquivalent(lhs: Int, rhs: Int, in context: EquivalencyContext) -> Bool {
         alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
-    }
-}
-
-enum CountingKey: EnvironmentKey {
-    static let defaultValue = 0
-    static var comparisonCount = 0
-
-    static func isEquivalent(lhs: Int, rhs: Int, in context: EquivalencyContext) -> Bool {
-        comparisonCount += 1
-        return lhs == rhs
-    }
-}
-
-enum ForcedResultKey: EnvironmentKey {
-    static let defaultValue: Bool? = nil
-    static var comparisonCount = 0
-
-    static func isEquivalent(lhs: Bool?, rhs: Bool?, in context: EquivalencyContext) -> Bool {
-        comparisonCount += 1
-        if let lhs {
-            return lhs
-        }
-        return lhs == rhs
     }
 }

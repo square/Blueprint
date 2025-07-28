@@ -4,11 +4,13 @@ import os.log
 /// Namespace for logging helpers
 enum Logger {
     fileprivate static let signposter = OSSignposter(logHandle: .active)
+    static var hook: ((String) -> Void)?
 }
 
 // MARK: - BlueprintView signposts
 extension Logger {
     static func logLayoutStart(view: BlueprintView) {
+
 
         guard BlueprintLogging.isEnabled else { return }
 
@@ -188,86 +190,59 @@ extension Logger {
         )
     }
 
-}
 
-// MARK: - Caching
-
-extension Logger {
-
-    // MARK: ValidatingCache
-
-    static func logValidatingCacheValidationStart(key: some Hashable) -> OSSignpostIntervalState {
-        signposter.beginInterval("ValidatingCache validation", id: key.signpost, "Start: \(String(describing: key))")
-    }
-
-    static func logValidatingCacheValidationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
-        signposter.endInterval("ValidatingCache validation", token, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheFreshValueCreationStart(key: some Hashable) -> OSSignpostIntervalState {
-        signposter.beginInterval("ValidatingCache fresh value creation", id: key.signpost, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheFreshValueCreationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
-        signposter.endInterval("ValidatingCache fresh value creation", token, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheKeyMiss(key: some Hashable) {
-        signposter.emitEvent("ValidatingCache key miss", id: key.signpost, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheKeyHit(key: some Hashable) {
-        signposter.emitEvent("ValidatingCache key hit", id: key.signpost, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheHitAndValidationSuccess(key: some Hashable) {
-        signposter.emitEvent("ValidatingCache validation success", id: key.signpost, "\(String(describing: key))")
-    }
-
-    static func logValidatingCacheHitAndValidationFailure(key: some Hashable) {
-        signposter.emitEvent("ValidatingCache validation failure", id: key.signpost, "\(String(describing: key))")
-    }
 
 }
+
+// MARK: - CacheStorage
 
 extension Logger {
 
     // MARK: Environment Comparison
 
     static func logEnvironmentKeySetEquivalencyComparisonStart(key: some Hashable) -> OSSignpostIntervalState {
-        signposter.beginInterval(
+        let token = signposter.beginInterval(
             "Environment key set equivalency comparison",
             id: key.signpost,
             "Start: \(String(describing: key))"
         )
+        hook?("\(#function) \(String(describing: key))")
+        return token
     }
 
     static func logEnvironmentKeySetEquivalencyComparisonEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
         signposter.endInterval("Environment key set equivalency comparison", token, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
     }
 
     static func logEnvironmentEquivalencyComparisonStart(environment: Environment) -> OSSignpostIntervalState {
-        signposter.beginInterval(
+        let token = signposter.beginInterval(
             "Environment equivalency comparison",
             id: environment.fingerprint.value.signpost,
             "Start: \(String(describing: environment))"
         )
+        hook?("\(#function) \(environment.fingerprint)")
+        return token
     }
 
     static func logEnvironmentEquivalencyComparisonEnd(_ token: OSSignpostIntervalState, environment: Environment) {
         signposter.endInterval("Environment equivalency comparison", token, "\(String(describing: environment))")
+        hook?("\(#function) \(environment.fingerprint)")
     }
 
     static func logEnvironmentEquivalencyFingerprintEqual(environment: Environment) {
         signposter.emitEvent("Environments trivially equal from fingerprint", id: environment.fingerprint.value.signpost)
+        hook?("\(#function) \(environment.fingerprint)")
     }
 
     static func logEnvironmentEquivalencyFingerprintCacheHit(environment: Environment) {
         signposter.emitEvent("Environment cached comparison result hit", id: environment.fingerprint.value.signpost)
+        hook?("\(#function) \(environment.fingerprint)")
     }
 
     static func logEnvironmentEquivalencyFingerprintCacheMiss(environment: Environment) {
         signposter.emitEvent("Environment cached comparison result miss", id: environment.fingerprint.value.signpost)
+        hook?("\(#function) \(environment.fingerprint)")
     }
 
     static func logEnvironmentEquivalencyCompletedWithNonEquivalence(
@@ -280,6 +255,7 @@ extension Logger {
             id: environment.fingerprint.value.signpost,
             "\(String(describing: context)): \(String(describing: key)) not equivalent"
         )
+        hook?("\(#function) \(String(describing: key))")
     }
 
     static func logEnvironmentEquivalencyCompletedWithEquivalence(environment: Environment, context: EquivalencyContext) {
@@ -288,7 +264,60 @@ extension Logger {
             id: environment.fingerprint.value.signpost,
             "\(String(describing: context))"
         )
+        hook?("\(#function) \(environment.fingerprint)")
+    }
 
+
+    // MARK: ValidatingCache
+
+    static func logValidatingCacheValidationStart(key: some Hashable) -> OSSignpostIntervalState {
+        let token = signposter.beginInterval(
+            "ValidatingCache validation",
+            id: key.signpost,
+            "Start: \(String(describing: key))"
+        )
+        hook?("\(#function) \(String(describing: key))")
+        return token
+    }
+
+    static func logValidatingCacheValidationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
+        signposter.endInterval("ValidatingCache validation", token, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
+    }
+
+    static func logValidatingCacheFreshValueCreationStart(key: some Hashable) -> OSSignpostIntervalState {
+        let token = signposter.beginInterval(
+            "ValidatingCache fresh value creation",
+            id: key.signpost,
+            "\(String(describing: key))"
+        )
+        hook?("\(#function) \(String(describing: key))")
+        return token
+    }
+
+    static func logValidatingCacheFreshValueCreationEnd(_ token: OSSignpostIntervalState, key: some Hashable) {
+        signposter.endInterval("ValidatingCache fresh value creation", token, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
+    }
+
+    static func logValidatingCacheKeyMiss(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache key miss", id: key.signpost, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
+    }
+
+    static func logValidatingCacheKeyHit(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache key hit", id: key.signpost, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
+    }
+
+    static func logValidatingCacheHitAndValidationSuccess(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache validation success", id: key.signpost, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
+    }
+
+    static func logValidatingCacheHitAndValidationFailure(key: some Hashable) {
+        signposter.emitEvent("ValidatingCache validation failure", id: key.signpost, "\(String(describing: key))")
+        hook?("\(#function) \(String(describing: key))")
     }
 
 }

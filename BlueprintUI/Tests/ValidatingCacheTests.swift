@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @_spi(CacheStorage) @testable import BlueprintUI
 
@@ -69,6 +70,7 @@ struct ValidatingCacheTests {
 
 }
 
+@MainActor
 struct EnvironmentValidatingCacheTests {
 
     @Test func basic() {
@@ -101,6 +103,7 @@ struct EnvironmentValidatingCacheTests {
 }
 
 
+@MainActor
 struct EnvironmentAndValueValidatingCacheTests {
 
     @Test func basic() {
@@ -158,6 +161,124 @@ struct EnvironmentAndValueValidatingCacheTests {
             "Five"
         }
         #expect(five == "Five")
+    }
+
+    @Test func basicElementsAndPaths() {
+
+        var cache = EnvironmentAndValueValidatingCache<String, CGSize, TestCachedElement>()
+        let elementOne = TestCachedElement(value: "Hello")
+        let elementOnePath = "some/element/path"
+        let elementTwo = TestCachedElement(value: "Hi")
+        let elementTwoPath = "some/other/path"
+        let elementOneModified = TestCachedElement(value: "Hello World")
+        var environment = Environment()
+
+        var evaluationCount = 0
+        func sizeForElement(element: TestCachedElement) -> CGSize {
+            evaluationCount += 1
+            // Fake size obviously, for demo purposes
+            return CGSize(width: element.value.count * 10, height: 100)
+        }
+
+        // First will be a key miss, so evaluate.
+        let firstSize = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOne,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOne)
+        }
+        #expect(firstSize == CGSize(width: 50, height: 100))
+        #expect(evaluationCount == 1)
+
+        // Second will be a key miss also, so evaluate.
+        let secondSize = cache.retrieveOrCreate(
+            key: elementTwoPath,
+            environment: environment,
+            validationValue: elementTwo,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementTwo)
+        }
+        #expect(secondSize == CGSize(width: 20, height: 100))
+        #expect(evaluationCount == 2)
+
+        // Querying first size again with matching environment and validation value. Cache hit, validation pass, no evaluation.
+        let firstSizeAgain = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOne,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOne)
+        }
+        #expect(firstSizeAgain == CGSize(width: 50, height: 100))
+        #expect(evaluationCount == 2)
+
+        // Querying first size again with matching environment and non-matching validation value. Cache hit, validation fail, evaluation.
+        let firstSizeWithNewElement = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOneModified,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOneModified)
+        }
+        #expect(firstSizeWithNewElement == CGSize(width: 110, height: 100))
+        #expect(evaluationCount == 3)
+
+        // Querying first size again with matching environment and validation value. Cache hit, validation pass, no evaluation.
+        let firstSizeWithNewElementAgain = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOneModified,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOneModified)
+        }
+        #expect(firstSizeWithNewElementAgain == CGSize(width: 110, height: 100))
+        #expect(evaluationCount == 3)
+
+        // Querying first size again with matching environment and original validation value. Cache hit, validation fail (because we don't preserve old values for keys with different validations), evaluation.
+        let originalFirstSizeAgain = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOne,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOne)
+        }
+        #expect(originalFirstSizeAgain == CGSize(width: 50, height: 100))
+        #expect(evaluationCount == 4)
+
+        // Querying first size again with non-equivalent environment and matching validation value. Cache hit, validation fail (due to environment diff), evaluation.
+        environment[ExampleKey.self] = 1
+        let firstSizeWithNewEnvironment = cache.retrieveOrCreate(
+            key: elementOnePath,
+            environment: environment,
+            validationValue: elementOneModified,
+            context: .elementSizing
+        ) {
+            sizeForElement(element: elementOne)
+        }
+        #expect(firstSizeWithNewEnvironment == CGSize(width: 50, height: 100))
+        #expect(evaluationCount == 5)
+
+
+    }
+
+}
+
+struct TestCachedElement: Element, Equatable, ContextuallyEquivalent {
+    let value: String
+
+    var content: ElementContent {
+        fatalError()
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        fatalError()
     }
 
 }
