@@ -9,12 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed bounding rects for VoiceOver when an attributed label's link spans more than one line.
-- Fixed an issue where resizing a `ScrollView` could result in its scroll position being adjusted incorrectly.
-
 ### Added
-
-- Added support for tabbing through links in `AttributedLabel`
 
 ### Removed
 
@@ -29,6 +24,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.1.0] - 2025-07-22
+
+### Fixed
+- Fixed bounding rects for VoiceOver when an attributed label's link spans more than one line.
+- Fixed an issue where resizing a `ScrollView` could result in its scroll position being adjusted incorrectly.
+- Fixed an issue where a dismissed keyboard could impact a `ScrollView`'s bottom safe area inset.
+- Fixed `AccessibilityContainer` to better handle the accessibility ordering for a `UITableView` or a `UICollectionView` inside it (such as a `Listable` instance).
+
+### Added
+
+- Added support for tabbing through links in `AttributedLabel`
 
 ## [6.0.0] - 2025-06-16
 
@@ -1253,7 +1260,8 @@ searchField
 
 - First stable release.
 
-[main]: https://github.com/square/Blueprint/compare/6.0.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.1.0...HEAD
+[6.1.0]: https://github.com/square/Blueprint/compare/6.0.0...6.1.0
 [6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
 [5.7.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
 [5.6.0]: https://github.com/square/Blueprint/compare/5.5.0...5.6.0
