@@ -78,6 +78,21 @@ class ScrollViewTests: XCTestCase {
             )
         )
 
+        // Anomalous Keyboard Inset
+
+        XCTAssertEqual(
+            UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+
+            ScrollView.calculateContentInset(
+                scrollViewInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+                safeAreaInsets: UIEdgeInsets(top: 10.0, left: 11.0, bottom: 12.0, right: 13.0),
+                // Since this value is < 1, the resulting bottom inset should be unchanged.
+                keyboardBottomInset: 0.15,
+                refreshControlState: .disabled,
+                refreshControlBounds: .zero
+            )
+        )
+
         // Keyboard Inset and refreshing state
         let expectedTopInset = 10.0
 

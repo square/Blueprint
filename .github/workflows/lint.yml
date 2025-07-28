@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Lint Swift code with SwiftFormat
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     steps:
     - uses: actions/checkout@v4
