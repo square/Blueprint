@@ -56,11 +56,7 @@ public struct Environment {
             let keybox = Keybox(key)
             let oldValue = values[keybox]
             values[keybox] = newValue
-            let token = Logger.logEnvironmentKeySetEquivalencyComparisonStart(key: keybox)
-            if !keybox.isEquivalent(newValue, oldValue, .all) {
-                fingerprint.modified()
-            }
-            Logger.logEnvironmentKeySetEquivalencyComparisonEnd(token, key: keybox)
+            fingerprint.modified()
         }
     }
 
@@ -68,7 +64,7 @@ public struct Environment {
         values[keybox, default: keybox.type.defaultValue]
     }
 
-    public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+    subscript<Key>(key: Key.Type) -> Key.Value where Key: InternalEnvironmentKey {
         get {
             internalValues[ObjectIdentifier(key), default: key.defaultValue] as! Key.Value
         }
