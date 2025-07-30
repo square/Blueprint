@@ -38,7 +38,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
             environment: environment,
             validationValue: validationKey,
             context: .elementSizing,
-        ) {
+        ) { environment in
             measurer(proposal, environment)
         }
     }
