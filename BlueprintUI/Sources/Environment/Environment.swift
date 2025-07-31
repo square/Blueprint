@@ -66,6 +66,14 @@ public struct Environment: Equatable {
         }
     }
 
+    public func adapted<Key: EnvironmentKey>(key: Key.Type, value: Key.Value) -> Environment {
+        var newThingy = self
+
+        newThingy[key] = value
+
+        return newThingy
+    }
+
     public static func == (lhs: Environment, rhs: Environment) -> Bool {
         guard lhs.values.count == rhs.values.count else { return false }
 

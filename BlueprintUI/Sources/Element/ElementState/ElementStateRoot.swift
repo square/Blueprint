@@ -87,6 +87,7 @@ final class ElementState {
     }
 
     private func clearCacheValues() {
+        /// The same values will probably come back, so keep the capacity
         cache.removeAll(keepingCapacity: true)
     }
 
