@@ -46,7 +46,6 @@ struct CachingMeasurableStorage: ContentStorage, CaffeinatedContentStorage {
         measurer(
             proposal,
             environment
-                .adapted(key: CacheAccessKey.self, value: node.state)
         )
     }
 
@@ -56,6 +55,13 @@ struct CachingMeasurableStorage: ContentStorage, CaffeinatedContentStorage {
         node: LayoutTreeNode
     ) -> [IdentifiedNode] {
         []
+    }
+
+    func adapt(
+        _ environment: inout Environment,
+        for node: LayoutTreeNode
+    ) {
+        environment[CacheAccessKey.self] = node.state
     }
 
     private enum CacheAccessKey: EnvironmentKey {

@@ -17,4 +17,20 @@ protocol CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> [ElementContent.IdentifiedNode]
+
+    func adapt(
+        _ environment: inout Environment,
+        for node: LayoutTreeNode
+    )
+}
+
+
+extension CaffeinatedContentStorage {
+
+    func adapt(
+        _ environment: inout Environment,
+        for node: LayoutTreeNode
+    ) {
+        // Nothin
+    }
 }

@@ -48,7 +48,11 @@ public struct ElementContent {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        storage.sizeThatFits(proposal: proposal, environment: environment, node: node)
+        var environment = environment
+
+        storage.adapt(&environment, for: node)
+
+        return storage.sizeThatFits(proposal: proposal, environment: environment, node: node)
     }
 
     public var childCount: Int {
@@ -62,7 +66,11 @@ public struct ElementContent {
         environment: Environment,
         node: LayoutTreeNode
     ) -> [IdentifiedNode] {
-        storage.performCaffeinatedLayout(
+        var environment = environment
+
+        storage.adapt(&environment, for: node)
+
+        return storage.performCaffeinatedLayout(
             frame: frame,
             environment: environment,
             node: node
