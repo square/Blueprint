@@ -265,7 +265,7 @@ extension ElementContent {
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
     public init(
         cacheValue: any Equatable,
-        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+        measureFunction: @escaping (SizeConstraint, Environment, ElementState) -> CGSize
     ) {
         storage = CachingMeasurableStorage(cacheValue: cacheValue, measurer: measureFunction)
     }

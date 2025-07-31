@@ -36,7 +36,7 @@ struct CachingMeasurableStorage: ContentStorage, CaffeinatedContentStorage {
 
     let cacheValue: any Equatable
 
-    let measurer: (SizeConstraint, Environment) -> CGSize
+    let measurer: (SizeConstraint, Environment, ElementState) -> CGSize
 
     func sizeThatFits(
         proposal: SizeConstraint,
@@ -45,7 +45,8 @@ struct CachingMeasurableStorage: ContentStorage, CaffeinatedContentStorage {
     ) -> CGSize {
         measurer(
             proposal,
-            environment
+            environment,
+            environment[CacheAccessKey.self]
         )
     }
 

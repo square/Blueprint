@@ -59,11 +59,10 @@ final class ElementState {
         }
     }
 
-    func perform<Return>(
+    func prepare(
         cacheInvalidationValue: (any Equatable)?,
-        in environment: Environment,
-        perform: (Environment) throws -> Return
-    ) rethrows -> Return {
+        in environment: Environment
+    ) {
 
         var environment = environment
         let newInvalidationValue = CacheInvalidationValue(value: cacheInvalidationValue)
@@ -80,12 +79,8 @@ final class ElementState {
             readKeys.insert($0)
         }
 
-        defer {
-            self.readEnvironmentValues = environment.subset(with: readKeys)
-            self.cacheInvalidationValue = newInvalidationValue
-        }
-
-        return try perform(environment)
+        readEnvironmentValues = environment.subset(with: readKeys)
+        self.cacheInvalidationValue = newInvalidationValue
     }
 
     private func clearCacheValues() {
