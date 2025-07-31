@@ -122,10 +122,10 @@ import Foundation
         backing.retrieveOrCreate(key: key) {
             environment.isEquivalent(to: $0.0, in: context) && validate($0.1)
         } create: {
-            let x = environment.snapshottingAccess { environment in
+            let ((value, additional), snapshot) = environment.snapshottingAccess { environment in
                 create(environment)
             }
-            return (x.0.0, (x.1, x.0.1))
+            return (value, (snapshot, additional))
         }
     }
 
