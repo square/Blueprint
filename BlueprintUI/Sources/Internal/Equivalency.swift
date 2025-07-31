@@ -65,7 +65,7 @@ public struct AnyContextuallyEquivalent: ContextuallyEquivalent {
 
     public func isEquivalent(to other: AnyContextuallyEquivalent?, in context: EquivalencyContext) -> Bool {
         guard let base = (base as? any ContextuallyEquivalent) else { return false }
-        return base.isEquivalent(to: other?.base as? ContextuallyEquivalent, in: context)
+        return base.isEquivalent(to: other?.base as? any ContextuallyEquivalent, in: context)
     }
 
 }
