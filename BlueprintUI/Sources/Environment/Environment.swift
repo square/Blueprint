@@ -124,10 +124,7 @@ extension Environment: ContextuallyEquivalent {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint, context] ?? other.cacheStorage.environmentComparisonCache[
-            fingerprint,
-            context
-        ] {
+        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
@@ -136,7 +133,7 @@ extension Environment: ContextuallyEquivalent {
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
-                cacheStorage.environmentComparisonCache[other.fingerprint, context] = false
+                cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -148,7 +145,7 @@ extension Environment: ContextuallyEquivalent {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[other.fingerprint, context] = true
+        cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
         return true
     }
 
@@ -160,7 +157,7 @@ extension Environment: ContextuallyEquivalent {
             return true
         }
         let scope = Set(snapshot.values.keys.map(\.objectIdentifier))
-        if let evaluated = cacheStorage.environmentComparisonCache[snapshot.fingerprint, context, scope] {
+        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
@@ -168,7 +165,7 @@ extension Environment: ContextuallyEquivalent {
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
         for (key, value) in snapshot.values {
             guard key.isEquivalent(self[key], value, context) else {
-                cacheStorage.environmentComparisonCache[snapshot.fingerprint, context, scope] = false
+                cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -180,7 +177,7 @@ extension Environment: ContextuallyEquivalent {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[snapshot.fingerprint, context, scope] = true
+        cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = true
         return true
 
     }
@@ -193,20 +190,29 @@ extension CacheStorage {
     fileprivate struct EnvironmentFingerprintCache {
 
         struct Key: Hashable {
-            let fingerprint: ComparableFingerprint.Value
+            let lhs: ComparableFingerprint.Value
+            let rhs: ComparableFingerprint.Value
             let scope: Set<ObjectIdentifier>?
+
+            init(_ lhs: ComparableFingerprint.Value, _ rhs: ComparableFingerprint.Value, scope: Set<ObjectIdentifier>?) {
+                // Sort lhs/rhs so we don't have diff results based on caller.
+                self.lhs = min(lhs, rhs)
+                self.rhs = max(lhs, rhs)
+                self.scope = scope
+            }
         }
 
         typealias EquivalencyResult = [EquivalencyContext: Bool]
         var storage: [Key: [EquivalencyContext: Bool]] = [:]
 
         public subscript(
-            fingerprint: ComparableFingerprint,
+            lhs: ComparableFingerprint,
+            rhs: ComparableFingerprint,
             context: EquivalencyContext,
             scope: Set<ObjectIdentifier>? = nil
         ) -> Bool? {
             get {
-                let key = Key(fingerprint: fingerprint.value, scope: scope)
+                let key = Key(lhs.value, rhs.value, scope: scope)
                 if let exact = storage[key]?[context] {
                     return exact
                 } else if let allComparisons = storage[key] {
@@ -231,7 +237,7 @@ extension CacheStorage {
                 }
             }
             set {
-                storage[Key(fingerprint: fingerprint.value, scope: scope), default: [:]][context] = newValue
+                storage[Key(lhs.value, rhs.value, scope: scope), default: [:]][context] = newValue
             }
         }
 

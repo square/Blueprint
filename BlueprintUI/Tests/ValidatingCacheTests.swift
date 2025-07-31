@@ -78,24 +78,28 @@ struct EnvironmentValidatingCacheTests {
         var environment = Environment()
         environment[ExampleKey.self] = 1
         let one = cache.retrieveOrCreate(key: "Hello", environment: environment, context: .all) {
-            "One"
+            _ = $0[ExampleKey.self]
+            return "One"
         }
         #expect(one == "One")
 
         let two = cache.retrieveOrCreate(key: "Hello", environment: environment, context: .all) {
-            "Two"
+            _ = $0[ExampleKey.self]
+            return "Two"
         }
         #expect(two == "One")
 
         let three = cache.retrieveOrCreate(key: "KeyMiss", environment: environment, context: .all) {
-            "Three"
+            _ = $0[ExampleKey.self]
+            return "Three"
         }
         #expect(three == "Three")
 
         var differentEnvironment = environment
         differentEnvironment[ExampleKey.self] = 2
         let four = cache.retrieveOrCreate(key: "Hello", environment: differentEnvironment, context: .all) {
-            "Four"
+            _ = $0[ExampleKey.self]
+            return "Four"
         }
         #expect(four == "Four")
     }
@@ -116,7 +120,8 @@ struct EnvironmentAndValueValidatingCacheTests {
             validationValue: "Validate",
             context: .all
         ) {
-            "One"
+            _ = $0[ExampleKey.self]
+            return "One"
         }
         #expect(one == "One")
 
@@ -126,7 +131,8 @@ struct EnvironmentAndValueValidatingCacheTests {
             validationValue: "Validate",
             context: .all
         ) {
-            "Two"
+            _ = $0[ExampleKey.self]
+            return "Two"
         }
         #expect(two == "One")
 
@@ -136,7 +142,8 @@ struct EnvironmentAndValueValidatingCacheTests {
             validationValue: "Validate",
             context: .all
         ) {
-            "Three"
+            _ = $0[ExampleKey.self]
+            return "Three"
         }
         #expect(three == "Three")
 
@@ -148,7 +155,8 @@ struct EnvironmentAndValueValidatingCacheTests {
             validationValue: "Validate",
             context: .all
         ) {
-            "Four"
+            _ = $0[ExampleKey.self]
+            return "Four"
         }
         #expect(four == "Four")
 
@@ -157,7 +165,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: differentEnvironment,
             validationValue: "Invalid",
             context: .all
-        ) {
+        ) { _ in
             "Five"
         }
         #expect(five == "Five")
@@ -186,7 +194,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOne,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOne)
         }
         #expect(firstSize == CGSize(width: 50, height: 100))
@@ -198,7 +206,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementTwo,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementTwo)
         }
         #expect(secondSize == CGSize(width: 20, height: 100))
@@ -210,7 +218,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOne,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOne)
         }
         #expect(firstSizeAgain == CGSize(width: 50, height: 100))
@@ -222,7 +230,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOneModified,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOneModified)
         }
         #expect(firstSizeWithNewElement == CGSize(width: 110, height: 100))
@@ -234,7 +242,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOneModified,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOneModified)
         }
         #expect(firstSizeWithNewElementAgain == CGSize(width: 110, height: 100))
@@ -246,7 +254,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOne,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOne)
         }
         #expect(originalFirstSizeAgain == CGSize(width: 50, height: 100))
@@ -259,7 +267,7 @@ struct EnvironmentAndValueValidatingCacheTests {
             environment: environment,
             validationValue: elementOneModified,
             context: .elementSizing
-        ) {
+        ) { _ in
             sizeForElement(element: elementOne)
         }
         #expect(firstSizeWithNewEnvironment == CGSize(width: 50, height: 100))
