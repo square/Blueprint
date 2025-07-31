@@ -66,8 +66,9 @@ final class ElementState {
     ) rethrows -> Return {
 
         var environment = environment
+        let newInvalidationValue = CacheInvalidationValue(value: cacheInvalidationValue)
 
-        if self.cacheInvalidationValue != CacheInvalidationValue(value: cacheInvalidationValue) {
+        if self.cacheInvalidationValue != newInvalidationValue {
             clearCacheValues()
         } else if environment.valuesEqual(to: readEnvironmentValues) == false {
             clearCacheValues()
@@ -80,7 +81,8 @@ final class ElementState {
         }
 
         defer {
-            readEnvironmentValues = environment.subset(with: readKeys)
+            self.readEnvironmentValues = environment.subset(with: readKeys)
+            self.cacheInvalidationValue = newInvalidationValue
         }
 
         return try perform(environment)
