@@ -10,7 +10,7 @@ jobs:
   spm:
     name: "iOS ${{ matrix.sdk }}"
 
-    runs-on: macos-14-xlarge
+    runs-on: macos-15-xlarge
 
     env:
       TUIST_TEST_DEVICE: iPhone SE (3rd generation)
@@ -30,9 +30,7 @@ jobs:
 
           - sdk: "17.2"
             simctl_runtime: "com.apple.CoreSimulator.SimRuntime.iOS-17-2"
-            # The iOS 17.2 SDK is pre-installed on the macOS 13 image.
-            # Attempting to install it will fail with an error.
-            installation_required: false
+            installation_required: true
 
     steps:
     - uses: actions/checkout@v4
