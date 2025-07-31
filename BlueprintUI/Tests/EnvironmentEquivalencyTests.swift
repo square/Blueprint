@@ -55,6 +55,7 @@ struct EnvironmentEquivalencyTests {
     }
 
     @Test func caching() {
+        BlueprintLogging.isEnabled = true
         var hookedResult: [String] = []
         Logger.hook = {
             hookedResult.append($0)
@@ -85,6 +86,7 @@ struct EnvironmentEquivalencyTests {
     }
 
     @Test func cascading() {
+        BlueprintLogging.isEnabled = true
         var hookedResult: [String] = []
         Logger.hook = {
             hookedResult.append($0)

@@ -68,7 +68,7 @@ import Foundation
 /// A convenience wrapper around ValidatingCache which ensures that only values which were cached in equivalent environments are returned.
 @_spi(CacheStorage) public struct EnvironmentValidatingCache<Key, Value>: Sendable where Key: Hashable {
 
-    private var backing = ValidatingCache<Key, Value, FrozenEnvironment>()
+    private var backing = ValidatingCache<Key, Value, EnvironmentSnapshot>()
 
     public init() {}
 
@@ -83,12 +83,14 @@ import Foundation
         key: Key,
         environment: Environment,
         context: EquivalencyContext,
-        create: () -> Value
+        create: (Environment) -> Value
     ) -> Value {
         backing.retrieveOrCreate(key: key) {
             environment.isEquivalent(to: $0, in: context)
         } create: {
-            (create(), environment.frozen)
+            environment.snapshottingAccess { environment in
+                create(environment)
+            }
         }
     }
 
@@ -97,7 +99,7 @@ import Foundation
 /// A convenience wrapper around ValidatingCache which ensures that only values which were cached in equivalent environments are returned, and allows for additional data to be stored to be validated.
 @_spi(CacheStorage) public struct EnvironmentAndValueValidatingCache<Key, Value, AdditionalValidationData>: Sendable where Key: Hashable {
 
-    private var backing = ValidatingCache<Key, Value, (FrozenEnvironment, AdditionalValidationData)>()
+    private var backing = ValidatingCache<Key, Value, (EnvironmentSnapshot, AdditionalValidationData)>()
 
     public init() {}
 
@@ -115,13 +117,15 @@ import Foundation
         environment: Environment,
         context: EquivalencyContext,
         validate: (AdditionalValidationData) -> Bool,
-        create: () -> (Value, AdditionalValidationData)
+        create: (Environment) -> (Value, AdditionalValidationData)
     ) -> Value {
         backing.retrieveOrCreate(key: key) {
             environment.isEquivalent(to: $0.0, in: context) && validate($0.1)
         } create: {
-            let (fresh, additional) = create()
-            return (fresh, (environment.frozen, additional))
+            let ((value, additional), snapshot) = environment.snapshottingAccess { environment in
+                create(environment)
+            }
+            return (value, (snapshot, additional))
         }
     }
 
@@ -143,12 +147,12 @@ import Foundation
         environment: Environment,
         validationValue: AdditionalValidationData,
         context: EquivalencyContext,
-        create: () -> (Value)
+        create: (Environment) -> (Value)
     ) -> Value {
         retrieveOrCreate(key: key, environment: environment, context: context) {
             $0.isEquivalent(to: validationValue, in: context)
         } create: {
-            (create(), validationValue)
+            (create($0), validationValue)
         }
 
     }
@@ -170,12 +174,12 @@ import Foundation
         environment: Environment,
         validationValue: AdditionalValidationData,
         context: EquivalencyContext,
-        create: () -> (Value)
+        create: (Environment) -> (Value)
     ) -> Value {
         retrieveOrCreate(key: key, environment: environment, context: context) {
             $0 == validationValue
         } create: {
-            (create(), validationValue)
+            (create($0), validationValue)
         }
     }
 

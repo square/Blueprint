@@ -52,8 +52,8 @@ extension Environment {
 
 
     @_spi(CacheStorage) public var cacheStorage: CacheStorage {
-        get { self[internal: CacheStorageEnvironmentKey.self] }
-        set { self[internal: CacheStorageEnvironmentKey.self] = newValue }
+        get { self[CacheStorageEnvironmentKey.self] }
+        set { self[CacheStorageEnvironmentKey.self] = newValue }
     }
 
 }

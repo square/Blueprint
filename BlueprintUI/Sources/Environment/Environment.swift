@@ -44,6 +44,7 @@ public struct Environment {
     var fingerprint = ComparableFingerprint()
 
     private var values: [Keybox: Any] = [:]
+    private var snapshotting: SnapshottingEnvironment?
 
     private var internalValues: [ObjectIdentifier: Any] = [:]
 
@@ -56,19 +57,19 @@ public struct Environment {
             let keybox = Keybox(key)
             let oldValue = values[keybox]
             values[keybox] = newValue
-            let token = Logger.logEnvironmentKeySetEquivalencyComparisonStart(key: keybox)
-            if !keybox.isEquivalent(newValue, oldValue, .all) {
-                fingerprint.modified()
-            }
-            Logger.logEnvironmentKeySetEquivalencyComparisonEnd(token, key: keybox)
+            fingerprint.modified()
         }
     }
 
     private subscript(keybox: Keybox) -> Any {
-        values[keybox, default: keybox.type.defaultValue]
+        let value = values[keybox, default: keybox.type.defaultValue]
+        if let snapshotting {
+            snapshotting.value.values[keybox] = value
+        }
+        return value
     }
 
-    public subscript<Key>(internal key: Key.Type) -> Key.Value where Key: EnvironmentKey {
+    subscript<Key>(key: Key.Type) -> Key.Value where Key: InternalEnvironmentKey {
         get {
             internalValues[ObjectIdentifier(key), default: key.defaultValue] as! Key.Value
         }
@@ -92,27 +93,27 @@ public struct Environment {
         return merged
     }
 
-    var frozen: FrozenEnvironment {
-        FrozenEnvironment(fingerprint: fingerprint, values: values)
+    func snapshottingAccess<T>(_ closure: (Environment) -> T) -> (T, EnvironmentSnapshot) {
+        var watching = self
+        let snapshotting = SnapshottingEnvironment()
+        watching.snapshotting = snapshotting
+        let result = closure(watching)
+        return (result, snapshotting.value)
     }
-
-    func thawing(frozen: FrozenEnvironment) -> Environment {
-        var merged = self
-        merged.values = frozen.values
-        merged.fingerprint = frozen.fingerprint
-        return merged
-    }
-
 
 }
 
-/// A frozen environment is immutable copy of the comparable elements of an Environment struct.
-struct FrozenEnvironment {
+/// An environment snapshot is immutable copy of the comparable elements of an Environment struct that were accessed during the cached value's creaton..
+struct EnvironmentSnapshot {
 
     // Fingerprint used for referencing previously compared environments.
-    let fingerprint: ComparableFingerprint
-    let values: [Environment.Keybox: Any]
+    var fingerprint: ComparableFingerprint
+    var values: [Environment.Keybox: Any]
 
+}
+
+private final class SnapshottingEnvironment {
+    var value = EnvironmentSnapshot(fingerprint: .init(), values: [:])
 }
 
 extension Environment: ContextuallyEquivalent {
@@ -123,10 +124,7 @@ extension Environment: ContextuallyEquivalent {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        if let evaluated = cacheStorage.environmentComparisonCache[other.fingerprint, context] ?? other.cacheStorage.environmentComparisonCache[
-            fingerprint,
-            context
-        ] {
+        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
@@ -135,7 +133,7 @@ extension Environment: ContextuallyEquivalent {
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isEquivalent(self[key], other[key], context) else {
-                cacheStorage.environmentComparisonCache[other.fingerprint, context] = false
+                cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -147,18 +145,41 @@ extension Environment: ContextuallyEquivalent {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[other.fingerprint, context] = true
+        cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
         return true
     }
 
-    func isEquivalent(to other: FrozenEnvironment?, in context: EquivalencyContext) -> Bool {
-        guard let other else { return false }
+    func isEquivalent(to snapshot: EnvironmentSnapshot?, in context: EquivalencyContext) -> Bool {
+        guard let snapshot else { return false }
         // We don't even need to thaw the environment if the fingerprints match.
-        if other.fingerprint.isEquivalent(to: fingerprint) {
+        if snapshot.fingerprint.isEquivalent(to: fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        return isEquivalent(to: thawing(frozen: other), in: context)
+        let scope = Set(snapshot.values.keys.map(\.objectIdentifier))
+        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] {
+            Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
+            return evaluated
+        }
+        Logger.logEnvironmentEquivalencyFingerprintCacheMiss(environment: self)
+        let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
+        for (key, value) in snapshot.values {
+            guard key.isEquivalent(self[key], value, context) else {
+                cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = false
+                Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
+                    environment: self,
+                    key: key,
+                    context: context
+                )
+                Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
+                return false
+            }
+        }
+        Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
+        Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
+        cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = true
+        return true
+
     }
 
 
@@ -168,14 +189,33 @@ extension CacheStorage {
 
     fileprivate struct EnvironmentFingerprintCache {
 
-        typealias EquivalencyResult = [EquivalencyContext: Bool]
-        var storage: [ComparableFingerprint.Value: [EquivalencyContext: Bool]] = [:]
+        struct Key: Hashable {
+            let lhs: ComparableFingerprint.Value
+            let rhs: ComparableFingerprint.Value
+            let scope: Set<ObjectIdentifier>?
 
-        public subscript(fingerprint: ComparableFingerprint, context: EquivalencyContext) -> Bool? {
+            init(_ lhs: ComparableFingerprint.Value, _ rhs: ComparableFingerprint.Value, scope: Set<ObjectIdentifier>?) {
+                // Sort lhs/rhs so we don't have diff results based on caller.
+                self.lhs = min(lhs, rhs)
+                self.rhs = max(lhs, rhs)
+                self.scope = scope
+            }
+        }
+
+        typealias EquivalencyResult = [EquivalencyContext: Bool]
+        var storage: [Key: [EquivalencyContext: Bool]] = [:]
+
+        public subscript(
+            lhs: ComparableFingerprint,
+            rhs: ComparableFingerprint,
+            context: EquivalencyContext,
+            scope: Set<ObjectIdentifier>? = nil
+        ) -> Bool? {
             get {
-                if let exact = storage[fingerprint.value]?[context] {
+                let key = Key(lhs.value, rhs.value, scope: scope)
+                if let exact = storage[key]?[context] {
                     return exact
-                } else if let allComparisons = storage[fingerprint.value] {
+                } else if let allComparisons = storage[key] {
                     switch context {
                     case .all:
                         // If we're checking for equivalency in ALL contexts, we can short circuit based on any case where equivalency is false.
@@ -197,7 +237,7 @@ extension CacheStorage {
                 }
             }
             set {
-                storage[fingerprint.value, default: [:]][context] = newValue
+                storage[Key(lhs.value, rhs.value, scope: scope), default: [:]][context] = newValue
             }
         }
 
