@@ -16,7 +16,6 @@ public struct ElementContent {
         measure(
             in: constraint,
             environment: environment,
-            cacheName: "ElementContent",
             layoutMode: RenderContext.current?.layoutMode ?? environment.layoutMode
         )
     }
@@ -24,14 +23,19 @@ public struct ElementContent {
     func measure(
         in constraint: SizeConstraint,
         environment: Environment,
-        cacheName: String,
         layoutMode: LayoutMode
     ) -> CGSize {
+        let root = ElementStateRoot()
+
         let node = LayoutTreeNode(
-            path: cacheName,
+            path: .empty, // TODO: Seems wrong; maybe we need a "MeasuringRootElement" here?
             signpostRef: SignpostToken(),
-            options: layoutMode.options
+            options: layoutMode.options,
+            getState: {
+                root[$0]
+            }
         )
+
         return sizeThatFits(
             proposal: constraint,
             environment: environment,
@@ -247,6 +251,17 @@ extension ElementContent {
         measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
         storage = MeasurableStorage(measurer: measureFunction)
+    }
+
+    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
+    ///
+    /// - parameter cacheValue: Poopin' ayyyy lmao (todo)
+    /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
+    public init(
+        cacheValue: any Equatable,
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+    ) {
+        storage = CachingMeasurableStorage(cacheValue: cacheValue, measurer: measureFunction)
     }
 
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.

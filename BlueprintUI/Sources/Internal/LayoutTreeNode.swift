@@ -21,29 +21,52 @@ final class LayoutTreeNode {
     typealias SubnodeKey = ElementIdentifier
 
     private var subnodes: [SubnodeKey: Subnode] = [:]
+    private let getState: (ElementPath) -> ElementState
 
-    let path: String
+    private var _state: ElementState?
+
+    var state: ElementState {
+        if let existing = _state {
+            return existing
+        } else {
+            let new = getState(path)
+            _state = new
+            return new
+        }
+    }
+
+    let path: ElementPath
     let sizeCache: HintingSizeCache
 
     // These commonly used properties have dedicated storage. If we need to hang more generalized
     // things off this type we may want to store them in a heterogeneous dictionary.
     private var _associatedCache: Any?
 
-    init(path: String, signpostRef: AnyObject, options: LayoutOptions) {
+    init(
+        path: ElementPath,
+        signpostRef: AnyObject,
+        options: LayoutOptions,
+        getState: @escaping (ElementPath) -> ElementState
+    ) {
         self.path = path
         sizeCache = HintingSizeCache(path: path, signpostRef: signpostRef, options: options)
+        self.getState = getState
     }
 
     func subnode(key: SubnodeKey) -> Subnode {
         if let subnode = subnodes[key] {
             return subnode
         }
+
         let subnode = Subnode(
-            path: "\(path)/\(key)",
+            path: path.appending(identifier: key),
             signpostRef: sizeCache.signpostRef,
-            options: sizeCache.options
+            options: sizeCache.options,
+            getState: getState
         )
+
         subnodes[key] = subnode
+
         return subnode
     }
 

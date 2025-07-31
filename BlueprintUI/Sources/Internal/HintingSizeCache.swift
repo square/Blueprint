@@ -15,11 +15,11 @@ final class HintingSizeCache {
     private var hasUnconstrainedWidth: Bool = false
     private var hasUnconstrainedHeight: Bool = false
 
-    let path: String
+    let path: ElementPath
     let signpostRef: AnyObject
     let options: Options
 
-    init(path: String, signpostRef: AnyObject, options: Options) {
+    init(path: ElementPath, signpostRef: AnyObject, options: Options) {
         self.path = path
         self.signpostRef = signpostRef
         self.options = options
@@ -27,7 +27,7 @@ final class HintingSizeCache {
 
     func get(key: Key, or create: (Key) -> Value) -> Value {
         if let size = values[key] {
-            Logger.logCacheHit(object: signpostRef, description: path, constraint: key)
+            Logger.logCacheHit(object: signpostRef, description: path.description, constraint: key)
             return size
         }
 
@@ -59,7 +59,7 @@ final class HintingSizeCache {
             {
                 Logger.logCacheUnconstrainedSearchMatch(
                     object: signpostRef,
-                    description: path,
+                    description: path.description,
                     constraint: key,
                     match: .init(width: key.width, height: .unconstrained)
                 )
@@ -76,7 +76,7 @@ final class HintingSizeCache {
             {
                 Logger.logCacheUnconstrainedSearchMatch(
                     object: signpostRef,
-                    description: path,
+                    description: path.description,
                     constraint: key,
                     match: .init(width: .unconstrained, height: key.height)
                 )
@@ -89,7 +89,7 @@ final class HintingSizeCache {
         // cases, such as deeply nested stacks. Enable it manually if you want this statistic.
         // Logger.logCacheMiss(object: signpostRef, description: path, constraint: key)
 
-        Logger.logMeasureStart(object: signpostRef, description: path, constraint: key)
+        Logger.logMeasureStart(object: signpostRef, description: path.description, constraint: key)
         let size = create(key)
         Logger.logMeasureEnd(object: signpostRef)
 

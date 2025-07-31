@@ -26,4 +26,29 @@ public protocol EnvironmentKey {
     /// The default value that will be vended by an `Environment` for this key if no other value
     /// has been set.
     static var defaultValue: Self.Value { get }
+
+    /// Equivalency check on the `Value`s of `EnvironmentKey`s. This should return false if the
+    /// difference in values affects the measurement or layout of consuming elements.
+    static func isEquivalent(_ lhs: Value, _ rhs: Value) -> Bool
+}
+
+extension EnvironmentKey where Value: Equatable {
+
+    public static func isEquivalent(_ lhs: Value, _ rhs: Value) -> Bool {
+        lhs == rhs
+    }
+}
+
+extension EnvironmentKey {
+    static func areValuesEqual(_ lhs: Any?, _ rhs: Any?) -> Bool {
+        if lhs == nil && rhs == nil { return true }
+
+        guard let lhs = lhs as? Value,
+              let rhs = rhs as? Value
+        else {
+            return false
+        }
+
+        return Self.isEquivalent(lhs, rhs)
+    }
 }

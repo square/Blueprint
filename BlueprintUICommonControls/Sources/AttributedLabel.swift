@@ -131,13 +131,16 @@ public struct AttributedLabel: Element, Hashable {
     private static let prototypeLabel = LabelView()
 
     public var content: ElementContent {
-
-        // We create this outside of the measurement block so it's called fewer times.
-        let text = displayableAttributedText
-
-        return ElementContent { constraint, environment -> CGSize in
+        ElementContent(cacheValue: self) { constraint, environment -> CGSize in
             let label = Self.prototypeLabel
-            label.update(model: self, text: text, environment: environment, isMeasuring: true)
+
+            label.update(
+                model: self,
+                text: displayableAttributedText,
+                environment: environment,
+                isMeasuring: true
+            )
+
             return label.sizeThatFits(constraint.maximum)
         }
     }

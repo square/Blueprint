@@ -40,6 +40,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private var state: ElementStateRoot = ElementStateRoot()
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -50,8 +52,7 @@ public final class BlueprintView: UIView {
     /// environment, the values from this environment will take priority over the inherited environment.
     public var environment: Environment {
         didSet {
-            // Shortcut: If both environments were empty, nothing changed.
-            if oldValue.isEmpty && environment.isEmpty { return }
+            if oldValue == environment { return }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -230,6 +231,8 @@ public final class BlueprintView: UIView {
             return .zero
         }
 
+        // TODO: How should this interact with the cache? It doesn't, for now!
+
         if let cachedSize = sizesThatFit[constraint] {
             return cachedSize
         }
@@ -251,7 +254,7 @@ public final class BlueprintView: UIView {
             element.content.measure(
                 in: constraint,
                 environment: environment,
-                cacheName: cacheName,
+                // cacheName: cacheName, TODO: bring his back with a name instead of path
                 layoutMode: layoutMode
             )
         }
@@ -413,12 +416,15 @@ public final class BlueprintView: UIView {
 
         // Perform layout.
         // Wrap in a RenderContext to ensure any out-of-band operations inherit the same context.
-        layoutResult = renderContext.perform {
-            element?.layout(
-                frame: rootFrame,
-                environment: environment,
-                layoutMode: layoutMode
-            )
+        layoutResult = state.perform {
+            renderContext.perform {
+                element?.layout(
+                    frame: rootFrame,
+                    environment: environment,
+                    layoutMode: layoutMode,
+                    state: state
+                )
+            }
         }
 
         // Flatten into tree of view descriptions

@@ -10,14 +10,24 @@ extension Element {
     ///   - environment: the root environment
     ///   - layoutMode: the mode to use for layout
     /// - Returns: A layout result
-    func layout(frame: CGRect, environment: Environment, layoutMode: LayoutMode) -> LayoutResultNode {
+    func layout(
+        frame: CGRect,
+        environment: Environment,
+        layoutMode: LayoutMode,
+        state: ElementStateRoot
+    ) -> LayoutResultNode {
         caffeinatedLayout(
             frame: frame,
             environment: environment,
+            state: state,
             node: LayoutTreeNode(
-                path: "\(type(of: self))",
+                // TODO: Make this nicer probably?
+                path: .empty.appending(identifier: .init(elementType: Self.self, key: nil, count: 0)),
                 signpostRef: SignpostToken(),
-                options: layoutMode.options
+                options: layoutMode.options,
+                getState: {
+                    state[$0] // TODO: Weak somehow? Not sure if cycle
+                }
             )
         )
     }
@@ -25,8 +35,10 @@ extension Element {
     private func caffeinatedLayout(
         frame: CGRect,
         environment: Environment,
-        node: LayoutTreeNode
+        state: ElementStateRoot,
+        node: LayoutTreeNode,
     ) -> LayoutResultNode {
+
         let children = content.performCaffeinatedLayout(
             frame: frame,
             environment: environment,
@@ -55,18 +67,6 @@ struct LayoutResultNode {
 
     /// The element's children.
     var children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
-
-    init(
-        element: Element,
-        layoutAttributes: LayoutAttributes,
-        environment: Environment,
-        children: [(identifier: ElementIdentifier, node: LayoutResultNode)]
-    ) {
-        self.element = element
-        self.layoutAttributes = layoutAttributes
-        self.environment = environment
-        self.children = children
-    }
 }
 
 
