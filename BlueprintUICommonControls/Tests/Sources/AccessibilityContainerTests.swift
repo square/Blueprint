@@ -154,4 +154,26 @@ class AccessibilityContainerTests: XCTestCase {
 
         XCTAssertNil(accessibleSubviews.first)
     }
+
+    func test_elements_override() {
+
+        let accessibleView = UIView()
+        accessibleView.isAccessibilityElement = true
+
+        let containerView = AccessibilityContainer.AccessibilityContainerView()
+        containerView.addSubview(accessibleView)
+
+        let elements = containerView.accessibilityElements
+
+        XCTAssertEqual(elements?.first as? UIView, accessibleView)
+
+        let overrideElement = NSObject()
+        overrideElement.isAccessibilityElement = true
+
+        containerView.elements = [overrideElement]
+
+        let overriden = containerView.accessibilityElements
+        XCTAssertEqual(overriden?.first as? NSObject, overrideElement)
+
+    }
 }
