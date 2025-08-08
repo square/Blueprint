@@ -78,6 +78,72 @@ final class AccessibilityViewController: UIViewController {
                     traits: [.staticText],
                     userInputLabels: ["Short Input Label"]
                 )
+            Row {
+                Button(
+                    wrapping: Label(text: "Large content item 1", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemBlue)
+                )
+                .accessibilityShowsLargeContentViewer(
+                    display: .title("Large content item 1 display text", nil),
+                    interactionEndedCallback: { print("Interaction ended on item 1 at: \($0)") }
+                )
+                Button(
+                    wrapping: Label(text: "Large content item 2", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemGreen)
+                )
+                .accessibilityShowsLargeContentViewer(
+                    display: .title("Large content item 2 display text", nil),
+                    interactionEndedCallback: { print("Interaction ended on item 2 at: \($0)") }
+                )
+            }.accessibilityLargeContentViewerInteractionContainer()
+            Row {
+                Button(
+                    wrapping: Label(text: "Large content item 3", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemRed)
+                )
+                .accessibilityShowsLargeContentViewer(
+                    display: .title("Large content item 3 display text", nil),
+                    interactionEndedCallback: { print("Interaction ended on item 3 at: \($0)") }
+                )
+                Button(
+                    wrapping: Label(text: "Large content item 4", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemYellow)
+                )
+                .accessibilityShowsLargeContentViewer(
+                    display: .title("Large content item 4 display text", nil),
+                    interactionEndedCallback: { print("Interaction ended on item 4 at: \($0)") }
+                )
+            }.accessibilityLargeContentViewerInteractionContainer()
+            Row {
+                Button(
+                    wrapping: Label(text: "Non large content item", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemGray)
+                )
+                .accessibilityShowsLargeContentViewer(display: .none)
+                Button(
+                    wrapping: Label(text: "Large content item 5", configure: { label in
+                        label.color = .white
+                    })
+                    .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                    .box(background: .systemPurple)
+                )
+                .accessibilityShowsLargeContentViewer(display: .title("Large content item 5 display text", nil))
+            }.accessibilityLargeContentViewerInteractionContainer()
 
         }
         .accessibilityContainer()
