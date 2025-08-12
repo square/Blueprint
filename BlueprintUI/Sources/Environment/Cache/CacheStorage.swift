@@ -24,7 +24,7 @@ import UIKit
         #endif
     }
 
-    public subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
+    public subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheStorage.Key {
         get {
             storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
         }

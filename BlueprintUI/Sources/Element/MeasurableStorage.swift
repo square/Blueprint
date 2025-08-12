@@ -70,7 +70,7 @@ extension MeasurableStorage {
 
 extension CacheStorage {
 
-    private struct MeasurableStorageCacheKey: CacheKey {
+    private struct MeasurableStorageCacheKey: CacheStorage.Key {
         static var emptyValue = EnvironmentAndValueValidatingCache<
             MeasurableStorage.MeasurableSizeKey,
             CGSize,

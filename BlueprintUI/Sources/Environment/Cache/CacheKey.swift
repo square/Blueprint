@@ -3,13 +3,13 @@ import Foundation
 /// Types conforming to this protocol can be used as keys in `CacheStorage`.
 ///
 /// Using a type as the key allows us to strongly type each value, with the
-/// key's `CacheKey.Value` associated value.
+/// key's `CacheStorage.Key.Value` associated value.
 ///
 /// ## Example
 ///
 /// Usually a key is implemented with an uninhabited type, such an empty enum.
 ///
-///     enum WidgetCountsKey: CacheKey {
+///     enum WidgetCountsKey: CacheStorage.Key {
 ///         static let emptyValue: [WidgetID: Int] = [:]
 ///     }
 ///
@@ -21,7 +21,12 @@ import Foundation
 ///             set { self[WidgetCountsKey.self] = newValue }
 ///         }
 ///     }
-public protocol CacheKey {
-    associatedtype Value
-    static var emptyValue: Self.Value { get }
+///
+extension CacheStorage {
+
+    public protocol Key {
+        associatedtype Value
+        static var emptyValue: Self.Value { get }
+    }
+
 }

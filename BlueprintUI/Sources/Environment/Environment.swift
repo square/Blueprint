@@ -244,8 +244,8 @@ extension CacheStorage {
     }
 
     /// A cache of previously compared environments and their results.
-    private struct EnvironmentComparisonCacheKey: CacheKey {
-        static var emptyValue = EnvironmentFingerprintCache()
+    private struct EnvironmentComparisonCacheKey: CacheStorage.Key {
+        static let emptyValue = EnvironmentFingerprintCache()
     }
 
     fileprivate var environmentComparisonCache: EnvironmentFingerprintCache {

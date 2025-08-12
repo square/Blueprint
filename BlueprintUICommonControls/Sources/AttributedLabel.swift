@@ -957,8 +957,8 @@ fileprivate struct AttributedStringNormalizationKey: Hashable {
 }
 
 extension CacheStorage {
-    private struct AttributedStringNormalizationCacheKey: CacheKey {
-        static var emptyValue: [AttributedStringNormalizationKey: NSAttributedString] = [:]
+    private struct AttributedStringNormalizationCacheKey: CacheStorage.Key {
+        static let emptyValue: [AttributedStringNormalizationKey: NSAttributedString] = [:]
     }
 
     fileprivate var attributedStringNormalizationCache: [AttributedStringNormalizationKey: NSAttributedString] {
