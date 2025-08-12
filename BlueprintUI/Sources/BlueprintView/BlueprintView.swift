@@ -40,6 +40,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private var cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -52,6 +54,13 @@ public final class BlueprintView: UIView {
         didSet {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
+            // Shortcut: If there are no changes to the environment, then, well, nothing changed.
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isEquivalent(
+                to: environment,
+                in: .all
+            ) {
+                return
+            }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -86,6 +95,13 @@ public final class BlueprintView: UIView {
             if oldValue == nil && element == nil {
                 return
             }
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates, let contextuallyEquivalent = element as? ContextuallyEquivalent, contextuallyEquivalent.isEquivalent(
+                to: oldValue as? ContextuallyEquivalent,
+                in: .all
+            ) {
+                return
+            }
+            cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
 
             Logger.logElementAssigned(view: self)
 
@@ -148,6 +164,7 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
+        self.environment.cacheStorage = cacheStorage
 
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -542,8 +559,12 @@ public final class BlueprintView: UIView {
             environment.layoutMode = layoutMode
         }
 
+        environment.cacheStorage = cacheStorage
+
         return environment
     }
+
+
 
     private func handleAppeared() {
         rootController.traverse { node in
