@@ -43,7 +43,7 @@ jobs:
       run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
 
     - name: Install xcodes
-      run: brew install aria2 xcodesorg/made/xcodes
+      run: brew install aria2
 
     - name: Install iOS ${{ matrix.sdk }}
       if: ${{ matrix.installation_required }}
