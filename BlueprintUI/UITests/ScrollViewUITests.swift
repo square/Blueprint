@@ -29,6 +29,21 @@ final class ScrollViewUITests: XCTestCase {
         }
     }
 
+    func test_contentSafeAreaOverlapBehavior_givenOmittedVerticalOverlap() throws {
+        try setupScrollView(scrollableAxesSafeAreaEdges: .horizontal) { controller in
+            // Decrease the vertical safe area.
+            controller.additionalSafeAreaInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+            controller.view.layoutIfNeeded()
+
+            // No bouncing should be enabled because vertical checks are disabled
+            // and the content is horizontally within the safe area.
+            let uiScrollView = try controller.view.expectedChild(ofType: UIScrollView.self)
+            XCTAssertEqual(uiScrollView.safeAreaInsets, UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+            XCTAssertFalse(uiScrollView.alwaysBounceVertical)
+            XCTAssertFalse(uiScrollView.alwaysBounceHorizontal)
+        }
+    }
+
     func test_contentSafeAreaOverlapBehavior_givenHorizontalOverlap() throws {
         try setupScrollView { controller in
             // Decrease the horizontal safe area.
@@ -44,6 +59,21 @@ final class ScrollViewUITests: XCTestCase {
         }
     }
 
+    func test_contentSafeAreaOverlapBehavior_givenOmittedHorizontalOverlap() throws {
+        try setupScrollView(scrollableAxesSafeAreaEdges: .vertical) { controller in
+            // Decrease the horizontal safe area.
+            controller.additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+            controller.view.layoutIfNeeded()
+
+            // No bouncing should be enabled because horizontal checks are disabled
+            // and the content is vertically within the safe area.
+            let uiScrollView = try controller.view.expectedChild(ofType: UIScrollView.self)
+            XCTAssertEqual(uiScrollView.safeAreaInsets, UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10))
+            XCTAssertFalse(uiScrollView.alwaysBounceVertical)
+            XCTAssertFalse(uiScrollView.alwaysBounceHorizontal)
+        }
+    }
+
     func test_contentSafeAreaOverlapBehavior_givenOutsideScrollViewBounds() throws {
         try setupScrollView(testSize: CGSize(width: 9999, height: 9999)) { controller in
             // No bouncing should be enabled because content is outside the bounds
@@ -56,12 +86,12 @@ final class ScrollViewUITests: XCTestCase {
     }
 
     func test_contentSafeAreaOverlapBehavior_givenIgnoredSafeArea() throws {
-        try setupScrollView(contentSafeAreaOverlapBehavior: .ignoreSafeArea) { controller in
+        try setupScrollView(scrollableAxesSafeAreaEdges: []) { controller in
             // Decrease the safe area.
             controller.additionalSafeAreaInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
             controller.view.layoutIfNeeded()
 
-            // No bouncing should be enabled because we're ignoring the safe area.
+            // No bouncing should be enabled because we're ignoring all safe area edges.
             let uiScrollView = try controller.view.expectedChild(ofType: UIScrollView.self)
             XCTAssertEqual(uiScrollView.safeAreaInsets, UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10))
             XCTAssertFalse(uiScrollView.alwaysBounceVertical)
@@ -70,7 +100,7 @@ final class ScrollViewUITests: XCTestCase {
     }
 
     func setupScrollView(
-        contentSafeAreaOverlapBehavior: ScrollView.ContentSafeAreaOverlapBehavior = .includeSafeArea,
+        scrollableAxesSafeAreaEdges: ScrollView.SafeAreaEdge = .all,
         testSize: CGSize? = nil,
         _ test: (UIViewController
         ) throws -> Void
@@ -79,16 +109,11 @@ final class ScrollViewUITests: XCTestCase {
             // Pick a frame for the ScrollView that is completely inside the safe area.
             let scrollViewFrame = controller.view.safeAreaLayoutGuide.layoutFrame
 
-            // Make the content smaller than the ScrollView's bounds by default.
-            let content = Box().constrainedTo(
-                size: testSize ?? CGSize(
-                    width: scrollViewFrame.width - 1,
-                    height: scrollViewFrame.height - 1
-                )
-            )
+            // Make the content equal to the ScrollView's bounds by default.
+            let content = Box().constrainedTo(size: testSize ?? scrollViewFrame.size)
             let scrollView = ScrollView(.fittingContent, wrapping: content) { scrollView in
                 scrollView.contentInsetAdjustmentBehavior = .scrollableAxes
-                scrollView.contentSafeAreaOverlapBehavior = contentSafeAreaOverlapBehavior
+                scrollView.scrollableAxesSafeAreaEdges = scrollableAxesSafeAreaEdges
             }
             let containerView = BlueprintView(element: scrollView)
             containerView.frame = scrollViewFrame
