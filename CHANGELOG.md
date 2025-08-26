@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- Stopped installing xcodes in GitHub Actions file.
+
 ## [6.2.0] - 2025-08-08
 
 - Added support for accessibility large content viewer.
