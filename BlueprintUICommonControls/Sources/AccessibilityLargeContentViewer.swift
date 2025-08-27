@@ -212,8 +212,11 @@ extension Accessibility {
 }
 
 extension Accessibility {
+    public protocol LargeContentViewerInteractionContainerViewable: UIView {
+        var largeContentViewerInteraction: UILargeContentViewerInteraction? { get }
+    }
 
-    private final class LargeContentViewerInteractionContainerView: UIView, UILargeContentViewerInteractionDelegate {
+    private final class LargeContentViewerInteractionContainerView: UIView, LargeContentViewerInteractionContainerViewable, UILargeContentViewerInteractionDelegate {
 
         var largeContentViewerInteraction: UILargeContentViewerInteraction?
 

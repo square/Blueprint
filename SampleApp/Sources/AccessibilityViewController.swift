@@ -6,9 +6,25 @@ final class AccessibilityViewController: UIViewController {
 
     private let blueprintView = BlueprintView()
 
+    private var isLongPressButtonDark: Bool = false {
+        didSet {
+            if oldValue != isLongPressButtonDark {
+                update()
+            }
+        }
+    }
+
     override func loadView() {
         view = blueprintView
+    }
+
+    func update() {
         blueprintView.element = element
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        update()
     }
 
     var firstTrigger = AccessibilityFocus.Trigger()
@@ -144,7 +160,17 @@ final class AccessibilityViewController: UIViewController {
                 )
                 .accessibilityShowsLargeContentViewer(display: .title("Large content item 5 display text", nil))
             }.accessibilityLargeContentViewerInteractionContainer()
-
+            Row {
+                Label(text: "Long press large content", configure: { label in
+                    label.color = isLongPressButtonDark ? .white : .black
+                })
+                .inset(by: .init(top: 8.0, left: 8.0, bottom: 8.0, right: 8.0))
+                .box(background: isLongPressButtonDark ? .black : .lightGray)
+                .onLongPress {
+                    self.isLongPressButtonDark.toggle()
+                }
+                .accessibilityShowsLargeContentViewer(display: .title("Long press large content display text", nil))
+            }.accessibilityLargeContentViewerInteractionContainer()
         }
         .accessibilityContainer()
         .inset(uniform: 20)
