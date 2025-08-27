@@ -22,15 +22,21 @@ extension Element {
         largeContentImageInsets: UIEdgeInsets = .zero,
         interactionEndedCallback: ((CGPoint) -> Void)? = nil
     ) -> Element {
-        Accessibility.LargeContentViewer(
-            wrapping: self,
-            configuration: .init(
-                display: display,
-                scalesLargeContentImage: scalesLargeContentImage,
-                largeContentImageInsets: largeContentImageInsets,
-                interactionEndedCallback: interactionEndedCallback
+        EnvironmentReader { env in
+            assert(
+                env.isWrappedInLargeContentViewerContainer,
+                "accessibilityShowsLargeContentViewer() must be used in conjunction with accessibilityLargeContentViewerInteractionContainer()."
             )
-        )
+            return Accessibility.LargeContentViewer(
+                wrapping: self,
+                configuration: .init(
+                    display: display,
+                    scalesLargeContentImage: scalesLargeContentImage,
+                    largeContentImageInsets: largeContentImageInsets,
+                    interactionEndedCallback: interactionEndedCallback
+                )
+            )
+        }
     }
 }
 
@@ -191,7 +197,10 @@ extension Element {
     /// Elements that are wrapped in this container will be able to show a large content viewer and allow a user to swipe through them with one finger
     /// and have the HUD update in real time.
     public func accessibilityLargeContentViewerInteractionContainer() -> Element {
-        Accessibility.LargeContentViewerInteractionContainer(wrapping: self)
+        Accessibility.LargeContentViewerInteractionContainer(wrapping: self).adaptedEnvironment(
+            keyPath: \.isWrappedInLargeContentViewerContainer,
+            value: true
+        )
     }
 }
 
@@ -243,3 +252,13 @@ extension Accessibility {
     }
 }
 
+extension Environment {
+    private enum LargeContentViewerContainerKey: EnvironmentKey {
+        static let defaultValue = false
+    }
+
+    var isWrappedInLargeContentViewerContainer: Bool {
+        get { self[LargeContentViewerContainerKey.self] }
+        set { self[LargeContentViewerContainerKey.self] = newValue }
+    }
+}
