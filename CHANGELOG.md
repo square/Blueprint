@@ -15,9 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Exposed largeContentViewerInteraction on LargeContentViewer backing view via protocol.
-- Asserted (in debug mode) when large content viewer is not placed inside an interaction container.
-
 ### Deprecated
 
 ### Security
@@ -25,6 +22,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 ### Misc
+
+### Internal
+
+## [6.3.0] - 2025-08-28
+
+### Changed
+
+- Exposed largeContentViewerInteraction on LargeContentViewer backing view via protocol.
+- Asserted when large content viewer is not placed inside an interaction container.
 
 ### Internal
 
@@ -1268,8 +1274,9 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-
-[main]: https://github.com/square/Blueprint/compare/6.1.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.3.0...HEAD
+[6.2.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
+[6.2.0]: https://github.com/square/Blueprint/compare/6.1.0...6.2.0
 [6.1.0]: https://github.com/square/Blueprint/compare/6.0.0...6.1.0
 [6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
 [5.7.0]: https://github.com/square/Blueprint/compare/5.6.0...5.7.0
