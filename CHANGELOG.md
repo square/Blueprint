@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Exposed largeContentViewerInteraction on LargeContentViewer backing view via protocol.
+- Asserted (in debug mode) when large content viewer is not placed inside an interaction container.
+
 ### Deprecated
 
 ### Security
