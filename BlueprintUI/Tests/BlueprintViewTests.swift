@@ -228,7 +228,7 @@ class BlueprintViewTests: XCTestCase {
     }
 
     func test_baseEnvironment() {
-        enum TestValue {
+        enum TestValue: Equatable {
             case defaultValue
             case right
         }
