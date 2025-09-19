@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed warning for a cross-module conformance
+- Fixed warning by updating Package.swift to use the newer `swiftLanguageModes`
+
 ### Added
 
 ### Removed
