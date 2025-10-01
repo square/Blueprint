@@ -10,10 +10,10 @@ public struct LayoutOptions: Hashable {
     public static let `default` = LayoutOptions(
         hintRangeBoundaries: true,
         searchUnconstrainedKeys: true,
-        measureableStorageCache: true,
-        stringNormalizationCache: true,
-        skipUnneededSetNeedsViewHierarchyUpdates: true,
-        labelAttributedStringCache: true
+        measureableStorageCache: false,
+        stringNormalizationCache: false,
+        skipUnneededSetNeedsViewHierarchyUpdates: false,
+        labelAttributedStringCache: false
     )
 
     /// Enables aggressive cache hinting along the boundaries of the range between constraints and
