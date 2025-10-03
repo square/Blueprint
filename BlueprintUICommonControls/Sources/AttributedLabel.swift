@@ -336,19 +336,20 @@ extension AttributedLabel {
         }
 
         private func updateAccessibilityTraits(with model: AttributedLabel) {
-
-            if let traits = model.accessibilityTraits {
-
-                var traits = UIAccessibilityTraits(with: traits)
-
-                if traits.contains(.updatesFrequently) {
-                    /// `UILabel` has the `.staticText` trait by default.
-                    /// If we explicitly set `.updatesFrequently` this should be removed.
-                    traits.subtract(.staticText)
-                }
-
-                accessibilityTraits = traits
+            guard let traits = model.accessibilityTraits else {
+                accessibilityTraits = []
+                return
             }
+
+            var uiTraits = UIAccessibilityTraits(with: traits)
+
+            if uiTraits.contains(.updatesFrequently) {
+                /// `UILabel` has the `.staticText` trait by default.
+                /// If we explicitly set `.updatesFrequently` this should be removed.
+                uiTraits.subtract(.staticText)
+            }
+
+            accessibilityTraits = uiTraits
         }
 
         override func drawText(in rect: CGRect) {
