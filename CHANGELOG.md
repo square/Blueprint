@@ -9,10 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Applied empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
-- Fixed warning for a cross-module conformance
-- Fixed warning by updating Package.swift to use the newer `swiftLanguageModes`
-
 ### Added
 
 ### Removed
@@ -28,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.3.1] - 2025-10-08
+
+### Fixed
+
+- Applied empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
+- Fixed warning for a cross-module conformance
+- Fixed warning by updating Package.swift to use the newer `swiftLanguageModes`
 
 ## [6.3.0] - 2025-08-28
 
@@ -1278,8 +1282,9 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.3.0...HEAD
-[6.2.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
+[main]: https://github.com/square/Blueprint/compare/6.3.1...HEAD
+[6.3.1]: https://github.com/square/Blueprint/compare/6.3.0...6.3.1
+[6.3.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
 [6.2.0]: https://github.com/square/Blueprint/compare/6.1.0...6.2.0
 [6.1.0]: https://github.com/square/Blueprint/compare/6.0.0...6.1.0
 [6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
@@ -1427,5 +1432,3 @@ searchField
 [#19]: https://github.com/square/Blueprint/pull/19
 [#18]: https://github.com/square/Blueprint/pull/18
 [#15]: https://github.com/square/Blueprint/pull/15
-[5.1.0]: https://github.com/square/Blueprint/compare/5.0.1...5.1.0
-[5.2.0]: https://github.com/square/Blueprint/compare/5.1.0...5.2.0
