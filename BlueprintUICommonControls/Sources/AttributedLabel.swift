@@ -830,7 +830,7 @@ extension AttributedLabel {
 
             self.sourceLabel = sourceLabel
             self.link = link
-            super.init(accessibilityContainer: link.container)
+            super.init(accessibilityContainer: link.container as Any)
         }
 
         var frame: CGRect {
@@ -891,7 +891,7 @@ extension Element {
 
 // MARK: Extensions
 
-extension UIOffset: Hashable {
+extension UIOffset: Swift.Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(horizontal)
         hasher.combine(vertical)
