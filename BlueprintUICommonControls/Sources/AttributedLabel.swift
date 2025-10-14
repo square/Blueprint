@@ -92,7 +92,7 @@ public struct AttributedLabel: Element, Hashable {
     /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
-    /// An array containing `AccessibilityElement.Content`to supplement the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
+    /// An array containing `AccessibilityElement.CustomContent`to supplement the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
     public var accessibilityCustomContent: [AccessibilityElement.CustomContent] = []
 
     /// A set of data types to detect and automatically link in the label.
