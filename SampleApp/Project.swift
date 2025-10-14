@@ -12,7 +12,14 @@ let project = Project(
 
         .app(
             name: "SampleApp",
-            sources: ["Sources/**"]
+            sources: ["Sources/**"],
+            scripts: [
+                .pre(
+                    path: .relativeToRoot("../Scripts/extract_english_strings.sh"),
+                    name: "Extract English Strings",
+                    basedOnDependencyAnalysis: true
+                ),
+            ]
         ),
 
         .app(
@@ -76,6 +83,12 @@ let project = Project(
                 ),
             ]
         ),
+
+        .unitTest(
+            for: "BlueprintUIAccessibilityCore",
+        ),
+
+
     ],
     schemes: [
         .scheme(
@@ -83,6 +96,7 @@ let project = Project(
             testAction: .targets(
                 [
                     "BlueprintUI-Tests",
+                    "BlueprintUIAccessibilityCore-Tests",
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
                     "BlueprintUICommonControls_UITests",
