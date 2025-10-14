@@ -26,7 +26,8 @@ extension Target {
         name: String,
         sources: ProjectDescription.SourceFilesList,
         resources: ProjectDescription.ResourceFileElements? = nil,
-        dependencies: [TargetDependency] = blueprintDependencies
+        dependencies: [TargetDependency] = blueprintDependencies,
+        scripts: [TargetScript] = []
     ) -> Self {
         .target(
             name: name,
@@ -42,6 +43,7 @@ extension Target {
             ),
             sources: sources,
             resources: resources,
+            scripts: scripts,
             dependencies: dependencies
         )
     }
