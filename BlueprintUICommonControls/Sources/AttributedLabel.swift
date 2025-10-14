@@ -92,6 +92,9 @@ public struct AttributedLabel: Element, Hashable {
     /// An array containing one or more `AccessibilityElement.CustomAction`s, defining additional supported actions. Assistive technologies, such as VoiceOver, will display your custom actions to the user at appropriate times.
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
+    /// An array containing `AccessibilityElement.Content`to supplement the element. Assistive technologies, such as VoiceOver, will announce your custom content to the user at appropriate times.
+    public var accessibilityCustomContent: [AccessibilityElement.CustomContent] = []
+
     /// A set of data types to detect and automatically link in the label.
     public var linkDetectionTypes: Set<LinkDetectionType> = []
 
@@ -190,7 +193,8 @@ extension AttributedLabel {
 
 extension AttributedLabel {
 
-    final class LabelView: UILabel {
+    final class LabelView: UILabel, AXCustomContentProvider {
+
         /// The touch handling logic explicitly tracks the active links when touches begin, so if you drag outside
         /// the link and touch up over another link, it just cancels the tap rather than accidentally opening
         /// a different link.
@@ -218,6 +222,8 @@ extension AttributedLabel {
             set { assertionFailure("accessibilityCustomRotors is not settable.") }
             get { !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : [] }
         }
+
+        public var accessibilityCustomContent: [AXCustomContent]! = []
 
         override var canBecomeFocused: Bool { false }
 
@@ -288,6 +294,7 @@ extension AttributedLabel {
                 accessibilityCustomActions = model.accessibilityCustomActions.map { action in
                     UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
                 }
+                accessibilityCustomContent = model.accessibilityCustomContent.map(AXCustomContent.init)
             }
 
             urlHandler = environment.urlHandler

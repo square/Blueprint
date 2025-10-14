@@ -160,7 +160,7 @@ extension Accessibility {
 
 // MARK: - Custom Content
 extension Accessibility {
-    public struct CustomContent: Equatable {
+    public struct CustomContent: Equatable, Hashable {
         /// The importance of the content.
         public enum Importance: Equatable {
             /// By default custom content is available through the rotor.
