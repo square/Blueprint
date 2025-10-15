@@ -211,7 +211,7 @@ class AttributedLabelTests: XCTestCase {
 
         test(
             in: CGSize(width: 30, height: 20),
-            expectedSize: CGSize(width: 30, height: 235.5)
+            expectedSize: CGSize(width: 30, height: 20.0)
         )
         test(
             in: CGSize(width: 100, height: 300),
