@@ -66,6 +66,7 @@ jobs:
       if: ${{ failure() }}
       run: |
         git ls-files -mo BlueprintUICommonControls/Tests/Sources/Resources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
+        git ls-files -mo BlueprintUICommonControls/AccessibilitySnapshotTests/__Snapshots__ | xargs tar -cvf accessibility_snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
       uses: actions/upload-artifact@v4
@@ -78,5 +79,5 @@ jobs:
       uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
-        name: TestResult.xcresult
+        name: TestResult-${{ matrix.sdk }}.xcresult
         path: TestResult.xcresult

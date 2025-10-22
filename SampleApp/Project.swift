@@ -76,6 +76,19 @@ let project = Project(
                 ),
             ]
         ),
+        .target(
+            name: "BlueprintUICommonControls_AccessibilitySnapshotTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "$(inherited).AccessibilitySnapshotTests",
+            deploymentTargets: blueprintDeploymentTargets,
+            sources: ["../BlueprintUICommonControls/AccessibilitySnapshotTests/**"],
+            dependencies: [
+                .target(name: "BlueprintUICommonControls_TestHost"),
+                .external(name: "AccessibilitySnapshot"),
+                .external(name: "SnapshotTesting"),
+            ]
+        ),
     ],
     schemes: [
         .scheme(
@@ -86,6 +99,7 @@ let project = Project(
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
                     "BlueprintUICommonControls_UITests",
+                    "BlueprintUICommonControls_AccessibilitySnapshotTests",
                 ]
             )
         ),
