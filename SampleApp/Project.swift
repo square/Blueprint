@@ -77,12 +77,12 @@ let project = Project(
             ]
         ),
         .target(
-            name: "BlueprintUICommonControls_SnapshotTests",
+            name: "BlueprintUICommonControls_AccessibilitySnapshotTests",
             destinations: .iOS,
             product: .unitTests,
-            bundleId: "$(inherited).SnapshotTests",
+            bundleId: "$(inherited).AccessibilitySnapshotTests",
             deploymentTargets: blueprintDeploymentTargets,
-            sources: ["../BlueprintUICommonControls/SnapshotTests/**"],
+            sources: ["../BlueprintUICommonControls/AccessibilitySnapshotTests/**"],
             dependencies: [
                 .target(name: "BlueprintUICommonControls_TestHost"),
                 .external(name: "AccessibilitySnapshot"),
@@ -99,7 +99,7 @@ let project = Project(
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
                     "BlueprintUICommonControls_UITests",
-                    "BlueprintUICommonControls_SnapshotTests",
+                    "BlueprintUICommonControls_AccessibilitySnapshotTests",
                 ]
             )
         ),
