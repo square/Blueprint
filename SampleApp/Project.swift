@@ -82,7 +82,7 @@ let project = Project(
             product: .unitTests,
             bundleId: "$(inherited).AccessibilitySnapshotTests",
             deploymentTargets: blueprintDeploymentTargets,
-            sources: ["../BlueprintUICommonControls/AccessibilitySnapshotTests/**"],
+            sources: ["../BlueprintUI/Tests/Extensions/**", "../BlueprintUICommonControls/AccessibilitySnapshotTests/**"],
             dependencies: [
                 .target(name: "BlueprintUICommonControls_TestHost"),
                 .external(name: "AccessibilitySnapshot"),

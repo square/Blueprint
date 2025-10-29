@@ -90,65 +90,6 @@ extension XCTestCase {
         return "\(iosVersionString)_\(screenSizeString)@\(Int(screenScale))x"
     }
 
-    /// Show a view controller in the test host application during a unit test.
-    /// This is a simplified version of the show(vc:) method from XCTestCase+AppHost.
-    public func show<ViewController: UIViewController>(
-        vc viewController: ViewController,
-        loadAndPlaceView: Bool = true,
-        test: (ViewController) throws -> Void
-    ) rethrows {
-        var temporaryWindow: UIWindow? = nil
-
-        func rootViewController() -> UIViewController {
-            if let rootVC = UIApplication.shared.delegate?.window??.rootViewController {
-                return rootVC
-            } else {
-                let window = UIWindow(frame: UIScreen.main.bounds)
-                let rootVC = UIViewController()
-                window.rootViewController = rootVC
-                window.makeKeyAndVisible()
-
-                temporaryWindow = window
-                return rootVC
-            }
-        }
-
-        let rootVC = rootViewController()
-
-        rootVC.addChild(viewController)
-        viewController.didMove(toParent: rootVC)
-
-        if loadAndPlaceView {
-            viewController.view.frame = rootVC.view.bounds
-            viewController.view.layoutIfNeeded()
-
-            rootVC.beginAppearanceTransition(true, animated: false)
-            rootVC.view.addSubview(viewController.view)
-            rootVC.endAppearanceTransition()
-        }
-
-        defer {
-            if loadAndPlaceView {
-                viewController.beginAppearanceTransition(false, animated: false)
-                viewController.view.removeFromSuperview()
-                viewController.endAppearanceTransition()
-            }
-
-            viewController.willMove(toParent: nil)
-            viewController.removeFromParent()
-
-            if let window = temporaryWindow {
-                window.resignKey()
-                window.isHidden = true
-                window.rootViewController = nil
-            }
-        }
-
-        try autoreleasepool {
-            try test(viewController)
-        }
-    }
-
     /// Creates a UIViewController from a Blueprint Element for testing purposes.
     ///
     /// This method wraps the provided Element in a BlueprintView and hosts it in a
