@@ -92,8 +92,9 @@ extension XCTestCase {
 
     /// Show a view controller in the test host application during a unit test.
     /// This is a simplified version of the show(vc:) method from XCTestCase+AppHost.
-    private func show<ViewController: UIViewController>(
+    public func show<ViewController: UIViewController>(
         vc viewController: ViewController,
+        loadAndPlaceView: Bool = true,
         test: (ViewController) throws -> Void
     ) rethrows {
         var temporaryWindow: UIWindow? = nil
@@ -117,17 +118,21 @@ extension XCTestCase {
         rootVC.addChild(viewController)
         viewController.didMove(toParent: rootVC)
 
-        viewController.view.frame = rootVC.view.bounds
-        viewController.view.layoutIfNeeded()
+        if loadAndPlaceView {
+            viewController.view.frame = rootVC.view.bounds
+            viewController.view.layoutIfNeeded()
 
-        rootVC.beginAppearanceTransition(true, animated: false)
-        rootVC.view.addSubview(viewController.view)
-        rootVC.endAppearanceTransition()
+            rootVC.beginAppearanceTransition(true, animated: false)
+            rootVC.view.addSubview(viewController.view)
+            rootVC.endAppearanceTransition()
+        }
 
         defer {
-            viewController.beginAppearanceTransition(false, animated: false)
-            viewController.view.removeFromSuperview()
-            viewController.endAppearanceTransition()
+            if loadAndPlaceView {
+                viewController.beginAppearanceTransition(false, animated: false)
+                viewController.view.removeFromSuperview()
+                viewController.endAppearanceTransition()
+            }
 
             viewController.willMove(toParent: nil)
             viewController.removeFromParent()
