@@ -16,7 +16,7 @@ class AccessibilityModifierSnapshotTests: XCTestCase {
                 traits: [.button]
             )
 
-        assertAccessibilitySnapshot(of: content, record: true)
+        assertAccessibilitySnapshot(of: content)
     }
 
     func test_accessibility_element_with_hint() {
