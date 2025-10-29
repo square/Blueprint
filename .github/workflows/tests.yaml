@@ -66,7 +66,6 @@ jobs:
       if: ${{ failure() }}
       run: |
         git ls-files -mo BlueprintUICommonControls/Tests/Sources/Resources/ReferenceImages | xargs tar -cvf snapshot_changes_${{ matrix.sdk }}.tar
-        git ls-files -mo BlueprintUICommonControls/AccessibilitySnapshotTests/__Snapshots__ | xargs tar -cvf accessibility_snapshot_changes_${{ matrix.sdk }}.tar
 
     - name: Archive snapshot changes
       uses: actions/upload-artifact@v4
@@ -74,10 +73,67 @@ jobs:
       with:
         name: snapshot_changes_${{ matrix.sdk }}
         path: snapshot_changes_${{ matrix.sdk }}.tar
-        
+
     - name: Archive TestResult
       uses: actions/upload-artifact@v4
       if: ${{ failure() }}
       with:
         name: TestResult-${{ matrix.sdk }}.xcresult
+        path: TestResult.xcresult
+
+  accessibility-snapshots:
+    name: "Accessibility Snapshots - iOS 16.2"
+
+    runs-on: macos-15-xlarge
+
+    env:
+      TUIST_TEST_DEVICE: iPhone SE (3rd generation)
+      TUIST_TEST_PLATFORM: iOS
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: jdx/mise-action@v2
+
+    - name: Read env
+      run: cat .github/workflows/env.properties >> $GITHUB_ENV
+
+    - name: Switch to Xcode ${{ env.xcode_version }}
+      run: sudo xcode-select -s /Applications/Xcode_${{ env.xcode_version }}.app
+
+    - name: Install aria2
+      run: brew install aria2
+
+    - name: Install iOS 16.2
+      run: sudo xcodes runtimes install "iOS 16.2"
+
+    - name: Ensure sim exists
+      run: |
+        xcrun simctl create \
+          "${{ env.TUIST_TEST_DEVICE }}" \
+          "${{ env.TUIST_TEST_DEVICE }}" \
+          "com.apple.CoreSimulator.SimRuntime.iOS-16-2"
+
+    - name: Install dependencies
+      run: tuist install --path SampleApp
+
+    - name: Build & Test (AccessibilitySnapshotTests scheme)
+      run: tuist test --path SampleApp --os 16.2 AccessibilitySnapshotTests -- -resultBundlePath TestResult
+
+    - name: Package accessibility snapshot changes
+      if: ${{ failure() }}
+      run: |
+        git ls-files -mo BlueprintUICommonControls/AccessibilitySnapshotTests/__Snapshots__ | xargs tar -cvf accessibility_snapshot_changes.tar
+
+    - name: Archive accessibility snapshot changes
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
+      with:
+        name: accessibility_snapshot_changes
+        path: accessibility_snapshot_changes.tar
+
+    - name: Archive TestResult
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() }}
+      with:
+        name: TestResult-accessibility-snapshots-16.2.xcresult
         path: TestResult.xcresult
