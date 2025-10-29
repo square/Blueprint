@@ -120,9 +120,9 @@ extension XCTestCase {
         viewController.view.frame = rootVC.view.bounds
         viewController.view.layoutIfNeeded()
 
-        viewController.beginAppearanceTransition(true, animated: false)
+        rootVC.beginAppearanceTransition(true, animated: false)
         rootVC.view.addSubview(viewController.view)
-        viewController.endAppearanceTransition()
+        rootVC.endAppearanceTransition()
 
         defer {
             viewController.beginAppearanceTransition(false, animated: false)
