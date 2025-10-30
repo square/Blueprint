@@ -99,6 +99,13 @@ let project = Project(
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
                     "BlueprintUICommonControls_UITests",
+                ]
+            )
+        ),
+        .scheme(
+            name: "AccessibilitySnapshotTests",
+            testAction: .targets(
+                [
                     "BlueprintUICommonControls_AccessibilitySnapshotTests",
                 ]
             )

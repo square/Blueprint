@@ -62,6 +62,10 @@ jobs:
     - name: Build & Test
       run: tuist test --path SampleApp --os ${{ matrix.sdk }} UnitTests -- -resultBundlePath TestResult
 
+    - name: Build & Test Accessibility Snapshots (iOS ${{ env.accessibility_snapshot_ios_version }} only)
+      if: ${{ matrix.sdk == env.accessibility_snapshot_ios_version }}
+      run: tuist test --path SampleApp --os ${{ matrix.sdk }} AccessibilitySnapshotTests -- -resultBundlePath AccessibilityTestResult
+
     - name: Package snapshot changes
       if: ${{ failure() }}
       run: |
@@ -81,3 +85,10 @@ jobs:
       with:
         name: TestResult-${{ matrix.sdk }}.xcresult
         path: TestResult.xcresult
+
+    - name: Archive AccessibilityTestResult
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() && matrix.sdk == env.accessibility_snapshot_ios_version }}
+      with:
+        name: AccessibilityTestResult-${{ matrix.sdk }}.xcresult
+        path: AccessibilityTestResult.xcresult
