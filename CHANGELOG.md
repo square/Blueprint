@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Revert applying empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
+
 ### Added
 
 ### Removed
