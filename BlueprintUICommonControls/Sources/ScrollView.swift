@@ -407,7 +407,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     override func safeAreaInsetsDidChange() {
         super.safeAreaInsetsDidChange()
 
-        processScrollableAxesEdgeConfigurations()
+        updateContentEdgeConfigurations()
         applyContentInset()
     }
 
@@ -470,7 +470,7 @@ fileprivate final class ScrollerWrapperView: UIView {
             self.scrollView.contentInsetAdjustmentBehavior = scrollView.contentInsetAdjustmentBehavior
         }
 
-        processScrollableAxesEdgeConfigurations()
+        updateContentEdgeConfigurations()
 
         contentOffsetTrigger = scrollView.contentOffsetTrigger
 
@@ -479,27 +479,13 @@ fileprivate final class ScrollerWrapperView: UIView {
 
     /// This function will calculate how each edge of the content overflows or underflows
     /// the safe area and scroll view bounds.
-    func processScrollableAxesEdgeConfigurations() {
+    func updateContentEdgeConfigurations() {
         guard let contentFrame,
               representedElement.contentInsetAdjustmentBehavior == .scrollableAxes,
               !representedElement.scrollableAxesSafeAreaEdges.isEmpty
         else {
             contentEdgeConfigurations = .none
             return
-        }
-
-        /// Executes the `compute` handler if the `edge` is included in the option set.
-        func calculateConfiguration(edge: ScrollView.SafeAreaEdge, compute: () -> (ContentEdgeConfiguration)) -> ContentEdgeConfiguration {
-            guard representedElement.scrollableAxesSafeAreaEdges.contains(edge) else {
-                return .none
-            }
-            // UIKit will always honor safe areas when using bouncing.
-            if edge.isVertical && representedElement.alwaysBounceVertical {
-                return .none
-            } else if edge.isHorizontal && representedElement.alwaysBounceHorizontal {
-                return .none
-            }
-            return compute()
         }
 
         let topConfiguration = calculateConfiguration(edge: .top) {
@@ -543,6 +529,25 @@ fileprivate final class ScrollerWrapperView: UIView {
             bottom: bottomConfiguration,
             right: rightConfiguration
         )
+    }
+
+    /// Executes the `makeConfiguration` handler if the `edge` is included in
+    /// `representedElement.scrollableAxesSafeAreaEdges` and axis bouncing isn't already
+    /// set to always.
+    private func calculateConfiguration(
+        edge: ScrollView.SafeAreaEdge,
+        makeConfiguration: () -> (ContentEdgeConfiguration)
+    ) -> ContentEdgeConfiguration {
+        guard representedElement.scrollableAxesSafeAreaEdges.contains(edge) else {
+            return .none
+        }
+        // UIKit will always honor safe areas when using bouncing.
+        if edge.isVertical && representedElement.alwaysBounceVertical {
+            return .none
+        } else if edge.isHorizontal && representedElement.alwaysBounceHorizontal {
+            return .none
+        }
+        return makeConfiguration()
     }
 
     private func applyContentInset() {
