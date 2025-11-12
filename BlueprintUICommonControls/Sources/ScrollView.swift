@@ -43,9 +43,12 @@ public struct ScrollView: Element {
         public static let bottom = SafeAreaEdge(rawValue: 1 << 2)
         public static let right = SafeAreaEdge(rawValue: 1 << 3)
 
-        public static let all: Self = [.top, .left, .bottom, .right]
         public static let horizontal: Self = [.left, .right]
         public static let vertical: Self = [.top, .bottom]
+
+        /// Instead of providing all edges to `scrollableAxesSafeAreaEdges`, use
+        /// `ContentInsetAdjustmentBehavior.always` instead of `scrollableAxes`.
+        internal static let all: Self = [.top, .left, .bottom, .right]
 
         var isHorizontal: Bool {
             SafeAreaEdge.horizontal.contains(self)
@@ -488,40 +491,48 @@ fileprivate final class ScrollerWrapperView: UIView {
             return
         }
 
-        let topConfiguration = calculateConfiguration(edge: .top) {
-            ScrollView.calculateEdgeConfiguration(
+        let topConfiguration = calculateConfiguration(
+            edge: .top,
+            makeConfiguration: ScrollView.calculateEdgeConfiguration(
                 contentMinEdge: contentFrame.minY,
                 safeAreaMinEdge: safeAreaLayoutGuide.layoutFrame.minY,
                 boundsMinEdge: bounds.minY
             )
-        }
-        let leftConfiguration = calculateConfiguration(edge: .left) {
-            ScrollView.calculateEdgeConfiguration(
+        )
+        let leftConfiguration = calculateConfiguration(
+            edge: .left,
+            makeConfiguration: ScrollView.calculateEdgeConfiguration(
                 contentMinEdge: contentFrame.minX,
                 safeAreaMinEdge: safeAreaLayoutGuide.layoutFrame.minX,
                 boundsMinEdge: bounds.minX
             )
-        }
-        let bottomConfiguration = calculateConfiguration(edge: .bottom) {
-            let topInset = topConfiguration == .overflowsSafeArea ? safeAreaInsets.top : 0
-            return ScrollView.calculateEdgeConfiguration(
-                contentMaxEdge: contentFrame.maxY,
-                // The bottom calculation needs to account for the top adjustment.
-                adjustedMaxEdge: contentFrame.maxY + topInset,
-                safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxY,
-                boundsMaxEdge: bounds.maxY
-            )
-        }
-        let rightConfiguration = calculateConfiguration(edge: .right) {
-            let leftInset = leftConfiguration == .overflowsSafeArea ? safeAreaInsets.left : 0
-            return ScrollView.calculateEdgeConfiguration(
-                contentMaxEdge: contentFrame.maxX,
-                // The right calculation needs to account for the left adjustment.
-                adjustedMaxEdge: contentFrame.maxX + leftInset,
-                safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxX,
-                boundsMaxEdge: bounds.maxX
-            )
-        }
+        )
+        let bottomConfiguration = calculateConfiguration(
+            edge: .bottom,
+            makeConfiguration: {
+                let topInset = topConfiguration == .overflowsSafeArea ? safeAreaInsets.top : 0
+                return ScrollView.calculateEdgeConfiguration(
+                    contentMaxEdge: contentFrame.maxY,
+                    // The bottom calculation needs to account for the top adjustment.
+                    adjustedMaxEdge: contentFrame.maxY + topInset,
+                    safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxY,
+                    boundsMaxEdge: bounds.maxY
+                )
+            }()
+        )
+        let rightConfiguration = calculateConfiguration(
+            edge: .right,
+            makeConfiguration: {
+                let leftInset = leftConfiguration == .overflowsSafeArea ? safeAreaInsets.left : 0
+                return ScrollView.calculateEdgeConfiguration(
+                    contentMaxEdge: contentFrame.maxX,
+                    // The right calculation needs to account for the left adjustment.
+                    adjustedMaxEdge: contentFrame.maxX + leftInset,
+                    safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxX,
+                    boundsMaxEdge: bounds.maxX
+                )
+            }()
+        )
 
         contentEdgeConfigurations = .init(
             top: topConfiguration,
@@ -536,7 +547,7 @@ fileprivate final class ScrollerWrapperView: UIView {
     /// set to always.
     private func calculateConfiguration(
         edge: ScrollView.SafeAreaEdge,
-        makeConfiguration: () -> (ContentEdgeConfiguration)
+        makeConfiguration: @autoclosure () -> ContentEdgeConfiguration
     ) -> ContentEdgeConfiguration {
         guard representedElement.scrollableAxesSafeAreaEdges.contains(edge) else {
             return .none
@@ -709,14 +720,7 @@ struct ContentEdgeConfigurations {
     var bottom: ContentEdgeConfiguration
     var right: ContentEdgeConfiguration
 
-    static var none: Self {
-        ContentEdgeConfigurations(
-            top: .none,
-            left: .none,
-            bottom: .none,
-            right: .none
-        )
-    }
+    static let none = ContentEdgeConfigurations(top: .none, left: .none, bottom: .none, right: .none)
 }
 
 extension ScrollerWrapperView: KeyboardObserverDelegate {

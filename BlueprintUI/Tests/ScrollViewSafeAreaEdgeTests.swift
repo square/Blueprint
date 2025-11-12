@@ -1,8 +1,8 @@
 import BlueprintUI
-import BlueprintUICommonControls
 import XCTest
+@testable import BlueprintUICommonControls
 
-final class ScrollViewUITests: XCTestCase {
+final class ScrollViewSafeAreaEdgeTests: XCTestCase {
 
     func test_scrollableAxesSafeAreaEdges_givenNoOverlap() throws {
         try setupScrollView { controller in
