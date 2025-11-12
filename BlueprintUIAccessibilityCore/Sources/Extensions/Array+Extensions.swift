@@ -3,7 +3,7 @@ import Foundation
 
 extension [String?] {
     /// Joins non-empty optional strings into a single string formatted for use in accessibility contexts.
-    internal func joinedAccessibilityString() -> String? {
+    public func joinedAccessibilityString() -> String? {
         let joined = compactMap { $0 }
             .filter { !$0.isEmpty }
             .joined(separator: ", ")
