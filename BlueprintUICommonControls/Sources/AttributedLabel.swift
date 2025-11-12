@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import Foundation
 import UIKit
 
@@ -190,7 +191,8 @@ extension AttributedLabel {
 
 extension AttributedLabel {
 
-    final class LabelView: UILabel {
+    final class LabelView: UILabel, AccessibilityDeferral.Receiver {
+
         /// The touch handling logic explicitly tracks the active links when touches begin, so if you drag outside
         /// the link and touch up over another link, it just cancels the tap rather than accidentally opening
         /// a different link.
@@ -213,11 +215,6 @@ extension AttributedLabel {
 
         // Store bounding shapes in this cache to avoid costly recalculations
         private var boundingShapeCache: [Link: Link.BoundingShape] = [:]
-
-        override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
-            set { assertionFailure("accessibilityCustomRotors is not settable.") }
-            get { !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : [] }
-        }
 
         override var canBecomeFocused: Bool { false }
 
@@ -649,6 +646,8 @@ extension AttributedLabel {
             return false
         }
 
+        // MARK: - Touch Handling
+
         override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             guard links.isEmpty == false, let first = touches.first else {
                 return super.touchesBegan(touches, with: event)
@@ -708,6 +707,32 @@ extension AttributedLabel {
         private func invalidateLinkBoundingShapeCaches() {
             boundingShapeCache.removeAll()
         }
+
+
+        // MARK: - Accessibility Deferral and Custom Content
+
+        var rotorSequencer: AccessibilityComposition.RotorSequencer?
+        var customContent: [AccessibilityElement.CustomContent]?
+        var deferredAccessibilityContent: [AccessibilityDeferral.Content]?
+
+        public override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
+            set { assertionFailure("accessibilityCustomRotors is not settable.") }
+            get {
+                let links = !linkElements.isEmpty ? [linkElements.accessibilityRotor(systemType: .link)] : []
+                let sequenced = rotorSequencer?.rotors ?? []
+                return links + sequenced
+            }
+        }
+
+        public var accessibilityCustomContent: [AXCustomContent]! {
+            get {
+                let deferred = deferredAccessibilityContent?.compactMap { $0.customContent }
+                let applied = customContent?.map { AXCustomContent($0) }
+                return (applied + deferred)?.removingDuplicates ?? []
+            }
+            set { fatalError("Please set customContent var instead.") }
+        }
+
     }
 }
 

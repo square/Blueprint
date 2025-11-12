@@ -14,7 +14,7 @@ extension [String?] {
 extension Array where Element: Equatable {
 
     /// Returns an array where only the first instance of any duplicated element is included.
-    internal var removingDuplicates: Self {
+    public var removingDuplicates: Self {
         reduce([]) { $0.contains($1) ? $0 : $0 + [$1] }
     }
 }
