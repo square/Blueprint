@@ -18,16 +18,8 @@ public struct ScrollView: Element {
     /// This will ensure that the provided edges are always scrollable when overhanging
     /// the safe area.
     ///
-    /// The default value is the empty set, which leverages standard UIKit behavior.
-    public var scrollableAxesSafeAreaEdges: SafeAreaEdge = [] {
-        didSet {
-            didModifyScrollableAxesSafeAreaEdges = true
-        }
-    }
-
-    /// Determines whether `scrollableAxesSafeAreaEdges` has been modified by the
-    /// client or not.
-    public private(set) var didModifyScrollableAxesSafeAreaEdges: Bool = false
+    /// The empty set and `nil` both leverage standard UIKit behavior. Defaults to `nil`.
+    public var scrollableAxesSafeAreaEdges: SafeAreaEdge? = nil
 
     /// This model represents the various edges of the `ScrollView` safe area.
     public struct SafeAreaEdge: OptionSet {
@@ -484,8 +476,9 @@ fileprivate final class ScrollerWrapperView: UIView {
     /// the safe area and scroll view bounds.
     func updateContentEdgeConfigurations() {
         guard let contentFrame,
-              representedElement.contentInsetAdjustmentBehavior == .scrollableAxes,
-              !representedElement.scrollableAxesSafeAreaEdges.isEmpty
+              let edges = representedElement.scrollableAxesSafeAreaEdges,
+              !edges.isEmpty,
+              representedElement.contentInsetAdjustmentBehavior == .scrollableAxes
         else {
             contentEdgeConfigurations = .none
             return
@@ -549,7 +542,7 @@ fileprivate final class ScrollerWrapperView: UIView {
         edge: ScrollView.SafeAreaEdge,
         makeConfiguration: @autoclosure () -> ContentEdgeConfiguration
     ) -> ContentEdgeConfiguration {
-        guard representedElement.scrollableAxesSafeAreaEdges.contains(edge) else {
+        guard let edges = representedElement.scrollableAxesSafeAreaEdges, edges.contains(edge) else {
             return .none
         }
         // UIKit will always honor safe areas when using bouncing.
