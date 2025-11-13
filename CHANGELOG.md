@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Revert applying empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
-
 ### Added
-
-- Added a `scrollableAxesSafeAreaEdges` property to `ScrollView` that is used with `ContentInsetAdjustmentBehavior.scrollableAxes`.
 
 ### Removed
 
@@ -28,6 +24,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.4.0] - 2025-11-13
+
+### Fixed
+
+- Revert applying empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
+
+### Added
+
+- Added a `scrollableAxesSafeAreaEdges` property to `ScrollView` that is used with `ContentInsetAdjustmentBehavior.scrollableAxes`.
 
 ## [6.3.1] - 2025-10-08
 
@@ -1286,7 +1292,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.3.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.4.0...HEAD
+[6.4.0]: https://github.com/square/Blueprint/compare/6.3.1...6.4.0
 [6.3.1]: https://github.com/square/Blueprint/compare/6.3.0...6.3.1
 [6.3.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
 [6.2.0]: https://github.com/square/Blueprint/compare/6.1.0...6.2.0
