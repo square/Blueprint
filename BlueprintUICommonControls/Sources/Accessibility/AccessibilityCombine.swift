@@ -5,48 +5,49 @@ import UIKit
 
 
 /// ### Use `AccessibilityCombine` to automatically combine child accessibility elements:
-///
-///    struct CustomRow: Element {
-///        var content: ElementContent {
-///            Row {
-///                Image(image: profileImage)
-///                Column {
-///                    Label(text: userName)
-///                    Label(text: userStatus)
-///                }
-///                Button("Follow") { followUser() }
-///            }
-///            .accessibilityCombine()
-///            // Automatically combines: "Profile image, John Doe, Online, Follow"
-///            // Button functionality preserved as custom action
-///        }
-///    }
+/// ```swift
+/// struct CustomRow: Element {
+///     var content: ElementContent {
+///         Row {
+///             Image(image: profileImage)
+///             Column {
+///                 Label(text: userName)
+///                 Label(text: userStatus)
+///             }
+///             Button("Follow") { followUser() }
+///         }
+///         .accessibilityCombine()
+///         // Automatically combines: "Profile image, John Doe, Online, Follow"
+///         // Button functionality preserved as custom action
+///     }
+/// }
+/// ```
 ///
 /// ### Custom Filtering and Sorting
 ///
-///  struct SmartCombinedElement: Element {
-///      var content: ElementContent {
-///          Column {
-///              Label(text: "Header").accessibilityTraits(add: [.header])
-///              Label(text: "Content")
-///              Button("Action") { /* action */ }
-///          }
-///          .accessibilityCombine(
-///              customFilter: { element in
-///                  // Only include elements with accessibility content
-///                  return element.hasAccessibilityRepresentation
-///              },
-///              customSorting: { element1, element2 in
-///                  // Headers come first
-///                  let element1IsHeader = element1.accessibilityTraits.contains(.header)
-///                  let element2IsHeader = element2.accessibilityTraits.contains(.header)
-///                  return element1IsHeader && !element2IsHeader
-///              }
-///          )
-///      }
-///   }
-
-public struct AccessibilityCombine: Element {
+/// ```swift
+/// struct SmartCombinedElement: Element {
+///     var content: ElementContent {
+///         Column {
+///             Label(text: "Header").accessibilityTraits(add: [.header])
+///             Label(text: "Content")
+///             Button("Action") { /* action */ }
+///         }
+///         .accessibilityCombine(
+///             customFilter: { element in
+///                 // Only include elements with accessibility content
+///                 return element.hasAccessibilityRepresentation
+///             },
+///             customSorting: { element1, element2 in
+///                 // Headers come first
+///                 let element1IsHeader = element1.accessibilityTraits.contains(.header)
+///                 let element2IsHeader = element2.accessibilityTraits.contains(.header)
+///                 return element1IsHeader && !element2IsHeader
+///             }
+///         )
+///     }
+/// }
+/// ```
 
     /// The wrapped element
     public var wrappedElement: Element
