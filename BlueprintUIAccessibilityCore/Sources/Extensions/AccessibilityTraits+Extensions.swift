@@ -39,7 +39,7 @@ extension UIAccessibilityTraits {
     internal var blueprintTraits: Set<Accessibility.Trait> {
         Accessibility.Trait.allTraits
             .lazy
-            .filter({ self.contains(UIAccessibilityTraits(with: [trait])) })
-            .reduce(into: Set<Accessibility.Trait>()) { $0.insert($1)
+            .filter { self.contains(UIAccessibilityTraits(with: [trait])) }
+            .reduce(into: Set<Accessibility.Trait>()) { $0.insert($1) }
     }
 }

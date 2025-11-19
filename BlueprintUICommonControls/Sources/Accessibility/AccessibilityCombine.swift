@@ -48,6 +48,7 @@ import UIKit
 ///     }
 /// }
 /// ```
+public struct AccessibilityCombine: Element {
 
     /// The wrapped element
     public var wrappedElement: Element
