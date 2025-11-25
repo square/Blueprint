@@ -12,14 +12,7 @@ let project = Project(
 
         .app(
             name: "SampleApp",
-            sources: ["Sources/**"],
-            scripts: [
-                .pre(
-                    path: .relativeToRoot("../Scripts/extract_english_strings.sh"),
-                    name: "Extract English Strings",
-                    basedOnDependencyAnalysis: true
-                ),
-            ]
+            sources: ["Sources/**"]
         ),
 
         .app(
