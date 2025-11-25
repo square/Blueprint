@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `BlueprintUIAccessibilityCore` module with accessibility composition and deferral patterns
+  - Accessibility composition for combining multiple elements into unified experiences  
+  - Accessibility deferral for content inheritance patterns
+  - Localization support for 12 locales
+  - Comprehensive documentation and examples
+
 ### Removed
 
 ### Changed
