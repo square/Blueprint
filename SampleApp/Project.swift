@@ -76,6 +76,12 @@ let project = Project(
                 ),
             ]
         ),
+
+        .unitTest(
+            for: "BlueprintUIAccessibilityCore",
+        ),
+
+
     ],
     schemes: [
         .scheme(
@@ -83,6 +89,7 @@ let project = Project(
             testAction: .targets(
                 [
                     "BlueprintUI-Tests",
+                    "BlueprintUIAccessibilityCore-Tests",
                     "BlueprintUICommonControls-Tests",
                     "BlueprintUI_UITests",
                     "BlueprintUICommonControls_UITests",

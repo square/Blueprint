@@ -49,9 +49,10 @@ dependencies: [
 In Xcode 11+, add Blueprint directly as a dependency to your project with
 `File` > `Swift Packages` > `Add Package Dependency...`. Provide the git URL when prompted: `git@github.com:square/Blueprint.git`.
 
-Two modules are provided:
+Three modules are provided:
 - `BlueprintUI` contains the core architecture and layout types.
 - `BlueprintUICommonControls` includes elements representing some common `UIKit` views and controls.
+- `BlueprintUIAccessibilityCore` provides accessibility infrastructure for component authors.
 
 ## Documentation
 

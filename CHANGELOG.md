@@ -25,6 +25,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+## [6.5.0] - 2025-11-25
+
+### Added
+
+- Added `BlueprintUIAccessibilityCore` module with accessibility composition and deferral patterns
+  - Accessibility composition for combining multiple elements into unified experiences
+  - Accessibility deferral for content inheritance patterns
+
+## [6.4.0] - 2025-11-13
+
+### Fixed
+
+- Revert applying empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
+
+### Added
+
+- Added a `scrollableAxesSafeAreaEdges` property to `ScrollView` that is used with `ContentInsetAdjustmentBehavior.scrollableAxes`.
+
+## [6.3.1] - 2025-10-08
+
+### Fixed
+
+- Applied empty accessibility traits to `AttributedLabel` if supplied traits is `nil`.
+- Fixed warning for a cross-module conformance
+- Fixed warning by updating Package.swift to use the newer `swiftLanguageModes`
+
 ## [6.3.0] - 2025-08-28
 
 ### Changed
@@ -110,17 +136,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AccessibilityElement.CustomAction` now a typealias to `Accessibility.CustomAction`
 - `AccessibilityElement.CustomContent` now a typealias to `Accessibility.CustomContent`
 
-### Deprecated
-
-### Security
-
-### Documentation
-
 ### Misc
 
 - `Accessibility.CustomContent` now conforms to `Equatable`
-
-### Internal
 
 ## [5.3.0] - 2025-01-30
 
@@ -144,12 +162,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 - `LayoutMode.legacy` is deprecated and will be removed in a future release.
-
-### Security
-
-### Documentation
-
-### Misc
 
 ### Internal
 
@@ -1274,8 +1286,11 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.3.0...HEAD
-[6.2.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
+[main]: https://github.com/square/Blueprint/compare/6.5.0...HEAD
+[6.5.0]: https://github.com/square/Blueprint/compare/6.4.0...6.5.0
+[6.4.0]: https://github.com/square/Blueprint/compare/6.3.1...6.4.0
+[6.3.1]: https://github.com/square/Blueprint/compare/6.3.0...6.3.1
+[6.3.0]: https://github.com/square/Blueprint/compare/6.2.0...6.3.0
 [6.2.0]: https://github.com/square/Blueprint/compare/6.1.0...6.2.0
 [6.1.0]: https://github.com/square/Blueprint/compare/6.0.0...6.1.0
 [6.0.0]: https://github.com/square/Blueprint/compare/5.7.0...6.0.0
@@ -1423,5 +1438,3 @@ searchField
 [#19]: https://github.com/square/Blueprint/pull/19
 [#18]: https://github.com/square/Blueprint/pull/18
 [#15]: https://github.com/square/Blueprint/pull/15
-[5.1.0]: https://github.com/square/Blueprint/compare/5.0.1...5.1.0
-[5.2.0]: https://github.com/square/Blueprint/compare/5.1.0...5.2.0
