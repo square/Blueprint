@@ -278,7 +278,7 @@ struct EnvironmentAndValueValidatingCacheTests {
 
 }
 
-struct TestCachedElement: Element, Equatable, ContextuallyEquivalent {
+struct TestCachedElement: Element, Equatable, CrossLayoutCacheable {
     let value: String
 
     var content: ElementContent {
