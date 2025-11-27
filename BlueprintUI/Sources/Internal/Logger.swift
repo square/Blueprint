@@ -3,7 +3,9 @@ import os.log
 
 /// Namespace for logging helpers
 enum Logger {
-    fileprivate static let signposter = OSSignposter(logHandle: .active)
+    fileprivate static var signposter: OSSignposter {
+        OSSignposter(logHandle: .active)
+    }
     static var hook: ((String) -> Void)?
 }
 
