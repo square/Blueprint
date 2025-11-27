@@ -30,7 +30,7 @@ import Foundation
         create: () -> (Value, ValidationData)
     ) -> Value {
         if let valueStorage = storage[key] {
-            Logger.logValidatingCacheKeyHit(key: key)
+            Logger.logValidatingCrossLayoutCacheKeyHit(key: key)
             let validationToken = Logger.logValidatingCacheValidationStart(key: key)
             if validate(valueStorage.validationData) {
                 Logger.logValidatingCacheHitAndValidationSuccess(key: key)
@@ -50,7 +50,7 @@ import Foundation
                 Logger.logValidatingCacheValidationEnd(validationToken, key: key)
             }
         } else {
-            Logger.logValidatingCacheKeyMiss(key: key)
+            Logger.logValidatingCrossLayoutCacheKeyMiss(key: key)
         }
         let createToken = Logger.logValidatingCacheFreshValueCreationStart(key: key)
         let (fresh, validationData) = create()
@@ -82,11 +82,11 @@ import Foundation
     mutating func retrieveOrCreate(
         key: Key,
         environment: Environment,
-        context: EquivalencyContext,
+        context: CrossLayoutCacheableContext,
         create: (Environment) -> Value
     ) -> Value {
         backing.retrieveOrCreate(key: key) {
-            environment.isEquivalent(to: $0, in: context)
+            environment.isCacheablyEquivalent(to: $0, in: context)
         } create: {
             environment.snapshottingAccess { environment in
                 create(environment)
@@ -115,12 +115,12 @@ import Foundation
     mutating func retrieveOrCreate(
         key: Key,
         environment: Environment,
-        context: EquivalencyContext,
+        context: CrossLayoutCacheableContext,
         validate: (AdditionalValidationData) -> Bool,
         create: (Environment) -> (Value, AdditionalValidationData)
     ) -> Value {
         backing.retrieveOrCreate(key: key) {
-            environment.isEquivalent(to: $0.0, in: context) && validate($0.1)
+            environment.isCacheablyEquivalent(to: $0.0, in: context) && validate($0.1)
         } create: {
             let ((value, additional), snapshot) = environment.snapshottingAccess { environment in
                 create(environment)
@@ -132,7 +132,7 @@ import Foundation
 }
 
 
-@_spi(CacheStorage) extension EnvironmentAndValueValidatingCache where AdditionalValidationData: ContextuallyEquivalent {
+@_spi(CacheStorage) extension EnvironmentAndValueValidatingCache where AdditionalValidationData: CrossLayoutCacheable {
 
     /// Retrieves or creates a value based on a key and a validation value, alongside environment validation.
     /// - Parameters:
@@ -146,11 +146,11 @@ import Foundation
         key: Key,
         environment: Environment,
         validationValue: AdditionalValidationData,
-        context: EquivalencyContext,
+        context: CrossLayoutCacheableContext,
         create: (Environment) -> (Value)
     ) -> Value {
         retrieveOrCreate(key: key, environment: environment, context: context) {
-            $0.isEquivalent(to: validationValue, in: context)
+            $0.isCacheablyEquivalent(to: validationValue, in: context)
         } create: {
             (create($0), validationValue)
         }
@@ -173,7 +173,7 @@ import Foundation
         key: Key,
         environment: Environment,
         validationValue: AdditionalValidationData,
-        context: EquivalencyContext,
+        context: CrossLayoutCacheableContext,
         create: (Environment) -> (Value)
     ) -> Value {
         retrieveOrCreate(key: key, environment: environment, context: context) {

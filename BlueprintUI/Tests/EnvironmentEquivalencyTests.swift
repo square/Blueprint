@@ -158,7 +158,7 @@ enum OptionalKey: EnvironmentKey {
 enum NonSizeAffectingKey: EnvironmentKey {
     static let defaultValue = 0
 
-    static func isEquivalent(lhs: Int, rhs: Int, in context: EquivalencyContext) -> Bool {
+    static func isEquivalent(lhs: Int, rhs: Int, in context: CrossLayoutCacheableContext) -> Bool {
         alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
     }
 }

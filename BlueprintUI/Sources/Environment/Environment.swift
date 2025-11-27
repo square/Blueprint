@@ -46,6 +46,7 @@ public struct Environment {
     private var values: [Keybox: Any] = [:]
     private var snapshotting: SnapshottingEnvironment?
 
+    // Internal values are hidden from consumers and do not participate in cross-layout cacheability checks.
     private var internalValues: [ObjectIdentifier: Any] = [:]
 
     /// Gets or sets an environment value by its key.
@@ -116,11 +117,11 @@ private final class SnapshottingEnvironment {
     var value = EnvironmentSnapshot(fingerprint: .init(), values: [:])
 }
 
-extension Environment: ContextuallyEquivalent {
+extension Environment: CrossLayoutCacheable {
 
-    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
+    public func isCacheablyEquivalent(to other: Self?, in context: CrossLayoutCacheableContext) -> Bool {
         guard let other else { return false }
-        if fingerprint.isEquivalent(to: other.fingerprint) {
+        if fingerprint.isCacheablyEquivalent(to: other.fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
@@ -132,7 +133,7 @@ extension Environment: ContextuallyEquivalent {
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
-            guard key.isEquivalent(self[key], other[key], context) else {
+            guard key.isCacheablyEquivalent(self[key], other[key], context) else {
                 cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
@@ -149,10 +150,10 @@ extension Environment: ContextuallyEquivalent {
         return true
     }
 
-    func isEquivalent(to snapshot: EnvironmentSnapshot?, in context: EquivalencyContext) -> Bool {
+    func isCacheablyEquivalent(to snapshot: EnvironmentSnapshot?, in context: CrossLayoutCacheableContext) -> Bool {
         guard let snapshot else { return false }
         // We don't even need to thaw the environment if the fingerprints match.
-        if snapshot.fingerprint.isEquivalent(to: fingerprint) {
+        if snapshot.fingerprint.isCacheablyEquivalent(to: fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
@@ -164,7 +165,7 @@ extension Environment: ContextuallyEquivalent {
         Logger.logEnvironmentEquivalencyFingerprintCacheMiss(environment: self)
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
         for (key, value) in snapshot.values {
-            guard key.isEquivalent(self[key], value, context) else {
+            guard key.isCacheablyEquivalent(self[key], value, context) else {
                 cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
@@ -202,13 +203,13 @@ extension CacheStorage {
             }
         }
 
-        typealias EquivalencyResult = [EquivalencyContext: Bool]
-        var storage: [Key: [EquivalencyContext: Bool]] = [:]
+        typealias EquivalencyResult = [CrossLayoutCacheableContext: Bool]
+        var storage: [Key: [CrossLayoutCacheableContext: Bool]] = [:]
 
         public subscript(
             lhs: ComparableFingerprint,
             rhs: ComparableFingerprint,
-            context: EquivalencyContext,
+            context: CrossLayoutCacheableContext,
             scope: Set<ObjectIdentifier>? = nil
         ) -> Bool? {
             get {
@@ -244,13 +245,13 @@ extension CacheStorage {
     }
 
     /// A cache of previously compared environments and their results.
-    private struct EnvironmentComparisonCacheKey: CacheKey {
+    private struct EnvironmentComparisonCrossLayoutCacheKey: CrossLayoutCacheKey {
         static var emptyValue = EnvironmentFingerprintCache()
     }
 
     fileprivate var environmentComparisonCache: EnvironmentFingerprintCache {
-        get { self[EnvironmentComparisonCacheKey.self] }
-        set { self[EnvironmentComparisonCacheKey.self] = newValue }
+        get { self[EnvironmentComparisonCrossLayoutCacheKey.self] }
+        set { self[EnvironmentComparisonCrossLayoutCacheKey.self] = newValue }
     }
 
 }
@@ -262,14 +263,14 @@ extension Environment {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type
-        let isEquivalent: (Any?, Any?, EquivalencyContext) -> Bool
+        let isCacheablyEquivalent: (Any?, Any?, CrossLayoutCacheableContext) -> Bool
 
         init<EnvironmentKeyType: EnvironmentKey>(_ type: EnvironmentKeyType.Type) {
             objectIdentifier = ObjectIdentifier(type)
             self.type = type
-            isEquivalent = {
+            isCacheablyEquivalent = {
                 guard let lhs = $0 as? EnvironmentKeyType.Value, let rhs = $1 as? EnvironmentKeyType.Value else { return false }
-                return type.isEquivalent(lhs: lhs, rhs: rhs, in: $2)
+                return type.isCacheablyEquivalent(lhs: lhs, rhs: rhs, in: $2)
             }
         }
 

@@ -1,10 +1,8 @@
 import Foundation
-#if canImport(UIKit)
 import UIKit
-#endif
 
 /// Environment-associated storage used to cache types used across layout passes (eg, size calculations).
-/// The storage itself is type-agnostic, requiring only that its keys and values conform to the `CacheKey` protocol
+/// The storage itself is type-agnostic, requiring only that its keys and values conform to the `CrossLayoutCacheKey` protocol
 /// Caches are responsible for managing their own lifetimes and eviction strategies.
 @_spi(CacheStorage) public final class CacheStorage: Sendable, CustomDebugStringConvertible {
 
@@ -13,7 +11,6 @@ import UIKit
     fileprivate var storage: [ObjectIdentifier: Any] = [:]
 
     init() {
-        #if canImport(UIKit)
         NotificationCenter.default.addObserver(
             forName: UIApplication.didReceiveMemoryWarningNotification,
             object: nil,
@@ -21,10 +18,9 @@ import UIKit
         ) { [weak self] _ in
             self?.storage.removeAll()
         }
-        #endif
     }
 
-    public subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CacheKey {
+    public subscript<KeyType>(key: KeyType.Type) -> KeyType.Value where KeyType: CrossLayoutCacheKey {
         get {
             storage[ObjectIdentifier(key), default: KeyType.emptyValue] as! KeyType.Value
         }
@@ -62,7 +58,7 @@ extension Environment {
 /// Two fingerprinted objects may be quickly compared for equality by comparing their fingerprints.
 /// This is roughly analagous to a hash, although with inverted properties: Two objects with the same fingerprint can be trivially considered equal, but two otherwise equal objects may have different fingerprint.
 /// - Note: This type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable.
-struct ComparableFingerprint: ContextuallyEquivalent, CustomStringConvertible {
+struct ComparableFingerprint: CrossLayoutCacheable, CustomStringConvertible {
 
     typealias Value = UUID
 
@@ -77,7 +73,7 @@ struct ComparableFingerprint: ContextuallyEquivalent, CustomStringConvertible {
     }
 
     /// - Note: This is a duplicate message but: this type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable. Use this instead.
-    func isEquivalent(to other: ComparableFingerprint?, in context: EquivalencyContext) -> Bool {
+    func isCacheablyEquivalent(to other: ComparableFingerprint?, in context: CrossLayoutCacheableContext) -> Bool {
         value == other?.value
     }
 

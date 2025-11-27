@@ -33,7 +33,7 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
         }
     }()
 
-    public static func isEquivalent(lhs: any URLHandler, rhs: any URLHandler, in context: EquivalencyContext) -> Bool {
+    public static func isCacheablyEquivalent(lhs: any URLHandler, rhs: any URLHandler, in context: CrossLayoutCacheableContext) -> Bool {
         alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
     }
 }
