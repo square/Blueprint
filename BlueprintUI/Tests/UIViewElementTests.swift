@@ -109,6 +109,9 @@ class UIViewElementTests: XCTestCase {
     func test_environment() {
         enum TestKey: EnvironmentKey {
             static let defaultValue: Void? = nil
+            static func isEquivalent(lhs: Void?, rhs: Void?, in context: CrossLayoutCacheableContext) -> Bool {
+                lhs == nil && rhs == nil || rhs != nil && lhs != nil
+            }
         }
 
         @propertyWrapper

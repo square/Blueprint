@@ -122,7 +122,12 @@ final class PostsViewController: UIViewController {
 }
 
 extension Environment {
+
     private enum FeedThemeKey: EnvironmentKey {
+        static func isEquivalent(lhs: FeedTheme, rhs: FeedTheme, in context: BlueprintUI.CrossLayoutCacheableContext) -> Bool {
+            alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
+        }
+
         static let defaultValue = FeedTheme(authorColor: .black)
     }
 
