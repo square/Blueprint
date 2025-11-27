@@ -34,13 +34,13 @@ public protocol EnvironmentKey {
     ///   - rhs: The right hand side value being compared.
     ///   - context: The context to evaluate the equivalency.
     /// - Returns: Whether or not the two values are equivalent in the specified context.
-    static func isEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool
+    static func isCacheablyEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool
 
 }
 
 extension EnvironmentKey where Value: Equatable {
 
-    public static func isEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool {
+    public static func isCacheablyEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool {
         lhs == rhs
     }
 
