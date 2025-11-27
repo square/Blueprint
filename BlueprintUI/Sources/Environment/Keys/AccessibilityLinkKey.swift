@@ -6,7 +6,7 @@ extension Environment {
             UIImage(systemName: "link")?.accessibilityLabel
         }
 
-        static func isEquivalent(lhs: String?, rhs: String?, in context: EquivalencyContext) -> Bool {
+        static func isEquivalent(lhs: String?, rhs: String?, in context: CrossLayoutCacheableContext) -> Bool {
             alwaysEquivalentIn([.elementSizing], lhs: lhs, rhs: rhs, evaluatingContext: context)
         }
     }

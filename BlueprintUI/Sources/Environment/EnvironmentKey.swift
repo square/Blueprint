@@ -34,13 +34,13 @@ public protocol EnvironmentKey {
     ///   - rhs: The right hand side value being compared.
     ///   - context: The context to evaluate the equivalency.
     /// - Returns: Whether or not the two values are equivalent in the specified context.
-    static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool
+    static func isEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool
 
 }
 
 extension EnvironmentKey where Value: Equatable {
 
-    public static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
+    public static func isEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool {
         lhs == rhs
     }
 
@@ -53,10 +53,10 @@ extension EnvironmentKey where Value: Equatable {
     /// - Returns: Whether or not the two values are equivalent in the specified context.
     /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
     public static func alwaysEquivalentIn(
-        _ contexts: Set<EquivalencyContext>,
+        _ contexts: Set<CrossLayoutCacheableContext>,
         lhs: Value,
         rhs: Value,
-        evaluatingContext: EquivalencyContext
+        evaluatingContext: CrossLayoutCacheableContext
     ) -> Bool {
         if contexts.contains(evaluatingContext) {
             true
@@ -67,13 +67,13 @@ extension EnvironmentKey where Value: Equatable {
 
 }
 
-extension EnvironmentKey where Value: ContextuallyEquivalent {
+extension EnvironmentKey where Value: CrossLayoutCacheable {
 
-    public static func isEquivalent(lhs: Value, rhs: Value, in context: EquivalencyContext) -> Bool {
-        lhs.isEquivalent(to: rhs, in: context)
+    public static func isCacheablyEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool {
+        lhs.isCacheablyEquivalent(to: rhs, in: context)
     }
 
-    /// Convenience implementation returning that the values are always equivalent in the specified contexts, and otherwise evaluates using ContextuallyEquivalent.
+    /// Convenience implementation returning that the values are always equivalent in the specified contexts, and otherwise evaluates using CrossLayoutCacheable.
     /// - Parameters:
     ///   - contexts: Contexts in which to always return true for equivalency.
     ///   - lhs: The left hand side value being compared.
@@ -82,15 +82,15 @@ extension EnvironmentKey where Value: ContextuallyEquivalent {
     /// - Returns: Whether or not the two values are equivalent in the specified context.
     /// - Note: This is often used for convenience in cases where layout is unaffected, e.g., for an environment value like dark mode, which will have no effect on internal or external layout.
     public static func alwaysEquivalentIn(
-        _ contexts: Set<EquivalencyContext>,
+        _ contexts: Set<CrossLayoutCacheableContext>,
         lhs: Value,
         rhs: Value,
-        evaluatingContext: EquivalencyContext
+        evaluatingContext: CrossLayoutCacheableContext
     ) -> Bool {
         if contexts.contains(evaluatingContext) {
             true
         } else {
-            lhs.isEquivalent(to: rhs, in: evaluatingContext)
+            lhs.isCacheablyEquivalent(to: rhs, in: evaluatingContext)
         }
     }
 
@@ -104,8 +104,8 @@ extension EnvironmentKey {
     ///   - evaluatingContext: The context being evaulated.
     /// - Returns: Whether or not the value is equivalent in the context.
     public static func alwaysEquivalentIn(
-        _ contexts: Set<EquivalencyContext>,
-        evaluatingContext: EquivalencyContext
+        _ contexts: Set<CrossLayoutCacheableContext>,
+        evaluatingContext: CrossLayoutCacheableContext
     ) -> Bool {
         contexts.contains(evaluatingContext)
     }

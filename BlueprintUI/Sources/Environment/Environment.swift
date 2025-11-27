@@ -42,6 +42,7 @@ public struct Environment {
 
     private var values: [Keybox: Any] = [:]
 
+    // Internal values are hidden from consumers and do not participate in cross-layout cacheability checks.
     private var internalValues: [ObjectIdentifier: Any] = [:]
 
     /// Gets or sets an environment value by its key.
@@ -85,9 +86,9 @@ public struct Environment {
 
 }
 
-extension Environment: ContextuallyEquivalent {
+extension Environment: CrossLayoutCacheable {
 
-    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
+    public func isCacheablyEquivalent(to other: Self?, in context: CrossLayoutCacheableContext) -> Bool {
         guard let other else { return false }
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
@@ -107,7 +108,7 @@ extension Environment {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type
-        let isEquivalent: (Any?, Any?, EquivalencyContext) -> Bool
+        let isEquivalent: (Any?, Any?, CrossLayoutCacheableContext) -> Bool
 
         init<EnvironmentKeyType: EnvironmentKey>(_ type: EnvironmentKeyType.Type) {
             objectIdentifier = ObjectIdentifier(type)
