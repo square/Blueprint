@@ -7,16 +7,16 @@ struct EnvironmentEquivalencyTests {
     @Test func simpleEquivalency() {
         let a = Environment()
         let b = Environment()
-        #expect(a.isEquivalent(to: b, in: .all))
-        #expect(a.isEquivalent(to: b, in: .elementSizing))
+        #expect(a.isCacheablyEquivalent(to: b, in: .all))
+        #expect(a.isCacheablyEquivalent(to: b, in: .elementSizing))
     }
 
     @Test func simpleChange() {
         var a = Environment()
         a[ExampleKey.self] = 1
         let b = Environment()
-        #expect(!a.isEquivalent(to: b, in: .all))
-        #expect(!a.isEquivalent(to: b, in: .elementSizing))
+        #expect(!a.isCacheablyEquivalent(to: b, in: .all))
+        #expect(!a.isCacheablyEquivalent(to: b, in: .elementSizing))
     }
 
     @Test func orderingWithDefaults() {
@@ -24,13 +24,13 @@ struct EnvironmentEquivalencyTests {
         var a = Environment()
         a[ExampleKey.self] = 1
         let b = Environment()
-        #expect(!a.isEquivalent(to: b))
+        #expect(!a.isCacheablyEquivalent(to: b))
 
         // Explicitly duplicated to ensure we don't hit a cached comparison.
         let c = Environment()
         var d = Environment()
         d[ExampleKey.self] = 1
-        #expect(!c.isEquivalent(to: d))
+        #expect(!c.isCacheablyEquivalent(to: d))
     }
 
     @Test func orderingWithNullability() {
@@ -38,20 +38,20 @@ struct EnvironmentEquivalencyTests {
         var a = Environment()
         a[OptionalKey.self] = 1
         let b = Environment()
-        #expect(!a.isEquivalent(to: b))
+        #expect(!a.isCacheablyEquivalent(to: b))
 
         // Explicitly duplicated to ensure we don't hit a cached comparison.
         let c = Environment()
         var d = Environment()
         d[OptionalKey.self] = 1
-        #expect(!c.isEquivalent(to: d))
+        #expect(!c.isCacheablyEquivalent(to: d))
     }
 
     @Test func modification() {
         var a = Environment()
         let b = a
         a[ExampleKey.self] = 1
-        #expect(!a.isEquivalent(to: b))
+        #expect(!a.isCacheablyEquivalent(to: b))
     }
 
     @Test func caching() {
@@ -64,22 +64,22 @@ struct EnvironmentEquivalencyTests {
         let b = a
         a[ExampleKey.self] = 1
         hookedResult = []
-        #expect(!a.isEquivalent(to: b))
+        #expect(!a.isCacheablyEquivalent(to: b))
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
         hookedResult = []
-        #expect(!a.isEquivalent(to: b))
+        #expect(!a.isCacheablyEquivalent(to: b))
         // Subsequent comparison should be cached
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(a.fingerprint)"))
 
         hookedResult = []
-        #expect(!b.isEquivalent(to: a))
+        #expect(!b.isCacheablyEquivalent(to: a))
         // Reversed order should still be cached
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(b.fingerprint)"))
 
         hookedResult = []
         let c = b
-        #expect(!a.isEquivalent(to: c))
+        #expect(!a.isCacheablyEquivalent(to: c))
         // Copying without mutation should preserve fingerprint, and be cached.
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(a.fingerprint)"))
 
@@ -99,11 +99,11 @@ struct EnvironmentEquivalencyTests {
         b[NonSizeAffectingKey.self] = 2
 
         hookedResult = []
-        #expect(a.isEquivalent(to: b, in: .elementSizing))
+        #expect(a.isCacheablyEquivalent(to: b, in: .elementSizing))
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
         hookedResult = []
-        #expect(!a.isEquivalent(to: b, in: .all))
+        #expect(!a.isCacheablyEquivalent(to: b, in: .all))
         // A specific equivalency being true doesn't imply `.all` to be true, so we should see another evaluation.
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(a.fingerprint)"))
 
@@ -113,11 +113,11 @@ struct EnvironmentEquivalencyTests {
         d[ExampleKey.self] = 1
 
         hookedResult = []
-        #expect(c.isEquivalent(to: d, in: .all))
+        #expect(c.isCacheablyEquivalent(to: d, in: .all))
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(c.fingerprint)"))
 
         hookedResult = []
-        #expect(c.isEquivalent(to: d, in: .elementSizing))
+        #expect(c.isCacheablyEquivalent(to: d, in: .elementSizing))
         // `.all` equivalency implies that any more fine-grained equivalency should also be true, so we should be using a cached result.
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(c.fingerprint)"))
 
@@ -127,11 +127,11 @@ struct EnvironmentEquivalencyTests {
         let f = Environment()
 
         hookedResult = []
-        #expect(!e.isEquivalent(to: f, in: .elementSizing))
+        #expect(!e.isCacheablyEquivalent(to: f, in: .elementSizing))
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheMiss(environment:) \(e.fingerprint)"))
 
         hookedResult = []
-        #expect(!e.isEquivalent(to: f, in: .all))
+        #expect(!e.isCacheablyEquivalent(to: f, in: .all))
         #expect(hookedResult.contains("logEnvironmentEquivalencyFingerprintCacheHit(environment:) \(e.fingerprint)"))
 
     }
@@ -158,7 +158,7 @@ enum OptionalKey: EnvironmentKey {
 enum NonSizeAffectingKey: EnvironmentKey {
     static let defaultValue = 0
 
-    static func isEquivalent(lhs: Int, rhs: Int, in context: EquivalencyContext) -> Bool {
+    static func isCacheablyEquivalent(lhs: Int, rhs: Int, in context: CrossLayoutCacheableContext) -> Bool {
         alwaysEquivalentIn([.elementSizing], evaluatingContext: context)
     }
 }

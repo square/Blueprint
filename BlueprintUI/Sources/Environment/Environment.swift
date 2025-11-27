@@ -41,11 +41,12 @@ public struct Environment {
     public static let empty = Environment()
 
     // Fingerprint used for referencing previously compared environments.
-    var fingerprint = ComparableFingerprint()
+    var fingerprint = CacheComparisonFingerprint()
 
     private var values: [Keybox: Any] = [:]
-    private var snapshotting: SnapshottingEnvironment?
+    private var observingAccess: ObservingAccessListEnvironment?
 
+    // Internal values are hidden from consumers and do not participate in cross-layout cacheability checks.
     private var internalValues: [ObjectIdentifier: Any] = [:]
 
     /// Gets or sets an environment value by its key.
@@ -63,8 +64,8 @@ public struct Environment {
 
     private subscript(keybox: Keybox) -> Any {
         let value = values[keybox, default: keybox.type.defaultValue]
-        if let snapshotting {
-            snapshotting.value.values[keybox] = value
+        if let observingAccess {
+            observingAccess.value.values[keybox] = value
         }
         return value
     }
@@ -93,38 +94,38 @@ public struct Environment {
         return merged
     }
 
-    func snapshottingAccess<T>(_ closure: (Environment) -> T) -> (T, EnvironmentSnapshot) {
+    func observingAccess<T>(_ closure: (Environment) -> T) -> (T, EnvironmentAccessList) {
         var watching = self
-        let snapshotting = SnapshottingEnvironment()
-        watching.snapshotting = snapshotting
+        let observingAccess = ObservingAccessListEnvironment()
+        watching.observingAccess = observingAccess
         let result = closure(watching)
-        return (result, snapshotting.value)
+        return (result, observingAccess.value)
     }
 
 }
 
-/// An environment snapshot is immutable copy of the comparable elements of an Environment struct that were accessed during the cached value's creaton..
-struct EnvironmentSnapshot {
+/// An environment access list is frozen-in-time copy of the comparable elements of an Environment struct that were accessed during the cached value's creaton.
+struct EnvironmentAccessList {
 
     // Fingerprint used for referencing previously compared environments.
-    var fingerprint: ComparableFingerprint
+    var fingerprint: CacheComparisonFingerprint
     var values: [Environment.Keybox: Any]
 
 }
 
-private final class SnapshottingEnvironment {
-    var value = EnvironmentSnapshot(fingerprint: .init(), values: [:])
+private final class ObservingAccessListEnvironment {
+    var value = EnvironmentAccessList(fingerprint: .init(), values: [:])
 }
 
-extension Environment: ContextuallyEquivalent {
+extension Environment: CrossLayoutCacheable {
 
-    public func isEquivalent(to other: Self?, in context: EquivalencyContext) -> Bool {
+    public func isCacheablyEquivalent(to other: Self?, in context: CrossLayoutCacheableContext) -> Bool {
         guard let other else { return false }
-        if fingerprint.isEquivalent(to: other.fingerprint) {
+        if fingerprint.isCacheablyEquivalent(to: other.fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] {
+        if let evaluated = hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
@@ -132,8 +133,8 @@ extension Environment: ContextuallyEquivalent {
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
-            guard key.isEquivalent(self[key], other[key], context) else {
-                cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
+            guard key.isCacheablyEquivalent(self[key], other[key], context) else {
+                hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -145,27 +146,27 @@ extension Environment: ContextuallyEquivalent {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
+        hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
         return true
     }
 
-    func isEquivalent(to snapshot: EnvironmentSnapshot?, in context: EquivalencyContext) -> Bool {
-        guard let snapshot else { return false }
+    func isCacheablyEquivalent(to accessList: EnvironmentAccessList?, in context: CrossLayoutCacheableContext) -> Bool {
+        guard let accessList else { return false }
         // We don't even need to thaw the environment if the fingerprints match.
-        if snapshot.fingerprint.isEquivalent(to: fingerprint) {
+        if accessList.fingerprint.isCacheablyEquivalent(to: fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        let scope = Set(snapshot.values.keys.map(\.objectIdentifier))
-        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] {
+        let scope = Set(accessList.values.keys.map(\.objectIdentifier))
+        if let evaluated = hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
         Logger.logEnvironmentEquivalencyFingerprintCacheMiss(environment: self)
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
-        for (key, value) in snapshot.values {
-            guard key.isEquivalent(self[key], value, context) else {
-                cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = false
+        for (key, value) in accessList.values {
+            guard key.isCacheablyEquivalent(self[key], value, context) else {
+                hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -177,7 +178,7 @@ extension Environment: ContextuallyEquivalent {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = true
+        hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] = true
         return true
 
     }
@@ -185,16 +186,16 @@ extension Environment: ContextuallyEquivalent {
 
 }
 
-extension CacheStorage {
+extension HostingViewContext {
 
     fileprivate struct EnvironmentFingerprintCache {
 
         struct Key: Hashable {
-            let lhs: ComparableFingerprint.Value
-            let rhs: ComparableFingerprint.Value
+            let lhs: CacheComparisonFingerprint.Value
+            let rhs: CacheComparisonFingerprint.Value
             let scope: Set<ObjectIdentifier>?
 
-            init(_ lhs: ComparableFingerprint.Value, _ rhs: ComparableFingerprint.Value, scope: Set<ObjectIdentifier>?) {
+            init(_ lhs: CacheComparisonFingerprint.Value, _ rhs: CacheComparisonFingerprint.Value, scope: Set<ObjectIdentifier>?) {
                 // Sort lhs/rhs so we don't have diff results based on caller.
                 self.lhs = min(lhs, rhs)
                 self.rhs = max(lhs, rhs)
@@ -202,13 +203,13 @@ extension CacheStorage {
             }
         }
 
-        typealias EquivalencyResult = [EquivalencyContext: Bool]
-        var storage: [Key: [EquivalencyContext: Bool]] = [:]
+        typealias EquivalencyResult = [CrossLayoutCacheableContext: Bool]
+        var storage: [Key: [CrossLayoutCacheableContext: Bool]] = [:]
 
         public subscript(
-            lhs: ComparableFingerprint,
-            rhs: ComparableFingerprint,
-            context: EquivalencyContext,
+            lhs: CacheComparisonFingerprint,
+            rhs: CacheComparisonFingerprint,
+            context: CrossLayoutCacheableContext,
             scope: Set<ObjectIdentifier>? = nil
         ) -> Bool? {
             get {
@@ -244,13 +245,13 @@ extension CacheStorage {
     }
 
     /// A cache of previously compared environments and their results.
-    private struct EnvironmentComparisonCacheKey: CacheStorage.Key {
-        static let emptyValue = EnvironmentFingerprintCache()
+    private struct EnvironmentComparisonCrossLayoutCacheKey: CrossLayoutCacheKey {
+        static var emptyValue = EnvironmentFingerprintCache()
     }
 
     fileprivate var environmentComparisonCache: EnvironmentFingerprintCache {
-        get { self[EnvironmentComparisonCacheKey.self] }
-        set { self[EnvironmentComparisonCacheKey.self] = newValue }
+        get { self[EnvironmentComparisonCrossLayoutCacheKey.self] }
+        set { self[EnvironmentComparisonCrossLayoutCacheKey.self] = newValue }
     }
 
 }
@@ -262,14 +263,14 @@ extension Environment {
 
         let objectIdentifier: ObjectIdentifier
         let type: any EnvironmentKey.Type
-        let isEquivalent: (Any?, Any?, EquivalencyContext) -> Bool
+        let isCacheablyEquivalent: (Any?, Any?, CrossLayoutCacheableContext) -> Bool
 
         init<EnvironmentKeyType: EnvironmentKey>(_ type: EnvironmentKeyType.Type) {
             objectIdentifier = ObjectIdentifier(type)
             self.type = type
-            isEquivalent = {
+            isCacheablyEquivalent = {
                 guard let lhs = $0 as? EnvironmentKeyType.Value, let rhs = $1 as? EnvironmentKeyType.Value else { return false }
-                return type.isEquivalent(lhs: lhs, rhs: rhs, in: $2)
+                return type.isCacheablyEquivalent(lhs: lhs, rhs: rhs, in: $2)
             }
         }
 

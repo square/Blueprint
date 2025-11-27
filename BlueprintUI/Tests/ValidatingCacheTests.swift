@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@_spi(CacheStorage) @testable import BlueprintUI
+@_spi(HostingViewContext) @testable import BlueprintUI
 
 @MainActor
 struct ValidatingCacheTests {
@@ -278,7 +278,7 @@ struct EnvironmentAndValueValidatingCacheTests {
 
 }
 
-struct TestCachedElement: Element, Equatable, ContextuallyEquivalent {
+struct TestCachedElement: Element, Equatable, CrossLayoutCacheable {
     let value: String
 
     var content: ElementContent {

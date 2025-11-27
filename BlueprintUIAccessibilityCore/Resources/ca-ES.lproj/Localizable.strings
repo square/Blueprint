@@ -1,0 +1,18 @@
+/* A label for accessibility custom content that indicates that an associated string is an error message. */
+"accessibility_error_label" = "Error";
+
+/* The default accessibility label for '-' button in Stepper. This button should decrease the value of the stepper. */
+"stepper_decrement" = "Redueix";
+
+/* The default accessibility label for '+' button in Stepper. This button should increase the value of the stepper. */
+"stepper_increase" = "Incrementa";
+
+/* Accessibility label describing a checkbox that is neither checked nor unchecked, but 'mixed' - it displays a dash instead of a check. */
+"toggle_mixed" = "Combinat";
+
+/* Accessibility label describing a checkbox or switch that is unchecked or off */
+"toggle_off" = "Desactivat";
+
+/* Accessibility label describing a checkbox or switch that is checked or on. */
+"toggle_on" = "Activat";
+

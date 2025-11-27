@@ -40,7 +40,7 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
-    private var cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
+    private var hostingViewContext = Environment.HostingViewContextKey.defaultValue
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -55,7 +55,7 @@ public final class BlueprintView: UIView {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
             // Shortcut: If there are no changes to the environment, then, well, nothing changed.
-            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isEquivalent(
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isCacheablyEquivalent(
                 to: environment,
                 in: .all
             ) {
@@ -95,13 +95,13 @@ public final class BlueprintView: UIView {
             if oldValue == nil && element == nil {
                 return
             }
-            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates, let contextuallyEquivalent = element as? ContextuallyEquivalent, contextuallyEquivalent.isEquivalent(
-                to: oldValue as? ContextuallyEquivalent,
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates, let crossLayoutCacheable = element as? CrossLayoutCacheable, crossLayoutCacheable.isCacheablyEquivalent(
+                to: oldValue as? CrossLayoutCacheable,
                 in: .all
             ) {
                 return
             }
-            cacheStorage = Environment.CacheStorageEnvironmentKey.defaultValue
+            hostingViewContext = Environment.HostingViewContextKey.defaultValue
 
             Logger.logElementAssigned(view: self)
 
@@ -164,7 +164,7 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
-        self.environment.cacheStorage = cacheStorage
+        self.environment.hostingViewContext = hostingViewContext
 
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -559,7 +559,7 @@ public final class BlueprintView: UIView {
             environment.layoutMode = layoutMode
         }
 
-        environment.cacheStorage = cacheStorage
+        environment.hostingViewContext = hostingViewContext
 
         return environment
     }

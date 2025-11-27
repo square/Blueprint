@@ -254,7 +254,7 @@ extension ElementContent {
     /// - parameter validationKey: If present, measureFunction will attempt to cache sizing based on the path of the node. validationKey will be evaluated to ensure that the result is valid.
     /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
     public init(
-        validationKey: some ContextuallyEquivalent,
+        validationKey: some CrossLayoutCacheable,
         measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
     ) {
         storage = MeasurableStorage(validationKey: validationKey, measurer: measureFunction)

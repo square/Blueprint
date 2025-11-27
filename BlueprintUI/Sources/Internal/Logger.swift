@@ -3,7 +3,9 @@ import os.log
 
 /// Namespace for logging helpers
 enum Logger {
-    fileprivate static let signposter = OSSignposter(logHandle: .active)
+    fileprivate static var signposter: OSSignposter {
+        OSSignposter(logHandle: .active)
+    }
     static var hook: ((String) -> Void)?
 }
 
@@ -194,7 +196,7 @@ extension Logger {
 
 }
 
-// MARK: - CacheStorage
+// MARK: - HostingViewContext
 
 extension Logger {
 
@@ -255,7 +257,7 @@ extension Logger {
     static func logEnvironmentEquivalencyCompletedWithNonEquivalence(
         environment: Environment,
         key: some Hashable,
-        context: EquivalencyContext
+        context: CrossLayoutCacheableContext
     ) {
         guard BlueprintLogging.isEnabled else { return }
         signposter.emitEvent(
@@ -266,7 +268,7 @@ extension Logger {
         hook?("\(#function) \(String(describing: key))")
     }
 
-    static func logEnvironmentEquivalencyCompletedWithEquivalence(environment: Environment, context: EquivalencyContext) {
+    static func logEnvironmentEquivalencyCompletedWithEquivalence(environment: Environment, context: CrossLayoutCacheableContext) {
         guard BlueprintLogging.isEnabled else { return }
         signposter.emitEvent(
             "Environment equivalency completed with equivalent result",
@@ -313,13 +315,13 @@ extension Logger {
         hook?("\(#function) \(String(describing: key))")
     }
 
-    static func logValidatingCacheKeyMiss(key: some Hashable) {
+    static func logValidatingCrossLayoutCacheKeyMiss(key: some Hashable) {
         guard BlueprintLogging.isEnabled else { return }
         signposter.emitEvent("ValidatingCache key miss", id: key.signpost)
         hook?("\(#function) \(String(describing: key))")
     }
 
-    static func logValidatingCacheKeyHit(key: some Hashable) {
+    static func logValidatingCrossLayoutCacheKeyHit(key: some Hashable) {
         guard BlueprintLogging.isEnabled else { return }
         signposter.emitEvent("ValidatingCache key hit", id: key.signpost)
         hook?("\(#function) \(String(describing: key))")

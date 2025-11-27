@@ -1,9 +1,9 @@
 import BlueprintUI
 import Foundation
 import UIKit
-@_spi(CacheStorage) import BlueprintUI
+@_spi(HostingViewContext) import BlueprintUI
 
-public struct AttributedLabel: Element, Hashable, ContextuallyEquivalent {
+public struct AttributedLabel: Element, Hashable, CrossLayoutCacheable {
 
     /// The attributed text to render in the label.
     ///
@@ -291,7 +291,6 @@ extension AttributedLabel {
         }
 
         private func updateAccessibilityTraits(with model: AttributedLabel) {
-
             if let traits = model.accessibilityTraits {
 
                 var traits = UIAccessibilityTraits(with: traits)
@@ -750,7 +749,7 @@ extension AttributedLabel {
 
             self.sourceLabel = sourceLabel
             self.link = link
-            super.init(accessibilityContainer: link.container)
+            super.init(accessibilityContainer: link.container as Any)
         }
 
         var frame: CGRect {
@@ -811,7 +810,7 @@ extension Element {
 
 // MARK: Extensions
 
-extension UIOffset: Hashable {
+extension UIOffset: Swift.Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(horizontal)
         hasher.combine(vertical)
@@ -887,7 +886,7 @@ extension NSAttributedString {
 
     fileprivate func normalizingForView(with numberOfLines: Int, environment: Environment) -> NSAttributedString {
         let key = AttributedStringNormalizationKey(label: self, lines: numberOfLines)
-        if environment.layoutMode.options.stringNormalizationCache, let cached = environment.cacheStorage.attributedStringNormalizationCache[key] {
+        if environment.layoutMode.options.stringNormalizationCache, let cached = environment.hostingViewContext.attributedStringNormalizationCache[key] {
             return cached
         }
         var attributedText = AttributedText(self)
@@ -927,7 +926,7 @@ extension NSAttributedString {
 
         let resolved = attributedText.attributedString
         if environment.layoutMode.options.stringNormalizationCache {
-            environment.cacheStorage.attributedStringNormalizationCache[key] = resolved
+            environment.hostingViewContext.attributedStringNormalizationCache[key] = resolved
         }
         return resolved
     }
@@ -956,8 +955,8 @@ fileprivate struct AttributedStringNormalizationKey: Hashable {
     let lines: Int
 }
 
-extension CacheStorage {
-    private struct AttributedStringNormalizationCacheKey: CacheStorage.Key {
+extension HostingViewContext {
+    private struct AttributedStringNormalizationCacheKey: CrossLayoutCacheKey {
         static let emptyValue: [AttributedStringNormalizationKey: NSAttributedString] = [:]
     }
 

@@ -13,6 +13,44 @@ public struct ScrollView: Element {
     public var alwaysBounceVertical = false
     public var alwaysBounceHorizontal = false
 
+    /// This controls which edges of the safe area that the `ScrollView` inspects for
+    /// overhanging content when using `ContentInsetAdjustmentBehavior.scrollableAxes`.
+    /// This will ensure that the provided edges are always scrollable when overhanging
+    /// the safe area.
+    ///
+    /// The empty set and `nil` both leverage standard UIKit behavior. Defaults to `nil`.
+    public var scrollableAxesSafeAreaEdges: SafeAreaEdge? = nil
+
+    /// This model represents the various edges of the `ScrollView` safe area.
+    public struct SafeAreaEdge: OptionSet {
+
+        public let rawValue: UInt8
+
+        public init(rawValue: UInt8) {
+            self.rawValue = rawValue
+        }
+
+        public static let top = SafeAreaEdge(rawValue: 1)
+        public static let left = SafeAreaEdge(rawValue: 1 << 1)
+        public static let bottom = SafeAreaEdge(rawValue: 1 << 2)
+        public static let right = SafeAreaEdge(rawValue: 1 << 3)
+
+        public static let horizontal: Self = [.left, .right]
+        public static let vertical: Self = [.top, .bottom]
+
+        /// Instead of providing all edges to `scrollableAxesSafeAreaEdges`, use
+        /// `ContentInsetAdjustmentBehavior.always` instead of `scrollableAxes`.
+        internal static let all: Self = [.top, .left, .bottom, .right]
+
+        var isHorizontal: Bool {
+            SafeAreaEdge.horizontal.contains(self)
+        }
+
+        var isVertical: Bool {
+            SafeAreaEdge.vertical.contains(self)
+        }
+    }
+
     /**
      How much the content of the `ScrollView` should be inset.
 
@@ -70,6 +108,17 @@ public struct ScrollView: Element {
                 /// This is most visible and annoying when you have a scroll view in a resizable modal, which is scrolled away
                 /// from the top of its content. If the size of the scroll view grows before the `contentSize` is adjusted,
                 /// the visible content will shift.
+                ///
+                ///
+                /// The `contentFrame` is not inset for the safe area. The `contentFrame` width and height will vary depending
+                /// upon the setting for `self.contentSize`. For instance, `fittingHeight` will use a width equal to the
+                /// scroll view's frame width. This width may overhang the horizontal safe area, but it will not extend beyond
+                /// the horizontal bounds of the scroll view.
+                ///
+                /// Using `ContentInsetAdjustmentBehavior.always` may eagerly enable scrolling along an unexpected axis, like
+                /// enabling horizontal scrolling in landscape when using `fittingHeight`. This is because the content may extend
+                /// beyond the horizontal safe area while still residing inside the bounds. The `scrollableAxes` behavior is
+                /// used to avoid this.
 
                 let contentSize = switch contentSize {
                 case .fittingWidth, .fittingHeight, .fittingContent:
@@ -291,6 +340,14 @@ fileprivate final class ScrollerWrapperView: UIView {
     /// The current `ScrollView` state we represent.
     private var representedElement: ScrollView
 
+    /// The current frame of the content within `ScrollView`. This is nil until
+    /// `apply(scrollView:contentFrame:)` is called.
+    private var contentFrame: CGRect?
+
+    /// Represents how each edge overflows or underflows the safe area and the scroll
+    /// view bounds. This is only used with `ContentInsetAdjustmentBehavior.scrollableAxes`.
+    private var contentEdgeConfigurations: ContentEdgeConfigurations = .none
+
     private var refreshControl: UIRefreshControl? = nil {
 
         didSet {
@@ -342,9 +399,17 @@ fileprivate final class ScrollerWrapperView: UIView {
         refreshAction()
     }
 
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+
+        updateContentEdgeConfigurations()
+        applyContentInset()
+    }
+
     func apply(scrollView: ScrollView, contentFrame: CGRect) {
 
         representedElement = scrollView
+        self.contentFrame = contentFrame
 
         switch scrollView.pullToRefreshBehavior {
         case .disabled, .refreshing:
@@ -400,34 +465,121 @@ fileprivate final class ScrollerWrapperView: UIView {
             self.scrollView.contentInsetAdjustmentBehavior = scrollView.contentInsetAdjustmentBehavior
         }
 
+        updateContentEdgeConfigurations()
+
         contentOffsetTrigger = scrollView.contentOffsetTrigger
 
-        applyContentInset(with: scrollView)
+        applyContentInset()
     }
 
-    private func applyContentInset(with scrollView: ScrollView) {
-        let contentInset = ScrollView.calculateContentInset(
-            scrollViewInsets: scrollView.contentInset,
-            safeAreaInsets: safeAreaInsets,
-            keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
-            refreshControlState: scrollView.pullToRefreshBehavior,
-            refreshControlBounds: refreshControl?.bounds
+    /// This function will calculate how each edge of the content overflows or underflows
+    /// the safe area and scroll view bounds.
+    func updateContentEdgeConfigurations() {
+        guard let contentFrame,
+              let edges = representedElement.scrollableAxesSafeAreaEdges,
+              !edges.isEmpty,
+              representedElement.contentInsetAdjustmentBehavior == .scrollableAxes
+        else {
+            contentEdgeConfigurations = .none
+            return
+        }
+
+        let topConfiguration = calculateConfiguration(
+            edge: .top,
+            makeConfiguration: ScrollView.calculateEdgeConfiguration(
+                contentMinEdge: contentFrame.minY,
+                safeAreaMinEdge: safeAreaLayoutGuide.layoutFrame.minY,
+                boundsMinEdge: bounds.minY
+            )
+        )
+        let leftConfiguration = calculateConfiguration(
+            edge: .left,
+            makeConfiguration: ScrollView.calculateEdgeConfiguration(
+                contentMinEdge: contentFrame.minX,
+                safeAreaMinEdge: safeAreaLayoutGuide.layoutFrame.minX,
+                boundsMinEdge: bounds.minX
+            )
+        )
+        let bottomConfiguration = calculateConfiguration(
+            edge: .bottom,
+            makeConfiguration: {
+                let topInset = topConfiguration == .overflowsSafeArea ? safeAreaInsets.top : 0
+                return ScrollView.calculateEdgeConfiguration(
+                    contentMaxEdge: contentFrame.maxY,
+                    // The bottom calculation needs to account for the top adjustment.
+                    adjustedMaxEdge: contentFrame.maxY + topInset,
+                    safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxY,
+                    boundsMaxEdge: bounds.maxY
+                )
+            }()
+        )
+        let rightConfiguration = calculateConfiguration(
+            edge: .right,
+            makeConfiguration: {
+                let leftInset = leftConfiguration == .overflowsSafeArea ? safeAreaInsets.left : 0
+                return ScrollView.calculateEdgeConfiguration(
+                    contentMaxEdge: contentFrame.maxX,
+                    // The right calculation needs to account for the left adjustment.
+                    adjustedMaxEdge: contentFrame.maxX + leftInset,
+                    safeAreaMaxEdge: safeAreaLayoutGuide.layoutFrame.maxX,
+                    boundsMaxEdge: bounds.maxX
+                )
+            }()
         )
 
-        if self.scrollView.contentInset != contentInset {
+        contentEdgeConfigurations = .init(
+            top: topConfiguration,
+            left: leftConfiguration,
+            bottom: bottomConfiguration,
+            right: rightConfiguration
+        )
+    }
 
-            let wasScrolledToTop = self.scrollView.contentOffset.y == -self.scrollView.contentInset.top
-            let wasScrolledToLeft = self.scrollView.contentOffset.x == -self.scrollView.contentInset.left
+    /// Executes the `makeConfiguration` handler if the `edge` is included in
+    /// `representedElement.scrollableAxesSafeAreaEdges` and axis bouncing isn't already
+    /// set to always.
+    private func calculateConfiguration(
+        edge: ScrollView.SafeAreaEdge,
+        makeConfiguration: @autoclosure () -> ContentEdgeConfiguration
+    ) -> ContentEdgeConfiguration {
+        guard let edges = representedElement.scrollableAxesSafeAreaEdges, edges.contains(edge) else {
+            return .none
+        }
+        // UIKit will always honor safe areas when using bouncing.
+        if edge.isVertical && representedElement.alwaysBounceVertical {
+            return .none
+        } else if edge.isHorizontal && representedElement.alwaysBounceHorizontal {
+            return .none
+        }
+        return makeConfiguration()
+    }
 
-            self.scrollView.contentInset = contentInset
+    private func applyContentInset() {
+        let (contentInset, indicatorBottomInset) = ScrollView.calculateContentInset(
+            scrollViewInsets: scrollViewInsets,
+            safeAreaInsets: safeAreaInsets,
+            keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
+            bottomEdgeConfiguration: contentEdgeConfigurations.bottom
+        )
+
+        if scrollView.contentInset != contentInset {
+
+            let wasScrolledToTop = scrollView.contentOffset.y == -scrollView.contentInset.top
+            let wasScrolledToLeft = scrollView.contentOffset.x == -scrollView.contentInset.left
+
+            scrollView.contentInset = contentInset
 
             if wasScrolledToTop {
-                self.scrollView.contentOffset.y = -contentInset.top
+                scrollView.contentOffset.y = -contentInset.top
             }
 
             if wasScrolledToLeft {
-                self.scrollView.contentOffset.x = -contentInset.left
+                scrollView.contentOffset.x = -contentInset.left
             }
+        }
+
+        if scrollView.verticalScrollIndicatorInsets.bottom != indicatorBottomInset {
+            scrollView.verticalScrollIndicatorInsets.bottom = indicatorBottomInset
         }
     }
 
@@ -454,15 +606,48 @@ fileprivate final class ScrollerWrapperView: UIView {
 
 
 extension ScrollView {
-    // Calculates the correct content inset to apply for the given inputs.
 
+    /// Calculates the `ContentEdgeConfiguration` for either the top or left
+    /// content edge.
+    static func calculateEdgeConfiguration(
+        contentMinEdge: CGFloat,
+        safeAreaMinEdge: CGFloat,
+        boundsMinEdge: CGFloat
+    ) -> ContentEdgeConfiguration {
+        if contentMinEdge < boundsMinEdge {
+            return .overflowsBounds
+        } else if contentMinEdge < safeAreaMinEdge {
+            return .overflowsSafeArea
+        } else {
+            return .underflowsSafeArea
+        }
+    }
+
+    /// Calculates the `ContentEdgeConfiguration` for either the right or bottom
+    /// content edge.
+    static func calculateEdgeConfiguration(
+        contentMaxEdge: CGFloat,
+        adjustedMaxEdge: CGFloat,
+        safeAreaMaxEdge: CGFloat,
+        boundsMaxEdge: CGFloat
+    ) -> ContentEdgeConfiguration {
+        if contentMaxEdge > boundsMaxEdge {
+            return .overflowsBounds
+        } else if adjustedMaxEdge > safeAreaMaxEdge {
+            return .overflowsSafeArea
+        } else {
+            return .underflowsSafeArea
+        }
+    }
+
+    /// Calculates the correct content inset to apply for the given inputs. This also returns
+    /// the appropriate indicator bottom inset to apply.
     static func calculateContentInset(
         scrollViewInsets: UIEdgeInsets,
         safeAreaInsets: UIEdgeInsets,
         keyboardBottomInset: CGFloat,
-        refreshControlState: PullToRefreshBehavior,
-        refreshControlBounds: CGRect?
-    ) -> UIEdgeInsets {
+        bottomEdgeConfiguration: ContentEdgeConfiguration
+    ) -> (contentInset: UIEdgeInsets, indicatorBottomInset: CGFloat) {
         var finalContentInset = scrollViewInsets
 
         // Include the keyboard's adjustment at the bottom of the scroll view.
@@ -473,18 +658,63 @@ extension ScrollView {
         // height of 715.66. If this view is anchored to the bottom of the screen, it will
         // technically overlap the dismissed keyboard by 0.15pts. We filter out these cases.
 
-        if keyboardBottomInset > 1.0 {
+        if keyboardBottomInset > max(1.0, safeAreaInsets.bottom) {
             finalContentInset.bottom += keyboardBottomInset
 
-            // Exclude the safe area insets, so the content hugs the top of the keyboard.
-
-            finalContentInset.bottom -= safeAreaInsets.bottom
+            switch bottomEdgeConfiguration {
+            case .none, .overflowsSafeArea, .overflowsBounds:
+                // Exclude the safe area insets, so the content hugs the top of the keyboard.
+                finalContentInset.bottom -= safeAreaInsets.bottom
+            case .underflowsSafeArea:
+                // If content doesn't reach the safe area, we don't want to remove the safe
+                // area from this inset because that would cause content to become unreachable
+                // under the keyboard.
+                break
+            }
         }
 
-        return finalContentInset
+        let finalIndicatorBottomInset: CGFloat
+        switch bottomEdgeConfiguration {
+        case .none:
+            finalIndicatorBottomInset = finalContentInset.bottom
+        case .underflowsSafeArea:
+            // When underflowing, we want to exclude the safe area inset, otherwise the
+            // indicator will be reduced too far. This particular case only goes into
+            // effect when the keyboard is on screen.
+            finalIndicatorBottomInset = finalContentInset.bottom - safeAreaInsets.bottom
+        case .overflowsSafeArea:
+            // Subtract the safe area to avoid it being included twice.
+            finalIndicatorBottomInset = finalContentInset.bottom - safeAreaInsets.bottom
+        case .overflowsBounds:
+            finalIndicatorBottomInset = finalContentInset.bottom
+        }
+
+        return (finalContentInset, finalIndicatorBottomInset)
     }
 }
 
+enum ContentEdgeConfiguration {
+    /// This edge is excluded from calculations.
+    case none
+
+    /// Content is smaller than the safe area edge.
+    case underflowsSafeArea
+
+    /// Content overflows the safe area but underflows the scroll view bounds.
+    case overflowsSafeArea
+
+    /// Content overflows the edge of the scroll view bounds.
+    case overflowsBounds
+}
+
+struct ContentEdgeConfigurations {
+    var top: ContentEdgeConfiguration
+    var left: ContentEdgeConfiguration
+    var bottom: ContentEdgeConfiguration
+    var right: ContentEdgeConfiguration
+
+    static let none = ContentEdgeConfigurations(top: .none, left: .none, bottom: .none, right: .none)
+}
 
 extension ScrollerWrapperView: KeyboardObserverDelegate {
 
@@ -492,14 +722,22 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
     // MARK: Keyboard
     //
 
-    private func updateBottomContentInsetWithKeyboardFrame() {
+    /// The minimal insets that should be applied to the scroll view.
+    var scrollViewInsets: UIEdgeInsets {
+        UIEdgeInsets(
+            top: representedElement.contentInset.top + (contentEdgeConfigurations.top == .overflowsSafeArea ? safeAreaInsets.top : 0),
+            left: representedElement.contentInset.left + (contentEdgeConfigurations.left == .overflowsSafeArea ? safeAreaInsets.left : 0),
+            bottom: representedElement.contentInset.bottom + (contentEdgeConfigurations.bottom == .overflowsSafeArea ? safeAreaInsets.bottom : 0),
+            right: representedElement.contentInset.right + (contentEdgeConfigurations.right == .overflowsSafeArea ? safeAreaInsets.right : 0)
+        )
+    }
 
-        let contentInset = ScrollView.calculateContentInset(
-            scrollViewInsets: representedElement.contentInset,
+    private func updateBottomContentInsetWithKeyboardFrame() {
+        let (contentInset, indicatorBottomInset) = ScrollView.calculateContentInset(
+            scrollViewInsets: scrollViewInsets,
             safeAreaInsets: safeAreaInsets,
             keyboardBottomInset: bottomContentInsetAdjustmentForKeyboard,
-            refreshControlState: representedElement.pullToRefreshBehavior,
-            refreshControlBounds: refreshControl?.bounds
+            bottomEdgeConfiguration: contentEdgeConfigurations.bottom
         )
 
         /// Setting contentInset, even to the same value, can cause issues during scrolling (such as stopping scrolling).
@@ -509,8 +747,8 @@ extension ScrollerWrapperView: KeyboardObserverDelegate {
             scrollView.contentInset.bottom = contentInset.bottom
         }
 
-        if scrollView.verticalScrollIndicatorInsets.bottom != contentInset.bottom {
-            scrollView.verticalScrollIndicatorInsets.bottom = contentInset.bottom
+        if scrollView.verticalScrollIndicatorInsets.bottom != indicatorBottomInset {
+            scrollView.verticalScrollIndicatorInsets.bottom = indicatorBottomInset
         }
     }
 

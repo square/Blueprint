@@ -7,11 +7,11 @@ struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
-    let validationKey: AnyContextuallyEquivalent?
+    let validationKey: AnyCrossLayoutCacheable?
     let measurer: (SizeConstraint, Environment) -> CGSize
 
-    init(validationKey: some ContextuallyEquivalent, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
-        self.validationKey = AnyContextuallyEquivalent(validationKey)
+    init(validationKey: some CrossLayoutCacheable, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        self.validationKey = AnyCrossLayoutCacheable(validationKey)
         self.measurer = measurer
     }
 
@@ -33,7 +33,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         }
 
         let key = MeasurableSizeKey(path: node.path, max: proposal.maximum)
-        return environment.cacheStorage.measurableStorageCache.retrieveOrCreate(
+        return environment.hostingViewContext.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
             validationValue: validationKey,
@@ -68,20 +68,20 @@ extension MeasurableStorage {
 
 }
 
-extension CacheStorage {
+extension HostingViewContext {
 
-    private struct MeasurableStorageCacheKey: CacheStorage.Key {
+    private struct MeasurableStorageCacheKey: CrossLayoutCacheKey {
         static var emptyValue = EnvironmentAndValueValidatingCache<
             MeasurableStorage.MeasurableSizeKey,
             CGSize,
-            AnyContextuallyEquivalent
+            AnyCrossLayoutCacheable
         >()
     }
 
     fileprivate var measurableStorageCache: EnvironmentAndValueValidatingCache<
         MeasurableStorage.MeasurableSizeKey,
         CGSize,
-        AnyContextuallyEquivalent
+        AnyCrossLayoutCacheable
     > {
         get { self[MeasurableStorageCacheKey.self] }
         set { self[MeasurableStorageCacheKey.self] = newValue }
