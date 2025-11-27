@@ -161,7 +161,7 @@ class BuilderTests: XCTestCase {
 
         let content: [String] = build {
 
-            if #available(iOS 20, *) {
+            if #available(iOS 1000, *) {
                 "1"
             } else {
                 "2"
