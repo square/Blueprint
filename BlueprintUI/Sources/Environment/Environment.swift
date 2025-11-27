@@ -41,10 +41,10 @@ public struct Environment {
     public static let empty = Environment()
 
     // Fingerprint used for referencing previously compared environments.
-    var fingerprint = ComparableFingerprint()
+    var fingerprint = CacheComparisonFingerprint()
 
     private var values: [Keybox: Any] = [:]
-    private var snapshotting: SnapshottingEnvironment?
+    private var observingAccess: ObservingAccessListEnvironment?
 
     // Internal values are hidden from consumers and do not participate in cross-layout cacheability checks.
     private var internalValues: [ObjectIdentifier: Any] = [:]
@@ -64,8 +64,8 @@ public struct Environment {
 
     private subscript(keybox: Keybox) -> Any {
         let value = values[keybox, default: keybox.type.defaultValue]
-        if let snapshotting {
-            snapshotting.value.values[keybox] = value
+        if let observingAccess {
+            observingAccess.value.values[keybox] = value
         }
         return value
     }
@@ -94,27 +94,27 @@ public struct Environment {
         return merged
     }
 
-    func snapshottingAccess<T>(_ closure: (Environment) -> T) -> (T, EnvironmentSnapshot) {
+    func observingAccess<T>(_ closure: (Environment) -> T) -> (T, EnvironmentAccessList) {
         var watching = self
-        let snapshotting = SnapshottingEnvironment()
-        watching.snapshotting = snapshotting
+        let observingAccess = ObservingAccessListEnvironment()
+        watching.observingAccess = observingAccess
         let result = closure(watching)
-        return (result, snapshotting.value)
+        return (result, observingAccess.value)
     }
 
 }
 
-/// An environment snapshot is immutable copy of the comparable elements of an Environment struct that were accessed during the cached value's creaton..
-struct EnvironmentSnapshot {
+/// An environment access list is frozen-in-time copy of the comparable elements of an Environment struct that were accessed during the cached value's creaton.
+struct EnvironmentAccessList {
 
     // Fingerprint used for referencing previously compared environments.
-    var fingerprint: ComparableFingerprint
+    var fingerprint: CacheComparisonFingerprint
     var values: [Environment.Keybox: Any]
 
 }
 
-private final class SnapshottingEnvironment {
-    var value = EnvironmentSnapshot(fingerprint: .init(), values: [:])
+private final class ObservingAccessListEnvironment {
+    var value = EnvironmentAccessList(fingerprint: .init(), values: [:])
 }
 
 extension Environment: CrossLayoutCacheable {
@@ -125,7 +125,7 @@ extension Environment: CrossLayoutCacheable {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] {
+        if let evaluated = hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
@@ -134,7 +134,7 @@ extension Environment: CrossLayoutCacheable {
         let keys = Set(values.keys).union(other.values.keys)
         for key in keys {
             guard key.isCacheablyEquivalent(self[key], other[key], context) else {
-                cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
+                hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -146,27 +146,27 @@ extension Environment: CrossLayoutCacheable {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
+        hostingViewContext.environmentComparisonCache[fingerprint, other.fingerprint, context] = true
         return true
     }
 
-    func isCacheablyEquivalent(to snapshot: EnvironmentSnapshot?, in context: CrossLayoutCacheableContext) -> Bool {
-        guard let snapshot else { return false }
+    func isCacheablyEquivalent(to accessList: EnvironmentAccessList?, in context: CrossLayoutCacheableContext) -> Bool {
+        guard let accessList else { return false }
         // We don't even need to thaw the environment if the fingerprints match.
-        if snapshot.fingerprint.isCacheablyEquivalent(to: fingerprint) {
+        if accessList.fingerprint.isCacheablyEquivalent(to: fingerprint) {
             Logger.logEnvironmentEquivalencyFingerprintEqual(environment: self)
             return true
         }
-        let scope = Set(snapshot.values.keys.map(\.objectIdentifier))
-        if let evaluated = cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] {
+        let scope = Set(accessList.values.keys.map(\.objectIdentifier))
+        if let evaluated = hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] {
             Logger.logEnvironmentEquivalencyFingerprintCacheHit(environment: self)
             return evaluated
         }
         Logger.logEnvironmentEquivalencyFingerprintCacheMiss(environment: self)
         let token = Logger.logEnvironmentEquivalencyComparisonStart(environment: self)
-        for (key, value) in snapshot.values {
+        for (key, value) in accessList.values {
             guard key.isCacheablyEquivalent(self[key], value, context) else {
-                cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = false
+                hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] = false
                 Logger.logEnvironmentEquivalencyCompletedWithNonEquivalence(
                     environment: self,
                     key: key,
@@ -178,7 +178,7 @@ extension Environment: CrossLayoutCacheable {
         }
         Logger.logEnvironmentEquivalencyComparisonEnd(token, environment: self)
         Logger.logEnvironmentEquivalencyCompletedWithEquivalence(environment: self, context: context)
-        cacheStorage.environmentComparisonCache[fingerprint, snapshot.fingerprint, context, scope] = true
+        hostingViewContext.environmentComparisonCache[fingerprint, accessList.fingerprint, context, scope] = true
         return true
 
     }
@@ -186,16 +186,16 @@ extension Environment: CrossLayoutCacheable {
 
 }
 
-extension CacheStorage {
+extension HostingViewContext {
 
     fileprivate struct EnvironmentFingerprintCache {
 
         struct Key: Hashable {
-            let lhs: ComparableFingerprint.Value
-            let rhs: ComparableFingerprint.Value
+            let lhs: CacheComparisonFingerprint.Value
+            let rhs: CacheComparisonFingerprint.Value
             let scope: Set<ObjectIdentifier>?
 
-            init(_ lhs: ComparableFingerprint.Value, _ rhs: ComparableFingerprint.Value, scope: Set<ObjectIdentifier>?) {
+            init(_ lhs: CacheComparisonFingerprint.Value, _ rhs: CacheComparisonFingerprint.Value, scope: Set<ObjectIdentifier>?) {
                 // Sort lhs/rhs so we don't have diff results based on caller.
                 self.lhs = min(lhs, rhs)
                 self.rhs = max(lhs, rhs)
@@ -207,8 +207,8 @@ extension CacheStorage {
         var storage: [Key: [CrossLayoutCacheableContext: Bool]] = [:]
 
         public subscript(
-            lhs: ComparableFingerprint,
-            rhs: ComparableFingerprint,
+            lhs: CacheComparisonFingerprint,
+            rhs: CacheComparisonFingerprint,
             context: CrossLayoutCacheableContext,
             scope: Set<ObjectIdentifier>? = nil
         ) -> Bool? {

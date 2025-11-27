@@ -194,7 +194,7 @@ extension Logger {
 
 }
 
-// MARK: - CacheStorage
+// MARK: - HostingViewContext
 
 extension Logger {
 

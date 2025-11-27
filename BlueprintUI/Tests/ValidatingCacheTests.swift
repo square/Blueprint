@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@_spi(CacheStorage) @testable import BlueprintUI
+@_spi(HostingViewContext) @testable import BlueprintUI
 
 @MainActor
 struct ValidatingCacheTests {

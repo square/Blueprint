@@ -4,7 +4,7 @@ import UIKit
 /// Environment-associated storage used to cache types used across layout passes (eg, size calculations).
 /// The storage itself is type-agnostic, requiring only that its keys and values conform to the `CrossLayoutCacheKey` protocol
 /// Caches are responsible for managing their own lifetimes and eviction strategies.
-@_spi(CacheStorage) public final class CacheStorage: Sendable, CustomDebugStringConvertible {
+@_spi(HostingViewContext) public final class HostingViewContext: Sendable, CustomDebugStringConvertible {
 
     // Optional name to distinguish between instances for debugging purposes.
     public var name: String? = nil
@@ -31,9 +31,9 @@ import UIKit
 
     public var debugDescription: String {
         let debugName = if let name {
-            "CacheStorage (\(name))"
+            "HostingViewContext (\(name))"
         } else {
-            "CacheStorage"
+            "HostingViewContext"
         }
         return "\(debugName): \(storage.count) entries"
     }
@@ -42,14 +42,14 @@ import UIKit
 
 extension Environment {
 
-    struct CacheStorageEnvironmentKey: InternalEnvironmentKey {
-        static var defaultValue = CacheStorage()
+    struct HostingViewContextKey: InternalEnvironmentKey {
+        static var defaultValue = HostingViewContext()
     }
 
 
-    @_spi(CacheStorage) public var cacheStorage: CacheStorage {
-        get { self[CacheStorageEnvironmentKey.self] }
-        set { self[CacheStorageEnvironmentKey.self] = newValue }
+    @_spi(HostingViewContext) public var hostingViewContext: HostingViewContext {
+        get { self[HostingViewContextKey.self] }
+        set { self[HostingViewContextKey.self] = newValue }
     }
 
 }
@@ -58,7 +58,7 @@ extension Environment {
 /// Two fingerprinted objects may be quickly compared for equality by comparing their fingerprints.
 /// This is roughly analagous to a hash, although with inverted properties: Two objects with the same fingerprint can be trivially considered equal, but two otherwise equal objects may have different fingerprint.
 /// - Note: This type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable.
-struct ComparableFingerprint: CrossLayoutCacheable, CustomStringConvertible {
+struct CacheComparisonFingerprint: CrossLayoutCacheable, CustomStringConvertible {
 
     typealias Value = UUID
 
@@ -73,7 +73,7 @@ struct ComparableFingerprint: CrossLayoutCacheable, CustomStringConvertible {
     }
 
     /// - Note: This is a duplicate message but: this type is deliberately NOT equatable – this is to prevent accidental inclusion of it when its containing type is equatable. Use this instead.
-    func isCacheablyEquivalent(to other: ComparableFingerprint?, in context: CrossLayoutCacheableContext) -> Bool {
+    func isCacheablyEquivalent(to other: CacheComparisonFingerprint?, in context: CrossLayoutCacheableContext) -> Bool {
         value == other?.value
     }
 
