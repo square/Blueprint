@@ -1,0 +1,18 @@
+/* A label for accessibility custom content that indicates that an associated string is an error message. */
+"accessibility_error_label" = "Error";
+
+/* Accessibility action to decrement a value */
+"Decrement" = "Decrement";
+
+/* Accessibility action to increment a value */
+"Increment" = "Increment";
+
+/* Accessibility value for a toggle button in a mixed state */
+"Mixed" = "Mixed";
+
+/* Accessibility value for a toggle button in the off state */
+"Off" = "Off";
+
+/* Accessibility value for a toggle button in the on state */
+"On" = "On";
+

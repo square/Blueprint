@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "BlueprintUI",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v15),
         .macCatalyst(.v15),
@@ -17,6 +18,10 @@ let package = Package(
         .library(
             name: "BlueprintUICommonControls",
             targets: ["BlueprintUICommonControls"]
+        ),
+        .library(
+            name: "BlueprintUIAccessibilityCore",
+            targets: ["BlueprintUIAccessibilityCore"]
         ),
     ],
     targets: [
@@ -33,8 +38,9 @@ let package = Package(
         ),
         .target(
             name: "BlueprintUICommonControls",
-            dependencies: ["BlueprintUI"],
-            path: "BlueprintUICommonControls/Sources"
+            dependencies: ["BlueprintUI", "BlueprintUIAccessibilityCore"],
+            path: "BlueprintUICommonControls/",
+            sources: ["Sources"]
             // Enable this setting to allow running tests in release mode.
             // swiftSettings: [.unsafeFlags(["-enable-testing"])]
         ),
@@ -47,6 +53,15 @@ let package = Package(
                 .copy("Resources/ReferenceImages"),
             ]
         ),
+        .target(
+            name: "BlueprintUIAccessibilityCore",
+            dependencies: ["BlueprintUI"],
+            path: "BlueprintUIAccessibilityCore/",
+            sources: ["Sources"],
+            resources: [
+                .process("Resources"),
+            ],
+        ),
     ],
-    swiftLanguageVersions: [.v5]
+    swiftLanguageModes: [.v5]
 )
