@@ -32,7 +32,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
             return measurer(proposal, environment)
         }
 
-        let key = MeasurableSizeKey(path: node.path, max: proposal.maximum)
+        let key = MeasurableSizeKey(path: node.path, proposedSizeConstraint: proposal)
         return environment.hostingViewContext.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
@@ -57,11 +57,11 @@ extension MeasurableStorage {
     fileprivate struct MeasurableSizeKey: Hashable {
 
         let path: String
-        let max: CGSize
+        let proposedSizeConstraint: SizeConstraint
 
         func hash(into hasher: inout Hasher) {
             path.hash(into: &hasher)
-            max.hash(into: &hasher)
+            proposedSizeConstraint.hash(into: &hasher)
         }
 
     }
