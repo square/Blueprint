@@ -21,6 +21,7 @@ import Foundation
 ///             set { self[WidgetCountsKey.self] = newValue }
 ///         }
 ///     }
+///
 public protocol CrossLayoutCacheKey {
     associatedtype Value
     static var emptyValue: Self.Value { get }

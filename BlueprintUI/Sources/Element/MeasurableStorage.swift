@@ -7,7 +7,18 @@ struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
+    let validationKey: AnyCrossLayoutCacheable?
     let measurer: (SizeConstraint, Environment) -> CGSize
+
+    init(validationKey: some CrossLayoutCacheable, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        self.validationKey = AnyCrossLayoutCacheable(validationKey)
+        self.measurer = measurer
+    }
+
+    init(measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        validationKey = nil
+        self.measurer = measurer
+    }
 }
 
 extension MeasurableStorage: CaffeinatedContentStorage {
@@ -17,7 +28,19 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        measurer(proposal, environment)
+        guard environment.layoutMode.options.measureableStorageCache, let validationKey else {
+            return measurer(proposal, environment)
+        }
+
+        let key = MeasurableSizeKey(path: node.path, proposedSizeConstraint: proposal)
+        return environment.hostingViewContext.measurableStorageCache.retrieveOrCreate(
+            key: key,
+            environment: environment,
+            validationValue: validationKey,
+            context: .elementSizing,
+        ) { environment in
+            measurer(proposal, environment)
+        }
     }
 
     func performCaffeinatedLayout(
@@ -27,4 +50,41 @@ extension MeasurableStorage: CaffeinatedContentStorage {
     ) -> [IdentifiedNode] {
         []
     }
+}
+
+extension MeasurableStorage {
+
+    fileprivate struct MeasurableSizeKey: Hashable {
+
+        let path: String
+        let proposedSizeConstraint: SizeConstraint
+
+        func hash(into hasher: inout Hasher) {
+            path.hash(into: &hasher)
+            proposedSizeConstraint.hash(into: &hasher)
+        }
+
+    }
+
+}
+
+extension HostingViewContext {
+
+    private struct MeasurableStorageCacheKey: CrossLayoutCacheKey {
+        static var emptyValue = EnvironmentAndValueValidatingCache<
+            MeasurableStorage.MeasurableSizeKey,
+            CGSize,
+            AnyCrossLayoutCacheable
+        >()
+    }
+
+    fileprivate var measurableStorageCache: EnvironmentAndValueValidatingCache<
+        MeasurableStorage.MeasurableSizeKey,
+        CGSize,
+        AnyCrossLayoutCacheable
+    > {
+        get { self[MeasurableStorageCacheKey.self] }
+        set { self[MeasurableStorageCacheKey.self] = newValue }
+    }
+
 }

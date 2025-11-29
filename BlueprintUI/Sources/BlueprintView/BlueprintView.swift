@@ -40,6 +40,8 @@ public final class BlueprintView: UIView {
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
 
+    private var hostingViewContext = Environment.HostingViewContextKey.defaultValue
+
     /// A base environment used when laying out and rendering the element tree.
     ///
     /// Some keys will be overridden with the traits from the view itself. Eg, `windowSize`, `safeAreaInsets`, etc.
@@ -52,6 +54,13 @@ public final class BlueprintView: UIView {
         didSet {
             // Shortcut: If both environments were empty, nothing changed.
             if oldValue.isEmpty && environment.isEmpty { return }
+            // Shortcut: If there are no changes to the environment, then, well, nothing changed.
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates && oldValue.isCacheablyEquivalent(
+                to: environment,
+                in: .all
+            ) {
+                return
+            }
 
             setNeedsViewHierarchyUpdate()
         }
@@ -86,6 +95,13 @@ public final class BlueprintView: UIView {
             if oldValue == nil && element == nil {
                 return
             }
+            if let layoutMode, layoutMode.options.skipUnneededSetNeedsViewHierarchyUpdates, let crossLayoutCacheable = element as? CrossLayoutCacheable, crossLayoutCacheable.isCacheablyEquivalent(
+                to: oldValue as? CrossLayoutCacheable,
+                in: .all
+            ) {
+                return
+            }
+            hostingViewContext = Environment.HostingViewContextKey.defaultValue
 
             Logger.logElementAssigned(view: self)
 
@@ -148,6 +164,7 @@ public final class BlueprintView: UIView {
 
         self.element = element
         self.environment = environment
+        self.environment.hostingViewContext = hostingViewContext
 
         rootController = NativeViewController(
             node: NativeViewNode(
@@ -542,8 +559,12 @@ public final class BlueprintView: UIView {
             environment.layoutMode = layoutMode
         }
 
+        environment.hostingViewContext = hostingViewContext
+
         return environment
     }
+
+
 
     private func handleAppeared() {
         rootController.traverse { node in

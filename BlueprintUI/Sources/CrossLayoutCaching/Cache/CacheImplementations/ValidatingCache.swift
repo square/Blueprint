@@ -80,7 +80,7 @@ import Foundation
     ///   - validate: A function that evaluates whether or not a given result is still valid.
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
-    /// - Note: Generally, prefer the `validationValue` versions of this method if the validation value conforms to ContextuallyEquivalent or Equatable.
+    /// - Note: Generally, prefer the `validationValue` versions of this method if the validation value conforms to CrossLayoutCacheable or Equatable.
     mutating func retrieveOrCreate(
         key: Key,
         environment: Environment,
