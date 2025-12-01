@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import Collections
 
 /// A node in the layout tree.
 ///
@@ -20,7 +21,7 @@ final class LayoutTreeNode {
     typealias Subnode = LayoutTreeNode
     typealias SubnodeKey = ElementIdentifier
 
-    private var subnodes: [SubnodeKey: Subnode] = [:]
+    private var subnodes: TreeDictionary<SubnodeKey, Subnode> = [:]
 
     let path: String
     let sizeCache: HintingSizeCache
