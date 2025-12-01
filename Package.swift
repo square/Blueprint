@@ -24,9 +24,18 @@ let package = Package(
             targets: ["BlueprintUIAccessibilityCore"]
         ),
     ],
+    dependencies: [
+        .package(
+            url: "https://github.com/apple/swift-collections.git",
+            .upToNextMinor(from: "1.3.0") // or `.upToNextMajor
+        )
+    ],
     targets: [
         .target(
             name: "BlueprintUI",
+            dependencies: [
+                .product(name: "Collections", package: "swift-collections")
+            ],
             path: "BlueprintUI/Sources"
             // Enable this setting to allow running tests in release mode.
             // swiftSettings: [.unsafeFlags(["-enable-testing"])]
