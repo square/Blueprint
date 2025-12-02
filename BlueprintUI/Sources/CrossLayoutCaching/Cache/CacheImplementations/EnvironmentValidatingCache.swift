@@ -1,7 +1,7 @@
 import Foundation
 
 /// A convenience wrapper around ValidatingCache which ensures that only values which were cached in equivalent environments are returned.
-@_spi(HostingViewContext) public final class EnvironmentValidatingCache<Key, Value>: Sendable where Key: Hashable & Sendable {
+@_spi(HostingViewContext) public struct EnvironmentValidatingCache<Key, Value>: Sendable where Key: Hashable {
 
     private var backing = ValidatingCache<Key, Value, EnvironmentAccessList>()
 
@@ -14,7 +14,7 @@ import Foundation
     ///   - context: The equivalency context in which the environment should be evaluated.
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
-    func retrieveOrCreate(
+    mutating func retrieveOrCreate(
         key: Key,
         environment: Environment,
         context: CrossLayoutCacheableContext,

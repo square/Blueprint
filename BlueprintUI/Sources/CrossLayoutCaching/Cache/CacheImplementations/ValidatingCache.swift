@@ -2,7 +2,7 @@ import Foundation
 
 /// Validating cache is a cache which, if it has a value for a key, runs a closure to verify that the cache value is still relevant and not state.
 /// This is useful for cases when you might otherwise wish to store the validation data as a key, but it does not conform to Hashable, or its hashability properties do not neccessarily affect the validity of the cached data.
-@_spi(HostingViewContext) public final class ValidatingCache<Key, Value, ValidationData>: Sendable where Key: Hashable & Sendable {
+@_spi(HostingViewContext) public struct ValidatingCache<Key, Value, ValidationData>: Sendable where Key: Hashable {
 
     private var storage: [Key: ValueStorage] = [:]
 
@@ -24,7 +24,7 @@ import Foundation
     ///   - validate: A function that evaluates whether or not a given result is still valid.
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
-    public func retrieveOrCreate(
+    public mutating func retrieveOrCreate(
         key: Key,
         validate: (ValidationData) -> Bool,
         create: () -> (Value, ValidationData)
@@ -59,7 +59,7 @@ import Foundation
         return fresh
     }
 
-    public func removeValue(forKey key: Key) -> Value? {
+    public mutating func removeValue(forKey key: Key) -> Value? {
         storage.removeValue(forKey: key)?.value
     }
 
