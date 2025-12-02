@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import Collections
 
 /// Environment is a container for values to be passed down an element tree.
 ///
@@ -204,7 +205,7 @@ extension HostingViewContext {
         }
 
         typealias EquivalencyResult = [CrossLayoutCacheableContext: Bool]
-        var storage: [Key: [CrossLayoutCacheableContext: Bool]] = [:]
+        var storage: TreeDictionary<Key, [CrossLayoutCacheableContext: Bool]> = [:]
 
         public subscript(
             lhs: CacheComparisonFingerprint,

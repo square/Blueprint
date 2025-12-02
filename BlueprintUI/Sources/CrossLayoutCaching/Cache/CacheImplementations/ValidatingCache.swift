@@ -1,10 +1,11 @@
 import Foundation
+import Collections
 
 /// Validating cache is a cache which, if it has a value for a key, runs a closure to verify that the cache value is still relevant and not state.
 /// This is useful for cases when you might otherwise wish to store the validation data as a key, but it does not conform to Hashable, or its hashability properties do not neccessarily affect the validity of the cached data.
 @_spi(HostingViewContext) public struct ValidatingCache<Key, Value, ValidationData>: Sendable where Key: Hashable {
 
-    private var storage: [Key: ValueStorage] = [:]
+    private var storage: TreeDictionary<Key, ValueStorage> = [:]
 
     private struct ValueStorage {
         let value: Value
