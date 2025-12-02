@@ -1,7 +1,7 @@
 import Foundation
 
 /// A convenience wrapper around ValidatingCache which ensures that only values which were cached in equivalent environments are returned, and allows for additional data to be stored to be validated.
-@_spi(HostingViewContext) public struct EnvironmentAndValueValidatingCache<Key, Value, AdditionalValidationData>: Sendable where Key: Hashable {
+@_spi(HostingViewContext) public final class EnvironmentAndValueValidatingCache<Key, Value, AdditionalValidationData>: Sendable where Key: Hashable & Sendable {
 
     private var backing = ValidatingCache<Key, Value, (EnvironmentAccessList, AdditionalValidationData)>()
 
@@ -16,7 +16,7 @@ import Foundation
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
     /// - Note: Generally, prefer the `validationValue` versions of this method if the validation value conforms to ContextuallyEquivalent or Equatable.
-    mutating func retrieveOrCreate(
+    func retrieveOrCreate(
         key: Key,
         environment: Environment,
         context: CrossLayoutCacheableContext,
@@ -45,7 +45,7 @@ import Foundation
     ///   - validationValue: A value that will be compared using contextual equivalence that evaluates whether or not a given result is still valid.
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
-    public mutating func retrieveOrCreate(
+    public func retrieveOrCreate(
         key: Key,
         environment: Environment,
         validationValue: AdditionalValidationData,
@@ -72,7 +72,7 @@ import Foundation
     ///   - validationValue: A value that will be compared using strict equality that evaluates whether or not a given result is still valid.
     ///   - create: Creates a fresh cache entry no valid cached data is available, and stores it.
     /// - Returns: Either a cached or newly created value.
-    @_disfavoredOverload public mutating func retrieveOrCreate(
+    @_disfavoredOverload public func retrieveOrCreate(
         key: Key,
         environment: Environment,
         validationValue: AdditionalValidationData,
