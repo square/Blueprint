@@ -188,7 +188,7 @@ extension Environment: CrossLayoutCacheable {
 
 extension HostingViewContext {
 
-    fileprivate struct EnvironmentFingerprintCache {
+    fileprivate final class EnvironmentFingerprintCache {
 
         struct Key: Hashable {
             let lhs: CacheComparisonFingerprint.Value
