@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>CaffeinatedLayout Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Protocol/CaffeinatedLayout" class="dashAnchor"></a>
+
+    <a title="CaffeinatedLayout Protocol Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Blueprint
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/square/Blueprint">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Blueprint Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      CaffeinatedLayout Protocol Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Creating%20Custom%20Elements.html">Creating Custom Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Element.html">Element</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ProxyElement.html">ProxyElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementContent.html">ElementContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementContent/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription.html">ViewDescription</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription/FrameRoundingBehavior.html">– FrameRoundingBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription/Configuration.html">– Configuration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/LayoutTransition.html">LayoutTransition</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/VisibilityTransition.html">VisibilityTransition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Displaying%20Elements.html">Displaying Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/BlueprintView.html">BlueprintView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementPreview.html">ElementPreview</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementPreview/PreviewType.html">– PreviewType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Common%20Elements.html">Common Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityBlocker.html">AccessibilityBlocker</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityContainer.html">AccessibilityContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityContainer/ContainerType.html">– ContainerType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityElement.html">AccessibilityElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AdaptedEnvironment.html">AdaptedEnvironment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EnvironmentReader.html">EnvironmentReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned.html">Aligned</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned/VerticalAlignment.html">– VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned/HorizontalAlignment.html">– HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedLabel.html">AttributedLabel</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedLabel/LinkDetectionType.html">– LinkDetectionType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box.html">Box</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/CornerCurve.html">– CornerCurve</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/BorderStyle.html">– BorderStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/ShadowStyle.html">– ShadowStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Button.html">Button</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Centered.html">Centered</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Column.html">Column</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Column/ColumnAlignment.html">– ColumnAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedAspectRatio.html">ConstrainedAspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedAspectRatio/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedSize.html">ConstrainedSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedSize/Constraint.html">– Constraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Empty.html">Empty</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack.html">EqualStack</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack/Direction.html">– Direction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GeometryReader.html">GeometryReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Image.html">Image</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Image/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Inset.html">Inset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Label.html">Label</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Label/LineHeight.html">– LineHeight</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Overlay.html">Overlay</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Overlay/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Row.html">Row</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Row/RowAlignment.html">– RowAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule.html">Rule</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule/Orientation.html">– Orientation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule/Thickness.html">– Thickness</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView.html">ScrollView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/SafeAreaEdge.html">– SafeAreaEdge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/KeyboardAdjustmentMode.html">– KeyboardAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ContentSize.html">– ContentSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/PullToRefreshBehavior.html">– PullToRefreshBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ScrollTrigger.html">– ScrollTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ContentOffset.html">– ContentOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl.html">SegmentedControl</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl/Selection.html">– Selection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl/Item.html">– Item</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Spacer.html">Spacer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Tappable.html">Tappable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextField.html">TextField</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TransitionContainer.html">TransitionContainer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Environment.html">Environment</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Environment.html">Environment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Environment/LayoutDirection.html">– LayoutDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/EnvironmentKey.html">EnvironmentKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/FocusTrigger.html">FocusTrigger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility.html">Accessibility</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/Trait.html">– Trait</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/CustomAction.html">– CustomAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/CustomContent.html">– CustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerElement.html">– LargeContentViewerElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerItem.html">– LargeContentViewerItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerConfiguration.html">– LargeContentViewerConfiguration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewer.html">– LargeContentViewer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerInteractionContainer.html">– LargeContentViewerInteractionContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerInteractionContainerViewable.html">– LargeContentViewerInteractionContainerViewable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/BlueprintLogging.html">BlueprintLogging</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/BlueprintLogging/Config.html">– Config</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ColorKey.html">ColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CornerStyle.html">CornerStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CornerStyle/Corners.html">– Corners</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/FontKey.html">FontKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/LinkKey.html">LinkKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ParagraphStyleKey.html">ParagraphStyleKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TrackingKey.html">TrackingKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/UnderlineColorKey.html">UnderlineColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/UnderlineStyleKey.html">UnderlineStyleKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/AXCustomContent.html">AXCustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/BidirectionalCollection.html">BidirectionalCollection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/CGSize.html">CGSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/ElementBuilder.html">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/FloatingPoint.html">FloatingPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/PreviewDevice.html">PreviewDevice</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIAccessibilityTraits.html">UIAccessibilityTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIBezierPath.html">UIBezierPath</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIOffset.html">UIOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions.html#/c:objc(cs)UIView">UIView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AlignmentID.html">AlignmentID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AttributedTextKey.html">AttributedTextKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/BlueprintViewMetricsDelegate.html">BlueprintViewMetricsDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CaffeinatedLayout.html">CaffeinatedLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CaffeinatedSingleChildLayout.html">CaffeinatedSingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ElementBuilderChild.html">ElementBuilderChild</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/LayoutTraitsKey.html">LayoutTraitsKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Measurable.html">Measurable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/NativeView.html">NativeView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols.html#/s:11BlueprintUI17SingleChildLayoutP">SingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/SingleTraitLayout.html">SingleTraitLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/StackElement.html">StackElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/UIViewElement.html">UIViewElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/URLHandler.html">URLHandler</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityCombine.html">AccessibilityCombine</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityFocus.html">AccessibilityFocus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityFocus/Trigger.html">– Trigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Alignment.html">Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AnimationAttributes.html">AnimationAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AspectRatio.html">AspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedText.html">AttributedText</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedText/Run.html">– Run</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/BlueprintViewRenderMetrics.html">BlueprintViewRenderMetrics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Builder.html">Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate.html">Decorate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Layering.html">– Layering</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Corner.html">– Corner</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Position.html">– Position</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu.html">EditingMenu</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu/Gesture.html">– Gesture</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu/MenuTrigger.html">– MenuTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenuItem.html">EditingMenuItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenuItem/Kind.html">– Kind</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementDimensions.html">ElementDimensions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow.html">Flow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/LineAlignment.html">– LineAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/ItemAlignment.html">– ItemAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/Priority.html">– Priority</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/FocusBinding.html">FocusBinding</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/FocusState.html">FocusState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GeometryProxy.html">GeometryProxy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow.html">GridRow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow/Width.html">– Width</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Hidden.html">Hidden</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/HorizontalAlignment.html">HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Keyed.html">Keyed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutAttributes.html">LayoutAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutMode.html">LayoutMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutOptions.html">LayoutOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutSubelement.html">LayoutSubelement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutSubelement/Attributes.html">– Attributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutTraits.html">LayoutTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter.html">LayoutWriter</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Context.html">– Context</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Sizing.html">– Sizing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LifecycleObserver.html">LifecycleObserver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Opacity.html">Opacity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint.html">SizeConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint/UnconstrainedInfiniteAxis.html">– UnconstrainedInfiniteAxis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout.html">StackLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/AlignmentGuide.html">– AlignmentGuide</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Traits.html">– Traits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/UnderflowDistribution.html">– UnderflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/OverflowDistribution.html">– OverflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Alignment.html">– Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextAttributeContainer.html">TextAttributeContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextShadow.html">TextShadow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TintAdjustmentMode.html">TintAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Transformed.html">Transformed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UIViewElementContext.html">UIViewElementContext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/URLHandlerEnvironmentKey.html">URLHandlerEnvironmentKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UnitPoint.html">UnitPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInteractionEnabled.html">UserInteractionEnabled</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInterfaceStyleOverridingElement.html">UserInterfaceStyleOverridingElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/VerticalAlignment.html">VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescriptionContext.html">ViewDescriptionContext</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI14ElementBuildera">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI17LifecycleCallbacka">LifecycleCallback</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>CaffeinatedLayout</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">CaffeinatedLayout</span></code></pre>
+
+                </div>
+              </div>
+            
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa"></a>
+                    <a name="//apple_ref/swift/Alias/Subelements" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa">Subelements</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">typealias</span> <span class="kt">Subelements</span> <span class="o">=</span> <span class="kt"><a href="../Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa"></a>
+                    <a name="//apple_ref/swift/Alias/Cache" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Cached values associated with the layout instance.</p>
+
+<p>If you create a cache for your custom layout, you can use a type alias to define this type
+as your data storage type. Alternatively, you can refer to the data storage type directly in
+all the places where you work with the cache.</p>
+
+<p>See <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP9makeCache11subelements11environment0F0QzSayAA0D10SubelementVG_AA11EnvironmentVtF">makeCache(subelements:environment:)</a></code> for more information.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">associatedtype</span> <span class="kt">Cache</span> <span class="o">=</span> <span class="kt">Void</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF"></a>
+                    <a name="//apple_ref/swift/Method/sizeThatFits(proposal:subelements:environment:cache:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">sizeThatFits(proposal:<wbr>subelements:<wbr>environment:<wbr>cache:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the size of the composite element, given a proposed size constraint and the
+container&rsquo;s subelements.</p>
+
+<p>Implement this method to tell your custom layout container’s parent how much space the
+container needs for a set of subelements, given a size constraint. The parent might call
+this method more than once during a layout pass with different proposed sizes to test the
+flexibility of the container.</p>
+
+<p>In Blueprint, parents ultimately choose the size of their children, so the actual size that
+this container is laid out in may not be a size that was returned from this method.</p>
+<h2 id='sizing-rules' class='heading'>Sizing Rules</h2>
+
+<p>For performance reasons, the layout engine may deduce the measurement of your container for
+some constraint values without explicitly calling
+<code>sizeThatFits(proposal:subelements:environment:cache:)</code>. To ensure that the deduced value
+is correct, your layout must follow some ground rules:</p>
+
+<ol>
+<li><strong>Given one fixed constraint axis, the element&rsquo;s growth along the other axis should be
+<em>monotonic</em>.</strong> That is, an element can grow when given a larger constraint, or shrink
+when given a smaller constraint, but it should never shrink when given a larger
+constraint. When growing on one axis, it is OK to shrink along the other axis, such as a
+block of text that re-flows as the width changes.</li>
+<li>For a constraint axis value <em>a</em>, if an element has a length <em>b</em> that is less than <em>a</em> on
+that axis, then the element must return <em>b</em> for <strong>all constraint values between <em>a</em> and
+<em>b</em></strong>. In other words, growth must follow a stair-step pattern; elements that grow
+continuously by calculating a fixed inset of the constraint or a percentage value of the
+constraint are forbidden. For example, if an element returns <code>10</code> for a constraint of
+<code>20</code>, then the element must return <code>10</code> for all values in the range <code>[10, 20]</code>.</li>
+<li>If your element has no intrinsic size along an axis, you can represent that in a couple
+ways:
+
+<ul>
+<li>You can return a fixed value representing the minimum size for your element. In this
+approach, a containing element is usually responsible for stretching your element to
+fill desired space.</li>
+<li>You can return a size that entirely fills the constraint proposed. In this approach,
+you <strong>must</strong> return <code>.infinity</code> when the constraint is
+<code><a href="../Structs/SizeConstraint/Axis.html#/s:11BlueprintUI14SizeConstraintV4AxisO13unconstrainedyA2EmF">unconstrained</a></code>. Otherwise, your behavior would be in violation
+of rule #1.</li>
+</ul></li>
+</ol>
+
+<p>If an element does not adhere to these rules, it may lay out in unexpected and unpredictable
+ways.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">sizeThatFits</span><span class="p">(</span>
+    <span class="nv">proposal</span><span class="p">:</span> <span class="kt"><a href="../Structs/SizeConstraint.html">SizeConstraint</a></span><span class="p">,</span>
+    <span class="nv">subelements</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa">Subelements</a></span><span class="p">,</span>
+    <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span><span class="p">,</span>
+    <span class="nv">cache</span><span class="p">:</span> <span class="k">inout</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a></span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGSize</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>proposal</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A size constraint for the container. The container&rsquo;s parent element that calls
+this method might call the method more than once with different constraints to learn
+more about the container’s flexibility before choosing a size for placement.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>subelements</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A collection of proxies that represent the elements that the container
+arranges. You can use the proxies in the collection to get information about the
+subelements as you determine how much space the container needs to display them.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>environment</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The environment of the container. You can use properties from the
+environment when calculating the size of this container, as long as you adhere to the
+sizing rules.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cache</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional storage for calculated data that you can share among the methods of your
+custom layout container. See <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP9makeCache11subelements11environment0F0QzSayAA0D10SubelementVG_AA11EnvironmentVtF">makeCache(subelements:environment:)</a></code> for details.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A size that indicates how much space the container needs to arrange its
+subelements.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF"></a>
+                    <a name="//apple_ref/swift/Method/placeSubelements(in:subelements:environment:cache:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">placeSubelements(in:<wbr>subelements:<wbr>environment:<wbr>cache:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Assigns positions to each of the layout’s subelements.</p>
+
+<p>Blueprint calls your implementation of this method to tell your custom layout container to
+place its subelements. From this method, call the
+<code><a href="../Structs/LayoutSubelement.html#/s:11BlueprintUI16LayoutSubelementV5place2at6anchor4sizeySo7CGPointV_AA9UnitPointVSo6CGSizeVtF">place(at:anchor:size:)</a></code> method on each item in <code>subelements</code> to tell the
+subelements where to appear in the user interface.</p>
+
+<p>You can also update the <code><a href="../Structs/LayoutSubelement.html#/s:11BlueprintUI16LayoutSubelementV10attributesAC10AttributesVvp">attributes</a></code> property of each
+subelement to set properties like opacity and transforms on each subelement.</p>
+
+<p>Be sure that you use computations during placement that are consistent with those in your
+implementation of other protocol methods for a given set of inputs. For example, if you add
+spacing during placement, make sure your implementation of
+<code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">sizeThatFits(proposal:subelements:environment:cache:)</a></code> accounts for the extra space.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">placeSubelements</span><span class="p">(</span>
+    <span class="k">in</span> <span class="nv">size</span><span class="p">:</span> <span class="kt">CGSize</span><span class="p">,</span>
+    <span class="nv">subelements</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa">Subelements</a></span><span class="p">,</span>
+    <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span><span class="p">,</span>
+    <span class="nv">cache</span><span class="p">:</span> <span class="k">inout</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a></span>
+<span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>size</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The region that the container&rsquo;s parent allocates to the container. Place all the
+container&rsquo;s subelements within the region. The size of this region may not match any
+size that was returned from a call to
+<code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">sizeThatFits(proposal:subelements:environment:cache:)</a></code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>subelements</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A collection of proxies that represent the elements that the container
+arranges. Use the proxies in the collection to get information about the subelements and
+to tell the subelements where to appear.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>environment</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The environment of this container. You can use properties from the
+environment to vary the placement of subelements.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cache</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Optional storage for calculated data that you can share among the methods of your
+custom layout container. See <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP9makeCache11subelements11environment0F0QzSayAA0D10SubelementVG_AA11EnvironmentVtF">makeCache(subelements:environment:)</a></code> for details.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutP9makeCache11subelements11environment0F0QzSayAA0D10SubelementVG_AA11EnvironmentVtF"></a>
+                    <a name="//apple_ref/swift/Method/makeCache(subelements:environment:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutP9makeCache11subelements11environment0F0QzSayAA0D10SubelementVG_AA11EnvironmentVtF">makeCache(subelements:<wbr>environment:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates and initializes a cache for a layout instance.</p>
+
+<p>You can optionally use a cache to preserve calculated values across calls to a layout
+container’s methods. Many layout types don’t need a cache, because Blueprint automatically
+caches the results of calls into layout methods, such as
+<code><a href="../Structs/LayoutSubelement.html#/s:11BlueprintUI16LayoutSubelementV12sizeThatFitsySo6CGSizeVAA14SizeConstraintVF">sizeThatFits(_:)</a></code>. Rely on the protocol’s default implementation of this
+method if you don’t need a cache.</p>
+
+<p>However you might find a cache useful when the layout container repeats complex intermediate
+calculations across calls to <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">sizeThatFits(proposal:subelements:environment:cache:)</a></code> and
+<code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">placeSubelements(in:subelements:environment:cache:)</a></code>. You might be able to improve
+performance by calculating values once and storing them in a cache.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    A cache&rsquo;s lifetime is limited to a single render pass, so you cannot use it to store
+values across multiple calls to <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">placeSubelements(in:subelements:environment:cache:)</a></code>. A
+render pass includes zero, one, or many calls to
+<code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP12sizeThatFits8proposal11subelements11environment5cacheSo6CGSizeVAA14SizeConstraintV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">sizeThatFits(proposal:subelements:environment:cache:)</a></code>, followed by a single call to
+<code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">placeSubelements(in:subelements:environment:cache:)</a></code>.
+
+</div>
+
+<p>Only implement a cache if profiling shows that it improves performance.</p>
+<h2 id='initializing-a-cache' class='heading'>Initializing a cache</h2>
+
+<p>Implement the <code>makeCache(subelements:)</code> method to create a cache. You can add computed
+values to the cache right away, using information from the subelements input parameter, or
+you can do that later. The methods of the <code><a href="../Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a></code> protocol that can access the cache take
+the cache as an in-out parameter, which enables you to modify the cache anywhere that you
+can read it.</p>
+
+<p>You can use any storage type that makes sense for your layout algorithm, but be sure that
+you only store data that you derive from the layout and its subelements (lazily, if
+possible). For this to work correctly, Blueprint needs to be able to call this method to
+recreate the cache without changing the layout result.</p>
+
+<p>When you return a cache from this method, you implicitly define a type for your cache. Be
+sure to either make the type of the cache parameters on your other <code><a href="../Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a></code> protocol
+methods match, or use a type alias to define the <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a></code> associated type.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">makeCache</span><span class="p">(</span><span class="nv">subelements</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa">Subelements</a></span><span class="p">,</span> <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>subelements</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A collection of proxy instances that represent the subelements that
+the container arranges. You can use the proxies in the collection to get information about
+the subelements as you calculate values to store in the cache.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>environment</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The environment of this container.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Storage for calculated data that you share among the methods of your custom
+layout container.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Available%20where%20%60Cache%60%20%3D%3D%20%28%29"></a>
+                <a name="//apple_ref/swift/Section/Available where `Cache` == ()" class="dashAnchor"></a>
+                <div class="section-name-container">
+                  <a class="section-name-link" href="#/Available%20where%20%60Cache%60%20%3D%3D%20%28%29"></a>
+                  <h3 class="section-name"><span>Available where <code><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP5CacheQa">Cache</a></code> == ()</span>
+</h3>
+                </div>
+              </div>
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17CaffeinatedLayoutPAAyt5CacheRtzrlE04makeE011subelements11environmentySayAA0D10SubelementVG_AA11EnvironmentVtF"></a>
+                    <a name="//apple_ref/swift/Method/makeCache(subelements:environment:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17CaffeinatedLayoutPAAyt5CacheRtzrlE04makeE011subelements11environmentySayAA0D10SubelementVG_AA11EnvironmentVtF">makeCache(subelements:<wbr>environment:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">makeCache</span><span class="p">(</span><span class="nv">subelements</span><span class="p">:</span> <span class="kt"><a href="../Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP11Subelementsa">Subelements</a></span><span class="p">,</span> <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2025 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2025-12-03)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

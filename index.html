@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blueprint  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="Blueprint  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Blueprint
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/square/Blueprint">
+            <img class="header-icon" src="img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Blueprint Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      Blueprint  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Creating%20Custom%20Elements.html">Creating Custom Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Element.html">Element</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/ProxyElement.html">ProxyElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementContent.html">ElementContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementContent/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription.html">ViewDescription</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription/FrameRoundingBehavior.html">– FrameRoundingBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription/Configuration.html">– Configuration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/LayoutTransition.html">LayoutTransition</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/VisibilityTransition.html">VisibilityTransition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Displaying%20Elements.html">Displaying Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/BlueprintView.html">BlueprintView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementPreview.html">ElementPreview</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementPreview/PreviewType.html">– PreviewType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Common%20Elements.html">Common Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityBlocker.html">AccessibilityBlocker</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityContainer.html">AccessibilityContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityContainer/ContainerType.html">– ContainerType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityElement.html">AccessibilityElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AdaptedEnvironment.html">AdaptedEnvironment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EnvironmentReader.html">EnvironmentReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned.html">Aligned</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned/VerticalAlignment.html">– VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned/HorizontalAlignment.html">– HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedLabel.html">AttributedLabel</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedLabel/LinkDetectionType.html">– LinkDetectionType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box.html">Box</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/CornerCurve.html">– CornerCurve</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/BorderStyle.html">– BorderStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/ShadowStyle.html">– ShadowStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Button.html">Button</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Centered.html">Centered</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Column.html">Column</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Column/ColumnAlignment.html">– ColumnAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedAspectRatio.html">ConstrainedAspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedAspectRatio/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedSize.html">ConstrainedSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedSize/Constraint.html">– Constraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Empty.html">Empty</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack.html">EqualStack</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack/Direction.html">– Direction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GeometryReader.html">GeometryReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Image.html">Image</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Image/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Inset.html">Inset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Label.html">Label</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Label/LineHeight.html">– LineHeight</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Overlay.html">Overlay</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Overlay/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Row.html">Row</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Row/RowAlignment.html">– RowAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule.html">Rule</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule/Orientation.html">– Orientation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule/Thickness.html">– Thickness</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView.html">ScrollView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/SafeAreaEdge.html">– SafeAreaEdge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/KeyboardAdjustmentMode.html">– KeyboardAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ContentSize.html">– ContentSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/PullToRefreshBehavior.html">– PullToRefreshBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ScrollTrigger.html">– ScrollTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ContentOffset.html">– ContentOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl.html">SegmentedControl</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl/Selection.html">– Selection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl/Item.html">– Item</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Spacer.html">Spacer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Tappable.html">Tappable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextField.html">TextField</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TransitionContainer.html">TransitionContainer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Environment.html">Environment</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Environment.html">Environment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Environment/LayoutDirection.html">– LayoutDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/EnvironmentKey.html">EnvironmentKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/FocusTrigger.html">FocusTrigger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility.html">Accessibility</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/Trait.html">– Trait</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/CustomAction.html">– CustomAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/CustomContent.html">– CustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerElement.html">– LargeContentViewerElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerItem.html">– LargeContentViewerItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerConfiguration.html">– LargeContentViewerConfiguration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewer.html">– LargeContentViewer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerInteractionContainer.html">– LargeContentViewerInteractionContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerInteractionContainerViewable.html">– LargeContentViewerInteractionContainerViewable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/BlueprintLogging.html">BlueprintLogging</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/BlueprintLogging/Config.html">– Config</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/ColorKey.html">ColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CornerStyle.html">CornerStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CornerStyle/Corners.html">– Corners</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/FontKey.html">FontKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/LinkKey.html">LinkKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/ParagraphStyleKey.html">ParagraphStyleKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/TrackingKey.html">TrackingKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/UnderlineColorKey.html">UnderlineColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/UnderlineStyleKey.html">UnderlineStyleKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/AXCustomContent.html">AXCustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/BidirectionalCollection.html">BidirectionalCollection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/CGSize.html">CGSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/ElementBuilder.html">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/FloatingPoint.html">FloatingPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/PreviewDevice.html">PreviewDevice</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIAccessibilityTraits.html">UIAccessibilityTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIBezierPath.html">UIBezierPath</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIOffset.html">UIOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions.html#/c:objc(cs)UIView">UIView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/AlignmentID.html">AlignmentID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/AttributedTextKey.html">AttributedTextKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/BlueprintViewMetricsDelegate.html">BlueprintViewMetricsDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CaffeinatedLayout.html">CaffeinatedLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CaffeinatedSingleChildLayout.html">CaffeinatedSingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/ElementBuilderChild.html">ElementBuilderChild</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/LayoutTraitsKey.html">LayoutTraitsKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Measurable.html">Measurable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/NativeView.html">NativeView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols.html#/s:11BlueprintUI17SingleChildLayoutP">SingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/SingleTraitLayout.html">SingleTraitLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/StackElement.html">StackElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/UIViewElement.html">UIViewElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/URLHandler.html">URLHandler</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityCombine.html">AccessibilityCombine</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityFocus.html">AccessibilityFocus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityFocus/Trigger.html">– Trigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Alignment.html">Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AnimationAttributes.html">AnimationAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AspectRatio.html">AspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedText.html">AttributedText</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedText/Run.html">– Run</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/BlueprintViewRenderMetrics.html">BlueprintViewRenderMetrics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Builder.html">Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate.html">Decorate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Layering.html">– Layering</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Corner.html">– Corner</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Position.html">– Position</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu.html">EditingMenu</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu/Gesture.html">– Gesture</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu/MenuTrigger.html">– MenuTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenuItem.html">EditingMenuItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenuItem/Kind.html">– Kind</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementDimensions.html">ElementDimensions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow.html">Flow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/LineAlignment.html">– LineAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/ItemAlignment.html">– ItemAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/Priority.html">– Priority</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/FocusBinding.html">FocusBinding</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/FocusState.html">FocusState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GeometryProxy.html">GeometryProxy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow.html">GridRow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow/Width.html">– Width</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Hidden.html">Hidden</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/HorizontalAlignment.html">HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Keyed.html">Keyed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutAttributes.html">LayoutAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutMode.html">LayoutMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutOptions.html">LayoutOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutSubelement.html">LayoutSubelement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutSubelement/Attributes.html">– Attributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutTraits.html">LayoutTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter.html">LayoutWriter</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Context.html">– Context</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Sizing.html">– Sizing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LifecycleObserver.html">LifecycleObserver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Opacity.html">Opacity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint.html">SizeConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint/UnconstrainedInfiniteAxis.html">– UnconstrainedInfiniteAxis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout.html">StackLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/AlignmentGuide.html">– AlignmentGuide</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Traits.html">– Traits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/UnderflowDistribution.html">– UnderflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/OverflowDistribution.html">– OverflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Alignment.html">– Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextAttributeContainer.html">TextAttributeContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextShadow.html">TextShadow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TintAdjustmentMode.html">TintAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Transformed.html">Transformed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UIViewElementContext.html">UIViewElementContext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/URLHandlerEnvironmentKey.html">URLHandlerEnvironmentKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UnitPoint.html">UnitPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UserInteractionEnabled.html">UserInteractionEnabled</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UserInterfaceStyleOverridingElement.html">UserInterfaceStyleOverridingElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/VerticalAlignment.html">VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescriptionContext.html">ViewDescriptionContext</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI14ElementBuildera">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI17LifecycleCallbacka">LifecycleCallback</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            
+            <h1 id='blueprint' class='heading'>Blueprint</h1>
+
+<p><a href="https://github.com/square/Blueprint/actions/workflows/tests.yaml"><img src="https://github.com/square/Blueprint/actions/workflows/tests.yaml/badge.svg" alt="Tests"></a>
+<a href="https://github.com/square/Blueprint/actions/workflows/docs.yml"><img src="https://github.com/square/Blueprint/actions/workflows/docs.yml/badge.svg" alt="Generate and publish docs"></a>
+<a href="https://github.com/square/Blueprint/actions/workflows/lint.yml"><img src="https://github.com/square/Blueprint/actions/workflows/lint.yml/badge.svg" alt="Linter"></a></p>
+<h2 id='declarative-ui-construction-for-ios-written-in-swift' class='heading'>Declarative UI construction for iOS, written in Swift</h2>
+
+<p>Blueprint greatly simplifies the task of building and updating views as application state changes.</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">view</span> <span class="o">=</span> <span class="kt">BlueprintView</span><span class="p">(</span><span class="nv">element</span><span class="p">:</span> <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Hello from Blueprint!"</span><span class="p">))</span>
+</code></pre>
+<h3 id='what-does-this-library-do' class='heading'>What does this library do?</h3>
+
+<p>Blueprint provides an architecture that allows you to:</p>
+
+<ul>
+<li>Declaratively define a UI hierarchy as pure values (Swift structs and enums).</li>
+<li>Display that hierarchy within your application.</li>
+<li>Update that hierarchy as application state changes (including animated transitions).</li>
+</ul>
+<h3 id='when-should-i-use-it' class='heading'>When should I use it?</h3>
+
+<p>Use Blueprint any time you want to display a view hierarchy, but don&rsquo;t want to manage view lifecycle (hint: managing view lifecycle is a large portion of most conventional UIKit code). There are times when you <em>want</em> to manage view lifecycle (complex animations and transitions are a good example), and for these cases you may want to stick with a conventional approach.</p>
+<h3 id='how-does-it-interact-with-uikit' class='heading'>How does it interact with UIKit?</h3>
+
+<p>Blueprint is not a replacement for UIKit! From the beginning, Blueprint has been designed as a compliment to all of the powerful tools that come with the platform. You can use Blueprint to manage the display of a single view controller, or of a single view representing a small part of the screen. Likewise, it&rsquo;s straightforward to host standard views and controls <em>within</em> a blueprint hierarchy, always leaving you with an escape hatch.</p>
+<h3 id='how-does-it-interact-with-swiftui' class='heading'>How does it interact with SwiftUI?</h3>
+
+<p>They serve similar purposes, and SwiftUI has heavily influenced Blueprint&rsquo;s API. However, Blueprint predates SwiftUI, and works a bit differently. You can host a <code><a href="Classes/BlueprintView.html">BlueprintView</a></code> in SwiftUI to embed Blueprint within SwiftUI, and you can also use the provided <code>ElementView</code> to create Xcode previews of Blueprint. Because SwiftUI is hosted by a UIViewController, and Blueprint is hosted in a UIView, we don&rsquo;t provide a way to embed SwiftUI within Blueprint.</p>
+<h2 id='getting-started' class='heading'>Getting Started</h2>
+<h3 id='swift-package-manager' class='heading'>Swift Package Manager</h3>
+
+<p><a href="#swift-package-manager"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg" alt="SwiftPM compatible"></a></p>
+
+<p>If you are developing your own package, be sure that Blueprint is included in <code>dependencies</code>
+in <code>Package.swift</code>:</p>
+<pre class="highlight swift"><code><span class="nv">dependencies</span><span class="p">:</span> <span class="p">[</span>
+    <span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/square/Blueprint"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"5.1.0"</span><span class="p">)</span>
+<span class="p">]</span>
+</code></pre>
+
+<p>In Xcode 11+, add Blueprint directly as a dependency to your project with
+<code>File</code> &gt; <code>Swift Packages</code> &gt; <code>Add Package Dependency...</code>. Provide the git URL when prompted: <code>git@github.com:square/Blueprint.git</code>.</p>
+
+<p>Three modules are provided:</p>
+
+<ul>
+<li><code>BlueprintUI</code> contains the core architecture and layout types.</li>
+<li><code>BlueprintUICommonControls</code> includes elements representing some common <code>UIKit</code> views and controls.</li>
+<li><code>BlueprintUIAccessibilityCore</code> provides accessibility infrastructure for component authors.</li>
+</ul>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<p>API documentation is available at <a href="https://square.github.io/Blueprint/">square.github.io/Blueprint</a></p>
+<h3 id='getting-started' class='heading'>Getting Started</h3>
+
+<ol>
+<li><p><strong><a href="Documentation/GettingStarted/HelloWorld.md">Hello, World</a></strong></p></li>
+<li><p><strong><a href="Documentation/GettingStarted/ElementHierarchy.md">The Element Hierarchy</a></strong></p></li>
+<li><p><strong><a href="Documentation/GettingStarted/CustomElements.md">Building Custom Elements</a></strong></p></li>
+<li><p><strong><a href="Documentation/GettingStarted/Layout.md">Layout</a></strong></p></li>
+</ol>
+<h3 id='reference' class='heading'>Reference</h3>
+
+<ol>
+<li><p><strong><a href="Documentation/Reference/Element.md"><code><a href="Protocols/Element.html">Element</a></code></a></strong></p></li>
+<li><p><strong><a href="Documentation/Reference/BlueprintView.md"><code><a href="Classes/BlueprintView.html">BlueprintView</a></code></a></strong></p></li>
+<li><p><strong><a href="Documentation/Reference/ViewDescription.md"><code><a href="Structs/ViewDescription.html">ViewDescription</a></code></a></strong></p></li>
+<li><p><strong><a href="Documentation/Reference/Transitions.md">Transitions</a></strong></p></li>
+</ol>
+<h3 id='tutorials' class='heading'>Tutorials</h3>
+
+<p><a href="Documentation/Tutorials/Setup.md">Tutorial setup instructions</a></p>
+
+<ol>
+<li><p><strong><a href="Documentation/Tutorials/Tutorial1.md">Using Blueprint in a View Controller</a></strong></p></li>
+<li><p><strong><a href="Documentation/Tutorials/Tutorial2.md">Building a receipt layout with Blueprint</a></strong></p></li>
+</ol>
+<h2 id='local-development' class='heading'>Local Development</h2>
+
+<p>This project uses <a href="https://mise.jdx.dev/">Mise</a> and <a href="https://tuist.io/">Tuist</a> to generate a project for local development. Follow the steps below for the recommended setup for zsh.</p>
+<pre class="highlight shell"><code><span class="c"># install mise</span>
+brew <span class="nb">install </span>mise
+<span class="c"># add mise activation line to your zshrc</span>
+<span class="nb">echo</span> <span class="s1">'eval "$(mise activate zsh)"'</span> <span class="o">&gt;&gt;</span> ~/.zshrc
+<span class="c"># load mise into your shell</span>
+<span class="nb">source</span> ~/.zshrc
+<span class="c"># tell mise to trust Blueprint's config file</span>
+mise trust
+<span class="c"># install dependencies</span>
+mise <span class="nb">install</span>
+
+<span class="c"># only necessary for first setup or after changing dependencies</span>
+tuist <span class="nb">install</span> <span class="nt">--path</span> SampleApp
+<span class="c"># generates and opens the Xcode project</span>
+tuist generate <span class="nt">--path</span> SampleApp
+</code></pre>
+
+<hr>
+
+<p>Copyright 2019 Square, Inc.</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the &ldquo;License&rdquo;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &ldquo;AS IS&rdquo; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2025 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2025-12-03)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

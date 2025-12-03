@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BlueprintView Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Class/BlueprintView" class="dashAnchor"></a>
+
+    <a title="BlueprintView Class Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="../index.html">
+          Blueprint
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="../search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/square/Blueprint">
+            <img class="header-icon" src="../img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="../index.html">Blueprint Reference</a>
+      <img class="carat" src="../img/carat.png" alt=""/>
+      BlueprintView Class Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Creating%20Custom%20Elements.html">Creating Custom Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Element.html">Element</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ProxyElement.html">ProxyElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementContent.html">ElementContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementContent/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription.html">ViewDescription</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription/FrameRoundingBehavior.html">– FrameRoundingBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescription/Configuration.html">– Configuration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/LayoutTransition.html">LayoutTransition</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/VisibilityTransition.html">VisibilityTransition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Displaying%20Elements.html">Displaying Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/BlueprintView.html">BlueprintView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementPreview.html">ElementPreview</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementPreview/PreviewType.html">– PreviewType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Common%20Elements.html">Common Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityBlocker.html">AccessibilityBlocker</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityContainer.html">AccessibilityContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityContainer/ContainerType.html">– ContainerType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityElement.html">AccessibilityElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AdaptedEnvironment.html">AdaptedEnvironment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EnvironmentReader.html">EnvironmentReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned.html">Aligned</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned/VerticalAlignment.html">– VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Aligned/HorizontalAlignment.html">– HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedLabel.html">AttributedLabel</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedLabel/LinkDetectionType.html">– LinkDetectionType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box.html">Box</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/CornerCurve.html">– CornerCurve</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/BorderStyle.html">– BorderStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Box/ShadowStyle.html">– ShadowStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Button.html">Button</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Centered.html">Centered</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Column.html">Column</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Column/ColumnAlignment.html">– ColumnAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedAspectRatio.html">ConstrainedAspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedAspectRatio/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedSize.html">ConstrainedSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ConstrainedSize/Constraint.html">– Constraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Empty.html">Empty</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack.html">EqualStack</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack/Direction.html">– Direction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EqualStack/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GeometryReader.html">GeometryReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Image.html">Image</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Image/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Inset.html">Inset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Label.html">Label</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Label/LineHeight.html">– LineHeight</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Overlay.html">Overlay</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Overlay/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Row.html">Row</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Row/RowAlignment.html">– RowAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule.html">Rule</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule/Orientation.html">– Orientation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Rule/Thickness.html">– Thickness</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView.html">ScrollView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/SafeAreaEdge.html">– SafeAreaEdge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/KeyboardAdjustmentMode.html">– KeyboardAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ContentSize.html">– ContentSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/PullToRefreshBehavior.html">– PullToRefreshBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ScrollTrigger.html">– ScrollTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ScrollView/ContentOffset.html">– ContentOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl.html">SegmentedControl</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl/Selection.html">– Selection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SegmentedControl/Item.html">– Item</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Spacer.html">Spacer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Tappable.html">Tappable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextField.html">TextField</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TransitionContainer.html">TransitionContainer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Environment.html">Environment</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Environment.html">Environment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Environment/LayoutDirection.html">– LayoutDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/EnvironmentKey.html">EnvironmentKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Classes/FocusTrigger.html">FocusTrigger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility.html">Accessibility</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/Trait.html">– Trait</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/CustomAction.html">– CustomAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/CustomContent.html">– CustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerElement.html">– LargeContentViewerElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerItem.html">– LargeContentViewerItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerConfiguration.html">– LargeContentViewerConfiguration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewer.html">– LargeContentViewer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerInteractionContainer.html">– LargeContentViewerInteractionContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/Accessibility/LargeContentViewerInteractionContainerViewable.html">– LargeContentViewerInteractionContainerViewable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/BlueprintLogging.html">BlueprintLogging</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/BlueprintLogging/Config.html">– Config</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ColorKey.html">ColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CornerStyle.html">CornerStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/CornerStyle/Corners.html">– Corners</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/FontKey.html">FontKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/LinkKey.html">LinkKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/ParagraphStyleKey.html">ParagraphStyleKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/TrackingKey.html">TrackingKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/UnderlineColorKey.html">UnderlineColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Enums/UnderlineStyleKey.html">UnderlineStyleKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/AXCustomContent.html">AXCustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/BidirectionalCollection.html">BidirectionalCollection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/CGSize.html">CGSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/ElementBuilder.html">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/FloatingPoint.html">FloatingPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/PreviewDevice.html">PreviewDevice</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIAccessibilityTraits.html">UIAccessibilityTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIBezierPath.html">UIBezierPath</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions/UIOffset.html">UIOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Extensions.html#/c:objc(cs)UIView">UIView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AlignmentID.html">AlignmentID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AttributedTextKey.html">AttributedTextKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/BlueprintViewMetricsDelegate.html">BlueprintViewMetricsDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CaffeinatedLayout.html">CaffeinatedLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/CaffeinatedSingleChildLayout.html">CaffeinatedSingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/ElementBuilderChild.html">ElementBuilderChild</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/LayoutTraitsKey.html">LayoutTraitsKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Measurable.html">Measurable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/NativeView.html">NativeView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols.html#/s:11BlueprintUI17SingleChildLayoutP">SingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/SingleTraitLayout.html">SingleTraitLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/StackElement.html">StackElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/UIViewElement.html">UIViewElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/URLHandler.html">URLHandler</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityCombine.html">AccessibilityCombine</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityFocus.html">AccessibilityFocus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AccessibilityFocus/Trigger.html">– Trigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Alignment.html">Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AnimationAttributes.html">AnimationAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AspectRatio.html">AspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedText.html">AttributedText</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/AttributedText/Run.html">– Run</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/BlueprintViewRenderMetrics.html">BlueprintViewRenderMetrics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Builder.html">Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate.html">Decorate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Layering.html">– Layering</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Corner.html">– Corner</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Decorate/Position.html">– Position</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu.html">EditingMenu</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu/Gesture.html">– Gesture</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenu/MenuTrigger.html">– MenuTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenuItem.html">EditingMenuItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/EditingMenuItem/Kind.html">– Kind</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ElementDimensions.html">ElementDimensions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow.html">Flow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/LineAlignment.html">– LineAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/ItemAlignment.html">– ItemAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/Priority.html">– Priority</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Flow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/FocusBinding.html">FocusBinding</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/FocusState.html">FocusState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GeometryProxy.html">GeometryProxy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow.html">GridRow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/GridRow/Width.html">– Width</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Hidden.html">Hidden</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/HorizontalAlignment.html">HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Keyed.html">Keyed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutAttributes.html">LayoutAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutMode.html">LayoutMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutOptions.html">LayoutOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutSubelement.html">LayoutSubelement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutSubelement/Attributes.html">– Attributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutTraits.html">LayoutTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter.html">LayoutWriter</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Context.html">– Context</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Sizing.html">– Sizing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LayoutWriter/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/LifecycleObserver.html">LifecycleObserver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Opacity.html">Opacity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint.html">SizeConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/SizeConstraint/UnconstrainedInfiniteAxis.html">– UnconstrainedInfiniteAxis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout.html">StackLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/AlignmentGuide.html">– AlignmentGuide</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Traits.html">– Traits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/UnderflowDistribution.html">– UnderflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/OverflowDistribution.html">– OverflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Alignment.html">– Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/StackLayout/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextAttributeContainer.html">TextAttributeContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TextShadow.html">TextShadow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/TintAdjustmentMode.html">TintAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/Transformed.html">Transformed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UIViewElementContext.html">UIViewElementContext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/URLHandlerEnvironmentKey.html">URLHandlerEnvironmentKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UnitPoint.html">UnitPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInteractionEnabled.html">UserInteractionEnabled</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/UserInterfaceStyleOverridingElement.html">UserInterfaceStyleOverridingElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/VerticalAlignment.html">VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Structs/ViewDescriptionContext.html">ViewDescriptionContext</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="../Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI14ElementBuildera">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Typealiases.html#/s:11BlueprintUI17LifecycleCallbacka">LifecycleCallback</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>BlueprintView</h1>
+              <div class="declaration">
+                <div class="language">
+                  
+                  <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">BlueprintView</span> <span class="p">:</span> <span class="kt">UIView</span></code></pre>
+
+                </div>
+              </div>
+            <p>A view that is responsible for displaying an <code><a href="../Protocols/Element.html">Element</a></code> hierarchy.</p>
+
+<p>A view controller that renders content via Blueprint might look something
+like this:</p>
+<pre class="highlight swift"><code><span class="kd">final</span> <span class="kd">class</span> <span class="kt">HelloWorldViewController</span><span class="p">:</span> <span class="kt">UIViewController</span> <span class="p">{</span>
+
+   <span class="kd">private</span> <span class="k">var</span> <span class="nv">blueprintView</span> <span class="o">=</span> <span class="kt">BlueprintView</span><span class="p">(</span><span class="nv">element</span><span class="p">:</span> <span class="kc">nil</span><span class="p">)</span>
+
+   <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLoad</span><span class="p">()</span> <span class="p">{</span>
+       <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLoad</span><span class="p">()</span>
+
+       <span class="k">let</span> <span class="nv">rootElement</span> <span class="o">=</span> <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Hello, world!"</span><span class="p">)</span>
+       <span class="n">blueprintView</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">rootElement</span>
+       <span class="n">view</span><span class="o">.</span><span class="nf">addSubview</span><span class="p">(</span><span class="n">blueprintView</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">viewDidLayoutSubviews</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">super</span><span class="o">.</span><span class="nf">viewDidLayoutSubviews</span><span class="p">()</span>
+        <span class="n">blueprintView</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">bounds</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC11environmentAA11EnvironmentVvp"></a>
+                    <a name="//apple_ref/swift/Property/environment" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC11environmentAA11EnvironmentVvp">environment</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A base environment used when laying out and rendering the element tree.</p>
+
+<p>Some keys will be overridden with the traits from the view itself. Eg, <code>windowSize</code>, <code>safeAreaInsets</code>, etc.</p>
+
+<p>If this blueprint view is within another blueprint view, the environment of the parent view
+will be inherited by this view if <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC046automaticallyInheritsEnvironmentFromContainingA5ViewsSbvp">automaticallyInheritsEnvironmentFromContainingBlueprintViews</a></code>
+is enabled. In the case of matching keys in both the inherited environment and the provided
+environment, the values from this environment will take priority over the inherited environment.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC046automaticallyInheritsEnvironmentFromContainingA5ViewsSbvp"></a>
+                    <a name="//apple_ref/swift/Property/automaticallyInheritsEnvironmentFromContainingBlueprintViews" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC046automaticallyInheritsEnvironmentFromContainingA5ViewsSbvp">automaticallyInheritsEnvironmentFromContainingBlueprintViews</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>If <code>true</code>, then Blueprint will automatically inherit the  <code><a href="../Structs/Environment.html">Environment</a></code> from the nearest
+parent <code>BlueprintView</code> in the view hierarchy.</p>
+
+<p>If <code>false</code>, then only the values from <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC11environmentAA11EnvironmentVvp">environment</a></code> will be used to
+seed the environment passed to the element hierarchy.</p>
+
+<p>This property is recursive – if the nearest parent <code>BlueprintView</code> also sets this property to
+true, then you will inherit the <code><a href="../Structs/Environment.html">Environment</a></code> from that view&rsquo;s parent <code>BlueprintView</code>, and so on.</p>
+
+<p>Defaults to <code>true</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">automaticallyInheritsEnvironmentFromContainingBlueprintViews</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp"></a>
+                    <a name="//apple_ref/swift/Property/element" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp">element</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The root element that is displayed within the view.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">element</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Element.html">Element</a></span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(py)bounds"></a>
+                    <a name="//apple_ref/swift/Property/bounds" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(py)bounds">bounds</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>We need to invalidateIntrinsicContentSize when <code>bound.size</code> changes for Auto Layout to work correctly.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="k">var</span> <span class="nv">bounds</span><span class="p">:</span> <span class="kt">CGRect</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC10layoutModeAA06LayoutE0VSgvp"></a>
+                    <a name="//apple_ref/swift/Property/layoutMode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC10layoutModeAA06LayoutE0VSgvp">layoutMode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An optional explicit layout mode for this view. If <code>nil</code>, this view will inherit the layout
+mode of its nearest ancestor or use <code><a href="../Structs/LayoutMode.html#/s:11BlueprintUI10LayoutModeV7defaultACvpZ">default</a></code> if it has no ancestor.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">layoutMode</span><span class="p">:</span> <span class="kt"><a href="../Structs/LayoutMode.html">LayoutMode</a></span><span class="p">?</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC4nameSSSgvp"></a>
+                    <a name="//apple_ref/swift/Property/name" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC4nameSSSgvp">name</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An optional name to help identify this view</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC15metricsDelegateAA0ac7MetricsE0_pSgvp"></a>
+                    <a name="//apple_ref/swift/Property/metricsDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC15metricsDelegateAA0ac7MetricsE0_pSgvp">metricsDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Provides performance metrics about the duration of layouts, updates, etc.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">metricsDelegate</span><span class="p">:</span> <span class="kt"><a href="../Protocols/BlueprintViewMetricsDelegate.html">BlueprintViewMetricsDelegate</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC18passThroughTouchesSbvp"></a>
+                    <a name="//apple_ref/swift/Property/passThroughTouches" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC18passThroughTouchesSbvp">passThroughTouches</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Defaults to <code>false</code>. If enabled, Blueprint will pass through any touches
+not recieved by an element to the view hierarchy behind the <code>BlueprintView</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">var</span> <span class="nv">passThroughTouches</span><span class="p">:</span> <span class="kt">Bool</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC7element11environmentAcA7Element_pSg_AA11EnvironmentVtcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(element:environment:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC7element11environmentAcA7Element_pSg_AA11EnvironmentVtcfc">init(element:<wbr>environment:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Instantiates a view with the given element</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="kd">required</span> <span class="nf">init</span><span class="p">(</span><span class="nv">element</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Element.html">Element</a></span><span class="p">?,</span> <span class="nv">environment</span><span class="p">:</span> <span class="kt"><a href="../Structs/Environment.html">Environment</a></span> <span class="o">=</span> <span class="o">.</span><span class="n">empty</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>element</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The root element that will be displayed in the view.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>environment</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A base environment to render elements with. Defaults to <code>.empty</code>.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)initWithFrame:"></a>
+                    <a name="//apple_ref/swift/Method/init(frame:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)initWithFrame:">init(frame:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="kd">convenience</span> <span class="k">override</span> <span class="nf">init</span><span class="p">(</span><span class="nv">frame</span><span class="p">:</span> <span class="kt">CGRect</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)sizeThatFits:"></a>
+                    <a name="//apple_ref/swift/Method/sizeThatFits(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)sizeThatFits:">sizeThatFits(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measures the size needed to display the view within the given constraining size,
+by measuring the current <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp">element</a></code> of the <code>BlueprintView</code>.</p>
+
+<p>If you would like to not constrain the measurement in a given axis,
+pass <code>0.0</code> or <code>.greatestFiniteMagnitude</code> for that axis, eg:</p>
+<pre class="highlight swift"><code><span class="c1">// Measures with a width of 100, and no height constraint.</span>
+<span class="n">blueprintView</span><span class="o">.</span><span class="nf">sizeThatFits</span><span class="p">(</span><span class="kt">CGSize</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">))</span>
+
+<span class="c1">// Measures with a height of 100, and no width constraint.</span>
+<span class="n">blueprintView</span><span class="o">.</span><span class="nf">sizeThatFits</span><span class="p">(</span><span class="kt">CGSize</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">))</span>
+
+<span class="c1">// Measures unconstrained in both axes.</span>
+<span class="n">blueprintView</span><span class="o">.</span><span class="nf">sizeThatFits</span><span class="p">(</span><span class="o">.</span><span class="n">zero</span><span class="p">)</span>
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">sizeThatFits</span><span class="p">(</span><span class="n">_</span> <span class="nv">fittingSize</span><span class="p">:</span> <span class="kt">CGSize</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGSize</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A4ViewC12sizeThatFitsySo6CGSizeVAA14SizeConstraintVF"></a>
+                    <a name="//apple_ref/swift/Method/sizeThatFits(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A4ViewC12sizeThatFitsySo6CGSizeVAA14SizeConstraintVF">sizeThatFits(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measures the size needed to display the view within the given <code><a href="../Structs/SizeConstraint.html">SizeConstraint</a></code>.
+by measuring the current <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp">element</a></code> of the <code>BlueprintView</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="kd">func</span> <span class="nf">sizeThatFits</span><span class="p">(</span><span class="n">_</span> <span class="nv">constraint</span><span class="p">:</span> <span class="kt"><a href="../Structs/SizeConstraint.html">SizeConstraint</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGSize</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)systemLayoutSizeFittingSize:"></a>
+                    <a name="//apple_ref/swift/Method/systemLayoutSizeFitting(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)systemLayoutSizeFittingSize:">systemLayoutSizeFitting(_:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measures the size needed to display the view within then given constraining size,
+by measuring the current <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp">element</a></code> of the <code>BlueprintView</code>.</p>
+
+<p>If you would like to not constrain the measurement in a given axis,
+pass <code>0.0</code> or <code>.greatestFiniteMagnitude</code> for that axis.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">systemLayoutSizeFitting</span><span class="p">(</span>
+    <span class="n">_</span> <span class="nv">targetSize</span><span class="p">:</span> <span class="kt">CGSize</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGSize</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)systemLayoutSizeFittingSize:withHorizontalFittingPriority:verticalFittingPriority:"></a>
+                    <a name="//apple_ref/swift/Method/systemLayoutSizeFitting(_:withHorizontalFittingPriority:verticalFittingPriority:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)systemLayoutSizeFittingSize:withHorizontalFittingPriority:verticalFittingPriority:">systemLayoutSizeFitting(_:<wbr>withHorizontalFittingPriority:<wbr>verticalFittingPriority:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measures the size needed to display the view within then given constraining size,
+by measuring the current <code><a href="../Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC7elementAA7Element_pSgvp">element</a></code> of the <code>BlueprintView</code>.</p>
+
+<p>If you would like to not constrain the measurement in a given axis,
+pass <code>0.0</code> or <code>.greatestFiniteMagnitude</code> for that axis.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">systemLayoutSizeFitting</span><span class="p">(</span>
+    <span class="n">_</span> <span class="nv">targetSize</span><span class="p">:</span> <span class="kt">CGSize</span><span class="p">,</span>
+    <span class="n">withHorizontalFittingPriority</span> <span class="nv">horizontalFittingPriority</span><span class="p">:</span> <span class="kt">UILayoutPriority</span><span class="p">,</span>
+    <span class="nv">verticalFittingPriority</span><span class="p">:</span> <span class="kt">UILayoutPriority</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGSize</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(py)intrinsicContentSize"></a>
+                    <a name="//apple_ref/swift/Property/intrinsicContentSize" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(py)intrinsicContentSize">intrinsicContentSize</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>For us, this is the same as <code>sizeThatFits</code>, since blueprint does not
+contain the same concept of constraints as Autolayout.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="k">var</span> <span class="nv">intrinsicContentSize</span><span class="p">:</span> <span class="kt">CGSize</span> <span class="p">{</span> <span class="k">get</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(py)semanticContentAttribute"></a>
+                    <a name="//apple_ref/swift/Property/semanticContentAttribute" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(py)semanticContentAttribute">semanticContentAttribute</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="k">var</span> <span class="nv">semanticContentAttribute</span><span class="p">:</span> <span class="kt">UISemanticContentAttribute</span> <span class="p">{</span> <span class="k">get</span> <span class="k">set</span> <span class="p">}</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)safeAreaInsetsDidChange"></a>
+                    <a name="//apple_ref/swift/Method/safeAreaInsetsDidChange()" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)safeAreaInsetsDidChange">safeAreaInsetsDidChange()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">safeAreaInsetsDidChange</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)layoutSubviews"></a>
+                    <a name="//apple_ref/swift/Method/layoutSubviews()" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)layoutSubviews">layoutSubviews()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">layoutSubviews</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)didMoveToWindow"></a>
+                    <a name="//apple_ref/swift/Method/didMoveToWindow()" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)didMoveToWindow">didMoveToWindow()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">didMoveToWindow</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@BlueprintUI@objc(cs)BlueprintView(im)hitTest:withEvent:"></a>
+                    <a name="//apple_ref/swift/Method/hitTest(_:with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@BlueprintUI@objc(cs)BlueprintView(im)hitTest:withEvent:">hitTest(_:<wbr>with:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Ignore any touches on this view and (pass through) by returning nil if the default <code>hitTest</code> implementation returns this view.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@MainActor</span>
+<span class="kd">public</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">hitTest</span><span class="p">(</span><span class="n">_</span> <span class="nv">point</span><span class="p">:</span> <span class="kt">CGPoint</span><span class="p">,</span> <span class="n">with</span> <span class="nv">event</span><span class="p">:</span> <span class="kt">UIEvent</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">UIView</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2025 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2025-12-03)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>

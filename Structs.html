@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Structures  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+    <a name="//apple_ref/swift/Section/Structures" class="dashAnchor"></a>
+
+    <a title="Structures  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Blueprint
+        </a>
+         (100% documented)
+      </p>
+    
+      <div class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </div>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/square/Blueprint">
+            <img class="header-icon" src="img/gh.png" alt="GitHub"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Blueprint Reference</a>
+      <img class="carat" src="img/carat.png" alt=""/>
+      Structures  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Creating%20Custom%20Elements.html">Creating Custom Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Element.html">Element</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/ProxyElement.html">ProxyElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementContent.html">ElementContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementContent/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription.html">ViewDescription</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription/FrameRoundingBehavior.html">– FrameRoundingBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescription/Configuration.html">– Configuration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/LayoutTransition.html">LayoutTransition</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/VisibilityTransition.html">VisibilityTransition</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Displaying%20Elements.html">Displaying Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/BlueprintView.html">BlueprintView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementPreview.html">ElementPreview</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementPreview/PreviewType.html">– PreviewType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Common%20Elements.html">Common Elements</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityBlocker.html">AccessibilityBlocker</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityContainer.html">AccessibilityContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityContainer/ContainerType.html">– ContainerType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityElement.html">AccessibilityElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AdaptedEnvironment.html">AdaptedEnvironment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EnvironmentReader.html">EnvironmentReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned.html">Aligned</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned/VerticalAlignment.html">– VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Aligned/HorizontalAlignment.html">– HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedLabel.html">AttributedLabel</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedLabel/LinkDetectionType.html">– LinkDetectionType</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box.html">Box</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/CornerCurve.html">– CornerCurve</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/BorderStyle.html">– BorderStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Box/ShadowStyle.html">– ShadowStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Button.html">Button</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Centered.html">Centered</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Column.html">Column</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Column/ColumnAlignment.html">– ColumnAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedAspectRatio.html">ConstrainedAspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedAspectRatio/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedSize.html">ConstrainedSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ConstrainedSize/Constraint.html">– Constraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Empty.html">Empty</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack.html">EqualStack</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack/Direction.html">– Direction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EqualStack/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GeometryReader.html">GeometryReader</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Image.html">Image</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Image/ContentMode.html">– ContentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Inset.html">Inset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Label.html">Label</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Label/LineHeight.html">– LineHeight</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Overlay.html">Overlay</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Overlay/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Row.html">Row</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Row/RowAlignment.html">– RowAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule.html">Rule</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule/Orientation.html">– Orientation</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Rule/Thickness.html">– Thickness</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView.html">ScrollView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/SafeAreaEdge.html">– SafeAreaEdge</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/KeyboardAdjustmentMode.html">– KeyboardAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ContentSize.html">– ContentSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/PullToRefreshBehavior.html">– PullToRefreshBehavior</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ScrollTrigger.html">– ScrollTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ScrollView/ContentOffset.html">– ContentOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl.html">SegmentedControl</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl/Selection.html">– Selection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SegmentedControl/Item.html">– Item</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Spacer.html">Spacer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Tappable.html">Tappable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextField.html">TextField</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TransitionContainer.html">TransitionContainer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Environment.html">Environment</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Environment.html">Environment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Environment/LayoutDirection.html">– LayoutDirection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/EnvironmentKey.html">EnvironmentKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Classes/FocusTrigger.html">FocusTrigger</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility.html">Accessibility</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/Trait.html">– Trait</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/CustomAction.html">– CustomAction</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/CustomContent.html">– CustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerElement.html">– LargeContentViewerElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerItem.html">– LargeContentViewerItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerConfiguration.html">– LargeContentViewerConfiguration</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewer.html">– LargeContentViewer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerInteractionContainer.html">– LargeContentViewerInteractionContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Accessibility/LargeContentViewerInteractionContainerViewable.html">– LargeContentViewerInteractionContainerViewable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/BlueprintLogging.html">BlueprintLogging</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/BlueprintLogging/Config.html">– Config</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/ColorKey.html">ColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CornerStyle.html">CornerStyle</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/CornerStyle/Corners.html">– Corners</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/FontKey.html">FontKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/LinkKey.html">LinkKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/ParagraphStyleKey.html">ParagraphStyleKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/TrackingKey.html">TrackingKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/UnderlineColorKey.html">UnderlineColorKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/UnderlineStyleKey.html">UnderlineStyleKey</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/AXCustomContent.html">AXCustomContent</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/BidirectionalCollection.html">BidirectionalCollection</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/CGSize.html">CGSize</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/ElementBuilder.html">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/FloatingPoint.html">FloatingPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/PreviewDevice.html">PreviewDevice</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIAccessibilityTraits.html">UIAccessibilityTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIBezierPath.html">UIBezierPath</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/UIOffset.html">UIOffset</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions.html#/c:objc(cs)UIView">UIView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/AlignmentID.html">AlignmentID</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/AttributedTextKey.html">AttributedTextKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/BlueprintViewMetricsDelegate.html">BlueprintViewMetricsDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CaffeinatedLayout.html">CaffeinatedLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/CaffeinatedSingleChildLayout.html">CaffeinatedSingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/ElementBuilderChild.html">ElementBuilderChild</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/LayoutTraitsKey.html">LayoutTraitsKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Measurable.html">Measurable</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/NativeView.html">NativeView</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols.html#/s:11BlueprintUI17SingleChildLayoutP">SingleChildLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/SingleTraitLayout.html">SingleTraitLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/StackElement.html">StackElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/UIViewElement.html">UIViewElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/URLHandler.html">URLHandler</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityCombine.html">AccessibilityCombine</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityFocus.html">AccessibilityFocus</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AccessibilityFocus/Trigger.html">– Trigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Alignment.html">Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AnimationAttributes.html">AnimationAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AspectRatio.html">AspectRatio</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedText.html">AttributedText</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/AttributedText/Run.html">– Run</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/BlueprintViewRenderMetrics.html">BlueprintViewRenderMetrics</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Builder.html">Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate.html">Decorate</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Layering.html">– Layering</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Corner.html">– Corner</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Decorate/Position.html">– Position</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu.html">EditingMenu</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu/Gesture.html">– Gesture</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenu/MenuTrigger.html">– MenuTrigger</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenuItem.html">EditingMenuItem</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EditingMenuItem/Kind.html">– Kind</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ElementDimensions.html">ElementDimensions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow.html">Flow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/LineAlignment.html">– LineAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/ItemAlignment.html">– ItemAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/Priority.html">– Priority</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Flow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/FocusBinding.html">FocusBinding</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/FocusState.html">FocusState</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GeometryProxy.html">GeometryProxy</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow.html">GridRow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/GridRow/Width.html">– Width</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Hidden.html">Hidden</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/HorizontalAlignment.html">HorizontalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Keyed.html">Keyed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutAttributes.html">LayoutAttributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutMode.html">LayoutMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutOptions.html">LayoutOptions</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutSubelement.html">LayoutSubelement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutSubelement/Attributes.html">– Attributes</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutTraits.html">LayoutTraits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter.html">LayoutWriter</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Builder.html">– Builder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Context.html">– Context</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Sizing.html">– Sizing</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LayoutWriter/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/LifecycleObserver.html">LifecycleObserver</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Opacity.html">Opacity</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint.html">SizeConstraint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SizeConstraint/UnconstrainedInfiniteAxis.html">– UnconstrainedInfiniteAxis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout.html">StackLayout</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/AlignmentGuide.html">– AlignmentGuide</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Traits.html">– Traits</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Axis.html">– Axis</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/UnderflowDistribution.html">– UnderflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/OverflowDistribution.html">– OverflowDistribution</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Alignment.html">– Alignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/StackLayout/Child.html">– Child</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextAttributeContainer.html">TextAttributeContainer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TextShadow.html">TextShadow</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/TintAdjustmentMode.html">TintAdjustmentMode</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Transformed.html">Transformed</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UIViewElementContext.html">UIViewElementContext</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/URLHandlerEnvironmentKey.html">URLHandlerEnvironmentKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UnitPoint.html">UnitPoint</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UserInteractionEnabled.html">UserInteractionEnabled</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/UserInterfaceStyleOverridingElement.html">UserInterfaceStyleOverridingElement</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/VerticalAlignment.html">VerticalAlignment</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ViewDescriptionContext.html">ViewDescriptionContext</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI14ElementBuildera">ElementBuilder</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:11BlueprintUI17LifecycleCallbacka">LifecycleCallback</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content top-matter">
+            <h1>Structures</h1>
+            <p>The following structures are available globally.</p>
+
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-content">
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI14AttributedTextV"></a>
+                    <a name="//apple_ref/swift/Struct/AttributedText" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI14AttributedTextV">AttributedText</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p><code>AttributedText</code> allows you to apply strongly-typed attributes to strings (much like the <code>AttributedString</code> type
+introduced in iOS 15). You can then access the <code>attributedString</code> property to get an attributed string with those
+attributes applied.</p>
+
+<p>For example:</p>
+<pre class="highlight swift"><code><span class="k">var</span> <span class="nv">text</span> <span class="o">=</span> <span class="kt">AttributedText</span><span class="p">(</span><span class="nv">string</span><span class="p">:</span> <span class="s">"Hello, world"</span><span class="p">)</span>
+<span class="c1">// Apply a font to the entire range</span>
+<span class="n">text</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="o">.</span><span class="nf">systemFont</span><span class="p">(</span><span class="nv">ofSize</span><span class="p">:</span> <span class="mi">20</span><span class="p">)</span>
+
+<span class="c1">// Apply a color to part of the string</span>
+<span class="k">let</span> <span class="nv">range</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="nf">range</span><span class="p">(</span><span class="nv">of</span><span class="p">:</span> <span class="s">"world"</span><span class="p">)</span><span class="o">!</span>
+<span class="n">text</span><span class="p">[</span><span class="n">range</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="o">.</span><span class="n">blue</span>
+
+<span class="c1">// Render the attributed text</span>
+<span class="k">let</span> <span class="nv">label</span> <span class="o">=</span> <span class="kt">AttributedLabel</span><span class="p">(</span><span class="nv">attributedText</span><span class="p">:</span> <span class="n">text</span><span class="o">.</span><span class="n">attributedString</span><span class="p">)</span>
+</code></pre>
+
+                        <a href="Structs/AttributedText.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@dynamicMemberLookup</span>
+<span class="kd">public</span> <span class="kd">struct</span> <span class="kt">AttributedText</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI22TextAttributeContainerV"></a>
+                    <a name="//apple_ref/swift/Struct/TextAttributeContainer" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI22TextAttributeContainerV">TextAttributeContainer</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="Structs/TextAttributeContainer.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">TextAttributeContainer</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI0A17ViewRenderMetricsV"></a>
+                    <a name="//apple_ref/swift/Struct/BlueprintViewRenderMetrics" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI0A17ViewRenderMetricsV">BlueprintViewRenderMetrics</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="Structs/BlueprintViewRenderMetrics.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">BlueprintViewRenderMetrics</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI22ViewDescriptionContextV"></a>
+                    <a name="//apple_ref/swift/Struct/ViewDescriptionContext" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI22ViewDescriptionContextV">ViewDescriptionContext</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The context passing to the <code>backingViewDescription</code> of an Element.</p>
+
+                        <a href="Structs/ViewDescriptionContext.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ViewDescriptionContext</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI20UIViewElementContextV"></a>
+                    <a name="//apple_ref/swift/Struct/UIViewElementContext" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI20UIViewElementContextV">UIViewElementContext</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Context object passed into <code>updateUIView</code>.</p>
+
+                        <a href="Structs/UIViewElementContext.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">UIViewElementContext</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI12FocusBindingV"></a>
+                    <a name="//apple_ref/swift/Struct/FocusBinding" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI12FocusBindingV">FocusBinding</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A two-way binding between a focusable element&rsquo;s backing view and a <code><a href="Structs/FocusState.html">FocusState</a></code>-wrapped
+property.</p>
+
+<p>Generally you should not need to interact with this type directly. However, you can use focus
+bindings to add focus support to custom elements.</p>
+<h2 id='adding-focus-bindings' class='heading'>Adding Focus Bindings</h2>
+
+<p>On a <code><a href="Structs/FocusState.html">FocusState</a></code>, call the <code>binding(for:)</code> method to get a binding bound to an optional value,
+or <code>binding()</code> to get a binding bound to a boolean.</p>
+
+<p>To set up the 2-way binding, there are 2 steps:</p>
+
+<ol>
+<li><p>Assign actions to the nested <code><a href="Classes/FocusTrigger.html">FocusTrigger</a></code>, so that your backing view is updated when the
+<code><a href="Structs/FocusState.html">FocusState</a></code>&lsquo;s value changes.</p></li>
+<li><p>Call the <code>onFocus</code> and <code>onBlur</code> callbacks when your backing view gains or loses focus, so
+that the value of the bound <code><a href="Structs/FocusState.html">FocusState</a></code> is updated.</p></li>
+</ol>
+<h2 id='example' class='heading'>Example</h2>
+<pre class="highlight swift"><code><span class="kd">final</span> <span class="kd">class</span> <span class="kt">FocusableView</span><span class="p">:</span> <span class="kt">UIView</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">focusBinding</span><span class="p">:</span> <span class="kt">FocusBinding</span><span class="p">?</span> <span class="p">{</span>
+        <span class="k">didSet</span> <span class="p">{</span>
+            <span class="n">oldValue</span><span class="p">?</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">focusAction</span> <span class="o">=</span> <span class="kc">nil</span>
+            <span class="n">oldValue</span><span class="p">?</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blurAction</span> <span class="o">=</span> <span class="kc">nil</span>
+
+            <span class="k">guard</span> <span class="k">let</span> <span class="nv">focusBinding</span> <span class="o">=</span> <span class="n">focusBinding</span> <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">}</span>
+
+            <span class="n">focusBinding</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">focusAction</span> <span class="o">=</span> <span class="p">{</span> <span class="p">[</span><span class="k">weak</span> <span class="k">self</span><span class="p">]</span> <span class="k">in</span>
+                <span class="k">self</span><span class="p">?</span><span class="o">.</span><span class="nf">becomeFirstResponder</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="n">focusBinding</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">blurAction</span> <span class="o">=</span> <span class="p">{</span> <span class="p">[</span><span class="k">weak</span> <span class="k">self</span><span class="p">]</span> <span class="k">in</span>
+                <span class="k">self</span><span class="p">?</span><span class="o">.</span><span class="nf">resignFirstResponder</span><span class="p">()</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">isFirstResponder</span> <span class="p">{</span>
+                <span class="n">focusBinding</span><span class="o">.</span><span class="nf">onFocus</span><span class="p">()</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">focusBinding</span><span class="o">.</span><span class="nf">onBlur</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">@discardableResult</span>
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">becomeFirstResponder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">focused</span> <span class="o">=</span> <span class="k">super</span><span class="o">.</span><span class="nf">becomeFirstResponder</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">focused</span> <span class="p">{</span>
+            <span class="n">focusBinding</span><span class="p">?</span><span class="o">.</span><span class="nf">onFocus</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">focused</span>
+    <span class="p">}</span>
+
+    <span class="kd">@discardableResult</span>
+    <span class="k">override</span> <span class="kd">func</span> <span class="nf">resignFirstResponder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">blurred</span> <span class="o">=</span> <span class="k">super</span><span class="o">.</span><span class="nf">resignFirstResponder</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">blurred</span> <span class="p">{</span>
+            <span class="n">focusBinding</span><span class="p">?</span><span class="o">.</span><span class="nf">onBlur</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">blurred</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<ul>
+<li>Tag: FocusBinding</li>
+</ul>
+
+                        <a href="Structs/FocusBinding.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">FocusBinding</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI10FocusStateV"></a>
+                    <a name="//apple_ref/swift/Struct/FocusState" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI10FocusStateV">FocusState</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A property wrapper type that can read and write a value that represents the placement of focus.</p>
+
+<p>Use this property wrapper in conjunction with modifiers on elements that support focus, such as
+<code><a href="Structs/TextField.html#/s:25BlueprintUICommonControls9TextFieldV7focused4when6equalsAC0A2UI10FocusStateVyxSgG_xtSHRzlF">TextField.focused(when:equals:)</a></code> and <code><a href="Structs/TextField.html#/s:25BlueprintUICommonControls9TextFieldV7focused4whenAC0A2UI10FocusStateVySbG_tF">TextField.focused(when:)</a></code>, to describe when those elements
+should have focus. When focus enters the modified element, the wrapped value of this property
+updates to match a given value. Similarly, when focus leaves, the wrapped value of this property
+resets to <code>nil</code> or <code>false</code>. Setting this property&rsquo;s value programmatically has the reverse
+effect, causing focus to move to the element associated with the updated value.</p>
+
+<p>In the following example of a simple login screen, when the user presses the Sign In button and
+one of the fields is still empty, focus moves to that field. Otherwise, the sign-in process
+proceeds.</p>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">LoginForm</span><span class="p">:</span> <span class="kt">ProxyElement</span> <span class="p">{</span>
+    <span class="kd">enum</span> <span class="kt">Field</span><span class="p">:</span> <span class="kt">Hashable</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">username</span>
+        <span class="k">case</span> <span class="n">password</span>
+    <span class="p">}</span>
+
+    <span class="k">var</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span>
+    <span class="k">var</span> <span class="nv">password</span><span class="p">:</span> <span class="kt">String</span>
+    <span class="k">var</span> <span class="nv">handleLogin</span><span class="p">:</span> <span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Void</span>
+
+    <span class="kd">@FocusState</span> <span class="kd">private</span> <span class="k">var</span> <span class="nv">focusedField</span><span class="p">:</span> <span class="kt">Field</span><span class="p">?</span>
+
+    <span class="k">var</span> <span class="nv">elementRepresentation</span><span class="p">:</span> <span class="kt">Element</span> <span class="p">{</span>
+        <span class="kt">Column</span> <span class="p">{</span> <span class="n">column</span> <span class="k">in</span>
+            <span class="n">column</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span>
+                <span class="nv">child</span><span class="p">:</span> <span class="kt">TextField</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">focused</span><span class="p">(</span><span class="nv">when</span><span class="p">:</span> <span class="n">$focusedField</span><span class="p">,</span> <span class="nv">equals</span><span class="p">:</span> <span class="o">.</span><span class="n">username</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">column</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span>
+                <span class="nv">child</span><span class="p">:</span> <span class="kt">TextField</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">focused</span><span class="p">(</span><span class="nv">when</span><span class="p">:</span> <span class="n">$focusedField</span><span class="p">,</span> <span class="nv">equals</span><span class="p">:</span> <span class="o">.</span><span class="n">password</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">column</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span>
+                <span class="nv">child</span><span class="p">:</span> <span class="kt">Button</span><span class="p">(</span>
+                    <span class="nv">onTap</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="k">if</span> <span class="n">username</span><span class="o">.</span><span class="n">isEmpty</span> <span class="p">{</span>
+                            <span class="n">focusedField</span> <span class="o">=</span> <span class="o">.</span><span class="n">username</span>
+                        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="n">password</span><span class="o">.</span><span class="n">isEmpty</span> <span class="p">{</span>
+                            <span class="n">focusedField</span> <span class="o">=</span> <span class="o">.</span><span class="n">password</span>
+                        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                            <span class="nf">handleLogin</span><span class="p">()</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="nv">wrapping</span><span class="p">:</span> <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Sign In"</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>To allow for cases where focus is completely absent from a view tree, the wrapped value must be
+either an optional or a Boolean. Set the focus binding to <code>false</code> or <code>nil</code> as appropriate to
+remove focus from all bound fields. You can also use this to remove focus from a <code><a href="Structs/TextField.html">TextField</a></code>
+and thereby dismiss the keyboard.</p>
+<h3 id='auto-focus' class='heading'>Auto-Focus</h3>
+
+<p>To auto-focus a field when it appears, set the value in an <code>onAppear</code> hook.</p>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">Example</span><span class="p">:</span> <span class="kt">ProxyElement</span> <span class="p">{</span>
+    <span class="kd">@FocusState</span> <span class="k">var</span> <span class="nv">isFocused</span><span class="p">:</span> <span class="kt">Bool</span>
+
+    <span class="k">var</span> <span class="nv">elementRepresentation</span><span class="p">:</span> <span class="kt">Element</span> <span class="p">{</span>
+        <span class="kt">TextField</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+            <span class="o">.</span><span class="nf">focused</span><span class="p">(</span><span class="nv">when</span><span class="p">:</span> <span class="n">$isFocused</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">onAppear</span> <span class="p">{</span>
+                <span class="n">isFocused</span> <span class="o">=</span> <span class="kc">true</span>
+            <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='avoid-ambiguous-focus-bindings' class='heading'>Avoid Ambiguous Focus Bindings</h3>
+
+<p>A <code><a href="Structs/TextField.html">TextField</a></code> can have only one focus binding, stored in its <code>focusBinding</code> property. If you apply
+the <code>focused</code> modifier multiple times, the last one will overwrite the previous value.</p>
+
+<p>On the other hand, binding the same value to two views is ambiguous. In the following example,
+two separate fields bind focus to the <code>name</code> value:</p>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">Content</span><span class="p">:</span> <span class="kt">ProxyElement</span> <span class="p">{</span>
+    <span class="kd">enum</span> <span class="kt">Field</span><span class="p">:</span> <span class="kt">Hashable</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">name</span>
+        <span class="k">case</span> <span class="n">fullName</span>
+    <span class="p">}</span>
+
+    <span class="kd">@FocusState</span> <span class="kd">private</span> <span class="k">var</span> <span class="nv">focusedField</span><span class="p">:</span> <span class="kt">Field</span><span class="p">?</span>
+
+    <span class="k">var</span> <span class="nv">elementRepresentation</span><span class="p">:</span> <span class="kt">Element</span> <span class="p">{</span>
+        <span class="kt">Column</span> <span class="p">{</span> <span class="n">column</span> <span class="k">in</span>
+            <span class="n">column</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span>
+                <span class="nv">child</span><span class="p">:</span> <span class="kt">TextField</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">focused</span><span class="p">(</span><span class="nv">when</span><span class="p">:</span> <span class="n">$focusedField</span><span class="p">,</span> <span class="nv">equals</span><span class="p">:</span> <span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">column</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span>
+                <span class="nv">child</span><span class="p">:</span> <span class="kt">TextField</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">""</span><span class="p">)</span>
+                    <span class="o">.</span><span class="nf">focused</span><span class="p">(</span><span class="nv">when</span><span class="p">:</span> <span class="n">$focusedField</span><span class="p">,</span> <span class="nv">equals</span><span class="p">:</span> <span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="c1">// incorrect re-use of .name</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>If the user moves focus to either field, the <code>focusedField</code> binding updates to <code>name</code>. However,
+if the app programmatically sets the value to <code>name</code>, the last field bound will be chosen.</p>
+
+                        <a href="Structs/FocusState.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@propertyWrapper</span>
+<span class="kd">public</span> <span class="kd">struct</span> <span class="kt">FocusState</span><span class="o">&lt;</span><span class="kt">Value</span><span class="o">&gt;</span> <span class="k">where</span> <span class="kt">Value</span> <span class="p">:</span> <span class="kt">Hashable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI9AlignmentV"></a>
+                    <a name="//apple_ref/swift/Struct/Alignment" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI9AlignmentV">Alignment</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An alignment in both axes.</p>
+
+                        <a href="Structs/Alignment.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Alignment</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI19HorizontalAlignmentV"></a>
+                    <a name="//apple_ref/swift/Struct/HorizontalAlignment" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI19HorizontalAlignmentV">HorizontalAlignment</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An alignment position along the horizontal axis.</p>
+
+                        <a href="Structs/HorizontalAlignment.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">HorizontalAlignment</span> <span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17VerticalAlignmentV"></a>
+                    <a name="//apple_ref/swift/Struct/VerticalAlignment" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17VerticalAlignmentV">VerticalAlignment</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An alignment position along the vertical axis.</p>
+
+                        <a href="Structs/VerticalAlignment.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">VerticalAlignment</span> <span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI11AspectRatioV"></a>
+                    <a name="//apple_ref/swift/Struct/AspectRatio" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI11AspectRatioV">AspectRatio</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Represents an a proportional relationship between width and height.</p>
+
+                        <a href="Structs/AspectRatio.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">AspectRatio</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI7BuilderV"></a>
+                    <a name="//apple_ref/swift/Struct/Builder" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI7BuilderV">Builder</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Generic result builder for converting blocks of <code>Child...</code> into <code>[Child]</code>.</p>
+
+                        <a href="Structs/Builder.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">@resultBuilder</span>
+<span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Builder</span><span class="o">&lt;</span><span class="kt">Child</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI8DecorateV"></a>
+                    <a name="//apple_ref/swift/Struct/Decorate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI8DecorateV">Decorate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Places a decoration element behind or in front of the given <code>wrapped</code> element,
+and positions it according to the <code>position</code> parameter.</p>
+
+<p>The size and position of the element is determined only by the <code>wrapped</code>
+element, the <code>decoration</code> element does not affect the layout at all.</p>
+<h2 id='example' class='heading'>Example</h2>
+
+<p>The arrows represent the measured size of the element for layout purposes.</p>
+<pre class="highlight swift"><code><span class="err">┌───────────────────┐</span>     <span class="err">┌──────┐</span>
+<span class="err">│</span>    <span class="kt">Decoration</span>     <span class="err">│</span>     <span class="err">│</span>      <span class="err">│</span>
+<span class="err">│</span> <span class="err">┏━━━━━━━━━━━━━━━┓</span> <span class="err">│</span> <span class="err">▲</span>   <span class="err">│</span>      <span class="err">┣━━━━━━━━━━┓</span>   <span class="err">▲</span>
+<span class="err">│</span> <span class="err">┃</span>               <span class="err">┃</span> <span class="err">│</span> <span class="err">│</span>   <span class="err">└─┳────┘</span>          <span class="err">┃</span>   <span class="err">│</span>
+<span class="err">│</span> <span class="err">┃</span>    <span class="kt">Wrapped</span>    <span class="err">┃</span> <span class="err">│</span> <span class="err">│</span>     <span class="err">┃</span>    <span class="kt">Wrapped</span>    <span class="err">┃</span>   <span class="err">│</span>
+<span class="err">│</span> <span class="err">┃</span>               <span class="err">┃</span> <span class="err">│</span> <span class="err">│</span>     <span class="err">┃</span>               <span class="err">┃</span>   <span class="err">│</span>
+<span class="err">│</span> <span class="err">┗━━━━━━━━━━━━━━━┛</span> <span class="err">│</span> <span class="err">▼</span>     <span class="err">┗━━━━━━━━━━━━━━━┛</span>   <span class="err">▼</span>
+<span class="err">└───────────────────┘</span>
+  <span class="err">◀───────────────▶</span>         <span class="err">◀───────────────▶</span>
+</code></pre>
+
+                        <a href="Structs/Decorate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Decorate</span> <span class="p">:</span> <span class="kt"><a href="Protocols/ProxyElement.html">ProxyElement</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17ElementDimensionsV"></a>
+                    <a name="//apple_ref/swift/Struct/ElementDimensions" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17ElementDimensionsV">ElementDimensions</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An element’s size and its alignment guides in its own coordinate space.</p>
+
+<p>You can access the size of the element through the <code>width</code> and <code>height</code> properties. You can
+access alignment guide values by subscripting with the specific alignment.</p>
+
+<p>These dimensions are typically used when setting an alignment guide on a stack, with
+<code><a href="Protocols/StackElement.html#/s:11BlueprintUI12StackElementPAAE3add12growPriority06shrinkG014alignmentGuide3key5childy14CoreFoundation7CGFloatV_A2lA0D10DimensionsVcSgs11AnyHashableVSgAA0D0_ptF">StackElement.add(...)</a></code>.</p>
+<h2 id='example' class='heading'>Example</h2>
+<pre class="highlight swift"><code><span class="c1">// get the alignment guide value for `VerticalAlignment.center`, falling back to the default</span>
+<span class="c1">// value if no alignment guide has been set</span>
+<span class="n">dimensions</span><span class="p">[</span><span class="kt">VerticalAlignment</span><span class="o">.</span><span class="n">center</span><span class="p">]</span>
+
+<span class="c1">// get the alignment guide value for `HorizontalAlignment.trailing`, or `nil` if none has been</span>
+<span class="c1">// set.</span>
+<span class="n">dimensions</span><span class="p">[</span><span class="nv">explicit</span><span class="p">:</span> <span class="o">.</span><span class="n">trailing</span><span class="p">]</span>
+</code></pre>
+<h2 id='see-also' class='heading'>See Also</h2>
+
+<p><a href="x-source-tag://StackElement.add">StackElement.add()</a></p>
+
+                        <a href="Structs/ElementDimensions.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ElementDimensions</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI4FlowV"></a>
+                    <a name="//apple_ref/swift/Struct/Flow" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI4FlowV">Flow</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Element which lays out children horizontally, wrapping to another row when there is not enough space.</p>
+
+<p>You may control the layout of each row within the flow layout, by providing a <code>LineAlignment</code>,
+which controls the horizontal alignment of content within a row when it is smaller than its container,
+and via <code>ItemAlignment</code>, which controls the vertical alignment of shorter elements within a row.</p>
+<pre class="highlight swift"><code><span class="kt">Flow</span><span class="p">(</span><span class="nv">itemSpacing</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nv">lineSpacing</span><span class="p">:</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Food / drink"</span><span class="p">)</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Retail goods"</span><span class="p">)</span><span class="o">.</span><span class="nf">flowChild</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="s">"aKey"</span><span class="p">)</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Grocery / gourmet / alcohol"</span><span class="p">)</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Beauty / wellness bookings"</span><span class="p">)</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Healthcare services"</span><span class="p">)</span>
+    <span class="kt">OnboardingPill</span><span class="p">(</span><span class="s">"Something else"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Below is a diagram showing a simple example of a <code>Flow</code> layout.</p>
+<pre class="highlight swift"><code><span class="err">┌─────────────────────────────────────┐</span>
+<span class="err">│</span> <span class="err">┌─────────┐┌─────────┐┌────────────┐│</span>
+<span class="err">│</span> <span class="err">│</span>    <span class="mi">1</span>    <span class="err">││</span>    <span class="mi">2</span>    <span class="err">││</span>     <span class="mi">3</span>      <span class="err">││</span>
+<span class="err">│</span> <span class="err">└─────────┘└─────────┘└────────────┘│</span>
+<span class="err">│</span> <span class="err">┌───────┐┌─────┐┌───────────┐</span>       <span class="err">│</span>
+<span class="err">│</span> <span class="err">│</span>   <span class="mi">4</span>   <span class="err">││</span>  <span class="mi">5</span>  <span class="err">││</span>     <span class="mi">6</span>     <span class="err">│</span>       <span class="err">│</span>
+<span class="err">│</span> <span class="err">└───────┘└─────┘└───────────┘</span>       <span class="err">│</span>
+<span class="err">└─────────────────────────────────────┘</span>
+</code></pre>
+
+                        <a href="Structs/Flow.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Flow</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI13GeometryProxyV"></a>
+                    <a name="//apple_ref/swift/Struct/GeometryProxy" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI13GeometryProxyV">GeometryProxy</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Contains information about the current layout being measured by GeometryReader</p>
+
+                        <a href="Structs/GeometryProxy.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">GeometryProxy</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI7GridRowV"></a>
+                    <a name="//apple_ref/swift/Struct/GridRow" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI7GridRowV">GridRow</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Like <code><a href="Structs/Row.html">Row</a></code>, <code>GridRow</code> displays a list of items in a linear horizontal layout. Unlike <code><a href="Structs/Row.html">Row</a></code>, <code>GridRow</code> provides
+convenience for describing columnar layout.</p>
+
+<p>Horizontally, <code>GridRow</code> children are stretched to fill the available space. Vertically, children are aligned
+according to the <code>verticalAlignment</code> property.</p>
+
+<p>Children may be sized proportionally or absolutely. Proportionally-sized children are granted a proportion of
+the total layout space <strong>after</strong> absolutely-sized children and margins have been subtracted.</p>
+<h2 id='example' class='heading'>Example:</h2>
+<pre class="highlight swift"><code><span class="kt">GridRow</span> <span class="p">{</span> <span class="n">row</span> <span class="k">in</span>
+  <span class="n">row</span><span class="o">.</span><span class="n">verticalAlignment</span> <span class="o">=</span> <span class="o">.</span><span class="n">fill</span>
+  <span class="n">row</span><span class="o">.</span><span class="n">spacing</span> <span class="o">=</span> <span class="mf">8.0</span>
+  <span class="n">row</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="o">.</span><span class="nf">proportional</span><span class="p">(</span><span class="mf">0.75</span><span class="p">),</span> <span class="nv">child</span><span class="p">:</span> <span class="n">name</span><span class="p">)</span>
+  <span class="n">row</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="o">.</span><span class="nf">proportional</span><span class="p">(</span><span class="mf">0.25</span><span class="p">),</span> <span class="nv">child</span><span class="p">:</span> <span class="n">number</span><span class="p">)</span>
+  <span class="n">row</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="o">.</span><span class="nf">absolute</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="nv">child</span><span class="p">:</span> <span class="n">status</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<h2 id='expected-layout' class='heading'>Expected layout:</h2>
+<pre class="highlight swift"><code><span class="err">┌────────────────────────────┬─┬────────┬─┬──────────────────┐</span>
+<span class="err">│</span>            <span class="n">name</span>            <span class="err">│</span> <span class="err">│</span> <span class="n">number</span> <span class="err">│</span> <span class="err">│</span>      <span class="n">status</span>      <span class="err">│</span>
+<span class="err">│</span>            <span class="p">(</span><span class="mi">75</span><span class="o">%</span><span class="p">)</span>           <span class="err">│</span><span class="mi">8</span><span class="err">│</span>  <span class="p">(</span><span class="mi">25</span><span class="o">%</span><span class="p">)</span> <span class="err">│</span><span class="mi">8</span><span class="err">│</span>     <span class="p">(</span><span class="mi">100</span> <span class="n">pts</span><span class="p">)</span>    <span class="err">│</span>
+<span class="err">│</span>                            <span class="err">│</span> <span class="err">│</span>        <span class="err">│</span> <span class="err">│</span>                  <span class="err">│</span>
+<span class="err">●────────────</span> <span class="mi">150</span> <span class="err">───────────●</span> <span class="err">●──</span> <span class="mi">50</span> <span class="err">──●</span> <span class="err">●───────</span> <span class="mi">100</span> <span class="err">──────●</span>
+<span class="err">└────────────────────────────┴─┴────────┴─┴──────────────────┘</span>
+<span class="err">●────────────────────────────</span> <span class="mi">316</span> <span class="err">───────────────────────────●</span>
+</code></pre>
+
+                        <a href="Structs/GridRow.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">GridRow</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI6HiddenV"></a>
+                    <a name="//apple_ref/swift/Struct/Hidden" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI6HiddenV">Hidden</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p><code>Hidden</code> conditionally hides its wrapped element.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    When an element is hidden, any elements within the wrapped element will be hidden.
+
+</div>
+
+                        <a href="Structs/Hidden.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Hidden</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI5KeyedV"></a>
+                    <a name="//apple_ref/swift/Struct/Keyed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI5KeyedV">Keyed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p><code>Keyed</code> allows providing a <code>Hashable</code> value which is used
+during view updates to uniquely identify content during the diff process
+between the old and new element structure.</p>
+
+<p>This is useful if you have two elements of the same type at the same depth
+in the element hierarchy, and you&rsquo;d like to differentiate between them, eg
+for appearance transition purposes.</p>
+<h2 id='example' class='heading'>Example</h2>
+
+<p>Keying the image returned, so that a transition occurs when changing
+between a placeholder image and an available photo.</p>
+<pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">imageElement</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Element</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="k">let</span> <span class="nv">photo</span> <span class="o">=</span> <span class="k">self</span><span class="o">.</span><span class="n">photo</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kt">Image</span><span class="p">(</span><span class="nv">image</span><span class="p">:</span> <span class="n">photo</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">transition</span><span class="p">(</span><span class="o">.</span><span class="n">fade</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">keyed</span><span class="p">(</span><span class="s">"photo"</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="kt">Image</span><span class="p">(</span><span class="nv">image</span><span class="p">:</span> <span class="k">self</span><span class="o">.</span><span class="n">placeholder</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">transition</span><span class="p">(</span><span class="o">.</span><span class="n">fade</span><span class="p">)</span>
+                <span class="o">.</span><span class="nf">keyed</span><span class="p">(</span><span class="s">"placeholder"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+                        <a href="Structs/Keyed.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Keyed</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI16LayoutAttributesV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutAttributes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI16LayoutAttributesV">LayoutAttributes</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Contains layout-related metrics for an element.</p>
+
+                        <a href="Structs/LayoutAttributes.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutAttributes</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">LayoutAttributes</span><span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI10LayoutModeV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutMode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI10LayoutModeV">LayoutMode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Controls the layout system that Blueprint uses to lay out elements.</p>
+
+<p>Blueprint supports multiple layout systems. Each is expected to produce the same result, but
+some may have different performance profiles or special requirements.</p>
+
+<p>You can change the layout system used by setting the <code><a href="Classes/BlueprintView.html#/s:11BlueprintUI0A4ViewC10layoutModeAA06LayoutE0VSgvp">layoutMode</a></code> property, but
+generally you should use the <code>default</code> option.</p>
+
+<p>Changing the default will cause all instances of <code><a href="Classes/BlueprintView.html">BlueprintView</a></code> to be invalidated, and re-
+render their contents.</p>
+
+                        <a href="Structs/LayoutMode.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutMode</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+<pre class="highlight swift"><code><span class="kd">extension</span> <span class="kt">LayoutMode</span><span class="p">:</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI13LayoutOptionsV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutOptions" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI13LayoutOptionsV">LayoutOptions</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Configuration options for <code><a href="Structs/LayoutMode.html#/s:11BlueprintUI10LayoutModeV11caffeinatedACvpZ">caffeinated</a></code>.</p>
+
+<p>Generally these are only useful for experimenting with the performance profile of different
+element compositions, and you should stick with <code>default</code>.</p>
+
+                        <a href="Structs/LayoutOptions.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutOptions</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI16LayoutSubelementV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutSubelement" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI16LayoutSubelementV">LayoutSubelement</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A proxy that represents one child element of a layout.</p>
+
+<p>This type acts as a proxy for a child element in a <code><a href="Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a></code>. Layout protocol methods receive a
+<code><a href="Typealiases.html#/s:11BlueprintUI17LayoutSubelementsa">LayoutSubelements</a></code> collection that contains exactly one proxy for each of the child elements
+managed by the layout.</p>
+
+<p>Use this proxy to get information about the associated element, like its size and traits. You
+should also use the proxy to tell its corresponding element where to appear by calling the
+proxy’s <code>place(at:anchor:size:)</code> method. Do this once for each subview from your
+implementation of the layout’s
+<code><a href="Protocols/CaffeinatedLayout.html#/s:11BlueprintUI17CaffeinatedLayoutP16placeSubelements2in11subelements11environment5cacheySo6CGSizeV_SayAA0D10SubelementVGAA11EnvironmentV5CacheQzztF">placeSubelements(in:subelements:environment:cache:)</a></code> method.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    The <code>LayoutSubelement</code> API, and its documentation, are modeled after SwiftUI&rsquo;s
+<a href="https://developer.apple.com/documentation/swiftui/layoutsubview">LayoutSubview</a>, with major
+differences noted.
+
+</div>
+
+                        <a href="Structs/LayoutSubelement.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutSubelement</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI12LayoutTraitsV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutTraits" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI12LayoutTraitsV">LayoutTraits</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A heterogeneous container of traits associated with a subelement being laid out.</p>
+
+<p>Generally, layout implementations will not need to use this type directly. However, elements
+that apply multiple traits to each subelement will use this type to store the traits, and
+calling <code><a href="Structs/ElementContent/Builder.html#/s:11BlueprintUI14ElementContentV7BuilderV3add6traits3key7elementy6TraitsAA17SingleTraitLayoutPQz_s11AnyHashableVSgAA0C0_ptAaKRzrlF">add(traits:key:element:)</a></code> when creating the
+<code><a href="Structs/ElementContent.html">ElementContent</a></code>.</p>
+
+<p>Layout implementations may access subelements&rsquo; traits during layout using the
+<code>LayoutSubelement/subscript(key:)</code> subscript. For more information, see <code><a href="Protocols/LayoutTraitsKey.html">LayoutTraitsKey</a></code>.</p>
+
+                        <a href="Structs/LayoutTraits.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutTraits</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI12LayoutWriterV"></a>
+                    <a name="//apple_ref/swift/Struct/LayoutWriter" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI12LayoutWriterV">LayoutWriter</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A parent element which allows arbitrary, custom layout and positioning of its children.</p>
+
+<p>Instead of creating a custom <code><a href="Protocols/Element.html">Element</a></code> with a custom <code><a href="Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a></code>, you might use
+this element to create a customized layout in a more lightweight way.</p>
+<pre class="highlight swift"><code><span class="kt">LayoutWriter</span> <span class="p">{</span> <span class="n">context</span><span class="p">,</span> <span class="n">layout</span> <span class="k">in</span>
+    <span class="n">layout</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">myFrame</span><span class="p">,</span> <span class="nv">child</span><span class="p">:</span> <span class="n">myElement</span><span class="p">)</span>
+    <span class="n">layout</span><span class="o">.</span><span class="nf">add</span><span class="p">(</span><span class="nv">with</span><span class="p">:</span> <span class="n">myOtherFrame</span><span class="p">,</span> <span class="nv">child</span><span class="p">:</span> <span class="n">myOtherElement</span><span class="p">)</span>
+
+    <span class="n">layout</span><span class="o">.</span><span class="n">sizing</span> <span class="o">=</span> <span class="o">.</span><span class="n">unionOfChildren</span>
+<span class="p">}</span>
+</code></pre>
+
+                        <a href="Structs/LayoutWriter.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LayoutWriter</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI17LifecycleObserverV"></a>
+                    <a name="//apple_ref/swift/Struct/LifecycleObserver" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI17LifecycleObserverV">LifecycleObserver</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Allows element lifecycle callbacks to be inserted anywhere into the element tree.</p>
+
+                        <a href="Structs/LifecycleObserver.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">LifecycleObserver</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI7OpacityV"></a>
+                    <a name="//apple_ref/swift/Struct/Opacity" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI7OpacityV">Opacity</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Changes the opacity of the wrapped element.</p>
+
+                        <a href="Structs/Opacity.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Opacity</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI11StackLayoutV"></a>
+                    <a name="//apple_ref/swift/Struct/StackLayout" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI11StackLayoutV">StackLayout</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A layout implementation that linearly lays out an array of children along either the horizontal or vertical axis.</p>
+
+                        <a href="Structs/StackLayout.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">StackLayout</span> <span class="p">:</span> <span class="kt"><a href="Protocols.html#/s:11BlueprintUI6LayoutP">Layout</a></span><span class="p">,</span> <span class="kt"><a href="Protocols/SingleTraitLayout.html">SingleTraitLayout</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI18TintAdjustmentModeV"></a>
+                    <a name="//apple_ref/swift/Struct/TintAdjustmentMode" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI18TintAdjustmentModeV">TintAdjustmentMode</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p><code>TintAdjustmentMode</code> conditionally modifies the tint adjustment mode of its wrapped element.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    When a tint adjustment mode is applied, any elements within the wrapped element will adopt the parent&rsquo;s tint adjustment mode.
+
+</div>
+
+                        <a href="Structs/TintAdjustmentMode.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">TintAdjustmentMode</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI11TransformedV"></a>
+                    <a name="//apple_ref/swift/Struct/Transformed" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI11TransformedV">Transformed</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Changes the transform of the wrapped element.</p>
+
+                        <a href="Structs/Transformed.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">Transformed</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI9UnitPointV"></a>
+                    <a name="//apple_ref/swift/Struct/UnitPoint" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI9UnitPointV">UnitPoint</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A normalized point in an element&rsquo;s coordinate space.</p>
+
+<p>Use a unit point to represent a location in an element without having to know the element’s
+rendered size. The point stores a value in each dimension that indicates the fraction of the
+element’s size in that dimension — measured from the element’s origin — where the point appears.
+For example, you can create a unit point that represents the center of any element by using the
+value <code>0.5</code> for each dimension:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">unitPoint</span> <span class="o">=</span> <span class="kt">UnitPoint</span><span class="p">(</span><span class="nv">x</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="nv">y</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">)</span>
+</code></pre>
+
+<p>To project the unit point into the rendered element’s coordinate space, multiply each component
+of the unit point with the corresponding component of the element’s size:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">projectedPoint</span> <span class="o">=</span> <span class="kt">CGPoint</span><span class="p">(</span>
+    <span class="nv">x</span><span class="p">:</span> <span class="n">unitPoint</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">size</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+    <span class="nv">y</span><span class="p">:</span> <span class="n">unitPoint</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">size</span><span class="o">.</span><span class="n">height</span>
+<span class="p">)</span>
+</code></pre>
+
+<p>You can perform this calculation yourself if you happen to know an element’s size, but Blueprint
+typically does this for you to carry out operations that you request, like when you place a
+subelement in a custom layout.</p>
+
+<p>You can create custom unit points with explicit values, like the example above, or you can use
+one of the built-in unit points, like <code>zero</code>, <code>center</code>, or <code>topTrailing</code>. The built-in
+values correspond to the alignment positions of the similarly named, built-in <code><a href="Structs/Alignment.html">Alignment</a></code>
+types.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    A unit point with one or more components outside the range <code>[0, 1]</code> projects to a point
+outside of the element.
+
+</div>
+
+                        <a href="Structs/UnitPoint.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">UnitPoint</span> <span class="p">:</span> <span class="kt">Hashable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI22UserInteractionEnabledV"></a>
+                    <a name="//apple_ref/swift/Struct/UserInteractionEnabled" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI22UserInteractionEnabledV">UserInteractionEnabled</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p><code>UserInteractionEnabled</code> conditionally enables user interaction of its wrapped element.</p>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    When user interaction is disabled, any elements within the wrapped element will become non-interactive.
+
+</div>
+
+                        <a href="Structs/UserInteractionEnabled.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">UserInteractionEnabled</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI14SizeConstraintV"></a>
+                    <a name="//apple_ref/swift/Struct/SizeConstraint" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI14SizeConstraintV">SizeConstraint</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Defines the maximum size for a measurement.</p>
+
+<p>Currently this constraint type can only handles layout where
+the primary (breaking) axis is horizontal (row in CSS-speak).</p>
+
+                        <a href="Structs/SizeConstraint.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SizeConstraint</span> <span class="p">:</span> <span class="kt">Hashable</span><span class="p">,</span> <span class="kt">CustomStringConvertible</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:11BlueprintUI19AnimationAttributesV"></a>
+                    <a name="//apple_ref/swift/Struct/AnimationAttributes" class="dashAnchor"></a>
+                    <a class="token" href="#/s:11BlueprintUI19AnimationAttributesV">AnimationAttributes</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>UIView animation configuration values.</p>
+
+                        <a href="Structs/AnimationAttributes.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">AnimationAttributes</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls20AccessibilityCombineV"></a>
+                    <a name="//apple_ref/swift/Struct/AccessibilityCombine" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls20AccessibilityCombineV">AccessibilityCombine</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <h3 id='use-code-accessibilitycombine-code-to-automatically-combine-child-accessibility-elements' class='heading'>Use <code>AccessibilityCombine</code> to automatically combine child accessibility elements:</h3>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">CustomRow</span><span class="p">:</span> <span class="kt">Element</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">content</span><span class="p">:</span> <span class="kt">ElementContent</span> <span class="p">{</span>
+        <span class="kt">Row</span> <span class="p">{</span>
+            <span class="kt">Image</span><span class="p">(</span><span class="nv">image</span><span class="p">:</span> <span class="n">profileImage</span><span class="p">)</span>
+            <span class="kt">Column</span> <span class="p">{</span>
+                <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="n">userName</span><span class="p">)</span>
+                <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="n">userStatus</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="kt">Button</span><span class="p">(</span><span class="s">"Follow"</span><span class="p">)</span> <span class="p">{</span> <span class="nf">followUser</span><span class="p">()</span> <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="o">.</span><span class="nf">accessibilityCombine</span><span class="p">()</span>
+        <span class="c1">// Automatically combines: "Profile image, John Doe, Online, Follow"</span>
+        <span class="c1">// Button functionality preserved as custom action</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<h3 id='custom-filtering-and-sorting' class='heading'>Custom Filtering and Sorting</h3>
+<pre class="highlight swift"><code><span class="kd">struct</span> <span class="kt">SmartCombinedElement</span><span class="p">:</span> <span class="kt">Element</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">content</span><span class="p">:</span> <span class="kt">ElementContent</span> <span class="p">{</span>
+        <span class="kt">Column</span> <span class="p">{</span>
+            <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Header"</span><span class="p">)</span><span class="o">.</span><span class="nf">accessibilityTraits</span><span class="p">(</span><span class="nv">add</span><span class="p">:</span> <span class="p">[</span><span class="o">.</span><span class="n">header</span><span class="p">])</span>
+            <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Content"</span><span class="p">)</span>
+            <span class="kt">Button</span><span class="p">(</span><span class="s">"Action"</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* action */</span> <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="o">.</span><span class="nf">accessibilityCombine</span><span class="p">(</span>
+            <span class="nv">customFilter</span><span class="p">:</span> <span class="p">{</span> <span class="n">element</span> <span class="k">in</span>
+                <span class="c1">// Only include elements with accessibility content</span>
+                <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">hasAccessibilityRepresentation</span>
+            <span class="p">},</span>
+            <span class="nv">customSorting</span><span class="p">:</span> <span class="p">{</span> <span class="n">element1</span><span class="p">,</span> <span class="n">element2</span> <span class="k">in</span>
+                <span class="c1">// Headers come first</span>
+                <span class="k">let</span> <span class="nv">element1IsHeader</span> <span class="o">=</span> <span class="n">element1</span><span class="o">.</span><span class="n">accessibilityTraits</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+                <span class="k">let</span> <span class="nv">element2IsHeader</span> <span class="o">=</span> <span class="n">element2</span><span class="o">.</span><span class="n">accessibilityTraits</span><span class="o">.</span><span class="nf">contains</span><span class="p">(</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">element1IsHeader</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">element2IsHeader</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+                        <a href="Structs/AccessibilityCombine.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">AccessibilityCombine</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls18AccessibilityFocusV"></a>
+                    <a name="//apple_ref/swift/Struct/AccessibilityFocus" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls18AccessibilityFocusV">AccessibilityFocus</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Enables VoiceOver focus to jump to the wrapped element via a trigger that can be manually fired.</p>
+
+                        <a href="Structs/AccessibilityFocus.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">AccessibilityFocus</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls24URLHandlerEnvironmentKeyV"></a>
+                    <a name="//apple_ref/swift/Struct/URLHandlerEnvironmentKey" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls24URLHandlerEnvironmentKeyV">URLHandlerEnvironmentKey</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                        <a href="Structs/URLHandlerEnvironmentKey.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">URLHandlerEnvironmentKey</span> <span class="p">:</span> <span class="kt"><a href="Protocols/EnvironmentKey.html">EnvironmentKey</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls11EditingMenuV"></a>
+                    <a name="//apple_ref/swift/Struct/EditingMenu" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls11EditingMenuV">EditingMenu</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Allows showing the system&rsquo;s <code>UIMenuController</code> editing menu.</p>
+
+<p>You can show the menu upon tap or long press:</p>
+<pre class="highlight swift"><code><span class="n">myElement</span><span class="o">.</span><span class="nf">editingMenu</span><span class="p">(</span><span class="nv">show</span><span class="p">:</span> <span class="o">.</span><span class="n">onLongPress</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">EditingMenuItem</span><span class="o">.</span><span class="nf">copying</span><span class="p">(</span><span class="s">"A String"</span><span class="p">)</span>
+
+    <span class="kt">EditingMenuItem</span><span class="p">(</span><span class="o">.</span><span class="n">select</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"Selected!"</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>You can also show the menu as a result of another element&rsquo;s <code>onTap</code> closure,
+using the trigger-based API:</p>
+<pre class="highlight swift"><code><span class="kt">EditingMenu</span> <span class="p">{</span> <span class="n">menu</span> <span class="k">in</span>
+    <span class="kt">MyRow</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Hello, World"</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">menu</span><span class="o">.</span><span class="nf">show</span><span class="p">()</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="nv">items</span><span class="p">:</span> <span class="p">{</span>
+    <span class="kt">EditingMenuItem</span><span class="o">.</span><span class="nf">copying</span><span class="p">(</span><span class="s">"A String"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+                        <a href="Structs/EditingMenu.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EditingMenu</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls15EditingMenuItemV"></a>
+                    <a name="//apple_ref/swift/Struct/EditingMenuItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls15EditingMenuItemV">EditingMenuItem</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A single item in an editing menu.</p>
+
+                        <a href="Structs/EditingMenuItem.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EditingMenuItem</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls10TextShadowV"></a>
+                    <a name="//apple_ref/swift/Struct/TextShadow" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls10TextShadowV">TextShadow</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Describes a shadow that can be applied to text elements, like <code><a href="Structs/Label.html">Label</a></code>.</p>
+
+                        <a href="Structs/TextShadow.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">TextShadow</span> <span class="p">:</span> <span class="kt">Hashable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:25BlueprintUICommonControls35UserInterfaceStyleOverridingElementV"></a>
+                    <a name="//apple_ref/swift/Struct/UserInterfaceStyleOverridingElement" class="dashAnchor"></a>
+                    <a class="token" href="#/s:25BlueprintUICommonControls35UserInterfaceStyleOverridingElementV">UserInterfaceStyleOverridingElement</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>An element that allows overriding the user interface style (light/dark mode) for its wrapped content.</p>
+
+<p>Use this element to force a specific appearance for a portion of your UI, regardless of the system-wide
+settings. This can be useful when you need to ensure certain UI elements maintain a consistent appearance
+across different user interface styles.</p>
+
+<p>Example:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">content</span> <span class="o">=</span> <span class="kt">Label</span><span class="p">(</span><span class="nv">text</span><span class="p">:</span> <span class="s">"Hello, World!"</span><span class="p">)</span>
+<span class="k">let</span> <span class="nv">forcedLightMode</span> <span class="o">=</span> <span class="kt">UserInterfaceStyleOverridingElement</span><span class="p">(</span>
+    <span class="nv">userInterfaceStyle</span><span class="p">:</span> <span class="o">.</span><span class="n">light</span><span class="p">,</span>
+    <span class="nv">wrapping</span><span class="p">:</span> <span class="n">content</span>
+<span class="p">)</span>
+</code></pre>
+
+                        <a href="Structs/UserInterfaceStyleOverridingElement.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">UserInterfaceStyleOverridingElement</span> <span class="p">:</span> <span class="kt"><a href="Protocols/Element.html">Element</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2025 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2025-12-03)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.14.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+    </section>
+  </body>
+</html>
