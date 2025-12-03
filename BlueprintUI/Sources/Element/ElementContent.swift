@@ -249,6 +249,17 @@ extension ElementContent {
         storage = MeasurableStorage(measurer: measureFunction)
     }
 
+    /// Initializes a new `ElementContent` with no children that delegates to the provided measure function.
+    ///
+    /// - parameter validationKey: If present, measureFunction will attempt to cache sizing based on the path of the node. validationKey will be evaluated to ensure that the result is valid.
+    /// - parameter measureFunction: How to measure the `ElementContent` in the given `SizeConstraint` and `Environment`.
+    public init(
+        validationKey: some CrossLayoutCacheable,
+        measureFunction: @escaping (SizeConstraint, Environment) -> CGSize
+    ) {
+        storage = MeasurableStorage(validationKey: validationKey, measurer: measureFunction)
+    }
+
     /// Initializes a new `ElementContent` with no children that uses the provided intrinsic size for measuring.
     public init(intrinsicSize: CGSize) {
         self = ElementContent(measureFunction: { _ in intrinsicSize })

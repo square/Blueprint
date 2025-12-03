@@ -1427,6 +1427,10 @@ extension VerticalAlignment {
 extension LayoutOptions {
     static let optimizationsDisabled: Self = .init(
         hintRangeBoundaries: false,
-        searchUnconstrainedKeys: false
+        searchUnconstrainedKeys: false,
+        measureableStorageCache: false,
+        stringNormalizationCache: false,
+        skipUnneededSetNeedsViewHierarchyUpdates: false,
+        labelAttributedStringCache: false
     )
 }
