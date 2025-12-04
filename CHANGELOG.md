@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `AttributedLabel` and `Label` will now restrict their measured size to the provided measurement constraint.
+
 ### Deprecated
 
 ### Security
