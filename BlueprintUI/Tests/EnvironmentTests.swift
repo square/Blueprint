@@ -307,7 +307,7 @@ private class TestView: UIView {
     var testValue = TestValue.defaultValue
 }
 
-private enum TestValue {
+private enum TestValue: Equatable {
     case defaultValue
     case wrong
     case right
