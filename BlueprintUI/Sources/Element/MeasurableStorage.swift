@@ -7,16 +7,16 @@ struct MeasurableStorage: ContentStorage {
 
     let childCount = 0
 
-    let validationKey: AnyCrossLayoutCacheable?
+    let cacheKey: AnyCrossLayoutCacheable?
     let measurer: (SizeConstraint, Environment) -> CGSize
 
-    init(validationKey: some CrossLayoutCacheable, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
-        self.validationKey = AnyCrossLayoutCacheable(validationKey)
+    init(cacheKey: some CrossLayoutCacheable, measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
+        self.cacheKey = AnyCrossLayoutCacheable(cacheKey)
         self.measurer = measurer
     }
 
     init(measurer: @escaping (SizeConstraint, Environment) -> CGSize) {
-        validationKey = nil
+        cacheKey = nil
         self.measurer = measurer
     }
 }
@@ -28,7 +28,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         environment: Environment,
         node: LayoutTreeNode
     ) -> CGSize {
-        guard environment.layoutMode.options.measureableStorageCache, let validationKey else {
+        guard environment.layoutMode.options.measureableStorageCache, let cacheKey else {
             return measurer(proposal, environment)
         }
 
@@ -36,7 +36,7 @@ extension MeasurableStorage: CaffeinatedContentStorage {
         return environment.hostingViewContext.measurableStorageCache.retrieveOrCreate(
             key: key,
             environment: environment,
-            validationValue: validationKey,
+            validationValue: cacheKey,
             context: .elementSizing,
         ) { environment in
             measurer(proposal, environment)
