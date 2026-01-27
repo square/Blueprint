@@ -1292,7 +1292,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.5.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.5.1...HEAD
+[6.5.1]: https://github.com/square/Blueprint/compare/6.5.0...6.5.1
 [6.5.0]: https://github.com/square/Blueprint/compare/6.4.0...6.5.0
 [6.4.0]: https://github.com/square/Blueprint/compare/6.3.1...6.4.0
 [6.3.1]: https://github.com/square/Blueprint/compare/6.3.0...6.3.1
