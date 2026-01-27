@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `accessibilityCustomContent` is an IUO and nils should be handled 
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.5.1] - 2026-01-27
+
+### Fixed
+
+- `accessibilityCustomContent` is an IUO and nils should be handled accordingly.
 
 ## [6.5.0] - 2025-11-25
 
