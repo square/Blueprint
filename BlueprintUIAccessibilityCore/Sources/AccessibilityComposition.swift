@@ -103,7 +103,7 @@ extension AccessibilityComposition {
                     {
                         allContent.append(contentsOf: content)
                     }
-                    allContent.append(contentsOf: provider.accessibilityCustomContent)
+                    allContent.append(contentsOf: provider.accessibilityCustomContent ?? [])
                 }
             }
 
