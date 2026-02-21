@@ -98,6 +98,15 @@ extension EnvironmentKey where Value: CrossLayoutCacheable {
 
 extension EnvironmentKey {
 
+    // For `EnvironmentKey`s which do not have equatable or cachably equivalent values, a default implementation of false is provided.
+    public static func isCacheablyEquivalent(lhs: Value, rhs: Value, in context: CrossLayoutCacheableContext) -> Bool {
+        Logger.logEnvironmentKeyDefaultConfrmanceWarning(key: ObjectIdentifier(self))
+        return false
+    }
+}
+
+extension EnvironmentKey {
+
     /// Convenience comparison to express default equality in specific contexts.
     /// - Parameters:
     ///   - contexts: The contexts in which the values are always equilvalent.

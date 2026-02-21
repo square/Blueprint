@@ -339,6 +339,11 @@ extension Logger {
         hook?("\(#function) \(String(describing: key))")
     }
 
+    static func logEnvironmentKeyDefaultConfrmanceWarning(key: some Hashable) {
+        guard BlueprintLogging.isEnabled else { return }
+        signposter.emitEvent("Default EnvironmentKey.isCacheablyEquivalent conformance invoked. If this is happening frequently, consider implementing this methed for your EnvironmentKey explicitly.", id: key.signpost)
+    }
+
 }
 
 extension Hashable {
