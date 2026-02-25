@@ -24,6 +24,9 @@ let package = Package(
             targets: ["BlueprintUIAccessibilityCore"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/square/swift-keyboard-observer", branch: "johnnewman/task/ios-15"),
+    ],
     targets: [
         .target(
             name: "BlueprintUI",
@@ -38,7 +41,11 @@ let package = Package(
         ),
         .target(
             name: "BlueprintUICommonControls",
-            dependencies: ["BlueprintUI", "BlueprintUIAccessibilityCore"],
+            dependencies: [
+                "BlueprintUI",
+                "BlueprintUIAccessibilityCore",
+                .product(name: "KeyboardObserver", package: "swift-keyboard-observer"),
+            ],
             path: "BlueprintUICommonControls/",
             sources: ["Sources"]
             // Enable this setting to allow running tests in release mode.

@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-keyboard-observer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/square/swift-keyboard-observer",
+      "state" : {
+        "branch" : "johnnewman/task/ios-15",
+        "revision" : "4d273643334b443c115dbc7ddd7ce4a2292bff5e"
+      }
+    }
+  ],
+  "version" : 2
+}
