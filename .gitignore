@@ -25,3 +25,6 @@ gen/
 /SampleApp/Derived
 /SampleApp/*.xcodeproj
 /SampleApp/*.xcworkspace
+
+# Resolved dependencies are managed by Tuist in SampleApp/Tuist/Package.resolved.
+Package.resolved
