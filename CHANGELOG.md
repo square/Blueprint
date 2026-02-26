@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Replaced the internal `KeyboardObserver` with https://github.com/square/swift-keyboard-observer.
-
 ### Deprecated
 
 ### Security
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.6.0] - 2026-02-25
+
+### Changed
+
+- Replaced the internal `KeyboardObserver` with https://github.com/square/swift-keyboard-observer.
 
 ## [6.5.1] - 2026-01-27
 
@@ -1294,7 +1298,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.5.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.6.0...HEAD
+[6.6.0]: https://github.com/square/Blueprint/compare/6.5.1...HEAD
 [6.5.1]: https://github.com/square/Blueprint/compare/6.5.0...6.5.1
 [6.5.0]: https://github.com/square/Blueprint/compare/6.4.0...6.5.0
 [6.4.0]: https://github.com/square/Blueprint/compare/6.3.1...6.4.0
