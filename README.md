@@ -1,4 +1,4 @@
-# Blueprint
+# Blueprint 
 
 [![Tests](https://github.com/square/Blueprint/actions/workflows/tests.yaml/badge.svg)](https://github.com/square/Blueprint/actions/workflows/tests.yaml)
 [![Generate and publish docs](https://github.com/square/Blueprint/actions/workflows/docs.yml/badge.svg)](https://github.com/square/Blueprint/actions/workflows/docs.yml)
