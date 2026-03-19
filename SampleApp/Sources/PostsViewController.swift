@@ -79,7 +79,7 @@ final class PostsViewController: UIViewController {
     }
 
     var element: Element {
-        let theme = FeedTheme(authorColor: .green)
+        let theme = FeedTheme(authorColor: .systemPurple)
 
         let pullToRefreshBehavior: ScrollView.PullToRefreshBehavior
         if state.isLoading {
@@ -290,7 +290,7 @@ fileprivate struct FeedItem: ProxyElement {
                 row.horizontalUnderflow = .growUniformly
 
                 let avatar = Box(
-                    backgroundColor: .lightGray,
+                    backgroundColor: .systemBlue,
                     cornerStyle: .rounded(radius: 32.0)
                 ).constrainedTo(width: .absolute(64.0), height: .absolute(64.0))
 
