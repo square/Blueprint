@@ -12,6 +12,9 @@ final class RootViewController: UIViewController {
             DemoItem(title: "Accessibility", onTap: { [weak self] in
                 self?.push(AccessibilityViewController())
             }),
+            DemoItem(title: "Accessibility Focus Trigger", onTap: { [weak self] in
+                self?.push(AccessibilityFocusTriggerViewController())
+            }),
             DemoItem(title: "Text Links", onTap: { [weak self] in
                 self?.push(TextLinkViewController())
             }),
