@@ -31,6 +31,10 @@ extension AccessibilityFocusableElement {
 
         private var currentTrigger: AccessibilityFocusTrigger?
 
+        deinit {
+            currentTrigger?.action = nil
+        }
+
         func apply(trigger: AccessibilityFocusTrigger) {
             // Tear down old trigger binding.
             currentTrigger?.action = nil

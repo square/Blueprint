@@ -140,6 +140,6 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
 
     private func separator() -> Element {
         Box(backgroundColor: .separator)
-            .constrainedTo(height: .absolute(1.0 / UIScreen.main.scale))
+            .constrainedTo(height: .absolute(1.0 / UITraitCollection.current.displayScale))
     }
 }
