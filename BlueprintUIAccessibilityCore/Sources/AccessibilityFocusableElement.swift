@@ -1,3 +1,4 @@
+import BlueprintUI
 import UIKit
 
 /// A wrapping element that binds an `AccessibilityFocusTrigger` to a backing view,

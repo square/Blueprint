@@ -1,3 +1,4 @@
+@testable import BlueprintUIAccessibilityCore
 import BlueprintUI
 import XCTest
 

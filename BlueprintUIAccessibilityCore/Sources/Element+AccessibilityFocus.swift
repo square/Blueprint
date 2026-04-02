@@ -1,3 +1,5 @@
+import BlueprintUI
+
 extension Element {
 
     /// Binds an `AccessibilityFocusTrigger` to this element.

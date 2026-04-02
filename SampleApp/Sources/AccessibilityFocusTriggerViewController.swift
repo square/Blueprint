@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import BlueprintUICommonControls
 import UIKit
 

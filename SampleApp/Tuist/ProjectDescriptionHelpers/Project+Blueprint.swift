@@ -8,6 +8,7 @@ public let blueprintDeploymentTargets: DeploymentTargets = .iOS("15.0")
 public let blueprintDependencies: [TargetDependency] = [
     .external(name: "BlueprintUI"),
     .external(name: "BlueprintUICommonControls"),
+    .external(name: "BlueprintUIAccessibilityCore"),
 ]
 
 extension String {
