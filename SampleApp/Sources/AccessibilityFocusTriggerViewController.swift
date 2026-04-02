@@ -10,15 +10,10 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
         case idle, loading, result
     }
 
-    private var errorState: DemoState = .idle {
-        didSet { update() }
-    }
-
     private var transferState: DemoState = .idle {
         didSet { update() }
     }
 
-    private let errorTrigger = AccessibilityFocusTrigger()
     private let resultTrigger = AccessibilityFocusTrigger()
     private let layoutChangeTrigger = AccessibilityFocusTrigger(notification: .layoutChanged)
     private let screenChangeTrigger = AccessibilityFocusTrigger(notification: .screenChanged)
@@ -41,40 +36,40 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
     var element: Element {
         Column(alignment: .fill, minimumSpacing: 24) {
 
-            // MARK: - Section: Focus on error
+            // MARK: - Section: Layout changed
 
-            sectionHeader("Focus on Error Message")
+            sectionHeader("Layout Changed (.layoutChanged)")
 
-            if errorState == .result {
-                Label(text: "Invalid amount entered.") { label in
-                    label.font = .systemFont(ofSize: 16, weight: .medium)
-                    label.color = .systemRed
-                }
-                .accessibilityFocus(trigger: errorTrigger)
+            Label(text: "Focuses this label with .layoutChanged") { label in
+                label.font = .systemFont(ofSize: 16)
+                label.color = .secondaryLabel
             }
+            .accessibilityFocus(trigger: layoutChangeTrigger)
 
             Button(
-                isEnabled: errorState != .loading,
                 onTap: {
-                    switch self.errorState {
-                    case .idle:
-                        self.errorState = .loading
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                            self.errorState = .result
-                            DispatchQueue.main.async {
-                                self.errorTrigger.requestFocus()
-                            }
-                        }
-                    case .result:
-                        self.errorState = .idle
-                    case .loading:
-                        break
-                    }
+                    self.layoutChangeTrigger.requestFocus()
                 },
-                wrapping: buttonLabel(
-                    errorState == .idle ? "Validate Amount" : errorState == .loading ? "Validating…" : "Reset",
-                    color: errorState == .loading ? .systemGray : errorState == .result ? .systemGray : .systemBlue
-                )
+                wrapping: buttonLabel("Trigger Layout Changed")
+            )
+
+            separator()
+
+            // MARK: - Section: Screen changed
+
+            sectionHeader("Screen Changed (.screenChanged)")
+
+            Label(text: "Focuses this label with .screenChanged") { label in
+                label.font = .systemFont(ofSize: 16)
+                label.color = .secondaryLabel
+            }
+            .accessibilityFocus(trigger: screenChangeTrigger)
+
+            Button(
+                onTap: {
+                    self.screenChangeTrigger.requestFocus()
+                },
+                wrapping: buttonLabel("Trigger Screen Changed")
             )
 
             separator()
@@ -113,44 +108,6 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
                     transferState == .idle ? "Send Transfer" : transferState == .loading ? "Sending…" : "Reset",
                     color: transferState == .loading ? .systemGray : transferState == .result ? .systemGray : .systemBlue
                 )
-            )
-
-            separator()
-
-            // MARK: - Section: Layout changed
-
-            sectionHeader("Layout Changed (.layoutChanged)")
-
-            Label(text: "Focuses this label with .layoutChanged") { label in
-                label.font = .systemFont(ofSize: 16)
-                label.color = .secondaryLabel
-            }
-            .accessibilityFocus(trigger: layoutChangeTrigger)
-
-            Button(
-                onTap: {
-                    self.layoutChangeTrigger.requestFocus()
-                },
-                wrapping: buttonLabel("Trigger Layout Changed")
-            )
-
-            separator()
-
-            // MARK: - Section: Screen changed
-
-            sectionHeader("Screen Changed (.screenChanged)")
-
-            Label(text: "Focuses this label with .screenChanged") { label in
-                label.font = .systemFont(ofSize: 16)
-                label.color = .secondaryLabel
-            }
-            .accessibilityFocus(trigger: screenChangeTrigger)
-
-            Button(
-                onTap: {
-                    self.screenChangeTrigger.requestFocus()
-                },
-                wrapping: buttonLabel("Trigger Screen Changed")
             )
         }
         .inset(uniform: 20)
