@@ -1,5 +1,5 @@
-@testable import BlueprintUIAccessibilityCore
 import BlueprintUI
+@testable import BlueprintUIAccessibilityCore
 import XCTest
 
 final class AccessibilityFocusTriggerTests: XCTestCase {
