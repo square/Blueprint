@@ -53,10 +53,11 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
                 .accessibilityFocus(trigger: errorTrigger)
             }
 
-            switch errorState {
-            case .idle:
-                Button(
-                    onTap: {
+            Button(
+                isEnabled: errorState != .loading,
+                onTap: {
+                    switch self.errorState {
+                    case .idle:
                         self.errorState = .loading
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             self.errorState = .result
@@ -64,20 +65,17 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
                                 self.errorTrigger.requestFocus()
                             }
                         }
-                    },
-                    wrapping: buttonLabel("Validate Amount")
-                )
-            case .loading:
-                buttonLabel("Validating…", color: .systemGray)
-                    .opacity(0.6)
-            case .result:
-                Button(
-                    onTap: {
+                    case .result:
                         self.errorState = .idle
-                    },
-                    wrapping: buttonLabel("Reset", color: .systemGray)
+                    case .loading:
+                        break
+                    }
+                },
+                wrapping: buttonLabel(
+                    errorState == .idle ? "Validate Amount" : errorState == .loading ? "Validating…" : "Reset",
+                    color: errorState == .loading ? .systemGray : errorState == .result ? .systemGray : .systemBlue
                 )
-            }
+            )
 
             separator()
 
@@ -93,10 +91,11 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
                 .accessibilityFocus(trigger: resultTrigger)
             }
 
-            switch transferState {
-            case .idle:
-                Button(
-                    onTap: {
+            Button(
+                isEnabled: transferState != .loading,
+                onTap: {
+                    switch self.transferState {
+                    case .idle:
                         self.transferState = .loading
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                             self.transferState = .result
@@ -104,20 +103,17 @@ final class AccessibilityFocusTriggerViewController: UIViewController {
                                 self.resultTrigger.requestFocus()
                             }
                         }
-                    },
-                    wrapping: buttonLabel("Send Transfer")
-                )
-            case .loading:
-                buttonLabel("Sending…", color: .systemGray)
-                    .opacity(0.6)
-            case .result:
-                Button(
-                    onTap: {
+                    case .result:
                         self.transferState = .idle
-                    },
-                    wrapping: buttonLabel("Reset", color: .systemGray)
+                    case .loading:
+                        break
+                    }
+                },
+                wrapping: buttonLabel(
+                    transferState == .idle ? "Send Transfer" : transferState == .loading ? "Sending…" : "Reset",
+                    color: transferState == .loading ? .systemGray : transferState == .result ? .systemGray : .systemBlue
                 )
-            }
+            )
 
             separator()
 
