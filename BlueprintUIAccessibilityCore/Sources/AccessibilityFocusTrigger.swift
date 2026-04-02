@@ -56,11 +56,4 @@ public final class AccessibilityFocusTrigger {
         action?()
     }
 
-    /// Posts a VoiceOver announcement without focusing a specific view.
-    /// No-op if VoiceOver is not running.
-    /// - Parameter message: The string to announce.
-    public static func announce(_ message: String) {
-        guard UIAccessibility.isVoiceOverRunning else { return }
-        UIAccessibility.post(notification: .announcement, argument: message)
-    }
 }

@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added `AccessibilityFocusTrigger` and `Element.accessibilityFocus(trigger:)` for programmatic VoiceOver focus management.
-- Added `AccessibilityFocusTrigger.announce(_:)` for posting VoiceOver announcements.
 
 ### Removed
 
