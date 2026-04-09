@@ -7,4 +7,8 @@ extension Optional where Wrapped: RangeReplaceableCollection {
         return val.isEmpty ? nil : val
     }
 
+    static func += (lhs: inout Wrapped?, rhs: Wrapped?) {
+        lhs = lhs + rhs
+    }
+
 }

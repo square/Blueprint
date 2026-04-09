@@ -24,11 +24,9 @@ public struct AccessibilityDeferral {
         /// Content from an outside source that will be exposed via AccessibilityCustomContent
         var deferredAccessibilityContent: [AccessibilityDeferral.Content]? { get set }
 
-        /// Called by the parent container. Default implementation provided.
-        /// - parameter content: the accessibility content to apply to the receiver.
-        func applyDeferredAccessibility(
-            content: [AccessibilityDeferral.Content]?
-        )
+        /// Called by the parent container after deferred value update pass completes.
+        /// - parameter frameProvider: an optional accessibility frame to apply at the receiver's discretion.
+        func updateDeferredAccessibility(frameProvider: AccessibilityDeferral.FrameProvider?)
     }
 
     /// An accessibility container wrapping an element that natively provides the deferred accessibility content. This element's accessibility is conditionally exposed based on the presence of a receiver.
@@ -44,12 +42,10 @@ public struct AccessibilityDeferral {
 
     public struct Content: Equatable {
         public enum Kind: Equatable {
-            /// Uses accessibility values from the contained element and exposes them as custom via the accessiblity rotor.
+            /// Uses accessibility values from the contained element and exposes them as custom via the accessibility rotor.
             case inherited(Accessibility.CustomContent.Importance = .default)
             /// Announces an error message with high importance using accessibility values from the contained element.
             case error
-            /// Exposes the custom content provided.
-            case custom(Accessibility.CustomContent)
         }
 
         public var kind: Kind
@@ -57,7 +53,7 @@ public struct AccessibilityDeferral {
         /// Used to identify a specific `Source` element to inherit accessibility from.
         public var sourceIdentifier: AnyHashable
 
-        /// : A stable identifier used to identify a given update pass through he view hierarchy. Content with matching updateIdentifiers should be combined.
+        /// A stable identifier used to identify a given update pass through the view hierarchy. Content with matching updateIdentifiers should be combined.
         internal var updateIdentifier: UUID?
         internal var inheritedAccessibility: AccessibilityComposition.CompositeRepresentation?
 
@@ -77,8 +73,59 @@ public struct AccessibilityDeferral {
                 content?.value = value
                 content?.label = LocalizedStrings.Accessibility.errorTitle
                 return content?.axCustomContent
-            case .custom(let customContent):
-                return customContent.axCustomContent
+            }
+        }
+    }
+}
+
+extension AccessibilityDeferral {
+
+    // Prefer accessibilityPath API to simplify overrides and provide a common codepath.
+    public struct FrameProvider {
+        public static let accessibilityCornerRadius = 8.0 // Matches Voiceover's CGRect API
+
+        fileprivate static let accessibilityPathInset = -2.0
+
+        private let provider: () -> UIBezierPath
+
+        private init(_ provider: @escaping () -> UIBezierPath) {
+            self.provider = provider
+        }
+
+        public func callAsFunction() -> UIBezierPath {
+            provider()
+        }
+
+        /// Creates a container frame from a CGRect with rounded corners
+        /// - Parameters:
+        ///   - rect: The frame in global coordinate space
+        ///   - cornerRadius: The radius for rounded corners
+        public static func frame(_ rect: CGRect, cornerRadius: CGFloat = accessibilityCornerRadius) -> Self {
+            .init {
+                UIBezierPath(roundedRect: rect, cornerRadius: max(0, cornerRadius - accessibilityPathInset))
+            }
+        }
+
+        /// Creates a container frame from a UIView
+        /// - Parameters:
+        ///   - view: The view providing the frame geometry
+        public static func view(_ view: UIView) -> Self {
+            .init { [weak view] in
+                guard let view else { return UIBezierPath() }
+
+                // Prefer the path if it's already set.
+                guard view.accessibilityPath == nil else { return view.accessibilityPath! }
+
+                let bounds = view.bounds
+                let outsetFrame = bounds.insetBy(dx: accessibilityPathInset * 2, dy: accessibilityPathInset * 2)
+                let convertedFrame = UIAccessibility.convertToScreenCoordinates(outsetFrame, in: view)
+
+                // Apply corner radius from layer if present, otherwise use default text field radius
+                let cornerRadius = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : accessibilityCornerRadius
+                return UIBezierPath(
+                    roundedRect: convertedFrame,
+                    cornerRadius: max(0, cornerRadius - accessibilityPathInset)
+                )
             }
         }
     }
@@ -97,6 +144,11 @@ extension Element {
     /// Creates a `SourceContainer` element to wrap the conditionally exposed element.
     public func deferredAccessibilitySource(identifier: AnyHashable) -> AccessibilityDeferral.SourceContainer {
         AccessibilityDeferral.SourceContainer(wrapping: { self }, identifier: identifier)
+    }
+
+    /// Creates a `ReceiverContainer` element to expose the deferred accessibility.
+    public func deferredAccessibilityReceiver() -> AccessibilityDeferral.ReceiverContainer {
+        AccessibilityDeferral.ReceiverContainer(wrapping: { self })
     }
 }
 
@@ -130,7 +182,6 @@ extension AccessibilityDeferral {
 
     private final class DeferralContainerView: UIView {
 
-        var useContainerFrame: Bool = true
         var contents: [Content]? {
             didSet {
                 if oldValue != contents {
@@ -177,9 +228,7 @@ extension AccessibilityDeferral {
 
             guard receivers.count <= 1 else {
                 // We cannot reasonably determine which receiver to apply the content to.
-                receivers.forEach { $0.applyDeferredAccessibility(
-                    content: nil
-                ) }
+                receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
             }
 
@@ -199,13 +248,112 @@ extension AccessibilityDeferral {
                 }
 
                 // Apply content to receiver.
-                receiver.applyDeferredAccessibility(
-                    content: deferredContent
-                )
+                receiver.apply(content: deferredContent, frameProvider: .view(self))
+
             }
         }
     }
 }
+
+extension AccessibilityDeferral {
+
+    public struct ReceiverContainer: Element {
+        public var wrappedElement: Element
+
+        init(wrapping: @escaping () -> Element) {
+            wrappedElement = wrapping()
+        }
+
+        public var content: ElementContent {
+            ElementContent(measuring: wrappedElement)
+        }
+
+        public func backingViewDescription(with context: BlueprintUI.ViewDescriptionContext) -> BlueprintUI.ViewDescription? {
+            ReceiverContainerView.describe { config in
+                config.apply { view in
+                    view.isAccessibilityElement = true
+                    view.needsAccessibilityUpdate = true
+                    view.layoutDirection = context.environment.layoutDirection
+                    view.element = wrappedElement
+                }
+            }
+        }
+
+        private final class ReceiverContainerView: AccessibilityComposition.CombinableView, AccessibilityDeferral.Receiver {
+            var element: Element? {
+                didSet {
+                    blueprintView.element = element
+                    blueprintView.setNeedsLayout()
+                }
+            }
+
+            private var blueprintView = BlueprintView()
+
+            override init(frame: CGRect) {
+                super.init(frame: frame)
+                isAccessibilityElement = true
+                mergeInteractiveSingleChild = false
+
+                blueprintView.backgroundColor = .clear
+                addSubview(blueprintView)
+            }
+
+            @MainActor required init?(coder: NSCoder) {
+                fatalError("init(coder:) has not been implemented")
+            }
+
+            override func layoutSubviews() {
+                super.layoutSubviews()
+                blueprintView.frame = bounds
+                needsAccessibilityUpdate = true
+            }
+
+            // MARK: - Accessibility Deferral and Custom Content
+            internal var frameProvider: FrameProvider?
+
+            var customContent: [Accessibility.CustomContent]?
+
+            var deferredAccessibilityContent: [AccessibilityDeferral.Content]?
+
+            public override var accessibilityCustomRotors: [UIAccessibilityCustomRotor]? {
+                get { super.accessibilityCustomRotors + rotorSequencer?.rotors }
+                set { super.accessibilityCustomRotors = newValue }
+            }
+
+            public override var accessibilityPath: UIBezierPath? {
+                get { frameProvider?() ?? UIBezierPath(rect: super.accessibilityFrame) }
+                set { assertionFailure("Use frameProvider instead of setting accessibilityPath directly.") }
+            }
+
+            public override var accessibilityCustomContent: [AXCustomContent]! {
+                get {
+                    let existing = super.accessibilityCustomContent
+                    let applied = customContent?.map { AXCustomContent($0) }
+                    return (existing + applied)?.removingDuplicates ?? []
+                }
+                set { super.accessibilityCustomContent = newValue }
+            }
+
+            public func updateDeferredAccessibility(frameProvider: FrameProvider?) {
+                needsAccessibilityUpdate = true
+
+                self.frameProvider = frameProvider
+
+                if let deferred = deferredAccessibilityContent?.compactMap({ $0.inheritedAccessibility }),
+                   let first = deferred.first
+                {
+                    mergeValues = deferred.dropFirst()
+                        .reduce(first) { result, value in
+                            result.merge(with: value)
+                        }
+                } else {
+                    mergeValues = nil
+                }
+            }
+        }
+    }
+}
+
 
 
 extension AccessibilityDeferral {
@@ -259,10 +407,6 @@ extension AccessibilityDeferral {
 
             blueprintView.backgroundColor = .clear
             addSubview(blueprintView)
-        }
-
-        override func addSubview(_ view: UIView) {
-            super.addSubview(view)
         }
 
         required init?(coder: NSCoder) {
@@ -325,11 +469,15 @@ extension AccessibilityComposition.CompositeRepresentation {
     }
 }
 
-/// Default Implementation
 extension AccessibilityDeferral.Receiver {
 
-    public func applyDeferredAccessibility(
-        content: [AccessibilityDeferral.Content]?
+    // Default implementation ignores frame
+    public func updateDeferredAccessibility(frameProvider: AccessibilityDeferral.FrameProvider?) {}
+
+
+    internal func apply(
+        content: [AccessibilityDeferral.Content]?,
+        frameProvider: AccessibilityDeferral.FrameProvider?
     ) {
         guard let content, !content.isEmpty else { replaceContent([]); return }
         guard let updateID = content.first?.updateIdentifier, content.allSatisfy({ $0.updateIdentifier == updateID }) else {
@@ -342,30 +490,32 @@ extension AccessibilityDeferral.Receiver {
         } else {
             replaceContent(content)
         }
+        updateDeferredAccessibility(frameProvider: frameProvider)
+    }
 
-        func replaceContent(_ content: [AccessibilityDeferral.Content]?) {
-            deferredAccessibilityContent = content
+    internal func replaceContent(_ content: [AccessibilityDeferral.Content]?) {
+        deferredAccessibilityContent = content
 
-            accessibilityCustomActions = content?.compactMap { $0.inheritedAccessibility?.allActions }.flatMap { $0 }.removingDuplicateActions()
+        accessibilityCustomActions = content?.compactMap { $0.inheritedAccessibility?.allActions }.flatMap { $0 }.removingDuplicateActions()
 
-            if let rotors = content?.compactMap({ $0.inheritedAccessibility?.rotors }).flatMap({ $0 }), !rotors.isEmpty {
-                rotorSequencer = .init(rotors: rotors)
-            } else {
-                rotorSequencer = nil
-            }
-        }
-
-        func mergeContent(_ content: [AccessibilityDeferral.Content]?) {
-            deferredAccessibilityContent = (deferredAccessibilityContent + content)?.removingDuplicates
-
-            let contentActions = content?.compactMap { $0.inheritedAccessibility?.allActions }.flatMap { $0 }
-            accessibilityCustomActions = (accessibilityCustomActions + contentActions)?.removingDuplicateActions()
-
-            if let rotors = content?.compactMap({ $0.inheritedAccessibility?.rotors }).flatMap({ $0 }), !rotors.isEmpty {
-                let mergedRotors = (rotorSequencer?.rotors ?? []) + rotors
-                rotorSequencer = .init(rotors: mergedRotors)
-                accessibilityCustomRotors = rotorSequencer?.rotors
-            }
+        if let rotors = content?.compactMap({ $0.inheritedAccessibility?.rotors }).flatMap({ $0 }), !rotors.isEmpty {
+            rotorSequencer = .init(rotors: rotors)
+        } else {
+            rotorSequencer = nil
         }
     }
+
+    internal func mergeContent(_ content: [AccessibilityDeferral.Content]?) {
+        deferredAccessibilityContent = (deferredAccessibilityContent + content)?.removingDuplicates
+
+        let contentActions = content?.compactMap { $0.inheritedAccessibility?.allActions }.flatMap { $0 }
+        accessibilityCustomActions = (accessibilityCustomActions + contentActions)?.removingDuplicateActions()
+
+        if let rotors = content?.compactMap({ $0.inheritedAccessibility?.rotors }).flatMap({ $0 }), !rotors.isEmpty {
+            let mergedRotors = (rotorSequencer?.rotors ?? []) + rotors
+            rotorSequencer = .init(rotors: mergedRotors)
+            accessibilityCustomRotors = rotorSequencer?.rotors
+        }
+    }
+
 }

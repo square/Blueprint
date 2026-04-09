@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import BlueprintUICommonControls
 import UIKit
 
@@ -171,6 +172,14 @@ final class AccessibilityViewController: UIViewController {
                 }
                 .accessibilityShowsLargeContentViewer(display: .title("Long press large content display text", nil))
             }.accessibilityLargeContentViewerInteractionContainer()
+            Row {
+                Label(text: "Deferral") { label in
+                    label.font = .systemFont(ofSize: 24, weight: .bold)
+                    label.accessibilityTraits = [.header]
+                }
+            }
+
+            deferralDemo
         }
         .accessibilityContainer()
         .inset(uniform: 20)
@@ -180,5 +189,36 @@ final class AccessibilityViewController: UIViewController {
                 self.secondTrigger.focus()
             }
         }
+    }
+
+    /// Demonstrates the Element deferral API.
+    /// The eyebrow and subheading are marked as deferred sources — VoiceOver
+    /// consolidates their content into the title (the receiver) so users hear
+    /// one combined element instead of three separate ones.
+    var deferralDemo: Element {
+        let eyebrowContent = AccessibilityDeferral.Content(kind: .inherited(.high))
+        let subheadingContent = AccessibilityDeferral.Content(kind: .inherited())
+
+        return Column(alignment: .fill, minimumSpacing: 4) {
+            Label(text: "FEATURED", configure: { label in
+                label.font = .systemFont(ofSize: 12, weight: .semibold)
+                label.color = .systemGray
+            })
+            .deferredAccessibilitySource(identifier: eyebrowContent.sourceIdentifier)
+
+            Label(text: "Accessibility Deferral", configure: { label in
+                label.font = .systemFont(ofSize: 20, weight: .bold)
+            })
+            .deferredAccessibilityReceiver()
+
+            Label(text: "Consolidate and order accessibility independently of layout", configure: { label in
+                label.font = .systemFont(ofSize: 14)
+                label.color = .systemGray
+            })
+            .deferredAccessibilitySource(identifier: subheadingContent.sourceIdentifier)
+        }
+        .inset(uniform: 16)
+        .box(background: .white, corners: .rounded(radius: 12))
+        .deferAccessibilityToChildren(content: [eyebrowContent, subheadingContent])
     }
 }
