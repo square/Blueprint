@@ -25,6 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+## [6.7.0] - 2026-04-09
+
+### Added
+
+- `AccessibilityDeferral.ReceiverContainer` element for wrapping elements that receive deferred accessibility content.
+- `AccessibilityDeferral.FrameProvider` for centralized accessibility frame handling with support for both `CGRect` and `UIView`-based providers.
+- `merge(with:)` on `CompositeRepresentation` for combining accessibility values from multiple sources.
+- Updated `Receiver` protocol with `updateDeferredAccessibility(frameProvider:)` callback for frame-aware receivers.
+- Element extensions: `.deferAccessibilityToChildren(content:)`, `.deferredAccessibilitySource(identifier:)`, `.deferredAccessibilityReceiver()` for declarative accessibility deferral.
+- `AccessibilityDeferralTests` covering merge chaining, apply/replace flow, and content generation.
+- SampleApp demo for accessibility deferral in `AccessibilityViewController`.
+
 ## [6.6.0] - 2026-02-25
 
 ### Changed
@@ -1298,8 +1310,9 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.6.0...HEAD
-[6.6.0]: https://github.com/square/Blueprint/compare/6.5.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.7.0...HEAD
+[6.7.0]: https://github.com/square/Blueprint/compare/6.6.0...6.7.0
+[6.6.0]: https://github.com/square/Blueprint/compare/6.5.1...6.6.0
 [6.5.1]: https://github.com/square/Blueprint/compare/6.5.0...6.5.1
 [6.5.0]: https://github.com/square/Blueprint/compare/6.4.0...6.5.0
 [6.4.0]: https://github.com/square/Blueprint/compare/6.3.1...6.4.0
