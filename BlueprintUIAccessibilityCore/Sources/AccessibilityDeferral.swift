@@ -271,8 +271,6 @@ extension AccessibilityDeferral {
         public func backingViewDescription(with context: BlueprintUI.ViewDescriptionContext) -> BlueprintUI.ViewDescription? {
             ReceiverContainerView.describe { config in
                 config.apply { view in
-                    view.isAccessibilityElement = true
-                    view.needsAccessibilityUpdate = true
                     view.layoutDirection = context.environment.layoutDirection
                     view.element = wrappedElement
                 }
@@ -291,7 +289,6 @@ extension AccessibilityDeferral {
 
             override init(frame: CGRect) {
                 super.init(frame: frame)
-                isAccessibilityElement = true
                 mergeInteractiveSingleChild = false
 
                 blueprintView.backgroundColor = .clear
@@ -300,6 +297,14 @@ extension AccessibilityDeferral {
 
             @MainActor required init?(coder: NSCoder) {
                 fatalError("init(coder:) has not been implemented")
+            }
+
+            override func didMoveToWindow() {
+                super.didMoveToWindow()
+                isAccessibilityElement = (window != nil)
+                if window != nil {
+                    needsAccessibilityUpdate = true
+                }
             }
 
             override func layoutSubviews() {
@@ -335,6 +340,7 @@ extension AccessibilityDeferral {
             }
 
             public func updateDeferredAccessibility(frameProvider: FrameProvider?) {
+                guard window != nil else { return }
                 needsAccessibilityUpdate = true
 
                 self.frameProvider = frameProvider
@@ -420,6 +426,7 @@ extension AccessibilityDeferral {
         }
 
         private func updateAccessibility() {
+            guard window != nil else { return }
             needsAccessibilityUpdate = false
             blueprintView.layoutIfNeeded()
             let elements = blueprintView.recursiveAccessibleElements()

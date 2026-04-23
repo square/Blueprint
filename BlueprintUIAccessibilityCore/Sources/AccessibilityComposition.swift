@@ -407,6 +407,7 @@ extension AccessibilityComposition {
         }
 
         private func updateAccessibility() {
+            guard window != nil else { return }
             let sorting = customSorting ?? Accessibility.frameSort(
                 direction: layoutDirection,
                 root: self,
@@ -438,6 +439,7 @@ extension AccessibilityComposition.CombinableView {
 
     public override var isAccessibilityElement: Bool {
         get {
+            guard window != nil else { return false }
             if needsAccessibilityUpdate {
                 updateAccessibility()
             }
@@ -484,6 +486,16 @@ extension AccessibilityComposition.CombinableView {
             return super.accessibilityIdentifier
         }
         set { super.accessibilityIdentifier = newValue }
+    }
+
+    public override var accessibilityTraits: UIAccessibilityTraits {
+        get {
+            if needsAccessibilityUpdate {
+                updateAccessibility()
+            }
+            return super.accessibilityTraits
+        }
+        set { super.accessibilityTraits = newValue }
     }
 
     public override var accessibilityElements: [Any]? {

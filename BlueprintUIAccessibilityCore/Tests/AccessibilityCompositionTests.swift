@@ -331,7 +331,9 @@ class AccessibilityCompositionTests: XCTestCase {
     }
 
     func test_blockWhenNotAccessible_givenPopulatedAccessibility() {
+        let window = UIWindow()
         let view = AccessibilityComposition.CombinableView()
+        window.addSubview(view)
         view.blockWhenNotAccessible = true
         (1...3)
             .map { int in
@@ -358,7 +360,9 @@ class AccessibilityCompositionTests: XCTestCase {
     }
 
     func test_blockWhenNotAccessible_givenEmptyAccessibility() {
+        let window = UIWindow()
         let view = AccessibilityComposition.CombinableView()
+        window.addSubview(view)
         view.blockWhenNotAccessible = true
         (1...3)
             .map { int in
@@ -384,6 +388,39 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertFalse(view.isAccessibilityElement, "The view should not be accessible.")
     }
 
+    func test_updateAccessibility_skipsWhenNotInWindow() {
+        let view = AccessibilityComposition.CombinableView()
+        view.blockWhenNotAccessible = true
+        let subview = UIView()
+        subview.isAccessibilityElement = true
+        subview.accessibilityLabel = "Should not appear"
+        view.addSubview(subview)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        XCTAssertNil(view.accessibilityLabel)
+        XCTAssertTrue(view.needsAccessibilityUpdate)
+    }
+
+    func test_updateAccessibility_runsAfterMovingToWindow() {
+        let view = AccessibilityComposition.CombinableView()
+        view.blockWhenNotAccessible = true
+        let subview = UIView()
+        subview.isAccessibilityElement = true
+        subview.accessibilityLabel = "Now visible"
+        view.addSubview(subview)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        XCTAssertNil(view.accessibilityLabel)
+        XCTAssertTrue(view.needsAccessibilityUpdate)
+
+        let window = UIWindow()
+        window.addSubview(view)
+        XCTAssertEqual(view.accessibilityLabel, "Now visible")
+        XCTAssertFalse(view.needsAccessibilityUpdate)
+    }
 
     func test_applyAccessibility() {
 
