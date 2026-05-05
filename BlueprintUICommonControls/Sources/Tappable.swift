@@ -42,9 +42,6 @@ fileprivate final class TappableView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        isAccessibilityElement = true
-        accessibilityTraits = .button
-
         let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
         addGestureRecognizer(tapRecognizer)
     }
