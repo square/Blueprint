@@ -9,7 +9,7 @@ public struct Tappable: Element {
     public var onTap: () -> Void
 
     public init(onTap: @escaping () -> Void, wrapping element: Element) {
-        wrappedElement = element
+        wrappedElement = element.accessibilityTraits(add: [.button])
         self.onTap = onTap
     }
 
