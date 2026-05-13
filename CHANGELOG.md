@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+## [6.7.1] - 2026-05-13
+
+### Fixed
+
+- `Tappable` now advertises the `.button` accessibility trait to assistive technologies, so VoiceOver announces tappable elements with the "Button" role. The trait is applied via `accessibilityTraits(add:)` to preserve the wrapped element's accessibility label.
+
 ## [6.7.0] - 2026-04-09
 
 ### Added
@@ -1310,7 +1316,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.7.0...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.7.1...HEAD
+[6.7.1]: https://github.com/square/Blueprint/compare/6.7.0...6.7.1
 [6.7.0]: https://github.com/square/Blueprint/compare/6.6.0...6.7.0
 [6.6.0]: https://github.com/square/Blueprint/compare/6.5.1...6.6.0
 [6.5.1]: https://github.com/square/Blueprint/compare/6.5.0...6.5.1
