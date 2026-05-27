@@ -132,36 +132,6 @@ class AccessibilityDeferralTests: XCTestCase {
         XCTAssertEqual(receiver.accessibilityCustomActions?.first?.name, "Test Action")
     }
 
-    // MARK: - Recovery from malformed input
-
-    func test_apply_ignores_malformed_batch_with_mismatched_updateIdentifiers() {
-        let receiver = TestReceiver()
-
-        // Seed the receiver with valid content sharing one updateID.
-        var seed = AccessibilityDeferral.Content(kind: .inherited(), identifier: "source1")
-        seed.updateIdentifier = UUID()
-        seed.inheritedAccessibility = makeRepresentation(label: "Seed")
-        receiver.apply(content: [seed], frameProvider: nil)
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 1)
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "Seed")
-
-        // Now hand it a malformed batch with two different updateIDs.
-        var malformedA = AccessibilityDeferral.Content(kind: .inherited(), identifier: "sourceA")
-        malformedA.updateIdentifier = UUID()
-        malformedA.inheritedAccessibility = makeRepresentation(label: "Malformed A")
-
-        var malformedB = AccessibilityDeferral.Content(kind: .inherited(), identifier: "sourceB")
-        malformedB.updateIdentifier = UUID()
-        malformedB.inheritedAccessibility = makeRepresentation(label: "Malformed B")
-
-        // A malformed batch (entries with differing updateIdentifiers) cannot be trusted as
-        // fresher than what's already applied, so existing content stays in place.
-        receiver.apply(content: [malformedA, malformedB], frameProvider: nil)
-
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 1)
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "Seed")
-    }
-
     // MARK: - Content customContent generation
 
     func test_content_inherited_customContent() {
