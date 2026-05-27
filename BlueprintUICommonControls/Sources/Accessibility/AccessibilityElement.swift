@@ -127,7 +127,7 @@ public struct AccessibilityElement: Element {
             }
 
             set {
-                fatalError("accessibilityFrame is not settable on AccessibilityView")
+                assertionFailure("accessibilityFrame is not settable on AccessibilityView")
             }
         }
 
@@ -144,7 +144,7 @@ public struct AccessibilityElement: Element {
             }
 
             set {
-                fatalError("accessibilityPath is not settable on AccessibilityView")
+                assertionFailure("accessibilityPath is not settable on AccessibilityView")
             }
         }
 

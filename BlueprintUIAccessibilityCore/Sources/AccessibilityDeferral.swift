@@ -227,7 +227,7 @@ extension AccessibilityDeferral {
 
 
             guard receivers.count <= 1 else {
-                // We cannot reasonably determine which receiver to apply the content to.
+                assertionFailure("AccessibilityDeferral.ParentContainer must contain at most one Receiver; found \(receivers.count).")
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
             }
@@ -239,8 +239,10 @@ extension AccessibilityDeferral {
                 let deferredContent = contents?.map { content in
                     var updated = content
                     let matches = sources.filter { $0.contentIdentifier == content.sourceIdentifier }
-                    guard matches.count <= 1 else { fatalError("Found multiple deferral sources with the same identifier. \(matches)") }
-                    let match = matches.first
+                    if matches.count > 1 {
+                        assertionFailure("Found multiple deferral sources with the same identifier \(content.sourceIdentifier); ignoring.")
+                    }
+                    let match = matches.count == 1 ? matches.first : nil
                     match?.accessibilityElementsHidden = true
                     updated.inheritedAccessibility = match?.accessibility
                     updated.updateIdentifier = updateID
@@ -481,7 +483,8 @@ extension AccessibilityDeferral.Receiver {
     ) {
         guard let content, !content.isEmpty else { replaceContent([]); return }
         guard let updateID = content.first?.updateIdentifier, content.allSatisfy({ $0.updateIdentifier == updateID }) else {
-            fatalError("Cannot merge deferral content as update identifiers do not match.")
+            assertionFailure("Deferral content batch has mismatched updateIdentifiers; ignoring.")
+            return
         }
         let lastUpdateID = deferredAccessibilityContent?.first?.updateIdentifier
 
