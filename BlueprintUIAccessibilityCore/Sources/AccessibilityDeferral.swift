@@ -227,8 +227,6 @@ extension AccessibilityDeferral {
 
 
             guard receivers.count <= 1 else {
-                // A ParentContainer must contain at most one Receiver. If a consumer wires up
-                // more than one we cannot pick safely, so fail safe by clearing every receiver.
                 assertionFailure("AccessibilityDeferral.ParentContainer must contain at most one Receiver; found \(receivers.count).")
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
@@ -242,9 +240,7 @@ extension AccessibilityDeferral {
                     var updated = content
                     let matches = sources.filter { $0.contentIdentifier == content.sourceIdentifier }
                     if matches.count > 1 {
-                        // Source identifiers must be unique within a ParentContainer.
-                        // First match wins; the rest stay visible to assistive tech.
-                        assertionFailure("Found multiple deferral sources with the same identifier \(content.sourceIdentifier).")
+                        assertionFailure("Found multiple deferral sources with the same identifier \(content.sourceIdentifier); using first match.")
                     }
                     let match = matches.first
                     match?.accessibilityElementsHidden = true
@@ -487,9 +483,6 @@ extension AccessibilityDeferral.Receiver {
     ) {
         guard let content, !content.isEmpty else { replaceContent([]); return }
         guard let updateID = content.first?.updateIdentifier, content.allSatisfy({ $0.updateIdentifier == updateID }) else {
-            // Entries in one batch must share an updateIdentifier within a layout pass.
-            // A mismatched batch is a programming bug; the malformed batch cannot be trusted
-            // as fresher than what's already applied, so leave existing content untouched.
             assertionFailure("Deferral content batch has mismatched updateIdentifiers; ignoring.")
             return
         }
