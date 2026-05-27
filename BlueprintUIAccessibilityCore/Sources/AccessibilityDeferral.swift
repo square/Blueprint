@@ -227,7 +227,8 @@ extension AccessibilityDeferral {
 
 
             guard receivers.count <= 1 else {
-                // We cannot reasonably determine which receiver to apply the content to.
+                // A ParentContainer must contain at most one Receiver. If a consumer wires up
+                // more than one we cannot pick safely, so fail safe by clearing every receiver.
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
             }
@@ -239,7 +240,8 @@ extension AccessibilityDeferral {
                 let deferredContent = contents?.map { content in
                     var updated = content
                     let matches = sources.filter { $0.contentIdentifier == content.sourceIdentifier }
-                    guard matches.count <= 1 else { fatalError("Found multiple deferral sources with the same identifier. \(matches)") }
+                    // If multiple sources share an identifier we cannot pick safely; first wins
+                    // and the rest stay visible to assistive tech rather than crashing.
                     let match = matches.first
                     match?.accessibilityElementsHidden = true
                     updated.inheritedAccessibility = match?.accessibility
@@ -481,7 +483,11 @@ extension AccessibilityDeferral.Receiver {
     ) {
         guard let content, !content.isEmpty else { replaceContent([]); return }
         guard let updateID = content.first?.updateIdentifier, content.allSatisfy({ $0.updateIdentifier == updateID }) else {
-            fatalError("Cannot merge deferral content as update identifiers do not match.")
+            // Entries in one batch should share an updateIdentifier within a layout pass.
+            // If they don't we cannot safely merge stale content — treat as a fresh replace.
+            replaceContent(content)
+            updateDeferredAccessibility(frameProvider: frameProvider)
+            return
         }
         let lastUpdateID = deferredAccessibilityContent?.first?.updateIdentifier
 

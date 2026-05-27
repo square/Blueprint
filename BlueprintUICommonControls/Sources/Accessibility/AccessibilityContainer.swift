@@ -115,7 +115,7 @@ extension AccessibilityContainer {
                     layoutDirection: layoutDirection
                 )
             }
-            set { fatalError("This property is not settable") }
+            set { assertionFailure("accessibilityElements is not settable on AccessibilityContainerView") }
         }
     }
 }
