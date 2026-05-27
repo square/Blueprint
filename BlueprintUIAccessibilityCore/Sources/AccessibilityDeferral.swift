@@ -240,9 +240,9 @@ extension AccessibilityDeferral {
                     var updated = content
                     let matches = sources.filter { $0.contentIdentifier == content.sourceIdentifier }
                     if matches.count > 1 {
-                        assertionFailure("Found multiple deferral sources with the same identifier \(content.sourceIdentifier); using first match.")
+                        assertionFailure("Found multiple deferral sources with the same identifier \(content.sourceIdentifier); ignoring.")
                     }
-                    let match = matches.first
+                    let match = matches.count == 1 ? matches.first : nil
                     match?.accessibilityElementsHidden = true
                     updated.inheritedAccessibility = match?.accessibility
                     updated.updateIdentifier = updateID
