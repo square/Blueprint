@@ -134,33 +134,32 @@ class AccessibilityDeferralTests: XCTestCase {
 
     // MARK: - Recovery from malformed input
 
-    func test_apply_recovers_from_mismatched_updateIdentifiers() {
+    func test_apply_ignores_malformed_batch_with_mismatched_updateIdentifiers() {
         let receiver = TestReceiver()
 
         // Seed the receiver with valid content sharing one updateID.
-        let firstUpdateID = UUID()
         var seed = AccessibilityDeferral.Content(kind: .inherited(), identifier: "source1")
-        seed.updateIdentifier = firstUpdateID
+        seed.updateIdentifier = UUID()
         seed.inheritedAccessibility = makeRepresentation(label: "Seed")
         receiver.apply(content: [seed], frameProvider: nil)
         XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 1)
+        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "Seed")
 
         // Now hand it a malformed batch with two different updateIDs.
         var malformedA = AccessibilityDeferral.Content(kind: .inherited(), identifier: "sourceA")
         malformedA.updateIdentifier = UUID()
-        malformedA.inheritedAccessibility = makeRepresentation(label: "Recovered A")
+        malformedA.inheritedAccessibility = makeRepresentation(label: "Malformed A")
 
         var malformedB = AccessibilityDeferral.Content(kind: .inherited(), identifier: "sourceB")
         malformedB.updateIdentifier = UUID()
-        malformedB.inheritedAccessibility = makeRepresentation(label: "Recovered B")
+        malformedB.inheritedAccessibility = makeRepresentation(label: "Malformed B")
 
-        // Previously this crashed via fatalError. Now it should recover by replacing rather than merging.
+        // A malformed batch (entries with differing updateIdentifiers) cannot be trusted as
+        // fresher than what's already applied, so existing content stays in place.
         receiver.apply(content: [malformedA, malformedB], frameProvider: nil)
 
-        // Content should be the malformed batch (replaced), not the seed.
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 2)
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "Recovered A")
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.last?.inheritedAccessibility?.label, "Recovered B")
+        XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 1)
+        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "Seed")
     }
 
     // MARK: - Content customContent generation

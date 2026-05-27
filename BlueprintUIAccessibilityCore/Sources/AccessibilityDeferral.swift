@@ -241,7 +241,7 @@ extension AccessibilityDeferral {
                     var updated = content
                     let matches = sources.filter { $0.contentIdentifier == content.sourceIdentifier }
                     // If multiple sources share an identifier we cannot pick safely; first wins
-                    // and the rest stay visible to assistive tech rather than crashing.
+                    // and the rest stay visible to assistive tech.
                     let match = matches.first
                     match?.accessibilityElementsHidden = true
                     updated.inheritedAccessibility = match?.accessibility
@@ -484,9 +484,9 @@ extension AccessibilityDeferral.Receiver {
         guard let content, !content.isEmpty else { replaceContent([]); return }
         guard let updateID = content.first?.updateIdentifier, content.allSatisfy({ $0.updateIdentifier == updateID }) else {
             // Entries in one batch should share an updateIdentifier within a layout pass.
-            // If they don't we cannot safely merge stale content — treat as a fresh replace.
-            replaceContent(content)
-            updateDeferredAccessibility(frameProvider: frameProvider)
+            // A mismatched batch means upstream is malformed — we can't trust the batch is
+            // fresher than what's already applied, so leave existing content untouched.
+            // The next legitimate broker pass will overwrite it.
             return
         }
         let lastUpdateID = deferredAccessibilityContent?.first?.updateIdentifier
