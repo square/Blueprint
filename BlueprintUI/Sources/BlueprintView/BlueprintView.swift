@@ -33,6 +33,7 @@ public final class BlueprintView: UIView {
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
+    private var hasScheduledDeferredViewHierarchyUpdate: Bool = false
 
     private let rootController: NativeViewController
 
@@ -364,13 +365,40 @@ public final class BlueprintView: UIView {
         invalidateIntrinsicContentSize()
         sizesThatFit.removeAll()
 
-        if needsViewHierarchyUpdate { return }
+        if needsViewHierarchyUpdate {
+            if isInsideUpdate {
+                scheduleDeferredViewHierarchyUpdate()
+            }
+
+            return
+        }
 
         needsViewHierarchyUpdate = true
 
         /// We use `UIView`'s layout pass to actually perform a hierarchy update.
         /// If a manual update is required, call `layoutIfNeeded()`.
-        setNeedsLayout()
+        if isInsideUpdate {
+            scheduleDeferredViewHierarchyUpdate()
+        } else {
+            setNeedsLayout()
+        }
+    }
+
+    @MainActor
+    private func scheduleDeferredViewHierarchyUpdate() {
+        guard hasScheduledDeferredViewHierarchyUpdate == false else { return }
+
+        hasScheduledDeferredViewHierarchyUpdate = true
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            hasScheduledDeferredViewHierarchyUpdate = false
+
+            guard needsViewHierarchyUpdate else { return }
+
+            setNeedsLayout()
+        }
     }
 
     @MainActor
@@ -386,10 +414,10 @@ public final class BlueprintView: UIView {
 
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
-        precondition(
-            !isInsideUpdate,
-            "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
-        )
+        if isInsideUpdate {
+            setNeedsViewHierarchyUpdate()
+            return
+        }
 
         isInsideUpdate = true
 
@@ -830,4 +858,3 @@ extension BlueprintView.NativeViewController {
         }
     }
 }
-

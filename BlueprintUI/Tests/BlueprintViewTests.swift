@@ -227,6 +227,99 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertTrue(layoutRecursed)
     }
 
+    func test_safeAreaChangeDuringUpdateDefersNestedUpdate() {
+        let viewController = UIViewController()
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+
+        viewController.view.frame = view.bounds
+        viewController.view.addSubview(view)
+
+        let window = UIWindow(frame: view.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+
+        let safeAreaInvalidation = SafeAreaInvalidation()
+
+        struct SafeAreaInvalidatingElement: Element {
+            weak var viewController: UIViewController?
+            let safeAreaInvalidation: SafeAreaInvalidation
+
+            var content: ElementContent {
+                ElementContent(measuring: Spacer(width: 1, height: 1))
+            }
+
+            func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+                SafeAreaInvalidatingView.describe { config in
+                    config.builder = {
+                        SafeAreaInvalidatingView(
+                            frame: context.bounds,
+                            viewController: viewController,
+                            safeAreaInvalidation: safeAreaInvalidation
+                        )
+                    }
+
+                    config.apply { view in
+                        view.viewController = viewController
+                        view.safeAreaInvalidation = safeAreaInvalidation
+                    }
+                }
+            }
+        }
+
+        final class SafeAreaInvalidation {
+            var hasInvalidatedSafeArea = false
+        }
+
+        final class SafeAreaInvalidatingView: UIView {
+            weak var viewController: UIViewController?
+            var safeAreaInvalidation: SafeAreaInvalidation
+
+            init(
+                frame: CGRect,
+                viewController: UIViewController?,
+                safeAreaInvalidation: SafeAreaInvalidation
+            ) {
+                self.viewController = viewController
+                self.safeAreaInvalidation = safeAreaInvalidation
+                super.init(frame: frame)
+            }
+
+            required init?(coder: NSCoder) { fatalError() }
+
+            override func didMoveToWindow() {
+                super.didMoveToWindow()
+                invalidateSafeAreaOnce()
+            }
+
+            override func layoutSubviews() {
+                super.layoutSubviews()
+                invalidateSafeAreaOnce()
+            }
+
+            private func invalidateSafeAreaOnce() {
+                guard
+                    safeAreaInvalidation.hasInvalidatedSafeArea == false,
+                    window != nil,
+                    let viewController
+                else {
+                    return
+                }
+
+                safeAreaInvalidation.hasInvalidatedSafeArea = true
+
+                viewController.additionalSafeAreaInsets.bottom += 1
+                viewController.view.setNeedsLayout()
+                viewController.view.layoutIfNeeded()
+            }
+        }
+
+        view.element = SafeAreaInvalidatingElement(
+            viewController: viewController,
+            safeAreaInvalidation: safeAreaInvalidation
+        )
+        view.layoutIfNeeded()
+    }
+
     func test_baseEnvironment() {
         enum TestValue {
             case defaultValue
