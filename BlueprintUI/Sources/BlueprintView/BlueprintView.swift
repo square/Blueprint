@@ -384,6 +384,14 @@ public final class BlueprintView: UIView {
         }
     }
 
+    /// Schedules a coalesced view hierarchy update on a following main run loop turn.
+    ///
+    /// Used when an invalidation arrives while an update is already in progress — for example,
+    /// UIKit keyboard and safe-area callbacks can fire synchronously mid-update and force a
+    /// layout pass. Re-arming with `setNeedsLayout()` immediately would let a forcing
+    /// `layoutIfNeeded()` re-dirty this view while the in-flight update still holds
+    /// `isInsideUpdate`, preventing that forced layout from ever terminating, so the re-arm
+    /// is deferred until the current update has unwound.
     @MainActor
     private func scheduleDeferredViewHierarchyUpdate() {
         guard hasScheduledDeferredViewHierarchyUpdate == false else { return }
@@ -415,6 +423,9 @@ public final class BlueprintView: UIView {
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
         if isInsideUpdate {
+            // A reentrant update was triggered from within the in-flight update, e.g. by a
+            // safe-area or keyboard change synchronously forcing a layout pass. Defer it so
+            // the current update can finish; the deferred pass picks up the latest state.
             setNeedsViewHierarchyUpdate()
             return
         }
@@ -485,8 +496,9 @@ public final class BlueprintView: UIView {
 
         /// We intentionally deliver our lifecycle callbacks (eg, `onAppear`,
         /// `onDisappear`, etc, _after_ we've marked our view as updated.
-        /// This is in case the `onAppear` callback triggers a re-render,
-        /// we don't hit our recurisve update precondition.
+        /// This way, if an `onAppear` callback triggers a re-render, it is
+        /// applied synchronously on the next layout pass rather than being
+        /// treated as a reentrant update and deferred.
 
         for callback in updateResult.lifecycleCallbacks {
             callback()

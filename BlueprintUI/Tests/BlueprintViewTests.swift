@@ -320,6 +320,52 @@ class BlueprintViewTests: XCTestCase {
         view.layoutIfNeeded()
     }
 
+    func test_elementChangeAndForcedLayoutDuringUpdateDefersNestedUpdate() {
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 200, height: 200))
+
+        var didTriggerReentrantUpdate = false
+
+        // Mirrors the navigation-bar crash shape: while the view is mid-update, a view
+        // callback replaces `element` and forces a synchronous layout pass.
+        view.element = CallbackElement {
+            guard !didTriggerReentrantUpdate else { return }
+            didTriggerReentrantUpdate = true
+
+            view.element = IdentifiedElement(identifier: "replacement")
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+        }
+
+        view.layoutIfNeeded()
+
+        XCTAssertTrue(didTriggerReentrantUpdate)
+
+        // The deferred update applies the replacement element on a following
+        // main run loop turn.
+        let deadline = Date(timeIntervalSinceNow: 5)
+
+        while findView(withAccessibilityIdentifier: "replacement", in: view) == nil, Date() < deadline {
+            RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.01))
+            view.layoutIfNeeded()
+        }
+
+        XCTAssertNotNil(findView(withAccessibilityIdentifier: "replacement", in: view))
+    }
+
+    private func findView(withAccessibilityIdentifier identifier: String, in root: UIView) -> UIView? {
+        if root.accessibilityIdentifier == identifier {
+            return root
+        }
+
+        for subview in root.subviews {
+            if let match = findView(withAccessibilityIdentifier: identifier, in: subview) {
+                return match
+            }
+        }
+
+        return nil
+    }
+
     func test_baseEnvironment() {
         enum TestValue {
             case defaultValue
@@ -935,6 +981,20 @@ private struct TestContainer: Element {
             for subelement in subelements {
                 subelement.place(in: .zero)
             }
+        }
+    }
+}
+
+private struct IdentifiedElement: Element {
+    var identifier: String
+
+    var content: ElementContent {
+        ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config[\.accessibilityIdentifier] = identifier
         }
     }
 }
