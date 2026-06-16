@@ -34,10 +34,10 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
     private var hasScheduledDeferredViewHierarchyUpdate: Bool = false
-#if DEBUG
+    #if DEBUG
     private var consecutiveDeferredViewHierarchyUpdateCount = 0
     private static let maximumConsecutiveDeferredViewHierarchyUpdateCount = 10
-#endif
+    #endif
 
     private let rootController: NativeViewController
 
@@ -420,7 +420,7 @@ public final class BlueprintView: UIView {
     private func recordDeferredViewHierarchyUpdate() {
         Logger.logDeferredViewHierarchyUpdate(view: self)
 
-#if DEBUG
+        #if DEBUG
         consecutiveDeferredViewHierarchyUpdateCount += 1
 
         guard consecutiveDeferredViewHierarchyUpdateCount >= Self.maximumConsecutiveDeferredViewHierarchyUpdateCount else {
@@ -438,13 +438,13 @@ public final class BlueprintView: UIView {
             Check for view callbacks that synchronously invalidate and force layout during Blueprint view updates.
             """
         )
-#endif
+        #endif
     }
 
     private func resetDeferredViewHierarchyUpdateCount() {
-#if DEBUG
+        #if DEBUG
         consecutiveDeferredViewHierarchyUpdateCount = 0
-#endif
+        #endif
     }
 
     @MainActor
