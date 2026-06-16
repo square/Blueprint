@@ -36,7 +36,10 @@ let package = Package(
         ),
         .testTarget(
             name: "BlueprintUITests",
-            dependencies: ["BlueprintUI"],
+            dependencies: [
+                "BlueprintUI",
+                "BlueprintUICommonControls",
+            ],
             path: "BlueprintUI/Tests"
         ),
         .target(

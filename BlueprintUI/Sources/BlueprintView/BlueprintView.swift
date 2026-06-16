@@ -33,6 +33,11 @@ public final class BlueprintView: UIView {
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
+    private var hasScheduledDeferredViewHierarchyUpdate: Bool = false
+    #if DEBUG
+    private var consecutiveDeferredViewHierarchyUpdateCount = 0
+    private static let maximumConsecutiveDeferredViewHierarchyUpdateCount = 10
+    #endif
 
     private let rootController: NativeViewController
 
@@ -364,13 +369,82 @@ public final class BlueprintView: UIView {
         invalidateIntrinsicContentSize()
         sizesThatFit.removeAll()
 
-        if needsViewHierarchyUpdate { return }
+        if needsViewHierarchyUpdate {
+            if isInsideUpdate {
+                scheduleDeferredViewHierarchyUpdate()
+            }
+
+            return
+        }
 
         needsViewHierarchyUpdate = true
 
         /// We use `UIView`'s layout pass to actually perform a hierarchy update.
         /// If a manual update is required, call `layoutIfNeeded()`.
-        setNeedsLayout()
+        if isInsideUpdate {
+            scheduleDeferredViewHierarchyUpdate()
+        } else {
+            setNeedsLayout()
+        }
+    }
+
+    /// Schedules a coalesced view hierarchy update on a following main run loop turn.
+    ///
+    /// Used when an invalidation arrives while an update is already in progress — for example,
+    /// UIKit keyboard and safe-area callbacks can fire synchronously mid-update and force a
+    /// layout pass. Re-arming with `setNeedsLayout()` immediately would let a forcing
+    /// `layoutIfNeeded()` re-dirty this view while the in-flight update still holds
+    /// `isInsideUpdate`, preventing that forced layout from ever terminating, so the re-arm
+    /// is deferred until the current update has unwound.
+    @MainActor
+    private func scheduleDeferredViewHierarchyUpdate() {
+        guard hasScheduledDeferredViewHierarchyUpdate == false else { return }
+
+        hasScheduledDeferredViewHierarchyUpdate = true
+        recordDeferredViewHierarchyUpdate()
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            hasScheduledDeferredViewHierarchyUpdate = false
+
+            guard needsViewHierarchyUpdate else {
+                resetDeferredViewHierarchyUpdateCount()
+                return
+            }
+
+            setNeedsLayout()
+        }
+    }
+
+    private func recordDeferredViewHierarchyUpdate() {
+        Logger.logDeferredViewHierarchyUpdate(view: self)
+
+        #if DEBUG
+        consecutiveDeferredViewHierarchyUpdateCount += 1
+
+        guard consecutiveDeferredViewHierarchyUpdateCount >= Self.maximumConsecutiveDeferredViewHierarchyUpdateCount else {
+            return
+        }
+
+        Logger.logExcessiveDeferredViewHierarchyUpdates(
+            view: self,
+            count: consecutiveDeferredViewHierarchyUpdateCount
+        )
+
+        assertionFailure(
+            """
+            BlueprintView deferred \(consecutiveDeferredViewHierarchyUpdateCount) consecutive reentrant view hierarchy updates.
+            Check for view callbacks that synchronously invalidate and force layout during Blueprint view updates.
+            """
+        )
+        #endif
+    }
+
+    private func resetDeferredViewHierarchyUpdateCount() {
+        #if DEBUG
+        consecutiveDeferredViewHierarchyUpdateCount = 0
+        #endif
     }
 
     @MainActor
@@ -386,10 +460,13 @@ public final class BlueprintView: UIView {
 
         guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
 
-        precondition(
-            !isInsideUpdate,
-            "Reentrant updates are not supported in BlueprintView. Ensure that view events from within the hierarchy are not synchronously triggering additional updates."
-        )
+        if isInsideUpdate {
+            // A reentrant update was triggered from within the in-flight update, e.g. by a
+            // safe-area or keyboard change synchronously forcing a layout pass. Defer it so
+            // the current update can finish; the deferred pass picks up the latest state.
+            setNeedsViewHierarchyUpdate()
+            return
+        }
 
         isInsideUpdate = true
 
@@ -457,11 +534,16 @@ public final class BlueprintView: UIView {
 
         /// We intentionally deliver our lifecycle callbacks (eg, `onAppear`,
         /// `onDisappear`, etc, _after_ we've marked our view as updated.
-        /// This is in case the `onAppear` callback triggers a re-render,
-        /// we don't hit our recurisve update precondition.
+        /// This way, if an `onAppear` callback triggers a re-render, it is
+        /// applied synchronously on the next layout pass rather than being
+        /// treated as a reentrant update and deferred.
 
         for callback in updateResult.lifecycleCallbacks {
             callback()
+        }
+
+        if hasScheduledDeferredViewHierarchyUpdate == false {
+            resetDeferredViewHierarchyUpdateCount()
         }
 
         Logger.logViewUpdateEnd(view: self)
@@ -830,4 +912,3 @@ extension BlueprintView.NativeViewController {
         }
     }
 }
-
