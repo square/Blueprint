@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `BlueprintView` now defers view hierarchy updates that are triggered while an update is already in progress, instead of crashing with a "Reentrant updates are not supported" precondition failure. Reentrant invalidations (e.g. keyboard or safe-area changes that synchronously force a layout pass mid-update) are coalesced and applied on a following main run loop turn.
-
 ### Added
 
 ### Removed
@@ -26,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Misc
 
 ### Internal
+
+## [6.7.2] - 2026-06-16
+
+### Fixed
+
+- `BlueprintView` now defers view hierarchy updates that are triggered while an update is already in progress, instead of crashing with a "Reentrant updates are not supported" precondition failure. Reentrant invalidations (e.g. keyboard or safe-area changes that synchronously force a layout pass mid-update) are coalesced and applied on a following main run loop turn.
 
 ## [6.7.1] - 2026-05-13
 
@@ -1318,7 +1322,8 @@ searchField
 ## [0.2.2] - 2019-03-29
 
 - First stable release.
-[main]: https://github.com/square/Blueprint/compare/6.7.1...HEAD
+[main]: https://github.com/square/Blueprint/compare/6.7.2...HEAD
+[6.7.2]: https://github.com/square/Blueprint/compare/6.7.1...6.7.2
 [6.7.1]: https://github.com/square/Blueprint/compare/6.7.0...6.7.1
 [6.7.0]: https://github.com/square/Blueprint/compare/6.6.0...6.7.0
 [6.6.0]: https://github.com/square/Blueprint/compare/6.5.1...6.6.0
