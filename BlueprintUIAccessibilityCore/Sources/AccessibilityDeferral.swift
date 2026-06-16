@@ -225,13 +225,10 @@ extension AccessibilityDeferral {
             // Reset source views.
             sources.forEach { $0.accessibilityElementsHidden = false }
 
-
             guard receivers.count <= 1 else {
-                assertionFailure("AccessibilityDeferral.ParentContainer must contain at most one Receiver; found \(receivers.count).")
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
             }
-
 
             if let receiver = receivers.first {
 

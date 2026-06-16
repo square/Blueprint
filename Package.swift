@@ -72,6 +72,14 @@ let package = Package(
                 .process("Resources"),
             ],
         ),
+        .testTarget(
+            name: "BlueprintUIAccessibilityCoreTests",
+            dependencies: [
+                "BlueprintUI",
+                "BlueprintUIAccessibilityCore",
+            ],
+            path: "BlueprintUIAccessibilityCore/Tests"
+        ),
     ],
     swiftLanguageModes: [.v5]
 )
