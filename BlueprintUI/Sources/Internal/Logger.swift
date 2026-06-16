@@ -72,6 +72,31 @@ extension Logger {
         )
     }
 
+    static func logDeferredViewHierarchyUpdate(view: BlueprintView) {
+
+        guard BlueprintLogging.isEnabled else { return }
+
+        os_signpost(
+            .event,
+            log: .active,
+            name: "Deferred View Hierarchy Update",
+            signpostID: OSSignpostID(log: .active, object: view),
+            "Deferred reentrant view hierarchy update for %{public}s",
+            view.name ?? "BlueprintView"
+        )
+    }
+
+    static func logExcessiveDeferredViewHierarchyUpdates(view: BlueprintView, count: Int) {
+
+        os_log(
+            .fault,
+            log: .blueprint,
+            "BlueprintView deferred %{public}d consecutive reentrant view hierarchy updates for %{public}s",
+            count,
+            view.name ?? "BlueprintView"
+        )
+    }
+
     static func logSizeThatFitsStart(
         view: BlueprintView,
         description: @autoclosure () -> String

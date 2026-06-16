@@ -34,6 +34,10 @@ public final class BlueprintView: UIView {
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
     private var hasScheduledDeferredViewHierarchyUpdate: Bool = false
+#if DEBUG
+    private var consecutiveDeferredViewHierarchyUpdateCount = 0
+    private static let maximumConsecutiveDeferredViewHierarchyUpdateCount = 10
+#endif
 
     private let rootController: NativeViewController
 
@@ -397,16 +401,50 @@ public final class BlueprintView: UIView {
         guard hasScheduledDeferredViewHierarchyUpdate == false else { return }
 
         hasScheduledDeferredViewHierarchyUpdate = true
+        recordDeferredViewHierarchyUpdate()
 
         Task { @MainActor [weak self] in
             guard let self else { return }
 
             hasScheduledDeferredViewHierarchyUpdate = false
 
-            guard needsViewHierarchyUpdate else { return }
+            guard needsViewHierarchyUpdate else {
+                resetDeferredViewHierarchyUpdateCount()
+                return
+            }
 
             setNeedsLayout()
         }
+    }
+
+    private func recordDeferredViewHierarchyUpdate() {
+        Logger.logDeferredViewHierarchyUpdate(view: self)
+
+#if DEBUG
+        consecutiveDeferredViewHierarchyUpdateCount += 1
+
+        guard consecutiveDeferredViewHierarchyUpdateCount >= Self.maximumConsecutiveDeferredViewHierarchyUpdateCount else {
+            return
+        }
+
+        Logger.logExcessiveDeferredViewHierarchyUpdates(
+            view: self,
+            count: consecutiveDeferredViewHierarchyUpdateCount
+        )
+
+        assertionFailure(
+            """
+            BlueprintView deferred \(consecutiveDeferredViewHierarchyUpdateCount) consecutive reentrant view hierarchy updates.
+            Check for view callbacks that synchronously invalidate and force layout during Blueprint view updates.
+            """
+        )
+#endif
+    }
+
+    private func resetDeferredViewHierarchyUpdateCount() {
+#if DEBUG
+        consecutiveDeferredViewHierarchyUpdateCount = 0
+#endif
     }
 
     @MainActor
@@ -502,6 +540,10 @@ public final class BlueprintView: UIView {
 
         for callback in updateResult.lifecycleCallbacks {
             callback()
+        }
+
+        if hasScheduledDeferredViewHierarchyUpdate == false {
+            resetDeferredViewHierarchyUpdateCount()
         }
 
         Logger.logViewUpdateEnd(view: self)
