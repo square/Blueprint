@@ -138,6 +138,10 @@ fi
 git fetch origin --tags
 
 target_sha=$(git rev-parse --verify "$target^{commit}")
+
+# Resolve an existing version tag to its commit. The ^{commit} suffix peels
+# annotated tags, and `|| true` lets a missing tag become an empty value under
+# `set -e`.
 existing_tag_sha=$(git rev-parse --verify --quiet "refs/tags/$version^{commit}" || true)
 
 if [[ -n "$existing_tag_sha" && "$existing_tag_sha" != "$target_sha" ]]; then
