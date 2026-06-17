@@ -139,6 +139,17 @@ git fetch origin --tags
 
 target_sha=$(git rev-parse --verify "$target^{commit}")
 
+# Resolve an existing version tag to its commit. The ^{commit} suffix peels
+# annotated tags, and `|| true` lets a missing tag become an empty value under
+# `set -e`.
+existing_tag_sha=$(git rev-parse --verify --quiet "refs/tags/$version^{commit}" || true)
+
+if [[ -n "$existing_tag_sha" && "$existing_tag_sha" != "$target_sha" ]]; then
+  echo "Error: Tag $version already exists at $existing_tag_sha, not $target_sha." >&2
+  echo "Choose a different version, delete or move the tag if it is wrong, or pass --target $existing_tag_sha." >&2
+  exit 1
+fi
+
 if gh release view "$version" > /dev/null 2>&1; then
   echo "Error: A GitHub release already exists for $version." >&2
   exit 1
