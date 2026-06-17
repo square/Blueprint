@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `AccessibilityDeferral` no longer aborts debug builds when its container transiently observes more than one `Receiver`. The `assertionFailure` treated more than one `Receiver` as a misconfiguration, but that state became reachable once `BlueprintView` began deferring reentrant updates (#618) instead of crashing on them: a reentrant layout pass can now run while the hierarchy is mid-swap, with the outgoing and incoming `Receiver` both briefly present. Previously that reentrancy tripped `BlueprintView`'s precondition first, so the deferral container never reached this state. The assertion was removed in favor of the existing safe recovery (clearing receiver content and bailing); the settled layout pass re-applies content with the single surviving `Receiver`.
+
 ### Added
 
 ### Removed

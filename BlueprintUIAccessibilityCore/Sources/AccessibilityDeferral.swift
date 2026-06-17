@@ -226,6 +226,10 @@ extension AccessibilityDeferral {
             sources.forEach { $0.accessibilityElementsHidden = false }
 
 
+            // During a reentrant Blueprint update (e.g. a forced layoutBelowIfNeeded mid-update),
+            // this container can transiently observe both the outgoing and incoming Receiver before
+            // the hierarchy settles. That isn't a misconfiguration, so we recover and bail; the
+            // settled layout pass re-runs updateAccessibility() with the single surviving Receiver.
             guard receivers.count <= 1 else {
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
