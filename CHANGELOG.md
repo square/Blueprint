@@ -1,9 +1,10 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+> [!NOTE]
+> This file is no longer maintained. Starting June 17, 2026, Blueprint uses GitHub auto-generated release notes for new releases.
+> See [RELEASING.md](RELEASING.md) for the current release process and [GitHub Releases](https://github.com/square/Blueprint/releases) for current release notes.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Historical release notes are preserved below.
 
 ## [Main]
 

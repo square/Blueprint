@@ -1,111 +1,190 @@
-#!/bin/bash
-
-echo "TODO: Update this script to use the new release process."
-echo "Use the manual steps in RELEASING.md for now."
-exit 0
+#!/usr/bin/env bash
 
 set -euo pipefail
 
-branch="main"
-diff_check=false
+target="origin/main"
+draft=true
+open_release=true
+dry_run=false
+fail_on_no_commits=true
+prerelease=false
+notes_start_tag=""
 
-# Function to display usage
 usage() {
-  echo "Usage: $0 --version <version> [--branch <branch>] [--no-diff-check]"
-  exit 1
+  cat <<'END'
+Usage: Scripts/release.sh --version <version> [options]
+
+Creates a GitHub release with auto-generated release notes.
+
+Options:
+  -v, --version <version>          Version tag to release, for example 6.8.0.
+  -t, --target <ref-or-sha>        Git ref or commit SHA to release. Defaults to origin/main.
+      --notes-start-tag <tag>      Tag to start generated release notes from.
+      --publish                    Publish immediately instead of creating a draft.
+      --draft                      Create a draft release. This is the default.
+      --prerelease                 Mark the release as a prerelease.
+      --allow-no-commits           Allow a release with no commits since the previous release.
+      --no-open                    Do not open the release in a browser.
+      --dry-run                    Print the gh command without creating the release.
+  -h, --help                       Show this help text.
+END
 }
 
-# Check if gh CLI is installed
-if ! command -v gh &> /dev/null; then
-  echo "Error: GitHub CLI (gh) is not installed. It is required by this script."
-  echo "Please install it from https://cli.github.com/, authenticate, and try again."
-  exit 1
-fi
+require_value() {
+  if [[ $# -lt 2 || -z "${2:-}" ]]; then
+    echo "Error: $1 requires a value." >&2
+    usage
+    exit 1
+  fi
 
-# Parse options
+  if [[ "${2:0:1}" == "-" ]]; then
+    echo "Error: $1 requires a value." >&2
+    usage
+    exit 1
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
-  case $1 in
-    -v|--version) version="$2"; shift 2 ;;
-    -b|--branch) branch="$2"; shift 2 ;;
-    -n|--no-diff-check) diff_check=false; shift ;;
-    --) shift; break ;;
-    -*|--*) echo "Unknown option $1"; usage ;;
-    *) break ;;
+  case "$1" in
+    -v|--version)
+      require_value "$@"
+      version="${2:-}"
+      shift 2
+      ;;
+    -t|--target)
+      require_value "$@"
+      target="${2:-}"
+      shift 2
+      ;;
+    --notes-start-tag)
+      require_value "$@"
+      notes_start_tag="${2:-}"
+      shift 2
+      ;;
+    --publish)
+      draft=false
+      shift
+      ;;
+    --draft)
+      draft=true
+      shift
+      ;;
+    --prerelease)
+      prerelease=true
+      shift
+      ;;
+    --allow-no-commits)
+      fail_on_no_commits=false
+      shift
+      ;;
+    --no-open)
+      open_release=false
+      shift
+      ;;
+    --dry-run)
+      dry_run=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*|--*)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+    *)
+      echo "Unexpected argument: $1" >&2
+      usage
+      exit 1
+      ;;
   esac
 done
 
-# Check if version argument is provided
-if [ -z "${version:-}" ]; then
-  echo "Error: You must provide a version number."
+if [[ -z "${version:-}" ]]; then
+  echo "Error: You must provide a version number." >&2
   usage
-fi
-
-# Ensure there are no unstaged changes
-if [ "$diff_check" = true ] && ! git diff --quiet origin/"$branch"; then
-  echo "Error: This branch has differences compared to origin/$branch. Please push or undo these changes before continuing."
-  echo "You can bypass this check with the --no-diff-check flag."
   exit 1
 fi
 
-# This timestamp is used during branch creation.
-# It's helpful in cases where the script fails and a new branch needs to
-# be created on a subsequent attempt.
-timestamp=$(date +"%Y-%m-%d-%H_%M_%S") 
+if [[ -z "$target" ]]; then
+  echo "Error: --target cannot be empty." >&2
+  exit 1
+fi
 
-git checkout "$branch"
-git pull
+if ! command -v gh > /dev/null; then
+  echo "Error: GitHub CLI (gh) is required. Install it from https://cli.github.com/ and authenticate before retrying." >&2
+  exit 1
+fi
 
-# Create a new branch with the version and timestamp
-branch_name="$(whoami)/release-$version-$timestamp"
-git checkout -b "$branch_name"
+if ! gh auth status > /dev/null 2>&1; then
+  echo "Error: GitHub CLI (gh) is not authenticated. Run 'gh auth login' before retrying." >&2
+  exit 1
+fi
 
-# Define the git repo root
 repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
 
-# Extract the previous version number from version.rb
-previous_version=$(grep 'BLUEPRINT_VERSION' "$repo_root/version.rb" | awk -F"'" '{print $2}')
+if [[ "$dry_run" == false ]] && { ! git diff --quiet || ! git diff --cached --quiet; }; then
+  echo "Error: The working tree has uncommitted changes. Commit or stash them before cutting a release." >&2
+  exit 1
+fi
 
-# Update the library version in version.rb
-sed -i '' "s/BLUEPRINT_VERSION ||= .*/BLUEPRINT_VERSION ||= '$version'/" "$repo_root/version.rb"
+git fetch origin --tags
 
-# Update CHANGELOG.md using stamp-changelog.sh
-"$repo_root/Scripts/stamp-changelog.sh" --version "$version" --previous-version "$previous_version"
+target_sha=$(git rev-parse --verify "$target^{commit}")
 
-# Change directory into the SampleApp dir and update Podfile.lock using a subshell
-(
-  cd "$repo_root/SampleApp"
-  bundle exec pod install
+if gh release view "$version" > /dev/null 2>&1; then
+  echo "Error: A GitHub release already exists for $version." >&2
+  exit 1
+fi
+
+release_command=(
+  gh release create "$version"
+  --target "$target_sha"
+  --title "$version"
+  --generate-notes
 )
 
-# Commit the changes
-git add .
-git commit -m "Bumping versions to $version."
+if [[ "$draft" == true ]]; then
+  release_command+=(--draft)
+fi
 
-# Push the branch and open a PR into main
-git push origin "$branch_name"
+if [[ "$prerelease" == true ]]; then
+  release_command+=(--prerelease)
+fi
 
-pr_body=$(cat <<-END
-https://github.com/square/Blueprint/blob/main/CHANGELOG.md
+if [[ "$fail_on_no_commits" == true ]]; then
+  release_command+=(--fail-on-no-commits)
+fi
 
-Post-merge steps:
+if [[ -n "$notes_start_tag" ]]; then
+  release_command+=(--notes-start-tag "$notes_start_tag")
+fi
 
-- Once the PR is merged, fetch changes and tag the release, using the merge commit:
-  \`\`\`
-  git fetch
-  git tag $version <merge commit SHA>
-  git push origin $version
-  \`\`\`
+release_kind=""
+if [[ "$draft" == true ]]; then
+  release_kind="draft "
+fi
 
-- Publish to CocoaPods:
-  \`\`\`
-  bundle exec pod trunk push BlueprintUI.podspec
-  bundle exec pod trunk push --synchronous BlueprintUICommonControls.podspec
-  \`\`\`
-END
-)
+printf 'Creating %srelease %s from %s (%s).\n' "$release_kind" "$version" "$target" "$target_sha"
 
-gh pr create --draft --title "release: Blueprint $version" --body "$pr_body"
+if [[ "$dry_run" == true ]]; then
+  printf 'Dry run:'
+  printf ' %q' "${release_command[@]}"
+  printf '\n'
+  exit 0
+fi
 
-gh pr view --web
+"${release_command[@]}"
 
-echo "Branch $branch_name created and pushed. A draft PR has been created."
+if [[ "$open_release" == true ]]; then
+  gh release view "$version" --web
+fi
+
+echo "Release $version created. Review the generated notes in GitHub before publishing if this is a draft."
