@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Duplicate accessibility deferral receivers in a parent container are now recovered by clearing deferred content without triggering a debug assertion.
+
 ### Added
 
 ### Removed

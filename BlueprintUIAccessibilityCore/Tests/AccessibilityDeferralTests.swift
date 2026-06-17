@@ -132,6 +132,29 @@ class AccessibilityDeferralTests: XCTestCase {
         XCTAssertEqual(receiver.accessibilityCustomActions?.first?.name, "Test Action")
     }
 
+    func test_parentContainerWithDuplicateReceiversClearsDeferralContent() {
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        let content = AccessibilityDeferral.Content(kind: .inherited(), identifier: "source")
+
+        view.element = Column {
+            AccessibilityTestElement(label: "Source")
+                .deferredAccessibilitySource(identifier: "source")
+            AccessibilityTestElement(label: "First receiver")
+                .deferredAccessibilityReceiver()
+            AccessibilityTestElement(label: "Second receiver")
+                .deferredAccessibilityReceiver()
+        }
+        .deferAccessibilityToChildren(content: [content])
+
+        view.layoutIfNeeded()
+
+        let receivers = view.recursiveSubviews(matching: { $0 is AccessibilityDeferral.Receiver })
+            .compactMap { $0 as? AccessibilityDeferral.Receiver }
+
+        XCTAssertEqual(receivers.count, 2)
+        XCTAssertTrue(receivers.allSatisfy { ($0.deferredAccessibilityContent ?? []).isEmpty })
+    }
+
     // MARK: - Content customContent generation
 
     func test_content_inherited_customContent() {
@@ -193,3 +216,20 @@ private final class TestReceiver: UIView, AccessibilityDeferral.Receiver, AXCust
 }
 
 extension TestReceiver: AccessibilityDeferral.DeferralView {}
+
+private struct AccessibilityTestElement: Element {
+    var label: String
+
+    var content: ElementContent {
+        ElementContent(intrinsicSize: CGSize(width: 10, height: 10))
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config.apply { view in
+                view.isAccessibilityElement = true
+                view.accessibilityLabel = label
+            }
+        }
+    }
+}
