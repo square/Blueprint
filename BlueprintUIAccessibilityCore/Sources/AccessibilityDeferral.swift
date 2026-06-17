@@ -225,6 +225,7 @@ extension AccessibilityDeferral {
             // Reset source views.
             sources.forEach { $0.accessibilityElementsHidden = false }
 
+            /* Content is bound to a Receiver by containment, and a container is modeled around a single receiver. Multiple Receivers is still valid, but they're separate accessibility elements with no single target, so we clear all deferral content and bail rather than duplicate it across all of them. */
             guard receivers.count <= 1 else {
                 receivers.forEach { $0.apply(content: nil, frameProvider: nil) }
                 return
