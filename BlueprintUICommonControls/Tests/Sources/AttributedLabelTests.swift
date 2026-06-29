@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import XCTest
 @testable import BlueprintUICommonControls
 
@@ -88,6 +89,89 @@ class AttributedLabelTests: XCTestCase {
             XCTAssertEqual(view.accessibilityValue, "Value")
             XCTAssertEqual(view.accessibilityIdentifier, "Identifier")
         }
+    }
+
+    func test_accessibilityLabel_derivedFromTextByDefault() {
+        // `nil` (the default) preserves the existing behavior: the backing view's accessibility
+        // label is derived from the displayed text.
+        let label = AttributedLabel(attributedText: NSAttributedString(string: "Hello, World!"))
+
+        let labelView = AttributedLabel.LabelView()
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+
+        XCTAssertNil(label.accessibilityLabel)
+        XCTAssertEqual(labelView.accessibilityLabel, "Hello, World!")
+    }
+
+    func test_accessibilityLabel_override() {
+        // A non-nil value overrides the text-derived label.
+        let label = AttributedLabel(attributedText: NSAttributedString(string: "Hello, World!")) {
+            $0.accessibilityLabel = "Custom"
+        }
+
+        let labelView = AttributedLabel.LabelView()
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+
+        XCTAssertEqual(labelView.accessibilityLabel, "Custom")
+    }
+
+    func test_accessibilityLabel_suppressed() {
+        // An empty string suppresses the spoken label entirely: the backing view reports "",
+        // *not* the displayed text. (UILabel returns an explicitly-set empty string verbatim,
+        // rather than falling back to its text the way it does for `nil`.)
+        let label = AttributedLabel(attributedText: NSAttributedString(string: "Hello, World!")) {
+            $0.accessibilityLabel = ""
+        }
+
+        let labelView = AttributedLabel.LabelView()
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+
+        XCTAssertEqual(labelView.accessibilityLabel, "")
+    }
+
+    func test_accessibilityLabel_appliesWithoutTextChange() {
+        // Changing only the override (with the text unchanged) must still update the backing view's
+        // label. This proves the override is applied outside the text-change guard.
+        let string = NSAttributedString(string: "Hello, World!")
+        let labelView = AttributedLabel.LabelView()
+
+        var label = AttributedLabel(attributedText: string)
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+        XCTAssertEqual(labelView.accessibilityLabel, "Hello, World!")
+
+        label.accessibilityLabel = "Custom"
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+        XCTAssertEqual(labelView.accessibilityLabel, "Custom")
+
+        label.accessibilityLabel = ""
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+        XCTAssertEqual(labelView.accessibilityLabel, "")
+
+        // Back to `nil` falls through to the cached derived label, not UILabel's text fallback.
+        label.accessibilityLabel = nil
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+        XCTAssertEqual(labelView.accessibilityLabel, "Hello, World!")
+    }
+
+    func test_accessibilityLabel_suppressionInComposition() {
+        // A suppressed ("") label paired with a value contributes only to the combined *value* when
+        // merged into a composite accessibility element — the empty label is filtered out, so the
+        // content isn't announced twice.
+        let label = AttributedLabel(attributedText: NSAttributedString(string: "Displayed text")) {
+            $0.accessibilityLabel = ""
+            $0.accessibilityValue = "X"
+        }
+
+        let labelView = AttributedLabel.LabelView()
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+
+        XCTAssertEqual(labelView.accessibilityLabel, "")
+        XCTAssertEqual(labelView.accessibilityValue, "X")
+
+        let representation = AccessibilityComposition.CompositeRepresentation([labelView]) {}
+
+        XCTAssertNil(representation.label)
+        XCTAssertEqual(representation.value, "X")
     }
 
     func test_displaysText() {

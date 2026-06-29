@@ -77,6 +77,15 @@ public struct AttributedLabel: Element, Hashable {
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
 
+    /// Overrides the automatically-derived accessibility label.
+    ///
+    /// When `nil` (the default), the label is derived from the displayed text — current behavior.
+    /// Provide a string to override it, or `""` to suppress the spoken label entirely. Suppression
+    /// is useful when the text is surfaced through `accessibilityValue` / `accessibilityHint`
+    /// instead, so the content is not announced twice (e.g. when this label is merged into a
+    /// combined accessibility element).
+    public var accessibilityLabel: String?
+
     /// A localized string that represents the current value of the accessibility element.
     ///
     /// The value is a localized string that contains the current value of an element.
@@ -203,6 +212,12 @@ extension AttributedLabel {
         private var links: [Link] = []
         private var linkElements: [LinkElement] = []
 
+        /// The accessibility label derived from the displayed text. Recomputed only when the text
+        /// changes (see the `previousAttributedText != attributedText` guard in `update`), and cached
+        /// here so an `accessibilityLabel` override change can be applied on every update without
+        /// re-running the expensive text derivation.
+        private var derivedAccessibilityLabel: String?
+
         private var textRectOffset: UIOffset = .zero {
             didSet {
                 if oldValue != textRectOffset {
@@ -298,7 +313,9 @@ extension AttributedLabel {
 
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
-                    accessibilityLabel = accessibilityLabel(
+                    // Cache the (expensive, link-enumerating) text-derived label so we can re-apply
+                    // the override below on every update without recomputing it.
+                    derivedAccessibilityLabel = accessibilityLabel(
                         with: links,
                         in: model.attributedText.string,
                         linkAccessibilityLabel: environment.linkAccessibilityLabel
@@ -307,6 +324,11 @@ extension AttributedLabel {
                         .sorted(by: { $0.range.location < $1.range.location })
                         .compactMap { .init(sourceLabel: attributedText, link: $0) }
                 }
+
+                // Apply the override on every update so a change to `model.accessibilityLabel` takes
+                // effect even when the text is unchanged. `nil` falls back to the cached derived label
+                // (current behavior); `""` explicitly suppresses the spoken label.
+                accessibilityLabel = model.accessibilityLabel ?? derivedAccessibilityLabel
 
                 if let shadow = model.shadow {
                     layer.shadowRadius = shadow.radius
