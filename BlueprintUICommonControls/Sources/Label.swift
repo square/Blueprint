@@ -57,6 +57,15 @@ public struct Label: ProxyElement {
     /// Determines if the label should be included when navigating the UI via accessibility.
     public var isAccessibilityElement = true
 
+    /// Overrides the automatically-derived accessibility label.
+    ///
+    /// When `nil` (the default), the label is derived from the displayed text — current behavior.
+    /// Provide a string to override it, or `""` to suppress the spoken label entirely. Suppression
+    /// is useful when the text is surfaced through `accessibilityValue` / `accessibilityHint`
+    /// instead, so the content is not announced twice (e.g. when this label is merged into a
+    /// combined accessibility element).
+    public var accessibilityLabel: String?
+
     /// A localized string that represents the current value of the accessibility element.
     ///
     /// The value is a localized string that contains the current value of an element.
@@ -108,6 +117,7 @@ public struct Label: ProxyElement {
             label.numberOfLines = numberOfLines
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
+            label.accessibilityLabel = accessibilityLabel
             label.accessibilityValue = accessibilityValue
             label.accessibilityHint = accessibilityHint
             label.accessibilityTraits = accessibilityTraits
