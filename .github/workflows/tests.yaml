@@ -50,15 +50,15 @@ jobs:
 
     - name: Install iOS ${{ matrix.sdk }}
       if: ${{ matrix.installation_required }}
-      # xcodes >= 2.0.3 is needed to decode Apple's current runtime list; the
-      # runner's preinstalled copy may be older. brew update first because the
-      # image's formula index is frozen at build time, and invoke by explicit
-      # path because sudo's secure_path ignores the job PATH.
+      # Upgrade xcodes if it's too old to decode Apple's runtime list.
+      # brew update: the image's formula index is stale without it.
+      # explicit path: sudo's secure_path ignores the job PATH.
       run: |
-        required="2.0.3"
-        installed="$(xcodes version)"
-        # sort -C exits 0 when the pair is in version order, i.e. required <= installed
-        if ! printf '%s\n%s\n' "$required" "$installed" | sort --check=silent --version-sort; then
+        # ver "2.0.3" -> 2000003, so versions compare as plain integers
+        ver() { echo "$1" | awk -F. '{ printf("%d%03d%03d", $1, $2, $3) }'; }
+        required=$(ver "2.0.3")
+        installed=$(ver "$(xcodes version)")
+        if [ "$installed" -lt "$required" ]; then
           brew update --quiet
           brew upgrade xcodes
         fi
