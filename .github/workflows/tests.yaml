@@ -55,7 +55,10 @@ jobs:
       # image's formula index is frozen at build time, and invoke by explicit
       # path because sudo's secure_path ignores the job PATH.
       run: |
-        if [ "$(printf '2.0.3\n%s' "$(xcodes version)" | sort -V | head -1)" != "2.0.3" ]; then
+        required="2.0.3"
+        installed="$(xcodes version)"
+        # sort -C exits 0 when the pair is in version order, i.e. required <= installed
+        if ! printf '%s\n%s\n' "$required" "$installed" | sort --check=silent --version-sort; then
           brew update --quiet
           brew upgrade xcodes
         fi
