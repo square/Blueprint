@@ -50,14 +50,15 @@ jobs:
 
     - name: Install iOS ${{ matrix.sdk }}
       if: ${{ matrix.installation_required }}
-      # The runner's preinstalled xcodes is too old to decode Apple's current
-      # runtime list, so install the latest. Invoke by explicit path because
-      # sudo's secure_path ignores the job PATH.
-      # (brew update first: the image's formula index is frozen at build time,
-      # so upgrade alone is a no-op.)
+      # xcodes >= 2.0.3 is needed to decode Apple's current runtime list; the
+      # runner's preinstalled copy may be older. brew update first because the
+      # image's formula index is frozen at build time, and invoke by explicit
+      # path because sudo's secure_path ignores the job PATH.
       run: |
-        brew update --quiet
-        brew upgrade xcodes
+        if [ "$(printf '2.0.3\n%s' "$(xcodes version)" | sort -V | head -1)" != "2.0.3" ]; then
+          brew update --quiet
+          brew upgrade xcodes
+        fi
         sudo "$(brew --prefix)/bin/xcodes" runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Ensure sim exists
