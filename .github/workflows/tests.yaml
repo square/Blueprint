@@ -53,8 +53,11 @@ jobs:
       # The runner's preinstalled xcodes is too old to decode Apple's current
       # runtime list, so install the latest. Invoke by explicit path because
       # sudo's secure_path ignores the job PATH.
+      # (brew update first: the image's formula index is frozen at build time,
+      # so upgrade alone is a no-op.)
       run: |
-        brew install xcodes || brew upgrade xcodes
+        brew update --quiet
+        brew upgrade xcodes
         sudo "$(brew --prefix)/bin/xcodes" runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Ensure sim exists
