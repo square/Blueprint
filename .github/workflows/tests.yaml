@@ -54,14 +54,15 @@ jobs:
       # brew update: the image's formula index is stale without it.
       # explicit path: sudo's secure_path ignores the job PATH.
       run: |
+        xcodes="$(brew --prefix)/bin/xcodes"
         required="2.0.3"
-        installed="$(xcodes version)"
+        installed="$("$xcodes" version)"
         lesser="$(printf '%s\n%s\n' "$required" "$installed" | sort --version-sort | head -1)"
         if [ "$lesser" != "$required" ]; then
           brew update --quiet
           brew upgrade xcodes
         fi
-        sudo "$(brew --prefix)/bin/xcodes" runtimes install "iOS ${{ matrix.sdk }}"
+        sudo "$xcodes" runtimes install "iOS ${{ matrix.sdk }}"
 
     - name: Ensure sim exists
       run: |
