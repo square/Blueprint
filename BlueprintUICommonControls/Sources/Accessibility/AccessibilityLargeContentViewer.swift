@@ -231,7 +231,7 @@ extension Accessibility {
 
         public override func didMoveToWindow() {
             super.didMoveToWindow()
-            if window != nil {
+            if window != nil && largeContentViewerInteraction == nil {
                 let largeContentViewerInteraction = UILargeContentViewerInteraction(delegate: self)
                 addInteraction(largeContentViewerInteraction)
                 self.largeContentViewerInteraction = largeContentViewerInteraction
