@@ -3,6 +3,51 @@ import XCTest
 
 class BlueprintViewTests: XCTestCase {
 
+    @MainActor
+    func test_defaultLayoutModeChangeInvalidatesSurvivingView() {
+        var measurementCount = 0
+        let view = BlueprintView(element: MeasurableElement { _ in
+            measurementCount += 1
+            return CGSize(width: 100, height: 50)
+        })
+        let size = CGSize(width: 200, height: 100)
+
+        _ = view.sizeThatFits(size)
+        _ = view.sizeThatFits(size)
+        XCTAssertEqual(measurementCount, 1)
+
+        weak var releasedView: BlueprintView?
+        autoreleasepool {
+            let temporaryView = BlueprintView()
+            releasedView = temporaryView
+        }
+        XCTAssertNil(releasedView)
+
+        NotificationCenter.default.post(name: .defaultLayoutModeChanged, object: nil)
+
+        _ = view.sizeThatFits(size)
+        XCTAssertEqual(measurementCount, 2)
+    }
+
+    @MainActor
+    func test_defaultLayoutModeChangePreservesExplicitLayoutModeCache() {
+        var measurementCount = 0
+        let view = BlueprintView(element: MeasurableElement { _ in
+            measurementCount += 1
+            return CGSize(width: 100, height: 50)
+        })
+        view.layoutMode = .caffeinated
+        let size = CGSize(width: 200, height: 100)
+
+        _ = view.sizeThatFits(size)
+        XCTAssertEqual(measurementCount, 1)
+
+        NotificationCenter.default.post(name: .defaultLayoutModeChanged, object: nil)
+
+        _ = view.sizeThatFits(size)
+        XCTAssertEqual(measurementCount, 1)
+    }
+
     func test_sizeThatFits() {
 
         /// NOTE: References to `.greatestFiniteMagnitude` always refer to the fully qualified type,
