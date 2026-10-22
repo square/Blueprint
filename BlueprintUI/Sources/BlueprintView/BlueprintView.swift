@@ -192,6 +192,11 @@ public final class BlueprintView: UIView {
         fatalError("init(coder:) is not available for BlueprintView.")
     }
 
+    deinit {
+        // Layout-mode changes may never be posted, so release the registration eagerly.
+        NotificationCenter.default.removeObserver(self, name: .defaultLayoutModeChanged, object: nil)
+    }
+
     ///
     /// Measures the size needed to display the view within the given constraining size,
     /// by measuring the current `element` of the `BlueprintView`.
