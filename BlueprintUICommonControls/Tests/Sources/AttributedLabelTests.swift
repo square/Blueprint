@@ -777,6 +777,76 @@ class AttributedLabelTests: XCTestCase {
         }
     }
 
+    func test_lineBreakModeAdjustment_withMultipleParagraphStyles() {
+        // Text with more than one paragraph style, like list items with their own indents.
+        func text(lineBreakMode: NSLineBreakMode) -> NSAttributedString {
+            let text = NSMutableAttributedString()
+            for (string, headIndent) in [
+                ("A first paragraph that is long enough to wrap onto several lines\n", CGFloat(0)),
+                ("A second paragraph", CGFloat(10)),
+            ] {
+                text.append(NSAttributedString(
+                    string: string,
+                    attributes: [
+                        .font: UIFont.systemFont(ofSize: 17),
+                        .paragraphStyle: NSParagraphStyle.style {
+                            $0.headIndent = headIndent
+                            $0.lineBreakMode = lineBreakMode
+                        },
+                    ]
+                ))
+            }
+            return text
+        }
+
+        func paragraphStyles(in text: NSAttributedString) -> [NSParagraphStyle] {
+            var styles: [NSParagraphStyle] = []
+            text.enumerateAttribute(.paragraphStyle, in: NSRange(location: 0, length: text.length)) { value, _, _ in
+                if let style = value as? NSParagraphStyle {
+                    styles.append(style)
+                }
+            }
+            return styles
+        }
+
+        // Normalizing for display adjusts every paragraph style, and keeps their other properties.
+        let multiLine = AttributedLabel(attributedText: text(lineBreakMode: .byTruncatingMiddle)) {
+            $0.numberOfLines = 0
+        }
+        let multiLineStyles = paragraphStyles(in: multiLine.displayableAttributedText)
+        XCTAssertEqual(multiLineStyles.map(\.lineBreakMode), [.byTruncatingTail, .byTruncatingTail])
+        XCTAssertEqual(multiLineStyles.map(\.headIndent), [0, 10])
+
+        let singleLine = AttributedLabel(attributedText: text(lineBreakMode: .byWordWrapping)) {
+            $0.numberOfLines = 1
+        }
+        XCTAssertEqual(
+            paragraphStyles(in: singleLine.displayableAttributedText).map(\.lineBreakMode),
+            [.byClipping, .byClipping]
+        )
+
+        // The text storage used for link hit-testing and link frames wraps every paragraph,
+        // like the label does, instead of truncating each one to a single line.
+        let label = AttributedLabel(attributedText: text(lineBreakMode: .byTruncatingTail)) {
+            $0.numberOfLines = 0
+        }
+        let labelView = AttributedLabel.LabelView()
+        labelView.frame = CGRect(x: 0, y: 0, width: 150, height: 1000)
+        labelView.update(model: label, text: label.displayableAttributedText, environment: .empty, isMeasuring: false)
+
+        let textStorage = labelView.makeTextStorage()!
+        XCTAssertEqual(paragraphStyles(in: textStorage).map(\.lineBreakMode), [.byWordWrapping, .byWordWrapping])
+
+        let layoutManager = textStorage.layoutManagers[0]
+        var lineCount = 0
+        layoutManager.enumerateLineFragments(
+            forGlyphRange: NSRange(location: 0, length: layoutManager.numberOfGlyphs)
+        ) { _, _, _, _, _ in
+            lineCount += 1
+        }
+        XCTAssertGreaterThan(lineCount, 2)
+    }
+
     func test_focusItems() {
         let string = "The Fellowship of the ring was established at the Council of Elrond and consisted of Gandalf, Sam, Frodo, Aragorn, Gimli, Pippin, Boromir, Legolas, and Merry."
         var attributedText = AttributedText(string)
