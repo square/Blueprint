@@ -8,6 +8,7 @@ final class TextLinkViewController: UIViewController {
 
     override func loadView() {
         view = blueprintView
+        blueprintView.backgroundColor = .systemBackground
         blueprintView.element = element
     }
 
