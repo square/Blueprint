@@ -50,6 +50,19 @@ struct AttributedTextViewTests {
         #expect(narrow.width <= 150)
     }
 
+    @Test func `Restyling unchanged characters preserves the selection`() {
+        guard #available(iOS 16.0, *) else { return }
+        let view = AttributedTextView.View()
+        view.update(AttributedTextView(attributedText: NSAttributedString(
+            string: "Select these words", attributes: [.font: UIFont.systemFont(ofSize: 17)]
+        )))
+        view.textView.selectedRange = NSRange(location: 7, length: 5)
+        view.update(AttributedTextView(attributedText: NSAttributedString(
+            string: "Select these words", attributes: [.font: UIFont.systemFont(ofSize: 30)]
+        )))
+        #expect(view.textView.selectedRange == NSRange(location: 7, length: 5))
+    }
+
     @Test func `Link activation uses the supplied handler and leaves previews to UIKit`() {
         guard #available(iOS 16.0, *) else { return }
         let view = AttributedTextView.View()

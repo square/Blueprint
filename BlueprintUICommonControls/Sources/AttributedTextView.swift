@@ -52,7 +52,12 @@ public struct AttributedTextView: UIViewElement {
             self.onLinkTap = onLinkTap
             textView.linkTextAttributes = model.linkAttributes
             if !textView.attributedText.isEqual(to: model.attributedText) {
+                let selection = textView.selectedRange
+                let sameCharacters = textView.attributedText.string == model.attributedText.string
                 textView.attributedText = model.attributedText
+                if sameCharacters {
+                    textView.selectedRange = selection
+                }
             }
         }
 
