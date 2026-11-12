@@ -379,7 +379,7 @@ extension AttributedLabel {
                 return nil
             }
 
-            let lineBreakAdjustedText = NSMutableAttributedString(attributedString: attributedText)
+            var lineBreakAdjustedText = AttributedText(attributedText)
 
             let textStorage = NSTextStorage()
             let layoutManager = NSLayoutManager()
@@ -389,16 +389,18 @@ extension AttributedLabel {
             textContainer.maximumNumberOfLines = numberOfLines
             textContainer.size = bounds.size
 
-            // If paragraph styles are set, we need to adjust their lineBreakMode
+            // If the paragraph style is set, we need to adjust its lineBreakMode
             // to one that works with NSTextContainer.
-            lineBreakAdjustedText.updateParagraphStyles { paragraphStyle in
-                paragraphStyle.lineBreakMode = paragraphStyle.lineBreakMode.textContainerMode(for: numberOfLines)
+            if let paragraphStyle = lineBreakAdjustedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
+                let adjustedLineBreakMode = paragraphStyle.lineBreakMode.textContainerMode(for: numberOfLines)
+                paragraphStyle.lineBreakMode = adjustedLineBreakMode
+                lineBreakAdjustedText.paragraphStyle = paragraphStyle
             }
 
             layoutManager.usesFontLeading = false
             layoutManager.addTextContainer(textContainer)
             textStorage.addLayoutManager(layoutManager)
-            textStorage.setAttributedString(lineBreakAdjustedText)
+            textStorage.setAttributedString(lineBreakAdjustedText.attributedString)
 
             return textStorage
         }
@@ -999,9 +1001,7 @@ extension NSAttributedString {
             }
         }
 
-        let normalizedText = NSMutableAttributedString(attributedString: attributedText.attributedString)
-
-        normalizedText.updateParagraphStyles { paragraphStyle in
+        if let paragraphStyle = attributedText.paragraphStyle?.mutableCopy() as? NSMutableParagraphStyle {
 
             // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
             // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
@@ -1015,24 +1015,11 @@ extension NSAttributedString {
             if numberOfLines == 1 && Self.invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
                 paragraphStyle.lineBreakMode = .byClipping
             }
+
+            attributedText.paragraphStyle = paragraphStyle
         }
 
-        return normalizedText
-    }
-}
-
-extension NSMutableAttributedString {
-
-    /// Updates a copy of every paragraph style in the string, including strings with more than
-    /// one paragraph style (for example, paragraphs with different indents).
-    fileprivate func updateParagraphStyles(_ update: (NSMutableParagraphStyle) -> Void) {
-        enumerateAttribute(.paragraphStyle, in: entireRange) { value, range, _ in
-            guard let paragraphStyle = (value as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle else {
-                return
-            }
-            update(paragraphStyle)
-            addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
-        }
+        return attributedText.attributedString
     }
 }
 
