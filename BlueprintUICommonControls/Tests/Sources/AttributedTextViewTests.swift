@@ -62,4 +62,17 @@ struct AttributedTextViewTests {
         #expect(opened == [url])
         #expect(view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .presentActions))
     }
+
+    @Test func `Unconstrained measurement returns a finite content size`() {
+        guard #available(iOS 16.0, *) else { return }
+        let model = AttributedTextView(attributedText: NSAttributedString(
+            string: "A short paragraph",
+            attributes: [.font: UIFont.preferredFont(forTextStyle: .body)]
+        ))
+        let view = model.makeUIView()
+        view.update(model)
+        let size = view.sizeThatFits(CGSize(width: CGFloat.infinity, height: CGFloat.infinity))
+        #expect(size.width.isFinite && size.width > 0)
+        #expect(size.height.isFinite && size.height > 0)
+    }
 }

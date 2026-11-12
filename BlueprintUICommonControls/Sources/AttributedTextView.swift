@@ -22,7 +22,7 @@ public struct AttributedTextView: UIViewElement {
     }
 
     public func updateUIView(_ view: View, with context: UIViewElementContext) {
-        view.update(self, onLinkTap: context.environment.urlHandler.onTap)
+        view.update(self, onLinkTap: context.isMeasuring ? nil : context.environment.urlHandler.onTap)
     }
 
     /// The shared UIKit implementation, also suitable for hosting outside Blueprint.
