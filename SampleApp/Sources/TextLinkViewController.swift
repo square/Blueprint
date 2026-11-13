@@ -8,6 +8,7 @@ final class TextLinkViewController: UIViewController {
 
     override func loadView() {
         view = blueprintView
+        blueprintView.backgroundColor = .systemBackground
         blueprintView.element = element
     }
 
@@ -31,6 +32,10 @@ final class TextLinkViewController: UIViewController {
         justified.alignment = NSTextAlignment.justified
 
         return Column(alignment: .fill, minimumSpacing: 20) {
+            if #available(iOS 16.0, *) {
+                AttributedTextView(attributedText: listText)
+                    .onLinkTapped { self.presentAlert(message: $0.absoluteString) }
+            }
             label
             Label(text: "Custom link handling:")
             label.onLinkTapped {
@@ -56,7 +61,36 @@ final class TextLinkViewController: UIViewController {
             }
         }
         .inset(uniform: 20)
-        .centered()
+        .scrollable(.fittingHeight)
+    }
+
+    @available(iOS 16.0, *)
+    private var listText: NSAttributedString {
+        let list = NSTextList(markerFormat: .decimal, options: 0)
+        list.startingItemNumber = 9
+        let nested = NSTextList(markerFormat: .disc, options: 0)
+        let text = NSMutableAttributedString(string: "")
+        for (item, lists) in [
+            ("Select and copy this read-only text. This item wraps onto multiple lines at narrower widths.", [list]),
+            ("A nested item with a link to Block.", [list, nested]),
+            ("The next numbered item.", [list]),
+        ] {
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.textLists = lists
+            paragraph.paragraphSpacing = 8
+            text.append(NSAttributedString(string: item + "\n", attributes: [
+                .font: UIFont.preferredFont(forTextStyle: .body),
+                .foregroundColor: UIColor.label,
+                .paragraphStyle: paragraph,
+            ]))
+        }
+        text.deleteCharacters(in: NSRange(location: text.length - 1, length: 1))
+        text.addAttribute(
+            .link,
+            value: URL(string: "https://block.xyz")!,
+            range: (text.string as NSString).range(of: "Block")
+        )
+        return text
     }
 
     func presentAlert(message: String) {

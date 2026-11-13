@@ -900,7 +900,7 @@ extension AttributedLabel {
 }
 
 extension Element {
-    /// Handle links opened in any `AttributedLabel` within this element using the provided closure.
+    /// Handle links opened in any `AttributedLabel` or `AttributedTextView` within this element.
     ///
     public func onLinkTapped(_ onTap: @escaping (URL) -> Void) -> Element {
         adaptedEnvironment(keyPath: \.urlHandler, value: ClosureURLHandler(onTap: onTap))
