@@ -12,6 +12,9 @@ public struct AttributedTextView: UIViewElement {
     /// Attributes UIKit applies to links, in addition to the attributed text's styling.
     public var linkAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.link]
 
+    /// Offsets the rendered text without changing its measured size.
+    public var textRectOffset: UIOffset = .zero
+
     public init(attributedText: NSAttributedString, configure: (inout Self) -> Void = { _ in }) {
         self.attributedText = attributedText
         configure(&self)
@@ -29,6 +32,7 @@ public struct AttributedTextView: UIViewElement {
     public final class View: UIView, UITextViewDelegate {
         let textView = UITextView(usingTextLayoutManager: true)
         private var onLinkTap: ((URL) -> Void)?
+        private var textRectOffset: UIOffset = .zero
 
         public init() {
             super.init(frame: .zero)
@@ -50,6 +54,10 @@ public struct AttributedTextView: UIViewElement {
         /// Applies content and link routing without resetting selection for unchanged text.
         public func update(_ model: AttributedTextView, onLinkTap: ((URL) -> Void)? = nil) {
             self.onLinkTap = onLinkTap
+            if textRectOffset != model.textRectOffset {
+                textRectOffset = model.textRectOffset
+                setNeedsLayout()
+            }
             textView.linkTextAttributes = model.linkAttributes
             if !textView.attributedText.isEqual(to: model.attributedText) {
                 let selection = textView.selectedRange
@@ -63,7 +71,7 @@ public struct AttributedTextView: UIViewElement {
 
         public override func layoutSubviews() {
             super.layoutSubviews()
-            textView.frame = bounds
+            textView.frame = bounds.offsetBy(dx: textRectOffset.horizontal, dy: textRectOffset.vertical)
         }
 
         public override func sizeThatFits(_ size: CGSize) -> CGSize {

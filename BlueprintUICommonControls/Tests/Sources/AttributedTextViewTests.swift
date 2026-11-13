@@ -88,4 +88,19 @@ struct AttributedTextViewTests {
         #expect(size.width.isFinite && size.width > 0)
         #expect(size.height.isFinite && size.height > 0)
     }
+
+    @Test func `Text offset changes placement without changing measurement`() {
+        guard #available(iOS 16.0, *) else { return }
+        var model = AttributedTextView(attributedText: NSAttributedString(string: "Body text"))
+        let view = model.makeUIView()
+        view.update(model)
+        let constraint = CGSize(width: 200, height: CGFloat.infinity)
+        let size = view.sizeThatFits(constraint)
+        view.frame.size = size
+        model.textRectOffset = UIOffset(horizontal: 0, vertical: -4)
+        view.update(model)
+        view.layoutIfNeeded()
+        #expect(view.textView.frame == view.bounds.offsetBy(dx: 0, dy: -4))
+        #expect(view.sizeThatFits(constraint) == size)
+    }
 }
