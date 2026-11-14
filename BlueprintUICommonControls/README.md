@@ -8,7 +8,8 @@ Blueprint elements wrapping commonly used UIKit primitives.
 Use `AttributedLabel` for label content. On iOS 16 and later, `AttributedTextView`
 displays selectable, read-only content through a native TextKit 2 `UITextView`.
 It accepts `NSAttributedString`, including paragraph styles with `NSTextList`
-membership, and keeps UIKit's accessibility behavior.
+membership, and keeps UIKit's accessibility behavior. Paragraphs remain separate
+accessibility elements by default, including when selection is disabled.
 
 ```swift
 let list = NSTextList(markerFormat: .disc, options: 0)
@@ -44,5 +45,7 @@ Configure `numberOfLines` (zero means unlimited), `textRectOffset`, `shadow`,
 single-line font fitting, tightening, and explicit accessibility properties on
 the element. Paragraph styles supply alignment and line-break behavior. These
 settings apply during both measurement and display and reset on reused views.
+`isAccessibilityElement` defaults to `nil` to preserve native paragraph navigation;
+`true` groups the content into one element and `false` hides its accessibility.
 Single-line fitting scales the supplied fonts proportionally; UIKit's label and
 text-view engines can still differ in rounding, underlines, and pressed links.
