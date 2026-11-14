@@ -21,7 +21,9 @@ let content = NSAttributedString(string: "First item\nSecond item", attributes: 
     .paragraphStyle: paragraph,
 ])
 
-AttributedTextView(attributedText: content)
+AttributedTextView(attributedText: content) {
+    $0.isSelectable = false
+}
     .onLinkTapped { url in /* Handle the URL. */ }
 ```
 
@@ -33,3 +35,14 @@ The view expands to fit the available width and its content. Put long documents
 inside a scrolling container. Callers supply the text's fonts and other
 attributes, including updated fonts when Dynamic Type changes. The public
 `AttributedTextView.View` provides the same UIKit implementation for other hosts.
+
+Selection is enabled by default. On iOS 17+, disabling it keeps native link
+activation and menus available through the text-item delegate API. On iOS 16,
+link interaction follows UIKit's selection setting.
+
+Configure `numberOfLines` (zero means unlimited), `textRectOffset`, `shadow`,
+single-line font fitting, tightening, and explicit accessibility properties on
+the element. Paragraph styles supply alignment and line-break behavior. These
+settings apply during both measurement and display and reset on reused views.
+Single-line fitting scales the supplied fonts proportionally; UIKit's label and
+text-view engines can still differ in rounding, underlines, and pressed links.

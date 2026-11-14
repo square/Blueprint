@@ -72,11 +72,19 @@ public struct AttributedTextView: UIViewElement {
             textView.isSelectable = model.isSelectable
             textView.linkTextAttributes = model.linkAttributes
             textView.textContainer.maximumNumberOfLines = max(0, model.numberOfLines)
+            let lastLineMode = model.attributedText.length > 0
+                ? (model.attributedText.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?.lineBreakMode ?? .byWordWrapping
+                : .byWordWrapping
+            textView.textContainer.lineBreakMode = lastLineMode.normalized(forNumberOfLines: model.numberOfLines)
 
             let text = NSMutableAttributedString(attributedString: model.attributedText)
             text.enumerateAttributes(in: NSRange(location: 0, length: text.length)) { attributes, range, _ in
                 let paragraph = (attributes[.paragraphStyle] as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
                 paragraph.lineBreakMode = paragraph.lineBreakMode.normalized(forNumberOfLines: model.numberOfLines)
+                // UITextView otherwise truncates every paragraph, even with unlimited lines.
+                if model.numberOfLines != 1 && paragraph.lineBreakMode == .byTruncatingTail {
+                    paragraph.lineBreakMode = .byWordWrapping
+                }
                 paragraph.allowsDefaultTighteningForTruncation = model.allowsDefaultTighteningForTruncation
                 text.addAttribute(.paragraphStyle, value: paragraph, range: range)
                 if attributes[.font] == nil {
@@ -84,9 +92,6 @@ public struct AttributedTextView: UIViewElement {
                 }
             }
             sourceText = text
-            textView.textContainer.lineBreakMode = text.length > 0
-                ? (text.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?.lineBreakMode ?? .byWordWrapping
-                : .byWordWrapping
             applyText(fitting: bounds.width)
 
             textView.isAccessibilityElement = model.isAccessibilityElement
@@ -137,6 +142,7 @@ public struct AttributedTextView: UIViewElement {
         }
 
         public override func sizeThatFits(_ size: CGSize) -> CGSize {
+            guard sourceText.length > 0 else { return .zero }
             applyText(fitting: size.width)
             return textView.sizeThatFits(size)
         }

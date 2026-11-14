@@ -5,6 +5,14 @@ import UIKit
 
 @MainActor
 struct AttributedTextViewTests {
+    @Test func `Empty content measures zero after a nonempty update`() {
+        guard #available(iOS 16.0, *) else { return }
+        let view = AttributedTextView.View()
+        view.update(.init(attributedText: NSAttributedString(string: "Body")))
+        view.update(.init(attributedText: NSAttributedString(string: "")))
+        #expect(view.sizeThatFits(CGSize(width: 200, height: CGFloat.infinity)) == .zero)
+    }
+
     @Test func `Selection can be disabled without removing native links`() {
         guard #available(iOS 16.0, *) else { return }
         let url = URL(string: "https://example.com")!
@@ -23,14 +31,17 @@ struct AttributedTextViewTests {
 
     @Test func `Line limits constrain measured content`() {
         guard #available(iOS 16.0, *) else { return }
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineBreakMode = .byTruncatingTail
         var model = AttributedTextView(attributedText: NSAttributedString(
             string: String(repeating: "A longer paragraph. ", count: 10),
-            attributes: [.font: UIFont.systemFont(ofSize: 20)]
+            attributes: [.font: UIFont.systemFont(ofSize: 20), .paragraphStyle: paragraph]
         ))
         let view = model.makeUIView()
         view.update(model)
         let size = CGSize(width: 180, height: CGFloat.infinity)
         let full = view.sizeThatFits(size)
+        #expect(full.height > 100)
         model.numberOfLines = 2
         view.update(model)
         #expect(view.sizeThatFits(size).height < full.height)
