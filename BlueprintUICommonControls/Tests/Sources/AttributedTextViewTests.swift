@@ -176,6 +176,11 @@ struct AttributedTextViewTests {
         #expect(!view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .invokeDefaultAction))
         #expect(opened == [url])
         #expect(view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .presentActions))
+        var replacementOpened = false
+        view.update(model, onLinkTap: { _ in replacementOpened = true })
+        #expect(!view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .invokeDefaultAction))
+        #expect(replacementOpened)
+        #expect(opened == [url])
     }
 
     @Test func `Unconstrained measurement returns a finite content size`() {
