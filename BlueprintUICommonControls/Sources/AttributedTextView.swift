@@ -19,7 +19,8 @@ public struct AttributedTextView: UIViewElement {
     /// Offsets the rendered text without changing its measured size.
     public var textRectOffset: UIOffset = .zero
 
-    public var isAccessibilityElement = true
+    /// Defaults to UIKit's native paragraph accessibility; set `true` to expose one element.
+    public var isAccessibilityElement: Bool?
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
     public var accessibilityLabel: String?
     public var accessibilityValue: String?
@@ -48,6 +49,7 @@ public struct AttributedTextView: UIViewElement {
         private var adjustsFontSizeToFitWidth = false
         private var minimumScaleFactor: CGFloat = 0
         private var nativeTraits: UIAccessibilityTraits = []
+        private var nativeIsAccessibilityElement = false
 
         public init() {
             super.init(frame: .zero)
@@ -58,6 +60,7 @@ public struct AttributedTextView: UIViewElement {
             textView.textContainer.lineFragmentPadding = 0
             textView.delegate = self
             nativeTraits = textView.accessibilityTraits
+            nativeIsAccessibilityElement = textView.isAccessibilityElement
             addSubview(textView)
         }
 
@@ -94,8 +97,8 @@ public struct AttributedTextView: UIViewElement {
             sourceText = text
             applyText(fitting: bounds.width)
 
-            textView.isAccessibilityElement = model.isAccessibilityElement
-            textView.accessibilityElementsHidden = !model.isAccessibilityElement
+            textView.isAccessibilityElement = model.isAccessibilityElement ?? nativeIsAccessibilityElement
+            textView.accessibilityElementsHidden = model.isAccessibilityElement == false
             textView.accessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? nativeTraits
             textView.accessibilityLabel = model.accessibilityLabel
             textView.accessibilityValue = model.accessibilityValue

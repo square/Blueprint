@@ -86,12 +86,17 @@ struct AttributedTextViewTests {
         }
         let view = model.makeUIView()
         let nativeTraits = view.textView.accessibilityTraits
+        let nativeIsAccessibilityElement = view.textView.isAccessibilityElement
         view.update(model)
         #expect(view.textView.accessibilityElementsHidden)
         #expect(view.textView.layer.shadowOpacity == 0.5)
+        model.isAccessibilityElement = true
+        view.update(model)
+        #expect(view.textView.isAccessibilityElement)
         model = AttributedTextView(attributedText: NSAttributedString(string: "New body"))
         view.update(model)
         #expect(!view.textView.accessibilityElementsHidden)
+        #expect(view.textView.isAccessibilityElement == nativeIsAccessibilityElement)
         #expect(view.textView.accessibilityLabel == nil)
         #expect(view.textView.accessibilityValue == nil)
         #expect(view.textView.accessibilityHint == nil)
