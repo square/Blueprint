@@ -48,6 +48,7 @@ public struct AttributedTextView: UIViewElement {
         private var sourceText = NSAttributedString(string: "")
         private var adjustsFontSizeToFitWidth = false
         private var minimumScaleFactor: CGFloat = 0
+        private var fittingWidth: CGFloat?
         private var nativeTraits: UIAccessibilityTraits = []
         private var nativeIsAccessibilityElement = false
 
@@ -95,6 +96,7 @@ public struct AttributedTextView: UIViewElement {
                 }
             }
             sourceText = text
+            fittingWidth = nil
             applyText(fitting: bounds.width)
 
             textView.isAccessibilityElement = model.isAccessibilityElement ?? nativeIsAccessibilityElement
@@ -117,19 +119,37 @@ public struct AttributedTextView: UIViewElement {
         }
 
         private func applyText(fitting width: CGFloat) {
+            guard fittingWidth != width else { return }
+            fittingWidth = width
             var text = sourceText
-            if adjustsFontSizeToFitWidth, textView.textContainer.maximumNumberOfLines == 1, width > 0, width.isFinite {
-                let naturalWidth = text.size().width
-                let scale = max(max(0, min(1, minimumScaleFactor)), min(1, width / max(1, naturalWidth)))
-                if scale < 1 {
-                    let scaled = NSMutableAttributedString(attributedString: text)
+            if adjustsFontSizeToFitWidth, textView.textContainer.maximumNumberOfLines == 1,
+               width > 0, width.isFinite, minimumScaleFactor < 1, sourceText.size().width > width {
+                func scaledText(at scale: CGFloat) -> NSAttributedString {
+                    let scaled = NSMutableAttributedString(attributedString: sourceText)
                     scaled.enumerateAttribute(.font, in: NSRange(location: 0, length: scaled.length)) { value, range, _ in
                         if let font = value as? UIFont {
                             scaled.addAttribute(.font, value: font.withSize(font.pointSize * scale), range: range)
                         }
                     }
-                    text = scaled
+                    return scaled
                 }
+
+                let minimum = max(0, min(1, minimumScaleFactor))
+                var lower = minimum
+                var upper: CGFloat = 1
+                var fitted: NSAttributedString?
+                // Font metrics change with point size, so measure candidates instead of scaling widths.
+                for _ in 0..<12 {
+                    let scale = (lower + upper) / 2
+                    let candidate = scaledText(at: scale)
+                    if candidate.size().width <= width {
+                        fitted = candidate
+                        lower = scale
+                    } else {
+                        upper = scale
+                    }
+                }
+                text = fitted ?? scaledText(at: minimum > 0 ? minimum : upper)
             }
             guard !textView.attributedText.isEqual(to: text) else { return }
             let selection = textView.selectedRange

@@ -72,6 +72,23 @@ struct AttributedTextViewTests {
         #expect((view.textView.attributedText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)?.pointSize == 40)
     }
 
+    @Test(arguments: [CGFloat(120), 220])
+    func `Font fitting keeps the complete line inside the available width`(_ width: CGFloat) {
+        guard #available(iOS 16.0, *) else { return }
+        let model = AttributedTextView(attributedText: NSAttributedString(
+            string: "Long single line of text that does not fit",
+            attributes: [.font: UIFont.systemFont(ofSize: 40)]
+        )) {
+            $0.numberOfLines = 1
+            $0.adjustsFontSizeToFitWidth = true
+        }
+        let view = model.makeUIView()
+        view.update(model)
+        _ = view.sizeThatFits(CGSize(width: width, height: .infinity))
+        #expect(view.textView.attributedText.size().width <= width)
+        #expect(view.textView.text == model.attributedText.string)
+    }
+
     @Test func `Reused views clear shadow and accessibility overrides`() {
         guard #available(iOS 16.0, *) else { return }
         var model = AttributedTextView(attributedText: NSAttributedString(string: "Body")) {
