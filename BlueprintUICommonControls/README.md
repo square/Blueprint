@@ -5,7 +5,7 @@ Blueprint elements wrapping commonly used UIKit primitives.
 
 ## Attributed text
 
-Use `AttributedLabel` for label content. On iOS 16 and later, `AttributedTextView`
+Use `AttributedLabel` for label content. On iOS 17 and later, `AttributedTextView`
 displays selectable, read-only content through a native TextKit 2 `UITextView`.
 It accepts `NSAttributedString`, including paragraph styles with `NSTextList`
 membership, and keeps UIKit's accessibility behavior. Paragraphs remain separate
@@ -37,9 +37,8 @@ inside a scrolling container. Callers supply the text's fonts and other
 attributes, including updated fonts when Dynamic Type changes. The public
 `AttributedTextView.View` provides the same UIKit implementation for other hosts.
 
-Selection is enabled by default. On iOS 17+, disabling it keeps native link
-activation and menus available through the text-item delegate API. On iOS 16,
-link interaction follows UIKit's selection setting.
+Selection is enabled by default. Disabling it keeps native link activation and
+menus available through the text-item delegate API.
 
 Configure `numberOfLines` (zero means unlimited), `textRectOffset`, `shadow`,
 single-line font fitting, tightening, and explicit accessibility properties on

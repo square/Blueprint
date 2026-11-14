@@ -3,7 +3,7 @@ import UIKit
 
 /// Displays read-only attributed text using TextKit 2 and native text accessibility.
 /// The view grows to fit its content; place it in a scroll view for long documents.
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 public struct AttributedTextView: UIViewElement {
     public var attributedText: NSAttributedString
     public var isSelectable = true
@@ -170,21 +170,13 @@ public struct AttributedTextView: UIViewElement {
             return textView.sizeThatFits(size)
         }
 
-        @available(iOS 17.0, *)
         public func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {
             guard case .link(let url) = textItem.content, onLinkTap != nil else { return defaultAction }
             return UIAction { [weak self] _ in self?.onLinkTap?(url) }
         }
 
-        @available(iOS 17.0, *)
         public func textView(_ textView: UITextView, menuConfigurationFor textItem: UITextItem, defaultMenu: UIMenu) -> UITextItem.MenuConfiguration? {
             .init(menu: defaultMenu)
-        }
-
-        public func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-            guard interaction == .invokeDefaultAction, let onLinkTap else { return true }
-            onLinkTap(url)
-            return false
         }
     }
 }

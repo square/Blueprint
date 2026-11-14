@@ -6,7 +6,7 @@ import UIKit
 @MainActor
 struct AttributedTextViewTests {
     @Test func `Empty content measures zero after a nonempty update`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let view = AttributedTextView.View()
         view.update(.init(attributedText: NSAttributedString(string: "Body")))
         view.update(.init(attributedText: NSAttributedString(string: "")))
@@ -14,7 +14,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Selection can be disabled without removing native links`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let url = URL(string: "https://example.com")!
         let model = AttributedTextView(attributedText: NSAttributedString(string: "Help", attributes: [.link: url])) {
             $0.isSelectable = false
@@ -24,13 +24,13 @@ struct AttributedTextViewTests {
         #expect(!view.textView.isSelectable)
         #expect(!view.textView.canPerformAction(#selector(UIResponderStandardEditActions.copy(_:)), withSender: nil))
         #expect(view.textView.attributedText.attribute(.link, at: 0, effectiveRange: nil) as? URL == url)
-        if #available(iOS 17.0, *) {
-            #expect(view.responds(to: #selector(UITextViewDelegate.textView(_:primaryActionFor:defaultAction:))))
-        }
+        #expect(view.responds(to: #selector(UITextViewDelegate.textView(_:primaryActionFor:defaultAction:))))
+        #expect(view.responds(to: #selector(UITextViewDelegate.textView(_:menuConfigurationFor:defaultMenu:))))
+        #expect(!view.responds(to: NSSelectorFromString("textView:shouldInteractWithURL:inRange:interaction:")))
     }
 
     @Test func `Line limits constrain measured content`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineBreakMode = .byTruncatingTail
         var model = AttributedTextView(attributedText: NSAttributedString(
@@ -51,7 +51,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Font fitting is shared by measurement and layout and resets`() throws {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         var model = AttributedTextView(attributedText: NSAttributedString(
             string: "A long single line of text", attributes: [.font: UIFont.systemFont(ofSize: 40)]
         )) {
@@ -74,7 +74,7 @@ struct AttributedTextViewTests {
 
     @Test(arguments: [CGFloat(120), 220])
     func `Font fitting keeps the complete line inside the available width`(_ width: CGFloat) {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let model = AttributedTextView(attributedText: NSAttributedString(
             string: "Long single line of text that does not fit",
             attributes: [.font: UIFont.systemFont(ofSize: 40)]
@@ -90,7 +90,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Reused views clear shadow and accessibility overrides`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         var model = AttributedTextView(attributedText: NSAttributedString(string: "Body")) {
             $0.shadow = .init(radius: 2, opacity: 0.5, offset: .zero, color: .red)
             $0.accessibilityLabel = "Custom"
@@ -125,7 +125,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Native list attributes survive and the view remains in TextKit 2`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let list = NSTextList(markerFormat: .decimal, options: 0)
         list.startingItemNumber = 9
         let paragraph = NSMutableParagraphStyle()
@@ -146,7 +146,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Reapplying unchanged content preserves the selection`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let model = AttributedTextView(attributedText: NSAttributedString(string: "Select these words"))
         let view = model.makeUIView()
         view.update(model)
@@ -156,7 +156,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Wrapped content grows when the available width shrinks`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let model = AttributedTextView(attributedText: NSAttributedString(
             string: String(repeating: "A paragraph with enough words to wrap. ", count: 5),
             attributes: [.font: UIFont.preferredFont(forTextStyle: .body)]
@@ -170,7 +170,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Restyling unchanged characters preserves the selection`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let view = AttributedTextView.View()
         view.update(AttributedTextView(attributedText: NSAttributedString(
             string: "Select these words", attributes: [.font: UIFont.systemFont(ofSize: 17)]
@@ -182,26 +182,8 @@ struct AttributedTextViewTests {
         #expect(view.textView.selectedRange == NSRange(location: 7, length: 5))
     }
 
-    @Test func `Link activation uses the supplied handler and leaves previews to UIKit`() {
-        guard #available(iOS 16.0, *) else { return }
-        let view = AttributedTextView.View()
-        let model = AttributedTextView(attributedText: NSAttributedString(string: "Help"))
-        let url = URL(string: "https://example.com/help")!
-        var opened: [URL] = []
-        view.update(model, onLinkTap: { opened.append($0) })
-        let range = NSRange(location: 0, length: 4)
-        #expect(!view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .invokeDefaultAction))
-        #expect(opened == [url])
-        #expect(view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .presentActions))
-        var replacementOpened = false
-        view.update(model, onLinkTap: { _ in replacementOpened = true })
-        #expect(!view.textView(view.textView, shouldInteractWith: url, in: range, interaction: .invokeDefaultAction))
-        #expect(replacementOpened)
-        #expect(opened == [url])
-    }
-
     @Test func `Unconstrained measurement returns a finite content size`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         let model = AttributedTextView(attributedText: NSAttributedString(
             string: "A short paragraph",
             attributes: [.font: UIFont.preferredFont(forTextStyle: .body)]
@@ -214,7 +196,7 @@ struct AttributedTextViewTests {
     }
 
     @Test func `Text offset changes placement without changing measurement`() {
-        guard #available(iOS 16.0, *) else { return }
+        guard #available(iOS 17.0, *) else { return }
         var model = AttributedTextView(attributedText: NSAttributedString(string: "Body text"))
         let view = model.makeUIView()
         view.update(model)

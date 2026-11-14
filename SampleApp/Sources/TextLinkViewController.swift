@@ -32,7 +32,7 @@ final class TextLinkViewController: UIViewController {
         justified.alignment = NSTextAlignment.justified
 
         return Column(alignment: .fill, minimumSpacing: 20) {
-            if #available(iOS 16.0, *) {
+            if #available(iOS 17.0, *) {
                 AttributedTextView(attributedText: listText)
                     .onLinkTapped { self.presentAlert(message: $0.absoluteString) }
             }
@@ -64,7 +64,7 @@ final class TextLinkViewController: UIViewController {
         .scrollable(.fittingHeight)
     }
 
-    @available(iOS 16.0, *)
+    @available(iOS 17.0, *)
     private var listText: NSAttributedString {
         let list = NSTextList(markerFormat: .decimal, options: 0)
         list.startingItemNumber = 9
