@@ -1006,18 +1006,18 @@ extension NSAttributedString {
             // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
             // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
             // only the last line with that mode. Normalize them to truncating tail instead.
-            if numberOfLines != 1 && Self.invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
-                paragraphStyle.lineBreakMode = .byTruncatingTail
-            }
-
-            // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-            // Normalize them to clipping mode instead (which renders the same on one line anyway).
-            if numberOfLines == 1 && Self.invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
-                paragraphStyle.lineBreakMode = .byClipping
-            }
+            paragraphStyle.lineBreakMode = paragraphStyle.lineBreakMode.normalized(forNumberOfLines: numberOfLines)
         }
 
         return normalizedText
+    }
+}
+
+extension NSLineBreakMode {
+    func normalized(forNumberOfLines numberOfLines: Int) -> Self {
+        if numberOfLines != 1 && NSAttributedString.invalidMultiLineModes.contains(self) { return .byTruncatingTail }
+        if numberOfLines == 1 && NSAttributedString.invalidSingleLineModes.contains(self) { return .byClipping }
+        return self
     }
 }
 
