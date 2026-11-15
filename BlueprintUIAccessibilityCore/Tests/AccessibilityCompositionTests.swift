@@ -130,6 +130,78 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertEqual(applied.accessibilityCustomRotors?[2].name, "Rotor 3")
     }
 
+    func test_combined_text_view_links_use_native_ranges() throws {
+        guard #available(iOS 17.0, *) else { return }
+        let first = UITextView(usingTextLayoutManager: true)
+        first.isEditable = false
+        first.isSelectable = false
+        let text = NSMutableAttributedString(string: "👋 Terms and Privacy")
+        text.addAttribute(.link, value: URL(string: "https://example.com/terms")!, range: NSRange(location: 3, length: 5))
+        text.addAttribute(.link, value: "https://example.com/privacy", range: NSRange(location: 13, length: 7))
+        first.attributedText = text
+
+        // Native paragraph elements share the text view as their container.
+        let paragraphs = (0..<2).map { _ in UIAccessibilityElement(accessibilityContainer: first) }
+        let combined = AccessibilityComposition.CompositeRepresentation(paragraphs) {}
+        XCTAssertEqual(combined.rotors?.count, 1)
+
+        let nested = AccessibilityComposition.CombinableView()
+        nested.applyAccessibility(combined)
+        let second = UITextView(usingTextLayoutManager: true)
+        second.isEditable = false
+        second.isSelectable = false
+        second.attributedText = NSAttributedString(string: "Help", attributes: [.link: URL(string: "https://example.com/help")!])
+        let outer = AccessibilityCombinableTestObject()
+        outer.applyAccessibility(.init([nested, second]) {})
+        let rotor = try XCTUnwrap(outer.accessibilityCustomRotors?.first)
+        XCTAssertEqual(outer.accessibilityCustomRotors?.count, 1)
+        XCTAssertEqual(rotor.systemRotorType, .link)
+
+        let predicate = UIAccessibilityCustomRotorSearchPredicate()
+        predicate.searchDirection = .next
+        for (view, range) in [(first, NSRange(location: 3, length: 5)), (first, NSRange(location: 13, length: 7)), (second, NSRange(location: 0, length: 4))] {
+            let result = try XCTUnwrap(rotor.itemSearchBlock(predicate))
+            XCTAssertTrue(result.targetElement === view)
+            let nativeRange = try XCTUnwrap(result.targetRange)
+            XCTAssertEqual(view.offset(from: view.beginningOfDocument, to: nativeRange.start), range.location)
+            XCTAssertEqual(view.offset(from: nativeRange.start, to: nativeRange.end), range.length)
+            predicate.currentItem = result
+        }
+        XCTAssertNil(rotor.itemSearchBlock(predicate))
+        predicate.searchDirection = .previous
+        for location in [13, 3] {
+            let result = try XCTUnwrap(rotor.itemSearchBlock(predicate))
+            XCTAssertTrue(result.targetElement === first)
+            XCTAssertEqual(first.offset(from: first.beginningOfDocument, to: try XCTUnwrap(result.targetRange).start), location)
+            predicate.currentItem = result
+        }
+        XCTAssertNil(rotor.itemSearchBlock(predicate))
+        XCTAssertFalse(first.isSelectable)
+        XCTAssertEqual(first.selectedRange.length, 0)
+        XCTAssertNotNil(first.textLayoutManager)
+    }
+
+    func test_combined_text_view_rotor_uses_current_content_without_retaining_the_view() throws {
+        guard #available(iOS 17.0, *) else { return }
+        var view: UITextView? = UITextView(usingTextLayoutManager: true)
+        view!.isEditable = false
+        view!.attributedText = NSAttributedString(string: "Old", attributes: [.link: URL(string: "https://example.com")!])
+        let combined = AccessibilityComposition.CompositeRepresentation([view!]) {}
+        let rotor = try XCTUnwrap(combined.rotors?.first)
+        view!.attributedText = NSAttributedString(string: "New link", attributes: [.link: URL(string: "https://example.com/new")!])
+        let predicate = UIAccessibilityCustomRotorSearchPredicate()
+        predicate.searchDirection = .next
+        let range = try XCTUnwrap(rotor.itemSearchBlock(predicate)?.targetRange)
+        XCTAssertEqual(view!.text(in: range), "New link")
+        view!.attributedText = NSAttributedString(string: "No link")
+        XCTAssertNil(rotor.itemSearchBlock(predicate))
+        XCTAssertNil(AccessibilityComposition.CompositeRepresentation([view!]) {}.rotors)
+        weak var weakView = view
+        view = nil
+        XCTAssertNil(weakView)
+        XCTAssertNil(rotor.itemSearchBlock(predicate))
+    }
+
     func test_action_aggregation() {
         let accessibilityContainer = NSObject()
 

@@ -48,6 +48,7 @@ extension AccessibilityComposition {
             var hints = [String]()
             var identifiers = [String]()
             var allRotors = [UIAccessibilityCustomRotor]()
+            var linkedTextViews = Set<ObjectIdentifier>()
             actions = Actions()
             var allContent = [AXCustomContent]()
             var allInteractiveChildren = [CompositeRepresentation]()
@@ -85,6 +86,13 @@ extension AccessibilityComposition {
                 traits.formUnion(element.accessibilityTraits)
 
                 allRotors.append(contentsOf: element.accessibilityCustomRotors ?? [])
+                if let textView = element.containingTextView,
+                   linkedTextViews.insert(ObjectIdentifier(textView)).inserted,
+                   let rotor = textView.compositionLinkRotor
+                {
+                    // UIKit's built-in text rotors are lost when a parent becomes the accessibility element.
+                    allRotors.append(rotor)
+                }
 
                 if element.isLikelyInteractive, element.isAccessibilityEnabled {
                     actions.activationAction = element.accessibilityAction(didFire: { _, _ in invalidator() })
@@ -706,6 +714,63 @@ extension UIView {
         return elements
             .filter { filter?($0) ?? true }
             .sorted(by: sorting ?? { _, _ in true })
+    }
+}
+
+extension UITextView {
+    fileprivate var compositionLinkRotor: UIAccessibilityCustomRotor? {
+        guard !isEditable, let text = attributedText,
+              !(accessibilityCustomRotors ?? []).contains(where: { $0.systemRotorType == .link })
+        else { return nil }
+        var hasLink = false
+        text.enumerateAttribute(.link, in: NSRange(location: 0, length: text.length)) { value, _, stop in
+            if value is URL || (value as? String).flatMap(URL.init(string:)) != nil {
+                hasLink = true
+                stop.pointee = true
+            }
+        }
+        guard hasLink else { return nil }
+        return UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
+            guard let self, let text = attributedText else { return nil }
+            let forward = predicate.searchDirection == .next
+            var boundary = forward ? 0 : text.length
+            if predicate.currentItem.targetElement === self,
+               let range = predicate.currentItem.targetRange
+            {
+                boundary = offset(from: beginningOfDocument, to: forward ? range.end : range.start)
+                boundary = min(max(0, boundary), text.length)
+            }
+            let searchRange = forward
+                ? NSRange(location: boundary, length: text.length - boundary)
+                : NSRange(location: 0, length: boundary)
+            var result: UIAccessibilityCustomRotorItemResult?
+            text.enumerateAttribute(.link, in: searchRange, options: forward ? [] : .reverse) { value, range, stop in
+                guard value is URL || (value as? String).flatMap(URL.init(string:)) != nil,
+                      let start = self.position(from: self.beginningOfDocument, offset: range.location),
+                      let end = self.position(from: start, offset: range.length),
+                      let textRange = self.textRange(from: start, to: end)
+                else { return }
+                result = UIAccessibilityCustomRotorItemResult(targetElement: self, targetRange: textRange)
+                stop.pointee = true
+            }
+            return result
+        }
+    }
+}
+
+extension NSObject {
+    fileprivate var containingTextView: UITextView? {
+        var element: NSObject? = self
+        var visited = Set<ObjectIdentifier>()
+        while let current = element, visited.insert(ObjectIdentifier(current)).inserted {
+            if let textView = current as? UITextView { return textView }
+            if let accessibleElement = current as? UIAccessibilityElement {
+                element = accessibleElement.accessibilityContainer as? NSObject
+            } else {
+                element = (current as? UIView)?.superview
+            }
+        }
+        return nil
     }
 }
 
