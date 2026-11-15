@@ -157,6 +157,17 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertNil(AccessibilityComposition.CompositeRepresentation(paragraphs) {}.rotors)
     }
 
+    func test_combined_text_view_uses_control_hint_instead_of_paragraph_activation_hint() {
+        let textView = UITextView()
+        let paragraph = UIAccessibilityElement(accessibilityContainer: textView)
+        paragraph.accessibilityHint = "Native paragraph activation hint"
+        XCTAssertNil(AccessibilityComposition.CompositeRepresentation([paragraph]) {}.hint)
+
+        textView.accessibilityHint = "Explicit guidance"
+        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([paragraph]) {}.hint, "Explicit guidance")
+        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.hint, "Explicit guidance")
+    }
+
     func test_action_aggregation() {
         let accessibilityContainer = NSObject()
 

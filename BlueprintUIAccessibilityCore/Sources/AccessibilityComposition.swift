@@ -75,7 +75,9 @@ extension AccessibilityComposition {
                     values.append(value)
                 }
 
-                if let hint = element.accessibilityHint {
+                // Native paragraph activation hints do not apply to the combined wrapper.
+                let hintSource: NSObject = element.containingTextView ?? element
+                if let hint = hintSource.accessibilityHint {
                     hints.append(hint)
                 }
 
