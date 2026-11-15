@@ -87,11 +87,11 @@ extension AccessibilityComposition {
 
                 allRotors.append(contentsOf: element.accessibilityCustomRotors ?? [])
                 if let textView = element.containingTextView,
-                   linkedTextViews.insert(ObjectIdentifier(textView)).inserted,
-                   let rotor = textView.compositionLinkRotor
+                   textView !== element,
+                   linkedTextViews.insert(ObjectIdentifier(textView)).inserted
                 {
-                    // UIKit's built-in text rotors are lost when a parent becomes the accessibility element.
-                    allRotors.append(rotor)
+                    // Native paragraph elements do not expose their text view's rotors.
+                    allRotors.append(contentsOf: textView.accessibilityCustomRotors ?? [])
                 }
 
                 if element.isLikelyInteractive, element.isAccessibilityEnabled {
@@ -714,47 +714,6 @@ extension UIView {
         return elements
             .filter { filter?($0) ?? true }
             .sorted(by: sorting ?? { _, _ in true })
-    }
-}
-
-extension UITextView {
-    fileprivate var compositionLinkRotor: UIAccessibilityCustomRotor? {
-        guard !isEditable, let text = attributedText,
-              !(accessibilityCustomRotors ?? []).contains(where: { $0.systemRotorType == .link })
-        else { return nil }
-        var hasLink = false
-        text.enumerateAttribute(.link, in: NSRange(location: 0, length: text.length)) { value, _, stop in
-            if value is URL || (value as? String).flatMap(URL.init(string:)) != nil {
-                hasLink = true
-                stop.pointee = true
-            }
-        }
-        guard hasLink else { return nil }
-        return UIAccessibilityCustomRotor(systemType: .link) { [weak self] predicate in
-            guard let self, let text = attributedText else { return nil }
-            let forward = predicate.searchDirection == .next
-            var boundary = forward ? 0 : text.length
-            if predicate.currentItem.targetElement === self,
-               let range = predicate.currentItem.targetRange
-            {
-                boundary = offset(from: beginningOfDocument, to: forward ? range.end : range.start)
-                boundary = min(max(0, boundary), text.length)
-            }
-            let searchRange = forward
-                ? NSRange(location: boundary, length: text.length - boundary)
-                : NSRange(location: 0, length: boundary)
-            var result: UIAccessibilityCustomRotorItemResult?
-            text.enumerateAttribute(.link, in: searchRange, options: forward ? [] : .reverse) { value, range, stop in
-                guard value is URL || (value as? String).flatMap(URL.init(string:)) != nil,
-                      let start = self.position(from: self.beginningOfDocument, offset: range.location),
-                      let end = self.position(from: start, offset: range.length),
-                      let textRange = self.textRange(from: start, to: end)
-                else { return }
-                result = UIAccessibilityCustomRotorItemResult(targetElement: self, targetRange: textRange)
-                stop.pointee = true
-            }
-            return result
-        }
     }
 }
 
