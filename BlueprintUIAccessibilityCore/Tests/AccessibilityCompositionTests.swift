@@ -183,23 +183,27 @@ class AccessibilityCompositionTests: XCTestCase {
 
     func test_combined_text_view_rotor_uses_current_content_without_retaining_the_view() throws {
         guard #available(iOS 17.0, *) else { return }
-        var view: UITextView? = UITextView(usingTextLayoutManager: true)
-        view!.isEditable = false
-        view!.attributedText = NSAttributedString(string: "Old", attributes: [.link: URL(string: "https://example.com")!])
-        let combined = AccessibilityComposition.CompositeRepresentation([view!]) {}
-        let rotor = try XCTUnwrap(combined.rotors?.first)
-        view!.attributedText = NSAttributedString(string: "New link", attributes: [.link: URL(string: "https://example.com/new")!])
-        let predicate = UIAccessibilityCustomRotorSearchPredicate()
-        predicate.searchDirection = .next
-        let range = try XCTUnwrap(rotor.itemSearchBlock(predicate)?.targetRange)
-        XCTAssertEqual(view!.text(in: range), "New link")
-        view!.attributedText = NSAttributedString(string: "No link")
-        XCTAssertNil(rotor.itemSearchBlock(predicate))
-        XCTAssertNil(AccessibilityComposition.CompositeRepresentation([view!]) {}.rotors)
-        weak var weakView = view
-        view = nil
+        weak var weakView: UITextView?
+        var rotor: UIAccessibilityCustomRotor?
+        try autoreleasepool {
+            let view = UITextView(usingTextLayoutManager: true)
+            weakView = view
+            view.isEditable = false
+            view.attributedText = NSAttributedString(string: "Old", attributes: [.link: URL(string: "https://example.com")!])
+            let combined = AccessibilityComposition.CompositeRepresentation([view]) {}
+            let linkRotor = try XCTUnwrap(combined.rotors?.first)
+            rotor = linkRotor
+            view.attributedText = NSAttributedString(string: "New link", attributes: [.link: URL(string: "https://example.com/new")!])
+            let predicate = UIAccessibilityCustomRotorSearchPredicate()
+            predicate.searchDirection = .next
+            let range = try XCTUnwrap(linkRotor.itemSearchBlock(predicate)?.targetRange)
+            XCTAssertEqual(view.text(in: range), "New link")
+            view.attributedText = NSAttributedString(string: "No link")
+            XCTAssertNil(linkRotor.itemSearchBlock(predicate))
+            XCTAssertNil(AccessibilityComposition.CompositeRepresentation([view]) {}.rotors)
+        }
         XCTAssertNil(weakView)
-        XCTAssertNil(rotor.itemSearchBlock(predicate))
+        XCTAssertNil(rotor?.itemSearchBlock(.init()))
     }
 
     func test_action_aggregation() {
