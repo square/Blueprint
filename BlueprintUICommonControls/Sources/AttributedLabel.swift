@@ -2,6 +2,7 @@ import BlueprintUI
 import Foundation
 import UIKit
 
+/// Displays attributed label content. For interactive links on iOS 17+, use `AttributedTextView`.
 public struct AttributedLabel: Element, Hashable {
 
     /// The attributed text to render in the label.
@@ -105,14 +106,17 @@ public struct AttributedLabel: Element, Hashable {
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
     /// A set of data types to detect and automatically link in the label.
-    public var linkDetectionTypes: Set<LinkDetectionType> = []
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkDetectionTypes for native link detection.")
+    public var linkDetectionTypes: Set<TextLinkDetectionType> = []
 
     /// A set of attributes to apply to links in the string.
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkAttributes for native link handling.")
     public var linkAttributes: [NSAttributedString.Key: AnyHashable] = [
         .foregroundColor: UIColor.systemBlue,
     ]
 
     /// A set of attributes to apply to links when they are touched.
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView for native pressed-link behavior.")
     public var activeLinkAttributes: [NSAttributedString.Key: AnyHashable] = [
         .foregroundColor: UIColor.systemBlue.withAlphaComponent(0.3),
     ]
@@ -172,29 +176,8 @@ public struct AttributedLabel: Element, Hashable {
 // MARK: - Models
 
 extension AttributedLabel {
-    /// Types of data that can be detected and automatically turned into links.
-    ///
-    /// Corresponds to `NSTextCheckingResult.CheckingType` types.
-    ///
-    public enum LinkDetectionType: Equatable, Hashable {
-        /// Detect date strings. Tapping a date opens the calendar to that date.
-        case date
-        /// Detect addresses. Tapping the address opens Maps with that address.
-        case address
-        /// Detect URLs. Tapping the link opens the URL.
-        case link
-        /// Detect phone numbers. Tapping the phone number prompts the user to call it.
-        case phoneNumber
-
-        var checkingType: NSTextCheckingResult.CheckingType {
-            switch self {
-            case .date: return .date
-            case .address: return .address
-            case .link: return .link
-            case .phoneNumber: return .phoneNumber
-            }
-        }
-    }
+    @available(iOS, deprecated: 17.0, renamed: "TextLinkDetectionType")
+    public typealias LinkDetectionType = TextLinkDetectionType
 }
 
 // MARK: View implementation
@@ -209,7 +192,7 @@ extension AttributedLabel {
         private var trackingLinks: [Link]?
 
         private var layoutDirection: Environment.LayoutDirection = .leftToRight
-        private var linkDetectionTypes: Set<LinkDetectionType> = []
+        private var linkDetectionTypes: Set<TextLinkDetectionType> = []
         private var linkAttributes: [NSAttributedString.Key: Any] = [:]
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
         private var links: [Link] = []
@@ -1037,7 +1020,7 @@ extension NSMutableAttributedString {
 }
 
 extension NSTextCheckingResult.CheckingType {
-    init(_ types: Set<AttributedLabel.LinkDetectionType>) {
+    init(_ types: Set<TextLinkDetectionType>) {
         var checkingType = NSTextCheckingResult.CheckingType()
 
         for type in types {

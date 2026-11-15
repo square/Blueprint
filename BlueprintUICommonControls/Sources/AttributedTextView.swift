@@ -7,6 +7,8 @@ import UIKit
 public struct AttributedTextView: UIViewElement {
     public var attributedText: NSAttributedString
     public var isSelectable = true
+    /// Data to detect as native links. Detection is disabled by default.
+    public var linkDetectionTypes: Set<TextLinkDetectionType> = []
     public var numberOfLines = 0
     public var shadow: TextShadow?
     public var adjustsFontSizeToFitWidth = false
@@ -74,6 +76,9 @@ public struct AttributedTextView: UIViewElement {
             adjustsFontSizeToFitWidth = model.adjustsFontSizeToFitWidth
             minimumScaleFactor = model.minimumScaleFactor
             textView.isSelectable = model.isSelectable
+            textView.dataDetectorTypes = model.linkDetectionTypes.reduce(into: UIDataDetectorTypes()) {
+                $0.formUnion($1.dataDetectorType)
+            }
             textView.linkTextAttributes = model.linkAttributes
             textView.textContainer.maximumNumberOfLines = max(0, model.numberOfLines)
             let lastLineMode = model.attributedText.length > 0
@@ -111,7 +116,10 @@ public struct AttributedTextView: UIViewElement {
             }
             textView.layer.shadowOpacity = Float(model.shadow?.opacity ?? 0)
             textView.layer.shadowRadius = model.shadow?.radius ?? 0
-            textView.layer.shadowOffset = model.shadow.map { CGSize(width: $0.offset.horizontal, height: $0.offset.vertical) } ?? .zero
+            textView.layer.shadowOffset = model.shadow.map { CGSize(
+                width: $0.offset.horizontal,
+                height: $0.offset.vertical
+            ) } ?? .zero
             textView.layer.shadowColor = model.shadow?.color.cgColor
             textView.layer.shouldRasterize = model.shadow != nil
             textView.layer.rasterizationScale = textView.layer.contentsScale
@@ -123,7 +131,8 @@ public struct AttributedTextView: UIViewElement {
             fittingWidth = width
             var text = sourceText
             if adjustsFontSizeToFitWidth, textView.textContainer.maximumNumberOfLines == 1,
-               width > 0, width.isFinite, minimumScaleFactor < 1, sourceText.size().width > width {
+               width > 0, width.isFinite, minimumScaleFactor < 1, sourceText.size().width > width
+            {
                 func scaledText(at scale: CGFloat) -> NSAttributedString {
                     let scaled = NSMutableAttributedString(attributedString: sourceText)
                     scaled.enumerateAttribute(.font, in: NSRange(location: 0, length: scaled.length)) { value, range, _ in

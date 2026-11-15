@@ -5,6 +5,25 @@ import UIKit
 
 @MainActor
 struct AttributedTextViewTests {
+    @Test func `Link detection maps shared types and resets on reuse`() {
+        guard #available(iOS 17.0, *) else { return }
+        var model = AttributedTextView(attributedText: NSAttributedString(string: "Text"))
+        let view = model.makeUIView()
+        let mappings: [(TextLinkDetectionType, UIDataDetectorTypes, NSTextCheckingResult.CheckingType)] = [
+            (.date, .calendarEvent, .date), (.address, .address, .address),
+            (.link, .link, .link), (.phoneNumber, .phoneNumber, .phoneNumber),
+        ]
+        for (type, detector, checkingType) in mappings {
+            model.linkDetectionTypes = [type]
+            view.update(model)
+            #expect(view.textView.dataDetectorTypes == detector)
+            #expect(NSTextCheckingResult.CheckingType([type]) == checkingType)
+        }
+        model.linkDetectionTypes = []
+        view.update(model)
+        #expect(view.textView.dataDetectorTypes.isEmpty)
+    }
+
     @Test func `Empty content measures zero after a nonempty update`() {
         guard #available(iOS 17.0, *) else { return }
         let view = AttributedTextView.View()
