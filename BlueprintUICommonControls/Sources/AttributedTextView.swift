@@ -76,9 +76,11 @@ public struct AttributedTextView: UIViewElement {
             adjustsFontSizeToFitWidth = model.adjustsFontSizeToFitWidth
             minimumScaleFactor = model.minimumScaleFactor
             textView.isSelectable = model.isSelectable
-            textView.dataDetectorTypes = model.linkDetectionTypes.reduce(into: UIDataDetectorTypes()) {
+            let detectorTypes = model.linkDetectionTypes.reduce(into: UIDataDetectorTypes()) {
                 $0.formUnion($1.dataDetectorType)
             }
+            let detectionChanged = textView.dataDetectorTypes != detectorTypes
+            textView.dataDetectorTypes = detectorTypes
             textView.linkTextAttributes = model.linkAttributes
             textView.textContainer.maximumNumberOfLines = max(0, model.numberOfLines)
             let lastLineMode = model.attributedText.length > 0
@@ -102,7 +104,7 @@ public struct AttributedTextView: UIViewElement {
             }
             sourceText = text
             fittingWidth = nil
-            applyText(fitting: bounds.width)
+            applyText(fitting: bounds.width, force: detectionChanged)
 
             textView.isAccessibilityElement = model.isAccessibilityElement ?? nativeIsAccessibilityElement
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
@@ -126,7 +128,7 @@ public struct AttributedTextView: UIViewElement {
             setNeedsLayout()
         }
 
-        private func applyText(fitting width: CGFloat) {
+        private func applyText(fitting width: CGFloat, force: Bool = false) {
             guard fittingWidth != width else { return }
             fittingWidth = width
             var text = sourceText
@@ -160,7 +162,8 @@ public struct AttributedTextView: UIViewElement {
                 }
                 text = fitted ?? scaledText(at: minimum > 0 ? minimum : upper)
             }
-            guard !textView.attributedText.isEqual(to: text) else { return }
+            // Reassigning clears UIKit's cached links when detector types change.
+            guard force || !textView.attributedText.isEqual(to: text) else { return }
             let selection = textView.selectedRange
             let sameCharacters = textView.attributedText.string == text.string
             textView.attributedText = text

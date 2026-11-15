@@ -7,8 +7,11 @@ import UIKit
 struct AttributedTextViewTests {
     @Test func `Link detection maps shared types and resets on reuse`() {
         guard #available(iOS 17.0, *) else { return }
-        var model = AttributedTextView(attributedText: NSAttributedString(string: "Text"))
+        let url = URL(string: "https://example.com")!
+        var model = AttributedTextView(attributedText: NSAttributedString(string: "Text", attributes: [.link: url]))
         let view = model.makeUIView()
+        view.update(model)
+        view.textView.selectedRange = NSRange(location: 0, length: 2)
         let mappings: [(TextLinkDetectionType, UIDataDetectorTypes, NSTextCheckingResult.CheckingType)] = [
             (.date, .calendarEvent, .date), (.address, .address, .address),
             (.link, .link, .link), (.phoneNumber, .phoneNumber, .phoneNumber),
@@ -18,10 +21,13 @@ struct AttributedTextViewTests {
             view.update(model)
             #expect(view.textView.dataDetectorTypes == detector)
             #expect(NSTextCheckingResult.CheckingType([type]) == checkingType)
+            #expect(view.textView.selectedRange == NSRange(location: 0, length: 2))
         }
         model.linkDetectionTypes = []
         view.update(model)
         #expect(view.textView.dataDetectorTypes.isEmpty)
+        #expect(view.textView.attributedText.attribute(.link, at: 0, effectiveRange: nil) as? URL == url)
+        #expect(view.textView.selectedRange == NSRange(location: 0, length: 2))
     }
 
     @Test func `Empty content measures zero after a nonempty update`() {
