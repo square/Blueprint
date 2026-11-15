@@ -173,7 +173,7 @@ class AttributedLabelTests: XCTestCase {
         let representation = AccessibilityComposition.CompositeRepresentation([labelView]) {}
 
         XCTAssertNil(representation.label)
-        XCTAssertEqual(representation.value, "X")
+        XCTAssertEqual(representation.value?.string, "X")
     }
 
     func test_displaysText() {
