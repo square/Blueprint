@@ -22,9 +22,9 @@ extension AccessibilityComposition {
 
         public let elementsCount: Int
 
-        public var label: String?
-        public var value: String?
-        public var hint: String?
+        public var label: NSAttributedString?
+        public var value: NSAttributedString?
+        public var hint: NSAttributedString?
         public var identifier: String?
         public var traits: UIAccessibilityTraits = .none
         public var actions: Actions
@@ -43,12 +43,11 @@ extension AccessibilityComposition {
 
         public init(_ elements: [NSObject], ignoreInteractive: Bool = true, invalidator: @escaping () -> Void) {
             elementsCount = elements.count
-            var labels = [String]()
-            var values = [String]()
-            var hints = [String]()
+            var labels = [NSAttributedString?]()
+            var values = [NSAttributedString?]()
+            var hints = [NSAttributedString?]()
             var identifiers = [String]()
             var allRotors = [UIAccessibilityCustomRotor]()
-            var linkedTextViews = Set<ObjectIdentifier>()
             actions = Actions()
             var allContent = [AXCustomContent]()
             var allInteractiveChildren = [CompositeRepresentation]()
@@ -67,17 +66,22 @@ extension AccessibilityComposition {
                     }
                 }
 
-                if let label = element.accessibilityLabel {
+                if let label = element.accessibilityAttributedLabel ?? element.accessibilityLabel.map(NSAttributedString.init(string:)) {
                     labels.append(label)
                 }
 
-                if let value = element.accessibilityValue {
+                if let value = element.accessibilityAttributedValue {
                     values.append(value)
+                } else if let textView = element as? UITextView,
+                          element.accessibilityValue == nil || element.accessibilityValue == textView.attributedText?.string,
+                          let text = textView.attributedText
+                {
+                    values.append(text)
+                } else if let value = element.accessibilityValue {
+                    values.append(NSAttributedString(string: value))
                 }
 
-                // Native paragraph activation hints do not apply to the combined wrapper.
-                let hintSource: NSObject = element.containingTextView ?? element
-                if let hint = hintSource.accessibilityHint {
+                if let hint = element.accessibilityAttributedHint ?? element.accessibilityHint.map(NSAttributedString.init(string:)) {
                     hints.append(hint)
                 }
 
@@ -88,14 +92,6 @@ extension AccessibilityComposition {
                 traits.formUnion(element.accessibilityTraits)
 
                 allRotors.append(contentsOf: element.accessibilityCustomRotors ?? [])
-                if let textView = element.containingTextView,
-                   textView !== element,
-                   linkedTextViews.insert(ObjectIdentifier(textView)).inserted
-                {
-                    // Native paragraph elements do not expose their text view's rotors.
-                    allRotors.append(contentsOf: textView.accessibilityCustomRotors ?? [])
-                }
-
                 if element.isLikelyInteractive, element.isAccessibilityEnabled {
                     actions.activationAction = element.accessibilityAction(didFire: { _, _ in invalidator() })
                     actions.increment = element.accessibilityIncrementDecrementActions?.increment
@@ -117,23 +113,9 @@ extension AccessibilityComposition {
                 }
             }
 
-            let label = labels
-                .removingDuplicates
-                .filter { !$0.isEmpty }
-                .joined(separator: ", ")
-            self.label = label.isEmpty ? nil : label
-
-            let value = values
-                .removingDuplicates
-                .filter { !$0.isEmpty }
-                .joined(separator: ", ")
-            self.value = value.isEmpty ? nil : value
-
-            let hint = hints
-                .removingDuplicates
-                .filter { !$0.isEmpty }
-                .joined(separator: ", ")
-            self.hint = hint.isEmpty ? nil : hint
+            label = labels.removingDuplicates.joinedAccessibilityText()
+            value = values.removingDuplicates.joinedAccessibilityText()
+            hint = hints.removingDuplicates.joinedAccessibilityText()
 
             let identifier = identifiers
                 .removingDuplicates
@@ -150,9 +132,9 @@ extension AccessibilityComposition {
         internal func merge(with other: AccessibilityComposition.CompositeRepresentation?) -> AccessibilityComposition.CompositeRepresentation {
             guard let other else { return self }
             var new = AccessibilityComposition.CompositeRepresentation([], invalidator: invalidator)
-            new.label = [label, other.label].joinedAccessibilityString()
-            new.value = [value, other.value].joinedAccessibilityString()
-            new.hint = [hint, other.hint].joinedAccessibilityString()
+            new.label = [label, other.label].joinedAccessibilityText()
+            new.value = [value, other.value].joinedAccessibilityText()
+            new.hint = [hint, other.hint].joinedAccessibilityText()
             new.identifier = [identifier, other.identifier].joinedAccessibilityString()
 
             new.traits = traits.union(other.traits)
@@ -486,6 +468,30 @@ extension AccessibilityComposition.CombinableView {
         set { super.accessibilityHint = newValue }
     }
 
+    public override var accessibilityAttributedLabel: NSAttributedString? {
+        get {
+            if needsAccessibilityUpdate { updateAccessibility() }
+            return super.accessibilityAttributedLabel
+        }
+        set { super.accessibilityAttributedLabel = newValue }
+    }
+
+    public override var accessibilityAttributedValue: NSAttributedString? {
+        get {
+            if needsAccessibilityUpdate { updateAccessibility() }
+            return super.accessibilityAttributedValue
+        }
+        set { super.accessibilityAttributedValue = newValue }
+    }
+
+    public override var accessibilityAttributedHint: NSAttributedString? {
+        get {
+            if needsAccessibilityUpdate { updateAccessibility() }
+            return super.accessibilityAttributedHint
+        }
+        set { super.accessibilityAttributedHint = newValue }
+    }
+
     public override var accessibilityIdentifier: String? {
         get {
             if needsAccessibilityUpdate {
@@ -615,9 +621,9 @@ extension AccessibilityCombinable {
         accessibilityInteractions = nil
         needsAccessibilityUpdate = accessibility == nil
 
-        accessibilityLabel = accessibility?.label
-        accessibilityValue = accessibility?.value
-        accessibilityHint = accessibility?.hint
+        accessibilityAttributedLabel = accessibility?.label
+        accessibilityAttributedValue = accessibility?.value
+        accessibilityAttributedHint = accessibility?.hint
         accessibilityTraits = accessibility?.traits ?? .none
         accessibilityIdentifier = accessibility?.identifier
 
@@ -636,9 +642,9 @@ extension AccessibilityCombinable {
         if shouldMergeFirstChild,
            let child = accessibility?.interactiveChildren?.first
         {
-            accessibilityLabel = [accessibilityLabel, child.label].removingDuplicates.compactMap { $0 }.joined(separator: ", ")
-            accessibilityValue = [accessibilityValue, child.value].removingDuplicates.compactMap { $0 }.joined(separator: ", ")
-            accessibilityHint = [accessibilityHint, child.hint].removingDuplicates.compactMap { $0 }.joined(separator: ", ")
+            accessibilityAttributedLabel = [accessibilityAttributedLabel, child.label].removingDuplicates.joinedAccessibilityText()
+            accessibilityAttributedValue = [accessibilityAttributedValue, child.value].removingDuplicates.joinedAccessibilityText()
+            accessibilityAttributedHint = [accessibilityAttributedHint, child.hint].removingDuplicates.joinedAccessibilityText()
             accessibilityIdentifier = [accessibilityIdentifier, child.identifier].removingDuplicates.compactMap { $0 }.joined(separator: "-")
             accessibilityTraits = accessibilityTraits.union(child.traits)
             if let rotors = child.rotors, !rotors.isEmpty {
@@ -673,7 +679,7 @@ extension AccessibilityCombinable {
             // Note that we don't take on the interactive child traits here. This is because we cant fulfill the promises with a single activation and instead relegate children to custom actions in the rotor. It would be a lie to call ourselves a button in this case.
             // Because we lack the traits we need to interpret the child values through the their own traits before appending them to our value.
             if let values = accessibility?.interactiveChildren?.compactMap({ $0.traits.interpret(value: $0.value) }) {
-                accessibilityValue = ([accessibilityValue] + values).compactMap { $0 }.joinedAccessibilityString()
+                accessibilityAttributedValue = ([accessibilityAttributedValue] + values).joinedAccessibilityText()
             }
         }
         accessibilityCustomActions = accessibilityCustomActions?.filter { !$0.name.isEmpty }
@@ -705,6 +711,9 @@ extension UIView {
         let elements = subviews.flatMap { subview -> [NSObject] in
             if subview.accessibilityElementsHidden || subview.isHidden {
                 return []
+            } else if subview is UITextView {
+                // Combining uses the control's attributed content; UIKit owns its native paragraph elements.
+                return [subview]
             } else if let accessibilityElements = subview.accessibilityElements {
                 return accessibilityElements.compactMap { $0 as? NSObject }
             } else if subview.isAccessibilityElement {
@@ -716,22 +725,6 @@ extension UIView {
         return elements
             .filter { filter?($0) ?? true }
             .sorted(by: sorting ?? { _, _ in true })
-    }
-}
-
-extension NSObject {
-    fileprivate var containingTextView: UITextView? {
-        var element: NSObject? = self
-        var visited = Set<ObjectIdentifier>()
-        while let current = element, visited.insert(ObjectIdentifier(current)).inserted {
-            if let textView = current as? UITextView { return textView }
-            if let accessibleElement = current as? UIAccessibilityElement {
-                element = accessibleElement.accessibilityContainer as? NSObject
-            } else {
-                element = (current as? UIView)?.superview
-            }
-        }
-        return nil
     }
 }
 
@@ -784,10 +777,10 @@ extension NSObject {
 extension NSObject {
     @objc fileprivate func accessibilityAction(didFire: @escaping (String, Bool) -> Void) -> UIAccessibilityCustomAction {
         let name: String = {
-            if let value = accessibilityTraits.interpret(value: accessibilityValue), !value.isEmpty,
+            if let value = accessibilityTraits.interpret(value: accessibilityAttributedValue ?? accessibilityValue.map(NSAttributedString.init(string:))), value.length > 0,
                let label = accessibilityLabel, !label.isEmpty
             {
-                return "\(label): \(value)"
+                return "\(label): \(value.string)"
             }
             // Actions need names or they don't show up in the rotor and we get complaints in logs. However containers sometimes contain valid accessibility elements without a label or value.
             // Often these elements are activated by an onTap handler on the containing view.
@@ -884,9 +877,11 @@ extension UIAccessibilityTraits {
 
     // VoiceOver can interpret specific value strings differently based on the presence of traits.
     // Because we're consolidating the values Voiceover wont read them correctly despite the inclusion of the trait so we preemptively swap out supported values with their localized interpretation.
-    func interpret(value: String?) -> String? {
-        if let value, contains(.init(with: [.toggleButton])), let toggleValue = Accessibility.ToggleValue(string: value) {
-            return toggleValue.description
+    func interpret(value: NSAttributedString?) -> NSAttributedString? {
+        if let value, contains(.init(with: [.toggleButton])), let toggleValue = Accessibility.ToggleValue(string: value.string) {
+            let interpreted = NSMutableAttributedString(attributedString: value)
+            interpreted.replaceCharacters(in: NSRange(location: 0, length: interpreted.length), with: toggleValue.description)
+            return interpreted
         }
         return value
     }

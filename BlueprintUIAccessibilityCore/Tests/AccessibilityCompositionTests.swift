@@ -130,7 +130,7 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertEqual(applied.accessibilityCustomRotors?[2].name, "Rotor 3")
     }
 
-    func test_combined_text_view_paragraphs_forward_their_native_rotor_once() throws {
+    func test_combining_uses_text_view_content_and_native_rotor_once() throws {
         let textView = UITextView()
         let link = UIAccessibilityElement(accessibilityContainer: textView)
         link.accessibilityLabel = "Terms"
@@ -140,8 +140,14 @@ class AccessibilityCompositionTests: XCTestCase {
         }
         textView.accessibilityCustomRotors = [nativeRotor]
         let paragraphs = (0..<2).map { _ in UIAccessibilityElement(accessibilityContainer: textView) }
-        let combined = AccessibilityComposition.CompositeRepresentation(paragraphs) {}
+        textView.isAccessibilityElement = false
+        textView.accessibilityElements = paragraphs
+        textView.attributedText = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com")!])
+        let container = AccessibilityComposition.CombinableView()
+        container.addSubview(textView)
+        let combined = container.combineChildren()
         XCTAssertEqual(combined.rotors, [nativeRotor])
+        XCTAssertEqual(combined.value, textView.attributedText)
 
         let nested = AccessibilityComposition.CombinableView()
         nested.applyAccessibility(combined)
@@ -154,18 +160,81 @@ class AccessibilityCompositionTests: XCTestCase {
         // A text view exposed as one element already contributes its rotors directly.
         XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.rotors, [nativeRotor])
         textView.accessibilityCustomRotors = nil
-        XCTAssertNil(AccessibilityComposition.CompositeRepresentation(paragraphs) {}.rotors)
+        XCTAssertNil(container.combineChildren().rotors)
     }
 
     func test_combined_text_view_uses_control_hint_instead_of_paragraph_activation_hint() {
         let textView = UITextView()
         let paragraph = UIAccessibilityElement(accessibilityContainer: textView)
         paragraph.accessibilityHint = "Native paragraph activation hint"
-        XCTAssertNil(AccessibilityComposition.CompositeRepresentation([paragraph]) {}.hint)
+        textView.accessibilityElements = [paragraph]
+        let container = AccessibilityComposition.CombinableView()
+        container.addSubview(textView)
+        XCTAssertNil(container.combineChildren().hint)
 
         textView.accessibilityHint = "Explicit guidance"
-        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([paragraph]) {}.hint, "Explicit guidance")
-        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.hint, "Explicit guidance")
+        XCTAssertEqual(container.combineChildren().hint?.string, "Explicit guidance")
+        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.hint?.string, "Explicit guidance")
+    }
+
+    func test_attributed_content_survives_merging_overriding_and_reuse() {
+        let first = UIAccessibilityElement(accessibilityContainer: NSObject())
+        let second = UIAccessibilityElement(accessibilityContainer: NSObject())
+        let terms = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
+        let privacy = NSAttributedString(string: "Privacy", attributes: [.link: URL(string: "https://example.com/privacy")!])
+        first.accessibilityAttributedLabel = terms
+        first.accessibilityAttributedValue = terms
+        first.accessibilityAttributedHint = NSAttributedString(string: "Guidance", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
+        second.accessibilityAttributedLabel = privacy
+        second.accessibilityAttributedValue = privacy
+        let a = AccessibilityComposition.CompositeRepresentation([first]) {}
+        let b = AccessibilityComposition.CompositeRepresentation([second]) {}
+        let expected = NSMutableAttributedString(attributedString: terms)
+        expected.append(NSAttributedString(string: ", "))
+        expected.append(privacy)
+        let view = AccessibilityComposition.CombinableView()
+        view.applyAccessibility(a.merge(with: b))
+        XCTAssertEqual(view.accessibilityAttributedLabel, expected)
+        XCTAssertEqual(view.accessibilityAttributedValue, expected)
+        XCTAssertEqual(view.accessibilityAttributedHint, first.accessibilityAttributedHint)
+
+        var override = AccessibilityComposition.CompositeRepresentation([]) {}
+        override.label = NSAttributedString(string: "Override")
+        override.value = NSAttributedString(string: "")
+        view.applyAccessibility(a.merge(with: b).override(with: override))
+        XCTAssertEqual(view.accessibilityAttributedLabel, override.label)
+        XCTAssertEqual(view.accessibilityAttributedValue, override.value)
+        view.applyAccessibility(nil)
+        XCTAssertNil(view.accessibilityAttributedLabel)
+        XCTAssertNil(view.accessibilityAttributedValue)
+        XCTAssertNil(view.accessibilityAttributedHint)
+    }
+
+    func test_equal_words_with_different_link_attributes_are_not_deduplicated() {
+        let elements = ["first", "second"].map { path in
+            let element = UIAccessibilityElement(accessibilityContainer: NSObject())
+            element.accessibilityAttributedLabel = NSAttributedString(string: "Link", attributes: [.link: URL(string: "https://example.com/" + path)!])
+            return element
+        }
+        let combined = AccessibilityComposition.CompositeRepresentation(elements) {}
+        XCTAssertEqual(combined.label?.string, "Link, Link")
+        XCTAssertEqual(combined.label?.attribute(.link, at: 0, effectiveRange: nil) as? URL, URL(string: "https://example.com/first"))
+        XCTAssertEqual(combined.label?.attribute(.link, at: 6, effectiveRange: nil) as? URL, URL(string: "https://example.com/second"))
+    }
+
+    func test_interactive_child_merge_and_toggle_interpretation_preserve_attributes() {
+        let control = Interactive("Terms")
+        let text = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com")!])
+        control.accessibilityAttributedLabel = text
+        let view = AccessibilityCombinableTestObject()
+        view.applyAccessibility(.init([control]) {})
+        XCTAssertEqual(view.accessibilityAttributedLabel, text)
+
+        control.accessibilityTraits = .init(with: [.toggleButton])
+        control.accessibilityAttributedValue = NSAttributedString(string: "1", attributes: [.accessibilitySpeechLanguage: "en-US"])
+        view.applyAccessibility(.init([control]) {}, mergeInteractiveSingleChild: false)
+        XCTAssertEqual(view.accessibilityValue, Accessibility.ToggleValue.on.description)
+        XCTAssertEqual(view.accessibilityAttributedValue?.attribute(.accessibilitySpeechLanguage, at: 0, effectiveRange: nil) as? String, "en-US")
     }
 
     func test_action_aggregation() {
