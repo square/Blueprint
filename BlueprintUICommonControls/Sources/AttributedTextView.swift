@@ -7,7 +7,7 @@ import UIKit
 public struct AttributedTextView: UIViewElement {
     public var attributedText: NSAttributedString
     public var isSelectable = true
-    /// Data to detect as native links. Detection is disabled by default.
+    /// Data to detect as native links. UIKit requires selection for detection; disabled by default.
     public var linkDetectionTypes: Set<TextLinkDetectionType> = []
     public var numberOfLines = 0
     public var shadow: TextShadow?

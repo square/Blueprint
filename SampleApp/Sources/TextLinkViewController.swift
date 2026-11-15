@@ -101,6 +101,9 @@ final class TextLinkViewController: UIViewController {
             caption("TextView selection is \(selectionEnabled ? "enabled: try selecting and copying" : "disabled: explicit links remain interactive"). Try long-press link menus, VoiceOver, larger text, and dark appearance.")
             for example in Example.allCases {
                 heading(example.rawValue)
+                if example == .detected {
+                    caption("TextView’s native detection requires selection. Explicit attributed links work with selection off.")
+                }
                 if renderer != 2 {
                     caption("AttributedLabel" + ([Example.links, .detected].contains(example) ? " — legacy link support" : ""))
                     specimen(example, textView: false)

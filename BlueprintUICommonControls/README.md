@@ -15,7 +15,8 @@ Label-specific link APIs are deprecated starting with iOS 17; use `AttributedTex
 for links. The shared `.onLinkTapped` and URL-handler environment APIs remain supported.
 Both controls use `Set<TextLinkDetectionType>` for `linkDetectionTypes`; supported
 cases are `.link`, `.phoneNumber`, `.address`, and `.date`. TextView uses native
-data detectors, with detection disabled by default. The old nested
+data detectors, with detection disabled by default. UIKit requires selection to
+detect links; explicit `.link` attributes work with selection disabled. The old nested
 `AttributedLabel.LinkDetectionType` name remains as a deprecated alias.
 
 ```swift
