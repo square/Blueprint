@@ -67,8 +67,8 @@ public struct AccessibilityDeferral {
             case .inherited(let importance):
                 return inheritedAccessibility?.makeContent(importance: importance)
             case .error:
-                guard let inheritedAccessibility else { return nil }
-                let value = [inheritedAccessibility.label, inheritedAccessibility.value].joinedAccessibilityText()
+                guard let inherited = inheritedAccessibility?.makeContent(importance: .high) else { return nil }
+                let value = [inherited.attributedLabel, inherited.attributedValue].joinedAccessibilityText()
                 let content = AXCustomContent(
                     attributedLabel: NSAttributedString(string: LocalizedStrings.Accessibility.errorTitle),
                     attributedValue: value ?? NSAttributedString(string: "")

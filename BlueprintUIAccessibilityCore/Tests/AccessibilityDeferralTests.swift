@@ -18,6 +18,9 @@ class AccessibilityDeferralTests: XCTestCase {
         expected.append(value)
         XCTAssertEqual(content.customContent?.attributedValue, expected)
         XCTAssertEqual(content.customContent?.importance, .high)
+        element.accessibilityCustomActions = [UIAccessibilityCustomAction(name: "Terms") { _ in true }]
+        content.inheritedAccessibility = .init([element]) {}
+        XCTAssertNil(content.customContent)
     }
 
     // MARK: - CompositeRepresentation.merge chaining
