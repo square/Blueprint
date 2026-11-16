@@ -45,13 +45,17 @@ inside a scrolling container. Callers supply the text's fonts and other
 attributes, including updated fonts when Dynamic Type changes. The public
 `AttributedTextView.View` provides the same UIKit implementation for other hosts.
 
-Selection is enabled by default. Disabling it keeps native link activation and
+Selection is enabled by default. Disabling it keeps native link interaction and
 menus available through the text-item delegate API.
 
 Configure `numberOfLines` (zero means unlimited), `textRectOffset`, `shadow`,
 single-line font fitting, tightening, and explicit accessibility properties on
 the element. Paragraph styles supply alignment and line-break behavior. These
 settings apply during both measurement and display and reset on reused views.
+Accessibility traits are added to UIKit's native traits, so heading styles retain
+native link semantics. UI tests compare public accessibility activation against an
+equivalently configured UIKit control and check touch interaction separately.
+
 `isAccessibilityElement` defaults to `nil` to preserve native paragraph navigation;
 `true` groups the content into one element and `false` hides its accessibility.
 Single-line fitting scales the supplied fonts proportionally; UIKit's label and

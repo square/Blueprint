@@ -17,15 +17,49 @@ final class AttributedTextViewInteractionTests: XCTestCase {
         XCTAssertEqual(app.staticTexts["result"].label, "Handler 2: https://example.com/terms")
     }
 
-    func test_combinedSingleLinkRetainsNativeActivation() throws {
+    func test_combinedSingleLinkRetainsTouchInteractionWithHeader() throws {
         try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
         let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
-        app.launchArguments = ["-attributed-text-view", "-single-link", "-label-role", "-combine"]
-        app.launch()
-        let link = app.links["composed"]
-        XCTAssertTrue(link.waitForExistence(timeout: 5))
-        link.tap()
-        XCTAssertEqual(app.staticTexts["result"].label, "Handler 1: https://example.com/terms")
+        for extra in [[], ["-heading"]] {
+            app.launchArguments = ["-attributed-text-view", "-single-link", "-label-role", "-combine"] + extra
+            app.launch()
+            let link = app.descendants(matching: .any)["composed"]
+            XCTAssertTrue(link.waitForExistence(timeout: 5))
+            link.tap()
+            XCTAssertEqual(app.staticTexts["result"].label, "Handler 1: https://example.com/terms")
+        }
+    }
+
+    func test_combinedLinkAccessibilityActivationMatchesUIKitWithHeader() throws {
+        try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
+        let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
+        for heading in [false, true] {
+            var outcomes: [String] = []
+            for reference in [true, false] {
+                app.launchArguments = ["-attributed-text-view", "-single-link", "-label-role", "-combine"]
+                    + (heading ? ["-heading"] : []) + (reference ? ["-uikit-reference"] : [])
+                app.launch()
+                let link = app.descendants(matching: .any)["composed"]
+                XCTAssertTrue(link.waitForExistence(timeout: 5))
+                app.buttons["Activate accessibility"].tap()
+                let result = app.staticTexts["result"]
+                XCTAssertNotEqual(result.label, "Ready")
+                outcomes.append(result.label)
+                if result.label.hasPrefix("Native fallback") {
+                    XCTAssertEqual(result.label, "Native fallback; link=true; header=\(heading)")
+                    link.tap()
+                    XCTAssertEqual(
+                        result.label,
+                        "Handler 1: https://example.com/terms",
+                        "Reference: \(reference), heading: \(heading)"
+                    )
+                } else {
+                    XCTAssertEqual(result.label, "Handler 1: https://example.com/terms")
+                }
+            }
+            // A false native result leaves activation to UIKit's fallback; touch is tested separately.
+            XCTAssertEqual(outcomes[0], outcomes[1], "Heading: \(heading)")
+        }
     }
 
     func test_combinedTextUsesItsRoleAndPreservesExplicitValues() throws {

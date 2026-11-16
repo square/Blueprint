@@ -32,6 +32,7 @@ public struct AttributedTextView: UIViewElement {
         case label, value, hint
     }
 
+    /// Additional traits, merged with UIKit's native text and link traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
     public var accessibilityLabel: String?
     public var accessibilityValue: String?
@@ -54,7 +55,7 @@ public struct AttributedTextView: UIViewElement {
     final class TextView: UITextView, AccessibilityComposition.TextProviding {
         var textAccessibilityRole: TextAccessibilityRole?
         var accessibilityElementOverride: Bool?
-        var accessibilityTraitsOverride: UIAccessibilityTraits?
+        var additionalAccessibilityTraits: UIAccessibilityTraits = []
 
         override var isAccessibilityElement: Bool {
             get { accessibilityElementOverride ?? super.isAccessibilityElement }
@@ -62,7 +63,7 @@ public struct AttributedTextView: UIViewElement {
         }
 
         override var accessibilityTraits: UIAccessibilityTraits {
-            get { accessibilityTraitsOverride ?? super.accessibilityTraits }
+            get { super.accessibilityTraits.union(additionalAccessibilityTraits) }
             set { super.accessibilityTraits = newValue }
         }
 
@@ -208,7 +209,7 @@ public struct AttributedTextView: UIViewElement {
             textView.accessibilityElementOverride = model.isAccessibilityElement
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
             accessibilityElements = model.isAccessibilityElement == false ? [] : [textView]
-            textView.accessibilityTraitsOverride = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:))
+            textView.additionalAccessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? []
             textView.textAccessibilityRole = model.textAccessibilityRole
             textView.accessibilityLabel = model.accessibilityLabel
             textView.accessibilityValue = model.accessibilityValue
