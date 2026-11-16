@@ -25,7 +25,7 @@ struct AttributedTextViewTests {
         #expect(view.accessibilityElements?.first as? UITextView === view.textView)
     }
 
-    @Test func `Link detection maps shared types and resets on reuse`() {
+    @Test func `Shared detection types map to UIKit and Foundation`() {
         guard #available(iOS 17.0, *) else { return }
         let url = URL(string: "https://example.com")!
         var model = AttributedTextView(attributedText: NSAttributedString(string: "Text", attributes: [.link: url]))
@@ -58,7 +58,7 @@ struct AttributedTextViewTests {
         #expect(view.sizeThatFits(CGSize(width: 200, height: CGFloat.infinity)) == .zero)
     }
 
-    @Test func `Selection can be disabled without removing native links`() {
+    @Test func `Disabling selection preserves explicit link attributes and disables copying`() {
         guard #available(iOS 17.0, *) else { return }
         let url = URL(string: "https://example.com")!
         let model = AttributedTextView(attributedText: NSAttributedString(string: "Help", attributes: [.link: url])) {
@@ -69,9 +69,6 @@ struct AttributedTextViewTests {
         #expect(!view.textView.isSelectable)
         #expect(!view.textView.canPerformAction(#selector(UIResponderStandardEditActions.copy(_:)), withSender: nil))
         #expect(view.textView.attributedText.attribute(.link, at: 0, effectiveRange: nil) as? URL == url)
-        #expect(view.responds(to: #selector(UITextViewDelegate.textView(_:primaryActionFor:defaultAction:))))
-        #expect(view.responds(to: #selector(UITextViewDelegate.textView(_:menuConfigurationFor:defaultMenu:))))
-        #expect(!view.responds(to: NSSelectorFromString("textView:shouldInteractWithURL:inRange:interaction:")))
     }
 
     @Test func `Line limits constrain measured content`() {

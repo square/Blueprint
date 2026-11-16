@@ -1,3 +1,5 @@
+import BlueprintUI
+import BlueprintUICommonControls
 import UIKit
 
 @UIApplicationMain
@@ -13,10 +15,70 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UIViewController()
+        if #available(iOS 17.0, *), ProcessInfo.processInfo.arguments.contains("-attributed-text-view") {
+            window?.rootViewController = AttributedTextViewTestController()
+        }
         window?.makeKeyAndVisible()
 
         return true
     }
 
+}
+
+@available(iOS 17.0, *)
+private final class AttributedTextViewTestController: UIViewController {
+    private let blueprint = BlueprintView()
+    private let result = UILabel()
+    private var handler = 1
+    private var detectsLinks = ProcessInfo.processInfo.arguments.contains("-detect-links")
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        result.accessibilityIdentifier = "result"
+        result.numberOfLines = 0
+        result.text = "Ready"
+        result.frame = CGRect(x: 20, y: 80, width: 300, height: 70)
+        view.addSubview(result)
+        blueprint.frame = CGRect(x: 20, y: 160, width: 300, height: 120)
+        view.addSubview(blueprint)
+        for (index, title) in ["Replace handler", "Disable detection"].enumerated() {
+            let button = UIButton(type: .system)
+            button.setTitle(title, for: .normal)
+            button.frame = CGRect(x: 20, y: CGFloat(300 + index * 60), width: 300, height: 44)
+            button.addAction(UIAction { [weak self] _ in
+                guard let self else { return }
+                if index == 0 { handler += 1 } else { detectsLinks = false }
+                update()
+            }, for: .touchUpInside)
+            view.addSubview(button)
+        }
+        update()
+    }
+
+    private func update() {
+        let detectionCase = ProcessInfo.processInfo.arguments.contains("-detect-links")
+        let detectsDate = ProcessInfo.processInfo.arguments.contains("-detect-dates")
+        let text = NSMutableAttributedString(
+            string: detectionCase
+                ? "Terms " + (detectsDate ? "January 15, 2030 at 10 AM" : "https://example.com/detected")
+                : "Terms Privacy",
+            attributes: [.font: UIFont.systemFont(ofSize: 20), .foregroundColor: UIColor.label]
+        )
+        for title in detectionCase ? ["Terms"] : ["Terms", "Privacy"] {
+            text.addAttribute(
+                .link,
+                value: URL(string: "https://example.com/" + title.lowercased())!,
+                range: (text.string as NSString).range(of: title)
+            )
+        }
+        let currentHandler = handler
+        blueprint.element = AttributedTextView(attributedText: text) {
+            $0.isSelectable = detectionCase
+            $0.linkDetectionTypes = detectsLinks ? [detectsDate ? .date : .link] : []
+        }.onLinkTapped { [weak self] url in
+            self?.result.text = "Handler \(currentHandler): \(url.absoluteString)"
+        }
+    }
 }
 
