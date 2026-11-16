@@ -5,6 +5,26 @@ import UIKit
 
 @MainActor
 struct AttributedTextViewTests {
+    @Test func `The wrapper exposes the native control as its accessibility container child`() throws {
+        guard #available(iOS 17.0, *) else { return }
+        var model = AttributedTextView(attributedText: NSAttributedString(string: "First\nSecond")) {
+            $0.isSelectable = false
+        }
+        let view = model.makeUIView()
+        view.update(model)
+        let children = try #require(view.accessibilityElements)
+        #expect(children.count == 1)
+        #expect(children.first as? UITextView === view.textView)
+        #expect(!view.textView.isAccessibilityElement)
+        #expect(!view.textView.accessibilityElementsHidden)
+        model.isAccessibilityElement = false
+        view.update(model)
+        #expect(view.accessibilityElements?.isEmpty == true)
+        model.isAccessibilityElement = nil
+        view.update(model)
+        #expect(view.accessibilityElements?.first as? UITextView === view.textView)
+    }
+
     @Test func `Link detection maps shared types and resets on reuse`() {
         guard #available(iOS 17.0, *) else { return }
         let url = URL(string: "https://example.com")!

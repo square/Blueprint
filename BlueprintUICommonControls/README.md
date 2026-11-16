@@ -58,8 +58,8 @@ Single-line fitting scales the supplied fonts proportionally; UIKit's label and
 text-view engines can still differ in rounding, underlines, and pressed links.
 
 `accessibilityCombine()` carries attributed labels, values, and hints through
-composition, including link and speech attributes. It uses a text view's full
-attributed content when combining; uncombined text views retain native paragraph
+composition, including link and speech attributes. It reads native attributed
+accessibility values when combining; uncombined text views retain native paragraph
 navigation. Existing string-based accessibility setters convert at entry.
 Direct users of `AccessibilityComposition.CompositeRepresentation` now supply
 `NSAttributedString` for its `label`, `value`, and `hint` properties.

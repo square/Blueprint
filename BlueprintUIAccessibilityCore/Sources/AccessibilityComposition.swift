@@ -70,15 +70,8 @@ extension AccessibilityComposition {
                     labels.append(label)
                 }
 
-                if let value = element.accessibilityAttributedValue {
+                if let value = element.accessibilityAttributedValue ?? element.accessibilityValue.map(NSAttributedString.init(string:)) {
                     values.append(value)
-                } else if let textView = element as? UITextView,
-                          element.accessibilityValue == nil || element.accessibilityValue == textView.attributedText?.string,
-                          let text = textView.attributedText
-                {
-                    values.append(text)
-                } else if let value = element.accessibilityValue {
-                    values.append(NSAttributedString(string: value))
                 }
 
                 if let hint = element.accessibilityAttributedHint ?? element.accessibilityHint.map(NSAttributedString.init(string:)) {
@@ -226,7 +219,7 @@ extension AccessibilityComposition {
 
             func boolInteraction(_ action: UIAccessibilityCustomAction?) -> (() -> Bool)? {
                 guard let action else { return nil }
-                return { return action.activate() }
+                return { action.activate() }
             }
             func voidInteraction(_ action: UIAccessibilityCustomAction?) -> (() -> Void)? {
                 guard let action else { return nil }
@@ -711,9 +704,6 @@ extension UIView {
         let elements = subviews.flatMap { subview -> [NSObject] in
             if subview.accessibilityElementsHidden || subview.isHidden {
                 return []
-            } else if subview is UITextView {
-                // Combining uses the control's attributed content; UIKit owns its native paragraph elements.
-                return [subview]
             } else if let accessibilityElements = subview.accessibilityElements {
                 return accessibilityElements.compactMap { $0 as? NSObject }
             } else if subview.isAccessibilityElement {
@@ -880,7 +870,10 @@ extension UIAccessibilityTraits {
     func interpret(value: NSAttributedString?) -> NSAttributedString? {
         if let value, contains(.init(with: [.toggleButton])), let toggleValue = Accessibility.ToggleValue(string: value.string) {
             let interpreted = NSMutableAttributedString(attributedString: value)
-            interpreted.replaceCharacters(in: NSRange(location: 0, length: interpreted.length), with: toggleValue.description)
+            interpreted.replaceCharacters(
+                in: NSRange(location: 0, length: interpreted.length),
+                with: toggleValue.description
+            )
             return interpreted
         }
         return value

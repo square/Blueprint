@@ -65,6 +65,7 @@ public struct AttributedTextView: UIViewElement {
             nativeTraits = textView.accessibilityTraits
             nativeIsAccessibilityElement = textView.isAccessibilityElement
             addSubview(textView)
+            accessibilityElements = [textView]
         }
 
         @available(*, unavailable)
@@ -108,6 +109,7 @@ public struct AttributedTextView: UIViewElement {
 
             textView.isAccessibilityElement = model.isAccessibilityElement ?? nativeIsAccessibilityElement
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
+            accessibilityElements = model.isAccessibilityElement == false ? [] : [textView]
             textView.accessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? nativeTraits
             textView.accessibilityLabel = model.accessibilityLabel
             textView.accessibilityValue = model.accessibilityValue
