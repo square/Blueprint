@@ -25,8 +25,8 @@ public struct AttributedTextView: UIViewElement {
     /// Defaults to UIKit's native paragraph accessibility; set `true` to expose one element.
     public var isAccessibilityElement: Bool?
     /// Which property receives UIKit's native attributed text when accessibility is combined.
-    /// Defaults to `.value`, matching UITextView. Standalone paragraph and link navigation stay native.
-    public var textAccessibilityRole: TextAccessibilityRole = .value
+    /// When nil, keeps UIKit's label/value placement. Standalone paragraph and link navigation stay native.
+    public var textAccessibilityRole: TextAccessibilityRole?
 
     public enum TextAccessibilityRole: Equatable {
         case label, value, hint
@@ -52,7 +52,20 @@ public struct AttributedTextView: UIViewElement {
     }
 
     final class TextView: UITextView, AccessibilityComposition.TextProviding {
-        var textAccessibilityRole: TextAccessibilityRole = .value
+        var textAccessibilityRole: TextAccessibilityRole?
+        var accessibilityElementOverride: Bool?
+        var accessibilityTraitsOverride: UIAccessibilityTraits?
+
+        override var isAccessibilityElement: Bool {
+            get { accessibilityElementOverride ?? super.isAccessibilityElement }
+            set { super.isAccessibilityElement = newValue }
+        }
+
+        override var accessibilityTraits: UIAccessibilityTraits {
+            get { accessibilityTraitsOverride ?? super.accessibilityTraits }
+            set { super.accessibilityTraits = newValue }
+        }
+
         private var labelOverride: NSAttributedString?
         private var valueOverride: NSAttributedString?
         private var hintOverride: NSAttributedString?
@@ -63,24 +76,38 @@ public struct AttributedTextView: UIViewElement {
             readingNativeAccessibility = true
             defer { readingNativeAccessibility = false }
             switch role {
-            case .label: return super.accessibilityAttributedLabel
-            case .value: return super.accessibilityAttributedValue
-            case .hint: return super.accessibilityAttributedHint
+            case .label: return super.accessibilityAttributedLabel ?? super.accessibilityLabel.map(NSAttributedString.init(string:))
+            case .value: return super.accessibilityAttributedValue ?? super.accessibilityValue.map(NSAttributedString.init(string:))
+            case .hint: return super.accessibilityAttributedHint ?? super.accessibilityHint.map(NSAttributedString.init(string:))
             }
         }
 
+        private var nativeContent: NSAttributedString? {
+            nativeText(for: .value) ?? nativeText(for: .label)
+        }
+
         var accessibilityCompositionText: AccessibilityComposition.Text {
-            AccessibilityComposition.Text(
-                label: labelOverride ?? nativeText(for: textAccessibilityRole == .label ? .value : .label),
-                value: valueOverride ?? (textAccessibilityRole == .value ? nativeText(for: .value) : nil),
-                hint: hintOverride ?? nativeText(for: textAccessibilityRole == .hint ? .value : .hint)
+            var text = AccessibilityComposition.Text(
+                label: nativeText(for: .label),
+                value: nativeText(for: .value),
+                hint: nativeText(for: .hint)
             )
+            if let textAccessibilityRole {
+                let content = text.value ?? text.label
+                text.label = textAccessibilityRole == .label ? content : nil
+                text.value = textAccessibilityRole == .value ? content : nil
+                if textAccessibilityRole == .hint { text.hint = content }
+            }
+            text.label = labelOverride ?? text.label
+            text.value = valueOverride ?? text.value
+            text.hint = hintOverride ?? text.hint
+            return text
         }
 
         override var accessibilityAttributedLabel: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedLabel }
-                return labelOverride ?? nativeText(for: valueOverride != nil && textAccessibilityRole == .label ? .value : .label)
+                return labelOverride ?? (valueOverride != nil && textAccessibilityRole == .label ? nativeContent : nativeText(for: .label))
             }
             set { labelOverride = newValue }
         }
@@ -126,8 +153,6 @@ public struct AttributedTextView: UIViewElement {
         private var adjustsFontSizeToFitWidth = false
         private var minimumScaleFactor: CGFloat = 0
         private var fittingWidth: CGFloat?
-        private var nativeTraits: UIAccessibilityTraits = []
-        private var nativeIsAccessibilityElement = false
 
         public init() {
             super.init(frame: .zero)
@@ -137,8 +162,6 @@ public struct AttributedTextView: UIViewElement {
             textView.textContainerInset = .zero
             textView.textContainer.lineFragmentPadding = 0
             textView.delegate = self
-            nativeTraits = textView.accessibilityTraits
-            nativeIsAccessibilityElement = textView.isAccessibilityElement
             addSubview(textView)
             accessibilityElements = [textView]
         }
@@ -182,10 +205,10 @@ public struct AttributedTextView: UIViewElement {
             fittingWidth = nil
             applyText(fitting: bounds.width, force: detectionChanged)
 
-            textView.isAccessibilityElement = model.isAccessibilityElement ?? nativeIsAccessibilityElement
+            textView.accessibilityElementOverride = model.isAccessibilityElement
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
             accessibilityElements = model.isAccessibilityElement == false ? [] : [textView]
-            textView.accessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? nativeTraits
+            textView.accessibilityTraitsOverride = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:))
             textView.textAccessibilityRole = model.textAccessibilityRole
             textView.accessibilityLabel = model.accessibilityLabel
             textView.accessibilityValue = model.accessibilityValue

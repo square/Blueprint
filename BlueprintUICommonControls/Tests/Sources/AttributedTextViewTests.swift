@@ -144,8 +144,6 @@ struct AttributedTextViewTests {
             $0.allowsDefaultTighteningForTruncation = true
         }
         let view = model.makeUIView()
-        let nativeTraits = view.textView.accessibilityTraits
-        let nativeIsAccessibilityElement = view.textView.isAccessibilityElement
         view.update(model)
         #expect(view.textView.accessibilityElementsHidden)
         #expect(view.textView.layer.shadowOpacity == 0.5)
@@ -154,13 +152,15 @@ struct AttributedTextViewTests {
         #expect(view.textView.isAccessibilityElement)
         model = AttributedTextView(attributedText: NSAttributedString(string: "New body"))
         view.update(model)
+        let fresh = model.makeUIView()
+        fresh.update(model)
         #expect(!view.textView.accessibilityElementsHidden)
-        #expect(view.textView.isAccessibilityElement == nativeIsAccessibilityElement)
+        #expect(view.textView.isAccessibilityElement == fresh.textView.isAccessibilityElement)
         #expect(view.textView.accessibilityLabel == nil)
         #expect(view.textView.accessibilityValue == nil)
         #expect(view.textView.accessibilityHint == nil)
         #expect(view.textView.accessibilityIdentifier == nil)
-        #expect(view.textView.accessibilityTraits == nativeTraits)
+        #expect(view.textView.accessibilityTraits == fresh.textView.accessibilityTraits)
         #expect(view.textView.layer.shadowOpacity == 0)
         #expect(!view.textView.layer.shouldRasterize)
         #expect((view.textView.attributedText.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?.allowsDefaultTighteningForTruncation == false)

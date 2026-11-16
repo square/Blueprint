@@ -65,6 +65,9 @@ private final class AttributedTextViewTestController: UIViewController {
                 : "Terms Privacy",
             attributes: [.font: UIFont.systemFont(ofSize: 20), .foregroundColor: UIColor.label]
         )
+        if ProcessInfo.processInfo.arguments.contains("-single-link") {
+            text.mutableString.setString("Terms")
+        }
         if ProcessInfo.processInfo.arguments.contains("-native-list") {
             let paragraph = NSMutableParagraphStyle()
             paragraph.textLists = [NSTextList(markerFormat: .disc, options: 0)]
@@ -99,5 +102,6 @@ private final class AttributedTextViewTestController: UIViewController {
         blueprint.element = ProcessInfo.processInfo.arguments.contains("-combine")
             ? element.accessibility(identifier: "composed") : element
     }
+
 }
 

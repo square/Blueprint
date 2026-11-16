@@ -17,6 +17,17 @@ final class AttributedTextViewInteractionTests: XCTestCase {
         XCTAssertEqual(app.staticTexts["result"].label, "Handler 2: https://example.com/terms")
     }
 
+    func test_combinedSingleLinkRetainsNativeActivation() throws {
+        try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
+        let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
+        app.launchArguments = ["-attributed-text-view", "-single-link", "-label-role", "-combine"]
+        app.launch()
+        let link = app.links["composed"]
+        XCTAssertTrue(link.waitForExistence(timeout: 5))
+        link.tap()
+        XCTAssertEqual(app.staticTexts["result"].label, "Handler 1: https://example.com/terms")
+    }
+
     func test_combinedTextUsesItsRoleAndPreservesExplicitValues() throws {
         try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
         let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
@@ -24,6 +35,7 @@ final class AttributedTextViewInteractionTests: XCTestCase {
             (["-label-role"], "Terms Privacy", ""),
             ([], "", "Terms Privacy"),
             (["-label-role", "-explicit-value"], "Terms Privacy", "42 dollars"),
+            (["-label-role", "-single-link"], "Terms", ""),
         ] {
             app.launchArguments = ["-attributed-text-view", "-combine"] + arguments
             app.launch()
