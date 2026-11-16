@@ -6,6 +6,24 @@ import UIKit.UIAccessibilityIdentification
 public struct AccessibilityComposition {
     public typealias Filter = (NSObject) -> Bool
     public typealias Sorting = (NSObject, NSObject) -> Bool
+
+    /// Attributed content to use when composing an element with its siblings.
+    public struct Text {
+        public var label: NSAttributedString?
+        public var value: NSAttributedString?
+        public var hint: NSAttributedString?
+
+        public init(label: NSAttributedString?, value: NSAttributedString?, hint: NSAttributedString?) {
+            self.label = label
+            self.value = value
+            self.hint = hint
+        }
+    }
+
+    /// Supplies composition semantics without changing a control's native accessibility navigation.
+    public protocol TextProviding {
+        var accessibilityCompositionText: Text { get }
+    }
 }
 
 
@@ -66,15 +84,20 @@ extension AccessibilityComposition {
                     }
                 }
 
-                if let label = element.accessibilityAttributedLabel ?? element.accessibilityLabel.map(NSAttributedString.init(string:)) {
+                let text = (element as? TextProviding)?.accessibilityCompositionText ?? Text(
+                    label: element.accessibilityAttributedLabel ?? element.accessibilityLabel.map(NSAttributedString.init(string:)),
+                    value: element.accessibilityAttributedValue ?? element.accessibilityValue.map(NSAttributedString.init(string:)),
+                    hint: element.accessibilityAttributedHint ?? element.accessibilityHint.map(NSAttributedString.init(string:))
+                )
+                if let label = text.label {
                     labels.append(label)
                 }
 
-                if let value = element.accessibilityAttributedValue ?? element.accessibilityValue.map(NSAttributedString.init(string:)) {
+                if let value = text.value {
                     values.append(value)
                 }
 
-                if let hint = element.accessibilityAttributedHint ?? element.accessibilityHint.map(NSAttributedString.init(string:)) {
+                if let hint = text.hint {
                     hints.append(hint)
                 }
 

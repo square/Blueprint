@@ -166,6 +166,30 @@ struct AttributedTextViewTests {
         #expect((view.textView.attributedText.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)?.allowsDefaultTighteningForTruncation == false)
     }
 
+    @Test func `Accessibility roles preserve explicit overrides and clear them on reuse`() {
+        guard #available(iOS 17.0, *) else { return }
+        let view = AttributedTextView.View()
+        for role in [AttributedTextView.TextAccessibilityRole.label, .value, .hint] {
+            var model = AttributedTextView(attributedText: NSAttributedString(string: "Body")) {
+                $0.textAccessibilityRole = role
+                $0.accessibilityLabel = "Label override"
+                $0.accessibilityValue = "Value override"
+                $0.accessibilityHint = "Hint override"
+            }
+            view.update(model)
+            #expect(view.textView.accessibilityAttributedLabel?.string == "Label override")
+            #expect(view.textView.accessibilityAttributedValue?.string == "Value override")
+            #expect(view.textView.accessibilityAttributedHint?.string == "Hint override")
+            model.accessibilityLabel = nil
+            model.accessibilityValue = nil
+            model.accessibilityHint = nil
+            view.update(model)
+            #expect(view.textView.accessibilityLabel != "Label override")
+            #expect(view.textView.accessibilityValue != "Value override")
+            #expect(view.textView.accessibilityHint != "Hint override")
+        }
+    }
+
     @Test func `Native list attributes survive and the view remains in TextKit 2`() {
         guard #available(iOS 17.0, *) else { return }
         let list = NSTextList(markerFormat: .decimal, options: 0)

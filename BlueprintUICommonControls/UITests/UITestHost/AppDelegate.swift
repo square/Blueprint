@@ -65,20 +65,39 @@ private final class AttributedTextViewTestController: UIViewController {
                 : "Terms Privacy",
             attributes: [.font: UIFont.systemFont(ofSize: 20), .foregroundColor: UIColor.label]
         )
+        if ProcessInfo.processInfo.arguments.contains("-native-list") {
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.textLists = [NSTextList(markerFormat: .disc, options: 0)]
+            text.setAttributedString(NSAttributedString(
+                string: "First item\nSecond item\nThird item",
+                attributes: [.font: UIFont.systemFont(ofSize: 20), .paragraphStyle: paragraph]
+            ))
+        }
         for title in detectionCase ? ["Terms"] : ["Terms", "Privacy"] {
+            let range = (text.string as NSString).range(of: title)
+            guard range.location != NSNotFound else { continue }
             text.addAttribute(
                 .link,
                 value: URL(string: "https://example.com/" + title.lowercased())!,
-                range: (text.string as NSString).range(of: title)
+                range: range
             )
         }
         let currentHandler = handler
-        blueprint.element = AttributedTextView(attributedText: text) {
+        let element = AttributedTextView(attributedText: text) {
             $0.isSelectable = detectionCase
+            if ProcessInfo.processInfo.arguments.contains("-label-role") {
+                $0.textAccessibilityRole = .label
+            }
+            if ProcessInfo.processInfo.arguments.contains("-explicit-value") {
+                $0.accessibilityValue = "42 dollars"
+                $0.isAccessibilityElement = true
+            }
             $0.linkDetectionTypes = detectsLinks ? [detectsDate ? .date : .link] : []
         }.onLinkTapped { [weak self] url in
             self?.result.text = "Handler \(currentHandler): \(url.absoluteString)"
         }
+        blueprint.element = ProcessInfo.processInfo.arguments.contains("-combine")
+            ? element.accessibility(identifier: "composed") : element
     }
 }
 

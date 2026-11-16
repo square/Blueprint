@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import UIKit
 
 /// Displays read-only attributed text using TextKit 2 and native text accessibility.
@@ -23,6 +24,14 @@ public struct AttributedTextView: UIViewElement {
 
     /// Defaults to UIKit's native paragraph accessibility; set `true` to expose one element.
     public var isAccessibilityElement: Bool?
+    /// Which property receives UIKit's native attributed text when accessibility is combined.
+    /// Defaults to `.value`, matching UITextView. Standalone paragraph and link navigation stay native.
+    public var textAccessibilityRole: TextAccessibilityRole = .value
+
+    public enum TextAccessibilityRole: Equatable {
+        case label, value, hint
+    }
+
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
     public var accessibilityLabel: String?
     public var accessibilityValue: String?
@@ -42,9 +51,75 @@ public struct AttributedTextView: UIViewElement {
         if context.isMeasuring { view.textView.accessibilityCustomActions = nil }
     }
 
+    final class TextView: UITextView, AccessibilityComposition.TextProviding {
+        var textAccessibilityRole: TextAccessibilityRole = .value
+        private var labelOverride: NSAttributedString?
+        private var valueOverride: NSAttributedString?
+        private var hintOverride: NSAttributedString?
+        private var readingNativeAccessibility = false
+
+        private func nativeText(for role: TextAccessibilityRole) -> NSAttributedString? {
+            // UIKit's attributed getters can call its String getters.
+            readingNativeAccessibility = true
+            defer { readingNativeAccessibility = false }
+            switch role {
+            case .label: return super.accessibilityAttributedLabel
+            case .value: return super.accessibilityAttributedValue
+            case .hint: return super.accessibilityAttributedHint
+            }
+        }
+
+        var accessibilityCompositionText: AccessibilityComposition.Text {
+            AccessibilityComposition.Text(
+                label: labelOverride ?? nativeText(for: textAccessibilityRole == .label ? .value : .label),
+                value: valueOverride ?? (textAccessibilityRole == .value ? nativeText(for: .value) : nil),
+                hint: hintOverride ?? nativeText(for: textAccessibilityRole == .hint ? .value : .hint)
+            )
+        }
+
+        override var accessibilityAttributedLabel: NSAttributedString? {
+            get {
+                if readingNativeAccessibility { return super.accessibilityAttributedLabel }
+                return labelOverride ?? nativeText(for: valueOverride != nil && textAccessibilityRole == .label ? .value : .label)
+            }
+            set { labelOverride = newValue }
+        }
+
+        override var accessibilityAttributedValue: NSAttributedString? {
+            get {
+                if readingNativeAccessibility { return super.accessibilityAttributedValue }
+                return valueOverride ?? nativeText(for: .value)
+            }
+            set { valueOverride = newValue }
+        }
+
+        override var accessibilityAttributedHint: NSAttributedString? {
+            get {
+                if readingNativeAccessibility { return super.accessibilityAttributedHint }
+                return hintOverride ?? nativeText(for: .hint)
+            }
+            set { hintOverride = newValue }
+        }
+
+        override var accessibilityLabel: String? {
+            get { readingNativeAccessibility ? super.accessibilityLabel : accessibilityAttributedLabel?.string }
+            set { labelOverride = newValue.map(NSAttributedString.init(string:)) }
+        }
+
+        override var accessibilityValue: String? {
+            get { readingNativeAccessibility ? super.accessibilityValue : accessibilityAttributedValue?.string }
+            set { valueOverride = newValue.map(NSAttributedString.init(string:)) }
+        }
+
+        override var accessibilityHint: String? {
+            get { readingNativeAccessibility ? super.accessibilityHint : accessibilityAttributedHint?.string }
+            set { hintOverride = newValue.map(NSAttributedString.init(string:)) }
+        }
+    }
+
     /// The shared UIKit implementation, also suitable for hosting outside Blueprint.
     public final class View: UIView, UITextViewDelegate {
-        let textView = UITextView(usingTextLayoutManager: true)
+        let textView = TextView(usingTextLayoutManager: true)
         private var onLinkTap: ((URL) -> Void)?
         private var textRectOffset: UIOffset = .zero
         private var sourceText = NSAttributedString(string: "")
@@ -111,6 +186,7 @@ public struct AttributedTextView: UIViewElement {
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
             accessibilityElements = model.isAccessibilityElement == false ? [] : [textView]
             textView.accessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? nativeTraits
+            textView.textAccessibilityRole = model.textAccessibilityRole
             textView.accessibilityLabel = model.accessibilityLabel
             textView.accessibilityValue = model.accessibilityValue
             textView.accessibilityHint = model.accessibilityHint
