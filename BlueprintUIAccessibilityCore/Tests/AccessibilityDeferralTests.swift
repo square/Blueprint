@@ -8,7 +8,10 @@ class AccessibilityDeferralTests: XCTestCase {
     func test_deferred_error_content_preserves_attributed_text() {
         let element = UIAccessibilityElement(accessibilityContainer: NSObject())
         let label = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
-        let value = NSAttributedString(string: "Privacy", attributes: [.link: URL(string: "https://example.com/privacy")!])
+        let value = NSAttributedString(
+            string: "Privacy",
+            attributes: [.link: URL(string: "https://example.com/privacy")!]
+        )
         element.accessibilityAttributedLabel = label
         element.accessibilityAttributedValue = value
         var content = AccessibilityDeferral.Content(kind: .error)
@@ -38,9 +41,9 @@ class AccessibilityDeferralTests: XCTestCase {
                 result.merge(with: value)
             }
 
-        XCTAssertEqual(merged.label?.string, "Label 1, Label 2, Label 3")
-        XCTAssertEqual(merged.value?.string, "Value 1, Value 2, Value 3")
-        XCTAssertEqual(merged.hint?.string, "Hint 1, Hint 2, Hint 3")
+        XCTAssertEqual(merged.label, "Label 1, Label 2, Label 3")
+        XCTAssertEqual(merged.value, "Value 1, Value 2, Value 3")
+        XCTAssertEqual(merged.hint, "Hint 1, Hint 2, Hint 3")
     }
 
     func test_merge_two_representations() {
@@ -49,8 +52,8 @@ class AccessibilityDeferralTests: XCTestCase {
 
         let merged = rep1.merge(with: rep2)
 
-        XCTAssertEqual(merged.label?.string, "First, Second")
-        XCTAssertEqual(merged.value?.string, "A, B")
+        XCTAssertEqual(merged.label, "First, Second")
+        XCTAssertEqual(merged.value, "A, B")
     }
 
     func test_merge_preserves_traits() {
@@ -76,8 +79,8 @@ class AccessibilityDeferralTests: XCTestCase {
         let rep = makeRepresentation(label: "Only", value: "One")
         let merged = rep.merge(with: nil)
 
-        XCTAssertEqual(merged.label?.string, "Only")
-        XCTAssertEqual(merged.value?.string, "One")
+        XCTAssertEqual(merged.label, "Only")
+        XCTAssertEqual(merged.value, "One")
     }
 
     // MARK: - Receiver apply / replace / merge
@@ -92,7 +95,7 @@ class AccessibilityDeferralTests: XCTestCase {
         receiver.apply(content: [content1], frameProvider: nil)
 
         XCTAssertEqual(receiver.deferredAccessibilityContent?.count, 1)
-        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label?.string, "First")
+        XCTAssertEqual(receiver.deferredAccessibilityContent?.first?.inheritedAccessibility?.label, "First")
     }
 
     func test_apply_merges_content_on_same_updateID() {

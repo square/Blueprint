@@ -456,13 +456,13 @@ extension Accessibility.CustomContent.Importance {
 
 extension AccessibilityComposition.CompositeRepresentation {
     fileprivate func makeContent(importance: Accessibility.CustomContent.Importance) -> AXCustomContent? {
-        if let allActions, allActions.contains(where: { $0.name == label?.string }) {
+        if let allActions, allActions.contains(where: { $0.name == label }) {
             return nil
         }
-        guard let contentLabel = label ?? value else { return nil }
+        guard let contentLabel = attributedLabel ?? attributedValue else { return nil }
         let content = AXCustomContent(
             attributedLabel: contentLabel,
-            attributedValue: label == nil ? NSAttributedString(string: "") : value ?? NSAttributedString(string: "")
+            attributedValue: attributedLabel == nil ? NSAttributedString(string: "") : attributedValue ?? NSAttributedString(string: "")
         )
         content.importance = importance.axImportance
         return content

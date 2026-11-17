@@ -5,6 +5,35 @@ import XCTest
 
 class AccessibilityCompositionTests: XCTestCase {
 
+    func test_string_accessors_share_attributed_backing() {
+        let properties: [(
+            WritableKeyPath<AccessibilityComposition.CompositeRepresentation, String?>,
+            WritableKeyPath<AccessibilityComposition.CompositeRepresentation, NSAttributedString?>
+        )] = [
+            (\.label, \.attributedLabel),
+            (\.value, \.attributedValue),
+            (\.hint, \.attributedHint),
+        ]
+        let text = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
+        for (stringProperty, attributedProperty) in properties {
+            var representation = AccessibilityComposition.CompositeRepresentation([]) {}
+            representation[keyPath: attributedProperty] = text
+            XCTAssertEqual(representation[keyPath: stringProperty], "Terms")
+            XCTAssertEqual(representation[keyPath: attributedProperty], text)
+
+            var different = representation
+            different[keyPath: attributedProperty] = NSAttributedString(string: "Terms")
+            XCTAssertNotEqual(representation, different)
+
+            representation[keyPath: stringProperty] = "Replacement"
+            XCTAssertEqual(representation[keyPath: attributedProperty], NSAttributedString(string: "Replacement"))
+            representation[keyPath: stringProperty] = ""
+            XCTAssertEqual(representation[keyPath: attributedProperty], NSAttributedString(string: ""))
+            representation[keyPath: stringProperty] = nil
+            XCTAssertNil(representation[keyPath: attributedProperty])
+        }
+    }
+
     func test_compositionUsesProvidedAttributedTextWithoutNativeFallbacks() {
         final class TextView: UIView, AccessibilityComposition.TextProviding {
             var accessibilityCompositionText = AccessibilityComposition.Text(
@@ -17,7 +46,7 @@ class AccessibilityCompositionTests: XCTestCase {
         view.accessibilityLabel = "Native label"
         view.accessibilityValue = "Native value"
         let combined = AccessibilityComposition.CompositeRepresentation([view], invalidator: {})
-        XCTAssertEqual(combined.label, view.accessibilityCompositionText.label)
+        XCTAssertEqual(combined.attributedLabel, view.accessibilityCompositionText.label)
         XCTAssertNil(combined.value)
         XCTAssertNil(combined.hint)
         XCTAssertEqual(view.accessibilityValue, "Native value")
@@ -169,7 +198,7 @@ class AccessibilityCompositionTests: XCTestCase {
         container.addSubview(wrapper)
         let combined = container.combineChildren()
         XCTAssertEqual(combined.rotors, [nativeRotor])
-        XCTAssertEqual(combined.value, text)
+        XCTAssertEqual(combined.attributedValue, text)
 
         let nested = AccessibilityComposition.CombinableView()
         nested.applyAccessibility(combined)
@@ -198,8 +227,8 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertNil(container.combineChildren().hint)
 
         textView.accessibilityHint = "Explicit guidance"
-        XCTAssertEqual(container.combineChildren().hint?.string, "Explicit guidance")
-        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.hint?.string, "Explicit guidance")
+        XCTAssertEqual(container.combineChildren().hint, "Explicit guidance")
+        XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.hint, "Explicit guidance")
     }
 
     func test_combining_does_not_invent_a_value_from_raw_text() {
@@ -213,8 +242,8 @@ class AccessibilityCompositionTests: XCTestCase {
                 ?? textView.accessibilityValue.map(NSAttributedString.init(string:))
 
             let combined = AccessibilityComposition.CompositeRepresentation([textView]) {}
-            XCTAssertEqual(combined.value, expected)
-            if secure { XCTAssertNotEqual(combined.value?.string, textView.text) }
+            XCTAssertEqual(combined.attributedValue, expected)
+            if secure { XCTAssertNotEqual(combined.value, textView.text) }
         }
     }
 
@@ -246,11 +275,11 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertEqual(view.accessibilityAttributedHint, first.accessibilityAttributedHint)
 
         var override = AccessibilityComposition.CompositeRepresentation([]) {}
-        override.label = NSAttributedString(string: "Override")
-        override.value = NSAttributedString(string: "")
+        override.attributedLabel = NSAttributedString(string: "Override")
+        override.attributedValue = NSAttributedString(string: "")
         view.applyAccessibility(a.merge(with: b).override(with: override))
-        XCTAssertEqual(view.accessibilityAttributedLabel, override.label)
-        XCTAssertEqual(view.accessibilityAttributedValue, override.value)
+        XCTAssertEqual(view.accessibilityAttributedLabel, override.attributedLabel)
+        XCTAssertEqual(view.accessibilityAttributedValue, override.attributedValue)
         view.applyAccessibility(nil)
         XCTAssertNil(view.accessibilityAttributedLabel)
         XCTAssertNil(view.accessibilityAttributedValue)
@@ -267,13 +296,13 @@ class AccessibilityCompositionTests: XCTestCase {
             return element
         }
         let combined = AccessibilityComposition.CompositeRepresentation(elements) {}
-        XCTAssertEqual(combined.label?.string, "Link, Link")
+        XCTAssertEqual(combined.label, "Link, Link")
         XCTAssertEqual(
-            combined.label?.attribute(.link, at: 0, effectiveRange: nil) as? URL,
+            combined.attributedLabel?.attribute(.link, at: 0, effectiveRange: nil) as? URL,
             URL(string: "https://example.com/first")
         )
         XCTAssertEqual(
-            combined.label?.attribute(.link, at: 6, effectiveRange: nil) as? URL,
+            combined.attributedLabel?.attribute(.link, at: 6, effectiveRange: nil) as? URL,
             URL(string: "https://example.com/second")
         )
     }
