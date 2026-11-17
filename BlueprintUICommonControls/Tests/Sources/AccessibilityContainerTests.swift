@@ -5,6 +5,48 @@ import XCTest
 
 class AccessibilityContainerTests: XCTestCase {
 
+    func test_largeContentViewerInteractionIsReusedWhenMovingBetweenWindows() throws {
+        let view = BlueprintView(element: Empty().accessibilityLargeContentViewerInteractionContainer())
+        view.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+
+        // These offscreen windows exercise attachment without taking key-window status.
+        let firstWindow = UIWindow(frame: view.bounds)
+        let secondWindow = UIWindow(frame: view.bounds)
+        defer { view.removeFromSuperview() }
+        firstWindow.addSubview(view)
+        view.layoutIfNeeded()
+
+        func findContainer(in view: UIView) -> UIView? {
+            if view is Accessibility.LargeContentViewerInteractionContainerViewable {
+                return view
+            }
+            return view.subviews.lazy.compactMap { findContainer(in: $0) }.first
+        }
+
+        let container = try XCTUnwrap(findContainer(in: view))
+        let originalInteraction = try XCTUnwrap(
+            container.interactions.first { $0 is UILargeContentViewerInteraction }
+        )
+
+        XCTAssertTrue(container.window === firstWindow)
+        XCTAssertEqual(container.interactions.filter { $0 is UILargeContentViewerInteraction }.count, 1)
+
+        view.removeFromSuperview()
+        XCTAssertNil(container.window)
+        XCTAssertEqual(container.interactions.filter { $0 is UILargeContentViewerInteraction }.count, 1)
+
+        firstWindow.addSubview(view)
+        XCTAssertTrue(container.window === firstWindow)
+        XCTAssertEqual(container.interactions.filter { $0 is UILargeContentViewerInteraction }.count, 1)
+
+        secondWindow.addSubview(view)
+        XCTAssertTrue(container.window === secondWindow)
+
+        let interactions = container.interactions.filter { $0 is UILargeContentViewerInteraction }
+        XCTAssertEqual(interactions.count, 1)
+        XCTAssertTrue(interactions.first === originalInteraction)
+    }
+
     func test_recursiveAccessibleSubviewsIncludesContainedElements() {
 
         let viewA = UIView()
