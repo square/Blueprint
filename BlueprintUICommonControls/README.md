@@ -61,10 +61,5 @@ equivalently configured UIKit control and check touch interaction separately.
 Single-line fitting scales the supplied fonts proportionally; UIKit's label and
 text-view engines can still differ in rounding, underlines, and pressed links.
 
-`accessibilityCombine()` carries attributed labels, values, and hints through
-composition, including link and speech attributes. It reads native attributed
-accessibility values when combining; uncombined text views retain native paragraph
-navigation. Existing string-based accessibility setters convert at entry.
-`AccessibilityComposition.CompositeRepresentation` stores `attributedLabel`,
-`attributedValue`, and `attributedHint`. Its existing `label`, `value`, and `hint`
-String properties read and write that backing storage for source compatibility.
+For attributed accessibility composition and String API compatibility, see
+[BlueprintUIAccessibilityCore](../BlueprintUIAccessibilityCore/README.md#attributed-accessibility-content).

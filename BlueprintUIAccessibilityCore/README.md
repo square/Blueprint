@@ -35,6 +35,21 @@ Combine multiple accessibility elements into a unified experience:
 - Combining interactive and non-interactive elements (e.g., label + switch)
 - Need to preserve individual element functionality while providing combined context
 
+## Attributed Accessibility Content
+
+Composition and deferral preserve native attributed labels, values, and hints,
+including link and speech attributes. `CompositeRepresentation` stores this content
+in `attributedLabel`, `attributedValue`, and `attributedHint`. Its existing `label`,
+`value`, and `hint` String properties read and write the same storage for source
+compatibility. Reading a String property leaves the attributes intact; assigning a
+String replaces that property's attributed content.
+
+Custom controls can implement `AccessibilityComposition.TextProviding` to supply
+composition-specific label, value, and hint content without changing their native
+standalone accessibility. Otherwise, composition reads UIKit's attributed
+accessibility properties, with String properties as a boundary fallback. It does
+not derive accessibility values from raw control text.
+
 ## Accessibility Deferral
 
 ### Basic Form Field Example
