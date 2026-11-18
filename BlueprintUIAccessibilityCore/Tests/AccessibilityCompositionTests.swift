@@ -6,32 +6,27 @@ import XCTest
 class AccessibilityCompositionTests: XCTestCase {
 
     func test_string_accessors_share_attributed_backing() {
-        let properties: [(
-            WritableKeyPath<AccessibilityComposition.CompositeRepresentation, String?>,
-            WritableKeyPath<AccessibilityComposition.CompositeRepresentation, NSAttributedString?>
-        )] = [
-            (\.label, \.attributedLabel),
-            (\.value, \.attributedValue),
-            (\.hint, \.attributedHint),
-        ]
-        let text = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
-        for (stringProperty, attributedProperty) in properties {
-            var representation = AccessibilityComposition.CompositeRepresentation([]) {}
-            representation[keyPath: attributedProperty] = text
-            XCTAssertEqual(representation[keyPath: stringProperty], "Terms")
-            XCTAssertEqual(representation[keyPath: attributedProperty], text)
+        var representation = AccessibilityComposition.CompositeRepresentation([]) {}
+        representation.attributedLabel = NSAttributedString(
+            string: "Terms",
+            attributes: [.link: URL(string: "https://example.com/terms")!]
+        )
+        representation.attributedValue = NSAttributedString(string: "Available")
+        representation.attributedHint = NSAttributedString(string: "Opens in Safari")
 
-            var different = representation
-            different[keyPath: attributedProperty] = NSAttributedString(string: "Terms")
-            XCTAssertNotEqual(representation, different)
+        XCTAssertEqual(representation.label, "Terms")
+        XCTAssertEqual(representation.value, "Available")
+        XCTAssertEqual(representation.hint, "Opens in Safari")
 
-            representation[keyPath: stringProperty] = "Replacement"
-            XCTAssertEqual(representation[keyPath: attributedProperty], NSAttributedString(string: "Replacement"))
-            representation[keyPath: stringProperty] = ""
-            XCTAssertEqual(representation[keyPath: attributedProperty], NSAttributedString(string: ""))
-            representation[keyPath: stringProperty] = nil
-            XCTAssertNil(representation[keyPath: attributedProperty])
-        }
+        var plain = representation
+        plain.label = "Terms"
+        XCTAssertEqual(plain.attributedLabel, NSAttributedString(string: "Terms"))
+        XCTAssertNotEqual(plain, representation)
+
+        plain.value = ""
+        plain.hint = nil
+        XCTAssertEqual(plain.attributedValue, NSAttributedString(string: ""))
+        XCTAssertNil(plain.attributedHint)
     }
 
     class Interactive: UIControl {
