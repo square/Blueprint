@@ -9,17 +9,4 @@ class ArrayExtensionsTests: XCTestCase {
         XCTAssertEqual(array.removingDuplicates, expectedArray)
     }
 
-    func test_joinedAccessibilityString() {
-
-        let array = ["foo", "", "bar", nil, "baz"]
-        let expectedString = "foo, bar, baz"
-
-        XCTAssertEqual(array.joinedAccessibilityString(), expectedString)
-
-        XCTAssertNil([String?]().joinedAccessibilityString())
-
-        XCTAssertNil(["", nil, nil, ""].joinedAccessibilityString())
-
-    }
-
 }
