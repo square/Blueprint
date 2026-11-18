@@ -24,8 +24,8 @@ public struct AttributedTextView: UIViewElement {
 
     /// Defaults to UIKit's native paragraph accessibility; set `true` to expose one element.
     public var isAccessibilityElement: Bool?
-    /// The accessibility property that receives this text in a combined element.
-    /// Use nil for UIKit's default placement.
+    /// The accessibility property that receives the text when Blueprint combines the view with other content.
+    /// Defaults to UIKit's label and value placement.
     public var textAccessibilityRole: TextAccessibilityRole?
 
     public enum TextAccessibilityRole: Equatable {
@@ -79,9 +79,9 @@ public struct AttributedTextView: UIViewElement {
             readingNativeAccessibility = true
             defer { readingNativeAccessibility = false }
             switch role {
-            case .label: return super.accessibilityAttributedLabel ?? super.accessibilityLabel.map(NSAttributedString.init(string:))
-            case .value: return super.accessibilityAttributedValue ?? super.accessibilityValue.map(NSAttributedString.init(string:))
-            case .hint: return super.accessibilityAttributedHint ?? super.accessibilityHint.map(NSAttributedString.init(string:))
+            case .label: return super.accessibilityAttributedLabel ?? super.accessibilityLabel.map { .init(string: $0) }
+            case .value: return super.accessibilityAttributedValue ?? super.accessibilityValue.map { .init(string: $0) }
+            case .hint: return super.accessibilityAttributedHint ?? super.accessibilityHint.map { .init(string: $0) }
             }
         }
 
@@ -121,17 +121,17 @@ public struct AttributedTextView: UIViewElement {
 
         override var accessibilityLabel: String? {
             get { readingNativeAccessibility ? super.accessibilityLabel : accessibilityAttributedLabel?.string }
-            set { labelOverride = newValue.map(NSAttributedString.init(string:)) }
+            set { accessibilityAttributedLabel = newValue.map { .init(string: $0) } }
         }
 
         override var accessibilityValue: String? {
             get { readingNativeAccessibility ? super.accessibilityValue : accessibilityAttributedValue?.string }
-            set { valueOverride = newValue.map(NSAttributedString.init(string:)) }
+            set { accessibilityAttributedValue = newValue.map { .init(string: $0) } }
         }
 
         override var accessibilityHint: String? {
             get { readingNativeAccessibility ? super.accessibilityHint : accessibilityAttributedHint?.string }
-            set { hintOverride = newValue.map(NSAttributedString.init(string:)) }
+            set { accessibilityAttributedHint = newValue.map { .init(string: $0) } }
         }
     }
 

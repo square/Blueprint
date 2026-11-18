@@ -53,11 +53,13 @@ single-line font fitting, tightening, and explicit accessibility properties on
 the element. Paragraph styles supply alignment and line-break behavior. These
 settings apply during both measurement and display and reset on reused views.
 Accessibility traits are added to UIKit's native traits, so heading styles retain
-native link semantics. UI tests compare public accessibility activation against an
-equivalently configured UIKit control and check touch interaction separately.
+native link semantics.
 
 `isAccessibilityElement` defaults to `nil` to preserve native paragraph navigation;
 `true` groups the content into one element and `false` hides its accessibility.
+Set `textAccessibilityRole` to route the view's text to the label, value, or hint of
+a combined element. The view supplies the attributed text through UIKit's matching
+accessibility property. Explicit field overrides take precedence.
 Single-line fitting scales the supplied fonts proportionally; UIKit's label and
 text-view engines can still differ in rounding, underlines, and pressed links.
 
