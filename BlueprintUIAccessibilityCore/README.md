@@ -135,24 +135,30 @@ class CustomCombinableView: UIView, AccessibilityCombinable {
     var customFilter: AccessibilityComposition.Filter?
     var customSorting: AccessibilityComposition.Sorting?
     
-    override var accessibilityLabel: String? {
+    override var accessibilityAttributedLabel: NSAttributedString? {
         get {
             updateAccessibilityIfNeeded()
-            return super.accessibilityLabel
+            return super.accessibilityAttributedLabel
         }
-        set { super.accessibilityLabel = newValue }
+        set { super.accessibilityAttributedLabel = newValue }
     }
     
-    override var accessibilityValue: String? {
+    override var accessibilityAttributedValue: NSAttributedString? {
         get {
             updateAccessibilityIfNeeded()
-            return super.accessibilityValue
+            return super.accessibilityAttributedValue
         }
-        set { super.accessibilityValue = newValue }
+        set { super.accessibilityAttributedValue = newValue }
     }
-    
-    // Implement similar getters for other accessibility properties...
-    
+
+    override var accessibilityAttributedHint: NSAttributedString? {
+        get {
+            updateAccessibilityIfNeeded()
+            return super.accessibilityAttributedHint
+        }
+        set { super.accessibilityAttributedHint = newValue }
+    }
+
     private func updateAccessibilityIfNeeded() {
         guard needsAccessibilityUpdate else { return }
         
@@ -330,9 +336,9 @@ class StatefulCombinableView: UIView, AccessibilityCombinable {
 ### Best Practices for Custom Implementation
 
 #### ✅ Do
-- Always check `needsAccessibilityUpdate` before accessing any accessibility properties
 - Set `needsAccessibilityUpdate = true` when content or state changes
-- Override accessibility property getters to call `updateAccessibilityIfNeeded()`
+- Refresh in the attributed label, value, and hint getters. Composition reads these properties first.
+- Refresh in the corresponding String getters for callers that read plain text directly.
 - Implement all accessibility interaction methods that your view supports
 - Use `UIAccessibility.post(notification:argument:)` for important state changes
 - Test with VoiceOver to ensure the combined accessibility makes sense
