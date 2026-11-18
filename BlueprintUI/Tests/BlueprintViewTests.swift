@@ -903,7 +903,7 @@ class BlueprintViewTests: XCTestCase {
     func test_layout_rendersWithTheNewWindowSizeWhenOnlyTheWindowResizes() {
         let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 700, height: 700))
 
-        let view = BlueprintView(element: WindowWidthTaggedElement())
+        let view = BlueprintView(element: WindowSizeMeasuringElement { _ in .zero })
         view.frame = CGRect(x: 0, y: 0, width: 343, height: 100)
         window.addSubview(view)
         view.layoutIfNeeded()
@@ -967,6 +967,65 @@ class BlueprintViewTests: XCTestCase {
         ])
 
         return (window, view)
+    }
+
+    func test_rotation_rendersOnceInTheRotatedWindow_whenTheViewResizesWithTheWindow() {
+        let fixture = WindowRotationFixture()
+        fixture.view.frame = fixture.window.bounds
+        fixture.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        fixture.window.layoutIfNeeded()
+
+        assertRotationRendersOnceAndMeasuresOnce(fixture) {
+            fixture.rotateWindow()
+            fixture.window.layoutIfNeeded()
+        }
+
+        XCTAssertEqual(fixture.view.bounds.size, CGSize(width: 844, height: 390))
+    }
+
+    func test_rotation_rendersOnceInTheRotatedWindow_whenTheViewKeepsItsSize() {
+        let fixture = WindowRotationFixture()
+        fixture.view.frame = CGRect(x: 0, y: 0, width: 343, height: 100)
+        fixture.window.layoutIfNeeded()
+
+        assertRotationRendersOnceAndMeasuresOnce(fixture) {
+            fixture.rotateWindow()
+            // UIKit doesn't lay out a view whose size stays the same, so its host asks for a layout.
+            fixture.view.setNeedsLayout()
+            fixture.window.layoutIfNeeded()
+        }
+
+        XCTAssertEqual(fixture.view.bounds.size, CGSize(width: 343, height: 100))
+    }
+
+    /// Checks that `rotate` renders the view once, with the rotated window's size, and that the
+    /// view measures once in the rotated window and then reuses that measurement.
+    private func assertRotationRendersOnceAndMeasuresOnce(
+        _ fixture: WindowRotationFixture,
+        rotate: () -> Void,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        let fittingSize = CGSize(width: 343, height: 600)
+
+        XCTAssertEqual(fixture.renderCount, 1, "Renders before rotating", file: file, line: line)
+        XCTAssertEqual(fixture.view.rootNativeElementViews.first?.tag, 390, file: file, line: line)
+        XCTAssertEqual(fixture.view.sizeThatFits(fittingSize), CGSize(width: 195, height: 10), file: file, line: line)
+        XCTAssertEqual(fixture.measureCount, 1, "Measurements before rotating", file: file, line: line)
+
+        rotate()
+
+        XCTAssertEqual(fixture.renderCount, 2, "Renders after rotating", file: file, line: line)
+        XCTAssertEqual(fixture.view.rootNativeElementViews.first?.tag, 844, file: file, line: line)
+
+        // Another layout pass in the same window doesn't render again.
+        fixture.view.setNeedsLayout()
+        fixture.window.layoutIfNeeded()
+        XCTAssertEqual(fixture.renderCount, 2, "Renders after another layout pass", file: file, line: line)
+
+        XCTAssertEqual(fixture.view.sizeThatFits(fittingSize), CGSize(width: 422, height: 10), file: file, line: line)
+        XCTAssertEqual(fixture.view.sizeThatFits(fittingSize), CGSize(width: 422, height: 10), file: file, line: line)
+        XCTAssertEqual(fixture.measureCount, 2, "Measurements after rotating", file: file, line: line)
     }
 
     func test_lifecycleCallbacks_dont_cause_crash() {
@@ -1041,6 +1100,7 @@ fileprivate struct MeasurableElement: Element {
     }
 }
 
+/// Measures from the window size, and renders a view tagged with the window's width.
 fileprivate struct WindowSizeMeasuringElement: Element {
 
     var measure: (CGSize) -> CGSize
@@ -1052,20 +1112,43 @@ fileprivate struct WindowSizeMeasuringElement: Element {
     }
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
-        nil
-    }
-}
-
-fileprivate struct WindowWidthTaggedElement: Element {
-
-    var content: ElementContent {
-        ElementContent(intrinsicSize: .zero)
-    }
-
-    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         UIView.describe { config in
             config[\.tag] = Int(context.environment.windowSize?.width ?? 0)
         }
+    }
+}
+
+/// A view whose element reads the window size, in a 390 × 844 window, counting the view's
+/// renders and measurements.
+fileprivate final class WindowRotationFixture {
+
+    final class Counter {
+        var count = 0
+    }
+
+    let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+    let view: BlueprintView
+
+    var renderCount: Int { metricsDelegate.metrics.count }
+    var measureCount: Int { measurements.count }
+
+    private let metricsDelegate = TestMetricsDelegate()
+    private let measurements: Counter
+
+    init() {
+        let measurements = Counter()
+        self.measurements = measurements
+
+        view = BlueprintView(element: WindowSizeMeasuringElement { windowSize in
+            measurements.count += 1
+            return CGSize(width: windowSize.width / 2, height: 10)
+        })
+        view.metricsDelegate = metricsDelegate
+        window.addSubview(view)
+    }
+
+    func rotateWindow() {
+        window.frame = CGRect(x: 0, y: 0, width: 844, height: 390)
     }
 }
 
