@@ -25,11 +25,21 @@ import UIKit
 ///
 /// }
 /// ```
+///
+/// ## Window size changes
+///
+/// Elements can read the size of the view's window from ``Environment/windowSize``.
+/// `BlueprintView` measures again when it is asked for a size after its window resizes, and
+/// renders again on its next layout pass. UIKit does not lay out a view when only its window
+/// resizes, though. If this view keeps its size and safe area while its window resizes, and an
+/// element reads `windowSize`, call `setNeedsLayout()` on this view (for example, from the view
+/// controller's `viewWillTransition(to:with:)`) so it renders with the new window size.
 public final class BlueprintView: UIView {
 
     private(set) var needsViewHierarchyUpdate: Bool = true
     private var hasUpdatedViewHierarchy: Bool = false
     private var lastViewHierarchyUpdateBounds: CGRect = .zero
+    private var lastViewHierarchyUpdateWindowSize: CGSize?
 
     /// Used to detect reentrant updates
     private var isInsideUpdate: Bool = false
@@ -44,6 +54,9 @@ public final class BlueprintView: UIView {
     private var layoutResult: LayoutResultNode?
 
     private var sizesThatFit: [SizeConstraint: CGSize] = [:]
+
+    /// The window size that the measurements in `sizesThatFit` were made with.
+    private var sizesThatFitWindowSize: CGSize?
 
     /// A base environment used when laying out and rendering the element tree.
     ///
@@ -238,6 +251,14 @@ public final class BlueprintView: UIView {
     public func sizeThatFits(_ constraint: SizeConstraint) -> CGSize {
         guard let element = element else {
             return .zero
+        }
+
+        // Elements can size themselves from `Environment.windowSize`, and the window can resize
+        // without changing this view's bounds or the constraint it is measured in.
+        let windowSize = window?.bounds.size
+        if windowSize != sizesThatFitWindowSize {
+            sizesThatFit.removeAll()
+            sizesThatFitWindowSize = windowSize
         }
 
         if let cachedSize = sizesThatFit[constraint] {
@@ -463,7 +484,10 @@ public final class BlueprintView: UIView {
             """
         )
 
-        guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds else { return }
+        let windowSize = window?.bounds.size
+        let windowSizeChanged = windowSize != lastViewHierarchyUpdateWindowSize
+
+        guard needsViewHierarchyUpdate || bounds != lastViewHierarchyUpdateBounds || windowSizeChanged else { return }
 
         if isInsideUpdate {
             // A reentrant update was triggered from within the in-flight update, e.g. by a
@@ -473,10 +497,17 @@ public final class BlueprintView: UIView {
             return
         }
 
+        if windowSizeChanged {
+            // Auto Layout may still hold an intrinsic size that was measured in the old window size,
+            // even when an update was already pending.
+            invalidateIntrinsicContentSize()
+        }
+
         isInsideUpdate = true
 
         needsViewHierarchyUpdate = false
         lastViewHierarchyUpdateBounds = bounds
+        lastViewHierarchyUpdateWindowSize = windowSize
 
         let startTime = CACurrentMediaTime()
         Logger.logLayoutStart(view: self)

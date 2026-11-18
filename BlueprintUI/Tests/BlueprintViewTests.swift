@@ -876,6 +876,99 @@ class BlueprintViewTests: XCTestCase {
         XCTAssertEqual(measureCount, 3)
     }
 
+    func test_sizeThatFits_remeasuresWhenOnlyTheWindowResizes() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 700, height: 700))
+
+        var measureCount = 0
+        let view = BlueprintView(element: WindowSizeMeasuringElement { windowSize in
+            measureCount += 1
+            return CGSize(width: windowSize.width / 2, height: 10)
+        })
+        view.frame = CGRect(x: 0, y: 0, width: 343, height: 600)
+        window.addSubview(view)
+
+        let fittingSize = CGSize(width: 343, height: 600)
+
+        XCTAssertEqual(view.sizeThatFits(fittingSize), CGSize(width: 350, height: 10))
+        XCTAssertEqual(view.sizeThatFits(fittingSize), CGSize(width: 350, height: 10))
+        XCTAssertEqual(measureCount, 1)
+
+        // The view's bounds and the fitting size stay the same.
+        window.frame.size.width = 500
+
+        XCTAssertEqual(view.sizeThatFits(fittingSize), CGSize(width: 250, height: 10))
+        XCTAssertEqual(measureCount, 2)
+    }
+
+    func test_layout_rendersWithTheNewWindowSizeWhenOnlyTheWindowResizes() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 700, height: 700))
+
+        let view = BlueprintView(element: WindowWidthTaggedElement())
+        view.frame = CGRect(x: 0, y: 0, width: 343, height: 100)
+        window.addSubview(view)
+        view.layoutIfNeeded()
+
+        XCTAssertEqual(view.rootNativeElementViews.first?.tag, 700)
+
+        // The view's bounds stay the same, so UIKit lays it out only when asked to.
+        window.frame.size.width = 500
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+
+        XCTAssertEqual(view.rootNativeElementViews.first?.tag, 500)
+    }
+
+    func test_intrinsicContentSize_updatesWhenOnlyTheWindowResizes() {
+        let (window, view) = makeWindowWithFixedWidthAutoLayoutView()
+        window.layoutIfNeeded()
+
+        XCTAssertEqual(view.bounds.height, 70)
+
+        // The constraints keep the view's width, so Auto Layout keeps its intrinsic size
+        // until the view invalidates it.
+        window.frame.size.width = 500
+        view.setNeedsLayout()
+        window.layoutIfNeeded()
+
+        XCTAssertEqual(view.bounds.height, 50)
+    }
+
+    func test_intrinsicContentSize_updatesWhenTheWindowResizesBeforeAPendingRender() {
+        let (window, view) = makeWindowWithFixedWidthAutoLayoutView()
+        window.layoutIfNeeded()
+
+        // Auto Layout reads the intrinsic size again before the view renders its new element.
+        let element = view.element
+        view.element = element
+        window.updateConstraintsIfNeeded()
+
+        window.frame.size.width = 500
+        view.setNeedsLayout()
+        window.layoutIfNeeded()
+
+        XCTAssertEqual(view.bounds.height, 50)
+    }
+
+    /// A view whose height is `windowSize.width / 10`, in a 700-point-wide window, with
+    /// constraints that fix its width.
+    private func makeWindowWithFixedWidthAutoLayoutView() -> (UIWindow, BlueprintView) {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 700, height: 700))
+
+        let view = BlueprintView(element: WindowSizeMeasuringElement { windowSize in
+            CGSize(width: 100, height: windowSize.width / 10)
+        })
+        view.translatesAutoresizingMaskIntoConstraints = false
+        window.addSubview(view)
+
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: window.topAnchor),
+            view.leadingAnchor.constraint(equalTo: window.leadingAnchor),
+            view.widthAnchor.constraint(equalToConstant: 343),
+        ])
+
+        return (window, view)
+    }
+
     func test_lifecycleCallbacks_dont_cause_crash() {
 
         let expectation = expectation(description: "Re-rendered")
@@ -945,6 +1038,34 @@ fileprivate struct MeasurableElement: Element {
 
     func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         nil
+    }
+}
+
+fileprivate struct WindowSizeMeasuringElement: Element {
+
+    var measure: (CGSize) -> CGSize
+
+    var content: ElementContent {
+        ElementContent(measureFunction: { _, environment in
+            measure(environment.windowSize ?? .zero)
+        })
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        nil
+    }
+}
+
+fileprivate struct WindowWidthTaggedElement: Element {
+
+    var content: ElementContent {
+        ElementContent(intrinsicSize: .zero)
+    }
+
+    func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
+        UIView.describe { config in
+            config[\.tag] = Int(context.environment.windowSize?.width ?? 0)
+        }
     }
 }
 
