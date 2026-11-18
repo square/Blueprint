@@ -44,8 +44,7 @@ and `hint` properties expose the plain strings. Assigning a String replaces the
 corresponding attributed content.
 
 Composition reads UIKit's attributed accessibility properties first and uses
-the String properties as a fallback. A control can implement
-`AccessibilityComposition.TextProviding` to supply its own text for combination.
+the String properties as a fallback.
 
 ## Accessibility Deferral
 
