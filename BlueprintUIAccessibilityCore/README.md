@@ -39,16 +39,12 @@ Combine multiple accessibility elements into a unified experience:
 
 Composition and deferral preserve native attributed labels, values, and hints,
 including link and speech attributes. `CompositeRepresentation` stores this content
-in `attributedLabel`, `attributedValue`, and `attributedHint`. Its existing `label`,
-`value`, and `hint` String properties read and write the same storage for source
-compatibility. Reading a String property leaves the attributes intact; assigning a
-String replaces that property's attributed content.
+in `attributedLabel`, `attributedValue`, and `attributedHint`. The `label`, `value`,
+and `hint` properties expose the plain strings. Assigning a String replaces the
+corresponding attributed content.
 
-Custom controls can implement `AccessibilityComposition.TextProviding` to supply
-composition-specific label, value, and hint content without changing their native
-standalone accessibility. Otherwise, composition reads UIKit's attributed
-accessibility properties, with String properties as a boundary fallback. It does
-not derive accessibility values from raw control text.
+Composition reads UIKit's attributed accessibility properties first and uses
+the String properties as a fallback.
 
 ## Accessibility Deferral
 

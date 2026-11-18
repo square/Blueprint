@@ -456,6 +456,7 @@ extension Accessibility.CustomContent.Importance {
 
 extension AccessibilityComposition.CompositeRepresentation {
     fileprivate func makeContent(importance: Accessibility.CustomContent.Importance) -> AXCustomContent? {
+        // Skip duplicate custom content when the label already names an action.
         if let allActions, allActions.contains(where: { $0.name == label }) {
             return nil
         }

@@ -34,24 +34,6 @@ class AccessibilityCompositionTests: XCTestCase {
         }
     }
 
-    func test_compositionUsesProvidedAttributedTextWithoutNativeFallbacks() {
-        final class TextView: UIView, AccessibilityComposition.TextProviding {
-            var accessibilityCompositionText = AccessibilityComposition.Text(
-                label: NSAttributedString(string: "Terms", attributes: [.accessibilitySpeechLanguage: "en-GB"]),
-                value: nil,
-                hint: nil
-            )
-        }
-        let view = TextView()
-        view.accessibilityLabel = "Native label"
-        view.accessibilityValue = "Native value"
-        let combined = AccessibilityComposition.CompositeRepresentation([view], invalidator: {})
-        XCTAssertEqual(combined.attributedLabel, view.accessibilityCompositionText.label)
-        XCTAssertNil(combined.value)
-        XCTAssertNil(combined.hint)
-        XCTAssertEqual(view.accessibilityValue, "Native value")
-    }
-
     class Interactive: UIControl {
         var action: () -> Bool
         init(_ name: String, action: @escaping () -> Bool = { false }) {
@@ -208,7 +190,6 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertEqual(outer.accessibilityCustomRotors?.count, 1)
         XCTAssertTrue(rotor.itemSearchBlock(.init())?.targetElement === link)
 
-        // A text view exposed as one element already contributes its rotors directly.
         XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.rotors, [nativeRotor])
         textView.accessibilityCustomRotors = nil
         XCTAssertNil(container.combineChildren().rotors)
