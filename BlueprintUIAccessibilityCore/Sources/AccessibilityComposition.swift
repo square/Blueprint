@@ -46,17 +46,35 @@ extension AccessibilityComposition {
 
         public var label: String? {
             get { attributedLabel?.string }
-            set { attributedLabel = newValue.map(NSAttributedString.init(string:)) }
+            set {
+                if let newValue {
+                    attributedLabel = .init(string: newValue)
+                } else {
+                    attributedLabel = nil
+                }
+            }
         }
 
         public var value: String? {
             get { attributedValue?.string }
-            set { attributedValue = newValue.map(NSAttributedString.init(string:)) }
+            set {
+                if let newValue {
+                    attributedValue = .init(string: newValue)
+                } else {
+                    attributedValue = nil
+                }
+            }
         }
 
         public var hint: String? {
             get { attributedHint?.string }
-            set { attributedHint = newValue.map(NSAttributedString.init(string:)) }
+            set {
+                if let newValue {
+                    attributedHint = .init(string: newValue)
+                } else {
+                    attributedHint = nil
+                }
+            }
         }
 
         public var identifier: String?
