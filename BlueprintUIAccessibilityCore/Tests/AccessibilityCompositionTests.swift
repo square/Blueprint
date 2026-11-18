@@ -208,7 +208,6 @@ class AccessibilityCompositionTests: XCTestCase {
         XCTAssertEqual(outer.accessibilityCustomRotors?.count, 1)
         XCTAssertTrue(rotor.itemSearchBlock(.init())?.targetElement === link)
 
-        // A text view exposed as one element already contributes its rotors directly.
         XCTAssertEqual(AccessibilityComposition.CompositeRepresentation([textView]) {}.rotors, [nativeRotor])
         textView.accessibilityCustomRotors = nil
         XCTAssertNil(container.combineChildren().rotors)
