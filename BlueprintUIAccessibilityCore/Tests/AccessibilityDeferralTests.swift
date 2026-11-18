@@ -5,6 +5,27 @@ import XCTest
 
 class AccessibilityDeferralTests: XCTestCase {
 
+    func test_deferred_error_content_preserves_attributed_text() {
+        let element = UIAccessibilityElement(accessibilityContainer: NSObject())
+        let label = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
+        let value = NSAttributedString(
+            string: "Privacy",
+            attributes: [.link: URL(string: "https://example.com/privacy")!]
+        )
+        element.accessibilityAttributedLabel = label
+        element.accessibilityAttributedValue = value
+        var content = AccessibilityDeferral.Content(kind: .error)
+        content.inheritedAccessibility = .init([element]) {}
+        let expected = NSMutableAttributedString(attributedString: label)
+        expected.append(NSAttributedString(string: ", "))
+        expected.append(value)
+        XCTAssertEqual(content.customContent?.attributedValue, expected)
+        XCTAssertEqual(content.customContent?.importance, .high)
+        element.accessibilityCustomActions = [UIAccessibilityCustomAction(name: "Terms") { _ in true }]
+        content.inheritedAccessibility = .init([element]) {}
+        XCTAssertNil(content.customContent)
+    }
+
     // MARK: - CompositeRepresentation.merge chaining
 
     func test_merge_multiple_representations() {

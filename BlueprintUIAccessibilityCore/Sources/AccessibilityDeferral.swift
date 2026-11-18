@@ -65,14 +65,16 @@ public struct AccessibilityDeferral {
         public var customContent: AXCustomContent? {
             switch kind {
             case .inherited(let importance):
-                return inheritedAccessibility?.makeContent(importance: importance)?.axCustomContent
+                return inheritedAccessibility?.makeContent(importance: importance)
             case .error:
-                guard let inheritedAccessibility else { return nil }
-                var content = inheritedAccessibility.makeContent(importance: .high)
-                let value = [content?.label, content?.value].joinedAccessibilityString()
-                content?.value = value
-                content?.label = LocalizedStrings.Accessibility.errorTitle
-                return content?.axCustomContent
+                guard let inherited = inheritedAccessibility?.makeContent(importance: .high) else { return nil }
+                let value = [inherited.attributedLabel, inherited.attributedValue].joinedAccessibilityText()
+                let content = AXCustomContent(
+                    attributedLabel: NSAttributedString(string: LocalizedStrings.Accessibility.errorTitle),
+                    attributedValue: value ?? NSAttributedString(string: "")
+                )
+                content.importance = .high
+                return content
             }
         }
     }
@@ -453,19 +455,17 @@ extension Accessibility.CustomContent.Importance {
 }
 
 extension AccessibilityComposition.CompositeRepresentation {
-    fileprivate func makeContent(importance: Accessibility.CustomContent.Importance) -> Accessibility.CustomContent? {
+    fileprivate func makeContent(importance: Accessibility.CustomContent.Importance) -> AXCustomContent? {
         if let allActions, allActions.contains(where: { $0.name == label }) {
-            // we don't want to duplicate custom actions and content so if we have an action with the same label, prefer the action.
             return nil
         }
-
-        if let label {
-            return .init(label: label, value: value, importance: importance)
-        } else if let value {
-            return .init(label: value, importance: importance)
-        }
-        return nil
-
+        guard let contentLabel = attributedLabel ?? attributedValue else { return nil }
+        let content = AXCustomContent(
+            attributedLabel: contentLabel,
+            attributedValue: attributedLabel == nil ? NSAttributedString(string: "") : attributedValue ?? NSAttributedString(string: "")
+        )
+        content.importance = importance.axImportance
+        return content
     }
 }
 

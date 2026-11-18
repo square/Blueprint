@@ -6,9 +6,9 @@ public struct AccessibilitySetter: Element {
     // The wrapped element
     private var wrappedElement: Element
 
-    private var label: String?
-    private var value: String?
-    private var hint: String?
+    private var label: NSAttributedString?
+    private var value: NSAttributedString?
+    private var hint: NSAttributedString?
     private var identifier: String?
     private var traits: Set<Accessibility.Trait>?
 
@@ -24,9 +24,9 @@ public struct AccessibilitySetter: Element {
         mergeInteractiveSingleChild: Bool = true
     ) {
         wrappedElement = element()
-        self.label = label
-        self.value = value
-        self.hint = hint
+        self.label = label.map(NSAttributedString.init(string:))
+        self.value = value.map(NSAttributedString.init(string:))
+        self.hint = hint.map(NSAttributedString.init(string:))
         self.identifier = identifier
         traits = accessibilityTraits
         self.mergeInteractiveSingleChild = mergeInteractiveSingleChild
@@ -38,9 +38,9 @@ public struct AccessibilitySetter: Element {
 
     private func combined(invalidator: @escaping () -> Void) -> AccessibilityComposition.CompositeRepresentation {
         var new = AccessibilityComposition.CompositeRepresentation([], invalidator: invalidator)
-        new.label = label
-        new.value = value
-        new.hint = hint
+        new.attributedLabel = label
+        new.attributedValue = value
+        new.attributedHint = hint
         new.identifier = identifier
         new.traits = UIAccessibilityTraits(with: traits ?? [])
         return new
