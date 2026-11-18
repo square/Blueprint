@@ -24,8 +24,8 @@ public struct AttributedTextView: UIViewElement {
 
     /// Defaults to UIKit's native paragraph accessibility; set `true` to expose one element.
     public var isAccessibilityElement: Bool?
-    /// Which property receives UIKit's native attributed text when accessibility is combined.
-    /// When nil, keeps UIKit's label/value placement. Standalone paragraph and link navigation stay native.
+    /// The accessibility property that receives this text in a combined element.
+    /// Use nil for UIKit's default placement.
     public var textAccessibilityRole: TextAccessibilityRole?
 
     public enum TextAccessibilityRole: Equatable {
@@ -48,12 +48,14 @@ public struct AttributedTextView: UIViewElement {
     public func makeUIView() -> View { View() }
 
     public func updateUIView(_ view: View, with context: UIViewElementContext) {
+        view.textView.accessibilityIsCombined = context.environment.accessibilityIsCombined
         view.update(self, onLinkTap: context.isMeasuring ? nil : context.environment.urlHandler.onTap)
         if context.isMeasuring { view.textView.accessibilityCustomActions = nil }
     }
 
-    final class TextView: UITextView, AccessibilityComposition.TextProviding {
+    final class TextView: UITextView {
         var textAccessibilityRole: TextAccessibilityRole?
+        var accessibilityIsCombined = false
         var accessibilityElementOverride: Bool?
         var additionalAccessibilityTraits: UIAccessibilityTraits = []
 
@@ -87,28 +89,14 @@ public struct AttributedTextView: UIViewElement {
             nativeText(for: .value) ?? nativeText(for: .label)
         }
 
-        var accessibilityCompositionText: AccessibilityComposition.Text {
-            var text = AccessibilityComposition.Text(
-                label: nativeText(for: .label),
-                value: nativeText(for: .value),
-                hint: nativeText(for: .hint)
-            )
-            if let textAccessibilityRole {
-                let content = text.value ?? text.label
-                text.label = textAccessibilityRole == .label ? content : nil
-                text.value = textAccessibilityRole == .value ? content : nil
-                if textAccessibilityRole == .hint { text.hint = content }
-            }
-            text.label = labelOverride ?? text.label
-            text.value = valueOverride ?? text.value
-            text.hint = hintOverride ?? text.hint
-            return text
-        }
-
         override var accessibilityAttributedLabel: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedLabel }
-                return labelOverride ?? (valueOverride != nil && textAccessibilityRole == .label ? nativeContent : nativeText(for: .label))
+                if let labelOverride { return labelOverride }
+                guard accessibilityIsCombined, let textAccessibilityRole else {
+                    return valueOverride != nil && textAccessibilityRole == .label ? nativeContent : nativeText(for: .label)
+                }
+                return textAccessibilityRole == .label ? nativeContent : nil
             }
             set { labelOverride = newValue }
         }
@@ -116,7 +104,9 @@ public struct AttributedTextView: UIViewElement {
         override var accessibilityAttributedValue: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedValue }
-                return valueOverride ?? nativeText(for: .value)
+                if let valueOverride { return valueOverride }
+                guard accessibilityIsCombined, let textAccessibilityRole else { return nativeText(for: .value) }
+                return textAccessibilityRole == .value ? nativeContent : nil
             }
             set { valueOverride = newValue }
         }
@@ -124,7 +114,7 @@ public struct AttributedTextView: UIViewElement {
         override var accessibilityAttributedHint: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedHint }
-                return hintOverride ?? nativeText(for: .hint)
+                return hintOverride ?? (accessibilityIsCombined && textAccessibilityRole == .hint ? nativeContent : nativeText(for: .hint))
             }
             set { hintOverride = newValue }
         }

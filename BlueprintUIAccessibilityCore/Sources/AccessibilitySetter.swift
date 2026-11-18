@@ -1,6 +1,17 @@
 import BlueprintUI
 import UIKit
 
+extension Environment {
+    private enum AccessibilityIsCombinedKey: EnvironmentKey {
+        static let defaultValue = false
+    }
+
+    package var accessibilityIsCombined: Bool {
+        get { self[AccessibilityIsCombinedKey.self] }
+        set { self[AccessibilityIsCombinedKey.self] = newValue }
+    }
+}
+
 public struct AccessibilitySetter: Element {
 
     // The wrapped element
@@ -33,7 +44,7 @@ public struct AccessibilitySetter: Element {
     }
 
     public var content: ElementContent {
-        ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement.adaptedEnvironment(keyPath: \.accessibilityIsCombined, value: true))
     }
 
     private func combined(invalidator: @escaping () -> Void) -> AccessibilityComposition.CompositeRepresentation {
@@ -94,7 +105,7 @@ public struct AccessibilityTraitsAdjust: Element {
     }
 
     public var content: ElementContent {
-        ElementContent(child: wrappedElement)
+        ElementContent(child: wrappedElement.adaptedEnvironment(keyPath: \.accessibilityIsCombined, value: true))
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
