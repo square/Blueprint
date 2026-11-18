@@ -35,9 +35,9 @@ public struct AccessibilitySetter: Element {
         mergeInteractiveSingleChild: Bool = true
     ) {
         wrappedElement = element()
-        self.label = label.map(NSAttributedString.init(string:))
-        self.value = value.map(NSAttributedString.init(string:))
-        self.hint = hint.map(NSAttributedString.init(string:))
+        self.label = label.map { .init(string: $0) }
+        self.value = value.map { .init(string: $0) }
+        self.hint = hint.map { .init(string: $0) }
         self.identifier = identifier
         traits = accessibilityTraits
         self.mergeInteractiveSingleChild = mergeInteractiveSingleChild

@@ -153,7 +153,11 @@ extension AccessibilityComposition {
             new.attributedLabel = [attributedLabel, other.attributedLabel].joinedAccessibilityText()
             new.attributedValue = [attributedValue, other.attributedValue].joinedAccessibilityText()
             new.attributedHint = [attributedHint, other.attributedHint].joinedAccessibilityText()
-            new.identifier = [identifier, other.identifier].joinedAccessibilityString()
+            let identifier = [identifier, other.identifier]
+                .compactMap { $0 }
+                .filter { !$0.isEmpty }
+                .joined(separator: ", ")
+            new.identifier = identifier.isEmpty ? nil : identifier
 
             new.traits = traits.union(other.traits)
 
@@ -244,7 +248,7 @@ extension AccessibilityComposition {
 
             func boolInteraction(_ action: UIAccessibilityCustomAction?) -> (() -> Bool)? {
                 guard let action else { return nil }
-                return { action.activate() }
+                return { return action.activate() }
             }
             func voidInteraction(_ action: UIAccessibilityCustomAction?) -> (() -> Void)? {
                 guard let action else { return nil }
@@ -629,7 +633,6 @@ extension AccessibilityCombinable {
     /// - Parameter mergeInteractiveSingleChild: Use the first interactive child's traits and
     ///   activation when it is the only interactive child or all children are interactive.
     ///   Set this to `false` when the receiving element supplies its own activation.
-    ///
     public func applyAccessibility(
         _ accessibility: AccessibilityComposition.CompositeRepresentation?,
         mergeInteractiveSingleChild: Bool = true
@@ -789,7 +792,8 @@ extension NSObject {
 extension NSObject {
     @objc fileprivate func accessibilityAction(didFire: @escaping (String, Bool) -> Void) -> UIAccessibilityCustomAction {
         let name: String = {
-            if let value = accessibilityTraits.interpret(value: accessibilityAttributedValue ?? accessibilityValue.map(NSAttributedString.init(string:))), value.length > 0,
+            let attributedValue = accessibilityAttributedValue ?? accessibilityValue.map { .init(string: $0) }
+            if let value = accessibilityTraits.interpret(value: attributedValue), value.length > 0,
                let label = accessibilityLabel, !label.isEmpty
             {
                 return "\(label): \(value.string)"
