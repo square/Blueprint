@@ -63,16 +63,29 @@ public struct AccessibilityDeferral {
         }
 
         public var customContent: AXCustomContent? {
+            guard let inheritedAccessibility else { return nil }
+            let label = inheritedAccessibility.attributedLabel
+            let value = inheritedAccessibility.attributedValue
+            guard let inheritedLabel = label ?? value else { return nil }
+            // Skip duplicate custom content when the label already names an action.
+            guard inheritedAccessibility.allActions?.contains(where: { $0.name == label?.string }) != true else { return nil }
+
             switch kind {
             case .inherited(let importance):
-                return inheritedAccessibility?.makeContent(importance: importance)?.axCustomContent
+                let inheritedValue = label == nil ? nil : value
+                let content = AXCustomContent(
+                    attributedLabel: inheritedLabel,
+                    attributedValue: inheritedValue ?? .init(string: "")
+                )
+                content.importance = importance.axImportance
+                return content
             case .error:
-                guard let inheritedAccessibility else { return nil }
-                var content = inheritedAccessibility.makeContent(importance: .high)
-                let value = [content?.label, content?.value].joinedAccessibilityString()
-                content?.value = value
-                content?.label = LocalizedStrings.Accessibility.errorTitle
-                return content?.axCustomContent
+                let content = AXCustomContent(
+                    attributedLabel: .init(string: LocalizedStrings.Accessibility.errorTitle),
+                    attributedValue: [label, value].joinedAccessibilityText() ?? .init(string: "")
+                )
+                content.importance = .high
+                return content
             }
         }
     }
@@ -449,23 +462,6 @@ extension Accessibility.CustomContent.Importance {
         case .default: .default
         case .high: .high
         }
-    }
-}
-
-extension AccessibilityComposition.CompositeRepresentation {
-    fileprivate func makeContent(importance: Accessibility.CustomContent.Importance) -> Accessibility.CustomContent? {
-        if let allActions, allActions.contains(where: { $0.name == label }) {
-            // we don't want to duplicate custom actions and content so if we have an action with the same label, prefer the action.
-            return nil
-        }
-
-        if let label {
-            return .init(label: label, value: value, importance: importance)
-        } else if let value {
-            return .init(label: value, importance: importance)
-        }
-        return nil
-
     }
 }
 

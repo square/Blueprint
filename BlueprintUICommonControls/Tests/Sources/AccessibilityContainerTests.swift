@@ -5,6 +5,30 @@ import XCTest
 
 class AccessibilityContainerTests: XCTestCase {
 
+    func test_accessibilityWrappersPreserveAttributedOverrides() {
+        let text = NSAttributedString(string: "Retour", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
+        let element = Label(text: "Back").accessibilityElement(label: nil, value: nil, traits: [.button]) {
+            $0.attributedLabel = text
+            $0.attributedValue = text
+            $0.attributedHint = text
+        }
+        element.accessBackingView(in: view) {
+            XCTAssertEqual($0.accessibilityAttributedLabel, text)
+            XCTAssertEqual($0.accessibilityAttributedValue, text)
+            XCTAssertEqual($0.accessibilityAttributedHint, text)
+        }
+
+        let container = element.accessibilityContainer(containerType: .list) {
+            $0.attributedLabel = text
+            $0.attributedValue = text
+        }
+        container.accessBackingView(in: view) {
+            XCTAssertEqual($0.accessibilityAttributedLabel, text)
+            XCTAssertEqual($0.accessibilityAttributedValue, text)
+        }
+    }
+
     func test_largeContentViewerInteractionIsReusedWhenMovingBetweenWindows() throws {
         let view = BlueprintView(element: Empty().accessibilityLargeContentViewerInteractionContainer())
         view.frame = CGRect(x: 0, y: 0, width: 100, height: 100)

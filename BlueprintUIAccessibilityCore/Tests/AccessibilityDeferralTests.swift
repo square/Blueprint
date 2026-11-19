@@ -5,6 +5,27 @@ import XCTest
 
 class AccessibilityDeferralTests: XCTestCase {
 
+    func test_deferred_error_content_preserves_attributed_text() {
+        let element = UIAccessibilityElement(accessibilityContainer: NSObject())
+        let label = NSAttributedString(string: "Terms", attributes: [.link: URL(string: "https://example.com/terms")!])
+        let value = NSAttributedString(
+            string: "Privacy",
+            attributes: [.link: URL(string: "https://example.com/privacy")!]
+        )
+        element.accessibilityAttributedLabel = label
+        element.accessibilityAttributedValue = value
+        var content = AccessibilityDeferral.Content(kind: .error)
+        content.inheritedAccessibility = .init([element]) {}
+        let expected = NSMutableAttributedString(attributedString: label)
+        expected.append(NSAttributedString(string: ", "))
+        expected.append(value)
+        XCTAssertEqual(content.customContent?.attributedValue, expected)
+        XCTAssertEqual(content.customContent?.importance, .high)
+        element.accessibilityCustomActions = [UIAccessibilityCustomAction(name: "Terms") { _ in true }]
+        content.inheritedAccessibility = .init([element]) {}
+        XCTAssertNil(content.customContent)
+    }
+
     // MARK: - CompositeRepresentation.merge chaining
 
     func test_merge_multiple_representations() {
@@ -23,16 +44,20 @@ class AccessibilityDeferralTests: XCTestCase {
         XCTAssertEqual(merged.label, "Label 1, Label 2, Label 3")
         XCTAssertEqual(merged.value, "Value 1, Value 2, Value 3")
         XCTAssertEqual(merged.hint, "Hint 1, Hint 2, Hint 3")
+        XCTAssertNil(merged.identifier)
     }
 
     func test_merge_two_representations() {
-        let rep1 = makeRepresentation(label: "First", value: "A")
-        let rep2 = makeRepresentation(label: "Second", value: "B")
+        var rep1 = makeRepresentation(label: "First", value: "A")
+        var rep2 = makeRepresentation(label: "Second", value: "B")
+        rep1.identifier = "first-id"
+        rep2.identifier = "second-id"
 
         let merged = rep1.merge(with: rep2)
 
         XCTAssertEqual(merged.label, "First, Second")
         XCTAssertEqual(merged.value, "A, B")
+        XCTAssertEqual(merged.identifier, "first-id, second-id")
     }
 
     func test_merge_preserves_traits() {
