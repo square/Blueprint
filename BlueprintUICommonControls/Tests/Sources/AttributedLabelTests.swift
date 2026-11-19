@@ -176,6 +176,37 @@ class AttributedLabelTests: XCTestCase {
         XCTAssertEqual(representation.value, "X")
     }
 
+    func test_attributedAccessibilitySurvivesLabelAndModifierComposition() {
+        let name = NSAttributedString(string: "Conditions", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
+        let value = NSAttributedString(string: "Available", attributes: [.accessibilitySpeechLanguage: "en-US"])
+        let hint = NSAttributedString(string: "Ouvrir", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
+
+        let label = Label(text: "Visible text") {
+            $0.accessibilityAttributedLabel = name
+            $0.accessibilityAttributedValue = value
+            $0.accessibilityAttributedHint = hint
+        }
+        let view = BlueprintView(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+
+        let combined = label.accessibilityCombine()
+        combined.accessBackingView(in: view) {
+            XCTAssertEqual($0.accessibilityAttributedLabel, name)
+            XCTAssertEqual($0.accessibilityAttributedValue, value)
+            XCTAssertEqual($0.accessibilityAttributedHint, hint)
+        }
+
+        let customized = label.accessibility(
+            attributedLabel: nil,
+            attributedValue: hint,
+            attributedHint: NSAttributedString(string: "")
+        )
+        customized.accessBackingView(in: view) {
+            XCTAssertEqual($0.accessibilityAttributedLabel, name)
+            XCTAssertEqual($0.accessibilityAttributedValue, hint)
+            XCTAssertEqual($0.accessibilityAttributedHint, NSAttributedString(string: ""))
+        }
+    }
+
     func test_displaysText() {
         let string = NSAttributedString()
             .appending(string: "H", font: .boldSystemFont(ofSize: 24.0), color: .red)

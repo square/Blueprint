@@ -6,9 +6,9 @@ public struct AccessibilitySetter: Element {
     // The wrapped element
     private var wrappedElement: Element
 
-    private var label: String?
-    private var value: String?
-    private var hint: String?
+    private var label: NSAttributedString?
+    private var value: NSAttributedString?
+    private var hint: NSAttributedString?
     private var identifier: String?
     private var traits: Set<Accessibility.Trait>?
 
@@ -23,10 +23,30 @@ public struct AccessibilitySetter: Element {
         accessibilityTraits: Set<Accessibility.Trait>? = nil,
         mergeInteractiveSingleChild: Bool = true
     ) {
+        self.init(
+            wrapping: element,
+            attributedLabel: label.map { .init(string: $0) },
+            attributedValue: value.map { .init(string: $0) },
+            attributedHint: hint.map { .init(string: $0) },
+            identifier: identifier,
+            accessibilityTraits: accessibilityTraits,
+            mergeInteractiveSingleChild: mergeInteractiveSingleChild
+        )
+    }
+
+    public init(
+        wrapping element: @escaping () -> Element,
+        attributedLabel: NSAttributedString?,
+        attributedValue: NSAttributedString? = nil,
+        attributedHint: NSAttributedString? = nil,
+        identifier: String? = nil,
+        accessibilityTraits: Set<Accessibility.Trait>? = nil,
+        mergeInteractiveSingleChild: Bool = true
+    ) {
         wrappedElement = element()
-        self.label = label
-        self.value = value
-        self.hint = hint
+        label = attributedLabel
+        value = attributedValue
+        hint = attributedHint
         self.identifier = identifier
         traits = accessibilityTraits
         self.mergeInteractiveSingleChild = mergeInteractiveSingleChild
@@ -38,9 +58,9 @@ public struct AccessibilitySetter: Element {
 
     private func combined(invalidator: @escaping () -> Void) -> AccessibilityComposition.CompositeRepresentation {
         var new = AccessibilityComposition.CompositeRepresentation([], invalidator: invalidator)
-        new.label = label
-        new.value = value
-        new.hint = hint
+        new.attributedLabel = label
+        new.attributedValue = value
+        new.attributedHint = hint
         new.identifier = identifier
         new.traits = UIAccessibilityTraits(with: traits ?? [])
         return new
@@ -150,6 +170,27 @@ extension Element {
             label: label,
             value: value,
             hint: hint,
+            identifier: identifier,
+            accessibilityTraits: traits,
+            mergeInteractiveSingleChild: mergeInteractiveSingleChild
+        )
+    }
+
+    /// Overrides the combined accessibility label, value, and hint with attributed text.
+    /// Nil values inherit the corresponding properties from the contained elements.
+    public func accessibility(
+        attributedLabel: NSAttributedString?,
+        attributedValue: NSAttributedString? = nil,
+        attributedHint: NSAttributedString? = nil,
+        traits: Set<Accessibility.Trait>? = nil,
+        identifier: String? = nil,
+        mergeInteractiveSingleChild: Bool
+    ) -> Element {
+        AccessibilitySetter(
+            wrapping: { self },
+            attributedLabel: attributedLabel,
+            attributedValue: attributedValue,
+            attributedHint: attributedHint,
             identifier: identifier,
             accessibilityTraits: traits,
             mergeInteractiveSingleChild: mergeInteractiveSingleChild

@@ -25,10 +25,32 @@ public struct AccessibilityContainer: Element {
     public var identifier: String?
 
     /// An optional `accessibilityLabel` to give the container. Defaults to `nil`.
-    public var label: String?
+    public var label: String? {
+        get { attributedLabel?.string }
+        set {
+            if let newValue {
+                attributedLabel = .init(string: newValue)
+            } else {
+                attributedLabel = nil
+            }
+        }
+    }
+
+    public var attributedLabel: NSAttributedString?
 
     /// An optional `accessibilityValue` to give the container. Defaults to `nil`.
-    public var value: String?
+    public var value: String? {
+        get { attributedValue?.string }
+        set {
+            if let newValue {
+                attributedValue = .init(string: newValue)
+            } else {
+                attributedValue = nil
+            }
+        }
+    }
+
+    public var attributedValue: NSAttributedString?
 
     public var wrapped: Element
 
@@ -42,8 +64,8 @@ public struct AccessibilityContainer: Element {
         wrapping element: Element
     ) {
         self.containerType = containerType
-        self.label = label
-        self.value = value
+        attributedLabel = label.map { .init(string: $0) }
+        attributedValue = value.map { .init(string: $0) }
         self.identifier = identifier
         wrapped = element
     }
@@ -58,8 +80,8 @@ public struct AccessibilityContainer: Element {
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityContainerView.describe { config in
-            config[\.accessibilityLabel] = label
-            config[\.accessibilityValue] = value
+            config[\.accessibilityAttributedLabel] = attributedLabel
+            config[\.accessibilityAttributedValue] = attributedValue
             config[\.accessibilityIdentifier] = identifier
             config[\.accessibilityContainerType] = containerType.UIKitContainerType
             config[\.layoutDirection] = context.environment.layoutDirection
@@ -93,15 +115,18 @@ extension Element {
         containerType: AccessibilityContainer.ContainerType = .none,
         label: String? = nil,
         value: String? = nil,
-        identifier: String? = nil
+        identifier: String? = nil,
+        configure: (inout AccessibilityContainer) -> Void = { _ in }
     ) -> Element {
-        AccessibilityContainer(
+        var container = AccessibilityContainer(
             containerType: containerType,
             label: label,
             value: value,
             identifier: identifier,
             wrapping: self
         )
+        configure(&container)
+        return container
     }
 }
 
