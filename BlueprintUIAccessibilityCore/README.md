@@ -47,6 +47,18 @@ content.
 properties expose the plain strings. Assigning a String replaces the
 corresponding attributed content.
 
+To override an element’s combined accessibility, pass attributed text to
+`.accessibility(attributedLabel:attributedValue:attributedHint:)`. A `nil` field
+inherits the combined text. An empty attributed string clears that field.
+
+```swift
+let name = NSAttributedString(
+    string: "Conditions",
+    attributes: [.accessibilitySpeechLanguage: "fr-FR"]
+)
+Label(text: "Conditions").accessibility(attributedLabel: name)
+```
+
 ## Accessibility Deferral
 
 ### Basic Form Field Example

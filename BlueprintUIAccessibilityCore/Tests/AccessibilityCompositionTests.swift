@@ -213,7 +213,6 @@ class AccessibilityCompositionTests: XCTestCase {
             textView.isSecureTextEntry = secure
             textView.text = "Private content"
             textView.accessibilityAttributedValue = nil
-            textView.accessibilityValue = nil
             let expected = textView.accessibilityAttributedValue
                 ?? textView.accessibilityValue.map(NSAttributedString.init(string:))
 

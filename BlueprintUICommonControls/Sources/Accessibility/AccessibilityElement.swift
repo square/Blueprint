@@ -7,9 +7,42 @@ public struct AccessibilityElement: Element {
     public typealias CustomAction = Accessibility.CustomAction
     public typealias CustomContent = Accessibility.CustomContent
 
-    public var label: String?
-    public var value: String?
-    public var hint: String?
+    public var label: String? {
+        get { attributedLabel?.string }
+        set {
+            if let newValue {
+                attributedLabel = .init(string: newValue)
+            } else {
+                attributedLabel = nil
+            }
+        }
+    }
+
+    public var attributedLabel: NSAttributedString?
+    public var value: String? {
+        get { attributedValue?.string }
+        set {
+            if let newValue {
+                attributedValue = .init(string: newValue)
+            } else {
+                attributedValue = nil
+            }
+        }
+    }
+
+    public var attributedValue: NSAttributedString?
+    public var hint: String? {
+        get { attributedHint?.string }
+        set {
+            if let newValue {
+                attributedHint = .init(string: newValue)
+            } else {
+                attributedHint = nil
+            }
+        }
+    }
+
+    public var attributedHint: NSAttributedString?
     public var identifier: String?
     public var traits: Set<Trait>
     public var accessibilityFrameSize: CGSize?
@@ -44,10 +77,10 @@ public struct AccessibilityElement: Element {
         wrapping element: Element,
         configure: (inout Self) -> Void = { _ in }
     ) {
-        self.label = label
-        self.value = value
+        attributedLabel = label.map { .init(string: $0) }
+        attributedValue = value.map { .init(string: $0) }
         self.traits = traits
-        self.hint = hint
+        attributedHint = hint.map { .init(string: $0) }
         self.identifier = identifier
         self.accessibilityFrameSize = accessibilityFrameSize
         self.accessibilityFrameCornerStyle = accessibilityFrameCornerStyle
@@ -69,9 +102,9 @@ public struct AccessibilityElement: Element {
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {
         AccessibilityView.describe { config in
             config.apply { element in
-                element.accessibilityLabel = label
-                element.accessibilityValue = value
-                element.accessibilityHint = hint
+                element.accessibilityAttributedLabel = attributedLabel
+                element.accessibilityAttributedValue = attributedValue
+                element.accessibilityAttributedHint = attributedHint
                 element.accessibilityIdentifier = identifier
                 element.accessibilityTraits = accessibilityTraits
                 element.isAccessibilityElement = true
@@ -185,7 +218,8 @@ extension Element {
         accessibilityFrameCornerStyle: CornerStyle = .square,
         customActions: [AccessibilityElement.CustomAction] = [],
         customContent: [AccessibilityElement.CustomContent] = [],
-        userInputLabels: [String] = []
+        userInputLabels: [String] = [],
+        configure: (inout AccessibilityElement) -> Void = { _ in }
     ) -> AccessibilityElement {
         AccessibilityElement(
             label: label,
@@ -198,7 +232,8 @@ extension Element {
             customActions: customActions,
             customContent: customContent,
             userInputLabels: userInputLabels,
-            wrapping: self
+            wrapping: self,
+            configure: configure
         )
     }
 }

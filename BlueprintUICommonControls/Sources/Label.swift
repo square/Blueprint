@@ -64,7 +64,18 @@ public struct Label: ProxyElement {
     /// spoken label entirely. Suppression is useful when the text is surfaced through
     /// `accessibilityValue` / `accessibilityHint` instead, so the content is not announced twice
     /// (e.g. when this label is merged into a combined accessibility element).
-    public var accessibilityLabel: String?
+    public var accessibilityLabel: String? {
+        get { accessibilityAttributedLabel?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedLabel = .init(string: newValue)
+            } else {
+                accessibilityAttributedLabel = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedLabel: NSAttributedString?
 
     /// Assign to `accessibilityLabel` to suppress the spoken label entirely (see that property).
     public static let suppressedAccessibilityLabel = ""
@@ -73,10 +84,32 @@ public struct Label: ProxyElement {
     ///
     /// The value is a localized string that contains the current value of an element.
     /// For example, the value of a slider might be 9.5 or 35% and the value of a text field is the text it contains.
-    public var accessibilityValue: String?
+    public var accessibilityValue: String? {
+        get { accessibilityAttributedValue?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedValue = .init(string: newValue)
+            } else {
+                accessibilityAttributedValue = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedValue: NSAttributedString?
 
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
-    public var accessibilityHint: String?
+    public var accessibilityHint: String? {
+        get { accessibilityAttributedHint?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedHint = .init(string: newValue)
+            } else {
+                accessibilityAttributedHint = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedHint: NSAttributedString?
 
     /// A set of accessibility traits that should be applied to the label, these will be merged with any existing traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
@@ -120,9 +153,9 @@ public struct Label: ProxyElement {
             label.numberOfLines = numberOfLines
             label.shadow = shadow
             label.isAccessibilityElement = isAccessibilityElement
-            label.accessibilityLabel = accessibilityLabel
-            label.accessibilityValue = accessibilityValue
-            label.accessibilityHint = accessibilityHint
+            label.accessibilityAttributedLabel = accessibilityAttributedLabel
+            label.accessibilityAttributedValue = accessibilityAttributedValue
+            label.accessibilityAttributedHint = accessibilityAttributedHint
             label.accessibilityTraits = accessibilityTraits
             label.accessibilityCustomActions = accessibilityCustomActions
             label.adjustsFontSizeToFitWidth = adjustsFontSizeToFitWidth

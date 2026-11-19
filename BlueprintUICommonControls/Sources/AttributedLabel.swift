@@ -85,7 +85,18 @@ public struct AttributedLabel: Element, Hashable {
     /// spoken label entirely. Suppression is useful when the text is surfaced through
     /// `accessibilityValue` / `accessibilityHint` instead, so the content is not announced twice
     /// (e.g. when this label is merged into a combined accessibility element).
-    public var accessibilityLabel: String?
+    public var accessibilityLabel: String? {
+        get { accessibilityAttributedLabel?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedLabel = .init(string: newValue)
+            } else {
+                accessibilityAttributedLabel = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedLabel: NSAttributedString?
 
     /// Assign to `accessibilityLabel` to suppress the spoken label entirely (see that property).
     public static let suppressedAccessibilityLabel = ""
@@ -94,10 +105,32 @@ public struct AttributedLabel: Element, Hashable {
     ///
     /// The value is a localized string that contains the current value of an element.
     /// For example, the value of a slider might be 9.5 or 35% and the value of a text field is the text it contains.
-    public var accessibilityValue: String?
+    public var accessibilityValue: String? {
+        get { accessibilityAttributedValue?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedValue = .init(string: newValue)
+            } else {
+                accessibilityAttributedValue = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedValue: NSAttributedString?
 
     /// A localized string that describes the result of performing an action on the element, when the result is non-obvious.
-    public var accessibilityHint: String?
+    public var accessibilityHint: String? {
+        get { accessibilityAttributedHint?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedHint = .init(string: newValue)
+            } else {
+                accessibilityAttributedHint = nil
+            }
+        }
+    }
+
+    public var accessibilityAttributedHint: NSAttributedString?
 
     /// A string that identifies the element.
     public var accessibilityIdentifier: String?
@@ -200,7 +233,7 @@ extension AttributedLabel {
 
         /// Text-derived label, cached so an `accessibilityLabel` override can be re-applied on every
         /// update without re-running the expensive derivation. Recomputed only when the text changes.
-        private var derivedAccessibilityLabel: String?
+        private var derivedAccessibilityLabel: NSAttributedString?
 
         private var textRectOffset: UIOffset = .zero {
             didSet {
@@ -280,8 +313,8 @@ extension AttributedLabel {
                 updateFontFitting(with: model)
 
                 isAccessibilityElement = model.isAccessibilityElement
-                accessibilityHint = model.accessibilityHint
-                accessibilityValue = model.accessibilityValue
+                accessibilityAttributedHint = model.accessibilityAttributedHint
+                accessibilityAttributedValue = model.accessibilityAttributedValue
                 accessibilityIdentifier = model.accessibilityIdentifier
                 updateAccessibilityTraits(with: model)
                 accessibilityCustomActions = model.accessibilityCustomActions.map { action in
@@ -297,11 +330,11 @@ extension AttributedLabel {
 
                 if previousAttributedText != attributedText {
                     links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
-                    derivedAccessibilityLabel = accessibilityLabel(
+                    derivedAccessibilityLabel = NSAttributedString(string: accessibilityLabel(
                         with: links,
                         in: model.attributedText.string,
                         linkAccessibilityLabel: environment.linkAccessibilityLabel
-                    )
+                    ))
                     linkElements = links
                         .sorted(by: { $0.range.location < $1.range.location })
                         .compactMap { .init(sourceLabel: attributedText, link: $0) }
@@ -309,7 +342,7 @@ extension AttributedLabel {
 
                 // Applied every update (outside the text-change guard) so an override change takes
                 // effect even when the text is unchanged. `nil` falls back to the derived label.
-                accessibilityLabel = model.accessibilityLabel ?? derivedAccessibilityLabel
+                accessibilityAttributedLabel = model.accessibilityAttributedLabel ?? derivedAccessibilityLabel
 
                 if let shadow = model.shadow {
                     layer.shadowRadius = shadow.radius

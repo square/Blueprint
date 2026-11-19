@@ -34,10 +34,30 @@ public struct AccessibilitySetter: Element {
         accessibilityTraits: Set<Accessibility.Trait>? = nil,
         mergeInteractiveSingleChild: Bool = true
     ) {
+        self.init(
+            wrapping: element,
+            attributedLabel: label.map { .init(string: $0) },
+            attributedValue: value.map { .init(string: $0) },
+            attributedHint: hint.map { .init(string: $0) },
+            identifier: identifier,
+            accessibilityTraits: accessibilityTraits,
+            mergeInteractiveSingleChild: mergeInteractiveSingleChild
+        )
+    }
+
+    public init(
+        wrapping element: @escaping () -> Element,
+        attributedLabel: NSAttributedString?,
+        attributedValue: NSAttributedString? = nil,
+        attributedHint: NSAttributedString? = nil,
+        identifier: String? = nil,
+        accessibilityTraits: Set<Accessibility.Trait>? = nil,
+        mergeInteractiveSingleChild: Bool = true
+    ) {
         wrappedElement = element()
-        self.label = label.map { .init(string: $0) }
-        self.value = value.map { .init(string: $0) }
-        self.hint = hint.map { .init(string: $0) }
+        label = attributedLabel
+        value = attributedValue
+        hint = attributedHint
         self.identifier = identifier
         traits = accessibilityTraits
         self.mergeInteractiveSingleChild = mergeInteractiveSingleChild
@@ -161,6 +181,27 @@ extension Element {
             label: label,
             value: value,
             hint: hint,
+            identifier: identifier,
+            accessibilityTraits: traits,
+            mergeInteractiveSingleChild: mergeInteractiveSingleChild
+        )
+    }
+
+    /// Overrides the combined accessibility label, value, and hint with attributed text.
+    /// Nil values inherit the corresponding properties from the contained elements.
+    public func accessibility(
+        attributedLabel: NSAttributedString?,
+        attributedValue: NSAttributedString? = nil,
+        attributedHint: NSAttributedString? = nil,
+        traits: Set<Accessibility.Trait>? = nil,
+        identifier: String? = nil,
+        mergeInteractiveSingleChild: Bool
+    ) -> Element {
+        AccessibilitySetter(
+            wrapping: { self },
+            attributedLabel: attributedLabel,
+            attributedValue: attributedValue,
+            attributedHint: attributedHint,
             identifier: identifier,
             accessibilityTraits: traits,
             mergeInteractiveSingleChild: mergeInteractiveSingleChild
