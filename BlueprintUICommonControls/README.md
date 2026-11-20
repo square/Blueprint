@@ -58,8 +58,10 @@ native link semantics.
 `isAccessibilityElement` defaults to `nil` to preserve native paragraph navigation;
 `true` groups the content into one element and `false` hides its accessibility.
 Set `textAccessibilityRole` to route the view's text to the label, value, or hint of
-a combined element. The view supplies the attributed text through UIKit's matching
-accessibility property. Explicit field overrides take precedence.
+a combined element. Explicit field overrides take precedence. Set
+`accessibilityAttributedLabel`, `accessibilityAttributedValue`, or
+`accessibilityAttributedHint` to preserve speech attributes in an override.
+The String properties use the same backing.
 Single-line fitting scales the supplied fonts proportionally; UIKit's label and
 text-view engines can still differ in rounding, underlines, and pressed links.
 

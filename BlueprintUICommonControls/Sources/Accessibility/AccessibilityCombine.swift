@@ -79,7 +79,7 @@ public struct AccessibilityCombine: Element {
 
 
     public var content: ElementContent {
-        ElementContent(child: wrappedElement.adaptedEnvironment(keyPath: \.accessibilityIsCombined, value: true))
+        ElementContent(child: wrappedElement)
     }
 
     public func backingViewDescription(with context: ViewDescriptionContext) -> ViewDescription? {

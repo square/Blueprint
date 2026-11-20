@@ -1,4 +1,5 @@
 import BlueprintUI
+import BlueprintUIAccessibilityCore
 import BlueprintUICommonControls
 import UIKit
 
@@ -29,7 +30,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 private final class AttributedTextViewTestController: UIViewController, UITextViewDelegate {
     private let blueprint = BlueprintView()
     private let result = UILabel()
+    private var customContainer: AccessibilityComposition.CombinableView?
     private var handler = 1
+    private var selectionEnabled = true
     private var detectsLinks = ProcessInfo.processInfo.arguments.contains("-detect-links")
 
     override func viewDidLoad() {
@@ -41,18 +44,31 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         result.frame = CGRect(x: 20, y: 80, width: 300, height: 70)
         view.addSubview(result)
         blueprint.frame = CGRect(x: 20, y: 160, width: 300, height: 120)
-        view.addSubview(blueprint)
-        for (index, title) in ["Replace handler", "Disable detection", "Activate accessibility"].enumerated() {
+        if ProcessInfo.processInfo.arguments.contains("-custom-container") {
+            let container = AccessibilityComposition.CombinableView(frame: blueprint.frame)
+            var overrides = AccessibilityComposition.CompositeRepresentation([]) {}
+            overrides.identifier = "composed"
+            overrides.attributedValue = NSAttributedString(string: "42 dollars")
+            container.overrideValues = overrides
+            blueprint.frame = container.bounds
+            container.addSubview(blueprint)
+            view.addSubview(container)
+            customContainer = container
+        } else {
+            view.addSubview(blueprint)
+        }
+        for (index, title) in ["Replace handler", "Disable detection", "Activate accessibility", "Toggle selection"].enumerated() {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.frame = CGRect(x: 20, y: CGFloat(300 + index * 60), width: 300, height: 44)
             button.addAction(UIAction { [weak self] _ in
                 guard let self else { return }
-                if index == 2 {
-                    activateAccessibility()
-                    return
+                switch index {
+                case 0: handler += 1
+                case 1: detectsLinks = false
+                case 2: activateAccessibility(); return
+                default: selectionEnabled.toggle()
                 }
-                if index == 0 { handler += 1 } else { detectsLinks = false }
                 update()
             }, for: .touchUpInside)
             view.addSubview(button)
@@ -128,7 +144,7 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         }
         let currentHandler = handler
         let element = AttributedTextView(attributedText: text) {
-            $0.isSelectable = detectionCase
+            $0.isSelectable = detectionCase && selectionEnabled
             if ProcessInfo.processInfo.arguments.contains("-label-role") {
                 $0.textAccessibilityRole = .label
             }
@@ -143,6 +159,10 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         }
         blueprint.element = ProcessInfo.processInfo.arguments.contains("-combine")
             ? element.accessibility(identifier: "composed") : element
+        if let customContainer {
+            blueprint.layoutIfNeeded()
+            customContainer.needsAccessibilityUpdate = true
+        }
     }
 
     func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {

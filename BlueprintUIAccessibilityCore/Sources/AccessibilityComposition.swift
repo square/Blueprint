@@ -10,6 +10,16 @@ public struct AccessibilityComposition {
 
 
 
+/// Supplies composed text for controls that expose a separate native accessibility presentation.
+package protocol AccessibilityCompositionTextProvider {
+    func attributedAccessibilityTextForComposition() -> (
+        label: NSAttributedString?,
+        value: NSAttributedString?,
+        hint: NSAttributedString?
+    )
+}
+
+
 extension AccessibilityComposition {
     public struct CompositeRepresentation {
 
@@ -100,9 +110,14 @@ extension AccessibilityComposition {
                     }
                 }
 
-                labels.append(element.accessibilityAttributedLabel ?? element.accessibilityLabel.map { .init(string: $0) })
-                values.append(element.accessibilityAttributedValue ?? element.accessibilityValue.map { .init(string: $0) })
-                hints.append(element.accessibilityAttributedHint ?? element.accessibilityHint.map { .init(string: $0) })
+                let (label, value, hint) = (element as? AccessibilityCompositionTextProvider)?.attributedAccessibilityTextForComposition() ?? (
+                    element.accessibilityAttributedLabel ?? element.accessibilityLabel.map { .init(string: $0) },
+                    element.accessibilityAttributedValue ?? element.accessibilityValue.map { .init(string: $0) },
+                    element.accessibilityAttributedHint ?? element.accessibilityHint.map { .init(string: $0) }
+                )
+                labels.append(label)
+                values.append(value)
+                hints.append(hint)
 
                 if let identifier = element.extractedAccessibilityIdentifier {
                     identifiers.append(identifier)
@@ -112,9 +127,10 @@ extension AccessibilityComposition {
 
                 allRotors.append(contentsOf: element.accessibilityCustomRotors ?? [])
                 if element.isLikelyInteractive, element.isAccessibilityEnabled {
-                    actions.activationAction = element.accessibilityAction(didFire: { _, _ in invalidator() })
-                    actions.increment = element.accessibilityIncrementDecrementActions?.increment
-                    actions.decrement = element.accessibilityIncrementDecrementActions?.decrement
+                    actions.activationAction = element.accessibilityAction(label: label?.string, value: value) { _, _ in invalidator() }
+                    let adjustableActions = element.accessibilityIncrementDecrementActions(name: label?.string ?? value?.string ?? "")
+                    actions.increment = adjustableActions?.increment
+                    actions.decrement = adjustableActions?.decrement
                 }
 
                 actions.customActions = actions.customActions + element.accessibilityCustomActions
@@ -790,16 +806,19 @@ extension NSObject {
 // MARK: Extensions - Element Activation
 
 extension NSObject {
-    @objc fileprivate func accessibilityAction(didFire: @escaping (String, Bool) -> Void) -> UIAccessibilityCustomAction {
+    fileprivate func accessibilityAction(
+        label: String?,
+        value: NSAttributedString?,
+        didFire: @escaping (String, Bool) -> Void
+    ) -> UIAccessibilityCustomAction {
         let name: String = {
-            let attributedValue = accessibilityAttributedValue ?? accessibilityValue.map { .init(string: $0) }
-            if let value = accessibilityTraits.interpret(value: attributedValue), value.length > 0,
-               let label = accessibilityLabel, !label.isEmpty
+            if let value = accessibilityTraits.interpret(value: value), value.length > 0,
+               let label, !label.isEmpty
             {
                 return "\(label): \(value.string)"
             }
             // Unnamed actions can supply activation but are omitted from the Actions rotor.
-            return accessibilityLabel ?? ""
+            return label ?? ""
         }()
 
         // Voiceover prefers the action handler if it's available, so we'll create the action using that init method.
@@ -820,13 +839,11 @@ extension NSObject {
         NSNumber(booleanLiteral: accessibilityActivate())
     }
 
-    fileprivate var accessibilityIncrementDecrementActions: (
+    fileprivate func accessibilityIncrementDecrementActions(name: String) -> (
         increment: UIAccessibilityCustomAction,
         decrement: UIAccessibilityCustomAction
     )? {
         guard accessibilityTraits.contains(.adjustable) else { return nil }
-        let name = accessibilityLabel ?? accessibilityValue ?? ""
-
         return (
             increment: UIAccessibilityCustomAction(name: "\(LocalizedStrings.Accessibility.increment) \(name)".trimmingCharacters(in: .whitespaces)) { [weak self] _ in
                 self?.accessibilityIncrement()

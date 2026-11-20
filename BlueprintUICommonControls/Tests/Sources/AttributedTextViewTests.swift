@@ -120,6 +120,28 @@ final class AttributedTextViewTests: XCTestCase {
         )
     }
 
+    func test_measuringAtAnotherWidthKeepsDisplayedFontAfterLayout() throws {
+        guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
+        let model = AttributedTextView(attributedText: NSAttributedString(
+            string: "A longer sentence for font fitting",
+            attributes: [.font: UIFont.systemFont(ofSize: 40)]
+        )) {
+            $0.numberOfLines = 1
+            $0.adjustsFontSizeToFitWidth = true
+            $0.minimumScaleFactor = 0.1
+        }
+        let view = model.makeUIView()
+        view.frame = CGRect(x: 0, y: 0, width: 260, height: 50)
+        view.update(model)
+        view.layoutIfNeeded()
+        let font = try XCTUnwrap(view.textView.attributedText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+
+        _ = view.sizeThatFits(CGSize(width: 120, height: CGFloat.infinity))
+        view.layoutIfNeeded()
+
+        XCTAssertEqual(view.textView.attributedText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont, font)
+    }
+
     func test_fontFittingKeepsTextWithinAvailableWidth() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
         let model = AttributedTextView(attributedText: NSAttributedString(
@@ -179,17 +201,20 @@ final class AttributedTextViewTests: XCTestCase {
     func test_accessibilityRolesPreserveOverridesAndClearThemOnReuse() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
         let view = AttributedTextView.View()
+        let label = NSAttributedString(string: "Label override", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
+        let value = NSAttributedString(string: "Value override", attributes: [.accessibilitySpeechLanguage: "en-US"])
+        let hint = NSAttributedString(string: "Hint override", attributes: [.accessibilitySpeechLanguage: "fr-FR"])
         for role in [AttributedTextView.TextAccessibilityRole.label, .value, .hint] {
             var model = AttributedTextView(attributedText: NSAttributedString(string: "Body")) {
                 $0.textAccessibilityRole = role
-                $0.accessibilityLabel = "Label override"
-                $0.accessibilityValue = "Value override"
-                $0.accessibilityHint = "Hint override"
+                $0.accessibilityAttributedLabel = label
+                $0.accessibilityAttributedValue = value
+                $0.accessibilityAttributedHint = hint
             }
             view.update(model)
-            XCTAssertEqual(view.textView.accessibilityAttributedLabel?.string, "Label override")
-            XCTAssertEqual(view.textView.accessibilityAttributedValue?.string, "Value override")
-            XCTAssertEqual(view.textView.accessibilityAttributedHint?.string, "Hint override")
+            XCTAssertEqual(view.textView.accessibilityAttributedLabel, label)
+            XCTAssertEqual(view.textView.accessibilityAttributedValue, value)
+            XCTAssertEqual(view.textView.accessibilityAttributedHint, hint)
             model.accessibilityLabel = nil
             model.accessibilityValue = nil
             model.accessibilityHint = nil

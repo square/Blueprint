@@ -34,9 +34,43 @@ public struct AttributedTextView: UIViewElement {
 
     /// Additional traits, merged with UIKit's native text and link traits.
     public var accessibilityTraits: Set<AccessibilityElement.Trait>?
-    public var accessibilityLabel: String?
-    public var accessibilityValue: String?
-    public var accessibilityHint: String?
+    public var accessibilityAttributedLabel: NSAttributedString?
+    public var accessibilityAttributedValue: NSAttributedString?
+    public var accessibilityAttributedHint: NSAttributedString?
+
+    public var accessibilityLabel: String? {
+        get { accessibilityAttributedLabel?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedLabel = .init(string: newValue)
+            } else {
+                accessibilityAttributedLabel = nil
+            }
+        }
+    }
+
+    public var accessibilityValue: String? {
+        get { accessibilityAttributedValue?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedValue = .init(string: newValue)
+            } else {
+                accessibilityAttributedValue = nil
+            }
+        }
+    }
+
+    public var accessibilityHint: String? {
+        get { accessibilityAttributedHint?.string }
+        set {
+            if let newValue {
+                accessibilityAttributedHint = .init(string: newValue)
+            } else {
+                accessibilityAttributedHint = nil
+            }
+        }
+    }
+
     public var accessibilityIdentifier: String?
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
@@ -48,14 +82,12 @@ public struct AttributedTextView: UIViewElement {
     public func makeUIView() -> View { View() }
 
     public func updateUIView(_ view: View, with context: UIViewElementContext) {
-        view.textView.accessibilityIsCombined = context.environment.accessibilityIsCombined
         view.update(self, onLinkTap: context.isMeasuring ? nil : context.environment.urlHandler.onTap)
         if context.isMeasuring { view.textView.accessibilityCustomActions = nil }
     }
 
-    final class TextView: UITextView {
+    final class TextView: UITextView, AccessibilityCompositionTextProvider {
         var textAccessibilityRole: TextAccessibilityRole?
-        var accessibilityIsCombined = false
         var accessibilityElementOverride: Bool?
         var additionalAccessibilityTraits: UIAccessibilityTraits = []
 
@@ -93,10 +125,7 @@ public struct AttributedTextView: UIViewElement {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedLabel }
                 if let labelOverride { return labelOverride }
-                guard accessibilityIsCombined, let textAccessibilityRole else {
-                    return valueOverride != nil && textAccessibilityRole == .label ? nativeContent : nativeText(for: .label)
-                }
-                return textAccessibilityRole == .label ? nativeContent : nil
+                return valueOverride != nil && textAccessibilityRole == .label ? nativeContent : nativeText(for: .label)
             }
             set { labelOverride = newValue }
         }
@@ -104,9 +133,7 @@ public struct AttributedTextView: UIViewElement {
         override var accessibilityAttributedValue: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedValue }
-                if let valueOverride { return valueOverride }
-                guard accessibilityIsCombined, let textAccessibilityRole else { return nativeText(for: .value) }
-                return textAccessibilityRole == .value ? nativeContent : nil
+                return valueOverride ?? nativeText(for: .value)
             }
             set { valueOverride = newValue }
         }
@@ -114,9 +141,25 @@ public struct AttributedTextView: UIViewElement {
         override var accessibilityAttributedHint: NSAttributedString? {
             get {
                 if readingNativeAccessibility { return super.accessibilityAttributedHint }
-                return hintOverride ?? (accessibilityIsCombined && textAccessibilityRole == .hint ? nativeContent : nativeText(for: .hint))
+                return hintOverride ?? nativeText(for: .hint)
             }
             set { hintOverride = newValue }
+        }
+
+        func attributedAccessibilityTextForComposition() -> (
+            label: NSAttributedString?,
+            value: NSAttributedString?,
+            hint: NSAttributedString?
+        ) {
+            guard let textAccessibilityRole else {
+                return (accessibilityAttributedLabel, accessibilityAttributedValue, accessibilityAttributedHint)
+            }
+            let content = nativeContent
+            return (
+                labelOverride ?? (textAccessibilityRole == .label ? content : nil),
+                valueOverride ?? (textAccessibilityRole == .value ? content : nil),
+                hintOverride ?? (textAccessibilityRole == .hint ? content : nativeText(for: .hint))
+            )
         }
 
         override var accessibilityLabel: String? {
@@ -166,7 +209,8 @@ public struct AttributedTextView: UIViewElement {
             adjustsFontSizeToFitWidth = model.adjustsFontSizeToFitWidth
             minimumScaleFactor = model.minimumScaleFactor
             textView.isSelectable = model.isSelectable
-            let detectorTypes = model.linkDetectionTypes.reduce(into: UIDataDetectorTypes()) {
+            let detectionTypes = model.isSelectable ? model.linkDetectionTypes : []
+            let detectorTypes = detectionTypes.reduce(into: UIDataDetectorTypes()) {
                 $0.formUnion($1.dataDetectorType)
             }
             let detectionChanged = textView.dataDetectorTypes != detectorTypes
@@ -201,9 +245,9 @@ public struct AttributedTextView: UIViewElement {
             accessibilityElements = model.isAccessibilityElement == false ? [] : [textView]
             textView.additionalAccessibilityTraits = model.accessibilityTraits.map(UIAccessibilityTraits.init(with:)) ?? []
             textView.textAccessibilityRole = model.textAccessibilityRole
-            textView.accessibilityLabel = model.accessibilityLabel
-            textView.accessibilityValue = model.accessibilityValue
-            textView.accessibilityHint = model.accessibilityHint
+            textView.accessibilityAttributedLabel = model.accessibilityAttributedLabel
+            textView.accessibilityAttributedValue = model.accessibilityAttributedValue
+            textView.accessibilityAttributedHint = model.accessibilityAttributedHint
             textView.accessibilityIdentifier = model.accessibilityIdentifier
             textView.accessibilityCustomActions = model.accessibilityCustomActions.map { action in
                 UIAccessibilityCustomAction(name: action.name) { _ in action.onActivation() }
@@ -271,6 +315,7 @@ public struct AttributedTextView: UIViewElement {
         public override func sizeThatFits(_ size: CGSize) -> CGSize {
             guard sourceText.length > 0 else { return .zero }
             applyText(fitting: size.width)
+            if adjustsFontSizeToFitWidth && size.width != bounds.width { setNeedsLayout() }
             return textView.sizeThatFits(size)
         }
 
