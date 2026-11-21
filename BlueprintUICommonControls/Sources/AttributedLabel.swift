@@ -2,6 +2,7 @@ import BlueprintUI
 import Foundation
 import UIKit
 
+/// Displays attributed label content. For interactive links on iOS 17+, use `AttributedTextView`.
 public struct AttributedLabel: Element, Hashable {
 
     /// The attributed text to render in the label.
@@ -138,14 +139,17 @@ public struct AttributedLabel: Element, Hashable {
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
     /// A set of data types to detect and automatically link in the label.
-    public var linkDetectionTypes: Set<LinkDetectionType> = []
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkDetectionTypes to detect links.")
+    public var linkDetectionTypes: Set<TextLinkDetectionType> = []
 
     /// A set of attributes to apply to links in the string.
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkAttributes for native link handling.")
     public var linkAttributes: [NSAttributedString.Key: AnyHashable] = [
         .foregroundColor: UIColor.systemBlue,
     ]
 
     /// A set of attributes to apply to links when they are touched.
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView for native pressed-link behavior.")
     public var activeLinkAttributes: [NSAttributedString.Key: AnyHashable] = [
         .foregroundColor: UIColor.systemBlue.withAlphaComponent(0.3),
     ]
@@ -205,29 +209,8 @@ public struct AttributedLabel: Element, Hashable {
 // MARK: - Models
 
 extension AttributedLabel {
-    /// Types of data that can be detected and automatically turned into links.
-    ///
-    /// Corresponds to `NSTextCheckingResult.CheckingType` types.
-    ///
-    public enum LinkDetectionType: Equatable, Hashable {
-        /// Detect date strings. Tapping a date opens the calendar to that date.
-        case date
-        /// Detect addresses. Tapping the address opens Maps with that address.
-        case address
-        /// Detect URLs. Tapping the link opens the URL.
-        case link
-        /// Detect phone numbers. Tapping the phone number prompts the user to call it.
-        case phoneNumber
-
-        var checkingType: NSTextCheckingResult.CheckingType {
-            switch self {
-            case .date: return .date
-            case .address: return .address
-            case .link: return .link
-            case .phoneNumber: return .phoneNumber
-            }
-        }
-    }
+    @available(iOS, deprecated: 17.0, renamed: "TextLinkDetectionType")
+    public typealias LinkDetectionType = TextLinkDetectionType
 }
 
 // MARK: View implementation
@@ -242,7 +225,7 @@ extension AttributedLabel {
         private var trackingLinks: [Link]?
 
         private var layoutDirection: Environment.LayoutDirection = .leftToRight
-        private var linkDetectionTypes: Set<LinkDetectionType> = []
+        private var linkDetectionTypes: Set<TextLinkDetectionType> = []
         private var linkAttributes: [NSAttributedString.Key: Any] = [:]
         private var activeLinkAttributes: [NSAttributedString.Key: Any] = [:]
         private var links: [Link] = []
@@ -346,7 +329,10 @@ extension AttributedLabel {
                 invalidateLinkBoundingShapeCaches()
 
                 if previousAttributedText != attributedText {
-                    links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
+                    let detected = TextLinkDetectionType.detectLinks(in: model.attributedText, types: linkDetectionTypes)
+                    links = attributedLinks(in: model.attributedText) + detected.map {
+                        Link(url: $0.url, range: $0.range, container: self)
+                    }
                     derivedAccessibilityLabel = NSAttributedString(string: accessibilityLabel(
                         with: links,
                         in: model.attributedText.string,
@@ -536,80 +522,6 @@ extension AttributedLabel {
                     links.append(.init(url: link, range: range, container: self))
                 } else if let link = link as? String, let url = URL(string: link) {
                     links.append(.init(url: url, range: range, container: self))
-                }
-            }
-
-            return links
-        }
-
-        private func detectedDataLinks(in string: NSAttributedString) -> [Link] {
-            guard !linkDetectionTypes.isEmpty else {
-                return []
-            }
-
-            let types = NSTextCheckingResult.CheckingType(linkDetectionTypes)
-
-            guard let detector = try? NSDataDetector(types: types.rawValue) else {
-                return []
-            }
-
-            var links: [Link] = []
-
-            detector.enumerateMatches(
-                in: string.string,
-                options: [],
-                range: string.entireRange
-            ) { result, _, _ in
-                guard let result = result else {
-                    return
-                }
-
-                switch result.resultType {
-                case .phoneNumber:
-                    if let phoneNumber = result.phoneNumber {
-                        let charactersToRemove = CharacterSet.decimalDigits.inverted
-                        let trimmedPhoneNumber = phoneNumber.components(separatedBy: charactersToRemove).joined()
-                        if let url = URL(string: "tel:\(trimmedPhoneNumber)") {
-                            links.append(.init(url: url, range: result.range, container: self))
-                        }
-                    }
-
-                case .link:
-                    if let url = result.url {
-                        links.append(.init(url: url, range: result.range, container: self))
-                    }
-
-                case .address:
-                    if let addressComponents = result.addressComponents {
-                        let components = [
-                            addressComponents[.name],
-                            addressComponents[.organization],
-                            addressComponents[.street],
-                            addressComponents[.city],
-                            addressComponents[.zip],
-                            addressComponents[.country],
-                        ]
-
-                        let address = components
-                            .compactMap { $0 }
-                            .joined(separator: " ")
-
-                        if let urlQuery = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                           let url = URL(string: "https://maps.apple.com/?address=\(urlQuery)")
-                        {
-                            links.append(.init(url: url, range: result.range, container: self))
-                        }
-                    }
-
-                case .date:
-                    if let date = result.date,
-                       let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")
-                    {
-                        links.append(.init(url: url, range: result.range, container: self))
-                    }
-
-                default:
-                    break
                 }
             }
 
@@ -933,7 +845,7 @@ extension AttributedLabel {
 }
 
 extension Element {
-    /// Handle links opened in any `AttributedLabel` within this element using the provided closure.
+    /// Handle links opened in any `AttributedLabel` or `AttributedTextView` within this element.
     ///
     public func onLinkTapped(_ onTap: @escaping (URL) -> Void) -> Element {
         adaptedEnvironment(keyPath: \.urlHandler, value: ClosureURLHandler(onTap: onTap))
@@ -1039,15 +951,7 @@ extension NSAttributedString {
             // These line break modes don't work with NSTextContainer where numberOfLines is not 1, breaking link
             // detection. Those modes also don't really make sense with multiple lines anyway - UILabel will render
             // only the last line with that mode. Normalize them to truncating tail instead.
-            if numberOfLines != 1 && Self.invalidMultiLineModes.contains(paragraphStyle.lineBreakMode) {
-                paragraphStyle.lineBreakMode = .byTruncatingTail
-            }
-
-            // These line break modes don't work when numberOfLines is 1, and they break line height adjustments.
-            // Normalize them to clipping mode instead (which renders the same on one line anyway).
-            if numberOfLines == 1 && Self.invalidSingleLineModes.contains(paragraphStyle.lineBreakMode) {
-                paragraphStyle.lineBreakMode = .byClipping
-            }
+            paragraphStyle.lineBreakMode = paragraphStyle.lineBreakMode.normalized(forNumberOfLines: numberOfLines)
 
             attributedText.paragraphStyle = paragraphStyle
         }
@@ -1056,15 +960,11 @@ extension NSAttributedString {
     }
 }
 
-extension NSTextCheckingResult.CheckingType {
-    init(_ types: Set<AttributedLabel.LinkDetectionType>) {
-        var checkingType = NSTextCheckingResult.CheckingType()
-
-        for type in types {
-            checkingType.formUnion(type.checkingType)
-        }
-
-        self = checkingType
+extension NSLineBreakMode {
+    func normalized(forNumberOfLines numberOfLines: Int) -> Self {
+        if numberOfLines != 1 && NSAttributedString.invalidMultiLineModes.contains(self) { return .byTruncatingTail }
+        if numberOfLines == 1 && NSAttributedString.invalidSingleLineModes.contains(self) { return .byClipping }
+        return self
     }
 }
 
