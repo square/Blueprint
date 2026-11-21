@@ -92,15 +92,17 @@ final class AttributedTextViewInteractionTests: XCTestCase {
         XCTAssertEqual(combined.value as? String, "42 dollars")
     }
 
-    func test_labelRolePreservesSeparateNativeListItems() throws {
+    func test_displayListKeepsSeparateItemsAndPassesTapsToParent() throws {
         try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
         let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
         for role in [[], ["-label-role"]] {
-            app.launchArguments = ["-attributed-text-view", "-native-list"] + role
+            app.launchArguments = ["-attributed-text-view", "-native-list", "-tap-parent"] + role
             app.launch()
             for item in ["First item", "Second item", "Third item"] {
                 XCTAssertTrue(app.staticTexts[item].waitForExistence(timeout: 5))
             }
+            app.staticTexts["First item"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            XCTAssertEqual(app.staticTexts["result"].label, "Parent tapped")
         }
     }
 

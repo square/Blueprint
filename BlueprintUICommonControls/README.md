@@ -5,11 +5,10 @@ Blueprint elements wrapping commonly used UIKit primitives.
 
 ## Attributed text
 
-Use `AttributedLabel` for label content. On iOS 17 and later, `AttributedTextView`
-displays selectable, read-only content through a native TextKit 2 `UITextView`.
-It accepts `NSAttributedString`, including paragraph styles with `NSTextList`
-membership, and keeps UIKit's accessibility behavior. Paragraphs remain separate
-accessibility elements by default, including when selection is disabled.
+Use `AttributedLabel` for ordinary display text. On iOS 17 and later, use
+`AttributedTextView` to display read-only text with TextKit 2. It accepts
+`NSAttributedString`, including paragraph styles with `NSTextList` membership.
+UIKit provides native links and exposes separate accessible paragraphs by default.
 
 Label-specific link APIs are deprecated starting with iOS 17; use `AttributedTextView`
 for links. The shared `.onLinkTapped` and URL-handler environment APIs remain supported.
@@ -30,9 +29,7 @@ let content = NSAttributedString(string: "First item\nSecond item", attributes: 
     .paragraphStyle: paragraph,
 ])
 
-AttributedTextView(attributedText: content) {
-    $0.isSelectable = false
-}
+AttributedTextView(attributedText: content)
     .onLinkTapped { url in /* Handle the URL. */ }
 ```
 
@@ -45,8 +42,9 @@ inside a scrolling container. Callers supply the text's fonts and other
 attributes, including updated fonts when Dynamic Type changes. The public
 `AttributedTextView.View` provides the same UIKit implementation for other hosts.
 
-Selection is enabled by default. Disabling it keeps native link interaction and
-menus available through the text-item delegate API.
+Set `isSelectable` to `true` to enable text selection and copying. Links are
+interactive by default. When selection is off, text without links passes taps to
+its containing view.
 
 Configure `numberOfLines` (zero means unlimited), `textRectOffset`, `shadow`,
 single-line font fitting, tightening, and explicit accessibility properties on

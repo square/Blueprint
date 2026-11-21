@@ -5,7 +5,7 @@ import UIKit
 final class TextLinkViewController: UIViewController {
     private let blueprintView = BlueprintView()
     private var renderer = 0
-    private var selectionEnabled = true
+    private var selectionEnabled = false
     private var detection = 0
     private var expandedContent = false
 

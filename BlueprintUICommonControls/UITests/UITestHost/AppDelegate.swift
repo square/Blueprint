@@ -53,6 +53,12 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
             container.addSubview(blueprint)
             view.addSubview(container)
             customContainer = container
+        } else if ProcessInfo.processInfo.arguments.contains("-tap-parent") {
+            let parent = TapParent(frame: blueprint.frame)
+            parent.onTap = { [weak self] in self?.result.text = "Parent tapped" }
+            blueprint.frame = parent.bounds
+            parent.addSubview(blueprint)
+            view.addSubview(parent)
         } else {
             view.addSubview(blueprint)
         }
@@ -142,7 +148,6 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         }
         let currentHandler = handler
         let element = AttributedTextView(attributedText: text) {
-            $0.isSelectable = false
             if ProcessInfo.processInfo.arguments.contains("-label-role") {
                 $0.textAccessibilityRole = .label
             }
@@ -177,3 +182,12 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
 
 }
 
+
+private final class TapParent: UIView {
+    var onTap: (() -> Void)?
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        onTap?()
+    }
+}

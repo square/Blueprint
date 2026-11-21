@@ -7,7 +7,8 @@ import UIKit
 @available(iOS 17.0, *)
 public struct AttributedTextView: UIViewElement {
     public var attributedText: NSAttributedString
-    public var isSelectable = true
+    /// Enables selection and copying of the displayed text.
+    public var isSelectable = false
     /// Data to detect and display as links. Detection is disabled by default.
     public var linkDetectionTypes: Set<TextLinkDetectionType> = []
     public var numberOfLines = 0
@@ -241,6 +242,16 @@ public struct AttributedTextView: UIViewElement {
                     text.addAttribute(.link, value: url, range: range)
                 }
             }
+            var allowsInteraction = model.isSelectable
+            if !allowsInteraction {
+                text.enumerateAttribute(.link, in: NSRange(location: 0, length: text.length)) { link, _, stop in
+                    if link != nil {
+                        allowsInteraction = true
+                        stop.pointee = true
+                    }
+                }
+            }
+            textView.isUserInteractionEnabled = allowsInteraction
             sourceText = text
             fittingWidth = nil
             applyText(fitting: bounds.width)

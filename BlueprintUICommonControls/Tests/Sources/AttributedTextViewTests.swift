@@ -7,9 +7,7 @@ import XCTest
 final class AttributedTextViewTests: XCTestCase {
     func test_wrapperExposesNativeAccessibilityChild() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
-        var model = AttributedTextView(attributedText: NSAttributedString(string: "First\nSecond")) {
-            $0.isSelectable = false
-        }
+        var model = AttributedTextView(attributedText: NSAttributedString(string: "First\nSecond"))
         let view = model.makeUIView()
         view.update(model)
         let children = try XCTUnwrap(view.accessibilityElements)
@@ -33,7 +31,7 @@ final class AttributedTextViewTests: XCTestCase {
         let explicitURL = URL(string: "https://example.com/override")!
         let detectedURL = URL(string: "https://example.com/detected")!
         text.addAttribute(.link, value: explicitURL, range: explicitRange)
-        var model = AttributedTextView(attributedText: text)
+        var model = AttributedTextView(attributedText: text) { $0.isSelectable = true }
         let view = model.makeUIView()
         view.update(model)
         let selection = NSRange(location: 0, length: 2)
@@ -75,15 +73,14 @@ final class AttributedTextViewTests: XCTestCase {
         XCTAssertEqual(view.sizeThatFits(CGSize(width: 200, height: CGFloat.infinity)), .zero)
     }
 
-    func test_disablingSelectionKeepsExplicitLinksAndDisablesCopying() throws {
+    func test_displayDefaultKeepsExplicitLinksWithoutTextCopying() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
         let url = URL(string: "https://example.com")!
-        let model = AttributedTextView(attributedText: NSAttributedString(string: "Help", attributes: [.link: url])) {
-            $0.isSelectable = false
-        }
+        let model = AttributedTextView(attributedText: NSAttributedString(string: "Help", attributes: [.link: url]))
         let view = model.makeUIView()
         view.update(model)
         XCTAssertFalse(view.textView.isSelectable)
+        XCTAssertTrue(view.textView.isUserInteractionEnabled)
         XCTAssertFalse(view.textView.canPerformAction(
             #selector(UIResponderStandardEditActions.copy(_:)),
             withSender: nil
@@ -258,14 +255,17 @@ final class AttributedTextViewTests: XCTestCase {
 
         XCTAssertNotNil(view.textView.textLayoutManager)
         XCTAssertFalse(view.textView.isEditable)
-        XCTAssertTrue(view.textView.isSelectable)
+        XCTAssertFalse(view.textView.isSelectable)
         XCTAssertFalse(view.textView.isScrollEnabled)
+        XCTAssertFalse(view.textView.isUserInteractionEnabled)
         XCTAssertTrue(view.textView.attributedText.isEqual(to: content))
     }
 
     func test_unchangedContentPreservesSelection() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
-        let model = AttributedTextView(attributedText: NSAttributedString(string: "Select these words"))
+        let model = AttributedTextView(attributedText: NSAttributedString(string: "Select these words")) {
+            $0.isSelectable = true
+        }
         let view = model.makeUIView()
         view.update(model)
         view.textView.selectedRange = NSRange(location: 7, length: 5)
@@ -289,14 +289,16 @@ final class AttributedTextViewTests: XCTestCase {
 
     func test_restylingUnchangedContentPreservesSelection() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
-        let view = AttributedTextView.View()
-        view.update(AttributedTextView(attributedText: NSAttributedString(
+        var model = AttributedTextView(attributedText: NSAttributedString(
             string: "Select these words", attributes: [.font: UIFont.systemFont(ofSize: 17)]
-        )))
+        )) { $0.isSelectable = true }
+        let view = model.makeUIView()
+        view.update(model)
         view.textView.selectedRange = NSRange(location: 7, length: 5)
-        view.update(AttributedTextView(attributedText: NSAttributedString(
+        model.attributedText = NSAttributedString(
             string: "Select these words", attributes: [.font: UIFont.systemFont(ofSize: 30)]
-        )))
+        )
+        view.update(model)
         XCTAssertEqual(view.textView.selectedRange, NSRange(location: 7, length: 5))
     }
 
