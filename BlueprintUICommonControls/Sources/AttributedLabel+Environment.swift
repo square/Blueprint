@@ -1,7 +1,7 @@
 import BlueprintUI
 import UIKit
 
-/// Conform to this protocol to handle links tapped in an `AttributedLabel`.
+/// Conform to this protocol to handle links tapped in an `AttributedLabel` or `AttributedTextView`.
 ///
 /// Use the `URLHandlerEnvironmentKey` or `Environment.urlHandler` property to override
 /// the link handler in the environment.
@@ -35,7 +35,7 @@ public struct URLHandlerEnvironmentKey: EnvironmentKey {
 }
 
 extension Environment {
-    /// The link handler to use to open links tapped in an `AttributedLabel`.
+    /// The handler for links tapped in an `AttributedLabel` or `AttributedTextView`.
     public var urlHandler: URLHandler {
         get { self[URLHandlerEnvironmentKey.self] }
         set { self[URLHandlerEnvironmentKey.self] = newValue }
