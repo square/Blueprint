@@ -98,11 +98,11 @@ final class TextLinkViewController: UIViewController {
         ]
         blueprintView.element = Column(alignment: .fill, minimumSpacing: 16) {
             caption("Compare identical attributed content in both controls. Use the navigation button to isolate a renderer and the toolbar to change selection, detectors, and content.")
-            caption("TextView selection is \(selectionEnabled ? "enabled: try selecting and copying" : "disabled: explicit links remain interactive"). Try long-press link menus, VoiceOver, larger text, and dark appearance.")
+            caption("TextView selection is \(selectionEnabled ? "enabled: try selecting and copying" : "disabled: links remain interactive"). Try long-press link menus, VoiceOver, larger text, and dark appearance.")
             for example in Example.allCases {
                 heading(example.rawValue)
                 if example == .detected {
-                    caption("TextView’s native detection requires selection. Explicit attributed links work with selection off.")
+                    caption("Both controls detect links with selection off.")
                 }
                 if renderer != 2 {
                     caption("AttributedLabel" + ([Example.links, .detected].contains(example) ? " — legacy link support" : ""))

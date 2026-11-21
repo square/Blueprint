@@ -25,29 +25,46 @@ final class AttributedTextViewTests: XCTestCase {
         XCTAssertIdentical(view.accessibilityElements?.first as? UITextView, view.textView)
     }
 
-    func test_linkDetectionUsesSharedTypesAndPreservesSelection() throws {
+    func test_detectedLinksPreserveExplicitLinksAndSelection() throws {
         guard #available(iOS 17.0, *) else { throw XCTSkip("AttributedTextView requires iOS 17") }
-        let url = URL(string: "https://example.com")!
-        var model = AttributedTextView(attributedText: NSAttributedString(string: "Text", attributes: [.link: url]))
+        let text = NSMutableAttributedString(string: "https://example.com/original https://example.com/detected")
+        let explicitRange = (text.string as NSString).range(of: "example.com/original")
+        let detectedRange = (text.string as NSString).range(of: "https://example.com/detected")
+        let explicitURL = URL(string: "https://example.com/override")!
+        let detectedURL = URL(string: "https://example.com/detected")!
+        text.addAttribute(.link, value: explicitURL, range: explicitRange)
+        var model = AttributedTextView(attributedText: text)
         let view = model.makeUIView()
         view.update(model)
-        view.textView.selectedRange = NSRange(location: 0, length: 2)
-        let mappings: [(TextLinkDetectionType, UIDataDetectorTypes, NSTextCheckingResult.CheckingType)] = [
-            (.date, .calendarEvent, .date), (.address, .address, .address),
-            (.link, .link, .link), (.phoneNumber, .phoneNumber, .phoneNumber),
-        ]
-        for (type, detector, checkingType) in mappings {
-            model.linkDetectionTypes = [type]
-            view.update(model)
-            XCTAssertEqual(view.textView.dataDetectorTypes, detector)
-            XCTAssertEqual(NSTextCheckingResult.CheckingType([type]), checkingType)
-            XCTAssertEqual(view.textView.selectedRange, NSRange(location: 0, length: 2))
-        }
+        let selection = NSRange(location: 0, length: 2)
+        view.textView.selectedRange = selection
+
+        model.linkDetectionTypes = [.link]
+        view.update(model)
+        XCTAssertEqual(
+            view.textView.attributedText.attribute(.link, at: explicitRange.location, effectiveRange: nil) as? URL,
+            explicitURL
+        )
+        XCTAssertEqual(
+            view.textView.attributedText.attribute(.link, at: detectedRange.location, effectiveRange: nil) as? URL,
+            detectedURL
+        )
+        XCTAssertEqual(view.textView.selectedRange, selection)
+
+        model.isSelectable = false
+        view.update(model)
+        XCTAssertEqual(
+            view.textView.attributedText.attribute(.link, at: detectedRange.location, effectiveRange: nil) as? URL,
+            detectedURL
+        )
+
         model.linkDetectionTypes = []
         view.update(model)
-        XCTAssertTrue(view.textView.dataDetectorTypes.isEmpty)
-        XCTAssertEqual(view.textView.attributedText.attribute(.link, at: 0, effectiveRange: nil) as? URL, url)
-        XCTAssertEqual(view.textView.selectedRange, NSRange(location: 0, length: 2))
+        XCTAssertNil(view.textView.attributedText.attribute(.link, at: detectedRange.location, effectiveRange: nil))
+        XCTAssertEqual(
+            view.textView.attributedText.attribute(.link, at: explicitRange.location, effectiveRange: nil) as? URL,
+            explicitURL
+        )
     }
 
     func test_emptyContentMeasuresZeroAfterUpdate() throws {

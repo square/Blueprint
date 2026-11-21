@@ -32,7 +32,6 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
     private let result = UILabel()
     private var customContainer: AccessibilityComposition.CombinableView?
     private var handler = 1
-    private var selectionEnabled = true
     private var detectsLinks = ProcessInfo.processInfo.arguments.contains("-detect-links")
 
     override func viewDidLoad() {
@@ -57,18 +56,17 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         } else {
             view.addSubview(blueprint)
         }
-        for (index, title) in ["Replace handler", "Disable detection", "Activate accessibility", "Toggle selection"].enumerated() {
+        for (index, title) in ["Replace handler", "Disable detection", "Activate accessibility"].enumerated() {
             let button = UIButton(type: .system)
             button.setTitle(title, for: .normal)
             button.frame = CGRect(x: 20, y: CGFloat(300 + index * 60), width: 300, height: 44)
             button.addAction(UIAction { [weak self] _ in
                 guard let self else { return }
-                switch index {
-                case 0: handler += 1
-                case 1: detectsLinks = false
-                case 2: activateAccessibility(); return
-                default: selectionEnabled.toggle()
+                if index == 2 {
+                    activateAccessibility()
+                    return
                 }
+                if index == 0 { handler += 1 } else { detectsLinks = false }
                 update()
             }, for: .touchUpInside)
             view.addSubview(button)
@@ -144,7 +142,7 @@ private final class AttributedTextViewTestController: UIViewController, UITextVi
         }
         let currentHandler = handler
         let element = AttributedTextView(attributedText: text) {
-            $0.isSelectable = detectionCase && selectionEnabled
+            $0.isSelectable = false
             if ProcessInfo.processInfo.arguments.contains("-label-role") {
                 $0.textAccessibilityRole = .label
             }

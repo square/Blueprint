@@ -139,7 +139,7 @@ public struct AttributedLabel: Element, Hashable {
     public var accessibilityCustomActions: [AccessibilityElement.CustomAction] = []
 
     /// A set of data types to detect and automatically link in the label.
-    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkDetectionTypes for native link detection.")
+    @available(iOS, deprecated: 17.0, message: "Use AttributedTextView.linkDetectionTypes to detect links.")
     public var linkDetectionTypes: Set<TextLinkDetectionType> = []
 
     /// A set of attributes to apply to links in the string.
@@ -329,7 +329,10 @@ extension AttributedLabel {
                 invalidateLinkBoundingShapeCaches()
 
                 if previousAttributedText != attributedText {
-                    links = attributedLinks(in: model.attributedText) + detectedDataLinks(in: model.attributedText)
+                    let detected = TextLinkDetectionType.detectLinks(in: model.attributedText, types: linkDetectionTypes)
+                    links = attributedLinks(in: model.attributedText) + detected.map {
+                        Link(url: $0.url, range: $0.range, container: self)
+                    }
                     derivedAccessibilityLabel = NSAttributedString(string: accessibilityLabel(
                         with: links,
                         in: model.attributedText.string,
@@ -519,80 +522,6 @@ extension AttributedLabel {
                     links.append(.init(url: link, range: range, container: self))
                 } else if let link = link as? String, let url = URL(string: link) {
                     links.append(.init(url: url, range: range, container: self))
-                }
-            }
-
-            return links
-        }
-
-        private func detectedDataLinks(in string: NSAttributedString) -> [Link] {
-            guard !linkDetectionTypes.isEmpty else {
-                return []
-            }
-
-            let types = NSTextCheckingResult.CheckingType(linkDetectionTypes)
-
-            guard let detector = try? NSDataDetector(types: types.rawValue) else {
-                return []
-            }
-
-            var links: [Link] = []
-
-            detector.enumerateMatches(
-                in: string.string,
-                options: [],
-                range: string.entireRange
-            ) { result, _, _ in
-                guard let result = result else {
-                    return
-                }
-
-                switch result.resultType {
-                case .phoneNumber:
-                    if let phoneNumber = result.phoneNumber {
-                        let charactersToRemove = CharacterSet.decimalDigits.inverted
-                        let trimmedPhoneNumber = phoneNumber.components(separatedBy: charactersToRemove).joined()
-                        if let url = URL(string: "tel:\(trimmedPhoneNumber)") {
-                            links.append(.init(url: url, range: result.range, container: self))
-                        }
-                    }
-
-                case .link:
-                    if let url = result.url {
-                        links.append(.init(url: url, range: result.range, container: self))
-                    }
-
-                case .address:
-                    if let addressComponents = result.addressComponents {
-                        let components = [
-                            addressComponents[.name],
-                            addressComponents[.organization],
-                            addressComponents[.street],
-                            addressComponents[.city],
-                            addressComponents[.zip],
-                            addressComponents[.country],
-                        ]
-
-                        let address = components
-                            .compactMap { $0 }
-                            .joined(separator: " ")
-
-                        if let urlQuery = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-                           let url = URL(string: "https://maps.apple.com/?address=\(urlQuery)")
-                        {
-                            links.append(.init(url: url, range: result.range, container: self))
-                        }
-                    }
-
-                case .date:
-                    if let date = result.date,
-                       let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")
-                    {
-                        links.append(.init(url: url, range: result.range, container: self))
-                    }
-
-                default:
-                    break
                 }
             }
 
@@ -1036,18 +965,6 @@ extension NSLineBreakMode {
         if numberOfLines != 1 && NSAttributedString.invalidMultiLineModes.contains(self) { return .byTruncatingTail }
         if numberOfLines == 1 && NSAttributedString.invalidSingleLineModes.contains(self) { return .byClipping }
         return self
-    }
-}
-
-extension NSTextCheckingResult.CheckingType {
-    init(_ types: Set<TextLinkDetectionType>) {
-        var checkingType = NSTextCheckingResult.CheckingType()
-
-        for type in types {
-            checkingType.formUnion(type.checkingType)
-        }
-
-        self = checkingType
     }
 }
 

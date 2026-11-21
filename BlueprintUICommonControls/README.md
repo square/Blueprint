@@ -14,10 +14,10 @@ accessibility elements by default, including when selection is disabled.
 Label-specific link APIs are deprecated starting with iOS 17; use `AttributedTextView`
 for links. The shared `.onLinkTapped` and URL-handler environment APIs remain supported.
 Both controls use `Set<TextLinkDetectionType>` for `linkDetectionTypes`; supported
-cases are `.link`, `.phoneNumber`, `.address`, and `.date`. TextView uses native
-data detectors, with detection disabled by default. UIKit requires selection to
-detect links; explicit `.link` attributes work with selection disabled. The old nested
-`AttributedLabel.LinkDetectionType` name remains as a deprecated alias.
+cases are `.link`, `.phoneNumber`, `.address`, and `.date`. Both controls use the same
+data detection, which is disabled by default and works with selection off.
+`AttributedTextView` exposes detected links through UIKit as attributed links.
+The old nested `AttributedLabel.LinkDetectionType` name remains as a deprecated alias.
 
 ```swift
 let list = NSTextList(markerFormat: .disc, options: 0)

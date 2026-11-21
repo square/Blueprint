@@ -92,25 +92,6 @@ final class AttributedTextViewInteractionTests: XCTestCase {
         XCTAssertEqual(combined.value as? String, "42 dollars")
     }
 
-    func test_togglingSelectionUpdatesGeneratedLinks() throws {
-        try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
-        let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
-        app.launchArguments = ["-attributed-text-view", "-detect-links"]
-        app.launch()
-
-        let detected = app.links.matching(NSPredicate(format: "label CONTAINS %@", "/detected")).firstMatch
-        let toggle = app.buttons["Toggle selection"]
-        XCTAssertTrue(detected.waitForExistence(timeout: 5))
-
-        toggle.tap()
-        let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: detected)
-        XCTAssertEqual(XCTWaiter.wait(for: [gone], timeout: 5), .completed)
-        XCTAssertTrue(app.links["Terms"].exists)
-
-        toggle.tap()
-        XCTAssertTrue(detected.waitForExistence(timeout: 5))
-    }
-
     func test_labelRolePreservesSeparateNativeListItems() throws {
         try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
         let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
@@ -123,7 +104,7 @@ final class AttributedTextViewInteractionTests: XCTestCase {
         }
     }
 
-    func test_disablingDetectionRemovesGeneratedLinkAndPreservesExplicitLink() throws {
+    func test_detectedLinksActivateWithoutSelectionAndCanBeDisabled() throws {
         try XCTSkipIf(ProcessInfo.processInfo.operatingSystemVersion.majorVersion < 17)
         let app = XCUIApplication(bundleIdentifier: "com.squareup.blueprint.BlueprintUICommonControlsTestHost")
         for (arguments, fragment) in [([], "/detected"), (["-detect-dates"], "2030")] {
@@ -131,6 +112,13 @@ final class AttributedTextViewInteractionTests: XCTestCase {
             app.launch()
             let detected = app.links.matching(NSPredicate(format: "label CONTAINS %@", fragment)).firstMatch
             XCTAssertTrue(detected.waitForExistence(timeout: 5))
+            detected.tap()
+            let result = app.staticTexts["result"].label
+            if arguments.isEmpty {
+                XCTAssertEqual(result, "Handler 1: https://example.com/detected")
+            } else {
+                XCTAssertTrue(result.hasPrefix("Handler 1: calshow:"))
+            }
             app.buttons["Disable detection"].tap()
             let gone = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: detected)
             XCTAssertEqual(XCTWaiter.wait(for: [gone], timeout: 5), .completed)

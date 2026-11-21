@@ -8,7 +8,7 @@ import UIKit
 public struct AttributedTextView: UIViewElement {
     public var attributedText: NSAttributedString
     public var isSelectable = true
-    /// Data to detect as native links. UIKit requires selection for detection; disabled by default.
+    /// Data to detect and display as links. Detection is disabled by default.
     public var linkDetectionTypes: Set<TextLinkDetectionType> = []
     public var numberOfLines = 0
     public var shadow: TextShadow?
@@ -209,12 +209,6 @@ public struct AttributedTextView: UIViewElement {
             adjustsFontSizeToFitWidth = model.adjustsFontSizeToFitWidth
             minimumScaleFactor = model.minimumScaleFactor
             textView.isSelectable = model.isSelectable
-            let detectionTypes = model.isSelectable ? model.linkDetectionTypes : []
-            let detectorTypes = detectionTypes.reduce(into: UIDataDetectorTypes()) {
-                $0.formUnion($1.dataDetectorType)
-            }
-            let detectionChanged = textView.dataDetectorTypes != detectorTypes
-            textView.dataDetectorTypes = detectorTypes
             textView.linkTextAttributes = model.linkAttributes
             textView.textContainer.maximumNumberOfLines = max(0, model.numberOfLines)
             let lastLineMode = model.attributedText.length > 0
@@ -236,9 +230,20 @@ public struct AttributedTextView: UIViewElement {
                     text.addAttribute(.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: range)
                 }
             }
+            for (url, range) in TextLinkDetectionType.detectLinks(
+                in: model.attributedText,
+                types: model.linkDetectionTypes
+            ) {
+                var effectiveRange = NSRange()
+                let link = text.attribute(.link, at: range.location, longestEffectiveRange: &effectiveRange, in: range)
+                // Preserve explicit links anywhere in the detected range.
+                if link == nil && effectiveRange == range {
+                    text.addAttribute(.link, value: url, range: range)
+                }
+            }
             sourceText = text
             fittingWidth = nil
-            applyText(fitting: bounds.width, force: detectionChanged)
+            applyText(fitting: bounds.width)
 
             textView.accessibilityElementOverride = model.isAccessibilityElement
             textView.accessibilityElementsHidden = model.isAccessibilityElement == false
@@ -264,7 +269,7 @@ public struct AttributedTextView: UIViewElement {
             setNeedsLayout()
         }
 
-        private func applyText(fitting width: CGFloat, force: Bool = false) {
+        private func applyText(fitting width: CGFloat) {
             guard fittingWidth != width else { return }
             fittingWidth = width
             var text = sourceText
@@ -298,8 +303,7 @@ public struct AttributedTextView: UIViewElement {
                 }
                 text = fitted ?? scaledText(at: minimum > 0 ? minimum : upper)
             }
-            // Reassigning clears UIKit's cached links when detector types change.
-            guard force || !textView.attributedText.isEqual(to: text) else { return }
+            guard !textView.attributedText.isEqual(to: text) else { return }
             let selection = textView.selectedRange
             let sameCharacters = textView.attributedText.string == text.string
             textView.attributedText = text
